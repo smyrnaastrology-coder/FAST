@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+*.png
+*.svg
+*.pdf
+!kapak1.png
+!Asartepe_Kapak.pdf
+build/
+dist/
+node_modules/
