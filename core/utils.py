@@ -342,7 +342,7 @@ CERCEVE_GRI    = "#D4CFC8"
 varsayilan_sabian_vizyonu = "Evrenin saklı geometri sembolü"
 varsayilan_sabian_yorumu = "Bu derece, ilişkinizde henüz keşfedilmemiş derin bir ruhsal potansiyeli ve kendi içinizde çözmeniz gereken kadersel bir gizi barındırır."
 
-ephe_klasoru = os.path.join(os.path.dirname(__file__), 'ephe')
+ephe_klasoru = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
 swe.set_ephe_path(ephe_klasoru)
 
 # ==============================================================================
@@ -684,7 +684,7 @@ def dereceyi_eve_ata(derece, cusps):
 GEZEGENLER = {
     "Güneş": 0, "Ay": 1, "Merkür": 2, "Venüs": 3, "Mars": 4,
     "Jüpiter": 5, "Satürn": 6, "Uranüs": 7, "Neptün": 8, "Plüton": 9,
-    "Chiron": 10, "Juno": 11, "Ceres": 12, "Lilith": 13,
+    "Chiron": 15, "Juno": swe.AST_OFFSET + 3, "Ceres": swe.AST_OFFSET + 1, "Lilith": 10,
 }
 
 def get_safe_flags(gezegen_id):
