@@ -1,0 +1,3611 @@
+import os, sys, logging, base64, stripe, json, hmac, hashlib, re
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
+
+logging.disable(logging.CRITICAL)
+os.environ.setdefault("STREAMLIT_RUN", "0")
+os.environ.setdefault("STREAMLIT_SUPPRESS_WARNINGS", "1")
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(_PROJECT_ROOT)
+
+import swisseph as swe
+from core import FBST_Engine
+from core.utils import (
+    GEZEGENLER, get_planetary_position, kadersel_yildiz_taramasi,
+    aci_farki_safe, sehir_veritabani_yukle, sehir_bul,
+    ULKE_SEHIR_DB as ULKE_SEHIR_DB,
+)
+
+# GEZEGEN_ACG - ACG hesaplamalari icin gezegen ID'leri
+GEZEGEN_ACG = {
+    "Güneş": 0, "Ay": 1, "Merkür": 2, "Venüs": 3, "Mars": 4,
+    "Jüpiter": 5, "Satürn": 6, "Uranüs": 7, "Neptün": 8, "Plüton": 9,
+}
+
+# GEZEGEN_ANLAMLARI - ACG icin gezegen anlamlari
+GEZEGEN_ANLAMLARI = {
+    "Güneş": {"para": 8, "huzur": 5, "tutku": 6},
+    "Ay": {"para": 4, "huzur": 9, "tutku": 3},
+    "Merkür": {"para": 6, "huzur": 5, "tutku": 4},
+    "Venüs": {"para": 7, "huzur": 9, "tutku": 7},
+    "Mars": {"para": 6, "huzur": 3, "tutku": 9},
+    "Jüpiter": {"para": 9, "huzur": 7, "tutku": 5},
+    "Satürn": {"para": 7, "huzur": 4, "tutku": 3},
+    "Uranüs": {"para": 8, "huzur": 5, "tutku": 7},
+    "Neptün": {"para": 5, "huzur": 8, "tutku": 6},
+    "Plüton": {"para": 9, "huzur": 3, "tutku": 8},
+}
+
+def _strip_html(text):
+    """Remove HTML tags from text."""
+    return re.sub(r'<[^>]+>', '', text).strip()
+
+def _bireysellestir(text):
+    """Replace relationship-focused language with individual life language."""
+    if not text or not isinstance(text, str): return text
+    subs = [
+        ("İlişkinin", "Hayatın"), ("ilişkinin", "hayatın"),
+        ("ilişkinizde", "hayatınızda"), ("ilişkinizden", "hayatınızdan"),
+        ("ilişkinize", "hayatınıza"), ("ilişkiniz", "hayatınız"),
+        ("ilişkide", "hayatta"), ("ilişkiyi", "hayatı"),
+        ("ilişkinizi", "hayatınızı"), ("ilişkiye", "hayata"),
+        ("ilişkideki", "hayattaki"), ("ilişkinin", "hayatın"),
+        ("ilişkinizle", "hayatınızla"),
+        ("Partnerinizin", "Kendinizin"), ("partnerinizin", "kendinizin"),
+        ("Partneriniz", "Kendiniz"), ("partneriniz", "kendiniz"),
+        ("partnerinize", "kendinize"), ("partnerinizden", "kendinizden"),
+        ("partnerinizle", "kendinizle"),
+        ("Partnerine", "Kendine"), ("partnerine", "kendine"),
+        ("Partnerinin", "Kendinin"), ("partnerinin", "kendinin"),
+        ("partneriyle", "kendisiyle"), ("partneri", "kendisi"),
+        ("Partner", "Kendi"), ("partner", "kendi"),
+        ("çift olarak", "birey olarak"), ("Çift olarak", "Birey olarak"),
+        ("çiftin", "kişinin"), ("Çiftin", "Kişinin"),
+        ("aranızda", "içinizde"), ("Aranızda", "İçinizde"),
+        ("birbirinize", "kendinize"), ("birbirinizi", "kendinizi"),
+        ("birbirinizle", "kendinizle"), ("birbirinizin", "kendinizin"),
+        ("Birbirinize", "Kendinize"), ("Birbirinizi", "Kendinizi"),
+        ("birbirinin", "kendinin"), ("Birbirinin", "Kendinin"),
+        ("ikili ilişki", "hayat"), ("İkili ilişki", "Hayat"),
+        ("ikili bir", ""), ("İkili bir", ""), ("ikili", ""), ("İkili", ""),
+        ("ortak", "kişisel"), ("Ortak", "Kişisel"),
+        ("birlikte", ""), ("Birlikte", ""),
+        ("bu ilişkinin", "hayatınızın"), ("Bu ilişkinin", "Hayatınızın"),
+        ("bu ilişki", "hayat"), ("Bu ilişki", "Hayat"),
+        ("ilişkinizin", "hayatınızın"), ("İlişkinizin", "Hayatınızın"),
+    ]
+    for old, new in subs:
+        text = text.replace(old, new)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+# ── Natal Moon Aspect Library: 3 interpretations per aspect ──
+NATAL_AY_ACISI_YORUMLARI = {
+    # ─────────── Ay + Güneş ───────────
+    ("Ay","Güneş","Kavuşum"): [
+        "Duygularınızla benliğiniz bugün tam bir uyum içinde. İç sesinizle mantığınız aynı şeyi söylüyor. Kendinize olan güveniniz artıyor ve bu enerji çevrenize de yansıyor.",
+        "Kalbinizle aklınız arasında nadir bir birlik var. Ne istediğinizi net görüyor, hislerinizden emin adımlarla ilerliyorsunuz. Bugün kendiniz olmanın gücünü sonuna kadar hissedin.",
+        "İçsel bütünlük günü: Hisleriniz ve düşünceleriniz aynı frekansta titreşiyor. Bu uyum sayesinde zor kararları bile kolaylıkla verebilir, çevrenize doğal bir otorite yayabilirsiniz."
+    ],
+    ("Ay","Güneş","Karşıt"): [
+        "İç dünyanızda bir denge arayışı var. Mantığınız bir şey söylerken kalbiniz başka bir yöne çekiyor. Bu gerilim aslında size hangi yolda ilerlemeniz gerektiğini göstermek için var.",
+        "Duygusal ihtiyaçlarınızla ego hedefleriniz arasında bir çatışma hissedebilirsiniz. Bugün iki sesi de dinleyin. Uzlaşma, ikisinin arasında değil, ikisini de kucaklamakta.",
+        "Zıtlıkların farkındalık getirdiği bir gün. İçsel bir gerilim yaşıyor olabilirsiniz, ancak bu size kendinizin henüz keşfetmediğiniz yönlerini gösterecek. Dengenizi bulmak için her iki tarafı da anlamaya çalışın."
+    ],
+    ("Ay","Güneş","Kare"): [
+        "Duygularınızla hedefleriniz arasında sıkışmış hissedebilirsiniz. Ne tarafa gideceğinizi bilememek doğal. Bu belirsizlik, yeni bir yön bulmanız için size alan açıyor.",
+        "İçsel bir baskı altındasınız. Kalbinizle aklınız arasındaki bu gerilim, bir karar vermeniz gerektiğinin işareti. Ertelemeyin, küçük bir adım bile sizi rahatlatacak.",
+        "Bugün kendinizle yüzleşme günü. İçsel çatışmalarınız size büyüme fırsatı sunuyor. Rahatsız edici duygulara direnmeyin; onları anlamaya çalışın, size bir şey öğretmek için buradalar."
+    ],
+    ("Ay","Güneş","Trigon"): [
+        "Duygusal dünyanız ve kimliğiniz arasında doğal bir uyum var. Bugün kendinizi olduğunuz gibi kabul etmek kolaylaşıyor. İç huzurunuz dış dünyaya yansıyor.",
+        "Akışta olduğunuz bir gün. Hislerinizle eylemleriniz arasında pürüzsüz bir bağlantı var. Yaratıcılığınız yüksek, sezgileriniz güçlü. Bu enerjiyi değerlendirin.",
+        "Kendinizle barışık hissettiğiniz bir zaman dilimi. İçsel uyumunuz sayesinde çevrenizdeki insanlara da huzur yayıyorsunuz. Bugün keyif aldığınız şeylere zaman ayırın."
+    ],
+    ("Ay","Güneş","Sekstil"): [
+        "Duygularınızı ifade etmek için güzel bir fırsat kapınızda. Bugün karşınıza çıkacak bir durum, içinizdeki gerçek hisleri açığa çıkarmanıza yardımcı olacak.",
+        "İç dünyanızla dış dünyanız arasında verimli bir köprü kuruluyor. Yeni bir hobi, yaratıcı bir proje veya kendinizi ifade edeceğiniz bir alan size iyi gelecek.",
+        "Duygusal zekanızın yükseldiği bir gün. Çevrenizdeki insanları anlamak ve onlarla bağ kurmak kolaylaşıyor. Bu fırsatı samimi bir sohbet için değerlendirin."
+    ],
+    # ─────────── Ay + Venüs ───────────
+    ("Ay","Venüs","Kavuşum"): [
+        "Sevgi enerjiniz bugün çok yüksek. Kalbinizdeki sıcaklık çevrenize de yansıyor. Sanatsal ve estetik konulara yönelmek, kendinizi güzel şeylerle çevrelemek size iyi gelecek.",
+        "Duygusal olarak şefkat dolu hissediyorsunuz. İçgüdüsel olarak güzellik ve uyum arayışındasınız. Bugün kendinize küçük bir jest yapın, bunu hak ediyorsunuz.",
+        "Vermek ve almak arasındaki denge bugün doğal olarak kuruluyor. Sevginizi ifade etmekten çekinmeyin. Yaratıcılık gerektiren işler için ilham alabilirsiniz."
+    ],
+    ("Ay","Venüs","Karşıt"): [
+        "Duygusal ihtiyaçlarınızla keyif aldığınız şeyler arasında bir seçim yapmanız gerekebilir. Kendinize hangi alanda daha fazla yatırım yapmak istediğinizi sorun.",
+        "İçsel bir tatminsizlik hissedebilirsiniz. İstediğiniz şeyle ihtiyacınız olan şey aynı olmayabilir. Bugün biraz yalnız kalıp içinizi dinleyin.",
+        "Sevgi ve para arasında bir denge kurma zamanı. Değer verdiğiniz şeylerle harcadığınız enerji arasında bir uyumsuzluk varsa, bugün bunu fark edip düzeltebilirsiniz."
+    ],
+    ("Ay","Venüs","Kare"): [
+        "Keyif aldığınız şeylerle sorumluluklarınız arasında sıkışmış hissedebilirsiniz. Kendinize zaman ayırmakta zorlanıyorsanız, küçük bir mola bile büyük fark yaratır.",
+        "Harcama isteğinizle tasarruf etme gerekliliğiniz çatışabilir. Bugün alacağınız kararlarda kalbinizi değil, mantığınızı dinleyin. Geçici bir heves sizi yanıltmasın.",
+        "İlişkilerde bir denge sorunu yaşayabilirsiniz. Fazla verip az almak veya tam tersi. Bugün sınırlarınızı gözden geçirin ve kendinizi koruyun."
+    ],
+    ("Ay","Venüs","Trigon"): [
+        "Sevgi ve güzellik hayatınızda doğal bir akış yakalıyor. İç huzurunuz dış dünyaya yansıyor. Sanatsal faaliyetler, müzik veya doğa yürüyüşü size iyi gelecek.",
+        "Sosyal çevrenizle aranızda doğal bir uyum var. Bugün sevdiklerinizle vakit geçirmek, güzel bir yemek yapmak veya estetik bir ortamda bulunmak size enerji verecek.",
+        "Kendinizi şımartma günü. Venüs ve Ay arasındaki bu uyumlu açı, size hayatın güzel yanlarını görme fırsatı sunuyor. Küçük zevklerin tadını çıkarın."
+    ],
+    ("Ay","Venüs","Sekstil"): [
+        "Yeni bir güzellik keşfi sizi bekliyor olabilir. Belki yeni bir kafe, belki bir sergi, belki de bir melodi. Bugün estetik duyarlılığınız yüksek, çevrenize dikkat edin.",
+        "Sosyalleşmek için güzel bir fırsat. Yeni insanlarla tanışabilir veya eski dostlarla bir araya gelebilirsiniz. İletişiminiz akıcı ve sıcak olacak.",
+        "Kendinizi ifade etmenin yeni bir yolunu bulabilirsiniz. Bir hobi edinmek veya yaratıcı bir projeye başlamak için ilham verici bir gün."
+    ],
+    # ─────────── Ay + Mars ───────────
+    ("Ay","Mars","Kavuşum"): [
+        "Enerjiniz ve duygularınız aynı anda harekete geçiyor. İçinizde güçlü bir yapma arzusu var. Bu enerjiyi spor veya fiziksel bir aktiviteye yönlendirmek size iyi gelecek.",
+        "Duygusal tepkileriniz normalden daha yoğun olabilir. Öfkenizi tanıyın ama kontrol etmesini de bilin. Bu enerji, doğru kanalize edildiğinde büyük bir itici güç.",
+        "Cesaret ve tutku günü. Uzun zamandır ertelediğiniz bir şeye başlamak için mükemmel bir zaman. İçgüdülerinize güvenin ve harekete geçin."
+    ],
+    ("Ay","Mars","Karşıt"): [
+        "İçsel arzularınızla dış dünyanın talepleri arasında kalabilirsiniz. İsteklerinizle zorunluluklarınız arasında bir denge kurmak için çaba göstermeniz gerekebilir.",
+        "Duygusal olarak gergin hissedebilir, tepkileriniz normalden daha sert olabilir. Bir çatışmaya girmeden önce derin bir nefes alın ve düşünün.",
+        "Başkalarının enerjisi sizi etkileyebilir. Kendi sınırlarınızı koruyun ve başkalarının sorunlarını üstlenmeyin. Fiziksel egzersiz bu gerilimi atmanıza yardımcı olacak."
+    ],
+    ("Ay","Mars","Kare"): [
+        "İçinizde bir volkan hazırda bekliyor olabilir. Küçük bir kıvılcım büyük bir patlamaya dönüşebilir. Bugün sakin kalmak için bilinçli çaba gösterin.",
+        "Duygusal öfkenizle mantığınız arasında sıkıştınız. Bir şeyleri kırıp dökmek istiyor ama durmanız gerektiğini de biliyorsunuz. Fiziksel bir aktivite bu baskıyı azaltabilir.",
+        "Sabırsızlık ve huzursuzluk hissedebilirsiniz. Her şey sizi rahatsız ediyor gibi gelebilir. Bu geçici bir dönem, kendinize zaman tanıyın ve zorlamayın."
+    ],
+    ("Ay","Mars","Trigon"): [
+        "Enerjiniz ve duygularınız mükemmel bir uyum içinde. Yapmak istediğiniz her şeyde başarılı olma potansiyeliniz yüksek. Spor, yaratıcı projeler veya yeni başlangıçlar için ideal.",
+        "Cesaretiniz ve azminiz zirvede. Zor görünen bir iş bile bugün size kolay gelebilir. İçgüdüsel olarak doğru hamleleri yapıyor, akışa teslim oluyorsunuz.",
+        "Fiziksel ve duygusal olarak güçlü hissettiğiniz bir gün. Kendinize güveniyor ve harekete geçmek için hiç vakit kaybetmiyorsunuz. Bu enerjiyi verimli kullanın."
+    ],
+    ("Ay","Mars","Sekstil"): [
+        "Yeni bir fiziksel aktiviteye başlamak için güzel bir fırsat. Dans, yoga, koşu veya takım sporu size iyi gelebilir. Bedeniniz ve ruhunuz birlikte çalışmak istiyor.",
+        "Duygusal cesaretiniz artıyor. Bugün karşınıza çıkacak bir fırsat, içinizdeki savaşçıyı uyandırabilir. Korkularınızın üzerine gidin.",
+        "Enerjinizi yönlendirebileceğiniz yeni bir alan keşfedebilirsiniz. Bir hobi, bir proje veya bir spor dalı size hem fiziksel hem duygusal tatmin sağlayacak."
+    ],
+    # ─────────── Ay + Jüpiter ───────────
+    ("Ay","Jüpiter","Kavuşum"): [
+        "İyimserlik ve neşe duygularınız bugün tavan yapıyor. Hayata daha geniş bir perspektiften bakıyor, geleceğe umutla yaklaşıyorsunuz. Yeni deneyimlere açık olun.",
+        "Duygusal olarak genişleme ve özgürleşme hissediyorsunuz. İçsel bir bolluk ve bereket duygusu var. Bu enerjiyi sevdiklerinizle paylaşmak size iyi gelecek.",
+        "Macera ve keşif arzunuz artıyor. Yeni bir yer görmek, farklı bir kültür tanımak veya sadece bilmediğiniz bir sokakta yürümek bile size iyi gelebilir."
+    ],
+    ("Ay","Jüpiter","Karşıt"): [
+        "İçsel büyüme arzunuzla dış dünyanın sınırlamaları arasında kalabilirsiniz. Daha fazlasını istiyor ama mevcut koşullar sizi kısıtlıyor olabilir. Sabırlı olun.",
+        "Abartma eğilimindesiniz. Duygularınızı veya harcamalarınızı kontrol etmekte zorlanabilirsiniz. Bugün ölçülü olmaya çalışın.",
+        "Başkalarının beklentileriyle kendi istekleriniz arasında bir denge kurmanız gerekebilir. Kendi yolunuzu bulmak için iç sesinizi dinleyin."
+    ],
+    ("Ay","Jüpiter","Kare"): [
+        "Aşırı iyimserlik gerçekçiliğinizi gölgeleyebilir. Büyük hayaller kurmak güzel ama bugün ayaklarınız yere basmalı. Bir adım geri çekilip durumu objektif değerlendirin.",
+        "Duygusal olarak abartıya kaçma eğilimindesiniz. Ne hissettiğinizle ne yaptığınız arasında bir dengesizlik olabilir. Bugün ölçülü olmaya özen gösterin.",
+        "Kendinizi kanıtlama ihtiyacı duyabilirsiniz. Ancak başkalarını etkilemek için kendinizi zorlamayın. Olduğunuz gibi kabul edilmek en büyük özgürlük."
+    ],
+    ("Ay","Jüpiter","Trigon"): [
+        "İçsel bolluk ve bereket duygunuz doğal bir akış içinde. Hayat size güzel sürprizler sunabilir. Minnettarlık duygusu bugün kalbinizi ısıtacak.",
+        "Öğrenme ve keşfetme arzunuz artıyor. Bir kitap okumak, belgesel izlemek veya yeni bir beceri öğrenmek için harika bir gün. Zihniniz ve kalbiniz birlikte çalışıyor.",
+        "İyimserlik enerjiniz çevrenizdeki insanları da etkiliyor. Bugün pozitif düşüncelerinizi paylaşın, sevdiklerinize ilham verin. Sosyalleşmek için ideal."
+    ],
+    ("Ay","Jüpiter","Sekstil"): [
+        "Yeni bir öğrenme fırsatı kapınızda olabilir. Bir eğitim programı, seminer veya atölye ilginizi çekebilir. Kişisel gelişiminize yatırım yapmak için güzel bir zaman.",
+        "Kültürel bir etkinlik veya seyahat planı size iyi gelebilir. Farklı perspektifler görmek, ufkunuzu genişletecek. Bugün yeni bir şey deneyin.",
+        "İçsel bilgeliğinize güvenin. Bir konuda doğru bildiğiniz bir şey varsa, bunu paylaşmaktan çekinmeyin. Çevrenizdeki insanlara ilham verebilirsiniz."
+    ],
+    # ─────────── Ay + Satürn ───────────
+    ("Ay","Satürn","Kavuşum"): [
+        "Duygusal olarak daha ciddi ve mesafeli hissedebilirsiniz. İç dünyanızda bir sorgulama var. Bu, duygusal olgunlaşma sürecinizin bir parçası. Kendinize karşı dürüst olun.",
+        "Sorumluluklarınızın ağırlığını hissediyorsunuz. Duygusal yükünüz artmış olabilir. Bugün kendinize şefkat gösterin ve yalnız olmadığınızı hatırlayın.",
+        "İçsel sınırlarınızı keşfetme günü. Nerede durmanız, nerede ilerlemeniz gerektiğini sorguluyorsunuz. Bu disiplin, uzun vadede size duygusal güvenlik sağlayacak."
+    ],
+    ("Ay","Satürn","Karşıt"): [
+        "Duygusal ihtiyaçlarınızla sorumluluklarınız arasında bir çatışma yaşıyorsunuz. İç sesiniz size bir şey söylerken, dış dünya başka bir şey bekliyor. Dengeyi bulmak sizin elinizde.",
+        "Yalnızlık hissi ağır basabilir. Başkaları tarafından anlaşılmadığınızı düşünebilirsiniz. Bu geçici bir duygu, kendinizi izole etmek yerine bir arkadaşınıza ulaşın.",
+        "Geçmişten gelen bir duygusal yük bugün yüzeye çıkabilir. Affetmek ve bırakmak, üzerinizdeki bu yükü hafifletecek. Kendinize zaman tanıyın."
+    ],
+    ("Ay","Satürn","Kare"): [
+        "Duygusal olarak baskı altında hissediyorsunuz. Bir konuda yetersiz veya hazırlıksız olabilirsiniz. Bu duyguyu bir öğrenme fırsatı olarak görün.",
+        "Kendinizi eleştirme eğiliminiz artıyor. Mükemmeliyetçilik bugün size zor anlar yaşatabilir. Her şeyin mükemmel olması gerekmediğini hatırlayın.",
+        "Duygusal bir engelle karşılaşabilirsiniz. Planlarınız aksayabilir veya bir konuda hayal kırıklığı yaşayabilirsiniz. Bu sizi güçlendirecek bir test."
+    ],
+    ("Ay","Satürn","Trigon"): [
+        "Duygusal disiplininiz ve olgunluğunuz sayesinde zorlukları kolaylıkla aşıyorsunuz. İçsel gücünüzün farkında olmak size güven veriyor.",
+        "Yapılandırılmış bir duygusal yaklaşım benimsiyorsunuz. Duygularınızı kontrol altında tutmak yerine onları yönetmeyi öğreniyorsunuz. Bu büyümenin işareti.",
+        "Uzun vadeli hedeflerinize odaklanmak için güzel bir gün. Duygusal istikrarınız sayesinde sağlam adımlar atabiliyor, geleceğe güvenle bakabiliyorsunuz."
+    ],
+    ("Ay","Satürn","Sekstil"): [
+        "Duygusal olarak daha organize ve planlı olmanızı sağlayacak bir fırsat karşınızda. Bir alışkanlık edinmek veya bir rutin oluşturmak için güzel bir zaman.",
+        "Geçmişten gelen bir ders bugün işinize yarayabilir. Daha önce zorlandığınız bir konuda şimdi daha olgun ve hazır hissediyorsunuz.",
+        "Bir mentor veya rehberden gelebilecek bir tavsiye size iyi gelecek. Deneyimli birinin perspektifi, duygusal bir konuda size yol gösterebilir."
+    ],
+    # ─────────── Ay + Merkür ───────────
+    ("Ay","Merkür","Kavuşum"): [
+        "Duygularınızı ifade etme gücünüz artıyor. İçinizdekileri kelimelere dökmek kolaylaşıyor. Yazmak, konuşmak veya birine derdinizi anlatmak için harika bir gün.",
+        "Sezgileriniz ve mantığınız aynı anda çalışıyor. Bir konuyu hem kalbinizle hem aklınızla kavrıyorsunuz. İkisi arasında bir çelişki varsa, bugün netleşecek.",
+        "Zihniniz ve kalbiniz arasında güçlü bir bağlantı var. Duygusal zekanız yüksek, insanları anlama ve onlarla empati kurma yeteneğiniz artıyor."
+    ],
+    ("Ay","Merkür","Karşıt"): [
+        "Duygularınızla düşünceleriniz arasında bir çelişki yaşıyorsunuz. Mantığınız bir şey söylerken kalbiniz başka bir şey hissediyor. İkisini de dinleyin.",
+        "Başkalarıyla iletişimde yanlış anlaşılmalar olabilir. Söylediklerinizle hissettikleriniz arasında bir fark varsa, bugün bu farkı kapatmaya çalışın.",
+        "Duygusal bir konuyu fazla düşünüp kafanızı karıştırabilirsiniz. Bazen analiz etmek yerine hissetmek gerekir. Zihninizi susturup kalbinizi dinleyin."
+    ],
+    ("Ay","Merkür","Kare"): [
+        "Zihinsel olarak dağınık ve odaklanmakta zorlanabilirsiniz. Duygularınız düşüncelerinizi bulandırıyor olabilir. Bugün önemli kararlar vermekten kaçının.",
+        "Söylemek istediklerinizle söyledikleriniz arasında fark olabilir. Kendinizi ifade etmekte zorlanıyorsanız, yazmak size yardımcı olabilir.",
+        "Duygusal bir konu hakkında takıntılı düşüncelere kapılabilirsiniz. Bu döngüden çıkmak için zihninizi başka bir şeye yönlendirin."
+    ],
+    ("Ay","Merkür","Trigon"): [
+        "Duygularınızı ifade etmek için mükemmel bir gün. İç sesiniz net, kelimeleriniz akıcı. Birine duygularınızı anlatmak veya bir mektup yazmak size iyi gelecek.",
+        "Sezgileriniz ve mantığınız uyum içinde. Bir konuyu hem hissediyor hem anlıyorsunuz. Bu bütünsel bakış açısı sayesinde doğru kararlar verebilirsiniz.",
+        "Öğrenme ve iletişim yeteneğiniz artıyor. Yeni bir dil öğrenmek, bir kitap okumak veya bir konuda araştırma yapmak için ideal bir gün."
+    ],
+    ("Ay","Merkür","Sekstil"): [
+        "Yeni bir iletişim fırsatı kapınızda. Eski bir arkadaşınızdan haber alabilir veya yeni biriyle anlamlı bir sohbet edebilirsiniz.",
+        "Duygusal zekanızı kullanabileceğiniz bir durumla karşılaşabilirsiniz. Birine tavsiye vermek veya onu anlamak size iyi gelecek.",
+        "Yazmak veya yaratıcı bir şey üretmek için ilham alabilirsiniz. Bir günlük tutmak, şiir yazmak veya blog paylaşımı yapmak duygularınızı ifade etmenize yardımcı olacak."
+    ],
+    # ─────────── Ay + Uranüs ───────────
+    ("Ay","Uranüs","Kavuşum"): [
+        "Duygusal olarak ani bir özgürleşme ihtiyacı hissedebilirsiniz. Rutinler sizi boğuyor, yeni ve farklı bir şey yapmak istiyorsunuz. İçgüdülerinize güvenin.",
+        "Beklenmedik bir duygusal farkındalık yaşayabilirsiniz. Birdenbire bir konuyu çok net görmeye başlayabilirsiniz. Bu aydınlanma anını değerlendirin.",
+        "Özgürlüğünüze düşkün olduğunuz bir gün. Başkalarının beklentilerine göre değil, kendi kurallarınıza göre yaşamak istiyorsunuz. Bu enerjiyi yaratıcı bir şekilde kullanın."
+    ],
+    ("Ay","Uranüs","Karşıt"): [
+        "İstikrar arzunuzla değişim ihtiyacınız arasında kalabilirsiniz. Bir yandan güvende olmak istiyor, bir yandan da sınırlarınızı zorlamak. Bu ikilem size büyüme fırsatı sunuyor.",
+        "Başkalarının beklentileriyle kendi özgürlük ihtiyacınız arasında bir gerilim var. Kendi yolunuzu bulmak için cesur olmanız gerekebilir.",
+        "Duygusal olarak ani tepkiler verebilir, sonra pişman olabilirsiniz. Bir şey söylemeden veya yapmadan önce bir kez daha düşünün."
+    ],
+    ("Ay","Uranüs","Kare"): [
+        "Beklenmedik bir duygusal patlama yaşayabilirsiniz. Uzun zamandır bastırdığınız bir duygu bugün aniden yüzeye çıkabilir. Şaşırmayın, bu doğal.",
+        "Rutininizin bozulması sizi rahatsız edebilir. Planlarınızın dışına çıkmak zorunda kalmak, başta sinir bozucu olsa da yeni bir kapı aralayabilir.",
+        "Duygusal dalgalanmalar yaşayabilirsiniz. Bir an mutlu, bir an hüzünlü hissedebilirsiniz. Bu geçici bir dönem, kendinizi akışa bırakın."
+    ],
+    ("Ay","Uranüs","Trigon"): [
+        "İçsel özgürlüğünüzü keşfettiğiniz bir gün. Kendi kurallarınızla yaşamanın tadını çıkarıyorsunuz. Yaratıcılığınız ve özgünlüğünüz çevrenizi etkiliyor.",
+        "Ani bir ilham patlaması yaşayabilirsiniz. Yaratıcı bir proje için mükemmel bir fikir aklınıza gelebilir. Bu ilhamı kaçırmayın, hemen not alın.",
+        "Değişim ve yenilik size iyi geliyor. Farklı bir ortam, yeni insanlar veya alışılmadık bir deneyim, içinizdeki potansiyeli ortaya çıkarabilir."
+    ],
+    ("Ay","Uranüs","Sekstil"): [
+        "Yeni ve sıra dışı bir deneyim için fırsat kapınızda. Daha önce hiç yapmadığınız bir şeyi denemek, size enerji verebilir.",
+        "Bir konuda farklı bir perspektif kazanabilirsiniz. Alışılmışın dışında bir düşünce, bir soruna yaratıcı bir çözüm bulmanızı sağlayabilir.",
+        "Teknoloji veya yenilikçi bir alanla ilgilenmek size iyi gelebilir. Yeni bir uygulama keşfetmek veya dijital bir projeye başlamak için güzel bir gün."
+    ],
+    # ─────────── Ay + Neptün ───────────
+    ("Ay","Neptün","Kavuşum"): [
+        "Sezgileriniz bugün çok güçlü. İnsanları ve olayları kelimelerin ötesinde hissediyorsunuz. Meditasyon, müzik veya sanat size derin bir huzur verecek.",
+        "Duygusal olarak sınırlarınızın eridiğini hissedebilir, her şeyle bir bağlantı içinde olduğunuzu görebilirsiniz. Bu birleşme duygusu size şifa veriyor.",
+        "Hayal gücünüz ve duygularınız iç içe geçiyor. Rüyalarınız daha canlı, sezgileriniz daha net olabilir. Bugün iç sesinize kulak verin."
+    ],
+    ("Ay","Neptün","Karşıt"): [
+        "Gerçeklikle hayal dünyanız arasında gidip gelebilirsiniz. Bir şeyleri olduğundan farklı görüyor olabilirsiniz. Bugün önemli kararlar vermekten kaçının.",
+        "Duygusal olarak kafa karışıklığı yaşayabilir, bir konuda net görmekte zorlanabilirsiniz. Bir süre geri çekilip durumu berraklaştırın.",
+        "Başkalarının enerjisi sizi kolayca etkileyebilir. Duygusal sınırlarınız zayıflamış olabilir. Kendinizi korumak için yalnız kalabileceğiniz bir alan yaratın."
+    ],
+    ("Ay","Neptün","Kare"): [
+        "Duygusal bir sisin içinde kaybolmuş hissedebilirsiniz. Neyin gerçek neyin hayal olduğunu ayırt etmek zorlaşabilir. Bugün kendinize karşı dürüst olun.",
+        "Kaçış eğiliminiz artabilir. Gerçeklikten uzaklaşmak için hayallere, alkole veya başka bir bağımlılığa yönelebilirsiniz. Farkında olun ve sağlıklı alternatifler bulun.",
+        "Aldatılma veya hayal kırıklığı yaşama olasılığınız yüksek. Birine veya bir duruma fazla güvenmeyin. Gerçekçi olun."
+    ],
+    ("Ay","Neptün","Trigon"): [
+        "Sezgileriniz ve hayal gücünüz arasında doğal bir akış var. Sanatsal bir proje, yaratıcı bir çalışma veya manevi bir uygulama için mükemmel bir gün.",
+        "İçsel huzur ve dinginlik hissediyorsunuz. Doğada vakit geçirmek, müzik dinlemek veya meditasyon yapmak size derin bir tatmin verecek.",
+        "Empati yeteneğiniz çok yüksek. İnsanları anlamak ve onlara yardım etmek için doğal bir yeteneğiniz var. Bugün bu gücünüzü kullanın."
+    ],
+    ("Ay","Neptün","Sekstil"): [
+        "Yaratıcılığınızı besleyecek bir fırsat karşınızda. Bir sanat atölyesi, fotoğraf gezisi veya müzik etkinliği size iyi gelebilir.",
+        "Manevi bir deneyim yaşayabilirsiniz. Bir kitap, bir konuşma veya bir doğa anısı size derin bir anlayış kazandırabilir.",
+        "Sezgileriniz bugün size yol gösterecek. Bir konuda içinizde bir his varsa, onu ciddiye alın. Mantığınız açıklayamasa da kalbiniz doğruyu biliyor."
+    ],
+    # ─────────── Ay + Plüton ───────────
+    ("Ay","Plüton","Kavuşum"): [
+        "Duygusal bir dönüşümün tam ortasındasınız. Bastırılmış duygular bugün yüzeye çıkabilir. Korkutucu görünse de bu yüzleşme sizi özgürleştirecek.",
+        "İçsel gücünüzün farkına vardığınız bir gün. Kontrol edemediğiniz şeyleri bırakmak, aslında en büyük güçlenme biçiminiz. Dönüşüme açık olun.",
+        "Derin bir duygusal arınma yaşıyorsunuz. Eski yaralar, geçmiş travmalar bugün kendini gösterebilir. Bu, onları iyileştirmek için bir fırsat."
+    ],
+    ("Ay","Plüton","Karşıt"): [
+        "Kontrol etmekle bırakmak arasında bir savaş veriyorsunuz. Bir durumu tutmaya çalıştıkça daha çok kaybediyor gibi hissedebilirsiniz. Bırakmak en büyük zafer.",
+        "Başkalarının gölgesi sizi etkileyebilir. Birinin size yansıttığı duyguları kendinize almayın. Kendi gücünüzü hatırlayın.",
+        "Duygusal bir hesaplaşma zamanı. Geçmişte yaşadığınız bir olay bugün tekrar gündeme gelebilir. Bu sefer aynı şekilde tepki vermek zorunda değilsiniz."
+    ],
+    ("Ay","Plüton","Kare"): [
+        "Duygusal yoğunluğunuz tavan yapmış durumda. Küçük bir olay büyük bir tepkiye dönüşebilir. Bugün kendinize ekstra özen gösterin ve tetikleyicilerinizi tanıyın.",
+        "İçsel bir güç mücadelesi yaşıyorsunuz. Eski alışkanlıklarınızla yeni benliğiniz arasında sıkışmış hissedebilirsiniz. Dönüşüm acı verici olabilir ama gerekli.",
+        "Takıntılı düşünceler ve duygular sizi ele geçirebilir. Bir konuyu bırakmakta zorlanıyorsanız, profesyonel destek almak iyi bir fikir olabilir."
+    ],
+    ("Ay","Plüton","Trigon"): [
+        "Duygusal dönüşüm gücünüz doğal bir akış içinde çalışıyor. Zor bir konuyu kolaylıkla çözebilir, derin bir anlayışla hareket edebilirsiniz.",
+        "İçsel iyileşme ve şifa enerjiniz yüksek. Geçmiş yaralarınızı sarmak, eski kalıplarınızı kırmak için güçlü bir dönemdesiniz.",
+        "Başkalarını iyileştirme ve dönüştürme yeteneğiniz artıyor. Birine destek olmak, rehberlik etmek size iyi gelecek. Bu süreçte siz de iyileşiyorsunuz."
+    ],
+    ("Ay","Plüton","Sekstil"): [
+        "Derin bir psikolojik içgörü kazanabilirsiniz. Bir rüya, bir terapi seansı veya derin bir sohbet, size kendinizle ilgili yeni bir şey öğretebilir.",
+        "Geçmişten gelen bir konuyu araştırmak veya aile geçmişinizi keşfetmek size iyi gelebilir. Köklerinizi anlamak, bugünkü davranışlarınızı açıklayabilir.",
+        "Bir konuda gizli kalmış bir gerçeği öğrenebilirsiniz. Bu bilgi başta sarsıcı olsa da, uzun vadede size özgürlük getirecek."
+    ],
+}  # 45 keys × 3 = 135 interpretations
+
+# ── Natal Moon Sign & House descriptors ──
+AY_BURC_TANIMLARI = {
+    "Koç": "Ay'ınız Koç burcunda — duygularınız ateşli, ani ve doğrudan. İçgüdüsel tepkileriniz güçlü, cesur ve atılgan.",
+    "Boğa": "Ay'ınız Boğa burcunda — duygusal istikrar ve güvenlik arayışındasınız. Konfor ve rahatlık sizin için önemli.",
+    "İkizler": "Ay'ınız İkizler burcunda — duygularınızı kelimelere dökme ihtiyacı hissediyorsunuz. Meraklı ve iletişim odaklı bir duygusal yapınız var.",
+    "Yengeç": "Ay'ınız Yengeç burcunda — Ay kendi evinde, duygularınız son derece derin ve korumacı. Aile ve yuva kavramı içinizde güçlü.",
+    "Aslan": "Ay'ınız Aslan burcunda — duygusal ifadeniz sıcak, cömert ve gösterişli. Kalbinizle hareket eder, onur ve gurur sizin için önemlidir.",
+    "Başak": "Ay'ınız Başak burcunda — duygularınızı analiz eder, mantıklı çerçeveye oturtmaya çalışırsınız. Düzen ve temizlik size huzur verir.",
+    "Terazi": "Ay'ınız Terazi burcunda — duygusal denge ve uyum arayışı içindesiniz. Estetik, zarafet ve adalet duygularınızı besler.",
+    "Akrep": "Ay'ınız Akrep burcunda — duygularınız yoğun, tutkulu ve dönüştürücü. Derinlerde gizlenen hisleriniz güçlüdür.",
+    "Yay": "Ay'ınız Yay burcunda — duygusal özgürlük ve keşif sizi besler. İyimser, maceracı ve bağımsız bir duygusal yapınız var.",
+    "Oğlak": "Ay'ınız Oğlak burcunda — duygularınız kontrollü, disiplinli ve sorumlu. Duygusal güvenlik başarı ve statü ile bağlantılı.",
+    "Kova": "Ay'ınız Kova burcunda — duygusal olarak özgür, bağımsız ve alışılmadık. Özgünlüğünüze değer verir, duygusal mesafenizi korursunuz.",
+    "Balık": "Ay'ınız Balık burcunda — duygularınız akışkan, sezgisel ve sınırsız. Empati yeteneğiniz yüksek, sanatsal ve manevi yönünüz güçlü.",
+}
+
+AY_EV_TANIMLARI = {
+    1: "Ay 1. evde — duygusal dışavurumunuz güçlü, hisleriniz yüzünüzde okunur. Kendi ihtiyaçlarınız ön planda.",
+    2: "Ay 2. evde — duygusal güvenliğiniz maddi istikrarla bağlantılı. Sahip olduklarınıza duygusal bağ geliştirirsiniz.",
+    3: "Ay 3. evde — duygularınızı iletişim yoluyla ifade edersiniz. Yakın çevreniz ve kardeşleriniz duygusal dünyanızda önemli yer tutar.",
+    4: "Ay 4. evde — aile ve yuva duygusal merkeziniz. Geçmişiniz, kökleriniz ve annenizle bağlantınız güçlü.",
+    5: "Ay 5. evde — duygularınızı yaratıcılık ve eğlence yoluyla ifade edersiniz. Romantizm ve çocuklarla ilgili konular ön planda.",
+    6: "Ay 6. evde — duygusal sağlığınız günlük rutin ve iş hayatınızla bağlantılı. Hizmet etmek ve yardım etmek size iyi gelir.",
+    7: "Ay 7. evde — duygusal ihtiyaçlarınız yakın ilişkiler ve ortaklıklar üzerinden şekillenir. Denge ve uyum arayışındasınız.",
+    8: "Ay 8. evde — duygusal derinlik, dönüşüm ve paylaşılan kaynaklar ön planda. Mahremiyet ve güven konuları hassastır.",
+    9: "Ay 9. evde — duygusal beslenmeniz seyahat, felsefe ve yüksek öğrenim yoluyla gelir. Keşif ve anlam arayışı duygusal ihtiyacınız.",
+    10: "Ay 10. evde — duygusal ifadeniz kariyer ve toplumsal statü üzerinden görünür. Duygusal güvenlik başarı ile bağlantılı.",
+    11: "Ay 11. evde — arkadaşlıklar ve toplumsal gruplar duygusal dünyanızda önemli. İdealist hedefler sizi besler.",
+    12: "Ay 12. evde — duygularınız bilinçaltı düzeyde akar. Yalnızlık, meditasyon ve içsel çalışma size iyi gelir.",
+}
+
+def _ay_ortami_yorumu(ay_burc, ay_ev):
+    """Ay'ın bulunduğu burç ve eve göre ortam tanımı döndürür."""
+    burc_tanim = AY_BURC_TANIMLARI.get(ay_burc, "Ay duygusal dünyanızı şekillendiriyor.")
+    ev_tanim = AY_EV_TANIMLARI.get(ay_ev, "")
+    return f"{burc_tanim} {ev_tanim}"
+
+def _aspekt_yorumu_sec(gezegen1, gezegen2, aci_turu, index=0):
+    """NATAL_AY_ACISI_YORUMLARI'ndan bir yorum seçer."""
+    key = (gezegen1, gezegen2, aci_turu)
+    if key in NATAL_AY_ACISI_YORUMLARI:
+        return NATAL_AY_ACISI_YORUMLARI[key][index % 3]
+    # Try reverse order
+    rev_key = (gezegen2, gezegen1, aci_turu)
+    if rev_key in NATAL_AY_ACISI_YORUMLARI:
+        return NATAL_AY_ACISI_YORUMLARI[rev_key][index % 3]
+    # Fallback by aspect type
+    FALLBACK = {
+        "Kavuşum": "Bu birleşme enerjisi duygusal dünyanızı güçlendiriyor.",
+        "Karşıt": "Bu karşıtlık duygusal dengenizi test ediyor, farkındalık getiriyor.",
+        "Kare": "Bu zorlu açı duygusal büyüme için bir sınav sunuyor.",
+        "Trigon": "Bu uyumlu açı duygusal akışınızı destekliyor.",
+        "Sekstil": "Bu fırsat açısı duygusal gelişim için bir kapı aralıyor.",
+    }
+    return FALLBACK.get(aci_turu, "Bu açı duygusal dünyanızı etkiliyor.")
+
+def _natal_gunluk_hava_durumu(motor):
+    """Daily Moon transit weather: transit Ay → natal gezegenler, 3 gün."""
+    import datetime, random
+    from datetime import timedelta
+    try:
+
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+        jd_natal = motor.get_natal_julian_day("p1")
+        bugun = datetime.datetime.now()
+        sonuclar = []
+        for gun_kaydir in range(3):  # today + 2 more days
+            gun = bugun + timedelta(days=gun_kaydir)
+            jd_transit = swe.julday(gun.year, gun.month, gun.day, 12.0)
+            # Transit Ay pozisyonu
+            ay_id = GEZEGENLER.get("Ay")
+            if ay_id is None: continue
+            ay_deg = swe.calc_ut(jd_transit, ay_id)[0][0]
+            ay_burc = BURCLAR[int(ay_deg // 30)]
+            ay_burc_no = int(ay_deg // 30)
+            # Transit Ay evi (house cusps)
+            cusps, ascmc = swe.houses(jd_natal, motor.enlem, motor.boylam, b'P')
+            def _house_of(deg):
+                for i in range(12):
+                    bas = cusps[i]; bit = cusps[(i+1)%12]
+                    if bas <= bit:
+                        if bas <= deg < bit: return i+1
+                    else:
+                        if deg >= bas or deg < bit: return i+1
+                return 1
+            ay_ev = _house_of(ay_deg)
+            ortam = _ay_ortami_yorumu(ay_burc, ay_ev)
+            # Aspects transit Ay → natal planets
+            aciklamalar = []
+            gorusler = []
+            hedef_list = ["Güneş","Merkür","Venüs","Mars","Jüpiter","Satürn","Uranüs","Neptün","Plüton","Chiron"]
+            for gez in hedef_list:
+                g_id = GEZEGENLER.get(gez)
+                if g_id is None: continue
+                try:
+                    g_deg = swe.calc_ut(jd_natal, g_id)[0][0]
+                except: continue
+                fark = abs(ay_deg - g_deg)
+                if fark > 180: fark = 360 - fark
+                # Aspect type detection
+                aci_turu = None
+                orb = 0
+                for (aci_dk, aci_adi, orb_max) in [(0,"Kavuşum",8),(180,"Karşıt",8),(90,"Kare",6),(120,"Trigon",6),(60,"Sekstil",4)]:
+                    if abs(fark - aci_dk) <= orb_max:
+                        aci_turu = aci_adi
+                        orb = abs(fark - aci_dk)
+                        break
+                if aci_turu and fark >= 1:
+                    index = (gun_kaydir + len(aciklamalar)) % 3
+                    yorum = _aspekt_yorumu_sec("Ay", gez, aci_turu, index)
+                    aciklamalar.append(f"{aci_turu} ∟ {gez} (orb {orb:.1f}°): {yorum}")
+            if not aciklamalar:
+                aciklamalar.append(f"Sakin bir geçiş — Ay bugün belirgin bir açı yapmıyor.")
+            # Pick 2-3 aspect highlights
+            rng = random.Random(str(jd_transit))
+            rng.shuffle(aciklamalar)
+            highlight = aciklamalar[:3]
+            hava = {
+                "tarih": gun.strftime("%Y-%m-%d"),
+                "gun_ad": ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"][gun.weekday()],
+                "ay_burc": ay_burc,
+                "ay_ev": ay_ev,
+                "ay_derece": round(ay_deg, 1),
+                "ortam": ortam,
+                "yorum": "\n".join(highlight),
+                "acilar": aciklamalar,
+            }
+            sonuclar.append(hava)
+        return sonuclar
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return [{"tarih":"","gun_ad":"Hata","ay_burc":"","ay_ev":0,"ortam":"","yorum":f"Hava durumu alınamadı: {e}","acilar":[]}]
+
+def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
+    """Daily minor progress (secondary progression) for next N days.
+    Each "day" = 1 symbolic progression year (1 after birth = 1 year of life).
+    Returns entries for the next progression years."""
+    import datetime
+    from datetime import timedelta
+    try:
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+
+        jd_natal = motor.get_natal_julian_day("p1")
+        cusps, ascmc = swe.houses(jd_natal, motor.enlem, motor.boylam, b'P')
+        def _house_of(deg):
+            for i in range(12):
+                bas = cusps[i]; bit = cusps[(i+1)%12]
+                if bas <= bit:
+                    if bas <= deg < bit: return i+1
+                else:
+                    if deg >= bas or deg < bit: return i+1
+            return 1
+        
+        bugun = datetime.datetime.now()
+        jd_now = swe.julday(bugun.year, bugun.month, bugun.day, 12.0)
+        # Current age in years (for secondary progression: 1 day = 1 year)
+        yas = (jd_now - jd_natal) / 365.25
+        
+        sonuclar = []
+        for kaydir in range(baslangic_gunu, baslangic_gunu + gun_sayisi):
+            # Progressed JD = birth JD + (current age + N) as days
+            jd_prog = jd_natal + yas + kaydir
+            
+            # Planet positions at progressed JD
+            gez_poz = {}
+            for g_ad, g_id in list(GEZEGENLER.items())[:14]:
+                try:
+                    gez_poz[g_ad] = swe.calc_ut(jd_prog, g_id)[0][0]
+                except:
+                    pass
+            
+            ay_derece = gez_poz.get("Ay", 0)
+            gunes_derece = gez_poz.get("Güneş", 0)
+            ay_burc = BURCLAR[int(ay_derece // 30)]
+            gunes_burc = BURCLAR[int(gunes_derece // 30)]
+            ay_ev = _house_of(float(ay_derece))
+            
+            ortam = _ay_ortami_yorumu(ay_burc, ay_ev)
+            
+            # Ay aspects to other progressed planets
+            aci_tipleri = [(0,"Kavuşum",8),(180,"Karşıt",8),(90,"Kare",6),(120,"Trigon",6),(60,"Sekstil",4)]
+            hedefler = ["Güneş","Merkür","Venüs","Mars","Jüpiter","Satürn","Uranüs","Neptün","Plüton","Chiron"]
+            aspekt_yorumlari = []
+            for hedef in hedefler:
+                if hedef not in gez_poz: continue
+                fark = abs(ay_derece - gez_poz[hedef])
+                if fark > 180: fark = 360 - fark
+                aci_turu = None
+                for (aci_dk, aci_adi, orb_max) in aci_tipleri:
+                    if abs(fark - aci_dk) <= orb_max:
+                        aci_turu = aci_adi; break
+                if aci_turu and fark >= 1:
+                    index = (kaydir + len(aspekt_yorumlari)) % 3
+                    yorum = _aspekt_yorumu_sec("Ay", hedef, aci_turu, index)
+                    aspekt_yorumlari.append(f"{hedef} {aci_turu}: {yorum}")
+            
+            if not aspekt_yorumlari:
+                aspekt_yorumlari.append("Bu dönem için belirgin bir Ay açısı bulunamadı.")
+            
+            # Pick 2-3 aspects max
+            if len(aspekt_yorumlari) > 3:
+                import random
+                rng = random.Random(str(jd_prog))
+                rng.shuffle(aspekt_yorumlari)
+                aspekt_yorumlari = aspekt_yorumlari[:3]
+            
+            prog_yili = int(bugun.year + kaydir)
+            gun_tarih = bugun + timedelta(days=kaydir)
+            
+            entry = {
+                "tarih": gun_tarih.strftime("%Y-%m-%d"),
+                "gun_ad": ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"][gun_tarih.weekday()],
+                "yil": prog_yili,
+                "ay_burc": ay_burc,
+                "gunes_burc": gunes_burc,
+                "ay_ev": ay_ev,
+                "ortam": ortam,
+                "aspekt_adet": len(aspekt_yorumlari),
+                "yorumlar": aspekt_yorumlari,
+            }
+            sonuclar.append(entry)
+        return sonuclar
+    except Exception as e:
+        import traceback, sys
+        traceback.print_exc(file=sys.stdout)
+        return [{"tarih":"","gun_ad":"Hata","yil":0,"ay_burc":"","gunes_burc":"","ay_ev":0,"ortam":"","aspekt_adet":0,"yorumlar":[f"İlerleme yorumu alınamadı: {e}"]}]
+
+def _natal_minor_progress_6month(motor):
+    """6-month daily minor progress for PDF — returns a pre-formatted HTML string."""
+    import datetime
+    from datetime import timedelta
+    try:
+        entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=180)
+        if not entries:
+            return "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
+        
+        # Group by month
+        aylar_tr = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
+        lines = []
+        for e in entries:
+            t = e.get("tarih","")
+            if not t:
+                continue
+            try:
+                dt = datetime.datetime.strptime(t, "%Y-%m-%d")
+                ay_ad = aylar_tr[dt.month - 1]
+                lines.append(
+                    f"<b>{dt.day} {ay_ad} {dt.year}</b> — "
+                    f"Ay {e['ay_burc']} ({e['ay_ev']}. Ev) | "
+                    f"{' | '.join(e['yorumlar'][:2])}"
+                )
+            except:
+                continue
+        
+        if not lines:
+            return "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
+        return "<br/>".join(lines)
+    except Exception as e:
+        return f"6 aylık minör progress raporu alınamadı: {e}"
+
+app_fast = FastAPI(title="FAST — Asartepe Sinastri Tekniği API", version="4.0")
+
+app_fast.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ─── In-memory engine cache ───
+_ENGINE_CACHE = {}
+_ENGINE_CACHE_MAX = 20
+
+def _cache_engine(motor):
+    sid = motor._session_id
+    _ENGINE_CACHE[sid] = motor
+    if len(_ENGINE_CACHE) > _ENGINE_CACHE_MAX:
+        for k in list(_ENGINE_CACHE)[:-_ENGINE_CACHE_MAX]:
+            del _ENGINE_CACHE[k]
+
+def _get_engine(sid: str):
+    return _ENGINE_CACHE.get(sid)
+
+# ─── Request Models ───
+
+class EsSevgiliInput(BaseModel):
+    p1_isim: str = ""
+    p1_tarih: str
+    p2_isim: str = ""
+    p2_tarih: str
+    event_tarih: str
+    event_saat: str = "12:00"
+    sehir: str = "İstanbul"
+    ulke: str = "Türkiye"
+    enlem: float = 41.0082
+    boylam: float = 28.9784
+    utc_offset: Optional[float] = None
+
+class EbeveynCocukInput(BaseModel):
+    ebeveyn_isim: str = ""
+    ebeveyn_tarih: str
+    ebeveyn_rolu: str = "anne"
+    cocuk_isim: str = ""
+    cocuk_tarih: str
+    cocuk_saat: str = "12:00"
+    sehir: str = "İstanbul"
+    ulke: str = "Türkiye"
+    enlem: float = 41.0082
+    boylam: float = 28.9784
+    utc_offset: Optional[float] = None
+
+class PotansiyelYetenekInput(BaseModel):
+    isim: str = ""
+    tarih: str
+    saat: str = "12:00"
+    sehir: str = "İstanbul"
+    ulke: str = "Türkiye"
+    enlem: float = 41.0082
+    boylam: float = 28.9784
+    utc_offset: Optional[float] = None
+
+class BireyselNatalInput(BaseModel):
+    isim: str = ""
+    tarih: str
+    saat: str = "12:00"
+    sehir: str = "İstanbul"
+    ulke: str = "Türkiye"
+    enlem: float = 41.0082
+    boylam: float = 28.9784
+    utc_offset: Optional[float] = None
+
+class SehirInput(BaseModel):
+    arama: str
+
+class AlternatifInput(BaseModel):
+    session_id: str
+    sehir: str
+    enlem: float
+    boylam: float
+    utc_offset: Optional[float] = None
+
+class AstroInput(BaseModel):
+    session_id: str = ""
+    sehir: str = ""
+    enlem: float = 41.0082
+    boylam: float = 28.9784
+    tarih: str = ""
+    saat: str = "12:00"
+
+# ─── Helpers ───
+
+def _parse_date(d: str) -> str:
+    d = d.strip().replace("/", "-").replace(".", "-")
+    parts = d.split("-")
+    if len(parts) == 3:
+        if len(parts[0]) == 4:
+            return d
+        else:
+            return f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
+    return d
+
+def _generate_ek_charts(motor):
+    sid = motor._session_id
+    motor.ciz_titresim_grafigi(dosya_adi=f"{sid}_Frekans.png")
+    motor.ciz_composite_harita(dosya_adi=f"{sid}_Composite.png")
+    motor.ciz_aci_gridi(dosya_adi=f"{sid}_Aci_Gridi.png")
+    motor.ciz_arap_noktalari_radar(dosya_adi=f"{sid}_Arap_Noktalari.png")
+
+def _generate_pdf(motor, tip="rapor"):
+    if tip == "rapor":
+        motor.pdf_rapor_uret(dosya_adi=f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf")
+    elif tip == "natal":
+        _generate_natal_pdf(motor)
+    else:
+        motor.pdf_potansiyel_rapor_uret(dosya_adi=f"{motor._session_id}_Potansiyel_Yetenek.pdf")
+
+def _generate_natal_pdf(motor):
+    """Generate a professional Bireysel Natal PDF — clean cards, proper spacing."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.colors import HexColor
+    from reportlab.pdfgen import canvas
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    font_dir = os.path.join(_PROJECT_ROOT, "dejavu-sans")
+    pdfmetrics.registerFont(TTFont("DejaVu", os.path.join(font_dir, "DejaVuSans.ttf")))
+    pdfmetrics.registerFont(TTFont("DejaVu-Bold", os.path.join(font_dir, "DejaVuSans-Bold.ttf")))
+    pdfmetrics.registerFont(TTFont("DejaVu-Oblique", os.path.join(font_dir, "DejaVuSans-Oblique.ttf")))
+    pdfmetrics.registerFont(TTFont("DejaVu-BoldOblique", os.path.join(font_dir, "DejaVuSans-BoldOblique.ttf")))
+
+    dosya = f"{motor._session_id}_Bireysel_Natal.pdf"
+    yol = os.path.join(_PROJECT_ROOT, dosya)
+    w, h = A4
+    c = canvas.Canvas(yol, pagesize=A4)
+
+    # ── Colors ──
+    altin = HexColor('#B8860B')
+    koyu = HexColor('#2C2C2C')
+    acik = HexColor('#555555')
+    gri = HexColor('#D4C5A9')
+    bg = HexColor('#FDFAF5')
+    kart_bg = HexColor('#F5EFE0')
+    bordo = HexColor('#8B4513')
+    yesil = HexColor('#5A7A5A')
+    sari_cizgi = HexColor('#E8DCC8')
+
+    SAYFA_UST = h - 60
+    SAYFA_ALT = 55
+    SOL = 55
+    SAG = w - 55
+
+    def yeni_sayfa():
+        c.showPage()
+        c.setFillColor(bg)
+        c.rect(0, 0, w, h, fill=1)
+        c.setStrokeColor(altin)
+        c.setLineWidth(1.5)
+        c.line(50, h - 40, w - 50, h - 40)
+        c.setStrokeColor(altin)
+        c.setLineWidth(0.5)
+        c.line(50, 45, w - 50, 45)
+
+    def sayfa_basligi(baslik, y=SAYFA_UST, numara=""):
+        c.setFont("DejaVu-Bold", 18)
+        c.setFillColor(koyu)
+        # Draw section number in gold box if provided
+        if numara:
+            c.setFillColor(altin)
+            c.roundRect(SOL - 4, y - 2, 24, 22, 3, fill=1, stroke=0)
+            c.setFillColor(HexColor('#FFFFFF'))
+            c.setFont("DejaVu-Bold", 11)
+            c.drawCentredString(SOL + 8, y + 2, numara)
+            c.setFont("DejaVu-Bold", 18)
+            c.setFillColor(koyu)
+            c.drawString(SOL + 30, y, baslik)
+        else:
+            c.drawString(SOL, y, baslik)
+        c.setStrokeColor(altin)
+        c.setLineWidth(1)
+        cx = SOL + (30 if numara else 0)
+        c.line(cx, y - 6, cx + len(baslik) * 9.5, y - 6)
+        return y - 28
+
+    def kart_ciz(x, y, genislik, yukseklik, baslik="", baslik_icon=""):
+        """Draw a card with background, border, and optional header."""
+        c.setFillColor(kart_bg)
+        c.roundRect(x, y, genislik, yukseklik, 6, fill=1, stroke=0)
+        c.setStrokeColor(gri)
+        c.setLineWidth(0.6)
+        c.roundRect(x, y, genislik, yukseklik, 6, fill=0, stroke=1)
+        if baslik:
+            c.setFillColor(bordo)
+            c.setFont("DejaVu-Bold", 10)
+            c.drawString(x + 12, y + yukseklik - 18, f"{baslik_icon} {baslik}" if baslik_icon else baslik)
+            c.setStrokeColor(sari_cizgi)
+            c.setLineWidth(0.4)
+            c.line(x + 12, y + yukseklik - 24, x + genislik - 12, y + yukseklik - 24)
+        return y + yukseklik
+
+    def metin_yaz(x, y, metin, font="DejaVu", boyut=8.5, renk=acik, max_genislik=90):
+        """Write wrapped text, return new y position."""
+        c.setFont(font, boyut)
+        c.setFillColor(renk)
+        for satir in _wrap_text(metin, max_genislik):
+            if y < SAYFA_ALT:
+                yeni_sayfa()
+                y = SAYFA_UST
+                c.setFont(font, boyut)
+                c.setFillColor(renk)
+            c.drawString(x, y, satir)
+            y -= boyut + 3.5
+        return y
+
+    def yazi_olcul(metin, font="DejaVu", boyut=8.5, max_genislik=90):
+        """Calculate how tall the text block will be."""
+        satirlar = _wrap_text(metin, max_genislik)
+        return len(satirlar) * (boyut + 3.5)
+
+    def bolum_ayraci(y):
+        """Draw a decorative gold section separator."""
+        if y < SAYFA_ALT + 30: return y
+        y -= 10
+        c.setStrokeColor(altin)
+        c.setLineWidth(0.8)
+        mid = (SOL + SAG) / 2
+        c.line(mid - 100, y, mid + 100, y)
+        c.setFillColor(altin)
+        c.setFont("DejaVu", 8)
+        c.drawCentredString(mid, y - 10, "✦  ✦  ✦")
+        return y - 18
+
+    # Collect data
+    try:
+        data = _collect_natal_data(motor)
+    except:
+        data = {}
+
+    # ── Simulation radar data ──
+    sim_data = {}
+    try:
+        p1_dt = motor.p1 if hasattr(motor, 'p1') else None
+        if p1_dt:
+            e_date = getattr(motor, 'event_date_str', '')
+            e_time = getattr(motor, 'event_time_str', '12:00')
+            radar_raw = _natal_radar(p1_dt, e_date, e_time)
+            if radar_raw:
+                kat, _ = _result_kategorize(radar_raw)
+                sim_data = kat
+    except Exception as e:
+        print(f"[PDF] Simülasyon verisi alınamadı: {e}")
+    data["simulasyon"] = sim_data
+
+    # ═══════════════════════════════════════════
+    # COVER PAGE
+    # ═══════════════════════════════════════════
+    c.setFillColor(koyu)
+    c.rect(0, 0, w, h, fill=1)
+    c.setFillColor(altin)
+    c.rect(0, h - 14, w, 14, fill=1)
+    c.setFillColor(altin)
+    c.rect(0, 0, w, 10, fill=1)
+    # title
+    c.setFont("DejaVu-Bold", 34)
+    c.setFillColor(HexColor('#FDFAF5'))
+    c.drawCentredString(w / 2, h - 150, "Bireysel Natal")
+    c.drawCentredString(w / 2, h - 190, "Analiz Raporu")
+    c.setStrokeColor(altin)
+    c.setLineWidth(1)
+    c.line(w / 2 - 110, h - 212, w / 2 + 110, h - 212)
+    c.setFont("DejaVu", 15)
+    c.setFillColor(HexColor('#CCCCCC'))
+    c.drawCentredString(w / 2, h - 240, motor.p1_isim or "Kişisel Analiz")
+    c.setFont("DejaVu", 9)
+    c.setFillColor(HexColor('#999999'))
+    c.drawCentredString(w / 2, h - 262, "FAST — Sinastri Tekniği  |  v4.0")
+    # Birth info on cover
+    try:
+        dogum_bilgi = f"Doğum: {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
+        yer_bilgi = f"Konum: {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
+        c.setFont("DejaVu", 8)
+        c.setFillColor(HexColor('#999999'))
+        if dogum_bilgi:
+            c.drawCentredString(w / 2, h - 285, dogum_bilgi)
+        if yer_bilgi:
+            c.drawCentredString(w / 2, h - 298, yer_bilgi)
+    except: pass
+
+    # Life areas summary on cover
+    ha_list = data.get("hayat_alanlari", [])
+    if ha_list:
+        y = h - 320
+        c.setFont("DejaVu-Bold", 11)
+        c.setFillColor(HexColor('#D4C5A9'))
+        c.drawCentredString(w / 2, y, "Hayat Alanları Puanları")
+        y -= 20
+        col1 = 90; col2 = w / 2 + 30
+        for i, ha in enumerate(ha_list):
+            cx = col1 if i < 7 else col2
+            cy = y - (i % 7) * 26
+            c.setFont("DejaVu", 8)
+            c.setFillColor(HexColor('#BBBBBB'))
+            c.drawString(cx, cy, f"{ha.get('icon','')} {ha.get('etiket','')}")
+            bar_w = 55
+            dolu = int(bar_w * min(ha.get("skor", 50), 100) / 100)
+            c.setFillColor(HexColor('#444444'))
+            c.rect(cx + 80, cy - 2, bar_w, 7, fill=1)
+            c.setFillColor(altin)
+            c.rect(cx + 80, cy - 2, dolu, 7, fill=1)
+            c.setFillColor(HexColor('#AAAAAA'))
+            c.setFont("DejaVu-Bold", 7)
+            c.drawString(cx + 80 + bar_w + 5, cy - 1, f"%{ha.get('skor','')}")
+
+    bolum_no = [0]  # mutable counter for closures
+
+    # ═══════════════════════════════════════════
+    # CHART WHEEL PAGE
+    # ═══════════════════════════════════════════
+    try:
+        motor.haritalari_ciz()
+        chart_png = os.path.join(_PROJECT_ROOT, f"{motor._session_id}_Situa_A.png")
+        chart_svg = os.path.join(_PROJECT_ROOT, f"{motor._session_id}_Situa_A.svg")
+        if os.path.exists(chart_png):
+            yeni_sayfa()
+            y = SAYFA_UST - 10
+            c.setFont("DejaVu-Bold", 18)
+            c.setFillColor(koyu)
+            c.drawCentredString(w / 2, y, "Doğum Haritası")
+            c.setStrokeColor(altin)
+            c.setLineWidth(1)
+            c.line(w / 2 - 100, y - 8, w / 2 + 100, y - 8)
+            c.drawImage(chart_png, SOL + 20, SAYFA_ALT + 20, width=(SAG - SOL - 40), height=(y - SAYFA_ALT - 40), preserveAspectRatio=True)
+    except Exception as e:
+        print(f"[PDF] Harita eklenemedi: {e}")
+
+    # ═══════════════════════════════════════════
+    # CHART INTERPRETATION — flowing text
+    # ═══════════════════════════════════════════
+    chart_yorum = data.get("chart_yorumu", "")
+    if chart_yorum and len(chart_yorum) > 30:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Doğum Haritası Yorumu", numara=str(bolum_no[0]))
+        paragraflar = chart_yorum.split("\n\n")
+        for para in paragraflar:
+            if not para.strip():
+                y -= 8
+                continue
+            if y < 80:
+                yeni_sayfa(); y = SAYFA_UST
+            y = metin_yaz(SOL, y, para.strip(), "DejaVu", 8.5, acik, 92)
+            y -= 6
+
+    # ═══════════════════════════════════════════
+    # LIFE AREAS DETAIL — cards
+    # ═══════════════════════════════════════════
+    if ha_list:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Hayat Alanları Detayı", numara=str(bolum_no[0]))
+        for ha in ha_list:
+            yorum_text = ha.get("yorum", "")[:400]
+            oneriler = ha.get("oneriler", [])[:3]
+            # Calculate card height
+            card_h = 28  # header
+            card_h += yazi_olcul(yorum_text, "DejaVu", 8.5, 88) + 4
+            card_h += len(oneriler) * 14 + 6
+            card_h += 10  # padding
+
+            if y - card_h < SAYFA_ALT:
+                yeni_sayfa(); y = SAYFA_UST
+
+            kart_ciz(SOL, y - card_h, SAG - SOL, card_h, ha.get('etiket',''), ha.get('icon',''))
+            inner_y = y - 30
+            # Score bar
+            bar_w = 70
+            skor = ha.get("skor", 50)
+            dolu = int(bar_w * min(skor, 100) / 100)
+            c.setFillColor(HexColor('#E0D8C8'))
+            c.rect(SAG - bar_w - 40, y - 22, bar_w, 9, fill=1)
+            c.setFillColor(altin)
+            c.rect(SAG - bar_w - 40, y - 22, dolu, 9, fill=1)
+            c.setFont("DejaVu-Bold", 8)
+            c.setFillColor(koyu)
+            c.drawString(SAG - 35, y - 21, f"%{skor}")
+            # Yorum
+            inner_y = metin_yaz(SOL + 12, inner_y - 4, yorum_text, "DejaVu", 8.5, koyu, 86)
+            # Öneriler
+            for oneri in oneriler:
+                metin = oneri.get("metin", "")[:130]
+                if inner_y < SAYFA_ALT:
+                    break
+                c.setFont("DejaVu-Oblique", 7.5)
+                c.setFillColor(acik)
+                c.drawString(SOL + 18, inner_y, f"\u2022 {metin}")
+                inner_y -= 12
+            y -= card_h + 12
+
+    # ═══════════════════════════════════════════
+    # HEALING PRESCRIPTIONS
+    # ═══════════════════════════════════════════
+    sifa = data.get("sifa_receteleri", "")
+    sifa_detay = data.get("sifa_receteleri_detay", [])
+    if sifa or sifa_detay:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Şifa Reçeteleri", numara=str(bolum_no[0]))
+        if sifa:
+            y = metin_yaz(SOL, y, str(sifa)[:600], "DejaVu", 8.5, acik, 92)
+            y -= 10
+        if sifa_detay:
+            for rec in sifa_detay:
+                rec_h = yazi_olcul(rec, "DejaVu", 8, 88) + 16
+                if y - rec_h < SAYFA_ALT:
+                    yeni_sayfa(); y = SAYFA_UST
+                # card
+                c.setFillColor(kart_bg)
+                c.roundRect(SOL, y - rec_h, SAG - SOL, rec_h, 4, fill=1, stroke=0)
+                c.setStrokeColor(altin)
+                c.setLineWidth(2)
+                c.line(SOL + 4, y - 6, SOL + 4, y - rec_h + 6)
+                c.setStrokeColor(gri)
+                c.setLineWidth(0.3)
+                c.roundRect(SOL, y - rec_h, SAG - SOL, rec_h, 4, fill=0, stroke=1)
+                inner_y = y - 10
+                inner_y = metin_yaz(SOL + 14, inner_y, rec, "DejaVu", 8, koyu, 86)
+                y -= rec_h + 8
+
+    # ═══════════════════════════════════════════
+    # SABIAN SYMBOLS
+    # ═══════════════════════════════════════════
+    sabianlar = data.get("sabianlar", [])
+    if sabianlar:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Sabian Sembolleri", numara=str(bolum_no[0]))
+        for s in sabianlar:
+            sembol = _strip_html(str(s.get('sembol','')))[:250]
+            sembol_h = yazi_olcul(sembol, "DejaVu", 8, 88) + 20
+            if y - sembol_h < SAYFA_ALT:
+                yeni_sayfa(); y = SAYFA_UST
+            c.setFillColor(kart_bg)
+            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 4, fill=1, stroke=0)
+            c.setStrokeColor(gri)
+            c.setLineWidth(0.3)
+            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 4, fill=0, stroke=1)
+            c.setFont("DejaVu-Bold", 9)
+            c.setFillColor(bordo)
+            c.drawString(SOL + 10, y - 16, f"{s.get('gezegen','')}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
+            metin_yaz(SOL + 10, y - 28, sembol, "DejaVu", 8, acik, 86)
+            y -= sembol_h + 8
+
+    # ═══════════════════════════════════════════
+    # SOLAR / LUNAR RETURN
+    # ═══════════════════════════════════════════
+    for baslik, icerik in [("Solar Return — Yıllık Öngörü", data.get("solar_return")),
+                           ("Lunar Return — Aylık Öngörü", data.get("lunar_return"))]:
+        if icerik and len(str(icerik)) > 20:
+            bolum_no[0] += 1
+            yeni_sayfa()
+            y = sayfa_basligi(baslik, numara=str(bolum_no[0]))
+            metin_yaz(SOL, y, str(icerik)[:3000], "DejaVu", 8.5, acik, 92)
+
+    # ═══════════════════════════════════════════
+    # MINOR PROGRESS — 3 DAY
+    # ═══════════════════════════════════════════
+    mp_data = data.get("minor_progress", [])
+    if isinstance(mp_data, list) and mp_data:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Minor Progress — Önümüzdeki 3 Gün", numara=str(bolum_no[0]))
+        for p in mp_data:
+            baslik = f"{p.get('tarih','')} ({p.get('gun_ad','')})" if p.get('tarih') else f"İlerleme Yılı: {p.get('yil','')}"
+            yorumlar = p.get("yorumlar", [])
+            mp_h = 30 + len(yorumlar) * 12 + 10
+            if y - mp_h < SAYFA_ALT:
+                yeni_sayfa(); y = SAYFA_UST
+            c.setFillColor(kart_bg)
+            c.roundRect(SOL, y - mp_h, SAG - SOL, mp_h, 4, fill=1, stroke=0)
+            c.setStrokeColor(gri)
+            c.setLineWidth(0.3)
+            c.roundRect(SOL, y - mp_h, SAG - SOL, mp_h, 4, fill=0, stroke=1)
+            c.setFont("DejaVu-Bold", 10)
+            c.setFillColor(bordo)
+            c.drawString(SOL + 10, y - 16, baslik)
+            ay_info = f"Ay: {p.get('ay_burc','')} ({p.get('ay_ev','')}. Ev)  |  Güneş: {p.get('gunes_burc','')}"
+            c.setFont("DejaVu", 8)
+            c.setFillColor(acik)
+            c.drawString(SOL + 10, y - 28, ay_info)
+            ortam = p.get("ortam", "")
+            inner_y = y - 40
+            if ortam:
+                inner_y = metin_yaz(SOL + 14, inner_y, ortam, "DejaVu-Oblique", 7.5, HexColor('#888888'), 86)
+            for yorum in yorumlar:
+                c.setFont("DejaVu", 8)
+                c.setFillColor(koyu)
+                c.drawString(SOL + 14, inner_y, f"\u2022 {yorum[:130]}")
+                inner_y -= 11
+            y -= mp_h + 10
+
+    # ═══════════════════════════════════════════
+    # 6-MONTH MINOR PROGRESS
+    # ═══════════════════════════════════════════
+    mp6 = data.get("minor_progress_6month", "")
+    if mp6 and len(mp6) > 20:
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("6 Aylık Minor Progress", numara=str(bolum_no[0]))
+        metin_yaz(SOL, y, mp6.replace("<br/>"," | ").replace("<b>","").replace("</b>",""), "DejaVu", 7.5, acik, 95)
+
+    # ═══════════════════════════════════════════
+    # SIMULATION — Global Kader Pusulası
+    # ═══════════════════════════════════════════
+    sim = data.get("simulasyon", {})
+    if sim and any(v for v in sim.values()):
+        bolum_no[0] += 1
+        yeni_sayfa()
+        y = sayfa_basligi("Global Kader Pusulası", numara=str(bolum_no[0]))
+        c.setFont("DejaVu", 8)
+        c.setFillColor(acik)
+        c.drawString(SOL, y, "Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır.")
+        y -= 24
+        SIM_KAT_PDF = [
+            ("para", "💰", "Para & Bolluk"),
+            ("huzur", "🕊️", "Huzur & İç Sakinlik"),
+            ("tutku", "🔥", "Tutku & Macera"),
+            ("kriz", "⚡", "Kriz & Dönüşüm"),
+        ]
+        for kat_key, icon, label in SIM_KAT_PDF:
+            cities = sim.get(kat_key, [])[:3]
+            if not cities:
+                continue
+            kat_h = 28 + len(cities) * 16 + 8
+            if y - kat_h < SAYFA_ALT:
+                yeni_sayfa()
+                y = sayfa_basligi("Global Kader Pusulası (devam)")
+            kart_ciz(SOL, y - kat_h, SAG - SOL, kat_h, label, icon)
+            inner_y = y - 28
+            for i, city in enumerate(cities):
+                sehir_adi = city.get("sehir", "")[:48]
+                skor_val = city.get("skor", 0)
+                c.setFont("DejaVu", 8)
+                c.setFillColor(koyu)
+                c.drawString(SOL + 16, inner_y, f"{i+1}. {sehir_adi}")
+                bar_x = SAG - 75
+                bar_w = 50
+                dolu = int(bar_w * min(skor_val, 99) / 99)
+                c.setFillColor(HexColor('#E0D8C8'))
+                c.rect(bar_x, inner_y - 2, bar_w, 7, fill=1)
+                c.setFillColor(altin)
+                c.rect(bar_x, inner_y - 2, dolu, 7, fill=1)
+                c.setFont("DejaVu-Bold", 7)
+                c.setFillColor(koyu)
+                c.drawString(bar_x + bar_w + 4, inner_y - 1, f"%{skor_val}")
+                inner_y -= 16
+            y -= kat_h + 10
+
+    c.save()
+    print(f"[PDF] Natal PDF saved: {yol}")
+
+def _wrap_text(text, maxlen):
+    """Wrap text into lines of maxlen characters."""
+    words = text.split()
+    lines = []
+    cur = ""
+    for w in words:
+        if len(cur) + len(w) + 1 > maxlen:
+            if cur: lines.append(cur)
+            cur = w
+        else:
+            cur = (cur + " " + w).strip()
+    if cur: lines.append(cur)
+    return lines or [text]
+
+def _collect_extra_data(motor):
+    data = {}
+    try:
+        mod = getattr(motor, 'mod', '')
+        ev = motor.karmik_ev_aktarimlari(pdf_icin=False)
+        if isinstance(ev, tuple):
+            data["karmik_ev"] = {"rapor_a": ev[0], "rapor_b": [] if mod == 'bireysel_natal' else ev[1]}
+        else:
+            data["karmik_ev"] = {"rapor_a": [], "rapor_b": []}
+    except: data["karmik_ev"] = {"rapor_a": [], "rapor_b": []}
+    try:
+        if getattr(motor, 'mod', '') == 'bireysel_natal':
+            data["bagil_iklim"] = ""
+        else:
+            data["bagil_iklim"] = motor.kadersel_bsp_iklimi()
+    except: data["bagil_iklim"] = ""
+    try:
+        mod = getattr(motor, 'mod', '')
+        if mod == 'bireysel_natal':
+            data["progression"] = []
+        else:
+            prog = motor.secondary_progression_yorumla()
+            data["progression"] = prog if isinstance(prog, list) else []
+    except: data["progression"] = []
+    try:
+        if getattr(motor, 'mod', '') == 'bireysel_natal':
+            data["hava_durumu"] = []
+        else:
+            alarms = motor.gunluk_bsp_taramasi(gun_sayisi=30)
+            data["hava_durumu"] = alarms[:3] if isinstance(alarms, list) else []
+    except: data["hava_durumu"] = []
+    try:
+        if getattr(motor, 'mod', '') == 'bireysel_natal':
+            data["zaman_makinesi"] = []
+        else:
+            nav = motor.calculate_gelecek_navigasyonu(pdf_icin=False)
+            data["zaman_makinesi"] = nav[:3] if isinstance(nav, list) else []
+    except: data["zaman_makinesi"] = []
+    try:
+
+        yildiz_liste = []
+        mod = getattr(motor, 'mod', '')
+        # For bireysel_natal, only use p1 (no duplicate data from p2)
+        ekran_haritalari = [
+            {"jd": motor.get_natal_julian_day("p1"), "isim": motor.p1_isim},
+        ]
+        if mod != 'bireysel_natal':
+            isim2 = motor.p2_isim or "Situa B"
+            ekran_haritalari.append({"jd": motor.get_natal_julian_day("p2"), "isim": isim2})
+        for harita in ekran_haritalari:
+            for g_ad, g_id in list(GEZEGENLER.items())[:10]:
+                if len(yildiz_liste) >= 3: break
+                try:
+                    deg = get_planetary_position(harita["jd"], g_id)
+                    sonuc = kadersel_yildiz_taramasi(g_ad, deg, orb_siniri=2.0)
+                    if sonuc:
+                        for s in sonuc:
+                            if len(yildiz_liste) >= 3: break
+                            satirlar = s.split("\n")
+                            yildiz_liste.append({"baslik": satirlar[0].replace("Kavuşumu", f"Kavuşumu ({harita['isim']})"), "icerik": "\n".join(satirlar[1:])})
+                except: continue
+            if len(yildiz_liste) >= 3: break
+        data["yildiz_muhurleri"] = yildiz_liste
+    except: data["yildiz_muhurleri"] = []
+    try:
+        arap = motor.arap_noktasi_hesapla()
+        if isinstance(arap, dict):
+            if getattr(motor, 'mod', '') == 'bireysel_natal':
+                # Keep only p1's data (same person, skip duplicate from p2)
+                p1_isim = motor.p1_isim
+                data["arap_noktalari"] = {k: v for k, v in arap.items() if k == p1_isim}
+            else:
+                data["arap_noktalari"] = arap
+        else:
+            data["arap_noktalari"] = {}
+    except: data["arap_noktalari"] = {}
+    try:
+        if mod == 'bireysel_natal':
+            data["arap_sinastri"] = []
+        else:
+            arap_sin = motor.arap_noktasi_sinastri_analizi()
+            data["arap_sinastri"] = arap_sin if isinstance(arap_sin, list) else []
+    except: data["arap_sinastri"] = []
+    try:
+        j_ileri, j_geri = motor.get_julian_dates()
+        ASTEROIDLER = ["Juno", "Ceres", "Pallas", "Vesta", "Eros", "Psyche", "Sappho", "Amor"]
+        HEDEFLER = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton", "Chiron"]
+
+        asteroit_bulgular = []
+        mod = getattr(motor, 'mod', '')
+        if mod == 'bireysel_natal':
+            # Natal mod: asteroids conjunct natal planets in same chart
+            for asto in ASTEROIDLER:
+                try:
+                    asto_id = GEZEGENLER.get(asto)
+                    if asto_id is None: continue
+                    a_deg = swe.calc_ut(j_ileri, asto_id)[0][0]
+                    for gez in HEDEFLER:
+                        g_id = GEZEGENLER.get(gez)
+                        if g_id is None: continue
+                        try: g_deg = swe.calc_ut(j_ileri, g_id)[0][0]
+                        except: continue
+                        fark = abs(a_deg - g_deg)
+                        if fark > 180: fark = 360 - fark
+                        if fark <= 5.0:
+                            ainfo = getattr(app, 'ASTEROID_ISIMLERI', {}).get(asto, {})
+                            yorum_dict = getattr(app, 'ASTEROID_SINASTRI_YORUMLARI', {})
+                            yorum = yorum_dict.get((asto, gez), "") or yorum_dict.get((gez, asto), "")
+                            asteroit_bulgular.append({
+                                "kaynak": motor.p1_isim, "asteroit": asto,
+                                "hedef": motor.p1_isim, "gezegen": gez,
+                                "fark": round(fark, 1),
+                                "etki": ainfo.get("etki", ""),
+                                "yorum": yorum,
+                            })
+                except: continue
+                if len(asteroit_bulgular) >= 20: break
+        else:
+            for (kaynak_jd, kaynak_ad, hedef_jd, hedef_ad) in [
+                (j_ileri, motor.p1_isim, j_geri, motor.p2_isim),
+                (j_geri, motor.p2_isim, j_ileri, motor.p1_isim),
+            ]:
+                for asto in ASTEROIDLER:
+                    try:
+                        asto_id = GEZEGENLER.get(asto)
+                        if asto_id is None: continue
+                        a_deg = swe.calc_ut(kaynak_jd, asto_id)[0][0]
+                        for gez in HEDEFLER:
+                            g_id = GEZEGENLER.get(gez)
+                            if g_id is None: continue
+                            try: g_deg = swe.calc_ut(hedef_jd, g_id)[0][0]
+                            except: continue
+                            fark = abs(a_deg - g_deg)
+                            if fark > 180: fark = 360 - fark
+                            if fark <= 5.0:
+                                ainfo = getattr(app, 'ASTEROID_ISIMLERI', {}).get(asto, {})
+                                yorum_dict = getattr(app, 'ASTEROID_SINASTRI_YORUMLARI', {})
+                                yorum = yorum_dict.get((asto, gez), "") or yorum_dict.get((gez, asto), "")
+                                asteroit_bulgular.append({
+                                    "kaynak": kaynak_ad, "asteroit": asto,
+                                    "hedef": hedef_ad, "gezegen": gez,
+                                    "fark": round(fark, 1),
+                                    "etki": ainfo.get("etki", ""),
+                                    "yorum": yorum,
+                                })
+                    except: continue
+                if len(asteroit_bulgular) >= 20: break
+        data["asteroitler"] = asteroit_bulgular
+    except: data["asteroitler"] = []
+    return data
+
+def _collect_astro_data(motor):
+    """Event koordinatları için composite-based astrokartografi verisi toplar."""
+    try:
+        comp = _composite_midpoints(motor.p1, motor.p2)
+        jd_ev = swe.julday(motor.event_date.year, motor.event_date.month, motor.event_date.day,
+                               motor.event_date.hour + motor.event_date.minute / 60.0)
+        skor = _composite_sehir_skor(comp, jd_ev, motor.enlem, motor.boylam)
+        return {"gezegenler": comp, "skor": {k: skor[k] for k in ["huzur","para","tutku","kriz","etkiler"]}}
+    except:
+        return None
+
+def _engine_es(p: EsSevgiliInput, ek_charts=False):
+    motor = FBST_Engine(
+        p1=_parse_date(p.p1_tarih), p2=_parse_date(p.p2_tarih),
+        event_date=_parse_date(p.event_tarih), event_time=p.event_saat,
+        city=p.sehir, country=p.ulke,
+        lat=p.enlem, lon=p.boylam,
+        p1_isim=p.p1_isim, p2_isim=p.p2_isim,
+        mod="es_sevgili", utc_offset=p.utc_offset,
+    )
+    motor.fbst_analizi_yap(sessiz=True)
+    if ek_charts:
+        _generate_ek_charts(motor)
+    _cache_engine(motor)
+    return motor
+
+def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
+    motor = FBST_Engine(
+        p1=_parse_date(p.cocuk_tarih), p2=_parse_date(p.ebeveyn_tarih),
+        event_date=_parse_date(p.cocuk_tarih), event_time=p.cocuk_saat,
+        city=p.sehir, country=p.ulke,
+        lat=p.enlem, lon=p.boylam,
+        p1_isim=p.cocuk_isim, p2_isim=p.ebeveyn_isim,
+        mod="ebeveyn_cocuk", ebeveyn_rolu=p.ebeveyn_rolu,
+        utc_offset=p.utc_offset,
+    )
+    motor.fbst_analizi_yap(sessiz=True)
+    if ek_charts:
+        _generate_ek_charts(motor)
+    _cache_engine(motor)
+    return motor
+
+def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
+    tarih = _parse_date(p.tarih)
+    motor = FBST_Engine(
+        p1=tarih, p2=tarih,
+        event_date=tarih, event_time=p.saat,
+        city=p.sehir, country=p.ulke,
+        lat=p.enlem, lon=p.boylam,
+        p1_isim=p.isim, p2_isim="",
+        mod="potansiyel_yetenek", utc_offset=p.utc_offset,
+    )
+    motor.fbst_analizi_yap(sessiz=True)
+    if ek_charts:
+        _generate_ek_charts(motor)
+    _cache_engine(motor)
+    return motor
+
+def _engine_natal(p: BireyselNatalInput, ek_charts=False):
+    tarih = _parse_date(p.tarih)
+    motor = FBST_Engine(
+        p1=tarih, p2=tarih,
+        event_date=tarih, event_time=p.saat,
+        city=p.sehir, country=p.ulke,
+        lat=p.enlem, lon=p.boylam,
+        p1_isim=p.isim, p2_isim="",
+        mod="bireysel_natal", utc_offset=p.utc_offset,
+    )
+    motor.fbst_analizi_yap(sessiz=True)
+    if ek_charts:
+        _generate_ek_charts(motor)
+    _cache_engine(motor)
+    return motor
+
+def _collect_sabian_data(motor):
+    """Collect Sabian symbols for all planets in the natal chart."""
+    try:
+
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+        jd = motor.get_natal_julian_day("p1")
+        sabianlar = []
+        for g_ad, g_id in list(GEZEGENLER.items())[:12]:
+            try:
+                deg = get_planetary_position(jd, g_id)
+                sonuc = motor.sabian_okuyucu(g_ad, deg)
+                if sonuc:
+                    burc = BURCLAR[int(deg // 30)]
+                    derece = deg % 30
+                    sabianlar.append({
+                        "gezegen": g_ad,
+                        "derece": round(deg, 1),
+                        "derece_str": f"{derece:.1f}° {burc}",
+                        "sembol": _strip_html(sonuc)
+                    })
+            except:
+                continue
+        return sabianlar
+    except:
+        return []
+
+def _aspect_interpretasyon_kutuphanesi():
+    """Dev interpretasyon kütüphanesi: gezegen profilleri × açı türleri × ev bağlamı.
+    Her çift için 5 açı tipinde doğrudan yorum + üretici ile eksikleri tamamlama."""
+
+    GEZEGENLER = {
+        "Güneş": {"oz": "öz benlik, kimlik, hayati amaç, yaratıcı güç, otorite, liderlik",
+                  "ev": {1:"dış görünüş ve kişilik",2:"değerler ve maddi güvenlik",3:"iletişim ve yakın çevre",4:"kökler ve aile",5:"yaratıcılık ve aşk",6:"sağlık ve günlük rutin",7:"ilişkiler ve ortaklıklar",8:"dönüşüm ve ortak kaynaklar",9:"inançlar ve yüksek öğrenim",10:"kariyer ve toplumsal statü",11:"sosyal çevre ve idealler",12:"bilinçaltı ve ruhsal yolculuk"}},
+        "Ay": {"oz": "duygular, iç dünya, anne, besleme, alışkanlıklar, sezgi, güven ihtiyacı",
+               "ev": {1:"duygusal dışavurum",2:"güvenlik arayışı",3:"kısa vadeli duygusal paylaşımlar",4:"aile bağı ve yuva hissi",5:"yaratıcı duygusal ifade",6:"günlük bakım alışkanlıkları",7:"duygusal partner",8:"derin duygusal dönüşüm",9:"duygusal inanç",10:"toplumsal roller duygusu",11:"arkadaşlık duyguları",12:"bilinçaltı duygular ve gizli korkular"}},
+        "Merkür": {"oz": "zihin, iletişim, mantık, öğrenme, analiz, yazma, kısa yolculuklar",
+                   "ev": {1:"iletişim tarzı",2:"parasal düşünce",3:"kardeşler ve yakın çevre iletişimi",4:"aile içi iletişim",5:"yaratıcı zihin",6:"çalışma ortamı iletişimi",7:"partnerle diyalog",8:"derin araştırma",9:"felsefi düşünce",10:"kariyer iletişimi",11:"grup çalışmaları",12:"bilinçaltı düşünce kalıpları"}},
+        "Venüs": {"oz": "aşk, güzellik, değerler, harmoni, estetik, çekim, para, rahatlık",
+                  "ev": {1:"fiziksel çekicilik",2:"para ve maddi değerler",3:"iletişimde çekicilik",4:"aile içi sevgi",5:"romantik aşk",6:"güzel alışkanlıklar",7:"ilişkiler ve evlilik",8:"cinsellik ve duygusal paylaşımlar",9:"güzellik felsefesi",10:"kariyerde estetik",11:"arkadaşlık ve sosyal zevkler",12:"gizli aşklar"}},
+        "Mars": {"oz": "eylem, tutku, cesaret, öfke, rekabet, irade, savaş enerjisi",
+                 "ev": {1:"dışa vurulan cesaret",2:"parasal mücadele",3:"sözlü tartışma",4:"aile içi mücadele",5:"tutkulu yaratıcılık",6:"iş hayatı ve sağlık mücadelesi",7:"ilişkilerde çatışma",8:"derin dönüşüm ve kriz yönetimi",9:"felsefi mücadele",10:"kariyer hırsı",11:"grup çalışmaları",12:"bilinçaltı öfke"}},
+        "Jüpiter": {"oz": "bolluk, şans, genişleme, felsefe, inanç, öğrenme, iyimserlik",
+                    "ev": {1:"geniş kişilik",2:"maddi bolluk",3:"iletişimde cömertlik",4:"aile içi bolluk",5:"yaratıcı bolluk",6:"sağlıkta şans",7:"ilişkilerde bolluk",8:"ortak kaynaklarda bolluk",9:"felsefi genişleme",10:"kariyerde bolluk",11:"sosyal çevre bolluğu",12:"ruhsal genişleme"}},
+        "Satürn": {"oz": "disiplin, sınırlar, sorumluluk, olgunluk, yapı, korku, sabır, dersler",
+                   "ev": {1:"kişisel sorumluluklar",2:"maddi sınırlar",3:"iletişimde kısıtlamalar",4:"aile köklerinde sorumluluklar",5:"yaratıcı kısıtlamalar",6:"sağlık disiplini",7:"ilişkilerde sınırlar",8:"derin korkular",9:"felsefi kısıtlamalar",10:"kariyer sorumlulukları",11:"sosyal sınırlamalar",12:"bilinçaltı korkular"}},
+        "Uranüs": {"oz": "özgürlük, devrim, ani değişim, icat, asi ruh, bağımsızlık, deha",
+                   "ev": {1:"kişisel özgürlük",2:"para ve değerlerde değişimler",3:"iletişimde yenilikçilik",4:"aile köklerinde değişimler",5:"yaratıcı devrim",6:"iş hayatında değişiklikler",7:"ilişkilerde ani başlangıçlar",8:"ani dönüşüm",9:"felsefi devrim",10:"kariyerde yön değişimi",11:"sosyal çevre değişimi",12:"bilinçaltı devrim"}},
+        "Neptün": {"oz": "hayal, ilham, sezgi, puslu, maneviyat, idealizm, kafa karışıklığı",
+                   "ev": {1:"kişisel hayaller",2:"para ve değerlerde hayal kırıklıkları",3:"iletişimde belirsizlik",4:"aile içi hayaller",5:"yaratıcı ilham",6:"sağlıkta belirsizlik",7:"ilişkilerde idealizm",8:"derin sezgisel dönüşüm",9:"ruhsal ilham",10:"kariyerde hayaller",11:"sosyal hayaller",12:"bilinçaltı sezgiler"}},
+        "Plüton": {"oz": "dönüşüm, güç, ölüm-yeniden doğum, obsesyon, derinlik, gizli güç",
+                   "ev": {1:"kişisel güç",2:"para ve değerlerde güç mücadeleleri",3:"iletişimde güç oyunları",4:"aile köklerinde güç dinamikleri",5:"yaratıcı güç",6:"iş hayatında güç mücadelesi",7:"ilişkilerde güç dengeleri",8:"derin cinsel ve ruhsal dönüşüm",9:"felsefi dönüşüm",10:"kariyerde güç",11:"sosyal güç",12:"bilinçaltı güç"}},
+        "Chiron": {"oz": "yara, kırılganlık, iyileşme, bilgelik, şifacı yara, kabul",
+                   "ev": {1:"kişisel yara",2:"değer yarası",3:"iletişim yarası",4:"aile yarası",5:"yaratıcı yara",6:"sağlık yarası",7:"ilişki yarası",8:"derin yara",9:"felsefi yara",10:"kariyer yarası",11:"sosyal yara",12:"bilinçaltı yara"}},
+    }
+
+    ASTEROITLER = {
+        "Juno": {"oz": "bağlılık, evlilik, sadakat, ortaklık, adalet, ilişki taahhüdü",
+                 "ev": {1:"kişisel bağlılık",2:"değer bağlılığı",3:"iletişimde sadakat",4:"aile bağlılığı",5:"yaratıcı bağlılık",6:"iş hayatı bağlılığı",7:"evlilik ve uzun vadeli ortaklıklar",8:"cinsel bağlılık",9:"felsefi bağlılık",10:"kariyer bağlılığı",11:"arkadaşlık bağlılığı",12:"ruhsal bağlılık"}},
+        "Ceres": {"oz": "besleme, annelik, kayıp, kabul, şefkat, beslenme, doğa",
+                  "ev": {1:"kişisel besleme",2:"değer beslemesi",3:"iletişimde besleme",4:"aile beslemesi",5:"yaratıcı besleme",6:"iş hayatı beslemesi",7:"partner beslemesi",8:"derin besleme ve kayıp",9:"felsefi besleme",10:"kariyer beslemesi",11:"arkadaşlık beslemesi",12:"ruhsal besleme"}},
+        "Pallas": {"oz": "bilgelik, strateji, yaratıcı zekâ, sanatsal yetenek, savaşçılık, öngörü",
+                   "ev": {1:"kişisel strateji",2:"maddi strateji",3:"iletişim stratejisi",4:"aile stratejisi",5:"yaratıcı strateji",6:"iş hayatı stratejisi",7:"ilişki stratejisi",8:"derin strateji",9:"felsefi strateji",10:"kariyer stratejisi",11:"grup stratejisi",12:"ruhsal strateji"}},
+        "Vesta": {"oz": "adanma, odak, kutsal ateş, iç disiplin, hizmet, Tapınak",
+                  "ev": {1:"kişisel adanma",2:"değer adanması",3:"iletişim adanması",4:"aile adanması",5:"yaratıcı adanma",6:"iş hayatı adanması",7:"ilişki adanması",8:"derin adanma",9:"felsefi adanma",10:"kariyer adanması",11:"arkadaşlık adanması",12:"ruhsal adanma"}},
+        "Eros": {"oz": "tutkulu aşk, arzu, cinsellik, şehvet, yaratıcı tutku, yaşam coşkusu",
+                 "ev": {1:"kişisel tutku",2:"maddi tutku",3:"iletişim tutkusu",4:"aile tutkusu",5:"romantik tutku",6:"iş hayatı tutkusu",7:"ilişki tutkusu",8:"derin tutku",9:"felsefi tutku",10:"kariyer tutkusu",11:"arkadaşlık tutkusu",12:"ruhsal tutku"}},
+        "Psyche": {"oz": "ruh, psikoloji, derin bağ, kırılganlık, sezgi, ruhsal aşk",
+                   "ev": {1:"kişisel ruh",2:"değer psikolojisi",3:"iletişim psikolojisi",4:"aile psikolojisi",5:"yaratıcı ruh",6:"iş hayatı psikolojisi",7:"ilişki psikolojisi",8:"derin psikoloji",9:"felsefi psikoloji",10:"kariyer psikolojisi",11:"arkadaşlık psikolojisi",12:"bilinçaltı psikoloji"}},
+    }
+
+    ARAP_NOKTALARI = {
+        "Ruh Noktası": {"oz": "yaşam amacı, ruhsal yön, kariyer yönü, kader, ilham kaynağı",
+                        "ev": {1:"yaşam amacı benlik üzerinden",2:"değer ve güvenlik amacı",3:"iletişim ve çevre amacı",4:"aile ve kökler amacı",5:"yaratıcılık ve aşk amacı",6:"hizmet ve sağlık amacı",7:"ilişki ve ortaklık amacı",8:"dönüşüm ve derinlik amacı",9:"öğrenim ve felsefe amacı",10:"kariyer ve toplumsal amaç",11:"sosyal çevre ve idealler amacı",12:"ruhsal arınma amacı"}},
+        "Evlilik Noktası": {"oz": "ilişki potansiyeli, evlilik teması, uzun vadeli ortaklık, uyum arayışı",
+                           "ev": {1:"benlik ile ilişki dengesi",2:"değer ve güvenlik ilişkisi",3:"iletişim ve çevre ilişkisi",4:"aile ve kökler ilişkisi",5:"yaratıcılık ve aşk ilişkisi",6:"hizmet ve sağlık ilişkisi",7:"doğrudan evlilik ve ortaklık",8:"derin dönüşüm ilişkisi",9:"felsefi ve uzak kültür ilişkisi",10:"kariyer ve toplumsal ilişki",11:"arkadaşlık ve grup ilişkisi",12:"ruhsal ve gizli ilişki"}},
+        "Aşk Noktası": {"oz": "aşk potansiyeli, romantik çekim, duygusal bağlılık, cinsel uyum",
+                       "ev": {1:"fiziksel çekim",2:"değer aşkı",3:"iletişim aşkı",4:"aile aşkı",5:"doymuş romantik aşk",6:"iş hayatı aşkı",7:"ilişki aşkı",8:"derin aşk",9:"felsefi aşk",10:"kariyer aşkı",11:"arkadaşlık aşkı",12:"ruhsal aşk"}},
+        "Tutku Noktası": {"oz": "yoğun tutku, arzu, hırs, obsesyon, derin çekim, cinsel enerji",
+                         "ev": {1:"kişisel tutku",2:"değer tutkusu",3:"iletişim tutkusu",4:"aile tutkusu",5:"yaratıcı tutku",6:"iş hayatı tutkusu",7:"ilişki tutkusu",8:"derin tutku",9:"felsefi tutku",10:"kariyer tutkusu",11:"arkadaşlık tutkusu",12:"ruhsal tutku"}},
+        "Para Noktası": {"oz": "maddi potansiyel, finansal şans, değer üretimi, bolluk",
+                        "ev": {1:"kişisel para potansiyeli",2:"doğrudan para üretimi",3:"iletişim ve çevre para potansiyeli",4:"aile mirası",5:"yaratıcı para",6:"iş hayatı para üretimi",7:"ilişki ve ortaklık para potansiyeli",8:"ortak kaynaklar",9:"uzak ülkeler ve bolluk",10:"kariyer para potansiyeli",11:"sosyal çevre para",12:"ruhsal bolluk"}},
+    }
+
+    CIFT_TEMA = {
+        ("Güneş","Ay"): "öz benlik ile duygusal dünya arasında köprü",
+        ("Güneş","Merkür"): "kimlik ile zihin arasında doğrudan bağlantı",
+        ("Güneş","Venüs"): "öz benlik ile sevgi ve değerler arasında uyum",
+        ("Güneş","Mars"): "kimlik ile eylem ve tutku arasında güçlü bağ",
+        ("Güneş","Jüpiter"): "benlik ile bolluk ve genişleme arasında destek",
+        ("Güneş","Satürn"): "öz ile sorumluluk ve sınırlar arasında denge",
+        ("Güneş","Uranüs"): "kimlik ile özgürlük ve devrim arasında kopuş",
+        ("Güneş","Neptün"): "benlik ile hayaller ve sezgiler arasında pusluluk",
+        ("Güneş","Plüton"): "öz ile güç ve dönüşüm arasında derin bağ",
+        ("Güneş","Chiron"): "benlik yarası ve kabul mücadelesi",
+        ("Ay","Merkür"): "duygu ile zihin arasında köprü",
+        ("Ay","Venüs"): "duygusal dünya ile sevgi arasında derin uyum",
+        ("Ay","Mars"): "duygular ile eylem arasında çatışma ve tutku",
+        ("Ay","Jüpiter"): "duygusal güvenlik ile bolluk arasında genişleme",
+        ("Ay","Satürn"): "duygular ile sınırlar arasında zorlu denge",
+        ("Ay","Uranüs"): "iç dünya ile özgürlük arasında ani kopuşlar",
+        ("Ay","Neptün"): "duygular ile hayaller arasında derin sezgisellik",
+        ("Ay","Plüton"): "duygusal dünya ile güç arasında yoğun dönüşüm",
+        ("Ay","Chiron"): "duygusal yara ve beslenme ihtiyacı",
+        ("Ay","KAD"): "aile kökleri ile duygusal alışkanlıklar arasında bağ",
+        ("Ay","Lilith"): "duygusal gizlilik ve bastırılmış arzu",
+        ("Merkür","Venüs"): "zihin ile çekicilik arasında uyum",
+        ("Merkür","Mars"): "düşünce ile eylem arasında hız",
+        ("Merkür","Jüpiter"): "zihin ile genişleme arasında bolluk",
+        ("Merkür","Satürn"): "düşünce ile sınırlar arasında ciddiyet",
+        ("Merkür","Uranüs"): "zihin ile devrim arasında deha",
+        ("Merkür","Neptün"): "düşünce ile hayal arasında puslu zekâ",
+        ("Merkür","Plüton"): "zihin ile güç arasında derin analiz",
+        ("Merkür","Chiron"): "iletişim yarası ve ifade zorluğu",
+        ("Merkür","KAD"): "aile köklerinde iletişim kalıpları",
+        ("Merkür","Lilith"): "zihinsel gizlilik ve bastırılmış düşünce",
+        ("Venüs","Mars"): "çekicilik ile tutku arasında güçlü çekim",
+        ("Venüs","Jüpiter"): "sevgi ile bolluk arasında genişleme",
+        ("Venüs","Satürn"): "aşk ile sınırlar arasında olgunlaşma",
+        ("Venüs","Uranüs"): "değerler ile devrim arasında ani değişim",
+        ("Venüs","Neptün"): "sevgi ile hayal arasında idealizm",
+        ("Venüs","Plüton"): "aşk ile güç arasında yoğun dönüşüm",
+        ("Venüs","Chiron"): "sevgi yarası ve kabul arayışı",
+        ("Venüs","KAD"): "aile köklerinde sevgi ve değer kalıpları",
+        ("Venüs","Lilith"): "aşkta gizlilik ve bastırılmış arzu",
+        ("Mars","Jüpiter"): "tutku ile bolluk arasında genişleme",
+        ("Mars","Satürn"): "eylem ile sınırlar arasında disiplin",
+        ("Mars","Uranüs"): "tutku ile devrim arasında ani patlamalar",
+        ("Mars","Neptün"): "eylem ile hayal arasında puslu mücadele",
+        ("Mars","Plüton"): "tutku ile güç arasında yoğun savaş",
+        ("Mars","Chiron"): "savaş yarası ve kırılgan cesaret",
+        ("Mars","KAD"): "aile köklerinde savaş ve koruma",
+        ("Mars","Lilith"): "tutkulu gizlilik ve bastırılmış öfke",
+        ("Jüpiter","Satürn"): "bolluk ile sınırlar arasında denge",
+        ("Jüpiter","Uranüs"): "genişleme ile devrim arasında ani şans",
+        ("Jüpiter","Neptün"): "inanç ile hayal arasında manevi genişleme",
+        ("Jüpiter","Plüton"): "bolluk ile güç arasında derin genişleme",
+        ("Jüpiter","Chiron"): "inanç yarası ve manevi iyileşme",
+        ("Jüpiter","KAD"): "aile köklerinde bolluk ve inanç",
+        ("Jüpiter","Lilith"): "inançta gizlilik ve genişleme",
+        ("Satürn","Uranüs"): "sınır ile devrim arasında zorlu denge",
+        ("Satürn","Neptün"): "disiplin ile hayal arasında puslu yapı",
+        ("Satürn","Plüton"): "sınır ile güç arasında yoğun yapı",
+        ("Satürn","Chiron"): "korku yarası ve olgunlaşma",
+        ("Satürn","KAD"): "aile köklerinde sorumluluk ve sınırlar",
+        ("Satürn","Lilith"): "sınırda gizlilik ve bastırılmış korku",
+        ("Uranüs","Neptün"): "devrim ile hayal arasında manevi değişim",
+        ("Uranüs","Plüton"): "özgürlük ile güç arasında derin devrim",
+        ("Uranüs","Chiron"): "özgürlük yarası ve kabul",
+        ("Uranüs","KAD"): "aile köklerinde devrim ve ani değişim",
+        ("Uranüs","Lilith"): "özgürlükte gizlilik ve asi ruh",
+        ("Neptün","Plüton"): "hayal ile güç arasında manevi dönüşüm",
+        ("Neptün","Chiron"): "hayal yarası ve ruhsal iyileşme",
+        ("Neptün","KAD"): "aile köklerinde hayaller ve pus",
+        ("Neptün","Lilith"): "hayalde gizlilik ve bastırılmış sezgi",
+        ("Plüton","Chiron"): "dönüşüm yarası ve derin iyileşme",
+        ("Plüton","KAD"): "aile köklerinde güç ve derin dönüşüm",
+        ("Plüton","Lilith"): "güçte gizlilik ve bastırılmış tutku",
+        ("Juno","Güneş"): "bağlılık ile kimlik arasında güçlü bağ",
+        ("Juno","Ay"): "bağlılık ile duygular arasında derin uyum",
+        ("Juno","Venüs"): "bağlılık ile çekicilik arasında evlilik teması",
+        ("Juno","Mars"): "bağlılık ile tutku arasında zorlu denge",
+        ("Ceres","Güneş"): "besleme ile kimlik arasında anne enerjisi",
+        ("Ceres","Ay"): "besleme ile duygular arasında derin şefkat",
+        ("Ceres","Venüs"): "besleme ile çekicilik arasında koşulsuz sevgi",
+        ("Ceres","Merkür"): "besleme ile zihin arasında iletişim bakımı",
+        ("Pallas","Güneş"): "strateji ile kimlik arasında bilgelik",
+        ("Pallas","Merkür"): "strateji ile zihin arasında analitik güç",
+        ("Pallas","Satürn"): "strateji ile sınırlar arasında yapısal bilgelik",
+        ("Pallas","Plüton"): "strateji ile güç arasında derin öngörü",
+        ("Vesta","Güneş"): "adanma ile kimlik arasında kutsal ateş",
+        ("Vesta","Ay"): "adanma ile duygular arasında iç disiplin",
+        ("Vesta","Venüs"): "adanma ile çekicilik arasında kutsal sevgi",
+        ("Vesta","Plüton"): "adanma ile güç arasında derin odak",
+        ("Eros","Venüs"): "tutku ile çekicilik arasında şehvetli aşk",
+        ("Eros","Mars"): "tutku ile eylem arasında yoğun arzu",
+        ("Eros","Plüton"): "tutku ile güç arasında derin dönüşüm",
+        ("Eros","Güneş"): "tutku ile kimlik arasında yaşam coşkusu",
+        ("Psyche","Ay"): "ruh ile duygular arasında derin bağ",
+        ("Psyche","Venüs"): "ruh ile çekicilik arasında ruhsal aşk",
+        ("Psyche","Plüton"): "ruh ile güç arasında psikolojik dönüşüm",
+        ("Psyche","Neptün"): "ruh ile hayal arasında manevi sezgi",
+        ("Ruh Noktası","Güneş"): "yaşam amacı ile kimlik arasında derin bağ",
+        ("Ruh Noktası","Ay"): "yaşam amacı ile duygular arasında sezgisel yön",
+        ("Ruh Noktası","Venüs"): "yaşam amacı ile çekicilik arasında estetik yön",
+        ("Ruh Noktası","Mars"): "yaşam amacı ile tutku arasında eylem odaklı yön",
+        ("Evlilik Noktası","Venüs"): "ilişki potansiyeli ile çekicilik arasında güçlü uyum",
+        ("Evlilik Noktası","Jüpiter"): "ilişki potansiyeli ile bolluk arasında genişleme",
+        ("Evlilik Noktası","Satürn"): "ilişki potansiyeli ile sınırlar arasında ciddi taahhüt",
+        ("Evlilik Noktası","Neptün"): "ilişki potansiyeli ile hayal arasında idealist ilişki",
+        ("Aşk Noktası","Venüs"): "aşk potansiyeli ile çekicilik arasında güçlü romantizm",
+        ("Aşk Noktası","Mars"): "aşk potansiyeli ile tutku arasında tutkulu aşk",
+        ("Aşk Noktası","Plüton"): "aşk potansiyeli ile güç arasında yoğun dönüşüm",
+        ("Aşk Noktası","Güneş"): "aşk potansiyeli ile kimlik arasında benlik aşkı",
+        ("Tutku Noktası","Mars"): "yoğun tutku ile eylem arasında güçlü hırs",
+        ("Tutku Noktası","Plüton"): "yoğun tutku ile güç arasında derin obsesyon",
+        ("Tutku Noktası","Venüs"): "yoğun tutku ile çekicilik arasında şehvetli enerji",
+        ("Tutku Noktası","Ay"): "yoğun tutku ile duygular arasında derin arzu",
+        ("Para Noktası","Jüpiter"): "maddi potansiyel ile bolluk arasında güçlü şans",
+        ("Para Noktası","Satürn"): "maddi potansiyel ile sınırlar arasında yapı",
+        ("Para Noktası","Venüs"): "maddi potansiyel ile çekicilik arasında estetik değer",
+        ("Para Noktası","Plüton"): "maddi potansiyel ile güç arasında derin dönüşüm",
+    }
+
+    OZEL_YORUMLAR = {
+        ("Güneş","Ay","Kavuşum"): "Güneş ve Ay'ınız aynı burçta birleşmiş. Öz benliğiniz ile duygusal dünyanız tam uyum içinde — ne istediğiniz ve neye ihtiyacınız olduğu konusunda doğal bir berraklığınız var. Bu kavuşum, hayatınızda güçlü bir iç tutarlılık sağlar.",
+        ("Güneş","Ay","Karşıt"): "Güneş ve Ay'ınız zıt burçlarda. Öz benliğiniz ile duygusal ihtiyaçlarınız sürekli denge arayışında — ne istediğiniz ile neye ihtiyacınız olduğu arasında gidip gelirsiniz. Bu karşıtlık, her iki tarafı da tam olarak anlamanızı gerektirir.",
+        ("Güneş","Ay","Kare"): "Güneş ve Ay'ınız kare açıda. Kimliğiniz ile duygusal dünyanız arasındaki gerilim, iç çatışmalara yol açabilir. Ancak bu mücadele, kendinizi daha derin tanımanız için güçlü bir fırsat sunar.",
+        ("Güneş","Ay","Trigon"): "Güneş ve Ay'ınız trigon açıda. Öz benliğiniz ile duygularınız doğal uyum içinde — ne istediğiniz konusunda içsel bir berraklığınız var. Bu enerjiyi yaratıcı projelerinizde kullanabilirsiniz.",
+        ("Güneş","Ay","Sekstil"): "Güneş ve Ay'ınız sekstil açıda. Öz benlik ile duygusal dünya arasında destekleyici bir bağ var. Bu fırsatı değerlendirerek, duygusal zekanızı ve kişisel powerınızı birleştirebilirsiniz.",
+        ("Güneş","Merkür","Kavuşum"): "Güneş ve Merkür'ünüz kavuşumda. Kimliğiniz ile zihinsel gücünüz aynı noktada — düşünce tarzınız ve iletişim şekliniz benliğinizi yansıtıyor. Zihniniz hızlı çalışır ve fikirlerinizi cesurca ifade edersiniz.",
+        ("Güneş","Merkür","Karşıt"): "Güneş ve Merkür'ünüz karşıt burçlarda. Öz benliğiniz ile düşünce tarzınız arasında bir denge arayışı var — ne istediğinizi söylerken aslında ne düşündüğünüz ile çelişebilirsiniz.",
+        ("Güneş","Merkür","Kare"): "Güneş ve Merkür'ünüz kare açıda. Kimliğiniz ile zihinsel analiz arasında gerilim var — cesurca konuşurken bazen düşüncelerinizi tam ifade edemeyebilirsiniz. Bu iletişim becerilerinizi geliştirmeniz için bir fırsat.",
+        ("Güneş","Merkür","Trigon"): "Güneş ve Merkür'ünüz trigon açıda. Düşünce ile kimlik doğal uyum içinde — zihniniz berrak, iletişiminiz akıcı ve fikirlerinizi kolayca hayata geçirirsiniz.",
+        ("Güneş","Merkür","Sekstil"): "Güneş ve Merkür'ünüz sekstil açıda. Zihinsel yetenekleriniz ile kimliğiniz arasında destekleyici bir bağ var. Yaratıcı fikirlerinizi güçlü bir şekilde ifade edebilirsiniz.",
+        ("Güneş","Venüs","Kavuşum"): "Güneş ve Venüs'ünüz kavuşumda. Öz benliğiniz ile sevgi diliniz aynı noktada — kendinizi sevme ve değer verme kapasiteniz güçlü. Çekiciliğiniz ve kişisel charminiz doğal olarak parlıyor.",
+        ("Güneş","Venüs","Karşıt"): "Güneş ve Venüs'ünüz karşıt burçlarda. Benlik ile sevgi arasında denge arayışı var — kendinizi ifade ederken sevdiklerinizin ihtiyaçlarını da göz önünde bulundurmanız gerekiyor.",
+        ("Güneş","Venüs","Kare"): "Güneş ve Venüs'ünüz kare açıda. Kimliğiniz ile sevgi diliniz arasındaki gerilim, ilişkilerinizde zorluklara yol açabilir. Ancak bu mücadele, sevgiyi daha derin anlamanız için bir fırsat.",
+        ("Güneş","Venüs","Trigon"): "Güneş ve Venüs'ünüz trigon açıda. Öz benliğiniz ile çekicilik enerjiniz doğal uyum içinde — sevgi ve değerler konusunda içsel bir berraklığınız var.",
+        ("Güneş","Venüs","Sekstil"): "Güneş ve Venüs'ünüz sekstil açıda. Kimlik ile sevgi arasında destekleyici bir bağ var. İlişkilerinizde ve yaratıcılığınızda güçlü bir denge kurabilirsiniz.",
+        ("Güneş","Mars","Kavuşum"): "Güneş ve Mars'ınız kavuşumda. Kimliğiniz ile savaşçı ruhunuz aynı noktada — cesaret, tutku ve eylem enerjiniz güçlü. Doğal bir lider ve mücadeleci yapıdasınız.",
+        ("Güneş","Mars","Karşıt"): "Güneş ve Mars'ınız karşıt burçlarda. Öz benlik ile eylem arasında denge arayışı var — ne istediğiniz konusunda tutkulu ama bazen sabırsız olabilirsiniz.",
+        ("Güneş","Mars","Kare"): "Güneş ve Mars'ınız kare açıda. Kimlik ile tutku arasındaki gerilim, öfke ve sabırsızlık yaratabilir. Ancak bu güçlü enerjiyi yaratıcı projelere kanalize etmek, büyük başarılara yol açar.",
+        ("Güneş","Mars","Trigon"): "Güneş ve Mars'ınız trigon açıda. Benlik ile eylem doğal uyum içinde — cesur, enerjik ve tutkulu bir yapınız var. Bu enerjiyi hedeflerinize ulaşmak için kullanabilirsiniz.",
+        ("Güneş","Mars","Sekstil"): "Güneş ve Mars'ınız sekstil açıda. Kimlik ile tutku arasında destekleyici bir bağ var. Cesur adımlar atarak hayallerinizi hayata geçirebilirsiniz.",
+        ("Güneş","Jüpiter","Kavuşum"): "Güneş ve Jüpiteriniz kavuşumda. Öz benliğiniz ile bolluk enerjisi aynı noktada — iyimserlik, cömertlik ve genişleme potansiyeliniz güçlü. Hayatınızda doğal bir şans ve bereket akışı var.",
+        ("Güneş","Jüpiter","Karşıt"): "Güneş ve Jüpiteriniz karşıt burçlarda. Benlik ile bolluk arasında denge arayışı var — aşırı iyimserlik ile gerçekçilik arasında gidip gelebilirsiniz.",
+        ("Güneş","Jüpiter","Kare"): "Güneş ve Jüpiteriniz kare açıda. Kimlik ile genişleme arasındaki gerilim, aşırıya kaçma eğilimini güçlendirebilir. Ancak bu enerjiyi dengelemek, büyük fırsatlar yaratır.",
+        ("Güneş","Jüpiter","Trigon"): "Güneş ve Jüpiteriniz trigon açıda. Benlik ile bolluk doğal uyum içinde — iyimser, cömert ve geniş düşünebilen bir yapınız var.",
+        ("Güneş","Jüpiter","Sekstil"): "Güneş ve Jüpiteriniz sekstil açıda. Kimlik ile genişleme arasında destekleyici bir bağ var. Kişisel gelişiminize ve başkalarına fayda sağlayabilirsiniz.",
+        ("Güneş","Satürn","Kavuşum"): "Güneş ve Satürn'ünüz kavuşumda. Öz benliğiniz ile sorumluluklarınız aynı noktada — disiplinli, ciddi ve yapısal bir yapınız var. Hayatınızda güçlü bir olgunluk enerjisi hakim.",
+        ("Güneş","Satürn","Karşıt"): "Güneş ve Satürn'ünüz karşıt burçlarda. Benlik ile sınırlar arasında denge arayışı — özgürlük ile sorumluluk arasındaki gerilim hayatınızın temel derslerinden biri.",
+        ("Güneş","Satürn","Kare"): "Güneş ve Satürn'ünüz kare açıda. Kimlik ile sınırlar arasındaki gerilim, kendinize karşı aşırı katı olmanıza yol açabilir. Bu dersi öğrenmek, gerçek olgunluğun anahtarı.",
+        ("Güneş","Satürn","Trigon"): "Güneş ve Satürn'ünüz trigon açıda. Benlik ile yapı doğal uyum içinde — disiplinli, kararlı ve sorumluluk sahibi bir yapınız var.",
+        ("Güneş","Satürn","Sekstil"): "Güneş ve Satürn'ünüz sekstil açıda. Kimlik ile sınırlar arasında destekleyici bir bağ var. Disiplinli adımlarla büyük projeler hayata geçirebilirsiniz.",
+        ("Güneş","Uranüs","Kavuşum"): "Güneş ve Uranüs'ünüz kavuşumda. Kimliğiniz ile devrimci ruhunuz aynı noktada — özgürlüğünüz, bağımsızlığınız ve yaratıcı dehanız güçlü. Ani değişimler hayatınızda belirgin.",
+        ("Güneş","Uranüs","Karşıt"): "Güneş ve Uranüs'ünüz karşıt burçlarda. Özgürlük ile gelenek arasında denge arayışı — asi ruhunuz ile toplumsal beklentiler arasında sürekli bir gerilim.",
+        ("Güneş","Uranüs","Kare"): "Güneş ve Uranüs'ünüz kare açıda. Kimlik ile devrim arasındaki gerilim, ani kopuşlara yol açabilir. Bu enerjiyi yapıcı kullanmak, hayatınızı dönüştürür.",
+        ("Güneş","Uranüs","Trigon"): "Güneş ve Uranüs'ünüz trigon açıda. Benlik ile özgürlük doğal uyum içinde — yenilikçi, yaratıcı ve bağımsız bir yapınız var.",
+        ("Güneş","Uranüs","Sekstil"): "Güneş ve Uranüs'ünüz sekstil açıda. Kimlik ile devrim arasında destekleyici bir bağ var. Yenilikçi değişimler başlatabilirsiniz.",
+        ("Güneş","Neptün","Kavuşum"): "Güneş ve Neptün'ünüz kavuşumda. Benliğiniz ile hayalleriniz aynı noktada — sezgisel, yaratıcı ve manevi bir yapınız var. Sanatsal yetenekleriniz güçlü.",
+        ("Güneş","Neptün","Karşıt"): "Güneş ve Neptün'ünüz karşıt burçlarda. Gerçekçilik ile hayal arasında denge arayışı — gerçek dünya ile hayal dünyası arasında gidip gelebilirsiniz.",
+        ("Güneş","Neptün","Kare"): "Güneş ve Neptün'ünüz kare açıda. Kimlik ile pusluluk arasındaki gerilim, kafa karışıklığı yaratabilir. Ancak bu enerjiyi sanatsal yaratıcılığa kanalize etmek güçlü sonuçlar verir.",
+        ("Güneş","Neptün","Trigon"): "Güneş ve Neptün'ünüz trigon açıda. Benlik ile sezgi doğal uyum içinde — manevi dünyanız güçlü ve yaratıcı ilhamınız bereketli.",
+        ("Güneş","Neptün","Sekstil"): "Güneş ve Neptün'ünüz sekstil açıda. Kimlik ile hayal arasında destekleyici bir bağ var. Sanatsal ve manevi projelerinizi hayata geçirebilirsiniz.",
+        ("Güneş","Plüton","Kavuşum"): "Güneş ve Plüton'uz kavuşumda. Kimliğiniz ile güç enerjiniz aynı noktada — derin bir dönüşüm, kararlılık ve iç güç taşıyorsunuz. Hayatınızda güçlü yeniden doğum döngüleri var.",
+        ("Güneş","Plüton","Karşıt"): "Güneş ve Plüton'uz karşıt burçlarda. Benlik ile güç arasında denge arayışı — başkalarının güç dinamikleri ile kendi powerınız arasında gerilim.",
+        ("Güneş","Plüton","Kare"): "Güneş ve Plüton'uz kare açıda. Kimlik ile güç arasındaki gerilim, kontrol ve güç mücadelelerini hayatınıza çekebilir. Bırakmayı öğrenmek, derin bir dönüşüm getirir.",
+        ("Güneş","Plüton","Trigon"): "Güneş ve Plüton'uz trigon açıda. Benlik ile güç doğal uyum içinde — derin kararlılık, iç güç ve dönüştürücü enerji taşıyorsunuz.",
+        ("Güneş","Plüton","Sekstil"): "Güneş ve Plüton'uz sekstil açıda. Kimlik ile güç arasında destekleyici bir bağ var. Kişisel dönüşümünüzü hızlandırabilirsiniz.",
+        ("Ay","Merkür","Kavuşum"): "Ay ve Merkür'ünüz kavuşumda. Duygularınız ile zihinsel gücünüz aynı noktada — duygusal zekanız yüksek, sezgileriniz ve analiz yeteneğiniz güçlü bir şekilde iç içe.",
+        ("Ay","Merkür","Karşıt"): "Ay ve Merkür'ünüz karşıt burçlarda. Duygular ile mantık arasında denge arayışı — hisleriniz ile düşünceleriniz zaman zaman çelişebilir.",
+        ("Ay","Merkür","Kare"): "Ay ve Merkür'ünüz kare açıda. Duygu ile zihin arasındaki gerilim, karar verme süreçlerinizi zorlaştırabilir. Ancak bu dengeyi öğrenmek, duygusal zekanızı güçlendirir.",
+        ("Ay","Merkür","Trigon"): "Ay ve Merkür'ünüz trigon açıda. Duygular ile düşünce doğal uyum içinde — sezgisel analiz yeteneğiniz güçlü, iletişim tarzınız akıcı ve empatik.",
+        ("Ay","Merkür","Sekstil"): "Ay ve Merkür'ünüz sekstil açıda. Duygusal dünya ile zihin arasında destekleyici bir bağ var. Duygusal berraklığınızı artırabilirsiniz.",
+        ("Ay","Venüs","Kavuşum"): "Ay ve Venüs'ünüz kavuşumda. Duygusal dünyanız ile sevgi diliniz aynı noktada — kendinizi ve başkalarını sevme kapasiteniz güçlü, içsel huzur ve estetik anlayışınız doğal.",
+        ("Ay","Venüs","Karşıt"): "Ay ve Venüs'ünüz karşıt burçlarda. Duygusal ihtiyaçlar ile sevgi dili arasında denge arayışı — sevilme ihtiyacınız ile sevme biçiminiz zaman zaman çelişebilir.",
+        ("Ay","Venüs","Kare"): "Ay ve Venüs'ünüz kare açıda. Duygu ile çekicilik arasındaki gerilim, ilişkilerinizde duygusal dalgalanmalara yol açabilir. Sevgi dilinizi güçlendirmek için bir fırsat.",
+        ("Ay","Venüs","Trigon"): "Ay ve Venüs'ünüz trigon açıda. Duygular ile sevgi doğal uyum içinde — empatik, şefkatli ve estetik anlayışı güçlü bir yapınız var.",
+        ("Ay","Venüs","Sekstil"): "Ay ve Venüs'ünüz sekstil açıda. Duygusal dünya ile sevgi arasında destekleyici bir bağ var. İlişkilerinizde derin bir uyum kurabilirsiniz.",
+        ("Ay","Mars","Kavuşum"): "Ay ve Mars'ınız kavuşumda. Duygularınız ile savaşçı ruhunuz aynı noktada — duygusal tepkileriniz hızlı ve güçlü, koruma içgüdünüz yüksek.",
+        ("Ay","Mars","Karşıt"): "Ay ve Mars'ınız karşıt burçlarda. Duygusal world ile eylem arasında denge arayışı — hisleriniz ile aksiyonunuz zaman zaman çelişebilir.",
+        ("Ay","Mars","Kare"): "Ay ve Mars'ınız kare açıda. Duygu ile tutku arasındaki gerilim, öfke ve duygusal tepkilere yol açabilir. Bu enerjiyi yapıcı kanalize etmek, büyük bir güç kaynağı.",
+        ("Ay","Mars","Trigon"): "Ay ve Mars'ınız trigon açıda. Duygular ile eylem doğal uyum içinde — cesur, enerjik ve duygusal olarak dengeli bir yapınız var.",
+        ("Ay","Mars","Sekstil"): "Ay ve Mars'ınız sekstil açıda. Duygusal dünya ile tutku arasında destekleyici bir bağ var. Duygusal cesaretinizi güçlendirebilirsiniz.",
+        ("Ay","Jüpiter","Kavuşum"): "Ay ve Jüpiteriniz kavuşumda. Duygularınız ile bolluk enerjiniz aynı noktada — duygusal genişleme, cömertlik ve iyimserlik içsel doğanız.",
+        ("Ay","Jüpiter","Karşıt"): "Ay ve Jüpiteriniz karşıt burçlarda. Duygusal güvenlik ile genişleme arasında denge arayışı — duygusal ihtiyaçlarınız ile büyüme arzunuz çelişebilir.",
+        ("Ay","Jüpiter","Kare"): "Ay ve Jüpiteriniz kare açıda. Duygu ile genişleme arasındaki gerilim, aşırıya kaçma eğilimini güçlendirebilir. Duygusal bolluk yaratmak için bir denge bulmalısınız.",
+        ("Ay","Jüpiter","Trigon"): "Ay ve Jüpiteriniz trigon açıda. Duygular ile bolluk doğal uyum içinde — duygusal olarak geniş, cömert ve iyimser bir yapınız var.",
+        ("Ay","Jüpiter","Sekstil"): "Ay ve Jüpiteriniz sekstil açıda. Duygusal dünya ile genişleme arasında destekleyici bir bağ var. Duygusal bolluğunuzu artırabilirsiniz.",
+        ("Ay","Satürn","Kavuşum"): "Ay ve Satürn'ünüz kavuşumda. Duygularınız ile sınırlarınız aynı noktada — duygusal olarak disiplinli, ciddi ve yapısal bir yapınız var. Güvenlik ihtiyacınız güçlü.",
+        ("Ay","Satürn","Karşıt"): "Ay ve Satürn'ünüz karşıt burçlarda. Duygusal world ile sınırlar arasında denge arayışı — duygusal ihtiyaçlarınız ile sorumluluklarınız çelişebilir.",
+        ("Ay","Satürn","Kare"): "Ay ve Satürn'ünüz kare açıda. Duygu ile sınır arasındaki gerilim, duygusal kısıtlamalara ve korkulara yol açabilir. Bu dersi öğrenmek, duygusal olgunluğun anahtarı.",
+        ("Ay","Satürn","Trigon"): "Ay ve Satürn'ünüz trigon açıda. Duygular ile yapı doğal uyum içinde — duygusal olarak olgun, disiplinli ve güvenilir bir yapınız var.",
+        ("Ay","Satürn","Sekstil"): "Ay ve Satürn'ünüz sekstil açıda. Duygusal dünya ile sınırlar arasında destekleyici bir bağ var. Duygusal güvenliğinizi güçlendirebilirsiniz.",
+        ("Merkür","Venüs","Kavuşum"): "Merkür ve Venüs'ünüz kavuşumda. Zihniniz ile çekiciliğiniz aynı noktada — iletişim tarzınız doğal olarak çekici, sosyal zekanız ve estetik anlayışınız güçlü.",
+        ("Merkür","Venüs","Karşıt"): "Merkür ve Venüs'ünüz karşıt burçlarda. Mantık ile çekicilik arasında denge arayışı — düşünceleriniz ile sevgi diliniz zaman zaman çelişebilir.",
+        ("Merkür","Venüs","Kare"): "Merkür ve Venüs'ünüz kare açıda. Zihin ile çekicilik arasındaki gerilim, iletişimde zorluklara yol açabilir. Sosyal becerilerinizi geliştirmek için bir fırsat.",
+        ("Merkür","Venüs","Trigon"): "Merkür ve Venüs'ünüz trigon açıda. Zihin ile çekicilik doğal uyum içinde — iletişim tarzınız akıcı, sosyal zekanız güçlü.",
+        ("Merkür","Venüs","Sekstil"): "Merkür ve Venüs'ünüz sekstil açıda. Düşünce ile çekicilik arasında destekleyici bir bağ var. İletişim becerilerinizi ve sosyal zekanızı artırabilirsiniz.",
+        ("Mars","Jüpiter","Kavuşum"): "Mars ve Jüpiteriniz kavuşumda. Tutku ile bolluk aynı noktada — cesur, enerjik ve geniş düşünebilen bir yapınız var. Aksiyon alırken doğal bir şans ve bereket akışı.",
+        ("Mars","Jüpiter","Karşıt"): "Mars ve Jüpiteriniz karşıt burçlarda. Eylem ile genişleme arasında denge arayışı — tutkunuz ile iyimserliğiniz zaman zaman çelişebilir.",
+        ("Mars","Jüpiter","Kare"): "Mars ve Jüpiteriniz kare açıda. Tutku ile genişleme arasındaki gerilim, aşırıya kaçma eğilimini güçlendirebilir. Ancak bu enerjiyi dengelemek, büyük başarılara yol açar.",
+        ("Mars","Jüpiter","Trigon"): "Mars ve Jüpiteriniz trigon açıda. Tutku ile bolluk doğal uyum içinde — cesur, enerjik ve bereketli bir yapınız var.",
+        ("Mars","Jüpiter","Sekstil"): "Mars ve Jüpiteriniz sekstil açıda. Eylem ile genişleme arasında destekleyici bir bağ var. Cesur adımlar atarak büyük fırsatlar yakalayabilirsiniz.",
+        ("Mars","Satürn","Kavuşum"): "Mars ve Satürn'ünüz kavuşumda. Tutku ile disiplin aynı noktada — güçlü bir irade, kararlılık ve yapısal mücadele enerjisi taşıyorsunuz.",
+        ("Mars","Satürn","Karşıt"): "Mars ve Satürn'ünüz karşıt burçlarda. Eylem ile sınırlar arasında denge arayışı — tutkunuz ile kısıtlamalarınız zaman zaman çelişebilir.",
+        ("Mars","Satürn","Kare"): "Mars ve Satürn'ünüz kare açıda. Tutku ile sınır arasındaki gerilim, güçlü bir iç mücadeleye yol açabilir. Bu dersi öğrenmek, irade gücünüzü dönüştürür.",
+        ("Mars","Satürn","Trigon"): "Mars ve Satürn'ünüz trigon açıda. Eylem ile yapı doğal uyum içinde — disiplinli, kararlı ve güçlü bir yapınız var.",
+        ("Mars","Satürn","Sekstil"): "Mars ve Satürn'ünüz sekstil açıda. Tutku ile sınırlar arasında destekleyici bir bağ var. Disiplinli adımlarla büyük projeler hayata geçirebilirsiniz.",
+        ("Venüs","Mars","Kavuşum"): "Venüs ve Mars'ınız kavuşumda. Çekicilik ile tutku aynı noktada — romantik ve cinsel enerjiniz güçlü, fiziksel ve duygusal çekim potansiyeliniz yüksek.",
+        ("Venüs","Mars","Karşıt"): "Venüs ve Mars'ınız karşıt burçlarda. Sevgi ile tutku arasında denge arayışı — çekim ile itiş dinamiği ilişkinizin temelini oluşturur.",
+        ("Venüs","Mars","Kare"): "Venüs ve Mars'ınız kare açıda. Çekicilik ile tutku arasındaki gerilim, ilişkilerinizde tutkulu ama zorlayıcı bir dinamik yaratabilir.",
+        ("Venüs","Mars","Trigon"): "Venüs ve Mars'ınız trigon açıda. Sevgi ile tutku doğal uyum içinde — romantik, tutkulu ve uyumlu bir ilişki enerjisi taşıyorsunuz.",
+        ("Venüs","Mars","Sekstil"): "Venüs ve Mars'ınız sekstil açıda. Çekicilik ile tutku arasında destekleyici bir bağ var. Romantik ve tutkulu bir denge kurabilirsiniz.",
+        ("Venüs","Satürn","Kavuşum"): "Venüs ve Satürn'ünüz kavuşumda. Sevgi ile sınırlar aynı noktada — ilişkilerinize ciddiyet ve yapı kazandırırsınız. Uzun vadeli taahhütler konusunda güçlü potansiyel.",
+        ("Venüs","Satürn","Karşıt"): "Venüs ve Satürn'ünüz karşıt burçlarda. Sevgi ile sınırlar arasında denge arayışı — aşk life'ınızda ciddiyet ve kısıtlama dinamikleri.",
+        ("Venüs","Satürn","Kare"): "Venüs ve Satürn'ünüz kare açıda. Çekicilik ile sınır arasındaki gerilim, ilişkilerinizde zorluklara yol açabilir. Ancak bu dersi olgunlaştırır.",
+        ("Venüs","Satürn","Trigon"): "Venüs ve Satürn'ünüz trigon açıda. Sevgi ile yapı doğal uyum içinde — olgun, kararlı ve yapısal ilişkiler kurarsınız.",
+        ("Venüs","Satürn","Sekstil"): "Venüs ve Satürn'ünüz sekstil açıda. Aşk ile sınırlar arasında destekleyici bir bağ var. Uzun vadeli ve değerli ilişkiler kurabilirsiniz.",
+        ("Jüpiter","Satürn","Kavuşum"): "Jüpiter ve Satürn'ünüz kavuşumda. Bolluk ile sınırlar aynı noktada — genişleme ve yapı arasında güçlü bir denge kurarsınız. Uzun vadeli projelerde doğal strateji yeteneği.",
+        ("Jüpiter","Satürn","Karşıt"): "Jüpiter ve Satürn'ünüz karşıt burçlarda. Genişleme ile yapı arasında denge arayışı — iyimserlik ile realite arasındaki gerilim hayatınızın temel derslerinden biri.",
+        ("Jüpiter","Satürn","Kare"): "Jüpiter ve Satürn'ünüz kare açıda. Bolluk ile sınır arasındaki gerilim, fırsatları ve kısıtlamaları aynı anda deneyimlemenize yol açar.",
+        ("Jüpiter","Satürn","Trigon"): "Jüpiter ve Satürn'ünüz trigon açıda. Genişleme ile yapı doğal uyum içinde — stratejik, kararlı ve geniş düşünebilen bir yapınız var.",
+        ("Jüpiter","Satürn","Sekstil"): "Jüpiter ve Satürn'ünüz sekstil açıda. Bolluk ile sınırlar arasında destekleyici bir bağ var. Büyük projeleri yapısal bir şekilde hayata geçirebilirsiniz.",
+        ("Jüpiter","Neptün","Kavuşum"): "Jüpiter ve Neptün'ünüz kavuşumda. İnanç ile hayal aynı noktada — manevi genişleme, ilham ve sezgisel berraklık içsel doğanız.",
+        ("Jüpiter","Neptün","Karşıt"): "Jüpiter ve Neptün'ünüz karşıt burçlarda. Gerçekçi genişleme ile idealist hayal arasında denge arayışı — iyimserlik ile pusluluk zaman zaman çelişebilir.",
+        ("Jüpiter","Neptün","Kare"): "Jüpiter ve Neptün'ünüz kare açıda. İnanç ile hayal arasındaki gerilim, kafa karışıklığı ve hayal kırıklıkları yaratabilir. Ancak bu enerjiyi manevi geliştirmek güçlü sonuçlar verir.",
+        ("Jüpiter","Neptün","Trigon"): "Jüpiter ve Neptün'ünüz trigon açıda. İnanç ile hayal doğal uyum içinde — manevi dünyanız geniş, ilhamınız bereketli ve sezgileriniz güçlü.",
+        ("Jüpiter","Neptün","Sekstil"): "Jüpiter ve Neptün'ünüz sekstil açıda. İnanç ile hayal arasında destekleyici bir bağ var. Manevi projelerinizi ve hayallerinizi hayata geçirebilirsiniz.",
+        ("Jüpiter","Plüton","Kavuşum"): "Jüpiter ve Plüton'uz kavuşumda. Bolluk ile güç aynı noktada — derin genişleme, dönüşüm ve güç potansiyeliniz güçlü. Hayatınızda büyük dönüşüm döngüleri var.",
+        ("Jüpiter","Plüton","Karşıt"): "Jüpiter ve Plüton'uz karşıt burçlarda. Genişleme ile güç arasında denge arayışı — bolluk ile güç arasındaki gerilim, büyük dengesizliklere yol açabilir.",
+        ("Jüpiter","Plüton","Kare"): "Jüpiter ve Plüton'uz kare açıda. Bolluk ile güç arasındaki gerilim, kontrol ve güç mücadelelerini hayatınıza çekebilir. Ancak bu enerjiyi dengelemek, büyük dönüşümler yaratır.",
+        ("Jüpiter","Plüton","Trigon"): "Jüpiter ve Plüton'uz trigon açıda. Bolluk ile güç doğal uyum içinde — derin genişleme, kararlılık ve dönüştürücü enerji taşıyorsunuz.",
+        ("Jüpiter","Plüton","Sekstil"): "Jüpiter ve Plüton'uz sekstil açıda. Bolluk ile güç arasında destekleyici bir bağ var. Derin dönüşümleri yapıcı bir şekilde hayata geçirebilirsiniz.",
+        ("Satürn","Plüton","Kavuşum"): "Satürn ve Plüton'uz kavuşumda. Sınır ile güç aynı noktada — yapısal dönüşüm, derin sorumluluk ve güçlü bir kararlılık enerjisi taşıyorsunuz.",
+        ("Satürn","Plüton","Karşıt"): "Satürn ve Plüton'uz karşıt burçlarda. Yapı ile güç arasında denge arayışı — sınırlar ile güç arasındaki gerilim, büyük yapısal dönüşümlere yol açabilir.",
+        ("Satürn","Plüton","Kare"): "Satürn ve Plüton'uz kare açıda. Sınır ile güç arasındaki gerilim, yapısal krizlere ve derin dönüşümlere yol açabilir. Bu dersi öğrenmek, güçlü bir olgunluk getirir.",
+        ("Satürn","Plüton","Trigon"): "Satürn ve Plüton'uz trigon açıda. Yapı ile güç doğal uyum içinde — disiplinli, kararlı ve dönüştürücü bir yapınız var.",
+        ("Satürn","Plüton","Sekstil"): "Satürn ve Plüton'uz sekstil açıda. Sınır ile güç arasında destekleyici bir bağ var. Yapısal dönüşümleri stratejik bir şekilde hayata geçirebilirsiniz.",
+        ("Uranüs","Plüton","Kavuşum"): "Uranüs ve Plüton'uz kavuşumda. Özgürlük ile güç aynı noktada — derin devrim, ani değişim ve güçlü bir dönüşüm enerjisi taşıyorsunuz. Hayatınızda köklü yenilikler var.",
+        ("Uranüs","Plüton","Karşıt"): "Uranüs ve Plüton'uz karşıt burçlarda. Özgürlük ile güç arasında denge arayışı — asi ruh ile güç arasındaki gerilim, büyük çatışmalara yol açabilir.",
+        ("Uranüs","Plüton","Kare"): "Uranüs ve Plüton'uz kare açıda. Özgürlük ile güç arasındaki gerilim, ani kopuşlara ve derin dönüşümlere yol açabilir. Bu enerjiyi yapıcı kullanmak, hayatınızı dönüştürür.",
+        ("Uranüs","Plüton","Trigon"): "Uranüs ve Plüton'uz trigon açıda. Özgürlük ile güç doğal uyum içinde — yenilikçi, kararlı ve dönüştürücü bir yapınız var.",
+        ("Uranüs","Plüton","Sekstil"): "Uranüs ve Plüton'uz sekstil açıda. Özgürlük ile güç arasında destekleyici bir bağ var. Derin devrimleri yapıcı bir şekilde hayata geçirebilirsiniz.",
+        ("Neptün","Plüton","Kavuşum"): "Neptün ve Plüton'uz kavuşumda. Hayal ile güç aynı noktada — manevi dönüşüm, derin sezgi ve güçlü bir ruhsal enerji taşıyorsunuz.",
+        ("Neptün","Plüton","Karşıt"): "Neptün ve Plüton'uz karşıt burçlarda. Hayal ile güç arasında denge arayışı — manevi dünyam ile güç arasındaki gerilim, büyük ruhsal dönüşümlere yol açabilir.",
+        ("Neptün","Plüton","Kare"): "Neptün ve Plüton'uz kare açıda. Hayal ile güç arasındaki gerilim, manevi krizlere ve derin dönüşümlere yol açabilir. Bu enerjiyi manevi geliştirmek, güçlü sonuçlar verir.",
+        ("Neptün","Plüton","Trigon"): "Neptün ve Plüton'uz trigon açıda. Hayal ile güç doğal uyum içinde — manevi dünyanız derin, sezgileriniz güçlü ve dönüştürücü enerji taşıyorsunuz.",
+        ("Neptün","Plüton","Sekstil"): "Neptün ve Plüton'uz sekstil açıda. Hayal ile güç arasında destekleyici bir bağ var. Manevi dönüşümlerinizi yapıcı bir şekilde hayata geçirebilirsiniz.",
+    }
+
+    tum = list(GEZEGENLER.keys()) + list(ASTEROITLER.keys()) + list(ARAP_NOKTALARI.keys())
+
+    def _urun(p1, p2, aci):
+        key = (p1, p2, aci)
+        key_t = (p2, p1, aci)
+        if key in OZEL_YORUMLAR: return OZEL_YORUMLAR[key]
+        if key_t in OZEL_YORUMLAR: return OZEL_YORUMLAR[key_t]
+        pair = (p1, p2) if (p1, p2) in CIFT_TEMA else ((p2, p1) if (p2, p1) in CIFT_TEMA else None)
+        tema = CIFT_TEMA.get(pair, f"{p1} ve {p2} enerjileri arasında bir ilişki") if pair else f"{p1} ve {p2} enerjileri arasında bir ilişki"
+        p1p = GEZEGENLER.get(p1) or ASTEROITLER.get(p1) or ARAP_NOKTALARI.get(p1, {})
+        p2p = GEZEGENLER.get(p2) or ASTEROITLER.get(p2) or ARAP_NOKTALARI.get(p2, {})
+        p1o = p1p.get("oz", f"{p1} enerjisi"); p2o = p2p.get("oz", f"{p2} enerjisi")
+        if aci == "Kavuşum":
+            return f"{p1} ve {p2} enerjileri aynı noktada birleşmiş durumda. {tema}. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü bir bütün oluşturuyor. Bu kavuşum, her iki enerjiyi de güçlü bir şekilde deneyimlemenizi sağlıyor."
+        elif aci == "Karşıt":
+            return f"{p1} ve {p2} zıt kutuplarda duruyor. {tema}. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü arasında sürekli bir denge arayışı var. Bu karşıtlık, her iki tarafı da tam olarak anlamanızı gerektiriyor."
+        elif aci == "Kare":
+            return f"{p1} ile {p2} arasındaki kare açısı, {tema} konusunda bir gerilim yaratıyor. Bu zorlayıcı enerji, sizi konfor alanınızın dışına itiyor ve büyümeye zorluyor. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü arasındaki mücadele, en güçlü dönüşüm fırsatlarınızdan biri."
+        elif aci == "Trigon":
+            return f"{p1} ile {p2} arasındaki trigon açısı, {tema} konusunda doğal bir uyum sağlıyor. Bu enerjiyi bilinçli kullanarak hayatınızda akış yaratabilirsiniz. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü doğal bir köprü kuruyor."
+        elif aci == "Sekstil":
+            return f"{p1} ile {p2} arasındaki sekstil açısı, {tema} konusunda fırsatlar sunuyor. Bu enerjiyi harekete geçirmek için bilinçli bir adım atmanız gerekiyor. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü arasında destekleyici bir bağ var."
+        return ""
+
+    kutuphane = {}
+    islenen = set()
+    for p1 in tum:
+        for p2 in tum:
+            if p1 == p2: continue
+            pk = tuple(sorted([p1, p2]))
+            if pk in islenen: continue
+            islenen.add(pk)
+            kutuphane[f"{pk[0]}-{pk[1]}"] = {}
+            for aci in ["Kavuşum","Karşıt","Kare","Trigon","Sekstil"]:
+                kutuphane[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci)
+    return kutuphane
+
+def _collect_solar_lunar_data(motor):
+    """Solar return and lunar return predictions for the natal chart. Individual-focused."""
+    data = {}
+    try:
+        jd = motor.get_natal_julian_day("p1")
+        import datetime
+        simdi = datetime.datetime.now()
+        sr = motor.calculate_solar_return_tema(jd, simdi.year)
+        if sr and isinstance(sr, str) and len(sr) > 20:
+            sr_clean = _bireysellestir(_strip_html(sr))
+            if len(sr_clean) > 20:
+                data["solar_return"] = sr_clean
+    except:
+        pass
+    try:
+        jd = motor.get_natal_julian_day("p1")
+        import datetime
+        simdi = datetime.datetime.now()
+        lr = motor.calculate_lunar_return_tema(jd, simdi.year, simdi.month)
+        if lr and isinstance(lr, str) and len(lr) > 20:
+            lr_clean = _bireysellestir(_strip_html(lr))
+            if len(lr_clean) > 20:
+                data["lunar_return"] = lr_clean
+    except:
+        pass
+    try:
+        data["minor_progress"] = _natal_minor_progress_yorumlari(motor)
+    except:
+        data["minor_progress"] = []
+    try:
+        data["minor_progress_6month"] = _natal_minor_progress_6month(motor)
+    except:
+        data["minor_progress_6month"] = ""
+    return data
+
+def _natal_hayat_alani_analizi(motor):
+    """Bireysel natal için kapsamlı hayat alanı analizi.
+    Her alan için: skor, doğal dil yorum, spor/sanat/beslenme/hastalık/öneri."""
+    try:
+        jd = motor.get_natal_julian_day("p1")
+
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+
+        gez_poz = {}
+        for g_ad, g_id in list(GEZEGENLER.items())[:14]:
+            try:
+                deg = swe.calc_ut(jd, g_id)[0][0]
+                gez_poz[g_ad] = {"derece": deg, "burc": BURCLAR[int(deg//30)], "burc_no": int(deg//30)}
+            except: pass
+
+        cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
+        ev_kapsamlari = []
+        for i in range(12):
+            bas = cusps[i]; bit = cusps[(i+1)%12]
+            ev_kapsamlari.append({"ev": i+1, "bas": bas, "bit": bit, "bas_burc": BURCLAR[int(bas//30)]})
+
+        def gezegenin_evi(deg):
+            for ek in ev_kapsamlari:
+                if ek["bas"] <= ek["bit"]:
+                    if ek["bas"] <= deg < ek["bit"]: return ek["ev"]
+                else:
+                    if deg >= ek["bas"] or deg < ek["bit"]: return ek["ev"]
+            return 1
+
+        gez_ev = {}
+        for g_ad, info in gez_poz.items():
+            gez_ev[g_ad] = gezegenin_evi(info["derece"])
+
+        BURC_YONETICI = {"Koç":"Mars","Boğa":"Venüs","İkizler":"Merkür","Yengeç":"Ay",
+            "Aslan":"Güneş","Başak":"Merkür","Terazi":"Venüs","Akrep":"Plüton",
+            "Yay":"Jüpiter","Oğlak":"Satürn","Kova":"Uranüs","Balık":"Neptün"}
+
+        def ev_konusu(ev_no):
+            return {1:"Benlik algısı",2:"Maddi kaynaklar",3:"İletişim",4:"Aile",5:"Yaratıcılık",
+                6:"Sağlık ve rutin",7:"Ortaklıklar",8:"Dönüşüm",9:"Seyahat ve inanç",
+                10:"Kariyer",11:"Sosyal çevre",12:"Bilinçaltı"}.get(ev_no,"Genel")
+
+        # ── Burç bazlı spor önerileri ──
+        BURC_SPOR = {
+            "Koç": "koşu, boks, dövüş sporları, kros, dağcılık, sprint",
+            "Boğa": "yürüyüş, pilates, ağırlık çalışması, bahçe sporları, ata binme",
+            "İkizler": "bisiklet, badminton, masa tenisi, çoklu spor denemeleri, okçuluk",
+            "Yengeç": "yüzme, su sporları, tai-chi, akşam yürüyüşleri, ritmik hareket",
+            "Aslan": "tenis, vücut geliştirme, jimnastik, Fitness, gösteri sporları",
+            "Başak": "yoga, pilates, düzenli yürüyüş, temiz hava egzersizleri, stretching",
+            "Terazi": "dans, pilates, buz pateni, ritmik jimnastik, partner sporları",
+            "Akrep": "boks, dövüş sanatları, crossfit, yüzme, dalış, yüksek yoğunluklu interval",
+            "Yay": "at biniciliği, açık hava sporları, kampçılık, okçuluk, macera sporları",
+            "Oğlak": "uzun mesafe koşusu, bisiklet, dağcılık, disiplinli antrenman, ağırlık",
+            "Kova": "ekstrem sporlar, kaykay, snowboard, serbest dalış, yenilikçi egzersizler",
+            "Balık": "yüzme, dalış, yoga, tai-chi, meditasyon hareketleri, su sporları",
+        }
+
+        # ── Planet+ev özel spor haritası ──
+        SPOR_MAP = {
+            ("Mars",1): "Koşu, boks, dövüş sanatları ve bireysel mücadele sporları",
+            ("Mars",6): "CrossFit, interval antrenman, yüksek tempolu egzersizler",
+            ("Mars",5): "Rekabetçi sporlar, tenis, squash, spor müsabakaları",
+            ("Venüs",1): "Dans, pilates, yüzme, estetik ve akıcı sporlar",
+            ("Venüs",6): "Yoga, esneme egzersizleri, doğa yürüyüşü",
+            ("Venüs",5): "Dans, buz pateni, ritmik jimnastik",
+            ("Jüpiter",1): "Açık hava sporları, takım oyunları, doğa sporları",
+            ("Jüpiter",6): "Uzun yürüyüşler, trekking, doğa kampçılığı",
+            ("Jüpiter",9): "At biniciliği, okçuluk, açık hava macera sporları",
+            ("Satürn",1): "Uzun mesafe koşusu, bisiklet, dayanıklılık sporları",
+            ("Satürn",6): "Düzenli yürüyüş, disiplinli antrenman, ağırlık çalışması",
+            ("Satürn",10): "Maraton, triatlon, uzun vadeli dayanıklılık hedefleri",
+            ("Ay",1): "Yüzme, tai-chi, akşam yürüyüşleri, ritmik hareket",
+            ("Ay",6): "Yoga, meditasyon egzersizleri, hafif tempolu sporlar",
+            ("Ay",4): "Bahçe yürüyüşleri, evde egzersiz, aile spor aktiviteleri",
+            ("Uranüs",1): "Ekstrem sporlar, kaykay, snowboard, yenilikçi egzersizler",
+            ("Uranüs",11): "Grup extreme sporları, parkour, serbest dalış",
+            ("Neptün",1): "Yoga, yüzme, dans, su sporları, tai-chi",
+            ("Neptün",12): "Meditasyon hareketleri, qigong, ruhsal beden egzersizleri",
+            ("Güneş",1): "Tenis, atletizm, liderlik gerektiren spor branşları",
+            ("Güneş",5): "Gösteri sporları, jimnastik, artistik performans",
+            ("Plüton",8): "Dönüşümsel fitness, derin vücut çalışmaları,detoks sporları",
+            ("Plüton",6): "Şifa odaklı yoga, meditasyon, beden-ruh arındırması",
+            ("Merkür",3): "Hızlı yürüyüş, bisiklet, çoklu spor salonu egzersizleri",
+            ("Merkür",6): "Koordinasyon çalışmaları, beyin-beden egzersizleri",
+        }
+
+        # ── Burç bazlı sanat önerileri ──
+        BURC_SANAT = {
+            "Koç": "heykel, performans sanatı, cesur deneysel çalışmalar, sokak sanatı",
+            "Boğa": "seramik, doğal malzemelerle sanat, fotoğrafçılık, müzik aleti çalma",
+            "İkizler": "yazma, edebiyat, tiyatro, podcast, dilbilimsel sanat, gazetecilik",
+            "Yengeç": "mutfak sanatı, el işi, fotoğrafçılık, duygusal müzik, hikaye anlatıcılığı",
+            "Aslan": "sahne sanatları, tiyatro, dans, gösteri, kostüm tasarımı, artistik performans",
+            "Başak": "detaylı el işleri, dijital tasarım, organizasyon sanatı, ince işçilik",
+            "Terazi": "moda tasarımı, iç mimari, estetik sanatlar, mücevher tasarımı, fotoğrafçılık",
+            "Akrep": "fotoğrafçılık, sinema, dönüşümsel sanat, heykel, derin temalı eserler",
+            "Yay": "seyahat fotoğrafçılığı, belgesel, mural, sokak sanatı, kültürler arası sanat",
+            "Oğlak": "mimari, heykel, yapısal sanatlar, restorasyon, geleneksel teknikler",
+            "Kova": "dijital sanat, enstalasyon, video art, teknoloji-sanat, grafik tasarım",
+            "Balık": "suluboya, müzik, dans, meditasyon sanatı, sinema, ruhsal sembolizm",
+        }
+
+        # ── Planet+ev özel sanat haritası ──
+        SANAT_MAP = {
+            ("Venüs",5): "Resim, heykel, seramik, görsel sanatlar",
+            ("Venüs",3): "Şiir, edebiyat, yaratıcı yazarlık, şarkı sözü yazma",
+            ("Venüs",10): "Moda tasarımı, iç mimari, estetik danışmanlık",
+            ("Neptün",5): "Müzik, dans, fotoğrafçılık, sinema ve sahne sanatları",
+            ("Neptün",12): "Meditasyon sanatı, mandala, spiritüel resim, şiir",
+            ("Neptün",3): "Müzik aleti çalma, şarkı söyleme, beste yapma",
+            ("Merkür",3): "Yazma, gazetecilik, blog, tiyatro oyunculuğu",
+            ("Merkür",5): "Tiyatro, senaryo yazımı, yaratıcı yazma atölyeleri",
+            ("Ay",4): "El sanatları, örgü, nakış, seramik, mutfak sanatı",
+            ("Ay",5): "Çocuk kitabı yazarlığı, oyuncak tasarımı, hikaye anlatıcılığı",
+            ("Güneş",5): "Sahne sanatları, tiyatro oyunculuğu, performans",
+            ("Uranüs",5): "Dijital sanat, grafik tasarım, enstalasyon, deneysel sanat",
+            ("Jüpiter",5): "Performans sanatları, gösteri dünyası, sahne yönetimi",
+            ("Satürn",5): "Mimari, heykel, yapısal sanatlar, restorasyon",
+            ("Plüton",5): "Fotoğrafçılık, dönüşümsel sanat, derin temalı eserler",
+        }
+
+        # ── Burç bazlı hobi önerileri ──
+        BURC_HOBI = {
+            "Koç": "macera sporları, seyahat, keşif, motor sporları, kampçılık",
+            "Boğa": "bahçecilik, koleksiyonculuk, yemek yapımı, antika araştırması, doğa yürüyüşü",
+            "İkizler": "satranç, yazılım, okuma, podcast dinleme, dil öğrenme, bulmaca çözme",
+            "Yengeç": "mutfak hobileri, fotoğrafçılık, hatıra defteri tutma, aile sohbetleri",
+            "Aslan": "tiyatro, sahne sanatları, çocuklara gönüllülük, gösteri hobileri",
+            "Başak": " Düzenleme, organizasyon, detaylı el işleri, kod yazma, veri analizi",
+            "Terazi": "müzik, sanat koleksiyonculuğu, sosyal etkinlikler, dekorasyon, modа",
+            "Akrep": "gizem romanları, dedektiflik oyunları, dalış, araştırma, psikoloji",
+            "Yay": "seyahat planlama, felsefe, okçuluk, doğa keşfi, kültürler arası etkileşim",
+            "Oğlak": "ahşap işçiliği, strateji oyunları, yürüyüş, plan yapma, geleneksel zanaat",
+            "Kova": "teknoloji, bilim kurgu, robotik, uzay araştırmaları, dijital projeler",
+            "Balık": "müzik, fotoğrafçılık, doğa gözleme, meditasyon, hayal güç aktiviteleri",
+        }
+
+        # ── Burç bazlı sağlık önerileri ──
+        BURC_SAGLIK = {
+            "Koç": "baş bölgesi sağlığına dikkat; dinamik egzersiz ama kafa travmalarından kaçınma",
+            "Boğa": "boğaz ve tiroid sağlığı; düzenli beslenme ve metabolizma kontrolü",
+            "İkizler": "sinir sistemi ve solunum yolu sağlığı; nefes çalışmaları önemli",
+            "Yengeç": "mide ve sindirim sistemi; düzenli uyku ve duygusal denge",
+            "Aslan": "kalp ve omurga sağlığı; kardiyo egzersizleri ve duruş düzeltilmesi",
+            "Başak": "bağırsak sağlığı ve gıda hassasiyeti; temiz beslenme öncelik",
+            "Terazi": "böbrek ve cilt sağlığı; su tüketimi ve hormonal denge önemli",
+            "Akrep": "üreme sistemi ve bağışıklık; detoks ve arındırıcı beslenme",
+            "Yay": "karaciğer ve kalça sağlığı; aktif yaşam ve düzenli egzersiz",
+            "Oğlak": "eklem, kemik ve cilt sağlığı; mineral takviyesi ve nemlendirme",
+            "Kova": "dolaşım sistemi ve ayak bilekleri; kan dolaşımı egzersizleri",
+            "Balık": "bağışıklık sistemi ve uyku düzeni; meditasyon ve düzenli ritim",
+        }
+
+        # ── Burç bazlı beslenme önerileri ──
+        BURC_BESLENME = {
+            "Koç": "baharatlı, enerji veren besinler; demir ve protein ağırlıklı, kırmızı et ve yeşil yapraklı",
+            "Boğa": "kaliteli, lezzetli, doyurucu yemekler; doğal ve katkısız beslenme, süt ürünleri",
+            "İkizler": "hafif, çeşitli ve renkli besinler; kuruyemiş, meyve, zengin atıştırmalıklar",
+            "Yengeç": "ev yapımı, doğal, organik gıdalar; süt ürünleri, çorbalar ve sıcak yemekler",
+            "Aslan": "kalp dostu besinler, antioksidan zengini gıdalar, kırmızı meyveler, balık",
+            "Başak": "saf, temiz, organik beslenme; lifli gıdalar, tam tahıllar, detoks çayları",
+            "Terazi": "dengeli, hafif, renkli beslenme; salatalar, sosyal yemekler, çikolata",
+            "Akrep": "yoğun lezzetli besinler, detoks gıdalar, probiyotikler, sarımsak ve zencefil",
+            "Yay": "farklı mutfakları keşfetme; baharatlı ve egzotik tatlar, protein ağırlıklı",
+            "Oğlak": "mineral zengini, düzenli ve ölçülü beslenme; kemik dostu kalsiyumlu gıdalar",
+            "Kova": "yenilikçi ve farklı besinler; smoothie bowl, süper gıdalar, vejetaryen alternatifler",
+            "Balık": "deniz ürünleri, omega-3 kaynakları; hafif ve sıvı ağırlıklı, bitki çayları",
+        }
+
+        # ── Burç bazlı aşk önerileri ──
+        BURC_ASK = {
+            "Koç": "tutkulu ve coşkulu bir bağ; fiziksel çekim güçlü, cesur romantik girişimler",
+            "Boğa": "sadakat, güven ve uzun vadeli bağlılık; duyusal zevkler ve konfor ön planda",
+            "İkizler": "entelektüel uyum ve sosyal paylaşım; iletişim, mizah ve zihinsel bağ önemli",
+            "Yengeç": "derin duygusal bağ ve ev hissi; şefkat, koruma ve aile değerleri temel",
+            "Aslan": "göz kamaştırıcı romantizm; ilgi, takdir ve gösterişli sevgi ifadeleri",
+            "Başak": "hizmet ve pratik sevgi; düzenli küçük jestler, düşüncelilik ve sadakat",
+            "Terazi": "zarif ve dengeli birliktelik; estetik paylaşım, sanat ve adalet duygusu",
+            "Akrep": "tutku, gizem ve derin dönüşüm; güçlü ruhsal ve cinsel bağ arayışı",
+            "Yay": "özgür ve maceracı aşk; birlikte keşif, felsefe ve geniş ufuklar",
+            "Oğlak": "ciddi, uzun vadeli ve hedefe yönelik birliktelik; disiplin ve saygı",
+            "Kova": "özgün ve bağımsız bağ; entelektüel uyum, yenilik ve sosyal idealizm",
+            "Balık": "ruhani ve koşulsuz aşk; empati, fedakarlık ve hayal gücü dolu romantizm",
+        }
+
+        # ── Burç bazlı kariyer önerileri ──
+        BURC_KARIYER = {
+            "Koç": "girişimcilik, liderlik, acil durum yönetimi, spor, askeriye, start-up",
+            "Boğa": "bankacılık, gayrimenkul, gıda, müzik, tasarım, sanat, değer yönetimi",
+            "İkizler": "iletişim, medya, yazılım, pazarlama, satış, gazetecilik, pedagoji",
+            "Yengeç": "eğitim, danışmanlık, turizm, gastronomi, emlak, aile işletmeciliği",
+            "Aslan": "sahne sanatları, yönetim, eğitim, eğlence, PR, lüks marka yönetimi",
+            "Başak": "muhasebe, sağlık hizmetleri, editörlük, kalite kontrol, analiz, IT",
+            "Terazi": "hukuk, diplomasi, sanat, moda, iç mimari, arabuluculuk, danışmanlık",
+            "Akrep": "araştırma, psikoloji, finans, dedektiflik, dönüşüm danışmanlığı, tıp",
+            "Yay": "akademisyenlik, uluslararası ilişkiler, seyahat, yayıncılık, felsefe",
+            "Oğlak": "yöneticilik, mimari, mühendislik, devlet hizmeti, uzun vadeli projeler",
+            "Kova": "teknoloji, bilim, sosyal hareketler, havacılık, yenilikçi start-up'lar",
+            "Balık": "sanat, psikoloji, sağlık, danışmanlık, manevi rehberlik, hayır kurumları",
+        }
+
+        # ── Burç bazlı aile önerileri ──
+        BURC_AILE = {
+            "Koç": "aile içinde lider ve koruyucu rol; cesaret ve bağımsızlık değerleri aktarır",
+            "Boğa": "aile geleneklerini sürdüren güvenilir bağ; konfor ve istikrar odaklı",
+            "İkizler": "aile ile entelektüel paylaşım ve açık iletişim; çok yönlü etkileşim",
+            "Yengeç": "aile bağlarınız duygusal derinlik ve şefkatle örülü; koruyucu ve besleyici",
+            "Aslan": "ailede yaratıcılık ve cömertlik; çocuklara ilham kaynağı olma",
+            "Başak": "aile içinde düzen ve hizmet; pratik destek ve detaycı bakım",
+            "Terazi": "ailede denge ve uyum; sanatsal paylaşım ve estetik değerler",
+            "Akrep": "ailede derin dönüşüm ve sadakat; güçlü duygusal bağlar ve korunma",
+            "Yay": "ailede macera ve bilgelik aktarımı; açık fikirli ve geniş perspektif",
+            "Oğlak": "ailede disiplin ve sorumluluk; geleneksel değer ve uzun vadeli yapı",
+            "Kova": "ailede yenilik ve bağımsızlık; bireyselliğe saygı ve farklılık kutlaması",
+            "Balık": "ailede merhamet ve ruhsal bağ; sezgisel anlayış ve koşulsuz kabul",
+        }
+
+        # ── Burç bazlı maddi öneriler ──
+        BURC_MADDI = {
+            "Koç": "girişimci yatırımlar ve risk alma potansiyeliniz yüksek; ani kararlar",
+            "Boğa": "birikim ve uzun vadeli yatırımlar; gayrimenkul ve değerli metal tercihi",
+            "İkizler": "çeşitli gelir kaynakları; iletişim ve medya yatırımları, kısa vadeli",
+            "Yengeç": "emlak ve aile yatırımları; güvenli liman arayışı, duygusal harcama kontrolü",
+            "Aslan": "gösterişli yatırımlar ve sanat; lüks markalar ve eğlence sektörü",
+            "Başak": "detaylı bütçe planlaması; küçük birikimler ve pratik tasarruf",
+            "Terazi": "partnerle ortak finansal kararlar; estetik yatırımlar ve denge arayışı",
+            "Akrep": "dönüşümsel yatırımlar; ortak kaynaklar, miras ve vergi planlaması",
+            "Yay": "farklı kültürlerden gelir kaynakları; uluslararası yatırımlar ve eğitim",
+            "Oğlak": "uzun vadeli ve disiplinli yatırımlar; emeklilik planlaması ve gayrimenkul",
+            "Kova": "teknoloji ve yenilikçi yatırımlar; kripto, start-up ve sosyal projeler",
+            "Balık": "sanat ve manevi değeri olan yatırımlar; hayırseverlik ve yaratıcı projeler",
+        }
+
+        # ── Burç bazlı sosyal öneriler ──
+        BURC_SOSYAL = {
+            "Koç": "sosyal çevrenizde doğal bir lider ve ilham kaynağısınız; cesur ve açık",
+            "Boğa": "sadık ve güvenilir bir dost; çevrenizde sağlam ve uzun süreli bağlar",
+            "İkizler": "geniş bir çevre ve entelektüel sohbetler; iletişim odaklı sosyallik",
+            "Yengeç": "samimi ve duygusal bağlar; küçük ama derin dostluk çevresi",
+            "Aslan": "sosyal çevrenin yıldızı; cömertlik ve ilham veren liderlik",
+            "Başak": "hizmet odaklı sosyallik; gönüllülük ve pratik yardımlaşma çevreleri",
+            "Terazi": "zarif ve dengeli sosyal ilişkiler; sanatsal paylaşım ve estetik çevre",
+            "Akrep": "derin ve seçici sosyal bağlar; güvene dayalı güçlü ittifaklar",
+            "Yay": "geniş ve çeşitli sosyal çevre; farklı kültürlerden dostluklar",
+            "Oğlak": "profesyonel ve amaçlı sosyal çevreler; kariyer odaklı networking",
+            "Kova": "özgün ve yenilikçi çevreler; sosyal gruplar ve dijital topluluklar",
+            "Balık": "empatik ve ruhsal çevreler; yardım dernekleri ve spiritüel topluluklar",
+        }
+
+        # ── Burç bazlı eğitim önerileri ──
+        BURC_EGITIM = {
+            "Koç": "yeni konulara hızlı ilgi duyar ve cesurca dalarsınız; pratik ve uygulamalı öğrenme",
+            "Boğa": "derinlemesine çalışma ve pratik beceriler kazanma; sabırlı ve metodik",
+            "İkizler": "soyut kavramlar ve teorik bilgiye yatkınsınız; çoklu kaynak kullanımı",
+            "Yengeç": "sezgisel öğrenme ve aile/duygusal konulara ilgi; hikaye anlatımı yöntemi",
+            "Aslan": "görsel ve performans odaklı öğrenme; yaratıcı projeler ve sunumlar",
+            "Başak": "sistemli ve detaycı çalışma; araştırma, analiz ve pratik uygulama",
+            "Terazi": "dengeli ve çok perspektifli öğrenme; müzakere ve estetik eğitimleri",
+            "Akrep": "araştırma ve derinlemesine dalma; psikoloji, gizem ve dönüşüm konuları",
+            "Yay": "felsefi ve geniş perspektifli öğrenme; uluslararası eğitim ve seyahat",
+            "Oğlak": "disiplinli ve hedefe yönelik çalışma; sertifika ve kariyer odaklı",
+            "Kova": "yenilikçi ve teknolojik öğrenme; online eğitim, dijital kaynaklar",
+            "Balık": "sezgisel ve yaratıcı öğrenme; sanat, müzik ve meditasyon yoluyla",
+        }
+
+        # ── Burç bazlı manevi öneriler ──
+        BURC_MANEVİ = {
+            "Koç": "aktif meditasyon ve doğada ruhsal bağlantı; cesur içsel keşif",
+            "Boğa": "toprakla bağlantı, doğa ritüelleri ve fiziksel manevi pratikler",
+            "İkizler": "felsefi sorgulama ve zihinsel farkındalık; yazı ve meditasyon",
+            "Yengeç": "ay döngülerine bağlı ritüeller, aile kökleri meditasyonu, su meditasyonu",
+            "Aslan": "kalp merkezli meditasyon, yaratıcı görselleştirme, ilham veren ritüeller",
+            "Başak": "günlük manevi pratikler, hizmet meditasyonu, düzenli ruhsal rutin",
+            "Terazi": "denge ve uyum meditasyonu, sanat yoluyla ruhsal ifade, ikiliklerin birleşmesi",
+            "Akrep": "dönüşüm meditasyonu, gölge çalışmaları, derin içsel arınma",
+            "Yay": "felsefi meditasyon, farklı spiritüel gelenekleri keşif, dağ meditasyonu",
+            "Oğlak": "disiplinli meditasyon pratiği, guru-öğrenci ilişkisi, yapılandırılmış ruhsallık",
+            "Kova": "teknoloji destekli meditasyon, grup meditasyonu, yenilikçi ruhsal pratikler",
+            "Balık": "derin meditasyon,瑜伽, ruhsal rehberlik, deniz meditasyonu, ego erimesi",
+        }
+
+        # ── Burç bazlı seyahat önerileri ──
+        BURC_SEYAHAT = {
+            "Koç": "macera dolu keşifler, adrenalin yüklü rotalar, solo seyahatler",
+            "Boğa": "doğa güzellikleri, lüks konaklama, gastronomi turları, yavaş seyahat",
+            "İkizler": "şehir şehir gezmeler, müze ve kültür turları, kısa süreli seyahatler",
+            "Yengeç": "doğup büyüdüğünüz topraklar, tarihi mekanlar, rahat ve huzurlu tatiller",
+            "Aslan": "lüks tatil köyleri, sahne sanatları festivalleri, gösterişli destinasyonlar",
+            "Başak": "sağlık turları, wellness merkezleri, temiz doğa yürüyüşleri, detoks kampları",
+            "Terazi": "kültürel başkentler, sanat galerileri, romantik kaçamaklar, estetik destinasyonlar",
+            "Akrep": "gizemli ve tarihi mekanlar, arkeolojik sitler, derin kültürel deneyimler",
+            "Yay": "farklı kıtalar, uzak kültürler, felsefi ve tarihi rotalar, açık hava kampları",
+            "Oğlak": "dağcılık turları, tarihi kaleler, geleneksel ve yapısal mimari keşifleri",
+            "Kova": "yenilikçi destinasyonlar, bilim müzeleri, farklı topluluklar, uzay merkezleri",
+            "Balık": "sahil kasabaları, mistik tapınaklar, meditasyon kampları, ruhsal yolculuklar",
+        }
+
+        # ── Planet+burç bazlı hastalık haritası ──
+        HASTALIK_MAP = {
+            ("Mars",6,"Koç"): "Baş ağrısı, migren, sinüzit, yüz ve kafa bölgesi rahatsızlıkları",
+            ("Mars",6,"Boğa"): "Boğaz enfeksiyonları, ses teli sorunları, tiroid dengesizliği",
+            ("Mars",6,"Aslan"): "Kalp çarpıntısı, sırt ağrıları, omurga sorunları",
+            ("Mars",6,"Akrep"): "Enflamasyon, üreme sağlığı, bağırsak iltihabı",
+            ("Mars",6,"Yay"): "Karaciğer, kalça bölgesi, siyatik sinir",
+            ("Mars",6,"Koç"): "Diş sağlığı, kafa travmaları, kemik yapısı",
+            ("Satürn",6,"Oğlak"): "Kireçlenme, eklem ağrıları, diz sorunları, kemik erimesi",
+            ("Satürn",6,"Kova"): "Dolaşım sorunları, varis, ayak bileği incinmeleri",
+            ("Satürn",6,"Balık"): "Ayak sağlığı, lenf sistemi, ödem tutma eğilimi",
+            ("Ay",6,"Yengeç"): "Mide hassasiyeti, sindirim sorunları, göğüs sağlığı",
+            ("Ay",6,"Balık"): "Psikolojik hassasiyet, bağımlılık eğilimi, uyku düzeni",
+            ("Ay",6,"Boğa"): "Boğaz hassasiyeti, yeme bozuklukları, metabolizma",
+            ("Venüs",6,"Boğa"): "Boğaz ve bademcik sorunları, cilt alerjileri, böbrek dengesi",
+            ("Venüs",6,"Terazi"): "Böbrek fonksiyonları, cilt hassasiyeti, hormonal denge",
+            ("Neptün",6,"Balık"): "Bağışıklık zayıflığı, kronik yorgunluk, uyku apnesi",
+            ("Neptün",6,"Yay"): "Karaciğer hassasiyeti, alerjik reaksiyonlar",
+            ("Güneş",6,"Aslan"): "Kalp sağlığı, canlılık düşüşü, tansiyon dalgalanmaları",
+            ("Plüton",6,"Akrep"): "Bağışıklık sistemi, hücresel sorunlar, detoks ihtiyacı",
+        }
+
+        # ── Planet+burç bazlı beslenme haritası (özel durumlar) ──
+        BESLENME_MAP = {
+            "Ay_Yengeç": "Ev yapımı, doğal, organik gıdalar; süt ürünleri ve ev yemekleri iyi gelir",
+            "Ay_Boğa": "Kaliteli, lezzetli, doyurucu yemekler; doğal ve katkısız beslenme",
+            "Ay_Balık": "Deniz ürünleri, omega-3 kaynakları; hafif ve sıvı ağırlıklı beslenme",
+            "Ay_Oğlak": "Düzenli, disiplinli, saatli beslenme; mineral ve kalsiyum ağırlıklı",
+            "Ay_Başak": "Saf, temiz, organik beslenme; gıda hassasiyetlerine dikkat",
+            "Venüs_Boğa": "Lezzet odaklı, kaliteli gıdalar; şarküteri ve doğal tatlar",
+            "Venüs_Terazi": "Dengeli, hafif, renkli ve çeşitli beslenme; sosyal yemekler",
+            "Jüpiter_Yay": "Farklı mutfakları keşfetme; baharatlı ve egzotik tatlar",
+            "Jüpiter_Balık": "Deniz ürünleri, bitkisel ağırlıklı, bol sıvı tüketimi",
+            "Mars_Koç": "Baharatlı, enerji veren, demir ve protein ağırlıklı beslenme",
+            "Mars_Aslan": "Kalp dostu besinler, magnezyum, antioksidan zengini gıdalar",
+            "Satürn_Oğlak": "Mineral zengini, kemik dostu kalsiyumlu beslenme",
+            "Neptün_Balık": "Sebze ağırlıklı, hafif, sıvı ve bitki bazlı beslenme",
+        }
+
+        # ── Burç bazlı sağlık uyarı haritası ──
+        BURC_SAGLIK_UYARISI = {
+            "Koç": "baş bölgesi, migren ve yaralanma riski; sıcak çatışmalara dikkat",
+            "Boğa": "boğaz, tiroid ve boyun kas gerginliği; yavaş metabolizma eğilimi",
+            "İkizler": "sinir sistemi, solunum yolu ve iletişim kaynaklı gerginlik",
+            "Yengeç": "mide, sindirim, göğüs bölgesi; duygusal yeme ve su tutma",
+            "Aslan": "kalp, sırt ve omurga; aşırı efordan kaynaklanan gerilim",
+            "Başak": "bağırsak, deri ve sinir sistemi; aşırı titizlik kaynaklı stres",
+            "Terazi": "böbrek, cilt ve hormonal denge; kararsızlık stresi",
+            "Akrep": "üreme sistemi, bağışıklık ve yoğun duygusal stres",
+            "Yay": "karaciğer, kalça ve siyatik; aşırıya kaçma ve sınırları zorlama",
+            "Oğlak": "eklem, kemik, cilt ve eklemler; kronik stres ve distoni",
+            "Kova": "dolaşım, ayak bilekleri ve sinir sistemi; beklenmedik kazalar",
+            "Balık": "bağışıklık, ayak ve lenf sistemi; ilaç/alergi duyarlılığı",
+        }
+
+        # ── Yardımcı fonksiyonlar ──
+        def _spor_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            key = (g_ad, ev_no)
+            if key in SPOR_MAP:
+                return f"{g_ad} • {burc}: {SPOR_MAP[key]}"
+            burc_spor = BURC_SPOR.get(burc)
+            if burc_spor:
+                return f"{g_ad} • {burc}: {burc_spor}"
+            return None
+
+        def _sanat_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            key = (g_ad, ev_no)
+            if key in SANAT_MAP:
+                return f"{g_ad} • {burc}: {SANAT_MAP[key]}"
+            burc_sanat = BURC_SANAT.get(burc)
+            if burc_sanat:
+                return f"{g_ad} • {burc}: {burc_sanat}"
+            return None
+
+        def _hobi_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_hobi = BURC_HOBI.get(burc)
+            if burc_hobi:
+                return f"{g_ad} • {burc}: {burc_hobi}"
+            return None
+
+        def _hastalik_uyarisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            key = (g_ad, ev_no, burc)
+            if key in HASTALIK_MAP:
+                return HASTALIK_MAP[key]
+            for (g, e, b), v in HASTALIK_MAP.items():
+                if g == g_ad and e == ev_no: return v
+            uyari = BURC_SAGLIK_UYARISI.get(burc)
+            if uyari:
+                return f"{g_ad} etkisiyle {burc}: {uyari}"
+            return None
+
+        def _saglik_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            saglik = BURC_SAGLIK.get(burc)
+            if saglik:
+                return f"{g_ad} • {burc}: {saglik}"
+            return None
+
+        def _beslenme_onerisi(g_ad, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            key = f"{g_ad}_{burc}"
+            if key in BESLENME_MAP:
+                return f"{g_ad} • {burc}: {BESLENME_MAP[key]}"
+            burc_besl = BURC_BESLENME.get(burc)
+            if burc_besl:
+                return f"{g_ad} • {burc}: {burc_besl}"
+            return None
+
+        def _ask_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_ask = BURC_ASK.get(burc)
+            if burc_ask:
+                return f"{g_ad} • {burc}: {burc_ask}"
+            return None
+
+        def _kariyer_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_kar = BURC_KARIYER.get(burc)
+            if burc_kar:
+                return f"{g_ad} • {burc}: {burc_kar}"
+            return None
+
+        def _aile_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_ail = BURC_AILE.get(burc)
+            if burc_ail:
+                return f"{g_ad} • {burc}: {burc_ail}"
+            return None
+
+        def _maddi_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_mad = BURC_MADDI.get(burc)
+            if burc_mad:
+                return f"{g_ad} • {burc}: {burc_mad}"
+            return None
+
+        def _sosyal_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_sos = BURC_SOSYAL.get(burc)
+            if burc_sos:
+                return f"{g_ad} • {burc}: {burc_sos}"
+            return None
+
+        def _egitim_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_egi = BURC_EGITIM.get(burc)
+            if burc_egi:
+                return f"{g_ad} • {burc}: {burc_egi}"
+            return None
+
+        def _manevi_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_man = BURC_MANEVİ.get(burc)
+            if burc_man:
+                return f"{g_ad} • {burc}: {burc_man}"
+            return None
+
+        def _seyahat_onerisi(g_ad, ev_no, burc_no):
+            burc = BURCLAR[burc_no % 12]
+            burc_sey = BURC_SEYAHAT.get(burc)
+            if burc_sey:
+                return f"{g_ad} • {burc}: {burc_sey}"
+            return None
+
+        # ── Kategori tanımları ──
+        ALANLAR = [
+            {"anahtar":"spor","etiket":"Spor & Fitness","icon":"🏃","image":"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=400&fit=crop",
+             "evler":[1,6,9],"gezegenler":["Mars","Satürn","Jüpiter","Venüs","Uranüs","Neptün","Ay","Güneş"],
+             "giris":"Fiziksel aktivite hayatınızda önemli bir yere sahip; bedeniniz harekete geçmek için doğal bir çağrı taşıyor.",
+             "kapanis":"Hareket hayattır, bedeninizi dinleyin."},
+            {"anahtar":"sanat","etiket":"Sanat & Yaratıcılık","icon":"🎨","image":"https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&h=400&fit=crop",
+             "evler":[5,3,12,9],"gezegenler":["Venüs","Neptün","Merkür","Ay","Uranüs","Jüpiter","Satürn","Plüton"],
+             "giris":"Yaratıcılık ve estetik duyarlılık sizin için hayatın renkli tarafını oluşturuyor.",
+             "kapanis":"Sanat ruhun gıdasıdır, içinizdeki yaratıcılığı besleyin."},
+            {"anahtar":"hobi","etiket":"Hobi & İlgi Alanları","icon":"🎮","image":"https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop",
+             "evler":[3,5,9,12],"gezegenler":["Ay","Venüs","Merkür","Neptün","Uranüs","Jüpiter","Mars","Güneş"],
+             "giris":"Boş zamanlarınızı nasıl değerlendirdiğiniz, ilgi alanlarınızın çeşitliliğiyle doğrudan bağlantılı.",
+             "kapanis":"Keyif aldığınız her an ruhunuzu besleyen bir hediyedir."},
+            {"anahtar":"saglik","etiket":"Sağlık & Zindelik","icon":"💪","image":"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop",
+             "evler":[6,12,1],"gezegenler":["Ay","Mars","Satürn","Neptün","Güneş"],
+             "giris":"Beden ve ruh arasındaki denge, günlük yaşam alışkanlıklarınızın bir yansımasıdır.",
+             "kapanis":"Sağlıklı bir yaşam küçük alışkanlıkların büyük etkisiyle inşa edilir."},
+            {"anahtar":"beslenme","etiket":"Beslenme & Diyet","icon":"🥗","image":"https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=400&fit=crop",
+             "evler":[2,6,12],"gezegenler":["Ay","Venüs","Mars","Jüpiter","Satürn","Neptün","Plüton","Güneş"],
+             "giris":"Yedikleriniz yalnızca bedeninizi değil, duygusal dünyanızı da doğrudan etkiler.",
+             "kapanis":"Yedikleriniz sadece bedeninizi değil ruhunuzu da besler."},
+            {"anahtar":"ask","etiket":"Aşk & Romantizm","icon":"❤️","image":"https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&h=400&fit=crop",
+             "evler":[5,7],"gezegenler":["Venüs","Mars","Ay","Güneş"],
+             "giris":"Aşk hayatınız, kalbinizin derinliklerinde saklı olan duygusal kodlarla şekilleniyor.",
+             "kapanis":"Gerçek aşk önce kendinize duyduğunuz sevgiyle başlar."},
+            {"anahtar":"kariyer","etiket":"Kariyer & İş Hayatı","icon":"💼","image":"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+             "evler":[6,10,2],"gezegenler":["Satürn","Jüpiter","Mars","Güneş","Merkür"],
+             "giris":"Kariyer yolculuğunuz, disiplin ve vizyonun birleştiği noktada şekilleniyor.",
+             "kapanis":"Başarı doğru zamanda atılan cesur adımlarla gelir."},
+            {"anahtar":"aile","etiket":"Aile & Kökler","icon":"🏠","image":"https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400&h=400&fit=crop",
+             "evler":[4,7,12],"gezegenler":["Ay","Satürn","Venüs","Güneş","Mars"],
+             "giris":"Aile bağlarınız ve kökleriniz, kim olduğunuzu anlamanın anahtarıdır.",
+             "kapanis":"Aile bağlarınız en büyük manevi mirasınızdır."},
+            {"anahtar":"maddi","etiket":"Maddi Durum","icon":"💰","image":"https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=400&fit=crop",
+             "evler":[2,8,11],"gezegenler":["Jüpiter","Venüs","Satürn","Plüton","Mars"],
+             "giris":"Parasal akışınız, değerlerinizle uyumlu olduğunda bereket doğal olarak gelir.",
+             "kapanis":"Maddi denge önce değerlerinizi netleştirmekten geçer."},
+            {"anahtar":"sosyal","etiket":"Sosyal Hayat","icon":"👥","image":"https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop",
+             "evler":[11,3,7],"gezegenler":["Merkür","Uranüs","Jüpiter","Venüs","Güneş"],
+             "giris":"Sosyal çevreniz, iletişim şekliniz ve çevrenizle etkileşiminiz hayatınızı zenginleştiriyor.",
+             "kapanis":"Çevreniz size en büyük aynanız ve öğretmeninizdir."},
+            {"anahtar":"egitim","etiket":"Eğitim & Zihin","icon":"📚","image":"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=400&fit=crop",
+             "evler":[3,9,1],"gezegenler":["Merkür","Jüpiter","Satürn","Uranüs","Ay"],
+             "giris":"Öğrenme arzunuz ve zihinsel merakınız sizi sürekli gelişmeye yönlendiriyor.",
+             "kapanis":"Öğrenmek asla bitmeyen bir yolculuktur."},
+            {"anahtar":"manevi","etiket":"Maneviyat & İçsel Yolculuk","icon":"🧘","image":"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=400&fit=crop",
+             "evler":[9,12,4],"gezegenler":["Neptün","Jüpiter","Ay","Plüton","Satürn"],
+             "giris":"İçsel yolculuğunuz, görünmeyen bağlantıların ve sezgisel farkındalığınızın derinliklerine uzanıyor.",
+             "kapanis":"İçsel huzur dış dünyada aradığınız her şeyin özüdür."},
+            {"anahtar":"seyahat","etiket":"Seyahat & Keşif","icon":"✈️","image":"https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=400&fit=crop",
+             "evler":[9,3,12],"gezegenler":["Jüpiter","Uranüs","Merkür","Neptün","Ay"],
+             "giris":"Keşfetme arzunuz, yeni ufuklara duyduğunuz özlemin bir yansımasıdır.",
+             "kapanis":"Her yolculuk kendinizi keşfetme fırsatıdır."},
+        ]
+
+        import random
+        sonuclar = []
+        for alan in ALANLAR:
+            anahtar = alan["anahtar"]
+            ilgili_gezegenler = [g for g, e in gez_ev.items() if e in alan["evler"] and g in alan["gezegenler"]]
+            ilgili_gezegenler += [g for g in alan["gezegenler"] if g not in ilgili_gezegenler and g in gez_poz]
+            ilgili_gezegenler = ilgili_gezegenler[:5]
+
+            skor = 50
+            rng = random.Random(str(gez_poz) + anahtar)
+            oneriler = []
+
+            # Collect element counts and key planet data (silently, for yorum generation)
+            element_sayac = {"Ateş":0,"Toprak":0,"Hava":0,"Su":0}
+            for g_ad in ilgili_gezegenler:
+                if g_ad not in gez_poz: continue
+                info = gez_poz[g_ad]
+                ev_no = gez_ev.get(g_ad,1)
+                burc_no = info["burc_no"]
+                burc_adi = info["burc"]
+                element = ["Ateş","Toprak","Hava","Su"][burc_no % 4]
+                element_sayac[element] = element_sayac.get(element,0) + 1
+
+                yonetici = BURC_YONETICI.get(burc_adi,"")
+                if yonetici == g_ad:
+                    skor += 8
+                elif ev_no in alan["evler"]:
+                    skor += 5
+                else:
+                    skor += 2
+
+                # Öneriler (tüm kategoriler için gezegen-burç bazlı)
+                if anahtar == "spor":
+                    spor = _spor_onerisi(g_ad, ev_no, burc_no)
+                    if spor: oneriler.append({"tur":"spor","metin":spor})
+                elif anahtar == "sanat":
+                    sanat = _sanat_onerisi(g_ad, ev_no, burc_no)
+                    if sanat: oneriler.append({"tur":"sanat","metin":sanat})
+                elif anahtar == "hobi":
+                    hobi = _hobi_onerisi(g_ad, ev_no, burc_no)
+                    if hobi: oneriler.append({"tur":"hobi","metin":hobi})
+                elif anahtar == "saglik":
+                    hasta = _hastalik_uyarisi(g_ad, ev_no, burc_no)
+                    if hasta: oneriler.append({"tur":"saglik","metin":f"🔴 {hasta}"})
+                    saglik = _saglik_onerisi(g_ad, ev_no, burc_no)
+                    if saglik: oneriler.append({"tur":"saglik","metin":saglik})
+                elif anahtar == "beslenme":
+                    besln = _beslenme_onerisi(g_ad, burc_no)
+                    if besln: oneriler.append({"tur":"beslenme","metin":besln})
+                elif anahtar == "ask":
+                    ask = _ask_onerisi(g_ad, ev_no, burc_no)
+                    if ask: oneriler.append({"tur":"ask","metin":ask})
+                elif anahtar == "kariyer":
+                    kar = _kariyer_onerisi(g_ad, ev_no, burc_no)
+                    if kar: oneriler.append({"tur":"kariyer","metin":kar})
+                elif anahtar == "aile":
+                    ail = _aile_onerisi(g_ad, ev_no, burc_no)
+                    if ail: oneriler.append({"tur":"aile","metin":ail})
+                elif anahtar == "maddi":
+                    mad = _maddi_onerisi(g_ad, ev_no, burc_no)
+                    if mad: oneriler.append({"tur":"maddi","metin":mad})
+                elif anahtar == "sosyal":
+                    sos = _sosyal_onerisi(g_ad, ev_no, burc_no)
+                    if sos: oneriler.append({"tur":"sosyal","metin":sos})
+                elif anahtar == "egitim":
+                    egi = _egitim_onerisi(g_ad, ev_no, burc_no)
+                    if egi: oneriler.append({"tur":"egitim","metin":egi})
+                elif anahtar == "manevi":
+                    man = _manevi_onerisi(g_ad, ev_no, burc_no)
+                    if man: oneriler.append({"tur":"manevi","metin":man})
+                elif anahtar == "seyahat":
+                    sey = _seyahat_onerisi(g_ad, ev_no, burc_no)
+                    if sey: oneriler.append({"tur":"seyahat","metin":sey})
+
+            dominan = sorted(element_sayac.items(), key=lambda x: -x[1])[0][0] if max(element_sayac.values()) > 0 else "Ateş"
+
+            # ── Natural language yorum generation (no planet names) ──
+            havuz = [alan["giris"]]
+
+            ELEMENT_ACIKLAMA = {
+                "Ateş": "içinizdeki dinamik ve tutkulu enerji, harekete geçme cesaretiniz",
+                "Toprak": "sabit ve güvenilir yapınız, sağlam temeller kurma beceriniz",
+                "Hava": "zihinsel berraklığınız ve iletişim kurma yeteneğiniz",
+                "Su": "derin duygusal sezgileriniz ve empatik anlayışınız",
+            }
+            eac = element_acik = ELEMENT_ACIKLAMA.get(dominan, "enerjiniz")
+            eac_baslik = eac[0].upper() + eac[1:] if eac else eac
+
+            ALAN_DOMINAN = {
+                "spor": f"Özellikle {dominan} elementinin ön planda olduğu bir vücut yapısına sahipsiniz. Bedeninizi zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
+                "sanat": f"Sanatsal ifadenizde {dominan} elementinin izleri belirgin — {eac} yaratıcılığınızı besleyen ana kaynak.",
+                "hobi": f"Boş zamanlarınızda {dominan} elementinin yönlendirdiği aktiviteler size daha çok hitap ediyor. {eac_baslik}, ilgi alanlarınızın temelini oluşturuyor.",
+                "saglik": f"Sağlığınız {dominan} elementinin dengesine duyarlı — {eac} beden sinyallerinizi doğru okumanızı sağlıyor.",
+                "beslenme": f"Beslenme alışkanlıklarınızda {dominan} elementinin etkisi görülüyor. {eac_baslik}, hangi besinlerin size iyi geldiğini belirlemede önemli rol oynuyor.",
+                "ask": f"Aşk hayatınızda {dominan} elementinin enerjisi öne çıkıyor. {eac_baslik}, duygusal bağ kurma biçiminizi derinden etkiliyor.",
+                "kariyer": f"Kariyer yolculuğunuzda {dominan} elementinin özellikleri belirleyici. {eac_baslik}, iş hayatınızdaki en büyük gücünüz.",
+                "aile": f"Aile bağlarınız {dominan} elementinin dokusuyla örülü. {eac_baslik}, köklerinizle kurduğunuz bağın kalitesini belirliyor.",
+                "maddi": f"Maddi konularda {dominan} elementinin yaklaşımı size rehberlik ediyor. {eac_baslik}, finansal kararlarınızı şekillendiriyor.",
+                "sosyal": f"Sosyal çevrenizde {dominan} elementinin enerjisiyle hareket ediyorsunuz. {eac_baslik}, çevrenizle kurduğunuz bağları güçlendiriyor.",
+                "egitim": f"Öğrenme tarzınız {dominan} elementinin doğasına uygun. {eac_baslik}, bilgiyi içselleştirme biçiminizi belirliyor.",
+                "manevi": f"Manevi yolculuğunuz {dominan} elementinin rehberliğinde ilerliyor. {eac_baslik}, ruhsal arayışınızın temel dinamiği.",
+                "seyahat": f"Keşfetme arzunuz {dominan} elementinin enerjisiyle besleniyor. {eac_baslik}, size yeni ufuklara açılma cesareti veriyor.",
+            }
+
+            # Element-based specific suggestions for each area
+            ELEMENT_ONERI = {
+                "spor": {"Ateş":"yüksek tempolu kardiyo, dövüş sporları ve takım oyunları","Toprak":"ağırlık çalışmaları, pilates ve doğa yürüyüşleri","Hava":"dans, esneme ve grup fitness dersleri","Su":"yüzme, yoga ve su egzersizleri"},
+                "sanat": {"Ateş":"heykel, performans sanatı ve deneysel çalışmalar","Toprak":"seramik, dokuma ve doğal malzemelerle sanat","Hava":"dijital sanat, edebiyat ve fotoğrafçılık","Su":"suluboya, müzik ve duygusal ifade sanatları"},
+                "hobi": {"Ateş":"macera sporları, seyahat ve keşif","Toprak":"bahçecilik, koleksiyon ve el işleri","Hava":"satranç, yazılım ve okuma","Su":"müzik, fotoğrafçılık ve doğa gözlemi"},
+                "saglik": {"Ateş":"dinamik egzersiz ve yüksek enerjili aktiviteler","Toprak":"düzenli uyku, sağlam bir günlük rutin ve doğal beslenme","Hava":"nefes çalışmaları ve zihin-beden bağlantısı","Su":"meditasyon, su terapisi ve duygusal denge"},
+                "beslenme": {"Ateş":"hafif, taze ve canlandırıcı besinler; baharatlı yemeklere dikkat","Toprak":"düzenli öğünler, köklü sebzeler ve doğal tahıllar","Hava":"çeşitli ve renkli besinler; sosyal yemek keyfi","Su":"sulu gıdalar, deniz ürünleri ve bitki çayları"},
+                "ask": {"Ateş":"tutkulu ve coşkulu bir bağ arayışı, fiziksel çekim güçlü","Toprak":"sadakat, güven ve uzun vadeli bağlılık ön planda","Hava":"entelektüel uyum ve sosyal paylaşım önemli","Su":"derin duygusal bağ ve ruhsal uyum arıyorsunuz"},
+                "kariyer": {"Ateş":"öncü ve girişimci roller, liderlik pozisyonları","Toprak":"yapıcı ve yönetici pozisyonlar, finansal istikrar","Hava":"iletişim, yazılım, medya ve danışmanlık","Su":"sanat, psikoloji, sağlık ve danışmanlık alanları"},
+                "aile": {"Ateş":"aile içinde lider ve koruyucu rol üstleniyorsunuz","Toprak":"aile geleneklerini sürdüren güvenilir bir bağ kuruyorsunuz","Hava":"aile ile entelektüel paylaşım ve açık iletişim","Su":"aile bağlarınız duygusal derinlik ve şefkatle örülü"},
+                "maddi": {"Ateş":"girişimci yatırımlar ve risk alma potansiyeliniz yüksek","Toprak":"birikim ve uzun vadeli yatırımlar size uygun","Hava":"entelektüel sermaye ve network ile kazanç","Su":"sanat ve duygusal değeri olan yatırımlar size uygun"},
+                "sosyal": {"Ateş":"sosyal çevrenizde doğal bir lider ve ilham kaynağısınız","Toprak":"sadık ve güvenilir bir dost, çevrenizde sağlam bağlar","Hava":"geniş bir çevre ve entelektüel sohbetler sizi besliyor","Su":"derin dostluklar ve empatik bağlar kuruyorsunuz"},
+                "egitim": {"Ateş":"yeni konulara hızlı ilgi duyar ve cesurca dalarsınız","Toprak":"derinlemesine çalışma ve pratik beceriler kazanma","Hava":"soyut kavramlar ve teorik bilgiye yatkınsınız","Su":"sezgisel öğrenme ve psikolojik konular ilginizi çeker"},
+                "manevi": {"Ateş":"aktif meditasyon ve doğada ruhsal bağlantı","Toprak":"ritüeller ve günlük manevi pratikler","Hava":"felsefi sorgulama ve zihinsel farkındalık","Su":"derin meditasyon, yoga ve ruhsal rehberlik"},
+                "seyahat": {"Ateş":"macera dolu keşifler ve adrenalin yüklü rotalar","Toprak":"doğal güzellikler ve kültürel turlar","Hava":"entelektüel seyahatler ve yeni kültürler öğrenme","Su":"deniz kenarı, mistik ve ruhsal yolculuklar"},
+            }
+            oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "doğal yapınıza uygun aktiviteler")
+
+            ALAN_OZEL_CUMLER = {
+                "spor": f"Sizin için en uygun sporlar {oneri_metni} gibi aktivitelerdir. Vücudunuzu zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
+                "sanat": f"Yaratıcı yönünüz en çok {dominan} elementinin etkisi altında şekilleniyor. {oneri_metni} gibi sanatsal ifade biçimleri size doğal geliyor. Sezgilerinizin rehberliğine izin verdiğinizde ortaya gerçekten özgün işler çıkıyor.",
+                "hobi": f"İlgi alanlarınız {dominan} elementinin özelliklerini yansıtıyor. {oneri_metni} gibi hobiler size daha çok hitap ediyor. Bu alandaki merakınız sizi sürekli yeni şeyler denemeye itiyor.",
+                "saglik": f"Sağlık konusunda {dominan} elementinin ihtiyaçlarını anlamak size büyük avantaj sağlıyor. Size en iyi gelen aktiviteler {oneri_metni} şeklinde sıralanabilir. Vücudunuzun sinyallerine kulak verdiğinizde doğru seçimleri yapıyorsunuz.",
+                "beslenme": f"Beslenme alışkanlıklarınızı {dominan} elementinin dengesine göre düzenlemek size iyi gelecek. {oneri_metni} gibi besinler vücudunuzu hem fiziksel hem de ruhsal olarak besliyor.",
+                "ask": f"İlişkilerinizde {oneri_metni}. Duygusal dünyanızda derinlik ve samimiyet arayışınız, sizi yüzeysel bağlardan uzaklaştırıyor. Kalbinizin sesini dinlediğinizde doğru yolu buluyorsunuz.",
+                "kariyer": f"Profesyonel hayatınızda {dominan} elementinin güçlü yönlerini kullanıyorsunuz. {oneri_metni} kariyerinizde başarıya ulaşmanızda size yardımcı oluyor. Disiplinli adımlar atmak size istikrar getiriyor.",
+                "aile": f"Aile bağlarınız {dominan} elementinin doğasına uygun bir şekilde şekilleniyor. {oneri_metni}. Köklerinizden aldığınız gücü fark ettiğinizde, hem geçmişinizle barışıyor hem de geleceğe sağlam adımlarla ilerliyorsunuz.",
+                "maddi": f"Parasal konularda {oneri_metni}. Değerlerinizi netleştirdiğinizde ve akışa güvendiğinizde, maddi kaynaklarınızı daha bilinçli yönetiyorsunuz.",
+                "sosyal": f"Sosyal çevrenizde {oneri_metni}. İnsanlarla kurduğunuz bağlarda içtenlik ve derinlik aramanız, size anlamlı dostluklar kazandırıyor.",
+                "egitim": f"Öğrenme süreciniz {dominan} elementinin özelliklerini taşıyor. {oneri_metni}. Merak ettiğiniz konuların derinliklerine indikçe, bilginin size kattığı gücü daha çok hissediyorsunuz.",
+                "manevi": f"İçsel yolculuğunuzda {oneri_metni} size rehberlik ediyor. Ruhsal arayışınızda sessizliğe ve iç gözleme zaman ayırdığınızda, kendinizle ilgili yeni farkındalıklar kazanıyorsunuz.",
+                "seyahat": f"Keşif ruhunuz {dominan} elementinin enerjisiyle canlanıyor. {oneri_metni} size sadece keyif değil, aynı zamanda derin bir perspektif kazandırıyor.",
+            }
+
+            yorum_parcalari = [alan["giris"]]
+            yorum_parcalari.append(ALAN_DOMINAN[anahtar])
+            yorum_parcalari.append(ALAN_OZEL_CUMLER[anahtar])
+            yorum_parcalari.append(alan["kapanis"])
+
+            # Kategoriye özel genel öneriler (element-bilinçli)
+            ELEMENT_SPOR_IPUCU = {
+                "Ateş": "Haftada en az 3 gün yüksek tempolu egzersiz; dinamik ve rekabetçi sporlar enerjinizi besler.",
+                "Toprak": "Düzenli ve sabit bir antrenman programı; doğa yürüyüşleri ve ağırlık çalışmaları ideal.",
+                "Hava": "Grup dersleri ve dans temelli egzersizler; zihinsel bağlantı kuran sporlar sizi besler.",
+                "Su": "Ritmik ve akıcı sporlar; yüzme, yoga, tai-chi gibi su ve meditasyon odaklı aktiviteler."
+            }
+            ELEMENT_SANAT_IPUCU = {
+                "Ateş": "Cesur ve deneysel sanat dallarına dalın; performans ve sahne sanatları size enerji katar.",
+                "Toprak": "Somut ve elle yapılan sanatlara odaklanın; seramik, ahşap, dokuma gibi doğal malzemeler.",
+                "Hava": "Yazı, edebiyat ve dijital sanatlar zihinsel yaratıcılığınızı besler; iletişim temelli sanatlar.",
+                "Su": "Müzik, suluboya ve duygusal ifade sanatları; sezgilerinizin rehberliğine bırakın kendinizi."
+            }
+            ELEMENT_BESLENME_IPUCU = {
+                "Ateş": "Enerji veren ve baharatlı besinler; yeşil yapraklılar ve protein ağırlıklı beslenme.",
+                "Toprak": "Toprak ürünleri ve köklü sebzeler; düzenli öğünler ve doğal gıdalar.",
+                "Hava": "Çeşitli ve renkli besinler; hafif atıştırmalıklar ve sosyal yemek deneyimleri.",
+                "Su": "Sıvı tüketimi ve deniz ürünleri; çorbalar, çaylar ve bitki bazlı beslenme."
+            }
+            ELEMENT_GENEL_IPUCU = {
+                "spor": ELEMENT_SPOR_IPUCU,
+                "sanat": ELEMENT_SANAT_IPUCU,
+                "beslenme": ELEMENT_BESLENME_IPUCU,
+            }
+            kat_oneriler = {
+                "spor": [ELEMENT_SPOR_IPUCU.get(dominan, "Düzenli egzersiz ve elementinize uygun sporlar ideal.")],
+                "sanat": [ELEMENT_SANAT_IPUCU.get(dominan, "Sanatsal ifadenizi keşfetmek için farklı dalları deneyin.")],
+                "hobi": ["Çocukluğunuzda keyif aldığınız aktivitelere geri dönmeyi deneyin; merak her zaman iyi bir rehberdir."],
+                "saglik": ["Yılda bir kez kapsamlı sağlık kontrolünden geçmeyi ihmal etmeyin; düzenli uyku ve doğal beslenme önceliğiniz."],
+                "beslenme": [ELEMENT_BESLENME_IPUCU.get(dominan, "Mevsimsel ve doğal beslenme sindirim sisteminizi dengeler.")],
+                "ask": ["Partnerinizle derin ve dürüst iletişim; duygusal ihtiyaçlarınızı açıkça paylaşın."],
+                "kariyer": ["Kariyer hedeflerinizi yazılı hale getirmek ve düzenli gözden geçirmek başarı şansınızı artırır."],
+                "aile": ["Aile bireyleriyle düzenli zaman geçirmek ve geçmiş hikayelerini paylaşmak bağları güçlendirir."],
+                "maddi": ["Bütçe planlaması ve düzenli tasarruf alışkanlığı size finansal özgürlük getirir."],
+                "sosyal": ["Derin ve anlamlı ilişkiler için aktif dinleme ve empati pratiği yapın."],
+                "egitim": ["Yeni bir konuyu 21 gün düzenli çalışarak alışkanlık haline getirebilirsiniz."],
+                "manevi": ["Günlük 10 dakikalık sessiz meditasyon bile uzun vadede büyük farklar yaratır."],
+                "seyahat": ["Seyahatlerinizi önceden planlamak ama esnek kalmak; en güzel anlar çoğu zaman plansız gelir."],
+            }
+            for o in kat_oneriler.get(anahtar, []):
+                oneriler.append({"tur":"genel","metin":o})
+
+            skor = max(10, min(100, skor))
+            yorum = " ".join(yorum_parcalari)
+
+            sonuclar.append({
+                "anahtar": anahtar,
+                "etiket": alan["etiket"],
+                "icon": alan["icon"],
+                "image": alan["image"],
+                "skor": skor,
+                "yorum": yorum.strip(),
+                "oneriler": oneriler[:8],
+            })
+
+        return sonuclar
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f"[HAYAT_ALANI_HATASI] {e}\n{tb}")
+        return [{"anahtar":"genel","etiket":"Genel Değerlendirme","icon":"📊","skor":50,"yorum":f"Sistem şu anda analiz yapamıyor: {e}","oneriler":[]}]
+
+def _natal_chart_yorumu(motor):
+    """Natal chart interpretation as flowing narrative — like a human astrologer."""
+    try:
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+
+        jd = motor.get_natal_julian_day("p1")
+        cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
+        asc_burc = BURCLAR[int(ascmc[0] // 30)]
+        mc_burc = BURCLAR[int(ascmc[1] // 30)]
+
+        EV_ANLAM = {
+            1:"kişilik ve dış görünüş", 2:"değerler ve maddi güvenlik", 3:"iletişim ve yakın çevre",
+            4:"kökler ve aile", 5:"yaratıcılık ve aşk", 6:"sağlık ve günlük rutin",
+            7:"ilişkiler ve ortaklıklar", 8:"dönüşüm ve ortak kaynaklar", 9:"inançlar ve yüksek öğrenim",
+            10:"kariyer ve toplumsal statü", 11:"sosyal çevre ve idealler", 12:"bilinçaltı ve ruhsal yolculuk"
+        }
+
+        gez_poz = {}
+        for g_ad, g_id in list(GEZEGENLER.items())[:14]:
+            try:
+                deg = swe.calc_ut(jd, g_id)[0][0]
+                burc_i = int(deg // 30)
+                burc = BURCLAR[burc_i]
+                ev = 1
+                for i in range(12):
+                    bas = cusps[i]; bit = cusps[(i+1)%12]
+                    if bas <= bit:
+                        if bas <= deg < bit: ev = i+1; break
+                    else:
+                        if deg >= bas or deg < bit: ev = i+1; break
+                element = ["Ateş","Ateş","Toprak","Toprak","Hava","Hava","Su","Su","Ateş","Ateş","Toprak","Toprak","Hava","Hava","Su","Su"][burc_i % 6]
+                gez_poz[g_ad] = {"burc": burc, "ev": ev, "derece": deg, "element": element}
+            except:
+                pass
+
+        # Elements
+        eleman_say = {"Ateş":0,"Toprak":0,"Hava":0,"Su":0}
+        for g, p in gez_poz.items():
+            e = p["element"]
+            if e in eleman_say: eleman_say[e] += 1
+        bask_element = max(eleman_say, key=eleman_say.get)
+
+        # Aspects
+        acilar = []
+        gez_list = list(gez_poz.keys())[:12]
+        for i, g1 in enumerate(gez_list):
+            for j, g2 in enumerate(gez_list):
+                if j <= i: continue
+                if g1 not in gez_poz or g2 not in gez_poz: continue
+                fark = abs(gez_poz[g1]["derece"] - gez_poz[g2]["derece"])
+                if fark > 180: fark = 360 - fark
+                for aci_dk, aci_ad, orb_max in [(0,"Kavuşum",7),(180,"Karşıt",7),(90,"Kare",6),(120,"Trigon",6),(60,"Sekstil",4)]:
+                    if abs(fark - aci_dk) <= orb_max and fark >= 1:
+                        acilar.append({"g1": g1, "g2": g2, "aci": aci_ad, "fark": round(fark, 1)})
+                        break
+
+        def _derece_str(d):
+            return f"{int(d%30)}°{BURCLAR[int(d//30)]}"
+
+        # ── PARAGRAPH 1: Overview + element + asc/mc ──
+        element_acik = {
+            "Ateş": "Ateş elementi ağır basıyor — doğal bir öncü ve ilham kaynağısınız. Hayatta cesur adımlar atar, içinizdeki tutkuyu dışarıya yansıtırsınız.",
+            "Toprak": "Toprak elementi ağır basıyor — sağlam temeller üzerinde yükselen, güvenilir ve üretken bir yapınız var. Hayallerinizi somut adımlarla gerçeğe dönüştürüyorsunuz.",
+            "Hava": "Hava elementi ağır basıyor — zihniniz sürekli aktif, fikirler üretiyor ve bağlantılar kuruyorsunuz. İletişim ve sosyal çevre hayatınızın merkezinde.",
+            "Su": "Su elementi ağır basıyor — derin bir sezgisel zekaya ve empati yeteneğine sahipsiniz. Duygusal dünyanız, aldığınız kararları ve ilişkilerinizi şekillendiriyor.",
+        }
+        eksik_element = [e for e, s in eleman_say.items() if s == 0]
+        eksik_not = ""
+        if eksik_element:
+            eksik_not = f" Öte yandan haritanızda { ' ve '.join(eksik_element) } elementinde gezegen bulunmuyor; bu alanları dengelemek için bilinçli bir gelişim yolculuğu sizi bekliyor olabilir."
+
+        par1 = f"Yükselen burcunuz {asc_burc} ve MC'niz {mc_burc} ile hayata geliş tarzınız ve toplumsal hedefleriniz şekilleniyor. {element_acik.get(bask_element, 'Element dağılımınız dengeli ve uyumlu.')}{eksik_not}"
+
+        # ── PARAGRAPH 2: Planet story ──
+        ozne_gezegenler = ["Güneş","Ay","Merkür","Venüs","Mars","Jüpiter","Satürn","Uranüs","Neptün","Plüton","Chiron"]
+        gez_parcalar = []
+        for g in ozne_gezegenler:
+            if g not in gez_poz: continue
+            p = gez_poz[g]
+            burc = p["burc"]; ev = p["ev"]
+            e_anlam = EV_ANLAM.get(ev, "hayat")
+            DUSUK_ZARAR = {
+                "Güneş": ("Terazi","Kova"), "Ay": ("Akrep","Oğlak"), "Merkür": ("Balık","Yay"),
+                "Venüs": ("Başak","Akrep"), "Mars": ("Boğa","Terazi"), "Jüpiter": ("Oğlak","Başak"),
+                "Satürn": ("Yengeç","Koç"), "Uranüs": ("Boğa","Aslan"), "Neptün": ("Başak","Kova"),
+                "Plüton": ("Başak","Boğa"), "Chiron": ("",""),
+            }
+            dusuk, zarar = DUSUK_ZARAR.get(g, ("",""))
+            notu = ""
+            if burc == zarar: notu = " Burada enerjisi sınanıyor — bilinçli çaba gerektiren bir alan."
+            elif burc == dusuk: notu = " Burada ifadesi zayıflıyor ama telafisi mümkün — farkındalıkla güçlenebilir."
+
+            giris = {
+                "Güneş": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) konumlanmış. Öz benliğiniz ve hayattaki temel amacınız bu kesişimde şekilleniyor.",
+                "Ay": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) yer alıyor. Duygusal dünyanız ve içgüdüsel tepkileriniz bu konumdan besleniyor.",
+                "Merkür": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Zihinsel yapınız ve iletişim tarzınız bu yerleşimden güç alıyor.",
+                "Venüs": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sevgi diliniz, estetik anlayışınız ve değer verdikleriniz bu konumun izlerini taşıyor.",
+                "Mars": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). İradeniz, tutkularınız ve mücadele enerjiniz buradan yönetiliyor.",
+                "Jüpiter": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Şans, bolluk ve kişisel genişleme alanınız bu konumda kendini gösteriyor.",
+                "Satürn": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sorumluluklarınız, sınırlarınız ve en önemli hayat dersleriniz bu yerleşimde gizli.",
+                "Uranüs": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Özgünlüğünüz, ani değişimleriniz ve isyan ettiğiniz alanlar bu konumla bağlantılı.",
+                "Neptün": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Hayalleriniz, sezgileriniz ve manevi bağlantılarınız buradan ilham alıyor.",
+                "Plüton": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Derin dönüşüm, güç dinamikleri ve yeniden doğuş potansiyeliniz bu konumda saklı.",
+                "Chiron": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). En derin yaranız ve aynı zamanda en büyük iyileşme gücünüz burada.",
+            }.get(g, "")
+            if giris:
+                gez_parcalar.append(f"{giris}{notu}")
+
+        # Connect first 3-4 planets with transitions, rest as separate sentences
+        if len(gez_parcalar) <= 4:
+            gez_parag = " ".join(gez_parcalar)
+        else:
+            gez_parag = " ".join(gez_parcalar[:3]) + " " + " ".join(gez_parcalar[3:])
+
+        # ── PARAGRAPH 3: Aspects — kütüphane ile spesifik yorumlar ──
+        try:
+            kutuphane = _aspect_interpretasyon_kutuphanesi()
+        except:
+            kutuphane = {}
+
+        aspekt_cumleleri = []
+        for a in acilar[:12]:
+            pk = tuple(sorted([a["g1"], a["g2"]]))
+            pair_key = f"{pk[0]}-{pk[1]}"
+            aci = a["aci"]
+            yorum = ""
+            if pair_key in kutuphane and aci in kutuphane[pair_key]:
+                yorum = kutuphane[pair_key][aci]
+            if not yorum:
+                sifa = _olumsuz_aci_sifasi(a["g1"], a["g2"], aci) if aci in ("Kare","Karşıt") else ""
+                etiket = {"Kavuşum":"birleşme ve güçlenme","Trigon":"doğal akış ve uyum","Sekstil":"fırsat ve destek","Kare":"meydan okuyor","Karşıt":"denge çağrısı yapıyor"}
+                yorum = f"{a['g1']} ve {a['g2']} arasındaki {aci} açısı size {etiket.get(aci,'bir gerilim getiriyor')}."
+                if sifa: yorum += f" {sifa}"
+            aspekt_cumleleri.append(yorum)
+
+        aspekt_parag = " ".join(aspekt_cumleleri) if aspekt_cumleleri else ""
+
+        # ── PARAGRAPH 4: Arabic Parts + Asteroids ──
+        diger_not = ""
+        try:
+            mp = motor.meslek_arap_noktasi_hesapla()
+            if mp and mp.get("ruh_burc"):
+                diger_not += f"Ruh noktanız {mp['ruh_burc']} burcunda ({mp['ruh_ev']}. ev) — kariyer ve yaşam amacı yolculuğunuzda size pusula görevi görüyor. "
+        except: pass
+        try:
+            ap = motor.arap_noktasi_hesapla()
+            if ap and isinstance(ap, dict):
+                ilk_kisi = list(ap.keys())[0]
+                if ilk_kisi and isinstance(ap.get(ilk_kisi), dict):
+                    ap_list = list(ap[ilk_kisi].items())[:3]
+                    eklenen = []
+                    for nokta_ad, nokta_data in ap_list:
+                        if isinstance(nokta_data, dict) and nokta_data.get("burc"):
+                            eklenen.append(f"{nokta_ad} {nokta_data['burc']} burcunda ({nokta_data.get('ev','?')}. ev)")
+                    if eklenen:
+                        diger_not += f"Arap noktalarından {', '.join(eklenen)} öne çıkıyor. "
+        except: pass
+        try:
+            ast_anahtar = {"Juno":"bağlılık","Ceres":"beslenme","Pallas":"bilgelik","Vesta":"adanma","Eros":"tutku","Psyche":"ruhsal bağ"}
+            ast_list = []
+            for ast_isim, ast_tema in ast_anahtar.items():
+                ast_id = GEZEGENLER.get(ast_isim)
+                if ast_id:
+                    deg = swe.calc_ut(jd, ast_id)[0][0]
+                    ast_burc = BURCLAR[int(deg // 30)]
+                    ast_list.append(f"{ast_isim} ({ast_burc} — {ast_tema})")
+            if ast_list:
+                diger_not += f"Asteroitlerden {', '.join(ast_list[:4])} haritanızda belirgin temalar taşıyor."
+        except: pass
+
+        # ── Assemble ──
+        paragraf = []
+        paragraf.append(par1)
+        paragraf.append(gez_parag)
+        if aspekt_parag:
+            paragraf.append(aspekt_parag)
+        if diger_not:
+            paragraf.append(diger_not)
+
+        return "\n\n".join(paragraf)
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return f"Harita yorumu hazırlanamadı: {e}"
+
+def _olumsuz_aci_sifasi(g1, g2, aci_turu):
+    """Returns a healing suggestion for a challenging aspect — natural, varied, specific."""
+    SIFA_DICT = {
+        # ── Güneş ──
+        ("Güneş","Satürn"): "Özgüveninizle sorumluluklarınız arasında sıkışmış hissediyorsunuz. Kendinize 'yeterli olmadığınızı' söyleyen iç sesi fark edin ve ona meydan okuyun. Küçük başarılarınızı kutlamak bu gerilimi azaltacak.",
+        ("Güneş","Plüton"): "Güç mücadeleleri ve kontrol dinamikleri gündemde. Başkalarını değiştirmeye çalışmak yerine kendi gölge yönlerinizle yüzleşin. Kendi gücünüzü keşfettiğinizde dışarıdaki mücadeleler anlamını yitirecek.",
+        ("Güneş","Neptün"): "Kimliğinizle ilgili bir sis perdesi aralanıyor. Kendinizi başkalarının beklentilerine göre şekillendirmekten vazgeçin. Meditasyon ve yalnız zaman geçirmek size gerçek benliğinizi hatırlatacak.",
+        ("Güneş","Uranüs"): "Özgürlük ihtiyacınız sorumluluklarınızla çatışıyor. Başkaldırmak için başkaldırmak yerine, hangi kalıpların size gerçekten dar geldiğini sorgulayın. Kendi yolunuzu bulmak başkalarını reddetmekten geçmez.",
+        ("Güneş","Merkür"): "Düşüncelerinizle öz benliğiniz arasında bir uyumsuzluk var. Söylediklerinizle hissettikleriniz aynı olmayabilir. Kendinize karşı dürüst olun, fikirlerinizi içinize sindirmeden paylaşmayın.",
+        ("Güneş","Venüs"): "Kendinizi ifade etme biçiminizle sevgi diliniz çelişiyor olabilir. Başkalarını memnun etmek için kendi isteklerinizi geri plana atıyorsunuz. Önce kendi ihtiyaçlarınızı fark edin.",
+        ("Güneş","Mars"): "İrade ile arzu arasında kalmış durumdasınız. Bir şeyi çok istiyor ama harekete geçmekten korkuyor olabilirsiniz. İlk adımı atın, gerisi kendiliğinden gelecek.",
+        ("Güneş","Jüpiter"): "Kendinizi kanıtlama ihtiyacınız abartıya kaçabilir. Herkese bir şey kanıtlamaya çalışmak yerine, sadece var olmanıza izin verin. Yeterlisiniz, fazlasına gerek yok.",
+        ("Güneş","KAD"): "Geçmişten gelen aile kalıpları ve atalardan miras kalan alışkanlıklar, kendi kimliğinizi kurmanızı zorlaştırıyor. Kendi yolunuzu çizmek için aile bağlarınızı reddetmeden onlardan özgürleşmeyi öğrenin. Köklerinizle barışmak sizi güçlendirecek.",
+        ("Güneş","Lilith"): "Öfkenizi ve bastırılmış yönlerinizi kabul etmekte zorlanıyorsunuz. Toplumun 'uygun' bulmadığı taraflarınızı sahiplenmek sizi özgürleştirecek. Gölgenizle yüzleşmek, ışığınızı bulmanın tek yolu.",
+        # ── Ay ──
+        ("Ay","Satürn"): "Duygusal olarak kendinizi kısıtlanmış hissediyorsunuz. İç çocuğunuz susturulmuş olabilir. Kendinize izin verin: ağlamak, sarılmak, sıcak bir şeyler içmek. Koruyucu duvarlarınızı yavaşça indirin.",
+        ("Ay","Plüton"): "Duygularınız okyanus kadar derin ve zaman zaman boğucu olabilir. Sahiplenme ve kıskançlık eğilimlerinizi fark edin. Birine bağımlı olmadan da güvende hissedebileceğinizi kendinize hatırlatın.",
+        ("Ay","Neptün"): "Başkalarının enerjisini sünger gibi çekiyor, nerede siz başlayıp nerede başkaları bittiğini ayırt edemiyorsunuz. Duygusal sınırlar çizmek için her gün 10 dakika sessizlik size iyi gelecek.",
+        ("Ay","Uranüs"): "Duygusal dalgalanmalarınız tahmin edilemez olabilir. Bir an mutlu, bir an huzursuz. Bu değişkenlik yaratıcılığınızın kaynağı ama aynı zamanda istikrarsızlığa da yol açabilir. Günlük rutinler size çapa olacak.",
+        ("Ay","Mars"): "Tepkileriniz ani ve güçlü. Öfkenizle duygusallığınız iç içe geçmiş durumda. Bir şey sizi kızdırdığında önce derin bir nefes alın, sonra yanıt verin. Bedeninizi hareket ettirmek bu enerjiyi dönüştürecek.",
+        ("Ay","Venüs"): "Duygusal ihtiyaçlarınızla keyif aldığınız şeyler arasında bir çelişki var. Sevilmek ve onaylanmak için kendinizi zorluyor olabilirsiniz. Koşulsuz sevgiyi önce kendinize gösterin.",
+        ("Ay","Merkür"): "Duygularınızı kelimelere dökmekte zorlanıyorsunuz. İçinizde bir şeyler oluyor ama ifade edemiyorsunuz. Günlük yazmak ve yaratıcı yazarlık bu blokajı aşmanıza yardımcı olacak.",
+        ("Ay","Jüpiter"): "Duygularınız abartıya meyilli. Küçük bir olayı büyütebilir, bir anlık üzüntüyü günlerce taşıyabilirsiniz. Gerçekçi bir perspektif geliştirmek için güvendiğiniz bir arkadaşınıza danışın.",
+        ("Ay","KAD"): "Aile geçmişinizin duygusal yükünü taşıyorsunuz. Annenizden veya büyüklerinizden size miras kalan duygusal alışkanlıklar var. Bu kalıpları fark edip bilinçli seçimler yapma zamanı. Geçmişin sizi tanımlamasına izin vermeyin.",
+        ("Ay","Lilith"): "Kadınlık, duygusallık ve kabul edilmeyen yönleriniz arasında bir gerilim var. Bastırdığınız duygusal tepkileriniz en beklenmedik anda yüzeye çıkabilir. Yargılanma korkusu olmadan kendinizi ifade edebileceğiniz güvenli alanlar yaratın.",
+        # ── Merkür ──
+        ("Merkür","Neptün"): "Zihniniz bir sis bulutunun içinde. Hayal ile gerçeği ayırt etmek zorlaşabiliyor. Düşüncelerinizi kağıda dökmek, yazmak ve çizmek size netlik kazandıracak. Sezgilerinize güvenin ama gerçeklik kontrolünü de elden bırakmayın.",
+        ("Merkür","Plüton"): "Zihniniz derin ve araştırmacı ama takıntılı düşünce döngülerine de kapılabiliyor. Bir konuyu bırakmakta zorlanıyor, sürekli aynı şeyi düşünüyorsunuz. Zihninizi boşaltmak için meditasyon ve fiziksel aktivite deneyin.",
+        ("Merkür","Uranüs"): "Fikirleriniz sıra dışı ve öncü ama bunları ifade ederken başkalarını geride bırakabiliyorsunuz. Ani çıkışlarınız ve beklenmedik sözleriniz ilişkilerinizi zorlayabilir. Düşüncelerinizi paylaşmadan önce bir saniye bekleyin.",
+        ("Merkür","Satürn"): "Zihniniz eleştirel ve disiplinli ama aşırı karamsar da olabiliyor. Kendi düşüncelerinizi bile fazla sorguluyor, karar vermekte zorlanıyorsunuz. Mükemmel olmayan bir fikri paylaşmak, hareketsiz kalmaktan iyidir.",
+        ("Merkür","Mars"): "Düşünceleriniz hızlı ve saldırgan olabilir. Tartışma sırasında kelimeler silaha dönüşebiliyor. Fikrinizi savunmak başkasını küçük düşürmek anlamına gelmez. Savaşmadan da iletişim kurabilirsiniz.",
+        ("Merkür","KAD"): "Eski düşünce kalıplarınız, ailenizden devraldığınız inanç sistemleri zihninizi şekillendiriyor. Hangi inançların size ait olmadığını sorgulama zamanı. Kendi zihinsel özgürlüğünüzü ilan edin.",
+        ("Merkür","Lilith"): "Söylenmemiş sözler, bastırılmış fikirler ve tabu konular zihninizi meşgul ediyor. Konuşulmayanı konuşma cesareti gösterin. Yasak olduğunu düşündüğünüz düşüncelerinizi sahiplenin.",
+        # ── Venüs ──
+        ("Venüs","Satürn"): "İlişkilerde mesafeli ve güvensiz hissediyorsunuz. 'Yeterince sevilmiyorum' korkusu sizi geri çekiyor. Küçük jestlerle sevginizi ifade etmeye başlayın ve karşınızdakinin dilini öğrenmeye çalışın.",
+        ("Venüs","Plüton"): "İlişkileriniz yoğun ve tutkulu ama aynı zamanda sahiplenme ve kontrol içerebiliyor. Birini kaybetme korkusu, ona fazla sıkı sarılmanıza neden oluyor. Güvenmeyi öğrenmek en büyük dersiniz.",
+        ("Venüs","Neptün"): "Aşkta sınırlarınız bulanık. Romantik hayalleriniz gerçekliğin önüne geçebiliyor. Birini olduğu gibi görmek yerine idealize ediyorsunuz. Gözlerinizi açın: gerçek aşk, hayal kırıklığını da içerir.",
+        ("Venüs","Uranüs"): "Özgürlük ve bağlanma arasında gidip geliyorsunuz. Birine yaklaştıkça uzaklaşma ihtiyacı duyuyorsunuz. İlişkilerinizde alana ihtiyacınız olduğunu kabul edin ama bunu ifade etmeyi öğrenin.",
+        ("Venüs","Mars"): "Sevgiyle tutku arasında bir denge arayışı içindesiniz. Biri kalbinizi, diğeri bedeninizi çağırıyor. Yaratıcı bir çıkış yolu — dans, resim, müzik — bu iki enerjiyi uyumlu hale getirebilir.",
+        ("Venüs","KAD"): "Aile kökenlerinizdeki sevgi alışkanlıkları yetişkin ilişkilerinizi etkiliyor. Çocuklukta öğrendiğiniz sevgi dili ihtiyaçlarınızı karşılamıyor olabilir. Yeni bir sevgi dili öğrenmek için geç değil.",
+        ("Venüs","Lilith"): "Cinsellik, çekim ve yasak arzu konularında içsel bir çatışma yaşıyorsunuz. Toplumun kadına veya cinselliğe dair dayattığı kalıplarla kendi gerçeğiniz arasında sıkışmış olabilirsiniz. Bedeninizi ve arzularınızı sahiplenmek sizi özgürleştirecek.",
+        # ── Mars ──
+        ("Mars","Satürn"): "Öfkenizi ifade etmekte zorlanıyor veya tam tersi, kontrolsüz patlamalar yaşıyorsunuz. İkisi de aynı sorunun iki yüzü: bastırma ve patlama döngüsü. Düzenli fiziksel egzersiz bu enerjiyi sağlıklı kanala yönlendirir.",
+        ("Mars","Plüton"): "Öfkeniz volkanik: uzun süre sessiz, sonra yıkıcı bir patlama. Güç mücadelelerine çekiliyor, her şeyi bir savaş alanı gibi görebiliyorsunuz. Gerçek gücün kontrol etmekte değil, bırakmakta olduğunu hatırlayın.",
+        ("Mars","Neptün"): "Enerjiniz dağınık, motivasyon bulmakta zorlanıyorsunuz. Nereye gitmek istediğinizi bilmiyor gibi hissediyorsunuz. Küçük ve net hedefler koyun. Adım adım ilerlemek, bir anda her şeyi başarmaya çalışmaktan daha etkili.",
+        ("Mars","Uranüs"): "Ani öfke patlamaları ve dürtüsel hareketler bu açının en belirgin özelliği. Düşünmeden hareket etmek sonra pişmanlık getirebilir. Sizi tetikleyen durumları tanıyın ve tepki vermeden önce 3'e kadar sayın.",
+        ("Mars","Jüpiter"): "Aşırı iyimserlik ve abartılı hareketler risk almanıza neden olabilir. Her şeyi birden istiyor, sonra tükeniyorsunuz. Hızınızı kesin, bir hedefe odaklanın ve oraya varana kadar bırakmayın.",
+        ("Mars","KAD"): "Öfkenizin kökeni aile geçmişinizde olabilir. Babanız veya büyüklerinizden miras kalan bir öfke kalıbı var. Atalarınızın savaşlarını kendi hayatınızda tekrarlamak zorunda değilsiniz. Bu döngüyü fark etmek bile iyileştirici.",
+        ("Mars","Lilith"): "Bastırılmış öfke ve yasak arzular vücudunuzda birikiyor. Öfkenizi ifade etmenin sağlıklı yollarını bulmak hem fiziksel hem duygusal sağlığınız için önemli. Dövüş sporları, yoğun egzersiz ve ses terapi işe yarayabilir.",
+        # ── Jüpiter ──
+        ("Jüpiter","Satürn"): "Genişleme ve sınırlama arasında bir salınım yaşıyorsunuz. Büyük hayaller kuruyor ama sonra kendinizi durduruyorsunuz. Mükemmel anı beklemeyin, elinizdeki imkanlarla başlayın. Sağlam temeller üzerinde yükselen hayaller gerçek olur.",
+        ("Jüpiter","Plüton"): "Güç, bolluk ve kontrol iç içe geçmiş durumda. Daha fazlasına sahip olma arzusu sizi tüketebilir. Gerçek bolluk, sahip olduklarınızın kıymetini bilmekten geçer. Paylaştıkça çoğalacağınızı hatırlayın.",
+        ("Jüpiter","Neptün"): "Sınır tanımayan iyimserlik sizi gerçekçi olmaktan uzaklaştırabilir. Her şeyin güzel olacağına o kadar inanıyorsunuz ki, tehlike işaretlerini görmüyorsunuz. Denge: hayal etmek ve gerçekçi olmak arasında bir orta yol bulun.",
+        ("Jüpiter","Uranüs"): "Özgürlük ve macera arzunuz o kadar güçlü ki istikrarı tamamen göz ardı edebiliyorsunuz. Ani kararlar, plansız atılımlar sonra pişmanlık getirebilir. Özgürlük sorumsuzluk demek değildir, ikisini birbirine karıştırmayın.",
+        ("Jüpiter","KAD"): "Ailenizden size miras kalan inanç sistemleriyle kendi hayalleriniz arasında sıkışmış olabilirsiniz. 'Biz böyle yapmayız' kalıplarını sorgulayın. Atalarınızın sınırlamaları sizin sınırlarınız değil.",
+        ("Jüpiter","Lilith"): "Yasak bilgi, tabu konular ve bastırılmış gerçekler size çekici geliyor. Toplumun 'aşırı' veya 'uygunsuz' bulduğu şeylere ilgi duyuyorsunuz. Bu merakınızı yaratıcı ve yapıcı alanlara yönlendirin.",
+        # ── Satürn ──
+        ("Satürn","Uranüs"): "Gelenekle devrim arasında sıkışmış durumdasınız. Bir yandan güvende olmak istiyor, diğer yandan özgür. Köklü bir değişim yapmadan önce küçük yenilikler deneyin. Eski kalıpları birden yıkmak yerine dönüştürün.",
+        ("Satürn","Neptün"): "Sorumluluklarınızla hayalleriniz arasında bir çatışma var. Birine ne kadar yaklaşırsanız diğeri o kadar uzaklaşıyor. Sorumluluklarınızı ihmal etmeden hayallerinizin peşinden gitmenin bir yolunu bulun.",
+        ("Satürn","Plüton"): "Hayatın en ağır dersleriyle yüzleşiyorsunuz: kayıp, kontrol, güç. Bu açı size dayanıklılık öğretiyor ama aynı zamanda katılaştırabiliyor. Yumuşamak güçsüzlük değil, olgunluğun işaretidir.",
+        ("Satürn","KAD"): "Aile geçmişinizden gelen sorumluluk yükünü taşıyorsunuz. Atalarınızın çözülmemiş sorunları sizin omuzlarınızda olabilir. Bu yükü bırakmak size ihanet gibi geliyor, ama asıl ihanet kendi hayatınızı yaşamamak.",
+        ("Satürn","Lilith"): "Bastırılmış duygular, yasak kabul edilen yönleriniz sorumluluk duvarlarınızın ardında sıkışmış durumda. Kim olduğunuzu tam olarak gösteremediğiniz için içinizde bir sıkışma hissediyorsunuz. Gölgenizi kucaklamak sizi özgürleştirecek.",
+        # ── Chiron ──
+        ("Chiron","Satürn"): "En derin yaranız sorumluluk ve yetersizlik hissiyle bağlantılı. 'Asla yeterli değilim' inancı iyileşmenizi engelliyor. Kusurlarınızın sizi insan yaptığını kabul edin. Mükemmel olmak zorunda değilsiniz.",
+        ("Chiron","Plüton"): "Geçmiş travmalar ve dönüşüm arasında bir köprüdesiniz. En çok acıdığınız yerde en büyük iyileşme potansiyeli yatıyor. Bunun için yalnız başınıza yapmak zorunda değilsiniz, profesyonel destek alın.",
+        ("Chiron","Neptün"): "İyileşme arzunuz var ama bunu nasıl yapacağınızı bilmiyorsunuz. Kaçış yolları arıyor, bağımlılıklara yönelebiliyorsunuz. Gerçek iyileşme, acınızla yüzleşmekten geçer, ondan kaçmaktan değil.",
+        ("Chiron","KAD"): "Aile geçmişinizde iyileşmemiş bir yara size miras kalmış olabilir. Bu, sizin kendi yaranız gibi hissettirse de aslında atalarınızdan geliyor olabilir. Bu döngüyü kırmak sizin elinizde, bu sizin kader yolculuğunuzun bir parçası.",
+        ("Chiron","Lilith"): "Reddedilme, dışlanma ve kabul görmeme korkusu en hassas noktanız. 'Fazla' olduğunuzu hissediyorsunuz. Oysa sizi farklı kılan şey tam da iyileşme gücünüz. Dışlanmış hissettiğiniz her alanda başkalarına şifa olabilirsiniz.",
+        # ── KAD + Lilith ──
+        ("KAD","Lilith"): "Geçmişin gölgesiyle bugünün bastırılmış yönleri birleşince güçlü bir karmik yük ortaya çıkıyor. Atalarınızdan miras kalan susturulmuş hikayeler var. Bu suskunluğu bozmak, hem kendinizi hem soyunuzu özgürleştirecek.",
+        ("KAD","Plüton"): "Aile geçmişinizde güç mücadeleleri, miras kavgaları veya travmatik kayıplar olabilir. Bu yoğun enerji bilinçaltınızda dolaşıyor. Aile sırlarını gün yüzüne çıkarmak korkutucu gelebilir ama bu, özgürleşmenizin anahtarı.",
+        ("KAD","Neptün"): "Aile geçmişinizde çözülmemiş bir kurbanlık hikayesi, fedakarlık veya hayal kırıklığı olabilir. Kendinizi başkaları için feda etme eğiliminiz buradan geliyor. Fedakarlık sevgi değildir. Önce kendinize iyi bakın.",
+        ("KAD","Uranüs"): "Aile kalıplarıyla bağımsızlığınız arasında bir savaş veriyorsunuz. Size dayatılan geleneksel rolleri reddediyor ama tamamen de kopamıyorsunuz. Özgürleşmek reddetmek değil, kendi seçiminizi yapmaktır.",
+        ("Lilith","Plüton"): "Bastırılmış cinsellik, yasak arzular ve gölge dürtüler derin bir dönüşüm çağrısı yapıyor. En çok utandığınız yönleriniz, en büyük gücünüzü barındırıyor. Karanlık yanınızla barışmak sizi bütünleyecek.",
+        ("Lilith","Neptün"): "Kurban-kurtarıcı döngüsü içinde kaybolmuş olabilirsiniz. Başkalarını kurtarmaya çalışırken kendinizi kaybediyorsunuz. Ya da bir kurtarıcı bekliyorsunuz. Gerçek kurtuluşun başkasında değil, kendi içinizde olduğunu fark edin.",
+        ("Uranüs","Lilith"): "İsyan ve bastırılmış arzular iç içe geçmiş durumda. Kurallara karşı gelmek sizi özgürleştirmiyor, sadece daha çok sıkıştırıyor. Asıl özgürlük, kendi sınırlarınızı kendinizin belirlemesinde. Dışarıdaki otoriteyle savaşmak yerine içinizdeki otoriteyi sorgulayın.",
+        ("Uranüs","KAD"): "Aile geçmişinizden kopma isteğiyle aidiyet ihtiyacınız arasında sıkışmış hissediyorsunuz. Köklerinizle bağlarınızı tamamen koparmak yerine, onları kendi ihtiyaçlarınıza göre yeniden tanımlayın. Aidiyet teslimiyet değildir.",
+        ("Lilith","Mars"): "Öfkeniz ve bastırılmış yönleriniz arasında bir bağ var. Kendinizi ifade etmenin 'yasak' olduğuna inandığınız bir alanda harekete geçmekten korkuyorsunuz. Bedeninizi hareket ettirmek ve sesinizi yükseltmek bu zincirleri kıracak.",
+        # ── Ek yaygın çiftler ──
+        ("Venüs","Jüpiter"): "Aşırı hoşgörü ve abartılı beklentiler ilişkilerinizde dengesizlik yaratabilir. Herkese yetişmeye, herkesi memnun etmeye çalışıyorsunuz. Hayır demeyi öğrenmek bu enerjiyi dengeleyecek.",
+        ("Merkür","Venüs"): "Ne söyleyeceğinizle ne hissettiğiniz arasında bir uyumsuzluk var. İltifat ederken samimiyetsiz ya da eleştirirken fazla sert olabilirsiniz. Kalbinizden geçenle dilinizden çıkanı aynı hizaya getirin.",
+        ("Ay","Jüpiter"): "Duygusal tepkileriniz büyük ve geniş kapsamlı. Küçük bir mutluluk sizi coştururken, küçük bir hayal kırıklığı yerle bir edebiliyor. Duygusal iniş çıkışlarınızı dengelemek için nefes egzersizleri ve topraklama teknikleri deneyin.",
+        ("Mars","Jüpiter"): "Risk almayı seviyorsunuz ama bazen aşırıya kaçabiliyor. 'Ya hep ya hiç' yaklaşımınız sizi yakabilir. Büyük resmi görmek güzel ama adım adım ilerlemek daha kalıcı sonuçlar getirecek.",
+        ("Güneş","Ay"): "Kimliğinizle duygusal dünyanız çatışıyor. Biri bir şey isterken diğeri başka bir şey istiyor. İçsel bütünlük için bu iki parçayı uzlaştırmalısınız. İkisini de dinleyin, birini tercih etmeyin.",
+    }
+    key = (g1, g2)
+    rev_key = (g2, g1)
+    if key in SIFA_DICT: return SIFA_DICT[key]
+    if rev_key in SIFA_DICT: return SIFA_DICT[rev_key]
+    # Varied generic fallbacks
+    import random
+    rng = random.Random(g1 + g2 + aci_turu)
+    generic_kare = [
+        f"{g1} ile {g2} arasındaki kare açısı ikisi arasında bir gerilim yaratıyor. Bu enerjiyi bastırmak yerine, ikisinin de size ne söylediğini dinleyin. Biri diğerini yok etmek zorunda değil.",
+        f"{g1} ve {g2} arasındaki bu zorlayıcı açı, bir alışkanlığınızı sorgulamanızı istiyor. İkisinin çatıştığı noktada aslında büyüme fırsatınız yatıyor. Sizi neyin rahatsız ettiğine yakından bakın.",
+        f"Bu kare açı, {g1} ve {g2} enerjilerini uyumlu hale getirmeniz için bir sınav. Birini seçmek zorunda değilsiniz, ikisini de kucaklayabilirsiniz. Önemli olan aralarındaki dengeyi bulmak.",
+        f"{g1} ile {g2} arasındaki gerilim, içinizde bir şeylerin değişmesi gerektiğini söylüyor. Bu rahatsızlık hissine kulak verin. Eski alışkanlıklarınızı bırakma zamanı gelmiş olabilir.",
+        f"{g1} ve {g2} arasındaki kare, sizi konfor alanınızın dışına itiyor. Zorlayıcı ama bir o kadar da öğretici bir döngüdesiniz. Bu gerilimi yaratıcı bir projeye kanalize etmeyi deneyin.",
+    ]
+    generic_karsit = [
+        f"{g1} ve {g2} arasındaki karşıt açı, iki ayrı kutup arasında gidip gelmenize neden oluyor. Bir denge noktası bulmak için her iki tarafa da eşit mesafede durmayı öğrenin.",
+        f"{g1} ile {g2} arasındaki bu karşıtlık, aslında bir yansıtma mekanizmasını işaret ediyor. Karşınızda gördüğünüz şey, kendi içinizde kabul etmediğiniz bir parçanız olabilir.",
+        f"Bu karşıt açı, {g1} ve {g2} alanlarında bir taraf seçmeye zorlanıyormuş gibi hissettirebilir. Oysa asıl mesele, her iki alanı da hayatınızda tutabilmenin bir yolunu bulmak.",
+        f"{g1} ile {g2} arasında bir çekim-itiş dinamiği var. Yaklaştıkça uzaklaşıyor, uzaklaştıkça özlüyorsunuz. Bu döngüyü kırmak için her iki enerjiyi de kucaklayacak bir orta yol bulun.",
+        f"{g1} ve {g2} arasındaki karşıtlık, bir ilişkide veya durumda denge arayışınızı simgeliyor. Siyah-beyaz düşünmek yerine gri alanları keşfedin. Gerçek çözüm, ikisinin de ötesinde.",
+    ]
+    if aci_turu == "Kare":
+        return rng.choice(generic_kare)
+    elif aci_turu == "Karşıt":
+        return rng.choice(generic_karsit)
+    return ""
+
+def _natal_sifa_receteleri(motor):
+    """Expanded healing prescriptions for negative aspects + fallen/detriment planets."""
+    try:
+        BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+
+        jd = motor.get_natal_julian_day("p1")
+        cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
+
+        gez_poz = {}
+        for g_ad, g_id in list(GEZEGENLER.items())[:14]:
+            try:
+                deg = swe.calc_ut(jd, g_id)[0][0]
+                burc = BURCLAR[int(deg // 30)]
+                gez_poz[g_ad] = {"burc": burc, "derece": deg}
+            except: pass
+
+        # Fall & detriment positions
+        DUSUK_ZARAR = {
+            "Güneş": ("Terazi","Kova"), "Ay": ("Akrep","Oğlak"), "Merkür": ("Balık","Yay"),
+            "Venüs": ("Başak","Akrep"), "Mars": ("Boğa","Terazi"), "Jüpiter": ("Oğlak","Başak"),
+            "Satürn": ("Yengeç","Koç"), "Uranüs": ("Boğa","Aslan"), "Neptün": ("Başak","Kova"),
+            "Plüton": ("Başak","Boğa"),
+        }
+        SAGALTIM_TEKNIKLERI = {
+            "Güneş": {"Terazi": "Kendinize değer vermeyi öğrenin. Onaylanma ihtiyacınızı fark edin ve içinizdeki ışığı dışarıdan onay beklemeden parlatın. Güneşe selam (Surya Namaskar) ve özgüven afirmasyonları.", "Kova": "Özgünlüğünüzü kucaklayın ama topluluktan tamamen kopmayın. Benzersiz yeteneklerinizi başkalarıyla paylaşmanın yollarını bulun. Meditasyon ve topluluk çalışmaları."},
+            "Ay": {"Akrep": "Duygusal yoğunluğunuzu yaratıcı alanlara yönlendirin. Günlük tutmak, duygularınızı yazmak ve sanatla ifade etmek size iyi gelecek. Su kenarında vakit geçirin.", "Oğlak": "Duygularınızı ifade etmekte zorlanıyorsunuz. İç dünyanıza dönmek ve kendinize şefkat göstermek için her gün 10 dakika ayırın. Bitki çayları ve sıcak banyo rahatlatıcı."},
+            "Merkür": {"Balık": "Düşünceleriniz dağınık hissedebilir. Günlük yazma pratiği ve zihin haritaları size odaklanma konusunda yardımcı olacak. Sessiz ortamda çalışmayı deneyin.", "Yay": "Fikirlerinizi paylaşmadan önce daha fazla araştırma yapın. Detaylara dikkat etmek ve sabırla dinlemek sizi daha etkili bir iletişimci yapacak."},
+            "Venüs": {"Başak": "Mükemmel aşkı aramaktan vazgeçin. Küçük kusurları kabul etmek ve gerçekçi beklentiler geliştirmek ilişkilerinizi iyileştirecek. Kendinize bir çiçek alın veya güzel bir ortam yaratın.", "Akrep": "İlişkilerde sahiplenme ve kıskançlık eğilimlerinizi fark edin. Güven egzersizleri yapın ve partnerinize alan tanıyın. Dans etmek duygusal blokajları çözer."},
+            "Mars": {"Boğa": "Öfkenizi bastırmak yerine fiziksel aktiviteyle sağlıklı şekilde ifade edin. Topraklama egzersizleri ve doğa yürüyüşleri enerjinizi dengeleyecek.", "Terazi": "Pasif-agresif davranışlardan kaçının. İhtiyaçlarınızı net ve nazikçe ifade etmeyi öğrenin. Yoga ve nefes çalışmaları öfke yönetimine yardımcı."},
+            "Jüpiter": {"Oğlak": "Büyük hayallerinizi gerçekleştirmek için disiplinli bir plan oluşturun. Bolluk bilinci affirmasyonları yapın ve minnettarlık günlüğü tutun.", "Başak": "Mükemmeliyetçiliğinizin sizi büyük resimden alıkoymasına izin vermeyin. Riski tolere etmeyi öğrenin ve her küçük başarıyı kutlayın."},
+            "Satürn": {"Yengeç": "Duygusal güvenlik ihtiyacınız sorumluluklarınızla çatışabilir. Aile geçmişinizle yüzleşmek ve duygusal olarak güçlenmek size özgürlük getirecek.", "Koç": "Sabır en büyük dersiniz. Hızlı sonuç beklemek yerine sürece güvenin. Kemik suyu, kalsiyum takviyeleri ve düzenli rutin size iyi gelir."},
+            "Uranüs": {"Boğa": "Değişime direnmek yerine küçük adımlarla yeniliklere açılın. Rutininizde küçük değişiklikler yapmak büyük dönüşümün kapısını aralayacak.", "Aslan": "Özgünlüğünüzü ifade etmekten korkmayın. Yaratıcı projelerde ani ilhamları takip edin. Elektrik mavisi ve mor renkler titreşiminizi yükseltir."},
+            "Neptün": {"Başak": "Maneviyatınızı pratik bir temele oturtun. Meditasyonu günlük rutininize ekleyin. Kristaller (ametist, lapis lazuli) ve tütsü odaklanmanıza yardımcı olur.", "Kova": "Hayallerinizi gerçekleştirmek için bir topluluk bulun. İdealist enerjinizi pratik projelere dönüştürmek sizi topraklayacak."},
+            "Plüton": {"Başak": "Kontrol ihtiyacınızı bırakmak en büyük dönüşümünüz olacak. Detaylara takılmak yerine büyük resme odaklanın. Derin nefes çalışmaları dönüşümü kolaylaştırır.", "Boğa": "Sahiplenme ve kontrol dürtülerinizi fark edin. Bir şeyleri bırakmak, kaybetmek korkunuzla yüzleşin. Bağışlama ve şükür pratikleri dönüşümü hızlandırır."},
+        }
+
+        receteler = []
+        # Hard aspects
+        gez_list = list(gez_poz.keys())[:12]
+        for i, g1 in enumerate(gez_list):
+            for j, g2 in enumerate(gez_list):
+                if j <= i: continue
+                if g1 not in gez_poz or g2 not in gez_poz: continue
+                fark = abs(gez_poz[g1]["derece"] - gez_poz[g2]["derece"])
+                if fark > 180: fark = 360 - fark
+                for aci_dk, aci_ad, orb_max in [(90,"Kare",6),(180,"Karşıt",7)]:
+                    if abs(fark - aci_dk) <= orb_max and fark >= 1:
+                        sifa = _olumsuz_aci_sifasi(g1, g2, aci_ad)
+                        if sifa:
+                            receteler.append(f"🔴 {g1} {aci_ad} {g2}: {sifa}")
+                        break
+
+        # Fall / detriment remedies
+        for gez, burc in gez_poz.items():
+            if gez in DUSUK_ZARAR:
+                dusuk, zarar = DUSUK_ZARAR[gez]
+                if burc["burc"] == zarar:
+                    teknik = SAGALTIM_TEKNIKLERI.get(gez, {}).get(zarar, "Farkındalık ve bilinçli çalışma gerekiyor.")
+                    receteler.append(f"🟠 {gez} Zarar ({zarar}): {teknik}")
+                elif burc["burc"] == dusuk:
+                    teknik = SAGALTIM_TEKNIKLERI.get(gez, {}).get(dusuk, "Farkındalık ve bilinçli çalışma gerekiyor.")
+                    receteler.append(f"🟡 {gez} Düşük ({dusuk}): {teknik}")
+
+        if not receteler:
+            receteler.append("Haritanızda belirgin bir zorlu açı veya zarar/düşük pozisyonu bulunmuyor. Enerjiniz doğal akışında.")
+        return receteler
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return [f"Şifa reçeteleri hazırlanamadı: {e}"]
+
+def _collect_natal_data(motor):
+    """Full natal analysis data combining all collectors."""
+    data = _collect_extra_data(motor)
+    data["sabianlar"] = _collect_sabian_data(motor)
+    data["hayat_alanlari"] = _natal_hayat_alani_analizi(motor)
+    # Apply _bireysellestir to each hayat_alanlari yorum for bireysel natal
+    if getattr(motor, 'mod', '') == 'bireysel_natal':
+        for h in data["hayat_alanlari"]:
+            if "yorum" in h:
+                h["yorum"] = _bireysellestir(h["yorum"])
+        for s in data["sabianlar"]:
+            if "sembol" in s:
+                s["sembol"] = _bireysellestir(s["sembol"])
+    sr_lr = _collect_solar_lunar_data(motor)
+    data.update(sr_lr)
+    # Daily Moon transit weather (overrides empty from _collect_extra_data)
+    data["hava_durumu"] = _natal_gunluk_hava_durumu(motor)
+    # Individual potential + career
+    try:
+        pot = motor.potansiyel_hesapla()
+        data["potansiyel_alanlar"] = pot[:10] if isinstance(pot, list) else []
+    except:
+        data["potansiyel_alanlar"] = []
+    try:
+        mes = motor.meslek_onerileri()
+        data["meslek_onerileri"] = mes[:7] if isinstance(mes, list) else []
+    except:
+        data["meslek_onerileri"] = []
+    # Healing prescriptions (şifa reçeteleri)
+    try:
+        data["sifa_receteleri"] = motor.get_kadersel_durak()
+    except:
+        data["sifa_receteleri"] = ""
+    # Comprehensive chart interpretation
+    try:
+        data["chart_yorumu"] = _natal_chart_yorumu(motor)
+    except:
+        data["chart_yorumu"] = ""
+    # Expanded healing prescriptions (negative aspects + fall/detriment)
+    try:
+        data["sifa_receteleri_detay"] = _natal_sifa_receteleri(motor)
+    except:
+        data["sifa_receteleri_detay"] = []
+    return data
+
+# ─── API Endpoints ───
+
+@app_fast.get("/api/health")
+def health():
+    return {"status": "ok", "version": "4.0"}
+
+@app_fast.get("/api/ulkeler")
+def ulkeler_listesi():
+    """Ülke -> şehir listesi döndürür."""
+    ulkeler = sorted(ULKE_SEHIR_DB.keys())
+    return {"ulkeler": ulkeler, "sehirler": ULKE_SEHIR_DB}
+
+@app_fast.post("/api/astrokartografi")
+def astrokartografi_analiz(input: AstroInput):
+    """Verilen koordinat için composite chart'a göre astrokartografi skoru hesaplar."""
+    try:
+        motor = _get_engine(input.session_id)
+        if not motor:
+            raise HTTPException(404, "Oturum bulunamadı")
+        comp = _composite_midpoints(motor.p1, motor.p2)
+        dt = datetime.strptime(f"{input.tarih} {input.saat}", "%Y-%m-%d %H:%M")
+        jd_ev = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
+        skor = _composite_sehir_skor(comp, jd_ev, input.enlem, input.boylam)
+        return {
+            "sehir": input.sehir,
+            "enlem": input.enlem,
+            "boylam": input.boylam,
+            "tarih": input.tarih,
+            "saat": input.saat,
+            "gezegenler": comp,
+            "skor": {k: skor[k] for k in ["huzur","para","tutku","kriz","etkiler"]},
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(400, f"Hesaplama hatası: {str(e)}")
+
+@app_fast.post("/api/geocode")
+def geocode(input: SehirInput):
+    try:
+        result = sehir_bul(input.arama)
+        if result:
+            return {
+                "lat": result["lat"],
+                "lon": result["lon"],
+                "city": result.get("sehir", input.arama),
+                "country": result.get("ulke", ""),
+                "tam_ad": result.get("tam_ad", ""),
+            }
+    except Exception as e:
+        raise HTTPException(404, f"Şehir bulunamadı: {str(e)}")
+    raise HTTPException(404, f"Şehir bulunamadı: {input.arama}")
+
+@app_fast.post("/api/harita/es_sevgili")
+def harita_es(input: EsSevgiliInput):
+    motor = _engine_es(input)
+    dosya = f"{motor._session_id}_Situa_A.png"
+    yol = os.path.join(_PROJECT_ROOT, dosya)
+    if os.path.exists(yol):
+        with open(yol, "rb") as f:
+            img_b64 = base64.b64encode(f.read()).decode()
+        return JSONResponse({"session_id": motor._session_id, "harita_base64": img_b64})
+    raise HTTPException(404, "Harita oluşturulamadı")
+
+@app_fast.post("/api/analiz/es_sevgili")
+def analiz_es(input: EsSevgiliInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_es(input)
+    uyum = motor.calculate_altin_oran_muhru()
+    tork = round(motor.calculate_tork_skoru(), 1)
+    fraktal = round(motor.calculate_fraktal_uyum(), 1)
+    _generate_pdf(motor, "rapor")
+    return {
+        "session_id": motor._session_id,
+        "p1_isim": motor.p1_isim,
+        "p2_isim": motor.p2_isim,
+        "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
+        "mod": "es_sevgili",
+    }
+
+@app_fast.post("/api/analiz/ebeveyn_cocuk")
+def analiz_eb(input: EbeveynCocukInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_eb(input)
+    uyum = motor.calculate_altin_oran_muhru()
+    _generate_pdf(motor, "rapor")
+    return {
+        "session_id": motor._session_id,
+        "ebeveyn": motor.p2_isim,
+        "cocuk": motor.p1_isim,
+        "uyum_orani": uyum,
+        "mod": "ebeveyn_cocuk",
+    }
+
+@app_fast.post("/api/analiz/ebeveyn_cocuk/detayli")
+def analiz_eb_detayli(input: EbeveynCocukInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_eb(input, ek_charts=True)
+    uyum = motor.calculate_altin_oran_muhru()
+    tork = round(motor.calculate_tork_skoru(), 1)
+    fraktal = round(motor.calculate_fraktal_uyum(), 1)
+    _generate_pdf(motor, "rapor")
+    extra = _collect_extra_data(motor)
+    base = {
+        "session_id": motor._session_id,
+        "ebeveyn": motor.p2_isim,
+        "cocuk": motor.p1_isim,
+        "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
+        "mod": "ebeveyn_cocuk",
+        "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
+    }
+    base.update(extra)
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    try:
+        pot = motor.potansiyel_hesapla()
+        base["potansiyel_alanlar"] = pot[:5] if isinstance(pot, list) else []
+    except: base["potansiyel_alanlar"] = []
+    try:
+        mes = motor.meslek_onerileri()
+        base["meslek_onerileri"] = mes[:7] if isinstance(mes, list) else []
+    except: base["meslek_onerileri"] = []
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
+
+@app_fast.post("/api/analiz/potansiyel_yetenek")
+def analiz_py(input: PotansiyelYetenekInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_py(input)
+    uyum = motor.calculate_altin_oran_muhru()
+    potansiyel = motor.potansiyel_hesapla()
+    _generate_pdf(motor, "potansiyel")
+    base = {
+        "session_id": motor._session_id,
+        "isim": motor.p1_isim,
+        "uyum_orani": uyum,
+        "potansiyel_alan_sayisi": len(potansiyel) if potansiyel else 0,
+        "potansiyel_alanlar": potansiyel[:5] if isinstance(potansiyel, list) else [],
+        "mod": "potansiyel_yetenek",
+    }
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    try:
+        mes = motor.meslek_onerileri()
+        base["meslek_onerileri"] = mes[:7] if isinstance(mes, list) else []
+    except: base["meslek_onerileri"] = []
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
+
+@app_fast.post("/api/analiz/bireysel_natal")
+def analiz_bireysel_natal(input: BireyselNatalInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_natal(input, ek_charts=True)
+    uyum = motor.calculate_altin_oran_muhru()
+    tork = round(motor.calculate_tork_skoru(), 1)
+    fraktal = round(motor.calculate_fraktal_uyum(), 1)
+    _generate_pdf(motor, "natal")
+    data = _collect_natal_data(motor)
+    base = {
+        "session_id": motor._session_id,
+        "isim": motor.p1_isim,
+        "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
+        "mod": "bireysel_natal",
+        "chartlar": ["situa_a", "frekans", "aci_gridi", "arap_noktalari"],
+    }
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    base.update(data)
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
+
+@app_fast.get("/api/pdf/{session_id}/{tip}")
+def pdf_indir(session_id: str, tip: str):
+    if tip == "natal":
+        dosya_adi = f"{session_id}_Bireysel_Natal.pdf"
+    elif tip == "potansiyel":
+        dosya_adi = f"{session_id}_Potansiyel_Yetenek.pdf"
+    else:
+        dosya_adi = f"{session_id}_Cift_Tarafli_Kontrat.pdf"
+    yol = os.path.join(_PROJECT_ROOT, dosya_adi)
+    if os.path.exists(yol):
+        return FileResponse(yol, media_type="application/pdf", filename=dosya_adi)
+    raise HTTPException(404, "PDF bulunamadı. Önce analiz çalıştırılmalı.")
+
+# ─── Specific chart routes (SVG with PNG fallback) ───
+
+def _svgy(resim):
+    return FileResponse(resim, media_type="image/svg+xml")
+
+@app_fast.get("/api/gorsel/{session_id}/situa_a")
+def gorsel_situa_a(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_A.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_A.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.haritalari_ciz()
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/situa_b")
+def gorsel_situa_b(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_B.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_B.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.haritalari_ciz()
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/frekans")
+def gorsel_frekans(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Frekans.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Frekans.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.ciz_titresim_grafigi(dosya_adi=png)
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/composite")
+def gorsel_composite(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Composite.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Composite.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.ciz_composite_harita(dosya_adi=png)
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/aci_gridi")
+def gorsel_aci_gridi(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Aci_Gridi.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Aci_Gridi.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.ciz_aci_gridi(dosya_adi=png)
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/arap_noktalari")
+def gorsel_arap(session_id: str):
+    svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Arap_Noktalari.svg")
+    png = os.path.join(_PROJECT_ROOT, f"{session_id}_Arap_Noktalari.png")
+    if os.path.exists(svg): return _svgy(svg)
+    m = _get_engine(session_id)
+    if m: m.ciz_arap_noktalari_radar(dosya_adi=png)
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
+    raise HTTPException(404)
+
+@app_fast.get("/api/gorsel/{session_id}/{dosya}")
+def gorsel_getir(session_id: str, dosya: str):
+    yol = os.path.join(_PROJECT_ROOT, dosya)
+    if os.path.exists(yol):
+        return FileResponse(yol, headers={"X-Handler": "generic"})
+    raise HTTPException(404, "Görsel bulunamadı")
+
+@app_fast.post("/api/analiz/es_sevgili/detayli")
+def analiz_es_detayli(input: EsSevgiliInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+    motor = _engine_es(input, ek_charts=True)
+    uyum = motor.calculate_altin_oran_muhru()
+    tork = round(motor.calculate_tork_skoru(), 1)
+    fraktal = round(motor.calculate_fraktal_uyum(), 1)
+    _generate_pdf(motor, "rapor")
+    extra = _collect_extra_data(motor)
+    base = {
+        "session_id": motor._session_id,
+        "p1_isim": motor.p1_isim,
+        "p2_isim": motor.p2_isim,
+        "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
+        "mod": "es_sevgili",
+        "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
+    }
+    base.update(extra)
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
+
+# ─── Composite chart astrocartography ───
+
+def _composite_midpoints(p1_dt, p2_dt):
+    """Compute composite midpoints for all planets from two birth datetimes."""
+    jd1 = swe.julday(p1_dt.year, p1_dt.month, p1_dt.day, 12.0)
+    jd2 = swe.julday(p2_dt.year, p2_dt.month, p2_dt.day, 12.0)
+    comp = {}
+    for gezegen_adi, gezegen_id in GEZEGEN_ACG.items():
+        try:
+            d1 = swe.calc_ut(jd1, gezegen_id)[0][0]
+            d2 = swe.calc_ut(jd2, gezegen_id)[0][0]
+            fark = abs(d1 - d2)
+            if fark > 180:
+                ort = (d1 + (d2 + 360)) / 2 if d1 > d2 else ((d1 + 360) + d2) / 2
+            else:
+                ort = (d1 + d2) / 2
+            comp[gezegen_adi] = ort % 360
+        except Exception:
+            continue
+    return comp
+
+def _composite_sehir_skor(comp, jd_event, lat, lon):
+    """Score a city using composite planet midpoints vs local AC/MC/DC/IC."""
+    try:
+        evre, ascs = swe.houses(jd_event, lat, lon, b'P')
+        mc_derece = ascs[1]
+        ac_derece = ascs[0]
+    except Exception:
+        return {"huzur": 50, "para": 50, "tutku": 50, "kriz": 50, "etkiler": []}
+    huzur, para, tutku, kriz = 50.0, 50.0, 50.0, 50.0
+    etkiler = []
+    ORB = 5.0
+    for gezegen_adi, gezegen_lon in comp.items():
+        ac_f = aci_farki_safe(gezegen_lon, ac_derece)
+        mc_f = aci_farki_safe(gezegen_lon, mc_derece)
+        dc_f = aci_farki_safe(gezegen_lon, (ac_derece + 180) % 360)
+        ic_f = aci_farki_safe(gezegen_lon, (mc_derece + 180) % 360)
+        en_yakin = min([("AC", ac_f), ("MC", mc_f), ("DC", dc_f), ("IC", ic_f)], key=lambda x: x[1])
+        aci, fark = en_yakin
+        if fark > ORB:
+            continue
+        deger = GEZEGEN_ANLAMLARI.get(gezegen_adi, {})
+        carpan = max(0, 1.0 - (fark / ORB))
+        if aci == "AC":        carpan *= 1.2
+        elif aci == "MC":       carpan *= 1.0
+        elif aci == "DC":       carpan *= 0.8
+        elif aci == "IC":       carpan *= 0.6
+        para += deger.get("para", 0) * carpan
+        tutku += deger.get("tutku", 0) * carpan
+        huzur += deger.get("huzur", 0) * carpan
+        kriz -= deger.get("huzur", 0) * carpan * 0.5
+        aci_simge = {"AC": "↑ Yükselen", "DC": "↓ Alçalan", "MC": "⌃ MC", "IC": "⌄ IC"}
+        etkiler.append(f"[K] {gezegen_adi} {aci_simge.get(aci, aci)} ({fark:.1f}°) → {deger.get('parlaklik', '')}")
+    if "Satürn" in comp and "Plüton" in comp:
+        sp_f = aci_farki_safe(comp["Satürn"], comp["Plüton"])
+        if sp_f < 10:
+            kriz += 20 * (1 - sp_f / 10)
+            etkiler.append(f"⚠️ [K] Satürn-Plüto kavuşumu ({sp_f:.1f}°)")
+    huzur = min(99, max(5, huzur))
+    para = min(99, max(5, para))
+    tutku = min(99, max(5, tutku))
+    kriz = min(99, max(5, kriz))
+    return {"huzur": round(huzur, 1), "para": round(para, 1), "tutku": round(tutku, 1), "kriz": round(kriz, 1), "etkiler": etkiler}
+
+def _composite_radar(p1_dt, p2_dt, event_date_str, event_time):
+    """Global city scan using composite chart midpoints + event-date houses."""
+    comp = _composite_midpoints(p1_dt, p2_dt)
+    if not comp:
+        return []
+    dt = datetime.strptime(f"{event_date_str} {event_time}", "%Y-%m-%d %H:%M")
+    jd_ev = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
+    db = sehir_veritabani_yukle()
+    is_list = []
+    for ulke, sehirler in db.items():
+        for sehir, koordinat in sehirler.items():
+            if isinstance(koordinat, dict):
+                lat, lon = koordinat["lat"], koordinat["lon"]
+            else:
+                lat, lon = koordinat
+            is_list.append((ulke, sehir, lat, lon))
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    def _hesapla(u, s, la, lo):
+        skor = _composite_sehir_skor(comp, jd_ev, la, lo)
+        return {"sehir": f"{s}, {u}", "lat": la, "lon": lo,
+                "huzur": skor["huzur"], "para": skor["para"],
+                "tutku": skor["tutku"], "kriz": skor["kriz"],
+                "etkiler": skor["etkiler"]}
+    sonuc = []
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs = {ex.submit(_hesapla, u, s, la, lo): (u, s) for u, s, la, lo in is_list}
+        for f in as_completed(futs):
+            sonuc.append(f.result())
+    return sonuc
+
+def _natal_radar(p1_dt, event_date_str, event_time):
+    """Global city scan using natal planet positions (single chart)."""
+    jd1 = swe.julday(p1_dt.year, p1_dt.month, p1_dt.day, 12.0)
+    natal = {}
+    for gezegen_adi, gezegen_id in GEZEGEN_ACG.items():
+        try:
+            natal[gezegen_adi] = swe.calc_ut(jd1, gezegen_id)[0][0]
+        except Exception:
+            continue
+    if not natal:
+        return []
+    dt = datetime.strptime(f"{event_date_str} {event_time}", "%Y-%m-%d %H:%M")
+    jd_ev = swe.julday(dt.year, dt.month, dt.day, dt.hour + dt.minute / 60.0)
+    db = sehir_veritabani_yukle()
+    is_list = []
+    for ulke, sehirler in db.items():
+        for sehir, koordinat in sehirler.items():
+            if isinstance(koordinat, dict):
+                lat, lon = koordinat["lat"], koordinat["lon"]
+            else:
+                lat, lon = koordinat
+            is_list.append((ulke, sehir, lat, lon))
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    def _hesapla(u, s, la, lo):
+        skor = _composite_sehir_skor(natal, jd_ev, la, lo)
+        return {"sehir": f"{s}, {u}", "lat": la, "lon": lo,
+                "huzur": skor["huzur"], "para": skor["para"],
+                "tutku": skor["tutku"], "kriz": skor["kriz"],
+                "etkiler": skor["etkiler"]}
+    sonuc = []
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futs = {ex.submit(_hesapla, u, s, la, lo): (u, s) for u, s, la, lo in is_list}
+        for f in as_completed(futs):
+            sonuc.append(f.result())
+    return sonuc
+
+def _result_kategorize(radar):
+    """Sort radar results into 4 categories, one per country, exclude 3rd world."""
+    EXCLUDED = {"Afghanistan","Afganistan","Pakistan","Bangladesh","Sri Lanka","Myanmar","Cambodia","Laos","Nepal","Bhutan","Maldives","Maldivler","Yemen","Syria","Suriye","Iraq","Irak","Libya","Sudan","Somali","Somalia","Ethiopia","Eritre","Chad","Nijer","Niger","Mali","Burkina Faso","Moritanya","Mauritania","Orta Afrika Cumhuriyeti","Central African Republic","Kongo","Demokratik Kongo Cumhuriyeti","DRC","Zimbabwe","Mozambik","Mozambique","Madagaskar","Madagascar","Haiti","Kuzey Kore","North Korea","Küba","Cuba"}
+    excluded_any = {e.lower() for e in EXCLUDED}
+    sirali = {"para": [], "huzur": [], "tutku": [], "kriz": []}
+    for c in radar:
+        raw = c["sehir"]
+        sehir_ad, ulke = raw.rsplit(", ", 1) if ", " in raw else (raw, "")
+        if (ulke in EXCLUDED) or (ulke and any(e in raw.lower() for e in excluded_any)): continue
+        for kat in sirali:
+            sirali[kat].append((sehir_ad, ulke, c[kat], c.get("lat"), c.get("lon")))
+    for kat in sirali:
+        sirali[kat].sort(key=lambda x: x[2], reverse=True)
+        gorulen = set()
+        tekil = []
+        for sehir_ad, ulke, skor, lat, lon in sirali[kat]:
+            if ulke not in gorulen:
+                gorulen.add(ulke)
+                tekil.append({"sehir": f"{sehir_ad}, {ulke}", "skor": round(skor, 2), "lat": lat, "lon": lon})
+                if len(tekil) == 10: break
+        sirali[kat] = tekil
+    return sirali, len(radar)
+
+@app_fast.post("/api/simulasyon/radar")
+def simulasyon_radar(input: EsSevgiliInput):
+    motor = _engine_es(input)
+    radar = _composite_radar(
+        p1_dt=motor.p1,
+        p2_dt=motor.p2,
+        event_date_str=_parse_date(input.event_tarih),
+        event_time=input.event_saat,
+    )
+    sirali, toplam = _result_kategorize(radar)
+    return {"session_id": motor._session_id, "top_sehirler": sirali, "toplam_sehir": toplam}
+
+@app_fast.post("/api/simulasyon/natal_radar")
+def simulasyon_natal_radar(input: BireyselNatalInput):
+    motor = _engine_natal(input)
+    radar = _natal_radar(
+        p1_dt=motor.p1,
+        event_date_str=_parse_date(input.tarih),
+        event_time=input.saat,
+    )
+    sirali, toplam = _result_kategorize(radar)
+    return {"session_id": motor._session_id, "top_sehirler": sirali, "toplam_sehir": toplam}
+
+@app_fast.post("/api/simulasyon/alternatif")
+def simulasyon_alternatif(input: AlternatifInput):
+    # Re-run analysis with different coordinates
+    motor = _get_engine(input.session_id)
+    if not motor:
+        raise HTTPException(404, "Oturum bulunamadı. Önce analiz çalıştırın.")
+    # Create new engine with alternative location
+    motor2 = FBST_Engine(
+        p1=motor.p1_str, p2=motor.p2_str,
+        event_date=motor.event_date_str, event_time=motor.event_time_str,
+        city=input.sehir, country="",
+        lat=input.enlem, lon=input.boylam,
+        p1_isim=motor.p1_isim, p2_isim=motor.p2_isim,
+        mod=motor.mod, utc_offset=input.utc_offset,
+    )
+    motor2.fbst_analizi_yap(sessiz=True)
+    _cache_engine(motor2)
+    uyum = motor2.calculate_altin_oran_muhru()
+    tork = round(motor2.calculate_tork_skoru(), 1) if motor2.mod != "potansiyel_yetenek" else None
+    fraktal = round(motor2.calculate_fraktal_uyum(), 1) if motor2.mod != "potansiyel_yetenek" else None
+    return {
+        "session_id": motor2._session_id,
+        "sehir": input.sehir,
+        "enlem": input.enlem,
+        "boylam": input.boylam,
+        "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
+    }
+
+# ─── City image cache ───
+import urllib.request, urllib.parse, json as pyjson
+_CITY_IMG_CACHE = {}  # {norm: {"img": str|None, "page": str|None}}
+
+def _sehir_wikipedia_bul(ad: str):
+    """Wikipedia'da şehri ara, (img_url, page_url) döndür."""
+    try:
+        search_url = f"https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={urllib.parse.quote(ad)}&format=json&srlimit=3&srprop="
+        req = urllib.request.Request(search_url, headers={"User-Agent": "FAST/4.0"})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            results = pyjson.loads(resp.read()).get("query", {}).get("search", [])
+        for r in results:
+            title = r.get("title", "")
+            if not title: continue
+            try:
+                page_url = f"https://en.wikipedia.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
+                summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{urllib.parse.quote(title)}"
+                req2 = urllib.request.Request(summary_url, headers={"User-Agent": "FAST/4.0"})
+                with urllib.request.urlopen(req2, timeout=4) as resp2:
+                    data = pyjson.loads(resp2.read())
+                img = data.get("thumbnail", {}).get("source") or data.get("originalimage", {}).get("source")
+                return img, page_url
+            except: continue
+    except: pass
+    return None, None
+
+@app_fast.get("/api/sehir_gorsel/{sehir:path}")
+def sehir_gorsel(sehir: str):
+    norm = sehir.strip().lower()
+    if norm in _CITY_IMG_CACHE:
+        img_url = _CITY_IMG_CACHE[norm]["img"]
+        if img_url:
+            from fastapi.responses import RedirectResponse
+            return RedirectResponse(img_url)
+        raise HTTPException(404)
+    ad = sehir.split(',')[0].strip()
+    img, page = _sehir_wikipedia_bul(ad)
+    _CITY_IMG_CACHE[norm] = {"img": img, "page": page}
+    if img:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(img)
+    raise HTTPException(404)
+
+@app_fast.get("/api/sehir_bilgi/{sehir:path}")
+def sehir_bilgi(sehir: str):
+    norm = sehir.strip().lower()
+    if norm not in _CITY_IMG_CACHE:
+        ad = sehir.split(',')[0].strip()
+        img, page = _sehir_wikipedia_bul(ad)
+        _CITY_IMG_CACHE[norm] = {"img": img, "page": page}
+    return _CITY_IMG_CACHE[norm]
+
+@app_fast.get("/api/astrocartography/harita/{session_id}")
+def astrocartography_harita(session_id: str):
+    """Astrocartography dünya haritasını SVG olarak döndürür."""
+    motor = _get_engine(session_id)
+    if not motor:
+        raise HTTPException(404, "Oturum bulunamadı")
+    try:
+        abs_svg = os.path.join(_PROJECT_ROOT, f"acg_{session_id}.svg")
+        abs_png = os.path.join(_PROJECT_ROOT, f"acg_{session_id}.png")
+        if not os.path.isfile(abs_svg) and not os.path.isfile(abs_png):
+            motor.ciz_astrocartography(abs_png)
+        if os.path.isfile(abs_svg):
+            return FileResponse(abs_svg, media_type="image/svg+xml")
+        if os.path.isfile(abs_png):
+            return FileResponse(abs_png, media_type="image/png")
+        raise HTTPException(500, "Harita oluşturulamadı")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Harita hatası: {str(e)}")
+
+# ─── Stripe / Ödeme ───
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_placeholder")
+PAID_SESSIONS = {}
+
+class PaymentRequest(BaseModel):
+    plan: str  # "premium" | "pro"
+    session_id: str
+
+PRICE_IDS = {
+    "premium": os.getenv("STRIPE_PRICE_PREMIUM", "price_premium_placeholder"),
+    "pro": os.getenv("STRIPE_PRICE_PRO", "price_pro_placeholder"),
+}
+PRICES_TL = {"premium": 12900, "pro": 24900}
+
+@app_fast.post("/api/payment/create-checkout")
+def create_checkout(req: PaymentRequest):
+    if stripe.api_key == "sk_test_placeholder":
+        # Demo mode — simulate success
+        PAID_SESSIONS[req.session_id] = True
+        return {"url": "", "demo": True}
+    try:
+        checkout = stripe.checkout.Session.create(
+            mode="payment",
+            line_items=[{"price": PRICE_IDS[req.plan], "quantity": 1}],
+            metadata={"session_id": req.session_id, "plan": req.plan},
+            success_url=f"/?session_id={req.session_id}&paid=true",
+            cancel_url="/",
+        )
+        return {"url": checkout.url}
+    except Exception as e:
+        raise HTTPException(400, f"Stripe hatası: {str(e)}")
+
+@app_fast.post("/api/payment/webhook")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig = request.headers.get("stripe-signature")
+    whsec = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+    if whsec:
+        try:
+            event = stripe.Webhook.construct_event(payload, sig, whsec)
+        except (ValueError, hmac.HMACError):
+            raise HTTPException(400, "Geçersiz imza")
+    else:
+        event = json.loads(payload)
+    if event.get("type") == "checkout.session.completed":
+        sess = event["data"]["object"]
+        sid = sess.get("metadata", {}).get("session_id")
+        if sid:
+            PAID_SESSIONS[sid] = True
+    return {"ok": True}
+
+@app_fast.get("/api/payment/verify/{session_id}")
+def verify_payment(session_id: str):
+    return {"paid": PAID_SESSIONS.get(session_id, False)}
+
+# ─── Email (placeholder) ───
+class EmailRequest(BaseModel):
+    session_id: str
+    email: str
+
+@app_fast.post("/api/email/send-pdf")
+def send_pdf_email(req: EmailRequest):
+    if not PAID_SESSIONS.get(req.session_id):
+        raise HTTPException(402, "Ödeme yapılmamış")
+    # TODO: integrate SendGrid / SMTP
+    # For now, log and return success
+    print(f"[EMAIL] PDF for session {req.session_id} would be sent to {req.email}")
+    return {"sent": True}
+
+# ─── Stats / Social Proof ───
+TOTAL_ANALYSIS = 0  # incremented in handle_submit
+
+@app_fast.get("/api/stats")
+def get_stats():
+    return {"total_analysis": TOTAL_ANALYSIS, "total_cities": 15000}
+
+# ─── Frontend serving ───
+_FRONTEND_HTML = os.path.join(_PROJECT_ROOT, "frontend", "dist", "index.html")
+_FRONTEND_DIR = os.path.dirname(_FRONTEND_HTML)
+
+@app_fast.get("/")
+def frontend_index():
+    if os.path.isfile(_FRONTEND_HTML):
+        return FileResponse(_FRONTEND_HTML)
+    raise HTTPException(404)
+
+@app_fast.get("/{path:path}")
+def frontend_catchall(path: str):
+    """Serve frontend static files for non-API paths."""
+    if path.startswith("api/"):
+        raise HTTPException(404)
+    file_path = os.path.join(_FRONTEND_DIR, path)
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    if os.path.isfile(_FRONTEND_HTML):
+        return FileResponse(_FRONTEND_HTML)
+    raise HTTPException(404)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app_fast, host="127.0.0.1", port=8000, log_level="error")
