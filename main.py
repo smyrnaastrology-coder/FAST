@@ -3135,81 +3135,70 @@ def pdf_indir(session_id: str, tip: str):
 def _svgy(resim):
     return FileResponse(resim, media_type="image/svg+xml")
 
-def _resim_once(svg, png):
-    if os.path.exists(png): return FileResponse(png, media_type="image/png")
-    if os.path.exists(svg): return _svgy(svg)
-    return None
-
 @app_fast.get("/api/gorsel/{session_id}/situa_a")
 def gorsel_situa_a(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_A.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_A.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.haritalari_ciz()
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/situa_b")
 def gorsel_situa_b(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_B.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_B.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.haritalari_ciz()
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/frekans")
 def gorsel_frekans(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Frekans.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Frekans.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.ciz_titresim_grafigi(dosya_adi=png)
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/composite")
 def gorsel_composite(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Composite.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Composite.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.ciz_composite_harita(dosya_adi=png)
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/aci_gridi")
 def gorsel_aci_gridi(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Aci_Gridi.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Aci_Gridi.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.ciz_aci_gridi(dosya_adi=png)
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/arap_noktalari")
 def gorsel_arap(session_id: str):
     svg = os.path.join(_PROJECT_ROOT, f"{session_id}_Arap_Noktalari.svg")
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Arap_Noktalari.png")
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
     m = _get_engine(session_id)
     if m: m.ciz_arap_noktalari_radar(dosya_adi=png)
-    r = _resim_once(svg, png)
-    if r: return r
+    if os.path.exists(svg): return _svgy(svg)
+    if os.path.exists(png): return FileResponse(png)
     raise HTTPException(404)
 
 @app_fast.get("/api/gorsel/{session_id}/{dosya}")
