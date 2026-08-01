@@ -8275,6 +8275,133 @@ class FBST_Engine:
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
+        # ═══ ELEMENT VE NİTELİK DAĞILIMI ═══
+        baslik_karti_ekle("ELEMENT VE NİTELİK DAĞILIMI", alt_baslik="Doğum haritasındaki enerji dengesi", emoji="🎨")
+        story.append(Spacer(1, 8))
+        try:
+            from reportlab.graphics.shapes import Drawing, Rect, String as RLString
+            konumlar_el = self.gezegen_konum_analizi()
+            element_sayac = {"Ateş": 0, "Toprak": 0, "Hava": 0, "Su": 0}
+            nitelik_sayac = {"Öncü": 0, "Sabit": 0, "Değişken": 0}
+            burc_nitelik_turu = {
+                "Koç": "Öncü", "Yengeç": "Öncü", "Terazi": "Öncü", "Oğlak": "Öncü",
+                "Boğa": "Sabit", "Aslan": "Sabit", "Akrep": "Sabit", "Kova": "Sabit",
+                "İkizler": "Değişken", "Başak": "Değişken", "Yay": "Değişken", "Balık": "Değişken",
+            }
+            element_renk = {"Ateş": "#E74C3C", "Toprak": "#27AE60", "Hava": "#F1C40F", "Su": "#2980B9"}
+            ana_gezegen_isimleri = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton"]
+            for g_name in ana_gezegen_isimleri:
+                bil = konumlar_el.get(g_name)
+                if bil:
+                    element_sayac[bil.get('element', 'Bilinmiyor')] = element_sayac.get(bil.get('element', 'Bilinmiyor'), 0) + 1
+                    nitelik_sayac[burc_nitelik_turu.get(bil.get('burc', ''), 'Değişken')] += 1
+            toplam_el = sum(element_sayac.values()) or 1
+            toplam_nt = sum(nitelik_sayac.values()) or 1
+            bar_genislik = 380
+            bar_yukseklik = 14
+            story.append(Paragraph("<font color='#1A1A2E'><b>ELEMENT DAĞILIMI:</b></font>", styles['TurkishNormal']))
+            for isim_el, sayi in element_sayac.items():
+                oran = sayi / toplam_el
+                d = Drawing(500, bar_yukseklik + 4)
+                d.add(Rect(0, 2, bar_genislik, bar_yukseklik, fillColor=HexColor("#F0F4F8"), strokeColor=HexColor("#C9A96E"), strokeWidth=0.8))
+                d.add(Rect(0, 2, bar_genislik * oran, bar_yukseklik, fillColor=HexColor(element_renk.get(isim_el, "#C9A96E")), strokeWidth=0))
+                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{isim_el}: %{round(oran * 100)} ({sayi} gezegen)", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
+                story.append(Spacer(1, 2))
+                story.append(d)
+            story.append(Spacer(1, 6))
+            story.append(Paragraph("<font color='#1A1A2E'><b>NİTELİK DAĞILIMI:</b></font>", styles['TurkishNormal']))
+            for isim_nt, sayi in nitelik_sayac.items():
+                oran = sayi / toplam_nt
+                d = Drawing(500, bar_yukseklik + 4)
+                d.add(Rect(0, 2, bar_genislik, bar_yukseklik, fillColor=HexColor("#F0F4F8"), strokeColor=HexColor("#C9A96E"), strokeWidth=0.8))
+                d.add(Rect(0, 2, bar_genislik * oran, bar_yukseklik, fillColor=HexColor("#8E44AD"), strokeWidth=0))
+                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{isim_nt}: %{round(oran * 100)}", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
+                story.append(Spacer(1, 2))
+                story.append(d)
+            baskin_el = max(element_sayac, key=element_sayac.get)
+            baskin_nt = max(nitelik_sayac, key=nitelik_sayac.get)
+            element_aciklama = {
+                "Ateş": "enerji, cesaret ve eylem ön plandadır; hareket etmeden gelişemez",
+                "Toprak": "somutluk, istikrar ve üretkenlik ön plandadır; sonuç görmeden tatmin olmaz",
+                "Hava": "düşünce, iletişim ve sosyallik ön plandadır; fikir üretmeden gelişemez",
+                "Su": "duygu, sezgi ve merhamet ön plandadır; hissetmeden derinleşemez",
+            }
+            nitelik_aciklama = {
+                "Öncü": "girişimci ve başlatıcı bir enerji taşır; yeni alanlara cesaretle adım atar",
+                "Sabit": "kararlı ve sürdürücü bir enerji taşır; başladığı işi derinleştirir",
+                "Değişken": "uyumlu ve esnek bir enerji taşır; değişen koşullara hızla uyum sağlar",
+            }
+            element_yorum = (
+                f"<font color='#1A1A2E'><b>Baskın Element: {baskin_el}</b></font><br/>"
+                f"<font color='#4A4A4A'>Haritanızda {baskin_el} elementinin gücü yüksektir: {element_aciklama.get(baskin_el, '')}. "
+                f"Baskın nitelik <b>{baskin_nt}</b>'dir: {nitelik_aciklama.get(baskin_nt, '')}. "
+                f"Bu denge, potansiyel alanlarının nasıl yaşanacağını şekillendirir.</font>"
+            )
+            element_kutu = Table([[Paragraph(element_yorum, styles['TurkishNormal'])]], colWidths=['100%'])
+            element_kutu.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
+                ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                ('PADDING', (0, 0), (-1, -1), 10),
+            ]))
+            story.append(Spacer(1, 6))
+            story.append(element_kutu)
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Element dağılımı hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
+        # ═══ AÇI HARİTASI ═══
+        baslik_karti_ekle("AÇI HARİTASI", alt_baslik="Gezegenler arası açılar ve tolerans (orb) değerleri", emoji="📐")
+        story.append(Spacer(1, 8))
+        try:
+            konumlar_ah = self.gezegen_konum_analizi()
+            aci_turleri = [(0, "Kavuşum", 8), (60, "Sekstil", 6), (90, "Kare", 8), (120, "Üçgen", 8), (180, "Karşıt", 10)]
+            aci_satirlari = []
+            for i in range(len(ana_gezegen_isimleri)):
+                for j in range(i + 1, len(ana_gezegen_isimleri)):
+                    g1, g2 = ana_gezegen_isimleri[i], ana_gezegen_isimleri[j]
+                    b1 = konumlar_ah.get(g1)
+                    b2 = konumlar_ah.get(g2)
+                    if not b1 or not b2:
+                        continue
+                    fark = abs(b1['ham_derece'] - b2['ham_derece']) % 360
+                    if fark > 180:
+                        fark = 360 - fark
+                    for ac_derece, ac_isim, orb_limit in aci_turleri:
+                        orb = abs(fark - ac_derece)
+                        if orb <= orb_limit:
+                            aci_satirlari.append([g1, g2, f"{ac_isim} ({ac_derece}°)", f"{orb:.1f}°"])
+                            break
+            if aci_satirlari:
+                ac_data = [["GEZEGEN A", "GEZEGEN B", "AÇI", "ORB"]] + aci_satirlari
+                ac_tablo = Table(ac_data, colWidths=['25%', '25%', '30%', '20%'])
+                ac_tablo.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), '#1A1A2E'),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), '#C9A96E'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'DejaVuSans-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('FONTNAME', (0, 1), (-1, -1), 'DejaVuSans'),
+                    ('FONTSIZE', (0, 1), (-1, -1), 9),
+                    ('BACKGROUND', (0, 1), (-1, -1), '#F8F5F1'),
+                    ('TEXTCOLOR', (0, 1), (-1, -1), '#1A1A2E'),
+                    ('BOX', (0, 0), (-1, -1), 1.5, '#C9A96E'),
+                    ('INNERGRID', (0, 0), (-1, -1), 0.5, '#E8E0D8'),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('TOPPADDING', (0, 0), (-1, -1), 6),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                ]))
+                story.append(ac_tablo)
+            else:
+                story.append(Paragraph("Belirgin bir gezegen açısı tespit edilemedi.", styles['TurkishNormal']))
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Açı haritası hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
         # ═══ GEZEGEN POZİSYONLARI ═══
         baslik_karti_ekle("GEZEGEN POZİSYONLARI", alt_baslik="Doğum anındaki gezegen, asteroid ve kadersel noktalar", emoji="🪐")
         story.append(Spacer(1, 8))
@@ -8286,6 +8413,17 @@ class FBST_Engine:
                 for g_isim, g_bilgi in gp.items():
                     derece_str = f"{g_bilgi['derece']}°{g_bilgi['dakika']}'" if 'dakika' in g_bilgi else f"{g_bilgi.get('ham_derece', 0):.2f}°"
                     gp_data.append([g_isim, derece_str, g_bilgi.get('burc', '—'), f"{g_bilgi.get('ev', '—')}. Ev"])
+                kad_bilgi = gp.get("KAD")
+                if kad_bilgi:
+                    try:
+                        gad_ham = (kad_bilgi['ham_derece'] + 180) % 360
+                        gad_burc = dereceyi_burca_cevir(gad_ham)
+                        gad_derece = int(gad_ham % 30)
+                        gad_dakika = int((gad_ham % 30 - gad_derece) * 60)
+                        gad_ev = ((kad_bilgi.get('ev', 1) + 5) % 12) + 1
+                        gp_data.append(["GAD (Güney Ay Düğümü)", f"{gad_derece}°{gad_dakika}'", gad_burc, f"{gad_ev}. Ev"])
+                    except Exception:
+                        pass
                 gp_tablo = Table(gp_data, colWidths=['25%', '25%', '25%', '25%'])
                 gp_tablo.setStyle(TableStyle([
                     ('BACKGROUND', (0,0), (-1,0), '#1A1A2E'),
@@ -8307,6 +8445,70 @@ class FBST_Engine:
                 story.append(Paragraph("Gezegen pozisyonları hesaplanamadı.", styles['TurkishNormal']))
         except Exception as e:
             story.append(Paragraph(f"<font color='red'>Gezegen pozisyonları hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
+        # ═══ ZORLUKLAR VE ENGELLER ═══
+        baslik_karti_ekle("ZORLUKLAR VE ENGELLER", alt_baslik="Kare ve karşıt açıların gölge tarafları ve dönüşüm yolları", emoji="⚖️")
+        story.append(Spacer(1, 8))
+        try:
+            gezegen_anlamlari = {
+                "Güneş": "öz benlik ve irade", "Ay": "duygusal dünya", "Merkür": "iletişim ve zihin",
+                "Venüs": "sevgi ve değerler", "Mars": "eylem ve cesaret", "Jüpiter": "genişleme ve iyimserlik",
+                "Satürn": "sınırlar ve disiplin", "Uranüs": "özgürlük ve değişim", "Neptün": "hayal gücü ve belirsizlik",
+                "Plüton": "dönüşüm ve kontrol", "Chiron": "yaralanma ve şifa", "Ceres": "beslenme ve koruma",
+                "Pallas": "strateji ve bilgelik", "Juno": "adalet ve bağlılık", "Vesta": "odak ve adanmışlık",
+                "KAD": "yaşam amacı", "GAD": "konfor alanı",
+            }
+            potansiyel_sonuclari = self.potansiyel_hesapla()
+            zorluk_satirlari = [s for s in (potansiyel_sonuclari or []) if s.get('aci_turu') in ('90', '180')]
+            if zorluk_satirlari:
+                gorulen_zorluklar = set()
+                for satir in zorluk_satirlari:
+                    aci_anahtari = f"{satir['alan']}|{satir['aci']}|{satir['aci_turu']}"
+                    if aci_anahtari in gorulen_zorluklar:
+                        continue
+                    gorulen_zorluklar.add(aci_anahtari)
+                    g1, g2 = (satir['aci'] + "|").split("|")[0].split("-") if "-" in satir['aci'] else (satir['aci'], "")
+                    g1 = g1.strip()
+                    g2 = g2.strip()
+                    anlam1 = gezegen_anlamlari.get(g1, "enerji alanı")
+                    anlam2 = gezegen_anlamlari.get(g2, "enerji alanı") if g2 else ""
+                    if satir['aci_turu'] == '90':
+                        zorluk_metni = (
+                            f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki kare açı, "
+                            f"içsel bir gerilim yaratabilir. Bu gerilim; sabırsızlık, aşırılık veya zıt ihtiyaçlar "
+                            f"arasında bocalama olarak görünebilir."
+                        )
+                    else:
+                        zorluk_metni = (
+                            f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki karşıt açı, "
+                            f"iki kutup arasında gidip gelme eğilimi yaratabilir. Dengeyi kurmakta zorlanma, "
+                            f"kararsızlık veya taraflı davranma olarak görünebilir."
+                        )
+                    asma_yolu = (
+                        f"<b>Dönüşüm yolu:</b> Bu enerji, {satir['alan']} alanında bilinçli çalışmayla "
+                        f"güçlü bir itici güce dönüşür. Farkındalık, düzenli pratik ve sabır, gerilimi "
+                        f"yeteneğe çeviren anahtarlardır."
+                    )
+                    zorluk_metni_html = (
+                        f"<font color='#8B0000'><b>{satir['alan']} — {g1} & {g2} ({satir['aci_turu']}° Açı, orb {satir.get('orb', '—')}°)</b></font><br/>"
+                        f"<font color='#4A4A4A'>{zorluk_metni}<br/>{asma_yolu}</font>"
+                    )
+                    zorluk_kutu = Table([[Paragraph(zorluk_metni_html, styles['TurkishNormal'])]], colWidths=['100%'])
+                    zorluk_kutu.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FDF6F0")),
+                        ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                        ('PADDING', (0, 0), (-1, -1), 10),
+                    ]))
+                    story.append(zorluk_kutu)
+                    story.append(Spacer(1, 6))
+            else:
+                story.append(Paragraph("Belirgin bir kare veya karşıt açı tespit edilemedi. Enerji akışı nispeten uyumludur.", styles['TurkishNormal']))
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Zorluklar bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
@@ -8341,6 +8543,62 @@ class FBST_Engine:
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
+        # ═══ GAD VE CHİRON — RUHSAL YOL HARİTASI ═══
+        baslik_karti_ekle("AY DÜĞÜMLERİ VE CHİRON", alt_baslik="Güney Ay Düğümü, Kuzey Ay Düğümü ve Chiron'un ruhsal yolculuğu", emoji="🪐")
+        story.append(Spacer(1, 8))
+        try:
+            konumlar_gc = self.gezegen_konum_analizi()
+            kad_poz = konumlar_gc.get("KAD")
+            chiron_poz = konumlar_gc.get("Chiron")
+            burc_konum_semasi = {
+                "Koç": "cesaret, bağımsızlık ve kendi yolunu çizme", "Boğa": "değer, sabır ve güven",
+                "İkizler": "iletişim, merak ve çok yönlülük", "Yengeç": "duygu, koruma ve ait olma",
+                "Aslan": "yaratıcılık, liderlik ve onur", "Başak": "detay, analiz ve hizmet",
+                "Terazi": "denge, estetik ve ilişki", "Akrep": "dönüşüm, derinlik ve güç",
+                "Yay": "özgürlük, felsefe ve genişleme", "Oğlak": "yapı, sorumluluk ve olgunluk",
+                "Kova": "yenilik, topluluk ve özgünlük", "Balık": "sezgi, merhamet ve hayal gücü",
+            }
+            gad_html_parcalari = []
+            if kad_poz:
+                gad_ham = (kad_poz['ham_derece'] + 180) % 360
+                gad_burc = dereceyi_burca_cevir(gad_ham)
+                gad_ev = ((kad_poz.get('ev', 1) + 5) % 12) + 1
+                gad_aciklama = burc_konum_semasi.get(gad_burc, "bilinen ve güvenli eğilimler")
+                kad_aciklama = burc_konum_semasi.get(kad_poz.get('burc', ''), "büyüme alanı")
+                gad_html_parcalari.append(
+                    f"<font color='#1A1A2E'><b>Güney Ay Düğümü (GAD) — {gad_burc}, {gad_ev}. Ev:</b></font><br/>"
+                    f"<font color='#4A4A4A'>GAD, ruhun rahat ettiği ancak büyümenin durduğu konfor alanını temsil eder. "
+                    f"{gad_burc} burcundaki konumu ({gad_aciklama}) temalarında aşina ve güvenli hissetmeye işaret eder. "
+                    f"Burada kalmak kolaydır; ancak asıl gelişim, <b>Kuzey Ay Düğümü ({kad_poz.get('burc', '')}, {kad_poz.get('ev', '—')}. Ev)</b> "
+                    f"yönünde, yani {kad_aciklama} temalarına adım attıkça gerçekleşir.</font><br/><br/>"
+                )
+            if chiron_poz:
+                chiron_aciklama = burc_konum_semasi.get(chiron_poz.get('burc', ''), "hassas ve şifalanan alanlar")
+                gad_html_parcalari.append(
+                    f"<font color='#1A1A2E'><b>Chiron — {chiron_poz.get('burc', '—')}, {chiron_poz.get('ev', '—')}. Ev:</b></font><br/>"
+                    f"<font color='#4A4A4A'>Chiron, en derin yaranın aynı zamanda en büyük şifa gücüne dönüştüğü noktadır. "
+                    f"{chiron_poz.get('burc', '—')} burcundaki konumu, {chiron_aciklama} temalarında hassas bir alana işaret eder. "
+                    f"Bu alan yaşandıkça ve kabul edildikçe, yalnızca kendini değil çevresindekileri de şifalandıran "
+                    f"doğal bir yardım gücüne dönüşür. Bu nedenle Chiron konumu, meslek seçiminde güçlü bir rehberdir.</font>"
+                )
+            if gad_html_parcalari:
+                gad_metni = "<br/>".join(gad_html_parcalari)
+                gad_kutu = Table([[Paragraph(gad_metni, styles['TurkishNormal'])]], colWidths=['100%'])
+                gad_kutu.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
+                    ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                    ('PADDING', (0, 0), (-1, -1), 10),
+                ]))
+                story.append(gad_kutu)
+            else:
+                story.append(Paragraph("Ay düğümü ve Chiron konumları hesaplanamadı.", styles['TurkishNormal']))
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Ay düğümleri bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
         # ═══ MESLEK YÖNLENDİRME ÖNERİLERİ ═══
         baslik_karti_ekle("MESLEK YÖNLENDİRME ÖNERİLERİ", alt_baslik="Potansiyel ve yetenek alanlarının senteziyle belirlenen meslek dalları", emoji="🎯")
         story.append(Spacer(1, 8))
@@ -8364,6 +8622,39 @@ class FBST_Engine:
                 ]))
                 story.append(ranking_kutu)
                 story.append(Spacer(1, 10))
+
+                # ── PUAN DAĞILIMI (PROGRESS BAR) ──
+                try:
+                    from reportlab.graphics.shapes import Drawing, Rect, String as RLString
+                    if sirali:
+                        story.append(Paragraph("<font color='#1A1A2E'><b>PUAN DAĞILIMI (GÖRSEL):</b></font>", styles['TurkishNormal']))
+                        story.append(Spacer(1, 4))
+                        max_puan = max(r['puan'] for r in sirali[:6]) or 1
+                        bar_rows = []
+                        for r in sirali[:6]:
+                            oran = max(0.04, min(1.0, r['puan'] / max_puan))
+                            bar_d = Drawing(300, 16)
+                            bar_d.add(Rect(0, 2, 300, 12, fillColor=HexColor("#F0F4F8"), strokeColor=HexColor("#C9A96E"), strokeWidth=0.8))
+                            bar_d.add(Rect(0, 2, 300 * oran, 12, fillColor=HexColor("#1A1A2E"), strokeWidth=0))
+                            bar_d.add(RLString(306, 3.5, f"%{r['yuzde']}", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
+                            bar_rows.append([
+                                Paragraph(f"<b>{r['alan']}</b>", styles['TurkishNormal']),
+                                bar_d,
+                            ])
+                        bar_tablo = Table(bar_rows, colWidths=['35%', '65%'])
+                        bar_tablo.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFFFFF")),
+                            ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                            ('INNERGRID', (0, 0), (-1, -1), 0.3, '#E8E0D8'),
+                            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                            ('TOPPADDING', (0, 0), (-1, -1), 4),
+                            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+                            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+                        ]))
+                        story.append(bar_tablo)
+                        story.append(Spacer(1, 8))
+                except Exception as e_bar:
+                    story.append(Paragraph(f"<font color='red'>Puan dağılımı hatası: {str(e_bar)}</font>", styles['TurkishNormal']))
 
                 for i, oneri in enumerate(meslek_onerileri, 1):
                     aci_sayisi = oneri.get('aci_sayisi', 0)
@@ -8399,6 +8690,141 @@ class FBST_Engine:
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
+        # ═══ HOBİ VE KURS ÖNERİLERİ ═══
+        baslik_karti_ekle("HOBİ VE KURS ÖNERİLERİ", alt_baslik="Potansiyel alanlarına göre yaş dönemine uygun gelişim önerileri", emoji="🎯")
+        story.append(Spacer(1, 8))
+        try:
+            from datetime import datetime
+            try:
+                dogum_tarihi = self.p1 if isinstance(self.p1, date) else datetime.strptime(str(self.p1), "%Y-%m-%d").date()
+            except Exception:
+                dogum_tarihi = None
+            yas = None
+            if dogum_tarihi:
+                yas = (date.today() - dogum_tarihi).days // 365
+            if yas is None:
+                yas_acilis = "Doğum tarihine göre yaş dönemine uygun öneriler:"
+            elif yas < 7:
+                yas_acilis = "Erken çocukluk döneminde oyun temelli keşif ön plandadır:"
+            elif yas < 13:
+                yas_acilis = "İlkokul ve ortaokul döneminde kurs ve atölyelerle yönlendirme önerilir:"
+            elif yas < 18:
+                yas_acilis = "Ergenlik döneminde kulüp ve projelerle derinleşme önerilir:"
+            else:
+                yas_acilis = "Yetişkinlikte sertifika ve uzmanlaşma odaklı gelişim önerilir:"
+
+            hobi_havuzu = {
+                "Stratejik Zeka": ["Satranç ve strateji oyunları", "Bilim ve araştırma atölyeleri", "Analiz ve bulmaca temalı kitaplar"],
+                "İletişim": ["Drama ve tiyatro kursu", "Diksiyon ve sunum atölyesi", "Hikaye anlatıcılığı"],
+                "Maneviyat": ["Yoga ve nefes çalışmaları", "Farkındalık ve meditasyon atölyeleri", "Doğa yürüyüşleri"],
+                "Bilgelik": ["Felsefe ve tarih kulübü", "Kitap okuma grubu", "Akıl oyunları atölyesi"],
+                "Yardımseverlik": ["Hayvan barınağı gönüllülüğü", "Topluluk yardım projeleri", "İlk yardım eğitimi"],
+                "Hukuk/Politika": ["Münazara kulübü", "Model Birleşmiş Milletler (MUN)", "Adalet ve etik atölyeleri"],
+                "Sanatsal Yetenek": ["Resim ve heykel atölyesi", "Fotoğrafçılık kursu", "Yaratıcı yazarlık"],
+                "Spor": ["Yüzme, atletizm veya takım sporu", "Dövüş sanatları", "Hareket ve denge atölyeleri"],
+                "Zanaatkarlık": ["El becerisi atölyeleri (ahşap, seramik)", "Teknik ve tamir atölyeleri", "Mutfak atölyesi"],
+                "Askeriye": ["İzcilik ve doğa kampları", "Strateji oyunları", "Tarih ve savunma temalı okumalar"],
+                "Zihinsel Yetenek": ["Robotik ve kodlama kursu", "Akıl ve zeka oyunları", "Bilim müzesi gezileri"],
+                "Girişimcilik": ["Girişimcilik atölyeleri", "Okul pazarı projeleri", "Finansal okuryazarlık oyunları"],
+                "Yenilikçilik": ["Robotik ve yapay zeka atölyeleri", "Bilim fuarları", "Tasarım ve inovasyon atölyeleri"],
+                "Sağlık/Tıp": ["Biyoloji ve bilim atölyeleri", "İlk yardım eğitimi", "Sağlıklı yaşam atölyeleri"],
+                "Liderlik": ["Öğrenci konseyi ve kulüp liderliği", "Takım kaptanlığı", "Sunum ve liderlik atölyeleri"],
+                "Akademik/Araştırma": ["Bilimsel proje kulüpleri", "Araştırma ve deney atölyeleri", "Yazarlık ve yayın deneyimleri"],
+            }
+            meslek_onerileri_hobi = self.meslek_onerileri()
+            sirali_hobi = sorted(meslek_onerileri_hobi, key=lambda x: x['puan'], reverse=True)[:4] if meslek_onerileri_hobi else []
+            hobi_html = f"<font color='#1A1A2E'><b>{yas_acilis}</b></font><br/>"
+            if sirali_hobi:
+                for r in sirali_hobi:
+                    alan = r['alan']
+                    oneriler = hobi_havuzu.get(alan)
+                    if not oneriler:
+                        oneriler = [kaynak for anahtar, kaynaklar in hobi_havuzu.items() if anahtar.split('/')[0] in alan or alan in anahtar]
+                        oneriler = oneriler[0] if oneriler else ["Kendini keşfeden yaratıcı atölyeler"]
+                    hobi_html += f"<br/><font color='#C9A96E'><b>• {alan}:</b></font> {', '.join(oneriler)}"
+            else:
+                hobi_html += "<br/>Potansiyel alanları belirlenemediği için genel keşif atölyeleri önerilir."
+            hobi_kutu = Table([[Paragraph(hobi_html, styles['TurkishNormal'])]], colWidths=['100%'])
+            hobi_kutu.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
+                ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                ('PADDING', (0, 0), (-1, -1), 10),
+            ]))
+            story.append(hobi_kutu)
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Hobi önerileri hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
+        # ═══ EBEVEYN İLETİŞİM REHBERİ ═══
+        baslik_karti_ekle("EBEVEYN İLETİŞİM REHBERİ", alt_baslik="Ay ve Merkür konumlarına göre duygusal ve zihinsel iletişim dili", emoji="💬")
+        story.append(Spacer(1, 8))
+        try:
+            duygu_rehber = {
+                "Koç": "hareket ve bağımsızlıkla güvende hisseder; zorlama onu yıpratır, özgür alan ve güven verin",
+                "Boğa": "düzen, rahatlık ve tutarlılıkla güvende hisseder; aceleye getirmeyin, kararlılığını destekleyin",
+                "İkizler": "konuşarak ve soru sorarak rahatlar; sohbet ve merakını besleyen paylaşımlar önemlidir",
+                "Yengeç": "sevgi ve güvenlik hissiyle güvende hisseder; duygularını paylaşması için yumuşak bir ortam yaratın",
+                "Aslan": "takdir ve onayla parlar; başarılarını görün ve kutlayın, eleştiriyi özel ortamda yapın",
+                "Başak": "faydalı olmakla değer hisseder; aşırı eleştiriden kaçının, yaptığı işi takdir edin",
+                "Terazi": "uyum ve adaletle rahatlar; tartışmalarda hakem rolüne itmeyin, duygularını dile getirmesine izin verin",
+                "Akrep": "güven ve sadakatle bağlanır; mahremiyetine saygı gösterin, yoğun duygularını yargılamayın",
+                "Yay": "özgürlük ve macerayla güvende hisseder; deneyimlerinden öğrenmesine izin verin, derslerini anlattırın",
+                "Oğlak": "sorumluluk ve başarıyla değer hisseder; katı beklentiler yerine adım adım destek olun",
+                "Kova": "bireysellik ve dostlukla rahatlar; fikirlerine saygı gösterin, özgünlüğünü destekleyin",
+                "Balık": "empati ve sanatla beslenir; hayal dünyasına saygı gösterin, duyarlılığını yargılamayın",
+            }
+            ogrenme_rehber = {
+                "Koç": "deneyerek ve hareketle öğrenir; kısa, enerjik ve yarışma temalı etkinlikler idealdir",
+                "Boğa": "tekrar ve somut örneklerle öğrenir; adım adım ilerleyen düzenli çalışma en iyisidir",
+                "İkizler": "konuşarak ve yazarak öğrenir; çok yönlü kaynaklar ve tartışma fırsatları verin",
+                "Yengeç": "duygusal bağ kurduğunda öğrenir; güvenli ortamda, öykü ve görsellerle anlatın",
+                "Aslan": "sahne ve takdir ile öğrenir; öğrendiklerini sunmasına ve göstermesine fırsat tanıyın",
+                "Başak": "liste ve analizlerle öğrenir; net adımlar, kontrol listeleri ve düzenli tekrar işe yarar",
+                "Terazi": "işbirliği ve karşılaştırma ile öğrenir; grup çalışması ve tartışma ortamları verimlidir",
+                "Akrep": "derinlemesine ve gizemli konularla öğrenir; ilgisini çeken konuları araştırmasına izin verin",
+                "Yay": "deneyim ve seyahatle öğrenir; pratik denemeler ve geniş konular ilgisini çeker",
+                "Oğlak": "hedef ve yapıyla öğrenir; planlı çalışma ve başarı belgeleri motivasyon sağlar",
+                "Kova": "yenilik ve projelerle öğrenir; teknoloji ve farklı bakış açılarıyla öğrenmeyi sever",
+                "Balık": "hayal gücü ve müzikle öğrenir; hikaye, sanat ve görsellerle anlatım en etkilisidir",
+            }
+            konumlar_er = self.gezegen_konum_analizi()
+            ay_poz = konumlar_er.get("Ay")
+            merk_poz = konumlar_er.get("Merkür")
+            er_parcalar = []
+            if ay_poz:
+                ay_burc = ay_poz.get('burc', '')
+                er_parcalar.append(
+                    f"<font color='#1A1A2E'><b>Duygusal dil (Ay — {ay_burc} burcunda):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{duygu_rehber.get(ay_burc, 'Duygusal ihtiyaçlarını gözlemleyerek yaklaşın.')}</font><br/><br/>"
+                )
+            if merk_poz:
+                merk_burc = merk_poz.get('burc', '')
+                er_parcalar.append(
+                    f"<font color='#1A1A2E'><b>Öğrenme stili (Merkür — {merk_burc} burcunda):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{ogrenme_rehber.get(merk_burc, 'Öğrenme tarzını birlikte keşfedin.')}</font>"
+                )
+            if er_parcalar:
+                er_metni = "<br/>".join(er_parcalar)
+                er_metni += "<br/><br/><font color='#718096'><i>İpucu: Bu rehber, çocuğunuzla iletişimde yol haritası sunar. Her birey kendine özgüdür; bu bilgiler başlangıç noktası olarak değerlendirilmelidir.</i></font>"
+                er_kutu = Table([[Paragraph(er_metni, styles['TurkishNormal'])]], colWidths=['100%'])
+                er_kutu.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, -1), HexColor("#F4F9F4")),
+                    ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                    ('PADDING', (0, 0), (-1, -1), 10),
+                ]))
+                story.append(er_kutu)
+            else:
+                story.append(Paragraph("Ay ve Merkür konumları hesaplanamadı.", styles['TurkishNormal']))
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Ebeveyn rehberi hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        story.append(Spacer(1, 15))
+        story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
+        story.append(Spacer(1, 15))
+
         # ═══ NİHAİ ÖZET ═══
         baslik_karti_ekle("ÖZET VE DEĞERLENDİRME", alt_baslik="Potansiyel ve yetenek analizinin genel değerlendirmesi", emoji="📜")
         story.append(Spacer(1, 8))
@@ -8424,6 +8850,110 @@ class FBST_Engine:
             ('PADDING', (0,0), (-1,-1), 15),
         ]))
         story.append(ozet_kutu)
+
+        # ═══ KAPANIŞ VE İMZA ═══
+        story.append(Spacer(1, 10))
+        try:
+            kapanis_html = (
+                f"<font color='#4A4A4A'>"
+                f"Bu rapor, doğum anındaki gökyüzü konumlarının potansiyel alanlarla eşleştirilmesiyle hazırlanmıştır. "
+                f"Gelecekte olacak olayları öngörmez; kehanet, fal veya kesin yargı değildir. Doğum anındaki gökyüzünün "
+                f"yeryüzüne izdüşümünü, kişisel farkındalık ve gelişim perspektifiyle anlatan bir analiz rehberidir. "
+                f"Yetenekler geliştirilebilir, engeller aşılabilir; bu harita bir başlangıç noktasıdır."
+                f"</font>"
+            )
+            kapanis_kutu = Table([[Paragraph(kapanis_html, styles['TurkishNormal'])]], colWidths=['100%'])
+            kapanis_kutu.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFF8EC")),
+                ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                ('PADDING', (0, 0), (-1, -1), 10),
+            ]))
+            story.append(kapanis_kutu)
+            story.append(Spacer(1, 12))
+            imza_html = (
+                f"<font color='#1A1A2E'><b>Saygılarımızla,</b></font><br/>"
+                f"<font color='#C9A96E'><b>Fatih Asartepe</b></font><br/>"
+                f"<font color='#4A4A4A'>Sinaatri Akademisi — FAST<br/>"
+                f"info@fatihasartepe.com | www.fatihasartepe.com</font>"
+            )
+            imza_kutu = Table([[Paragraph(imza_html, styles['TurkishNormal'])]], colWidths=['100%'])
+            imza_kutu.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFFFFF")),
+                ('BOX', (0, 0), (-1, -1), 0.8, ALTIN_AMBER),
+                ('PADDING', (0, 0), (-1, -1), 10),
+            ]))
+            story.append(imza_kutu)
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Kapanış bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+
+        # ═══ DANIŞMANLIK VE PAYLAŞIM KARTI ═══
+        story.append(PageBreak())
+        try:
+            danisma_url = "https://www.fatihasartepe.com"
+            qr_hazir = False
+            qr_flow = None
+            try:
+                from reportlab.graphics.barcode.qr import QrCodeWidget
+                from reportlab.graphics.shapes import Drawing
+                qr_widget = QrCodeWidget(danisma_url, barLevel='H')
+                qr_boyut = 150
+                qr_drawing = Drawing(qr_boyut, qr_boyut)
+                qr_drawing.add(qr_widget)
+                qr_flow = qr_drawing
+                qr_hazir = True
+            except Exception:
+                qr_flow = Paragraph(f"<font color='#C9A96E'><b>www.fatihasartepe.com</b></font>", styles['TurkishNormal'])
+
+            ilk_3_alan = ""
+            if potansiyel_sonuclari:
+                gorulen_kart = set()
+                alanlar_kart = []
+                for s in potansiyel_sonuclari:
+                    if s['alan'] not in gorulen_kart and len(alanlar_kart) < 3:
+                        gorulen_kart.add(s['alan'])
+                        alanlar_kart.append(s['alan'])
+                if alanlar_kart:
+                    ilk_3_alan = "<br/>".join(f"★ {a}" for a in alanlar_kart)
+            if not ilk_3_alan:
+                ilk_3_alan = "★ Potansiyel alanlar raporda detaylandırılmıştır"
+
+            kart_baslik = "YILDIZ BAĞ ANALİZİ"
+            kart_html = (
+                f"<table width='100%' cellpadding='14'><tr>"
+                f"<td bgcolor='#1A1A2E' align='center'>"
+                f"<font color='#C9A96E' size='20'><b>{kart_baslik}</b></font><br/>"
+                f"<font color='#FFFFFF' size='11'>FAST — Sinaatri Akademisi</font><br/><br/>"
+                f"<font color='#FFFFFF' size='12'><b>{self.p1_isim}</b></font><br/>"
+                f"<font color='#A0A0B0' size='9'>{self.p1.strftime('%d.%m.%Y')} · {self.city}, {self.country}</font><br/><br/>"
+                f"<font color='#C9A96E' size='11'><b>ÖNE ÇIKAN POTANSİYEL ALANLAR</b></font><br/>"
+                f"<font color='#FFFFFF' size='10'>{ilk_3_alan}</font><br/><br/>"
+                f"<font color='#A0A0B0' size='9'>www.fatihasartepe.com</font>"
+                f"</td></tr></table>"
+            )
+            kart_flow = Paragraph(kart_html, styles['TurkishNormal'])
+
+            danisma_html = (
+                f"<font color='#1A1A2E'><b>DANIŞMANLIK VE RANDEVU</b></font><br/><br/>"
+                f"<font color='#4A4A4A'>Bu raporu birlikte derinleştirmek ve sorularınızı yanıtlamak için "
+                f"danışmanlık randevusu alabilirsiniz. QR kodu okutarak veya www.fatihasartepe.com adresini "
+                f"ziyaret ederek iletişime geçebilirsiniz.<br/><br/>"
+                f"<b>info@fatihasartepe.com</b></font>"
+            )
+            danisma_flow = Paragraph(danisma_html, styles['TurkishNormal'])
+
+            paylasim_tablo = Table(
+                [[kart_flow], [qr_flow], [danisma_flow]],
+                colWidths=['100%'],
+            )
+            paylasim_tablo.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ]))
+            story.append(paylasim_tablo)
+        except Exception as e:
+            story.append(Paragraph(f"<font color='red'>Paylaşım kartı hatası: {str(e)}</font>", styles['TurkishNormal']))
 
         # FİNAL
         ilk_sayfa_ciz = sayfa_ciz if _asartepe_kapak_var else kapak_ciz
