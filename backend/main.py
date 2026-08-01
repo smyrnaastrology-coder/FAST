@@ -1297,7 +1297,7 @@ def _generate_natal_pdf(motor):
             baslik = f"{tarih} ({gun_ad})"
             yorumlar = (p.get("yorumlar") or [])[:2]
             ay_info = f"Ay: {p.get('ay_burc','')} ({p.get('ay_ev',0)}. Ev)  |  Güneş: {p.get('gunes_burc','')}"
-            mp_h = 34 + len(yorumlar) * 11 + 8
+            mp_h = 38 + sum(yazi_olcul("\u2022 " + yrm, "DejaVu", 7.5, 76) for yrm in yorumlar)
             if y - mp_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
             c.setFillColor(kart_bg)
@@ -1313,10 +1313,8 @@ def _generate_natal_pdf(motor):
             c.drawString(SOL + 10, y - 26, ay_info)
             inner_y = y - 36
             for yorum in yorumlar:
-                c.setFont("DejaVu", 7.5)
-                c.setFillColor(koyu)
-                c.drawString(SOL + 12, inner_y, f"\u2022 {str(yorum)[:120]}")
-                inner_y -= 10
+                inner_y = metin_yaz(SOL + 12, inner_y, f"\u2022 {yorum}", "DejaVu", 7.5, koyu, 76)
+                inner_y -= 4
             y -= mp_h + 8
 
     # ═══════════════════════════════════════════
@@ -1494,12 +1492,15 @@ def _collect_extra_data(motor):
     except: data["arap_sinastri"] = []
     try:
         j_ileri, j_geri = motor.get_julian_dates()
+        ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+        swe.set_ephe_path(ephe_yolu)
         # MOSEPH (analitik) sadece bu 4 asteroidi dosyasız hesaplar; ephe dosyaları eksik olduğundan diğerleri atlanır
         ASTEROIDLER = ["Juno", "Ceres", "Pallas", "Vesta"]
         HEDEFLER = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton", "Chiron"]
 
         asteroit_bulgular = []
         asteroit_konumlar = []
+        asteroit_hata = []
         mod = getattr(motor, 'mod', '')
         for asto in ASTEROIDLER:
             try:
@@ -1511,7 +1512,9 @@ def _collect_extra_data(motor):
                     "asteroit": asto, "derece": round(a_deg, 2), "burc": a_burc,
                     "etki": ARAP_ILISKI.get("ASTEROID_ISIMLERI", {}).get(asto, {}).get("etki", ""),
                 })
-            except: continue
+            except Exception as _e:
+                asteroit_hata.append(f"konum {asto}: {_e}")
+                continue
         if mod == 'bireysel_natal':
             # Natal mod: asteroids conjunct natal planets in same chart
             for asto in ASTEROIDLER:
@@ -1525,7 +1528,9 @@ def _collect_extra_data(motor):
                         try:
                             g_flags = swe.FLG_MOSEPH | swe.FLG_SPEED if g_id >= 10 else get_safe_flags(g_id)
                             g_deg = swe.calc_ut(j_ileri, g_id, g_flags)[0][0]
-                        except: continue
+                        except Exception as _e:
+                            asteroit_hata.append(f"gezegen {gez}: {_e}")
+                            continue
                         fark = abs(a_deg - g_deg)
                         if fark > 180: fark = 360 - fark
                         if fark <= 5.0:
@@ -1575,9 +1580,12 @@ def _collect_extra_data(motor):
                 if len(asteroit_bulgular) >= 20: break
         data["asteroitler"] = asteroit_bulgular
         data["asteroit_konumlar"] = asteroit_konumlar
-    except: 
+        if asteroit_hata:
+            data["asteroit_hata"] = "; ".join(asteroit_hata[:8])
+    except Exception as _e:
         data["asteroitler"] = []
         data["asteroit_konumlar"] = []
+        data["asteroit_hata"] = f"DIS: {_e}"
     return data
 
 def _collect_astro_data(motor):
