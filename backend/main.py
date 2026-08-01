@@ -746,7 +746,7 @@ def _html_bolumleri_ayir(html):
             continue
         if bold.endswith(":"):
             icerik = " ".join(metin.split())
-            if icerik:
+            if icerik.strip("• "):
                 bolumler.append(((parent or son_heading) or "", icerik))
                 parent = None
             son_heading = bold
@@ -754,7 +754,7 @@ def _html_bolumleri_ayir(html):
         else:
             metin += bold + " "
     icerik = " ".join(metin.split())
-    if icerik:
+    if icerik.strip("• "):
         bolumler.append(((parent or son_heading) or "", icerik))
     return bolumler
 
