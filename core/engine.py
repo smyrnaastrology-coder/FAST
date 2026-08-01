@@ -1448,7 +1448,7 @@ class FBST_Engine:
         # Gezegenin temel fıtratını yapi olarak belirliyoruz
         gez_fitrat_sozlugu = {
             "Güneş": "iradesi ve ego vitrini", "Ay": "duygusal aidiyet ihtiyacı",
-            "Merkür": "zihinsel titresimı", "Venüs": "özdeğer algısı ve aşkı",
+            "Merkür": "zihinsel titreşimi", "Venüs": "özdeğer algısı ve aşkı",
             "Mars": "eylemsel gucu ve tutkusu", "Jüpiter": "kadersel vizyonu",
             "Satürn": "sarsılmaz sadakati", "Uranüs": "isyankar özgürlüğü",
             "Neptün": "ilahi teslimiyeti", "Plüton": "yeraltı simyası",
@@ -1497,7 +1497,7 @@ class FBST_Engine:
             elif 2 <= iliski_suresi < 7: 
                 return "⚙️ Kalfalık Aşaması (Sabir Testi): İlişkiniz artık başlangıçtaki o illüzyonlu 'Yeni Ay' fazından çıkmış ve gerçek bir motor gibi yük taşımaya başlamıştır. FAST tekniğinde 'Bağ Gücü', iliskinin yokus çıkabilme gücüdür. Bu dönemde yaşadığınız krizler, kavgalar veya ego çarpışmaları ilişkinin kötüye gittiğini değil; aksine 'vites kutusunun' test edildiğini gösterir. Göreviniz birbirinizle savaşmak değil, aranızdaki bu yüksek sürtünmeyi (krizi) kalıcı bir üretim ilerlemesine (çözüme) dönüştürmektir."
             else: 
-                return "🏛️ Ustalık Aşaması (Fraktal Büyüme): İlişkiniz tüm ağır sabir testlerinden ve Satürn döngülerinden sağ çıkarak kendi sarsılmaz imparatorluğunu kurmuştur. Artık aranızdaki bağ, ufak krizlerle sarsılmayacak kadar köklenmiş ve Altın Oran'ın o çabasız, koruyucu titresimına yerleşmiştir."
+                return "🏛️ Ustalık Aşaması (Fraktal Büyüme): İlişkiniz tüm ağır sabır testlerinden ve Satürn döngülerinden sağ çıkarak kendi sarsılmaz imparatorluğunu kurmuştur. Artık aranızdaki bağ, ufak krizlerle sarsılmayacak kadar köklenmiş ve Altın Oran'ın o çabasız, koruyucu titreşimine yerleşmiştir."
 
     def calculate_bagil_tarihler(self):
         import swisseph as swe
@@ -1897,7 +1897,7 @@ class FBST_Engine:
                         
                         # --- GELİŞTİRİLMİŞ ŞİFA REÇETELERİ ---
                         fbst_receteler = {
-                        "Güneş-Güneş-0": "Öneri: İkinizin de benzer enerji titresimlarında titreştiği bu kavuşumda, birlikte güneş doğumu meditasyonu yaparak ortak niyetlerinizi güçlendirin. Her sabah 10 dakika gözlerinizi kapatarak içsel ışığınızın birleşmesini hayal edin ve ardından ortak bir hedefinizi journal'a yazın. Bu ritüeli 21 gün boyunca her sabah tekrarlayarak birlikteliğinizin temel enerjisini yeniden kodlayın.",
+                        "Güneş-Güneş-0": "Öneri: İkinizin de benzer enerji titreşimlerinde titreştiği bu kavuşumda, birlikte güneş doğumu meditasyonu yaparak ortak niyetlerinizi güçlendirin. Her sabah 10 dakika gözlerinizi kapatarak içsel ışığınızın birleşmesini hayal edin ve ardından ortak bir hedefinizi journal'a yazın. Bu ritüeli 21 gün boyunca her sabah tekrarlayarak birlikteliğinizin temel enerjisini yeniden kodlayın.",
                         "Güneş-Güneş-60": "Öneri: Benzer ama farklı yollarda yürüyen bu uyumlu enerjiyi korumak için haftada bir kez 'İçsel Işık Paylaşımı' seansı düzenleyin. Birbirinizin güçlü yönlerini yüksek sesle takdir ederek başlayın, ardından ortak bir yürüyüşe çıkın ve yürüyüş sırasında birbirinize ilham veren hikayeler anlatın. Bu pratik, doğal uyumunuzu bilinçli bir şekilde besleyerek ilişkinizin akışını koruyacaktır.",
                         "Güneş-Güneş-90": "Öneri: Birbirinizin egosunu zorlayan bu gerilimli açıyı çözmek için şu 3 adımı uygulayın: 1) Haftada iki kez 'Gölge Yansıtma' oturumu yapın ve birbirinizin davranışlarında hoşunuza gitmeyen yönleri kendi içinizde arayın.\n2) Güç mücadelesine dönüşen anlarda hemen durun ve sesli nefes egzersizi yapın.\n3) Ortak bir yaratıcı projeye yönelerek rekabet enerjisini işbirliğine dönüştürün.",
                         "Güneş-Güneş-120": "Öneri: Doğal akışı ve uyumu korumak için bu trine enerjisini bilinçli şekilde besleyin. Her ay birlikte yeni bir deneyim planlayın ve bu deneyim sırasında birbirinizin rehberliğine güvenme pratiği yapın. Birlikte doğada yürüyerek ve birbirinizin hikayelerini dinleyerek bu doğal bağınızı derinleştirin.",
@@ -1912,7 +1912,7 @@ class FBST_Engine:
                         "Güneş-Merkür-90": "Öneri: Güneş'in baskın enerjisi ile Merkür'ün hızlı zihni arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) İletişimde 'Dinleme Molası' verin: her konuştuğunuzda 3 saniye durupdoğruın sözünü bitirmesini bekleyin.\n2) Düşüncelerinizi journal'a yazarak zihinsel karmaşayı dağıtın.\n3) Birlikte sesli kitap okuyarak iletişim tarzlarınızı senkronize edin.",
                         "Güneş-Merkür-120": "Öneri: Güneş'insıcakluğu ile Merkür'ün netliğinin doğal akışını korumak için birlikte okuma saati düzenleyin. Her akşam 20 dakika boyunca aynı kitabı okuyun ve ardından birbirinize düşüncelerinizi paylaşın. Bu ortak entelektüel deneyim, zihinsel bağınızı güçlendirerek iletişiminizi derinleştirecektir.",
                         "Güneş-Merkür-180": "Öneri: Güneş'in dışa dönüklüğü ile Merkür'ün içe dönüklüğü arasındaki zıtlığı dengelemek için 'İletişim Dansı' pratiği yapın: bir gün sadece dinleyin, ertesi gün sadece anlatın. Ardından bu deneyimleri paylaşarak iletişim tarzlarınızdaki zıtlıkların aslında birbirinizi nasıl tamamladığını keşfedin. Bu pratik, zihinsel ve duygusal köprülerinizi güçlendirecektir.",
-                        "Güneş-Venüs-0": "Öneri: Güneş'in güç enerjisi ile Venüs'ün sevgi enerjisinin kavuştuğu bu noktada, birlikte güzellik ve sevgi ritüelleri oluşturun. Her sabah birbirinize sevgi dolu bir mesaj yazın ve akşam birlikte güzel bir müzik dinleyerek dans edin. Bu ritüel, ilişkinizin sevgi titresimını yükselterek romantik bağınızı besleyecektir.",
+                        "Güneş-Venüs-0": "Öneri: Güneş'in güç enerjisi ile Venüs'ün sevgi enerjisinin kavuştuğu bu noktada, birlikte güzellik ve sevgi ritüelleri oluşturun. Her sabah birbirinize sevgi dolu bir mesaj yazın ve akşam birlikte güzel bir müzik dinleyerek dans edin. Bu ritüel, ilişkinizin sevgi titreşimini yükselterek romantik bağınızı besleyecektir.",
                         "Güneş-Venüs-60": "Öneri: Güneş'in ışığı ile Venüs'ün zarafetinin uyumunu korumak için haftada bir 'Güzellik Günü' düzenleyin. Birlikte doğa yürüyüşüne çıkın ve güzelliklerini fotoğraf çekin, ardından birlikte yemek pişirin ve şık bir sofra kurun. Bu estetik deneyimler, doğal uyumunuzu besleyerek duyusal bağınızı derinleştirecektir.",
                         "Güneş-Venüs-90": "Öneri: Güneş'in baskın enerjisi ile Venüs'ün barışçıl doğası arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Çatışma anında 'Sevgi Nefesi' tekniğini kullanın: derin nefes alırken sevgihis edin, verirken baskisi serbest bırakın.\n2) Birbirinizin sevgi dilini öğrenmek için 'Beş Sevgi Dili' testini birlikte yapın.\n3) Ortak bir şifa sanatı pratiği (resim, müzik veya dans) yaparak yaratıcı enerjinizi birleştirin.",
                         "Güneş-Venüs-120": "Öneri: Güneş'insıcakluğu ile Venüs'ün sevgisinin doğal akışını korumak için birlikte romantik ritüeller oluşturun. Her ay birlikte yeni bir deneyim planlayın (müze ziyareti, doğa yürüyüşü, yemek kursu) ve bu deneyim sırasında birbirinize olan minnettarlığınızı ifade edin. Bu ritüel, sevgi enerjinizi canlı tutarak ilişkinizi besleyecektir.",
@@ -1957,7 +1957,7 @@ class FBST_Engine:
                         "Güneş-Chiron-90": "Öneri: Güneş'in ego enerjisi ile Chiron'un kırılgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Kırılganlık anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Yaralarınızı şifalandırmak için profesyonel destek alın.\n3) Birlikte şifa projeleri başlatarak yaralarınızı dönüştürücü güce dönüştürün.",
                         "Güneş-Chiron-120": "Öneri: Güneş'insıcakluğu ile Chiron'un şifa akışının doğal uyumunu korumak için birlikte şifa banyosu veya enerji çalışması yapın. Doğanın iyileştirici gücünden faydalanarak birlikte şifa deneyimleri yaşayın. Bu pratik, derin şifa sürecinizi ve ruhsal iyileşmenizi destekleyecektir.",
                         "Güneş-Chiron-180": "Öneri: Güneş'in bireyselliği ile Chiron'un evrensel şifası arasındaki zıtlığı dengelemek için 'Bireysel Şifa' pratiği yapın: her biriniz kendi şifa yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir şifa vizyonu oluşturun. Bu denge, hem bireysel şifayı hem de ortak iyileşmeyi destekleyecektir.",
-                        "Ay-Ay-0": "Öneri: İkinizin de benzer duygusal titresimlarda titreştiği bu kavuşumda, birlikte duygusal ritim ritüelleri oluşturun. Her yeni ayda ortak duygusal niyetler belirleyin ve dolunayda bu niyetleri serbest bırakma pratiği yapın. Bu ritüel, duygusal senkronizasyonunuzu derinleştirerek ortak içsel dünyanızı besleyecektir.",
+                        "Ay-Ay-0": "Öneri: İkinizin de benzer duygusal titreşimlerde titreştiği bu kavuşumda, birlikte duygusal ritim ritüelleri oluşturun. Her yeni ayda ortak duygusal niyetler belirleyin ve dolunayda bu niyetleri serbest bırakma pratiği yapın. Bu ritüel, duygusal senkronizasyonunuzu derinleştirerek ortak içsel dünyanızı besleyecektir.",
                         "Ay-Ay-60": "Öneri: Duygusal hassasiyetinizin doğal uyumunu korumak için haftada bir 'Duygu Paylaşımı' oturumu düzenleyin. Birbirinize duygusal deneyimlerinizi anlatın ve birlikte meditasyon yaparak duygusal berraklık elde edin. Bu pratik, duygusal bağınızı güçlendirerek derin bir anlayış oluşturacaktır.",
                         "Ay-Ay-90": "Öneri: Duygusal hassasiyetiniz arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal tetiklenme anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Duygusal ihtiyaçlarınızı açıkça ifade edin ve birbirinizin ihtiyaçlarını öğrenin.\n3) Birlikte duygusal şifa meditasyonu yaparak duygusal dengenizi yeniden kurun.",
                         "Ay-Ay-120": "Öneri: Duygusal hassasiyetinizin doğal akışını korumak için birlikte duygusal deneyimler planlayın. Birlikte doğa yürüyüşü yapın, müzik dinleyin veya sanat eserlerini inceleyerek duygusal deneyimlerinizi paylaşın. Bu pratik, duygusal derinliğinizi ve ortak duygusal dünyanızı besleyecektir.",
@@ -2012,7 +2012,7 @@ class FBST_Engine:
                         "Ay-Chiron-90": "Öneri: Ay'ın duygusal hassasiyeti ile Chiron'un kırılgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal kırılganlık anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Duygusal yaralarınızı şifalandırmak için profesyonel destek alın.\n3) Birlikte duygusal şifa projeleri başlatarak yaralarınızı dönüştürücü güce dönüştürün.",
                         "Ay-Chiron-120": "Öneri: Ay'ın duygusal akışı ile Chiron'un şifa akışının doğal uyumunu korumak için birlikte duygusal şifa banyosu veya enerji çalışması yapın. Doğanın iyileştirici gücünden faydalanarak birlikte duygusal şifa deneyimleri yaşayın. Bu pratik, derin duygusal şifa sürecinizi ve ruhsal iyileşmenizi destekleyecektir.",
                         "Ay-Chiron-180": "Öneri: Ay'ın içe dönüklüğü ile Chiron'un evrensel şifası arasındaki zıtlığı dengelemek için 'Bireysel Duygusal Şifa' pratiği yapın: her biriniz kendi duygusal şifa yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir duygusal şifa vizyonu oluşturun. Bu denge, hem bireysel duygusal şifayı hem de ortak iyileşmeyi destekleyecektir.",
-                        "Merkür-Merkür-0": "Öneri: İkinizin de benzer zihinsel titresimlarda titreştiği bu kavuşumda, birlikte zihinsel senkronizasyon ritüelleri oluşturun. Her sabah birlikte journal'a yazın ve düşüncelerinizi yüksek sesle paylaşın. Bu ritüel, zihinsel senkronizasyonunuzu derinleştirerek ortak entelektüel dünyanızı besleyecektir.",
+                        "Merkür-Merkür-0": "Öneri: İkinizin de benzer zihinsel titreşimlerde titreştiği bu kavuşumda, birlikte zihinsel senkronizasyon ritüelleri oluşturun. Her sabah birlikte journal'a yazın ve düşüncelerinizi yüksek sesle paylaşın. Bu ritüel, zihinsel senkronizasyonunuzu derinleştirerek ortak entelektüel dünyanızı besleyecektir.",
                         "Merkür-Merkür-60": "Öneri: Zihinsel uyumunuzu korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin. Birbirinize bu hafta öğrendiğiniz yeni bir şeyi anlatın ve ardından birlikte bu konuyu tartışın. Zihinsel alışverişlerinizi destekleyen bu pratik, doğal uyumunuzu besleyerek entelektüel bağınızı derinleştirecektir.",
                         "Merkür-Merkür-90": "Öneri: Zihinsel iletişim tarzlarınız arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) İletişimde 'Dinleme Molası' verin: her konuştuğunuzda 3 saniye durupdoğruın sözünü bitirmesini bekleyin.\n2) Düşüncelerinizi journal'a yazarak zihinsel karmaşayı dağıtın.\n3) Birlikte sesli kitap okuyarak iletişim tarzlarınızı senkronize edin.",
                         "Merkür-Merkür-120": "Öneri: Zihinsel doğal akışınızı korumak için birlikte okuma saati düzenleyin. Her akşam 20 dakika boyunca aynı kitabı okuyun ve ardından birbirinize düşüncelerinizi paylaşın. Bu ortak entelektüel deneyim, zihinsel bağınızı güçlendirerek iletişiminizi derinleştirecektir.",
@@ -2284,7 +2284,7 @@ class FBST_Engine:
                         
                         if self.mod == "ebeveyn_cocuk":
                             fbst_receteler_ebeveyn = {
-                                "Güneş-Güneş-0": "Pedagojik Protokol: Ebeveyn ve çocuk arasındaki benzer enerji titresimlarını güçlendirmek için birlikte sabah ritüelleri oluşturun. Her sabah 5 dakika boyunca birlikte niyet belirleyin ve günün hedefini konuşun. Bu ritüel, ortak vizyonunuzu ve birliktelik duygusunu güçlendirecektir.",
+                                "Güneş-Güneş-0": "Pedagojik Protokol: Ebeveyn ve çocuk arasındaki benzer enerji titreşimlerini güçlendirmek için birlikte sabah ritüelleri oluşturun. Her sabah 5 dakika boyunca birlikte niyet belirleyin ve günün hedefini konuşun. Bu ritüel, ortak vizyonunuzu ve birliktelik duygusunu güçlendirecektir.",
                                 "Güneş-Güneş-60": "Pedagojik Protokol: Benzer ama farklı yeteneklerdeki bu uyumlu enerjiyi korumak için haftada bir 'Güçlü Yan Paylaşımı' oturumu düzenleyin. Birbirinizin güçlü yönlerini yüksek sesle takdir edin ve birlikte yeni beceriler keşfedin.",
                                 "Güneş-Güneş-90": "Pedagojik Protokol: Ego çatışmalarını çözmek için şu adımları uygulayın: 1) Tartışma anında 'Dur ve Dinle' tekniğini kullanın. 2) Her iki taraf da kendi açısını yüksek sesle ifade etsin. 3) Ortak bir çözüm yolu birlikte belirlensin.",
                                 "Güneş-Güneş-120": "Pedagojik Protokol: Doğal uyumu korumak için birlikte yeni deneyimler planlayın. Ayda bir yeni bir aktivite deneyin ve bu deneyim sırasında birbirinizin rehberliğine güvenme pratiği yapın.",
@@ -2331,7 +2331,7 @@ class FBST_Engine:
                                 "Güneş-Chiron-90": "Pedagojik Protokol: Ego ile kırılganlık arasındaki baskisi çözmek için: 1) Kırılganlık anında alan tanıyın. 2) Profesyonel destek alın. 3) Şifa projeleri başlatın.",
                                 "Güneş-Chiron-120": "Pedagojik Protokol: Doğal şifa akışını korumak için birlikte doğada yürüyüş yapın ve şifa enerjisini hissedin.",
                                 "Güneş-Chiron-180": "Pedagojik Protokol: Bireysel şifa ile evrensel şifa arasındaki dengeyi bulmak için her biriniz kendi şifa yolunuzu takip edin, ardından paylaşın.",
-                                "Ay-Ay-0": "Pedagojik Protokol: Benzer duygusal titresimlar için birlikte ay döngüsü takibi yapın. Yeni ay ve dolunay ritüelleri oluşturun.",
+                                "Ay-Ay-0": "Pedagojik Protokol: Benzer duygusal titreşimler için birlikte ay döngüsü takibi yapın. Yeni ay ve dolunay ritüelleri oluşturun.",
                                 "Ay-Ay-60": "Pedagojik Protokol: Duygusal uyumu korumak için haftada bir 'Duygu Paylaşımı' oturumu düzenleyin.",
                                 "Ay-Ay-90": "Pedagojik Protokol: Duygusal hassasiyet arasındaki baskisi çözmek için: 1) Alan tanıyın. 2) İhtiyaçlarınızı açıkça ifade edin. 3) Duygusal şifa meditasyonu yapın.",
                                 "Ay-Ay-120": "Pedagojik Protokol: Doğal duygusal akışı korumak için birlikte doğa yürüyüşü yapın ve müzik dinleyin.",
@@ -2351,7 +2351,7 @@ class FBST_Engine:
                                 "Ay-Chiron-0": "Pedagojik Protokol: Duygusal derinlik ve şifacı yaranın kavuştuğu bu noktada, birlikte duygusal şifa ritüelleri oluşturun.",
                                 "Ay-Chiron-60": "Pedagojik Protokol: Yumuşaklık ve şifa enerjisi uyumunu korumak için haftada bir 'Duygusal Şifa Paylaşımı' düzenleyin.",
                                 "Ay-Chiron-90": "Pedagojik Protokol: Duygusal hassasiyet ile kırılganlık arasındaki baskisi çözmek için alan tanıyın ve destek olun.",
-                                "Merkür-Merkür-0": "Pedagojik Protokol: Benzer zihinsel titresimlar için birlikte iletişim ritüelleri oluşturun. Her sabah journal'a yazın.",
+                                "Merkür-Merkür-0": "Pedagojik Protokol: Benzer zihinsel titreşimler için birlikte iletişim ritüelleri oluşturun. Her sabah journal'a yazın.",
                                 "Merkür-Merkür-60": "Pedagojik Protokol: Zihinsel uyumu korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin.",
                                 "Merkür-Merkür-90": "Pedagojik Protokol: İletişim tarzlarındaki baskisi çözmek için 'Dinleme Molası' verin.",
                                 "Merkür-Venüs-0": "Pedagojik Protokol: Zeka ve sevgi dilinin kavuştuğu bu noktada, birlikte sevgi dolu iletişim ritüelleri oluşturun.",
@@ -5064,7 +5064,7 @@ class FBST_Engine:
             {
                 "yil": 2.4, 
                 "ad": "Büyük Kozmik Çekim ve Kriz Testi (2.4. Yıl)", 
-                "yorum": "Dikkat! Bu durak, evrenin ilişkinize yaptığı ilk büyük dayanıklılık ve 'ego' testidir. İlk zamanlardaki sorunsuz akış yerini; fikir ayrılıklarına, 'benim alanım - senin alanın' çekişmelerine veya dışarıdan gelen (iş, aile, taşınma gibi) stres kaynaklarının ilişkiye yansımasına bırakabilir. Bu dönemde yaşanan çatışmalar, ilişkinizin kötüye gittiğinin değil; tam aksine, hayatın zorlu yokuşlarını birlikte çıkabilme gücünüzün, yani aranızdaki 'Kozmik Cekim Gucu'nun (Uretim Gucu) evren tarafından test edildiğinin kanıtıdır. Bu sınavı geçmenin tek yolu inatlaşmayı, haklı çıkma çabasını bırakmak ve 'Biz bu sorunu omuz omuza nasıl çözeriz?' diyerek takımı korumaktır."
+                "yorum": "Dikkat! Bu durak, evrenin ilişkinize yaptığı ilk büyük dayanıklılık ve 'ego' testidir. İlk zamanlardaki sorunsuz akış yerini; fikir ayrılıklarına, 'benim alanım - senin alanın' çekişmelerine veya dışarıdan gelen (iş, aile, taşınma gibi) stres kaynaklarının ilişkiye yansımasına bırakabilir. Bu dönemde yaşanan çatışmalar, ilişkinizin kötüye gittiğinin değil; tam aksine, hayatın zorlu yokuşlarını birlikte çıkabilme gücünüzün, yani aranızdaki 'Kozmik Çekim Gücü'nün (Üretim Gücü) evren tarafından test edildiğinin kanıtıdır. Bu sınavı geçmenin tek yolu inatlaşmayı, haklı çıkma çabasını bırakmak ve 'Biz bu sorunu omuz omuza nasıl çözeriz?' diyerek takımı korumaktır."
             },
             {
                 "yil": 4.0, 
@@ -5213,7 +5213,7 @@ class FBST_Engine:
                 if fark <= 8.0:
                     yorum = _sinastri_sozluk.get(
                         (nokta_adi, nokta_adi),
-                        f"{nokta_adi} noktalariniz kaderin ayni titresiminda titresiyor."
+                        f"{nokta_adi} noktalarınız kaderin aynı titreşiminde titreşiyor."
                     )
                     bulgular.append({
                         "tip": "nokta_nokta",
@@ -5328,7 +5328,7 @@ class FBST_Engine:
             html_cikti = f"""
             <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
                 <b style='font-size:18px; color:#4A3F5C;'>Pedagojik BSP Ay İklimi (Minör Progress)</b><br>
-                <span style='color:#6B5B7B; font-size:14px;'>Ebeveyn-Çocuk bağınızın anlık duygusal gelişim haritası (1 Ay = 1 Yıl titresimı)</span>
+                <span style='color:#6B5B7B; font-size:14px;'>Ebeveyn-Çocuk bağınızın anlık duygusal gelişim haritası (1 Ay = 1 Yıl titreşimi)</span>
                 <hr style='border-color:#E8E0D8; margin:8px 0;'>
                 <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
                     <b>{self.p1_isim} (Çocuk):</b> İlerletilmiş duygusal zeka şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda evriliyor.<br>
@@ -5341,7 +5341,7 @@ class FBST_Engine:
             html_cikti = f"""
             <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
                 <b style='font-size:18px; color:#4A3F5C;'>Güncel BSP Ay İklimi (Minör Progress)</b><br>
-                <span style='color:#6B5B7B; font-size:14px;'>İlişkinizin anlık duygusal röntgeni (1 Ay = 1 Yıl titresimı)</span>
+                <span style='color:#6B5B7B; font-size:14px;'>İlişkinizin anlık duygusal röntgeni (1 Ay = 1 Yıl titreşimi)</span>
                 <hr style='border-color:#E8E0D8; margin:8px 0;'>
                 <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
                     <b>{self.p1_isim}:</b> İlerletilmiş duygu dünyası şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda transit ediyor.<br>
@@ -5716,7 +5716,7 @@ class FBST_Engine:
                 "Koç": "İlerletilmiş Ay'ınız Koç burcunda — cesaret ve bağımsızlık ön planda. İlişkinizde liderlik almak, inisiyatif kullanmak için güçlü bir dönem. Ama dikkat: acelecilik partnerinizi üzebilir. Tutkunuzu sabırla harmanlayın.",
                 "Boğa": "İlerletilmiş Ay'ınız Boğa burcunda — istikrar ve güven arayışınız çok belirgin. İlişkinizde somut adımlar atma, maddi konuları netleştirme zamanı. Değişim korkutucu olabilir ama bu dönem sizi daha sağlam temellere taşıyacak.",
                 "İkizler": "İlerletilmiş Ay'ınız İkizler burcunda — iletişim ve merak çok yüksek. Partnerinizle uzun sohbetler, fikir alışverişleri bugün çok keyifli olacak. Ama yüzeysellikten kaçının: derinleşmek için de fırsat var.",
-                "Yengeç": "İlerletilmiş Ay'ınız Yengeç burcunda — duygusal derinlik ve aidiyet ihtiyacı çok belirgin. İlişkinizde güvende hissetmek, partnerinize close olmak bugün çok önemli. Geçmişle yüzleşmek, yaraları sarmak için harika bir dönem.",
+                "Yengeç": "İlerletilmiş Ay'ınız Yengeç burcunda — duygusal derinlik ve aidiyet ihtiyacı çok belirgin. İlişkinizde güvende hissetmek, partnerinize yakın olmak bugün çok önemli. Geçmişle yüzleşmek, yaraları sarmak için harika bir dönem.",
                 "Aslan": "İlerletilmiş Ay'ınız Aslan burcunda — yaratıcılık ve parlama zamanı. İlişkinizde sevginizi göstermek, birlikte eğlenmek, hayatı kutlamak için ideal bir dönem. Ama egonuza çok kapılmayın: partnerinizin de ışığı var.",
                 "Başak": "İlerletilmiş Ay'ınız Başak burcunda — detaylar ve mükemmeliyetçilik ön planda. İlişkinizde küçük ama anlamlı düzenlemeler yapmak, alışkanlıkları iyileştirmek için harika bir zaman. Ama eleştirinizi yapıcı tutun.",
                 "Terazi": "İlerletilmiş Ay'ınız Terazi burcunda — uyum ve denge arayışınız çok güçlü. İlişkinizde barış, güzellik ve estetik ön planda. Uzlaşmaya açık olun ama kendi ihtiyaçlarınızı da ihmal etmeyin.",
@@ -5757,7 +5757,7 @@ class FBST_Engine:
             uyum_mesajlari = {
                 ("ateş", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — aynı element grubundasınız: tutkunuz, cesaretiniz ve enerjiniz birbirini doğal olarak besliyor. Birlikte hayatın tadını çıkarmak için yaratılmışsınız. Ama dikkat: iki ateş bir arada bazen yangın da yaratabilir — sabırlı olun.",
                 ("toprak", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprağın sağlamlığı sizde: istikrar, güven ve somut adımlar bu ilişkinin temeli. Birlikte çok güçlü bir yapı kurabilirsiniz. Ama esnekliği de elden bırakmayın: bazen biraz topraktan kalkıp rüzgara karışmak gerekir.",
-                ("hava", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — zihinsel olarak çok uumlusunuz: sohbetleriniz bitmez, fikirleriniz birbirini besler. Birlikte dünyayı keşfetmek için harika bir ekiptomsunuz. Ama sadece zihinle yetinmeyin: duygularınızı da paylaşın.",
+                ("hava", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — zihinsel olarak çok uyumlusunuz: sohbetleriniz bitmez, fikirleriniz birbirini besler. Birlikte dünyayı keşfetmek için harika bir ekip oluşturuyorsunuz. Ama sadece zihinle yetinmeyin: duygularınızı da paylaşın.",
                 ("su", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — duygusal derinliğiniz çok güçlü: birbirinizi çok derinden anlıyor, sezgilerinizle bile konuşabiliyorsunuz. Bu ruhsal bağ çok özel. Ama duygusal dalgalanmalara karşı birbirinizi desteklemeyi unutmayın.",
                 ("ateş", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — ateş ve hava çok uyumlu: siz tutku ve enerji getiriyorsunuz, o vizyon ve zekâ. Birlikte çok parlak fikirler üretebilir, büyük hayaller kurabilirsiniz. Bu kombinasyon çok yaratıcı.",
                 ("hava", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — hava ve ateş çok uyumlu: zihinsel zekânız tutkunuzla buluşuyor. Birlikte hem konuşabilir hem de harekete geçebilirsiniz. Bu denge çok değerli.",
@@ -5799,380 +5799,355 @@ class FBST_Engine:
         if aktif_mod == "ebeveyn_cocuk":
             bsp_sozlugu = {
                 "Güneş_0": [
-                    "Kimlik Yenilenmesi: Çocuğun benlik algısı bugün güçlü bir şekilde ortaya çıkıyor. Somut: Onunla birlikte yeni bir hobie veya aktiviteye başlamak için harika bir gün. Soyut: Çocuğun 'ben kimim' sorusuna cevap aradığı gelişim anı.",
-                    "Ego Parlaması: Çocuk bugün dikkatleri üzerine çekmek istiyor. Somut: Başarılarını kutlayın, övgünüzü eksik etmeyin. Soyut: Ebeveynin onayının çocuk için ne kadar kritik olduğunu gösteren kozmik bir an.",
-                    "Canlanma Vakti: Çocuğun enerji seviyesi çok yüksek. Somut: Dışarı çıkın, koşun, oynayın — enerjisini sağlıklı boşaltmasına yardım edin. Soyut: Yaşam enerjisinin_CHILD_üzerinde coşkuyla aktığı büyüme anı.",
-                    "Ortak Vizyon: Birlikte geleceğe dair güzel planlar yapabileceğiniz bir gün. Somut: Birlikte bir hedef belirleyin veya hayal kurun. Soyut: Ebeveyn ve çocuğun vizyonlarının kaderde hizalandığı özel an."
+                    "Kimlik Yenilenmesi: Çocuğun benlik algısı bugün güçlü bir şekilde ortaya çıkıyor. Onunla birlikte yeni bir hobi veya aktiviteye başlamak için harika bir gün; 'ben kimim' sorusuna cevap aradığı bu anlarda yanında olun.",
+                    "Ego Parlaması: Çocuk bugün dikkatleri üzerine çekmek istiyor. Başarılarını kutlayın, övgünüzü eksik etmeyin; onayınız onun kendine güveninin temel taşı.",
+                    "Canlanma Vakti: Çocuğun enerjisi bugün tavan yapmış durumda. Dışarı çıkın, koşun, oynayın; bu coşkuyu birlikte sağlıklı şekilde boşaltmak ikinize de iyi gelecek.",
+                    "Ortak Vizyon: Birlikte geleceğe dair güzel planlar yapabileceğiniz bir gün. Bir hedef belirleyin veya hayal kurun; vizyonlarınızın buluştuğu bu anlar bağınızı görünür kılar."
                 ],
                 "Güneş_60": [
-                    "İrade Uyumu: Ebeveyn ve çocuk arasında doğal bir uyum var. Somut: Ortak kararlar almak bugün çok kolay. Soyut: Rehberlik ve bağımsızlığın dengelendiği yapıcı pencere.",
-                    "Destekleyici Akış: Günün akışı anne/baba ve çocuk için çok yumuşak ilerliyor. Somut: Birlikte yapacağınız küçük aktiviteler büyük mutluluklar yaratabilir. Soyut: Ebeveyn desteğinin çocukta güvenle karşılık bulduğu zaman.",
-                    "Tatlı Fırsatlar: Çocuğunuz için güzel bir sürpriz yapma zamanı. Somut: Beklenmedik bir hediye veya aktivite planı keyifli anlar yaratabilir. Soyut: Evrenin ebeveyn-çocuk bağını desteklediği yeşil ışık.",
-                    "Yumuşak Geçiş: Gergin bir dönemden çıkıyorsanız bugün rahat bir nefes alma zamanı. Somut: Birlikte sakin bir aktivite yapın, sohbet edin. Soyut: Sabır ve anlayışın meyvelerini topladığınız huzurlu gün."
+                    "İrade Uyumu: Ebeveyn ve çocuk arasında doğal bir uyum var. Ortak kararlar bugün çok kolay alınıyor; rehberlik ve bağımsızlık bugün çatışmadan dengeleniyor.",
+                    "Destekleyici Akış: Günün akışı oldukça yumuşak ilerliyor. Birlikte yapacağınız küçük aktiviteler büyük mutluluklar doğurabilir; desteğiniz çocukta güven olarak karşılık buluyor.",
+                    "Tatlı Fırsatlar: Çocuğunuzu şaşırtmak için güzel bir zaman. Beklenmedik bir hediye veya aktivite planı, gününüze keyifli anlar katabilir; bu enerjiyi değerlendirin.",
+                    "Yumuşak Geçiş: Gergin bir dönemden çıkıyorsanız bugün rahat bir nefes alabilirsiniz. Birlikte sakin bir şeyler yapın, sohbet edin; sabır ve anlayış bugün meyvelerini veriyor."
                 ],
                 "Güneş_90": [
-                    "Ego Sınavı: Çocuğun 'ben istiyorum' talepleri bugün zorlayıcı olabilir. Somut: Sabırlı olun, sınır koymakla dinlemek arasında denge kurun. Soyut: Ebeveyn otoritesi ile çocuğun bireyselliği arasındaki kadersel test.",
-                    "İrade Sürtünmesi: Anne/baba ile çocuk arasında fikir ayrılıkları yaşanabilir. Somut: Tartışmadan önce 'neden?' diye sorarak çocuğun iç dünyasını anlamaya çalışın. Soyut: Ebeveyn rehberliğinin esnekliğinin test edildiği gelişim anı.",
-                    "Kışkırtıcı Ayna: Çocuğunuzun tavrı sizi kızdırabilir. Somut: Onun davranışında kendi çocukluk deneyimlerinizi görebilirsiniz — sakin kalın. Soyut: Ebeveynin kendi içsel yolculuğunu çocuğun aynasından gördüğü kadersel an.",
-                    "Sabir Testi: Disiplin konusunda zorlandığınız saatler. Somut: Kuralları net ama sevgi dolu bir dille açıklayın. Soyut: Ebeveyn ile çocuk arasındakiPOWER dinamiğinin yeniden dengelendiği sınav anı."
+                    "Ego Sınavı: Çocuğunuzun 'ben istiyorum' talepleri bugün zorlayıcı olabilir. Sabırlı olun, sınır koymakla dinlemek arasında denge kurun; otorite ve bireyselliğin çarpıştığı bu saatlerde sakin kalmak önemli.",
+                    "İrade Sürtünmesi: Anne/baba ile çocuk arasında fikir ayrılıkları yaşanabilir. Tartışmadan önce 'neden?' diye sorarak çocuğunuzun iç dünyasını anlamaya çalışın; bu çaba gerilimi yumuşatır.",
+                    "Kışkırtıcı Ayna: Çocuğunuzun tavrı sizi kızdırabilir. Davranışlarında kendi çocukluk deneyimlerinizi görebilirsiniz — sakin kalın; bu ayna size de bir şey anlatıyor.",
+                    "Sabır Testi: Disiplin konusunda zorlandığınız saatler. Kuralları net ama sevgi dolu bir dille açıklayın; bu denge, ebeveyn-çocuk güç dengesini yeniden kurar."
                 ],
                 "Güneş_120": [
-                    "Zahmetsiz Parlama: Çocuğunuz bugün parlak bir şekilde parlıyor. Somut: Yeteneklerini sergilemesine fırsat verin, gurur duyacaklarınız var. Soyut: Çocuğun potansiyelinin ebeveyn desteğiyle özgürce aktığı zahmetsiz büyüme.",
-                    "Ruhsal Ziyafet: Birlikte geçirdiğiniz her an bugün çok kıymetli. Somut: Birlikte kitap okuyun, sohbet edin veya yürüyüşe çıkın. Soyut: Ebeveyn ve çocuğun ruhsal olarak birbirini beslediği şifa anı.",
-                    "Şanslı Gün: Her ikiniz için de çok keyifli bir gün. Somut: Çocuğunuzla birlikte gülün, eğlenin, hayatı kutlayın. Soyut: Ebeveyn-çocuk bağının evrensel olarak kutsandığı altın saatler.",
-                    "İlahi Senkronizasyon: Birbirinizi bugün çok iyi anlıyorsunuz. Somut: Aynı şeyleri düşünüp aynı anda gülebilirsiniz — bu bağı takdir edin. Soyut: Ebeveyn ve çocuğun kozmik titresimta hizalandığı mucizevi an."
+                    "Zahmetsiz Parlama: Çocuğunuz bugün doğal bir ışıltı içinde. Yeteneklerini sergilemesine fırsat verin; gurur duyacağınız anlar yaşayacaksınız.",
+                    "Ruhsal Ziyafet: Birlikte geçirilen her an bugün çok kıymetli. Kitap okuyun, sohbet edin veya yürüyüşe çıkın; bu paylaşımlar ikinizi de besliyor.",
+                    "Şanslı Gün: Her ikiniz için de keyifli bir gün. Çocuğunuzla gülün, eğlenin, hayatı kutlayın; bu neşe bağınızı tazeliyor.",
+                    "Senkronize Anlar: Birbirinizi bugün şaşırtıcı derecede iyi anlıyorsunuz. Aynı şeyleri düşünüp aynı anda gülebilirsiniz; bu uyumu fark edin ve kıymetini bilin."
                 ],
                 "Güneş_180": [
-                    "Kutuplaşma Sınavı: Siz ve çocuğunuz bugün tamamen zıt kutuplarda olabilirsiniz. Somut: 'Haklıymışım' demek yerine 'seni anlamak istiyorum' deyin. Soyut: Ebeveyn ile çocuğun birbirinin gölgesini yansıttığı gelişim aynası.",
-                    "Tahterevalli Dengesi: Siz çok ciddiyken çocuk şen, veya tam tersi olabilir. Somut: Birinizin enerjisine diğerinin uyum sağlaması gereken bir denge anı. Soyut: Ebeveyn-çocuk arasındaki ritim farkının test edildiği kadersel viraj.",
-                    "Çekim ve İtiş: Çocuğunuza hem çok yakın hem çok uzak hissedebilirsiniz. Somut: Mesafe koymak ile sarılmak arasındaki doğru anı hissedin. Soyut: Bağlanma ile bağımsızlığın kadersel dengesinin sınandığı an.",
-                    "Karşı Cephe: Çocuğunuz sizin otoritenize meydan okuyabilir. Somut: Bu bir isyan değil, kimlik arayışıdır — sınırlarınızı korurken onu da dinleyin. Soyut: Ebeveyn otoritesinin çocuğun bireyselliğiyle yüzleştiği kadersel an."
+                    "Kutuplaşma Sınavı: Bugün tamamen zıt kutuplarda olabilirsiniz. 'Haklıymışım' demek yerine 'seni anlamak istiyorum' deyin; zıtlıklar aslında birbirinizi daha iyi tanımanızı sağlar.",
+                    "Tahterevalli Dengesi: Siz ciddiyken çocuk şen, ya da tam tersi olabilir. Birinizin enerjisine diğerinin uyum sağlaması gereken bir denge günü; ritim farkını sorun değil renk olarak görün.",
+                    "Çekim ve İtiş: Çocuğunuza hem çok yakın hem çok uzak hissedebilirsiniz. Mesafe koymak ile sarılmak arasındaki doğru anı hissedin; bağlanma ve bağımsızlık bugün birlikte sınanıyor.",
+                    "Karşı Cephe: Çocuğunuz otoritenize meydan okuyabilir. Bu bir isyan değil, kimlik arayışıdır — sınırlarınızı korurken onu da dinleyin."
                 ],
-
                 "Merkür_0": [
-                    "Telepatik Zihin: Çocuğunuzla bugün harika bir iletişim kurabilirsiniz. Somut: Onunla uzun ve derin bir sohbet yapın, ne düşündüğünü dinleyin. Soyut: Ebeveyn ve çocuğun zihinsel titresimlarının tam hizalandığı an.",
-                    "Zihinsel Bütünlük: Birlikte önemli bir kararı çok kolay konuşup çözebilirsiniz. Somut: Çocuğun fikrini alın, ortak bir yol bulun. Soyut: İki zihnin tek bir süper-bilgisayar gibi çalıştığı pedagojik an.",
-                    "Fikirsel Kıvılcım: Çocuğunuzun yaratıcılığı bugün çok yüksek. Somut: Birlikte bir proje veya sanat aktivitesi yapın. Soyut: Çocuğun zihinsel potansiyelinin ebeveyn desteğiyle kıvılcımlandığı aydınlanma.",
-                    "Pürüzsüz İletişim: Yanlış anlaşılmaların buharlaştığı bir gün. Somut: Zor konuları bile bugün rahatça konuşabilirsiniz. Soyut: Anlaşma ve anlama ihtiyacının zihinsel olarak tam karşılandığı döngü."
+                    "Telepatik Zihin: Çocuğunuzla bugün çok akıcı bir iletişim kurabilirsiniz. Onunla uzun ve derin bir sohbet yapın, ne düşündüğünü dinleyin; kelimeler neredeyse gereksizleşiyor.",
+                    "Zihinsel Bütünlük: Önemli bir kararı bugün çok kolay konuşup çözebilirsiniz. Çocuğunuzun fikrini alın, ortak bir yol bulun; iki zihin bugün tek bir akış gibi çalışıyor.",
+                    "Fikirsel Kıvılcım: Çocuğunuzun yaratıcılığı bugün çok yüksek. Birlikte bir proje veya sanat aktivitesi yapın; bu kıvılcımı birlikte besleyin.",
+                    "Pürüzsüz İletişim: Yanlış anlaşılmaların buharlaştığı bir gün. Zor konuları bile bugün rahatça konuşabilirsiniz; anlaşılma ihtiyacınız tam olarak karşılanacak."
                 ],
                 "Merkür_90": [
-                    "İletişim Darboğazı: Söylenenler ters anlaşılabilecek bir gün. Somut: Sözlerinizi çok dikkat seçin, çocuğun zihninden düşünmeye çalışın. Soyut: Zihinsel titresimların çatıştığı kadersel 'dinleme' sınavı.",
-                    "Sözsel Gerilim: Tartışmalar kolayca alevlenebilir. Somut: Ses tonunuza dikkat edin, dinlemeyi konuşmaya tercih edin. Soyut: Ebeveyn ve çocuk arasındaki iletişim köprüsünün kadersel bakım onarımı.",
-                    "Yanlış Anlama: Çocuğunuz şaka yaptığınızı ciddiye alabilir veya tam tersi. Somut: Bugün net ve açık olun, ima yapmaktan kaçının. Soyut: Evren size 'bugün konuşmak yerine sadece dinle' mesajı veriyor.",
-                    "Mantık Çatışması: Günlük planlar birbirine uymayabilir. Somut: Esnek olun, planları birlikte yeniden düzenleyin. Soyut: Ortak iletişim mekanizmanızın kadersel bakım onarımı."
+                    "İletişim Darboğazı: Söylenenlerin ters anlaşılabileceği bir gün. Sözlerinizi dikkatle seçin, çocuğunuzun zihninden düşünmeye çalışın; asıl sınav bugün 'dinlemek'.",
+                    "Sözsel Gerilim: Tartışmalar kolayca alevlenebilir. Ses tonunuza dikkat edin, dinlemeyi konuşmaya tercih edin; iletişim köprünüz bugün bakım istiyor.",
+                    "Yanlış Anlama: Çocuğunuz şaka yaptığınızı ciddiye alabilir veya tam tersi. Bugün net ve açık olun, imalardan kaçının; bazen en iyi mesaj sessizliktir.",
+                    "Mantık Çatışması: Günlük planlar birbirine uymayabilir. Esnek olun, planları birlikte yeniden düzenleyin; bu karmaşa bile bir fırsat olabilir."
                 ],
                 "Merkür_120": [
-                    "Kusursuz Diyalog: Zor bir konuyu bugün masaya yatırmak için mükemmel zaman. Somut: Çocuğunuzla önemli bir konuyu rahatça konuşabilirsiniz. Soyut: Ebeveyn ve çocuk arasındaki iletişim kanalının pırıl pırıl açıldığı an.",
-                    "Entelektüel Dans: Birlikte kitap okuyun, film tartışın veya derin sohbetler yapın. Somut: Çocuğun zihinsel dünyasını keşfetmek için harika bir gün. Soyut: Zihinsel olarak birbirini derinden besleyen şifa uyumı.",
-                    "Ortak Bağ: Çocuğunuz ne diyeceğinizi o daha söylemeden anlayabilir. Somut: Bu özel bağı ve anlayışı kutlayın. Soyut: Zihinlerin evrensel uyumla birbirini yatıştırdığı gün.",
-                    "Sözlerin Şifası: Çocuğunuzla ilgili endişelerinizi bugün rahatça paylaşabilirsiniz. Somut: Onunla empati kurarak duygusal bir köprü kurun. Soyut: İletişim kanalının şifayla dolduğu, güvenin pekiştiği döngü."
+                    "Kusursuz Diyalog: Zor bir konuyu bugün masaya yatırmak için ideal bir zaman. Çocuğunuzla önemli bir konuyu rahatça konuşabilirsiniz; iletişim kanalınız sonuna kadar açık.",
+                    "Entelektüel Dans: Birlikte kitap okuyun, film tartışın veya derin sohbetler edin. Çocuğunuzun zihinsel dünyasını keşfetmek için harika bir gün; bu keşif ikinizi de zenginleştirir.",
+                    "Ortak Bağ: Çocuğunuz ne diyeceğinizi o daha söylemeden anlayabilir. Bu özel bağı kutlayın; zihinleriniz bugün aynı frekansta.",
+                    "Sözlerin Şifası: Çocuğunuzla ilgili endişelerinizi bugün rahatça paylaşabilirsiniz. Empati kurarak duygusal bir köprü kurun; güven, bugünkü konuşmalarla pekişiyor."
                 ],
                 "Merkür_180": [
-                    "Fikir Düellosu: Siz ve çocuğunuz bugün çok farklı bakış açılarına sahip olabilirsiniz. Somut: Farklılıklarınızı çatışma değil zenginlik olarak görün. Soyut: Farklı perspektiflerin masaya yatırıldığı kadersel fırtına.",
-                    "Zıt Bakışlar: Aynı olaya tamamen farklı açılardan bakabilirsiniz. Somut: Çocuğunuzun bakış açısını anlamaya çalışın, eleştirmeden dinleyin. Soyut: Birbirinin karar alma mekanizmasındaki açıkları gösteren gelişim aynası.",
-                    "Sorgulama Fazı: Çocuğunuzun kararlarını today çok eleştirel değerlendirebilirsiniz. Somut: Eleştirinizi yapıcı ve destekleyici bir dille ifade edin. Soyut: Ebeveyn beklentileri ile çocuğun bireyselliği arasındaki test anı.",
-                    "Gerilimli Müzakere: Ev ödevi, kurallar veya sorumluluklar konusunda tartışabilirsiniz. Somut: Kuralları birlikte koyun, çocuğun da fikrini alın. Soyut: İki dünyanın uzlaşmak için kadersel masaya oturduğu zorunlu toplantı."
+                    "Fikir Düellosu: Bugün çok farklı bakış açılarına sahip olabilirsiniz. Farklılıklarınızı çatışma değil zenginlik olarak görün; her bakış açısı ufuk açar.",
+                    "Zıt Bakışlar: Aynı olaya tamamen farklı açılardan bakabilirsiniz. Çocuğunuzun bakış açısını anlamaya çalışın, eleştirmeden dinleyin; bu size yeni pencereler açar.",
+                    "Sorgulama Fazı: Çocuğunuzun kararlarını bugün çok eleştirel değerlendirebilirsiniz. Eleştirinizi yapıcı ve destekleyici bir dille ifade edin; amaç kırmak değil, yol göstermek.",
+                    "Gerilimli Müzakere: Ev ödevi, kurallar veya sorumluluklar konusunda tartışabilirsiniz. Kuralları birlikte koyun, çocuğunuzun da fikrini alın; uzlaşma bugün masada mümkün."
                 ],
-
                 "Venüs_0": [
-                    "Sevginin Mührü: Bugün birbirinize karşı çok şefkatli ve sevgi dolusunuz. Somut: Sarılın, öpün, 'seni seviyorum' deyin — sevginizi fiziksel olarak gösterin. Soyut: Ebeveyn ve çocuk arasındaki sevgi bağının kozmik olarak mühürlendiği gün.",
-                    "Cazibe Zirvesi: Çocuğunuzun bugün çok çekici ve sevecen bir enerjisi var. Somut: Bu enerjiyi birlikte bir aktiviteye dönüştürün. Soyut: Ebeveyn-çocuk bağının sevgiyle yenilendiği faz.",
-                    "Koşulsuz Uyum: Bugün aranızda kavga veya gerginlik olma ihtimali çok düşük. Somut: Bu huzurlu anın tadını çıkarın, birlikte güzel şeyler yapın. Soyut: Evrenin ebeveyn-çocuk sevgisini kutsadığı kadersel uyanış.",
-                    "Tatlı Çekim: Çocuğunuzla birlikte güzelleşmek, estetik aktiviteler yapmak için harika zaman. Somut: Birlikte resim yapın, müzik dinleyin veya doğa yürüyüşüne çıkın. Soyut: Sevgi titresimının ebeveyn-çocuk bağının tam merkezine yerleştiği an."
+                    "Sevgi Dolu Gün: Bugün birbirinize karşı çok şefkatli ve sevgi dolusunuz. Sarılın, öpün, 'seni seviyorum' deyin — sevginizi sözlü ve fiziksel olarak gösterin; bu bağ bugün yenileniyor.",
+                    "Cazibe Zirvesi: Çocuğunuz bugün çok çekici ve sevecen bir enerji taşıyor. Bu enerjiyi birlikte bir aktiviteye dönüştürün; sevgi dolu saatler sizi bekliyor.",
+                    "Koşulsuz Uyum: Aranızda kavga veya gerginlik ihtimali bugün çok düşük. Bu huzurlu anın tadını çıkarın, birlikte güzel şeyler yapın; böyle günler nadirdir.",
+                    "Tatlı Çekim: Güzellik ve estetik bugün ön planda. Birlikte resim yapın, müzik dinleyin veya doğa yürüyüşüne çıkın; sevgi, bu paylaşımların içinde akıyor."
                 ],
                 "Venüs_90": [
-                    "Değer Sınavı: Çocuğunuz bugün kendini değersiz hissedebilir. Somut: Onu koşulsuz sevdiğinizi defalarca söyleyin, somut örnekler verin. Soyut: Çocuğun içsel 'sevilmeme korkusunun' yüzeye çıktığı gelişim anı.",
-                    "Duygusal Susuzluk: Çocuğunuz bugün ekstra sevgi ve ilgi talep edebilir. Somut: Bu bir şımarıklık değil, içsel bir ihtiyacı. Sabırla karşılayın. Soyut: Ebeveyn sevgisinin yoğun bir şekilde ihtiyaç duyulduğu kadersel gün.",
-                    "Estetik Çatışma: Giyinme, görünüm veya zevkler konusunda anlaşmazlık yaşanabilir. Somut: Çocuğunuzun zevklerine saygı duyun, rehberlik edin ama baskı yapmayın. Soyut: Ebeveyn beğentisi ile çocuğun bireysel zevki arasındaki kadersel test.",
-                    "Tutku Darboğazı: Çocuğunuz bugün çok duygusal ve alıngan olabilir. Somut: Onunla sabırla ve şefkatle ilgilenin, duygularını onaylayın. Soyut: Duygusal ihtiyaçların kadersel olarak yüzeye çıktığı hassas saatler."
+                    "Değer Sınavı: Çocuğunuz bugün kendini değersiz hissedebilir. Onu koşulsuz sevdiğinizi sık sık söyleyin, somut örnekler verin; bu güvenceye bugün çok ihtiyacı var.",
+                    "Duygusal Susuzluk: Çocuğunuz bugün ekstra sevgi ve ilgi talep edebilir. Bu bir şımarıklık değil, içsel bir ihtiyaç — sabırla karşılayın.",
+                    "Estetik Çatışma: Giyinme, görünüm veya zevkler konusunda anlaşmazlık yaşanabilir. Çocuğunuzun zevklerine saygı duyun, rehberlik edin ama baskı yapmayın; zevkler zamanla oturur.",
+                    "Tutku Darboğazı: Çocuğunuz bugün çok duygusal ve alıngan olabilir. Sabırla ve şefkatle ilgilenin, duygularını onaylayın; bugün dinlemek, konuşmaktan daha değerli."
                 ],
                 "Venüs_120": [
-                    "Koşulsuz Çekim: Bugün çocuğunuzla aranızdaki sevgi çok doğal ve güçlü akıyor. Somut: Hiçbir çaba harcamadan mutluluğu yakalayacağınız yumuşak bir gün. Soyut: Ebeveyn ve çocuk arasındaki sevginin kendiliğinden aktığı eşsiz titresim.",
-                    "Romantik Akış: (Ebeveyn-çocuk bağında) Sevginizi dile getirmek, sarılmak, göz göze gelmek için harika zaman. Somut: Küçük sevgi jestleri bugün çok etkili olacak. Soyut: Bağın şifayla dolduğu, aidiyetin tavan yaptığı kozmik an.",
-                    "Tatlı Huzur: Ortak bir aktivite yaparak huzurun tadını çıkarın. Somut: Birlikte müzik dinleyin, yemek yapın veya bahçede vakit geçirin. Soyut: Kalplerin senkronize attığı, dış streslerin sevgi duvarından sektiği gün.",
-                    "Güzellik Ritmi: Bugün çocuğunuzla birlikte olduğunuz her ortam güzelleşiyor. Somut: Birlikte sosyal ortamlara katılın, birlikte parlayın. Soyut: Ebeveyn-çocuk bağının güzellik ve bereket enerjisiyle yıkandığı lütuf anı."
+                    "Koşulsuz Çekim: Aranızdaki sevgi bugün çok doğal ve güçlü akıyor. Hiçbir çaba harcamadan mutluluğu yakalayacağınız yumuşak bir gün; bu akışa bırakın kendinizi.",
+                    "Romantik Akış: (Ebeveyn-çocuk bağında) Sevginizi dile getirmek, sarılmak, göz göze gelmek için harika bir zaman. Küçük sevgi jestleri bugün çok etkili olacak.",
+                    "Tatlı Huzur: Ortak bir aktivite yaparak huzurun tadını çıkarın. Birlikte müzik dinleyin, yemek yapın veya bahçede vakit geçirin; dış dünya bugün bekleyebilir.",
+                    "Güzellik Ritmi: Bugün çocuğunuzla birlikte olduğunuz her ortam güzelleşiyor. Birlikte sosyal ortamlara katılın, birlikte parlayın; bu uyum dışarıdan da görülüyor."
                 ],
                 "Venüs_180": [
-                    "Sevgi İhtiyacı: Çocuğunuz bugün fazladan sevgiye ihtiyaç duyabilir. Somut: Onu ne kadar sevdiğinizi somut davranışlarınızla gösterin. Soyut: Ebeveyn sevgisi ile çocuğun ihtiyaç duyduğu güven arasındaki denge testi.",
-                    "Beklenti Kutuplaşması: Çocuğunuz sizden çok şey beklerken, siz ona sınırlar koymaya çalışıyor olabilirsiniz. Somut: Beklentilerinizi açıkça konuşun, çocuğun beklentilerini de dinleyin. Soyut: Ebeveyn kısıtlamaları ile çocuğun sevgi ihtiyacı arasındaki kadersel gerilim.",
-                    "Soğuk Ayna: Bugün duygusal olarak birbirinize mesafeli kalabilirsiniz. Somut: Mesafeyi kapatmak için inisiyatif alın, sarılın. Soyut: Ebeveyn-çocuk arasındaki duygusal mesafenin kadersel olarak test edildiği an.",
-                    "Tutku Tahterevallisi: Çocuğunuz bugün duygusal olarak çok inişli çıkışlı olabilir. Somut: Sabırlı olun, duygusal dalgalanmaları normal karşılayın. Soyut: Çocuğun duygusal gelişim sınırlarının kadersel olarak test edildiği gün."
+                    "Sevgi İhtiyacı: Çocuğunuz bugün fazladan sevgiye ihtiyaç duyabilir. Onu ne kadar sevdiğinizi davranışlarınızla gösterin; kelimelerden çok davranışlar konuşur.",
+                    "Beklenti Kutuplaşması: Çocuğunuz sizden çok şey beklerken, siz ona sınırlar koymaya çalışıyor olabilirsiniz. Beklentilerinizi açıkça konuşun, onun beklentilerini de dinleyin; orta yol bugün bulunabilir.",
+                    "Soğuk Ayna: Bugün duygusal olarak birbirinize mesafeli kalabilirsiniz. Mesafeyi kapatmak için ilk adımı siz atın, sarılın; soğukluk çoğu zaman korkudan gelir.",
+                    "Tutku Tahterevallisi: Çocuğunuz bugün duygusal olarak inişli çıkışlı olabilir. Sabırlı olun, dalgalanmaları normal karşılayın; duygular gelip geçer, bağ kalıcıdır."
                 ],
-
                 "Mars_0": [
-                    "Tutku ve Eylem: Çocuğunuzun enerji seviyesi bugün çok yüksek. Somut: Birlikte spor yapın, koşun, oyun oynayın. Soyut: Ebeveyn ve çocuğun birlikte eyleme geçtiği yapi gün.",
-                    "Volkanik Enerji: Çocuğunuzda bugün muazzam bir enerji var. Somut: Bu enerjiyi yaratıcı bir projeye yönlendirin. Soyut: Ebeveyn ve çocuğun enerjilerinin birleşip güçlü bir ittifak oluşturduğu an.",
-                    "Cesaretin Doğuşu: Çocuğunuz bugün cesur ve girişken. Somut: Yeni bir şey denemesi için onu destekleyin, yüreklendirin. Soyut: Çocuğun cesaretinin ebeveyn desteğiyle parlakça yandığı büyüme anı.",
-                    "Hızlı ve Öfkeli: Enerji yüksek ama sabır düşük olabilir. Somut: Sabırsızlığına karşı sabırlı olun, enerjisini doğru kanala yönlendirin. Soyut: Ebeveyn rehberliğinin çocuğun ham enerjisini şekillendirdiği pedagojik an."
+                    "Tutku ve Eylem: Çocuğunuzun enerjisi bugün çok yüksek. Birlikte spor yapın, koşun, oyun oynayın; bu enerjiyi birlikte eyleme dönüştürmek en doğrusu.",
+                    "Volkanik Enerji: Çocuğunuzda bugün muazzam bir enerji var. Bu enerjiyi yaratıcı bir projeye yönlendirin; iki güçlü irade birleşince neler yapabileceğinizi göreceksiniz.",
+                    "Cesaretin Doğuşu: Çocuğunuz bugün cesur ve girişken. Yeni bir şey denemesi için destekleyin, yüreklendirin; onun cesareti sizin güveninizle büyür.",
+                    "Hızlı ve Öfkeli: Enerji yüksek ama sabır düşük olabilir. Sabırsızlığına karşı sabırlı olun, enerjisini doğru kanala yönlendirin; sizin sakinliğiniz ona örnek olur."
                 ],
                 "Mars_90": [
-                    "Ateş Çemberi: Çocuğunuz bugün kolayca kızabilir veya sinirlenebilir. Somut: Onun öfkesini yargılamadan dinleyin, nefes alma tekniklerini öğretin. Soyut: Çocuğun öfke yönetimi becerisinin kadersel olarak test edildiği gelişim sınavı.",
-                    "Buyuk Sinav: Ebeveyn ve çocuk arasında sert tartışmalar yaşanabilir. Somut: Seslerinizi yükseltmeyin, sakin kalın — siz model olun. Soyut: Ebeveyn sabrının ve çocuğun öfke kontrolünün test edildiği sınav anı.",
-                    "Sürtünme ve Kriz: Kurallar ve bağımsızlık arasındaki çatışma tırmanabilir. Somut: Sınırı koruyun ama Empatiyi de elden bırakmayın. Soyut: Ebeveyn otoritesi ile çocuğun isyan enerjisi arasındaki kadersel yüzleşme.",
-                    "Sabır Testi: Çocuğunuzun davranışları today sizi çok zorlayabilir. Somut: Derin nefes alın, 'bu da geçecek' diye hatırlatın. Soyut: Ebeveyn sabrının en büyük sınavlarından birini verdiği hassas an."
+                    "Ateş Çemberi: Çocuğunuz bugün kolayca kızabilir veya sinirlenebilir. Öfkesini yargılamadan dinleyin, nefes egzersizleri önerin; öfke yönetimi bugün öğreniliyor.",
+                    "Büyük Sınav: Ebeveyn ve çocuk arasında sert tartışmalar yaşanabilir. Seslerinizi yükseltmeyin, sakin kalın — siz model olun; sabrınız bugün en büyük sınavı veriyor.",
+                    "Sürtünme ve Kriz: Kurallar ve bağımsızlık arasındaki çatışma tırmanabilir. Sınırı koruyun ama empatiyi de elden bırakmayın; onun isyanı aslında bir çağrı olabilir.",
+                    "Sabır Testi: Çocuğunuzun davranışları bugün sizi çok zorlayabilir. Derin nefes alın, 'bu da geçecek' diye kendinize hatırlatın; bu anlar geçicidir."
                 ],
                 "Mars_120": [
-                    "Yenilmez İttifak: Bugün anne/baba ve çocuk olarak çok güçlü bir takımsınız. Somut: Birlikte zor bir işin üstesinden gelin, takım ruhunuzu gösterin. Soyut: Ebeveyn ve çocuğun tek yürek olduğu ilahi faz.",
-                    "Eylem Akışı: Fiziksel olarak çok uyumlusunuz. Somut: Birlikte spor yapın, yürüyüşe çıkın, enerjinizi birlikte harcayın. Soyut: Ebeveyn-çocuk eylem motorunun hiç teklemeden çalıştığı üretim ve enerji zirvesi.",
-                    "Takim Calismasi: Çocuğunuzun eksik kalan enerjisini siz tamamlıyorsunuz. Somut: Birbirinizi destekleyerek harika işler başarabilirsiniz. Soyut: Evrenin ebeveyn-çocuk bağına 'engelleri aşma' kalkanı verdiği uyum.",
-                    "Hızlı Senkronizasyon: Ortak kararlar bugün çok hızlı uygulamaya geçiyor. Somut: Birlikte bir plan yapın ve hemen başlayın —timing mükemmel. Soyut: Ebeveyn ve çocuğun eylem dilinde tam uyumda olduğu kadersel an."
+                    "Yenilmez İttifak: Bugün anne/baba ve çocuk olarak çok güçlü bir takımsınız. Birlikte zor bir işin üstesinden gelin, takım ruhunuzu gösterin; birlikte daha güçlü olduğunuzu hissedeceksiniz.",
+                    "Eylem Akışı: Fiziksel olarak çok uyumlusunuz. Birlikte spor yapın, yürüyüşe çıkın, enerjinizi birlikte harcayın; birlikte hareket etmek bugün doğal geliyor.",
+                    "Takım Çalışması: Çocuğunuzun eksik kalan enerjisini siz tamamlıyorsunuz. Birbirinizi destekleyerek harika işler başarabilirsiniz; bu denge sizi 'engelleri aşma' gücüyle donatıyor.",
+                    "Hızlı Senkronizasyon: Ortak kararlar bugün çok hızlı uygulamaya geçiyor. Birlikte bir plan yapın ve hemen başlayın — zamanlama bugün mükemmel."
                 ],
                 "Mars_180": [
-                    "Büyük Düello: Siz ve çocuğunuz bugün sert tartışmalara girebilirsiniz. Somut: Öfkenizi çocuğunuza değil, soruna yönelin. Soyut: Ebeveyn ile çocuğun güç sınırlarının en sert kutuplaştığı kadersel sınav.",
-                    "Güç Savaşı: 'Benim dediğim olacak' restleşmeleri yaşanabilir. Somut: Otorite ile demokrasi arasında denge kurun — sınırlar koyun ama dinleyin. Soyut: Ebeveyn otoritesinin çocuğun bireyselliğiyle savaştığı kadersel an.",
-                    "Kutuplaşan İrade: Siz ve çocuğunuzbugün çok farklı hızlarda hareket edebilirsiniz. Somut: Çocuğunuzun ritmine saygı duyun, acele ettirmeyin. Soyut: Farklı eylem ritimlerinin kadersel olarak test edildiği denge anı.",
-                    "Zıt Ritimler: Siz çok hızlıyken çocuk yavaş, veya tam tersi olabilir. Somut: Ortak bir tempo bulun, birbirinize uyum sağlayın. Soyut: Ebeveyn ve çocuk arasındaki ritim farkının kadersel aynası."
+                    "Büyük Düello: Bugün sert tartışmalara girebilirsiniz. Öfkenizi çocuğunuza değil, soruna yöneltin; güç sınırları bugün netleşiyor, dikkatli olun.",
+                    "Güç Savaşı: 'Benim dediğim olacak' restleşmeleri yaşanabilir. Otorite ile demokrasi arasında denge kurun — sınırlar koyun ama dinleyin; kazanan taraf değil, bağ olsun.",
+                    "Kutuplaşan İrade: Bugün çok farklı hızlarda hareket edebilirsiniz. Çocuğunuzun ritmine saygı duyun, acele ettirmeyin; farklı temposu bir engel değil.",
+                    "Zıt Ritimler: Siz çok hızlıyken çocuk yavaş, ya da tam tersi olabilir. Ortak bir tempo bulun, birbirinize uyum sağlayın; ritim farkı bugün bir ders taşıyor."
                 ],
-
                 "Satürn_0": [
-                    "Karmik Köklenme: Bugün ciddi ve sorumluluk odaklı bir gün. Somut: Çocuğunuza önemli bir sorumluluk verin, güvenin. Soyut: Ebeveyn-çocuk arasındaki sorumluluk paylaşımının mühürlendiği köklenme anı.",
-                    "Temel İnşası: Geleceğe dair somut planlar yapmak için harika bir gün. Somut: Birlikte bir hedef belirleyin ve adım adım planlayın. Soyut: Ebeveyn-çocuk yapısının görünmez kolonlarının güçlendirildiği faz.",
-                    "Sorumluluk Fazı: Bugün sorumluluklar ve kurallar ön planda. Somut: Çocuğunuza disiplin ve düzenin önemini sevgiyle öğretin. Soyut: Ebeveynin çocuğa yaşam dersi verdiği pedagojik disiplin günü.",
-                    "Kalıcı Mühür: Verdiğiniz sözlerin bugün çok güçlü bir etkisi var. Somut: Çocuğunuza verdiğiniz sözleri tutun, güven inşa edin. Soyut: Ebeveyn-çocuk güveninin kadersel olarak mühürlendiği kritik an."
+                    "Sorumluluk Günü: Bugün ciddi ve sorumluluk odaklı bir gün. Çocuğunuza önemli bir sorumluluk verin, güvenin; sizin güveniniz onun olgunlaşmasını hızlandırır.",
+                    "Temel İnşası: Geleceğe dair somut planlar yapmak için harika bir gün. Birlikte bir hedef belirleyin ve adım adım planlayın; sağlam temeller bugün atılıyor.",
+                    "Sorumluluk Fazı: Bugün sorumluluklar ve kurallar ön planda. Çocuğunuza disiplin ve düzenin önemini sevgiyle öğretin; bu ders kalıcı iz bırakır.",
+                    "Kalıcı Söz: Verdiğiniz sözlerin bugün çok güçlü bir etkisi var. Çocuğunuza verdiğiniz sözleri tutun, güven inşa edin; tutulan sözler bağınızı güçlendirir."
                 ],
                 "Satürn_90": [
-                    "Yapısal Direnç: Çocuğunuz bugün disiplin ve kurallara karşı direnç gösterebilir. Somut: Kuralların nedenlerini açıklayın, baskıyla değil anlayışla yaklaşın. Soyut: Ebeveyn disiplini ile çocuğun bağımsızlık ihtiyacı arasındaki yapısal sınav.",
-                    "Yetersizlik Sınavı: Kendinizi yetersiz bir ebeveyn hissedebilirsiniz. Somut: Mükemmel olmak zorunda değilsiniz — samimiyet yeterli. Soyut: Ebeveynlik yetkinliğinizin kadersel olarak test edildiği gelişim anı.",
-                    "Karmik Duvar: Çocuğunuzla aranızda bugün görünmez bir duvar olabilir. Somut: Bu duvarı şefkatle yıkın, onayakın olun. Soyut: Ebeveyn-çocuk arasındaki duygusal mesafenin kadersel yüzleşmesi.",
-                    "Görev Yorgunluğu: Ebeveynlik görevlerinden yorulduğunuz bir gün olabilir. Somut: Kendinize de zaman ayırın, destek istemekten çekinmeyin. Soyut: Ebeveynlik yükünün kadersel olarak tartıldığı hassas an."
+                    "Yapısal Direnç: Çocuğunuz bugün disiplin ve kurallara karşı direnç gösterebilir. Kuralların nedenlerini açıklayın, baskıyla değil anlayışla yaklaşın; nedenini bilen kurallara daha kolay uyar.",
+                    "Yetersizlik Sınavı: Kendinizi yetersiz bir ebeveyn gibi hissedebilirsiniz. Mükemmel olmak zorunda değilsiniz — samimiyet yeterli; çocuğunuz mükemmel değil, yanında olan bir ebeveyn istiyor.",
+                    "Görünmez Duvar: Çocuğunuzla aranızda bugün görünmez bir duvar olabilir. Bu duvarı şefkatle yıkın, ona yakın olun; duvarlar çoğu zaman korkudan örülür.",
+                    "Görev Yorgunluğu: Ebeveynlik görevlerinden yorulduğunuz bir gün olabilir. Kendinize de zaman ayırın, destek istemekten çekinmeyin; yorgun bir ebeveyn, dengeli bir ebeveyn olamaz."
                 ],
                 "Satürn_120": [
-                    "Sarsılmaz Liman: Bugün çocuğunuz için güçlü bir liman olduğunuzu hissediyorsunuz. Somut: Ona güvende olduğunu hissettirin, destek olun. Soyut: Ebeveynin çocuğu için güvenli bir liman olduğu gerçeğinin kozmik onaylanması.",
-                    "Güven Duvarı: Saygı ve bağlılık bugün çok güçlü. Somut: Birbirinize olan güveninizi somut davranışlarla pekiştirin. Soyut: Ebeveyn-çocuk güven duvarının köklü ve sağlam olduğu onaylayan şifa.",
-                    "Ağırbaşlı Aşk: Büyük sözlere gerek yok, sadece yan yana olmanız bile yeterli. Somut: Sessizce birlikte vakit geçirin, bu bile çok değerli. Soyut: Zamanın ebeveyn-çocuk bağını yıpratmadığı, aksine güçlendirdiği an.",
-                    "Ortak Disiplin: Kurallar ve sorumluluklar bugün çok uyumlu işliyor. Somut: Çocuğunuz kurallara gönüllü uyuyor — bunu takdir edin. Soyut: Ebeveyn disiplininin çocuğun içselleştirdiği kadersel uyum anı."
+                    "Sarsılmaz Liman: Bugün çocuğunuz için güçlü bir liman olduğunuzu hissediyorsunuz. Ona güvende olduğunu hissettirin, destek olun; sizin varlığınız onun en büyük güvencesi.",
+                    "Güven Duvarı: Saygı ve bağlılık bugün çok güçlü. Birbirinize olan güveninizi somut davranışlarla pekiştirin; güven, küçük ve sürekli adımlarla büyür.",
+                    "Ağırbaşlı Aşk: Büyük sözlere gerek yok, sadece yan yana olmanız bile yeterli. Sessizce birlikte vakit geçirin, bu bile çok değerli; zaman bağınızı yıpratmıyor, güçlendiriyor.",
+                    "Ortak Disiplin: Kurallar ve sorumluluklar bugün çok uyumlu işliyor. Çocuğunuz kurallara gönüllü uyuyor — bunu takdir edin; disiplin, sevgiyle birleşince özgürleştirir."
                 ],
                 "Satürn_180": [
-                    "Otorite Çarpışması: Siz ve çocuğunuzbugün otorite konusunda çatışabilirsiniz. Somut: 'Büyükler así yapar' değil, 'birlikte böyle karar verdik' dilini kullanın. Soyut: Ebeveyn otoritesinin çocuğun bireyselliğiyle çarpıştığı kadersel an.",
-                    "Mesafe Sınavı: Siz çok sıcakken çocuk mesafeli, veya tam tersi olabilir. Somut: Mesafeye rağmen sevginizi göstermeye devam edin. Soyut: Ebeveyn-çocuk arasındaki duygusal mesafenin kadersel olarak test edildiği viraj.",
-                    "Katı Duvarlar: Kurallar bugün çok katı hissedilebilir. Somut: Kuralların esnek yanlarını da gösterin, çocuğu bunaltmayın. Soyut: Ebeveyn disiplini ile sevgi arasındaki dengenin kadersel yüzleşmesi.",
-                    "Sorumluluk Yükü: Ebeveynlik yükünün tamamen sizin omuzlarınızda olduğu hissine kapılabilirsiniz. Somut: Yardım isteyin, paylaşın. Soyut: Ebeveynlik sorumluluklarının kadersel olarak yeniden dağıtıldığı hassas denge anı."
+                    "Otorite Çarpışması: Bugün otorite konusunda çatışabilirsiniz. 'Büyükler böyle yapar' değil, 'birlikte böyle karar verdik' dilini kullanın; saygı, emirle değil örnekle kazanılır.",
+                    "Mesafe Sınavı: Siz çok sıcakken çocuk mesafeli, ya da tam tersi olabilir. Mesafeye rağmen sevginizi göstermeye devam edin; soğukluk geçicidir, bağ kalıcı.",
+                    "Katı Duvarlar: Kurallar bugün çok katı hissedilebilir. Kuralların esnek yanlarını da gösterin, çocuğu bunaltmayın; katılık kırılır, esneklik yol alır.",
+                    "Sorumluluk Yükü: Ebeveynlik yükünün tamamen omuzlarınızda olduğu hissine kapılabilirsiniz. Yardım isteyin, paylaşın; yük paylaşıldıkça hafifler."
                 ],
-
                 "Jüpiter_0": [
-                    "İlahi Lütuf: Bugün çok şanslı ve bereketli bir gün. Somut: Çocuğunuzla birlikte kutlama yapın, sevincinizi paylaşın. Soyut: Ebeveyn-çocuk bağının evrensel bereketle dolduğu ilahi an.",
-                    "Genişleyen Ufuk: Çocuğunuzun ufkunun bugün çok genişlediğini göreceksiniz. Somut: Yeni deneyimler ve öğrenme fırsatları sunun. Soyut: Çocuğun gelişiminin ebeveyn desteğiyle genişlediği kozmik genişleme.",
-                    "Ortak İnanç: Her ikiniz de geleceğe dair güçlü bir umut taşıyorsunuz. Somut: Bu umudu birlikte bir plana dönüştürün. Soyut: Ebeveyn-çocuk arasındaki inanç bağının tazelendiği özel kalkan.",
-                    "Abartılı Neşe: Bugün fazla neşeli ve coşkulu olabilirsiniz. Somut: Bu enerjiyi doğru yönlendirin, sınırlarınızı da koruyun. Soyut: Ebeveyn-çocuk neşesinin taştığı, kozmik bereketin aktığı gün."
+                    "Bereketli Gün: Bugün çok şanslı ve bereketli bir gün. Çocuğunuzla birlikte kutlama yapın, sevincinizi paylaşın; bu coşku bulaşıcı olacak.",
+                    "Genişleyen Ufuk: Çocuğunuzun ufku bugün belirgin şekilde genişliyor. Yeni deneyimler ve öğrenme fırsatları sunun; merak, öğrenmenin en güçlü motorudur.",
+                    "Ortak İnanç: Her ikiniz de geleceğe dair güçlü bir umut taşıyorsunuz. Bu umudu birlikte bir plana dönüştürün; umut, harekete geçince gerçeğe dönüşür.",
+                    "Abartılı Neşe: Bugün fazla neşeli ve coşkulu olabilirsiniz. Bu enerjiyi doğru yönlendirin, sınırlarınızı da koruyun; neşe, dengeyle buluşunca kalıcı olur."
                 ],
                 "Jüpiter_90": [
-                    "Beklenti Yanılsaması: Çocuğunuz bugün fazla büyük beklentilere girebilir. Somut: Gerçekçilik öğretin ama hayallerini de öldürmeyin. Soyut: Ebeveynin gerçekçiliği ile çocuğun hayal gücü arasındaki kadersel sınav.",
-                    "Aşırı Özgüven: Çocuğunuz bugün aşırı özgüvenli olabilir. Somut: Cesaretini destekleyin ama gerçekçi sınırları da hatırlatın. Soyut: Çocuğun özgüveninin kadersel olarak dengelendiği test anı.",
-                    "Şımarıklık Testi: Çocuğunuz bugün fazla talepkar olabilir. Somut: 'Hayır' demeyi sevgiyle öğrenin, sınırlar koyun. Soyut: Ebeveynin cömertliği ile sınır koyma ihtiyacı arasındaki denge testi.",
-                    "Felsefi Çatışma: İnançlar ve değerler konusunda tartışabilirsiniz. Somut: Çocuğunuzun farklı bakış açısına saygı duyun. Soyut: Ebeveyn değerleri ile çocuğun bireysel inanç sistemi arasındaki kadersel yüzleşme."
+                    "Beklenti Yanılsaması: Çocuğunuz bugün fazla büyük beklentilere girebilir. Gerçekçilik öğretin ama hayallerini de öldürmeyin; hayal ile gerçek arasındaki köprü sizin rehberliğinizle kurulur.",
+                    "Aşırı Özgüven: Çocuğunuz bugün aşırı özgüvenli olabilir. Cesaretini destekleyin ama gerçekçi sınırları da hatırlatın; özgüven, deneyimle dengelenir.",
+                    "Şımarıklık Testi: Çocuğunuz bugün fazla talepkar olabilir. 'Hayır' demeyi sevgiyle öğrenin, sınırlar koyun; sınırlar, güvenin temelidir.",
+                    "Felsefi Çatışma: İnançlar ve değerler konusunda tartışabilirsiniz. Çocuğunuzun farklı bakış açısına saygı duyun; her neslin kendi soruları vardır."
                 ],
-
                 "Uranüs_0": [
-                    "Elektrikli Uyanış: Bugün çok sürprizli ve heyecan verici bir gün olabilir. Somut: Çocuğunuzun sıra dışı fikirlerine açık olun, destekleyin. Soyut: Ebeveyn-çocuk rutininin kozmik bir şokla tazelandığı devrim anı.",
-                    "Sıra Dışı Çekim: Çocuğunuz bugün çok yaratıcı ve yenilikçi. Somut: Fikirlerini ciddiye alın, birlikte deneyin. Soyut: Kalıpların yıkıldığı, çocuğun potansiyelinin yeni bir boyuta açıldığı 'evreka' anı.",
-                    "Zincirleri Kırmak: Çocuğunuz bugün kuralları sorgulayabilir. Somut: Bu bir isyan değil, sorgulama yeteneğinin gelişimidir — destekleyin. Soyut: Özgürlüğün ve bireyselliğin ebeveyn-çocuk bağına zarar vermeden entegre edildiği uyanış.",
-                    "Sürpriz Rota: Beklenmedik bir gelişmenin yaşanabileceği bir gün. Somut: Çocuğunuzun sürprizlerine hazır olun, esnek davranın. Soyut: Kadersel monotonluğun evrenin şimşekleriyle parçalandığı ve bağın nefes aldığı döngü."
+                    "Sürprizli Gün: Bugün çok sürprizli ve heyecan verici bir gün olabilir. Çocuğunuzun sıra dışı fikirlerine açık olun, destekleyin; yenilik bugün sizi şaşırtabilir ama büyütür.",
+                    "Sıra Dışı Çekim: Çocuğunuz bugün çok yaratıcı ve yenilikçi. Fikirlerini ciddiye alın, birlikte deneyin; kalıpların dışına çıkmak bugün mümkün.",
+                    "Zincirleri Kırmak: Çocuğunuz bugün kuralları sorgulayabilir. Bu bir isyan değil, sorgulama yeteneğinin gelişimi — destekleyin; soru sormak, özgür düşüncenin başlangıcı.",
+                    "Sürpriz Rota: Beklenmedik bir gelişme yaşanabilir. Çocuğunuzun sürprizlerine hazır olun, esnek davranın; rutinin dışına çıkmak bugün nefes aldırıyor."
                 ],
                 "Uranüs_90": [
-                    "Özgürlük İsyanı: Çocuğunuz bugün aşırı bağımsızlık talep edebilir. Somut: Bağımsız alanlar verin ama sınırları da koruyun. Soyut: Çocuğun özgürlük ihtiyacı ile ebeveyn kontrolü arasındaki kadersel gerilim.",
-                    "Ani Yıkım Güdüsü: Çocuğunuz bugün ani ve öngörülemez davranışlar sergileyebilir. Somut: Sabırlı olun, provokasyona kapılmayın. Soyut: Ebeveyn-çocuk düzeninin ani değişimlerle test edildiği sınav anı.",
-                    "Elektrik Yüklü Kriz: Ani tartışmalar veya beklenmedik tepkiler yaşanabilir. Somut: Sakin kalın, fevri kararlardan kaçının — siz model olun. Soyut: Ebeveyn-çocuk yapısının şiddetle sarsıldığı, sabır ve anlayışın test edildiği kırmızı alarm.",
-                    "Mesafe Kopuşu: Çocuğunuz bugün size çok uzak hissedebilir. Somut: Bu geçici bir durum — üstüne gitmeyin, bekleyin. Soyut: Ebeveyn-çocuk sürekliliğindeki geçici ayrışmanın kadersel yüzleşmesi."
+                    "Özgürlük İsyanı: Çocuğunuz bugün aşırı bağımsızlık talep edebilir. Bağımsız alanlar verin ama sınırları da koruyun; özgürlük ve güvenlik bugün birlikte sınanıyor.",
+                    "Ani Değişimler: Çocuğunuz ani ve öngörülemez davranışlar sergileyebilir. Sabırlı olun, provokasyona kapılmayın; ani tepkiler çoğu zaman bir ihtiyacın habercisidir.",
+                    "Elektrikli Kriz: Ani tartışmalar veya beklenmedik tepkiler yaşanabilir. Sakin kalın, fevri kararlardan kaçının — siz model olun; fırtına geçer, denge geri gelir.",
+                    "Mesafe Kopuşu: Çocuğunuz bugün size çok uzak hissedebilir. Bu geçici bir durum — üstüne gitmeyin, bekleyin; bazen mesafe, yakınlaşmanın ön koşuludur."
                 ],
-
                 "Neptün_0": [
-                    "Ruhsal Simya: Bugün çok duygusal ve manevi bir gün. Somut: Birlikte hayal kurun, sanat yapın veya sadece sarılın. Soyut: Ebeveyn ve çocuk arasındaki empati ve ruhsal kenetlenmenin zirve yaptığı gün.",
-                    "İlahi Çözülme: Affetmenin çok kolay olduğu bir gün. Somut: Eski kırgınlıkları bırakın, temiz bir sayfa açın. Soyut: Ebeveyn-çocuk arasındaki duygusal yüklerin kozmik olarak yıkandığı şifa anı.",
-                    "Telepatik Teslimiyet: Çocuğunuzun ne hissettiğini bugün çok daha iyi anlayabiliyorsunuz. Somut: Bu empati yeteneğinizi onunla derin bir bağ kurmak için kullanın. Soyut: Ebeveyn ve çocuğun ruhsal olarak birbirine ilahi pamuk ipliğiyle bağlandığı masal saati.",
-                    "Tatlı İllüzyon: Bugün her şey çok güzel ve pembe görünebilir. Somut: Bu güzel anın tadını çıkarın ama gerçekleri de göz ardı etmeyin. Soyut: Evrenin ebeveyn-çocuk bağına sunduğu rüya molası."
+                    "Duygusal Gün: Bugün çok duygusal ve manevi bir gün. Birlikte hayal kurun, sanat yapın veya sadece sarılın; empati bugün ikiniz arasında köprü kuruyor.",
+                    "Affetme Kolaylığı: Affetmek bugün çok kolay. Eski kırgınlıkları bırakın, temiz bir sayfa açın; affetmek karşı tarafa olduğu kadar size de iyi gelir.",
+                    "Sezgisel Anlayış: Çocuğunuzun ne hissettiğini bugün çok daha iyi anlayabiliyorsunuz. Bu sezgiyi onunla derin bir bağ kurmak için kullanın; kelimelerin yetmediği yerde sezgi konuşur.",
+                    "Tatlı İllüzyon: Bugün her şey çok güzel ve pembe görünebilir. Bu güzel anın tadını çıkarın ama gerçekleri de göz ardı etmeyin; hayal ile gerçeği bugün ayırt edin."
                 ],
                 "Neptün_90": [
-                    "Sis Perdesi: Bugün yanlış anlaşılmalar olabilir. Somut: Çocuğunuzun sözlerini çok dikkat dinleyin, varsayım yapmayın. Soyut: Gerçeklerin çarpıtılabildiği gün — bugün büyük kararlar almaktan kaçının.",
-                    "Kurban Psikolojisi: 'Ben senin için her şeyimi verdim' hissine kapılabilirsiniz. Somut: Fedakarlığınızın sınırlarını koruyun, tükenmişlikten kaçının. Soyut: Ebeveynin fedakarlığı ile sınırları arasındaki kadersel test.",
-                    "Hayal Kırıklığı Sınavı: Çocuğunuzun gerçekliği ile hayalleriniz örtüşmeyebilir. Somut: Onu olduğu gibi kabul edin, idealize etmeyi bırakın. Soyut: Ebeveyn beklentileri ile çocuğun gerçek potansiyeli arasındaki kadersel uyanış.",
-                    "Kaçış Eğilimi: Sorunları görmezden gelme isteği bugün çok güçlü olabilir. Somut: Kaçmak yerine yüzleşin, destek alın. Soyut: Ebeveyn-çocuk bağının karanlık sularında kaybolma hissinin kadersel yüzleşmesi."
+                    "Sis Perdesi: Bugün yanlış anlaşılmalar olabilir. Çocuğunuzun sözlerini çok dikkatli dinleyin, varsayım yapmayın; bugün büyük kararlar almaktan kaçının.",
+                    "Kurban Psikolojisi: 'Ben senin için her şeyimi verdim' hissine kapılabilirsiniz. Fedakarlığınızın sınırlarını koruyun, tükenmişlikten kaçının; fedakarlık, sınırlarla birlikte anlamlıdır.",
+                    "Hayal Kırıklığı Sınavı: Çocuğunuzun gerçekliği ile hayalleriniz örtüşmeyebilir. Onu olduğu gibi kabul edin, idealize etmeyi bırakın; onu tanımak, ona dair hayallerden daha değerli.",
+                    "Kaçış Eğilimi: Sorunları görmezden gelme isteği bugün çok güçlü olabilir. Kaçmak yerine yüzleşin, destek alın; ertelenen sorunlar büyüyerek geri döner."
                 ],
-
                 "Plüton_0": [
-                    "Küllerinden Doğuş: Bugün çok derin ve dönüştürücü bir deneyim yaşanabilir. Somut: Çocuğunuzun derin duygularına kulak verin, onu anladığınızı hissettirin. Soyut: Ebeveyn-çocuk arasındaki derin dönüşümün kozmik olarak gerçekleştiği simyasal gün.",
-                    "Hipnotik Çekim: Bugün çocuğunuzla aranızdaki bağ çok derin ve güçlü. Somut: Bu derin bağı hissedin ve takdir edin. Soyut: Ruhların en derin dehlizlerde bile birbirini tanıyıp kucakladığı ebeveyn-çocuk mührü.",
-                    "Dönüştürücü Güç: Ortak bir zorluğun üstesinden muazzam bir güç birliğiyle gelebilirsiniz. Somut: Birlikte zorlukların üstesinden gelin, bu deneyimden büyüyerek çıkın. Soyut: Ebeveyn-çocuk bağının deri değiştirdiği, eski toksik kalıpların ölüp güçlü bir bağın doğduğu faz.",
-                    "Sessiz İttifak: Bugün birbirinizi sadece göz temasıyla anlayabileceğiniz özel bir an olabilir. Somut: Bu sessiz anları değerli kılın,acele etmeyin. Soyut: Ebeveyn ve çocuğun ruhsal olarak tek vücut olduğu mistik gün."
+                    "Derin Dönüşüm: Bugün çok derin ve dönüştürücü bir deneyim yaşanabilir. Çocuğunuzun derin duygularına kulak verin, onu anladığınızı hissettirin; bu samimiyet şifa getirir.",
+                    "Güçlü Bağ: Bugün çocuğunuzla aranızdaki bağ çok derin ve güçlü. Bu derin bağı hissedin ve takdir edin; böyle anlar nadirdir.",
+                    "Dönüştürücü Güç: Ortak bir zorluğun üstesinden muazzam bir güç birliğiyle gelebilirsiniz. Birlikte zorlukların üstesinden gelin, bu deneyimden büyüyerek çıkın; krizler bağları güçlendirir.",
+                    "Sessiz İttifak: Bugün birbirinizi sadece göz temasıyla anlayabileceğiniz özel anlar olabilir. Bu sessiz anları değerli kılın, acele etmeyin; kelimelerin ötesinde bir iletişim bugün mümkün."
                 ],
                 "Plüton_90": [
-                    "Karanlık Sınav: Bugün çok yoğun ve zorlayıcı duygular yaşanabilir. Somut: Kontrolü bırakın, teslim olmayı öğrenin — bu bir ebeveyn için en zor ders. Soyut: Kontrol manyaklığının kadersel olarak yüzeye çıktığı derin sınav.",
-                    "Güç Savaşı: Siz ve çocuğunuzbugün güç konusunda çatışabilirsiniz. Somut: Gücü değil, şefkati silah olarak kullanın. Soyut: Ebeveyn ile çocuğun güç dengesinin kadersel olarak yeniden yapılandırıldığı sınav anı.",
-                    "Paranoya Fazı: Çocuğunuzun her davranışından endişe duyabilirsiniz. Somut: Endişelerinizi abartmayın, gerçekçi olun. Soyut: Geçmiş yaşamlardan veya çocukluktan gelen korkuların kadersel olarak tetiklenmesi.",
-                    "Yıkıcı Uretim Gucu: Bastırılmış öfke bugün patlayabilir. Somut: Öfkenizi çocuğunuza değil, soruna yöneltin — panzehir şefkattir. Soyut: Ebeveyn-çocuk arasındaki derin krizin kadersel yüzleşmesi."
+                    "Karanlık Sınav: Bugün çok yoğun ve zorlayıcı duygular yaşanabilir. Kontrolü bırakın, teslim olmayı öğrenin — bu bir ebeveyn için en zor ders; kontrol bırakıldıkça bağ güçlenir.",
+                    "Güç Savaşı: Bugün güç konusunda çatışabilirsiniz. Gücü değil, şefkati ön planda tutun; güç gösterisi değil, güç birliği bugün kazandırır.",
+                    "Endişe Fazı: Çocuğunuzun her davranışından endişe duyabilirsiniz. Endişelerinizi abartmayın, gerçekçi olun; geçmişten gelen korkular bugün güçlenebilir, farkında olun.",
+                    "Yıkıcı Üretim Gücü: Bastırılmış öfke bugün patlayabilir. Öfkenizi çocuğunuza değil, soruna yöneltin — panzehir şefkattir; bu sınavdan birlikte güçlenerek çıkabilirsiniz."
                 ]
             }
         else:
             bsp_sozlugu = {
-                # ☀️ GÜNEŞ (Ortak İrade, Ego, Yaşam Enerjisi)
                 "Güneş_0": [
-                    "☀️ <b>Kimlik Yenilenmesi:</b> <i>Somut:</i> Birlikte dışarı çıkmak veya ortak bir karar almak için harika bir gün. <i>Soyut:</i> Ruhlarınızın tek bir iradede hizalandığı yüksek enerjili bir faz.",
-                    "☀️ <b>Ego Parlaması:</b> <i>Somut:</i> Partnerinizle birlikte bir başarıyı kutlayabilir veya dikkatleri üzerinize çekebilirsiniz. <i>Soyut:</i> 'Biz' bilincinin evren tarafından yeniden tohumlandığı özel bir gün.",
-                    "☀️ <b>Canlanma Vakti:</b> <i>Somut:</i> Fiziksel olarak çok daha enerjik ve dışa dönük hissedeceğiniz bir tempo. <i>Soyut:</i> İlişkinizin çekirdek kimliğinin kozmik bir güncelleme aldığı zaman dilimi.",
-                    "☀️ <b>Ortak Vizyon:</b> <i>Somut:</i> Geleceğe dair umut veren, net kararlar aldığınız ve inisiyatif kullandığınız anlar. <i>Soyut:</i> Egoların eriyip saf yaşam enerjisinin ilişkinizi yıkadığı bir gün."
+                    "☀️ <b>Kimlik Yenilenmesi:</b> Bugün birlikte dışarı çıkmak veya ortak bir karar almak için harika bir gün. Kimlikleriniz ve iradeleriniz doğal bir şekilde aynı yöne akıyor; bu uyumun keyfini çıkarın.",
+                    "☀️ <b>Ego Parlaması:</b> Partnerinizle birlikte bir başarıyı kutlamak veya dikkatleri üzerinize çekmek için güzel bir gün. 'Biz' bilinci bugün yeniden güçleniyor.",
+                    "☀️ <b>Canlanma Vakti:</b> Fiziksel olarak çok daha enerjik ve dışa dönük hissedeceğiniz bir tempo. İlişkinizin çekirdek kimliği bugün tazeleniyor, bu enerjiyi birlikte kullanın.",
+                    "☀️ <b>Ortak Vizyon:</b> Geleceğe dair umut veren, net kararlar alabileceğiniz bir gün. Egoların geri çekildiği bu saatlerde birlikte plan yapmak için ideal zaman."
                 ],
                 "Güneş_60": [
-                    "☀️ <b>İrade Uyumu:</b> <i>Somut:</i> Günlük akışta işlerin tıkır tıkır ilerlediği, tatlı ve sorunsuz bir gün. <i>Soyut:</i> Egoların çatışmadan, ortak hedeflere hizmet ettiği yapıcı bir pencere.",
-                    "☀️ <b>Destekleyici Akış:</b> <i>Somut:</i> Birbirinize küçük yardımlarda bulunarak günün stresini kolayca attığınız saatler. <i>Soyut:</i> İletişimin ve iradenin dostça bir titresimta hizalandığı uyum zamanı.",
-                    "☀️ <b>Tatlı Fırsatlar:</b> <i>Somut:</i> İlişkinize keyif katacak sürpriz küçük gelişmeler veya dışarıdan gelen güzel haberler. <i>Soyut:</i> Evrenin ilişkinize 'devam edin' dediği yeşil ışık.",
-                    "☀️ <b>Yumuşak Geçiş:</b> <i>Somut:</i> Düne göre çok daha toleranslı ve uyumlu olduğunuz, gerginlikten uzak bir faz. <i>Soyut:</i> Ruhsal dayanışmanın ve onaylanma hissinin içten içe büyüdüğü gün."
+                    "☀️ <b>İrade Uyumu:</b> Günlük akışta işlerin tıkır tıkır ilerlediği, tatlı ve sorunsuz bir gün. İradeleriniz çatışmadan, ortak hedeflere hizmet ediyor.",
+                    "☀️ <b>Destekleyici Akış:</b> Birbirinize küçük yardımlarda bulunarak günün stresini kolayca atabileceğiniz saatler. İletişim ve irade bugün dostça buluşuyor.",
+                    "☀️ <b>Tatlı Fırsatlar:</b> İlişkinize keyif katacak sürpriz küçük gelişmeler veya dışarıdan gelen güzel haberler gündemde. 'Devam edin' işaretlerini fark edin.",
+                    "☀️ <b>Yumuşak Geçiş:</b> Düne göre çok daha toleranslı ve uyumlu olduğunuz, gerginlikten uzak bir faz. Onaylanma hissinin tadını birlikte çıkarın."
                 ],
                 "Güneş_90": [
-                    "☀️ <b>Ego Sınavı:</b> <i>Somut:</i> 'Benim dediğim olacak' inatlaşmaları veya planlarda ufak pürüzler. <i>Soyut:</i> Sivri köşelerinizin birbirinize çarparak törpülendiği gelişim anıdır; esnek olan kazanır.",
-                    "☀️ <b>İrade Sürtünmesi:</b> <i>Somut:</i> Dışarıdan gelen bir stresin aranıza yansıması ve haksızlığa uğramışlık hissi. <i>Soyut:</i> İlişkinin kadersel esnekliğinin test edildiği, tahammül gerektiren bir gün.",
-                    "☀️ <b>Kışkırtıcı Ayna:</b> <i>Somut:</i> Ortak bir karar alırken zorlanma, partnerin tavrını fazla buyurgan bulma. <i>Soyut:</i> Kendi gücünüzü eşiniz üzerinden kanıtlamaya çalışmayın; rekabeti dış dünyaya saklayın.",
-                    "☀️ <b>Sabir Testi:</b> <i>Somut:</i> Enerjinizin bloke olduğunu hissettiğiniz, onay ihtiyacınızın karşılanmadığı saatler. <i>Soyut:</i> Egoların savaşından ziyade, birbirinizin farklılıklarına saygı duyma antrenmanı."
+                    "☀️ <b>Ego Sınavı:</b> 'Benim dediğim olacak' inatlaşmaları veya planlarda ufak pürüzler olabilir. Sivri köşeleriniz birbirinize çarparak törpüleniyor; esnek olan bugün kazanır.",
+                    "☀️ <b>İrade Sürtünmesi:</b> Dışarıdan gelen bir stres aranıza yansıyabilir, haksızlığa uğramışlık hissedebilirsiniz. Tahammül ve esneklik bugünün anahtarı.",
+                    "☀️ <b>Kışkırtıcı Ayna:</b> Ortak bir karar alırken zorlanabilir, partnerin tavrını buyurgan bulabilirsiniz. Gücünüzü eşiniz üzerinden kanıtlamaya çalışmayın; rekabeti dış dünyaya saklayın.",
+                    "☀️ <b>Sabır Testi:</b> Enerjinizin bloke olduğunu, onay ihtiyacınızın karşılanmadığını hissedebilirsiniz. Farklılıklara saygı duymak bugünün pratiği; sabır, sevginin en sessiz kanıtı."
                 ],
                 "Güneş_120": [
-                    "☀️ <b>Zahmetsiz Parlama:</b> <i>Somut:</i> İlişkinin keyfini çıkardığınız, dışarıdan iltifat aldığınız pürüzsüz bir zaman. <i>Soyut:</i> Yaşam enerjisinin kendiliğinden aktığı, evrensel onay günü.",
-                    "☀️ <b>Ruhsal Ziyafet:</b> <i>Somut:</i> Eşinizin yanındayken kendinizi en iyi versiyonunuzda hissedeceğiniz rahatlatıcı bir akış. <i>Soyut:</i> Kimliklerinizin birbirini yormadan, doğal bir şekilde şifalandırdığı anlar.",
-                    "☀️ <b>Şanslı Gün:</b> <i>Somut:</i> İşlerinizin kolaylaştığı, aranızdaki neşenin ve gülümsemenin tavan yaptığı bir gün. <i>Soyut:</i> Kozmik akışın ilişkinizin yelkenlerini rüzgarla doldurduğu zahmetsiz seyir.",
-                    "☀️ <b>İlahi Senkronizasyon:</b> <i>Somut:</i> Aynı anda aynı şeyi düşünüp güldüğünüz, aidiyet hissinin çok güçlü olduğu saatler. <i>Soyut:</i> Gökyüzünün ilişkinizin varlığını ve gücünü kutsadığı altın saatler."
+                    "☀️ <b>Zahmetsiz Parlama:</b> İlişkinin keyfini çıkardığınız, dışarıdan iltifat aldığınız pürüzsüz bir zaman. Yaşam enerjiniz bugün kendiliğinden akıyor.",
+                    "☀️ <b>Ruhsal Ziyafet:</b> Eşinizin yanındayken kendinizi en iyi versiyonunuzda hissedeceğiniz rahatlatıcı bir akış. Birbirinizi yormadan, doğal biçimde şifalandırıyorsunuz.",
+                    "☀️ <b>Şanslı Gün:</b> İşlerinizin kolaylaştığı, aranızdaki neşenin ve gülümsemenin tavan yaptığı bir gün. Bu akışın tadını sonuna kadar çıkarın.",
+                    "☀️ <b>Senkronize Anlar:</b> Aynı anda aynı şeyi düşünüp güldüğünüz, aidiyet hissinin çok güçlü olduğu saatler. Bu uyum, ilişkinizin en sağlıklı kanıtlarından biri."
                 ],
                 "Güneş_180": [
-                    "☀️ <b>Kutuplaşma Sınavı:</b> <i>Somut:</i> Partnerinizin tamamen size zıt bir fikirle gelmesi veya aranıza duygusal bir mesafe girmesi. <i>Soyut:</i> Eşiniz bugün sizin gölgenizi yansıtıyor, bu bir gelişim aynasıdır.",
-                    "☀️ <b>Tahterevalli Dengesi:</b> <i>Somut:</i> Biriniz çok hevesliyken diğerinin isteksiz olduğu, ritimlerin bir türlü uyuşmadığı anlar. <i>Soyut:</i> İlişkinin iki zıt ucu test ediliyor; dengeyi bulmak için karşılıklı taviz şart.",
-                    "☀️ <b>Çekim ve İtiş:</b> <i>Somut:</i> Bir yandan büyük bir fiziksel çekim hissederken, bir yandan uzaklaşma arzusu yaşanabilir. <i>Soyut:</i> Eksik olan yönünüz eşinizde beden buluyor; onu yargılamak yerine tamamlanmayı seçin.",
-                    "☀️ <b>Karşı Cephe:</b> <i>Somut:</i> İlişkideki rolünüzün sorgulandığı, kendinizi partnere beğendirme ihtiyacının arttığı gün. <i>Soyut:</i> Dış dünyadaki iradeniz iç dünyanızla çarpışıyor, sakin kalıp merkezinizi koruyun."
+                    "☀️ <b>Kutuplaşma Sınavı:</b> Partneriniz tamamen size zıt bir fikirle gelebilir veya aranıza duygusal bir mesafe girebilir. Bugün eşiniz size bir ayna tutuyor; bu bir gelişim fırsatı.",
+                    "☀️ <b>Tahterevalli Dengesi:</b> Biriniz çok hevesliyken diğeri isteksiz olabilir, ritimler uyuşmayabilir. Zıt uçlar bugün test ediliyor; denge için karşılıklı taviz şart.",
+                    "☀️ <b>Çekim ve İtiş:</b> Büyük bir fiziksel çekim ile uzaklaşma arzusu bir arada yaşanabilir. Eksik olan yönünüz eşinizde beden buluyor; yargılamak yerine tamamlanmayı seçin.",
+                    "☀️ <b>Karşı Cephe:</b> İlişkideki rolünüzün sorgulandığını, kendinizi beğendirme ihtiyacının arttığını hissedebilirsiniz. Sakin kalıp merkezinizi koruyun; bu da geçecek."
                 ],
-
-                # 🧠 MERKÜR (Ortak Zihin, İletişim, Kararlar)
                 "Merkür_0": [
-                    "🧠 <b>Telepatik Zihin:</b> <i>Somut:</i> Mesajlaşmaların arttığı, harika sohbetlerin edildiği veya kısa bir yolculuk planı günü. <i>Soyut:</i> Kelimelere gerek kalmadan birbirinizin zihnini okuyabildiğiniz derin titresim.",
-                    "🧠 <b>Zihinsel Bütünlük:</b> <i>Somut:</i> Önemli bir kararı ortak akılla ve çok hızlı bir şekilde masaya yatırıp çözdüğünüz saatler. <i>Soyut:</i> İki ayrı zihnin tek bir süper-bilgisayar gibi evrensel verileri işlediği an.",
-                    "🧠 <b>Fikirsel Kıvılcım:</b> <i>Somut:</i> Birbirinize ilham verdiğiniz, yeni projeler veya hobiler hakkında hevesle konuştuğunuz gün. <i>Soyut:</i> Ortak vizyonunuzun zihinsel boyutta yenilendiği aydınlanma fazı.",
-                    "🧠 <b>Pürüzsüz İletişim:</b> <i>Somut:</i> Yanlış anlaşılmaların buharlaştığı, en zor konuların bile tatlı dille konuşulabildiği akış. <i>Soyut:</i> Anlaşma ve onaylanma ihtiyacınızın zihinsel olarak tam tatmin edildiği döngü."
+                    "🧠 <b>Telepatik Zihin:</b> Mesajlaşmaların arttığı, harika sohbetlerin edildiği veya kısa bir yolculuk planı günü. Kelimelere gerek kalmadan birbirinizi anlayabiliyorsunuz.",
+                    "🧠 <b>Zihinsel Bütünlük:</b> Önemli bir kararı ortak akılla ve çok hızlı şekilde masaya yatırıp çözebileceğiniz saatler. İki zihin bugün tek bir akış gibi çalışıyor.",
+                    "🧠 <b>Fikirsel Kıvılcım:</b> Birbirinize ilham verdiğiniz, yeni projeler veya hobiler hakkında hevesle konuştuğunuz bir gün. Ortak vizyonunuz zihinsel olarak yenileniyor.",
+                    "🧠 <b>Pürüzsüz İletişim:</b> Yanlış anlaşılmaların buharlaştığı, en zor konuların bile tatlı dille konuşulabildiği bir akış. Anlaşılma ihtiyacınız bugün tam karşılanıyor."
                 ],
                 "Merkür_90": [
-                    "🧠 <b>İletişim Darboğazı:</b> <i>Somut:</i> Söylenenlerin ters anlaşıldığı, evrak/teknoloji sorunlarının ilişkiye stres kattığı gün. <i>Soyut:</i> Zihinsel titresimların çatıştığı kadersel bir 'dinleme' sınavı.",
-                    "🧠 <b>Sözsel Gerilim:</b> <i>Somut:</i> Tartışmaların kolayca alevlenebileceği, söz kesme ve inatlaşmanın yaşanabileceği saatler. <i>Soyut:</i> Kendi haklılığınızı kanıtlamak yerine, partnerinizin sessizliğindeki nedeni arayın.",
-                    "🧠 <b>Yanlış Anlama:</b> <i>Somut:</i> Birinizin şaka yaptığı bir konuya diğerinin ciddi alınıp küsebileceği alınganlık fazı. <i>Soyut:</i> Evren size 'Bugün konuşmak yerine sadece dinle' mesajı veriyor.",
-                    "🧠 <b>Mantık Çatışması:</b> <i>Somut:</i> Gündelik planların birbirine uymaması ve organizasyon eksikliği nedeniyle yaşanan sinir harbi. <i>Soyut:</i> Ortak karar mekanizmanızın kadersel bir bakım onarıma girdiği zorlu saatler."
+                    "🧠 <b>İletişim Darboğazı:</b> Söylenenlerin ters anlaşıldığı, evrak/teknoloji sorunlarının ilişkiye stres kattığı bir gün. Bugünkü asıl sınav, 'dinlemeyi' başarmak.",
+                    "🧠 <b>Sözsel Gerilim:</b> Tartışmalar kolayca alevlenebilir, söz kesme ve inatlaşma yaşanabilir. Kendi haklılığınızı kanıtlamak yerine, partnerinizin sessizliğindeki nedeni arayın.",
+                    "🧠 <b>Yanlış Anlama:</b> Birinizin şaka yaptığı bir konuya diğeri ciddi alınıp küsebilir. Bugün net ve açık olun, imalardan kaçının; bazen en iyi mesaj sessizliktir.",
+                    "🧠 <b>Mantık Çatışması:</b> Gündelik planlar birbirine uymayabilir, organizasyon eksikliği sinir harbine dönüşebilir. Ortak karar mekanizmanız bugün bakıma girdi; esnek kalın."
                 ],
                 "Merkür_120": [
-                    "🧠 <b>Kusursuz Diyalog:</b> <i>Somut:</i> Ertelenen zor bir konuyu masaya yatırmak ve tatlıya bağlamak için mükemmel bir gün. <i>Soyut:</i> Evrenin size zihinsel bir kalkan sunduğu, fikirlerin su gibi aktığı faz.",
-                    "🧠 <b>Entelektüel Dans:</b> <i>Somut:</i> Birlikte film izlemek, kitap tartışmak veya sadece kahve eşliğinde uzun uzun dertleşmek için harika bir akış. <i>Soyut:</i> Zihinsel olarak birbirinizi çok derinden beslediğiniz şifa uyumı.",
-                    "🧠 <b>Ortak Bağ:</b> <i>Somut:</i> Partnerinizin ne diyeceğini o daha söylemeden anladığınız, çok tatlı ve neşeli iletişim saatleri. <i>Soyut:</i> Zihinlerinizin evrensel bir uyumla birbirini yatıştırdığı ve vizyon kattığı gün.",
-                    "🧠 <b>Sözlerin Şifası:</b> <i>Somut:</i> Sizi üzen bir konuyu eşinizle paylaştığınızda harika bir tavsiye alıp rahatladığınız anlar. <i>Soyut:</i> İlişkinin iletişim kanalının pırıl pırıl açıldığı, güvenin sözlerle pekiştiği döngü."
+                    "🧠 <b>Kusursuz Diyalog:</b> Ertelenen zor bir konuyu masaya yatırmak ve tatlıya bağlamak için mükemmel bir gün. Fikirleriniz bugün su gibi akıyor.",
+                    "🧠 <b>Entelektüel Dans:</b> Birlikte film izlemek, kitap tartışmak veya kahve eşliğinde uzun uzun dertleşmek için harika bir akış. Birbirinizi zihinsel olarak derinden besliyorsunuz.",
+                    "🧠 <b>Ortak Bağ:</b> Partnerinizin ne diyeceğini o daha söylemeden anladığınız, çok tatlı ve neşeli iletişim saatleri. Zihinleriniz bugün aynı frekansta.",
+                    "🧠 <b>Sözlerin Şifası:</b> Sizi üzen bir konuyu eşinizle paylaştığınızda harika bir tavsiye alıp rahatlayabilirsiniz. İletişim kanalınız pırıl pırıl açık; güven bugün sözlerle pekişiyor."
                 ],
                 "Merkür_180": [
-                    "🧠 <b>Fikir Düellosu:</b> <i>Somut:</i> Karşılıklı eleştirilerin artabileceği, eski defterlerin açılabileceği diyaloglar. <i>Soyut:</i> Farklı perspektiflerin masaya yatırılmasıdır, ufuk genişleten bir fırtına olarak görün.",
-                    "🧠 <b>Zıt Bakışlar:</b> <i>Somut:</i> Birinizin siyah dediğine diğerinin beyaz demekte ısrar edeceği zihinsel inatlaşma. <i>Soyut:</i> Birbirinizin karar alma mekanizmasındaki açıkları size gösteren kadersel bir ayna.",
-                    "🧠 <b>Sorgulama Fazı:</b> <i>Somut:</i> Eşinizin aldığı kararları veya mantığını acımasızca eleştirmeye yatkın olduğunuz saatler. <i>Soyut:</i> Kendi içinizdeki kararsızlıkların partneriniz üzerinden size yansıtıldığı test anı.",
-                    "🧠 <b>Gerilimli Müzakere:</b> <i>Somut:</i> Ortak bir bütçe, plan veya zaman çizelgesi yaparken zorlanma ve yorgunluk. <i>Soyut:</i> İki farklı dünyanın birbiriyle uzlaşmak için kadersel masaya oturduğu zorunlu toplantı."
+                    "🧠 <b>Fikir Düellosu:</b> Karşılıklı eleştiriler artabilir, eski defterler açılabilir. Bu, ufuk genişleten bir fırtına olarak görülebilir; korkmayın, dinleyin.",
+                    "🧠 <b>Zıt Bakışlar:</b> Birinizin siyah dediğine diğeri beyaz demekte ısrar edebilir. Bu inatlaşma, birbirinizin karar mekanizmalarındaki açıkları gösteriyor; ders çıkarın.",
+                    "🧠 <b>Sorgulama Fazı:</b> Eşinizin aldığı kararları veya mantığını acımasızca eleştirmeye yatkın olabilirsiniz. Kendi kararsızlıklarınızı partneriniz üzerinden yansıtıyorsunuz; önce kendinize bakın.",
+                    "🧠 <b>Gerilimli Müzakere:</b> Ortak bir bütçe, plan veya zaman çizelgesi yaparken zorlanabilirsiniz. İki farklı dünya bugün uzlaşma masasında; esneklik kazanır."
                 ],
-
-                # ❤️ VENÜS (Aşk, Değer, Estetik, Para)
                 "Venüs_0": [
-                    "❤️ <b>Aşkın Mührü:</b> <i>Somut:</i> Romantik bir randevu, fiziksel çekimin tavan yapması veya ortak finansal bir kazanç. <i>Soyut:</i> Kalp çakralarının hizalandığı, estetik ve tutkunun ruhlarınızı erittiği gün.",
-                    "❤️ <b>Cazibe Zirvesi:</b> <i>Somut:</i> Birbirinize ekstra çekici geldiğiniz, hediyeleşme veya küçük jestlerle sevginin tazelendiği saatler. <i>Soyut:</i> İlişkinin özdeğer algısının ve dişil enerjisinin kozmik olarak şifalandığı faz.",
-                    "❤️ <b>Koşulsuz Uyum:</b> <i>Somut:</i> Kavgaların kolayca unutulup sarılarak çözüldüğü, huzur ve tatlılığın hakim olduğu akış. <i>Soyut:</i> Gökyüzünün sevginizi kutsadığı ve aranızdaki bağın yenilendiği kadersel uyanış.",
-                    "❤️ <b>Tatlı Çekim:</b> <i>Somut:</i> Birlikte güzelleşmek, alışveriş yapmak veya evinize estetik bir dokunuş katmak için ideal zaman. <i>Soyut:</i> Evrensel sevgi titresimının ilişkinizin tam merkezine yerleştiği derin uyum."
+                    "❤️ <b>Sevgi Dolu Gün:</b> Bugün birbirinize karşı çok şefkatli ve sevgi dolusunuz. Romantik bir randevu, fiziksel çekimin tavan yapması veya ortak bir kazanç gündemde; bu bağ bugün yenileniyor.",
+                    "❤️ <b>Cazibe Zirvesi:</b> Birbirinize ekstra çekici geldiğiniz, hediyeleşme veya küçük jestlerle sevginin tazelendiği saatler. İlişkinizin özdeğer duygusu bugün güçleniyor.",
+                    "❤️ <b>Koşulsuz Uyum:</b> Kavgaların kolayca unutulup sarılarak çözüldüğü, huzur ve tatlılığın hakim olduğu bir akış. Sevginiz bugün kendiliğinden akıyor.",
+                    "❤️ <b>Tatlı Çekim:</b> Birlikte güzelleşmek, alışveriş yapmak veya evinize estetik bir dokunuş katmak için ideal zaman. Sevgi, bu paylaşımların içinde akıyor."
                 ],
                 "Venüs_90": [
-                    "💔 <b>Değer Sınavı:</b> <i>Somut:</i> Kıskançlık krizleri, 'bana yetersiz vakit ayırıyorsun' kaprisleri veya parasal gerginlik. <i>Soyut:</i> Kendi içinizdeki 'sevilmeme korkusunun' yüzeye çıkışıdır, içsel şefkatle doldurun.",
-                    "💔 <b>Duygusal Susuzluk:</b> <i>Somut:</i> Partnerinizin jestlerini yetersiz bulma, alınganlık yapma veya değersizlik hissi yaşama. <i>Soyut:</i> Aşkın lisanının karıştığı kadersel gün; beklentilerinizi sıfırlayıp sadece akışta kalın.",
-                    "💔 <b>Estetik Çatışma:</b> <i>Somut:</i> Dış görünüş, harcamalar veya sosyal zevkler yüzünden yaşanan ufak çaplı soğuk savaşlar. <i>Soyut:</i> Alma-verme dengenizin kozmik bir testten geçtiği, ego ve sevginin sürtüştüğü an.",
-                    "💔 <b>Tutku Darboğazı:</b> <i>Somut:</i> Fiziksel mesafelenme veya eşinizin sizi anlamadığını, takdir etmediğini düşündüğünüz kapalı faz. <i>Soyut:</i> Şımarıklık ve şefkat arasındaki o ince sınırın kadersel olarak sınandığı tehlikeli saatler."
+                    "💔 <b>Değer Sınavı:</b> Kıskançlık krizleri, 'bana yetersiz vakit ayırıyorsun' kaprisleri veya parasal gerginlik yaşanabilir. İçinizdeki 'sevilmeme korkusu' yüzeye çıkıyor; bu korkuyu şefkatle karşılayın.",
+                    "💔 <b>Duygusal Susuzluk:</b> Partnerinizin jestlerini yetersiz bulma, alınganlık veya değersizlik hissi yaşayabilirsiniz. Beklentilerinizi sıfırlayıp akışta kalmak bugünün şifası.",
+                    "💔 <b>Estetik Çatışma:</b> Dış görünüş, harcamalar veya sosyal zevkler yüzünden soğuk savaşlar yaşanabilir. Alma-verme dengeniz bugün test ediliyor; açıkça konuşun.",
+                    "💔 <b>Tutku Darboğazı:</b> Fiziksel mesafelenme veya 'beni anlamıyor' hissi yaşanabilir. Şımarıklık ile şefkat arasındaki ince sınır bugün sınanıyor; konuşmak iyileştirir."
                 ],
                 "Venüs_120": [
-                    "🕊️ <b>Koşulsuz Çekim:</b> <i>Somut:</i> Hiçbir çaba harcamadan mutluluğu yakaladığınız, huzurun hakim olduğu yumuşak gün. <i>Soyut:</i> Aşkın ve dişil enerjinin kendiliğinden, su gibi aktığı eşsiz ruh eşliği titresimı.",
-                    "🕊️ <b>Romantik Akış:</b> <i>Somut:</i> Aşkınızı dile getirmek, küçük sürprizler yapmak veya derin bakışmalarla anlaşmak için harika zaman. <i>Soyut:</i> Birbirinizin yaralarını sevgiyle onardığınız ve aidiyetin tavan yaptığı kozmik şifa.",
-                    "🕊️ <b>Tatlı Huzur:</b> <i>Somut:</i> Ortak zevklerde buluşup, belki bir müzik veya güzel bir yemek eşliğinde dinlendiğiniz rahatlatıcı saatler. <i>Soyut:</i> Kalplerin senkronize attığı, dünyevi streslerin sevginizin duvarından sektiği gün.",
-                    "🕊️ <b>Güzellik Ritmi:</b> <i>Somut:</i> Sosyal ortamlarda gıptayla bakılan bir çift olduğunuz, aranızdaki neşenin dışa yansıdığı faz. <i>Soyut:</i> Evrensel güzellik ve bereket enerjisinin tam olarak ilişkinizin üzerine yağdığı lütuf anı."
+                    "🕊️ <b>Koşulsuz Çekim:</b> Hiçbir çaba harcamadan mutluluğu yakaladığınız, huzurun hakim olduğu yumuşak bir gün. Sevginiz bugün su gibi, doğal akıyor.",
+                    "🕊️ <b>Romantik Akış:</b> Aşkınızı dile getirmek, küçük sürprizler yapmak veya derin bakışmalarla anlaşmak için harika zaman. Birbirinizin yaralarını sevgiyle onarıyorsunuz.",
+                    "🕊️ <b>Tatlı Huzur:</b> Ortak zevklerde buluşup, belki bir müzik veya güzel bir yemek eşliğinde dinleneceğiniz rahatlatıcı saatler. Dünyevi stresler bugün kapının dışında kalıyor.",
+                    "🕊️ <b>Güzellik Ritmi:</b> Sosyal ortamlarda gıptayla bakılan bir çift olduğunuz, aranızdaki neşenin dışa yansıdığı bir faz. Güzellik ve bereket bugün üzerinize yağıyor."
                 ],
                 "Venüs_180": [
-                    "🪞 <b>Sevgi İhtiyacı:</b> <i>Somut:</i> İlgisizlik hissi veya 'ben çok veriyorum, o az veriyor' hesaplaşması. <i>Soyut:</i> İlişkinin verme-alma dengesi test ediliyor; dengeyi kurmanın ruhsal kilit noktası.",
-                    "🪞 <b>Beklenti Kutuplaşması:</b> <i>Somut:</i> Biriniz çok yapışkan olurken diğerinin kaçmak istemesi, sevgi dillerinin uyuşmaması. <i>Soyut:</i> Kendi özdeğer eksikliğinizi partnerinizin üzerinden tamamlama eğilimi; dikkati kendinize çevirin.",
-                    "🪞 <b>Soğuk Ayna:</b> <i>Somut:</i> Aşırı eleştirel olmak, eşinizin zevklerini yargılamak veya finansal konularda zıt düşmek. <i>Soyut:</i> Aşkta karşıt cephelerde gibi hissetseniz de, bu gerilim aslında ilişkinizi dengeleyen bir pusuladır.",
-                    "🪞 <b>Tutku Tahterevallisi:</b> <i>Somut:</i> Ani bir kıskançlık ile derin bir soğukluk arasında gidip gelen dengesiz bir duygu durumu. <i>Soyut:</i> İlişkinin sınırlarının test edildiği, 'ne kadar sana aitim' sorusunun kadersel yansıması."
+                    "🪞 <b>Sevgi İhtiyacı:</b> İlgisizlik hissi veya 'ben çok veriyorum, o az veriyor' hesaplaşması yaşanabilir. Verme-alma dengeniz bugün test ediliyor; dengeyi kurmak size kalmış.",
+                    "🪞 <b>Beklenti Kutuplaşması:</b> Biriniz çok yapışkan olurken diğeri kaçmak isteyebilir, sevgi dilleri uyuşmayabilir. Özdeğer eksikliğinizi partneriniz üzerinden tamamlama eğilimine dikkat edin.",
+                    "🪞 <b>Soğuk Ayna:</b> Aşırı eleştirel olabilir, eşinizin zevklerini yargılayabilir veya finansal konularda zıt düşebilirsiniz. Bu gerilim aslında ilişkinizi dengeleyen bir pusula; sakin değerlendirin.",
+                    "🪞 <b>Tutku Tahterevallisi:</b> Ani kıskançlık ile derin soğukluk arasında gidip gelen dengesiz bir duygu durumu yaşanabilir. 'Ne kadar sana aitim' sorusu bugün gündemde; cevabı birlikte arayın."
                 ],
-
-                # ⚔️ MARS (Eylem, Tutku, Öfke, Rekabet)
                 "Mars_0": [
-                    "🔥 <b>Tutku ve Eylem:</b> <i>Somut:</i> Birlikte spor yapmak, yorucu bir işi halletmek veya artan fiziksel tutku. <i>Soyut:</i> Birlikte dünyayı fethetme arzusunun zirveye çıktığı yapi gün.",
-                    "🔥 <b>Volkanik Enerji:</b> <i>Somut:</i> İlişkide bir anda yükselen enerji, hızlı kararlar ve ortak bir düşmana karşı kenetlenme. <i>Soyut:</i> İradelerin birleşip adeta bir savaşçı gibi tek vücut olduğu kadersel ittifak zamanı.",
-                    "🔥 <b>Cesaretin Doğuşu:</b> <i>Somut:</i> Ertelenen zor işlerin üstesinden omuz omuza verip geldiğiniz çok aktif saatler. <i>Soyut:</i> İlişkinin yaşam ateşinin, gökyüzünün eril enerjisiyle harlandığı yenilenme fazı.",
-                    "🔥 <b>Hızlı ve Öfkeli:</b> <i>Somut:</i> Biraz sabırsız ama çok üretken olduğunuz, rekabeti dışarıya yönelttiğiniz yapi akış. <i>Soyut:</i> Birlikte terlemenin ve üretmenin getirdiği o derin ruhsal tatmin günü."
+                    "🔥 <b>Tutku ve Eylem:</b> Birlikte spor yapmak, yorucu bir işi halletmek veya artan fiziksel tutku gündemde. Birlikte harekete geçmek bugün doğal geliyor.",
+                    "🔥 <b>Volkanik Enerji:</b> İlişkide bir anda yükselen enerji, hızlı kararlar ve ortak bir hedefe kenetlenme söz konusu. İradeleriniz birleşip tek bir güce dönüşüyor.",
+                    "🔥 <b>Cesaretin Doğuşu:</b> Ertelenen zor işlerin üstesinden omuz omuza gelebileceğiniz çok aktif saatler. İlişkinizin yaşam ateşi bugün harlandı.",
+                    "🔥 <b>Hızlı ve Öfkeli:</b> Biraz sabırsız ama çok üretken olduğunuz, rekabeti dışarıya yönelttiğiniz bir akış. Birlikte terlemenin getirdiği tatmin bugün çok yakın."
                 ],
                 "Mars_90": [
-                    "⚔️ <b>Ateş Çemberi:</b> <i>Somut:</i> İncir çekirdeğini doldurmayan öfke patlamaları, ufak ev kazaları veya tahammülsüzlük. <i>Soyut:</i> Kılıçları birbirinize doğrultmak yerine bu yoğun enerjiyi yorulacağınız bir işe dökün.",
-                    "⚔️ <b>Buyuk Sinav:</b> <i>Somut:</i> Seslerin yükselebileceği, 'bana karışma' isyanlarının yaşanabileceği kırmızı alarm günü. <i>Soyut:</i> İlişkinin stres testidir. Patlamaya hazır bu enerjiyi derin bir nefes alarak soğutun.",
-                    "⚔️ <b>Sürtünme ve Kriz:</b> <i>Somut:</i> Rekabetin ilişki içine girdiği, inatlaşmaların kalpleri kırabileceği hassas saatler. <i>Soyut:</i> Egonuzun savaş boyalarını sürdüğü kadersel an; partneriniz düşmanınız değil, bunu hatırlayın.",
-                    "⚔️ <b>Sabır Testi:</b> <i>Somut:</i> Eşinizin hareketlerinin size batması, tahriklere kapılma ve ani tepki verme riski. <i>Soyut:</i> Agresyonun kadersel olarak partnere yöneldiği bu günde, geri adım atan ilişkiyi kurtarır."
+                    "⚔️ <b>Ateş Çemberi:</b> İncir çekirdeğini doldurmayan öfke patlamaları veya tahammülsüzlük yaşanabilir. Bu yoğun enerjiyi yorulacağınız bir işe dökün; patlamak yerine kullanın.",
+                    "⚔️ <b>Büyük Sınav:</b> Seslerin yükselebileceği, 'bana karışma' isyanlarının yaşanabileceği kırmızı alarm günü. Bu enerjiyi derin bir nefes alarak soğutun; sakinlik bugün kazandırır.",
+                    "⚔️ <b>Sürtünme ve Kriz:</b> Rekabet ilişkinin içine girebilir, inatlaşmalar kalpleri kırabilir. Partneriniz düşmanınız değil — bugün bunu hatırlayın.",
+                    "⚔️ <b>Sabır Testi:</b> Eşinizin hareketleri size batabilir, tahriklere kapılma riski yüksek. Bugün geri adım atmak, ilişkiyi kurtaran en akıllıca hamle."
                 ],
                 "Mars_120": [
-                    "🚀 <b>Yenilmez İttifak:</b> <i>Somut:</i> Sırt sırta vererek zorlukların üstesinden geldiğiniz, cesur adımlar attığınız akış. <i>Soyut:</i> Ortak bir hedef uğruna muazzam bir cesaretle tek yürek olduğunuz ilahi faz.",
-                    "🚀 <b>Eylem Akışı:</b> <i>Somut:</i> Fiziksel olarak çok uyumlu olduğunuz, hem yorucu işleri halledip hem de eğlendiğiniz gün. <i>Soyut:</i> İlişkinin eylem motorunun hiç teklemeden çalıştığı, üretim ve tutkunun zirvesi.",
-                    "🚀 <b>Takim Calismasi:</b> <i>Somut:</i> Birinizin eksik kalan enerjisini diğerinin tamamladığı, harika bir takım arkadaşlığı. <i>Soyut:</i> Evrenin ilişkinize müthiş bir 'ilerleme ve engelleri aşma' kalkanı verdiği özel uyum.",
-                    "🚀 <b>Hızlı Senkronizasyon:</b> <i>Somut:</i> Ortak kararların eyleme çok hızlı döküldüğü, aranızdaki ateşin tatlıca yandığı saatler. <i>Soyut:</i> Birbirinizin eylem dilini yargılamadan desteklediğiniz, kadersel bir omuz omuza verme anı."
+                    "🚀 <b>Yenilmez İttifak:</b> Sırt sırta vererek zorlukların üstesinden gelebileceğiniz, cesur adımlar atabileceğiniz bir akış. Ortak bir hedef uğruna bugün tek yüreksiniz.",
+                    "🚀 <b>Eylem Akışı:</b> Fiziksel olarak çok uyumlusunuz; hem yorucu işleri halledip hem eğlenebiliyorsunuz. Üretim ve tutkunun zirvesi bugün.",
+                    "🚀 <b>Takım Çalışması:</b> Birinizin eksik kalan enerjisini diğeri tamamlıyor — harika bir takım arkadaşlığı. 'Engelleri aşma' gücü bugün ikinizde de yüksek.",
+                    "🚀 <b>Hızlı Senkronizasyon:</b> Ortak kararlar eyleme çok hızlı dökülüyor; aranızdaki ateş tatlı tatlı yanıyor. Zamanlama bugün lehinize çalışıyor."
                 ],
                 "Mars_180": [
-                    "⚔️ <b>Büyük Düello:</b> <i>Somut:</i> Sert tartışmalar, 'benim kurallarım' baskısı veya sinirlerin gergin olduğu kriz potansiyeli. <i>Soyut:</i> Rekabetin ve sınırların en sert kutuplaşması; ateşi eşinize değil, dışarıdaki sorunlara çevirin.",
-                    "⚔️ <b>Güç Savaşı:</b> <i>Somut:</i> İlişkide kimin sözünün geçeceğine dair yaşanan gizli veya açık otorite çekişmesi. <i>Soyut:</i> Bireysel iradenizin test edildiği kadersel bir ayna; birbirinizi yok etmek değil, büyütmek için ordasınız.",
-                    "⚔️ <b>Kutuplaşan İrade:</b> <i>Somut:</i> Eylemlerinizin birbirini engellediği, 'sen yapmazsan ben de yapmam' noktasına gelinen inat. <i>Soyut:</i> İki savaşçının karşılıklı cephe almasıdır; o kılıçları indirip sadece birbirinizin gözlerine bakın.",
-                    "⚔️ <b>Zıt Ritimler:</b> <i>Somut:</i> Biriniz çok hızlı hareket etmek isterken, diğerinin ayak sürüdüğü ve sinirleri bozduğu saatler. <i>Soyut:</i> Kendi eylem eksikliğinizi partnerinizde görüp ona kızdığınız o ilüzyonlu kadersel ayna."
+                    "⚔️ <b>Büyük Düello:</b> Sert tartışmalar, 'benim kurallarım' baskısı veya gergin sinirler söz konusu. Ateşi eşinize değil, dışarıdaki sorunlara çevirin.",
+                    "⚔️ <b>Güç Savaşı:</b> Kimin sözünün geçeceğine dair otorite çekişmesi yaşanabilir. Birbirinizi yok etmek için değil, büyütmek için varsınız; bunu bugün hatırlayın.",
+                    "⚔️ <b>Kutuplaşan İrade:</b> Eylemleriniz birbirini engelleyebilir, 'sen yapmazsan ben de yapmam' noktasına gelebilirsiniz. Kılıçları indirip birbirinizin gözlerine bakın.",
+                    "⚔️ <b>Zıt Ritimler:</b> Biriniz hızlı hareket etmek isterken diğeri ayak sürüyebilir. Kendi eylem eksikliğinizi partnerinizde görüp ona kızıyorsunuz; önce kendi aynanıza bakın."
                 ],
-
-                # ⏳ SATÜRN
                 "Satürn_0": [
-                    "⚖️ <b>Karmik Köklenme:</b> <i>Somut:</i> Ciddi bir sorumluluk almak, yatırım konuşmak veya soğuk, mesafeli bir ciddiyet günü. <i>Soyut:</i> Uçarı duyguların yerini ağırbaşlı bir mühür ve sadakat yeminine bıraktığı köklenme anı.",
-                    "⚖️ <b>Temel İnşası:</b> <i>Somut:</i> Geleceğe dair somut planlar yapıldığı, sadakatin ve kuralların ön planda olduğu saatler. <i>Soyut:</i> Zamanın testine dayanan ilişkinizin görünmez kolonlarının betonla güçlendirildiği faz.",
-                    "⚖️ <b>Sorumluluk Fazı:</b> <i>Somut:</i> Romantizmden çok iş, güç, ailevi görevler ve ciddiyetin konuşulduğu ağırlıklı bir akış. <i>Soyut:</i> Evrenin sizden aşkı değil, partnerliğin dünyevi yükünü paylaşmanızı beklediği disiplin günü.",
-                    "⚖️ <b>Kalıcı Mühür:</b> <i>Somut:</i> Birbirinize verdiğiniz sözlerin değerini hissettiğiniz, eski sorunların akıllıca kapatıldığı dönem. <i>Soyut:</i> İlişkinin karmik borçlarının ödendiği ve sarsılmaz bir kale duvarının örüldüğü kadersel an."
+                    "⚖️ <b>Sorumluluk Günü:</b> Ciddi bir sorumluluk almak, yatırım konuşmak veya ağırbaşlı bir gün söz konusu. Uçarı duygular yerini sadakate bırakıyor; bu ciddiyet bağınızı güçlendiriyor.",
+                    "⚖️ <b>Temel İnşası:</b> Geleceğe dair somut planlar yapıldığı, sadakatin ve kuralların ön planda olduğu saatler. İlişkinizin görünmez kolonları bugün güçleniyor.",
+                    "⚖️ <b>Sorumluluk Fazı:</b> Romantizmden çok iş, güç, ailevi görevler ve ciddiyetin konuşulduğu ağırlıklı bir akış. Partnerliğin dünyevi yükünü paylaşma günü.",
+                    "⚖️ <b>Kalıcı Söz:</b> Birbirinize verdiğiniz sözlerin değerini hissettiğiniz, eski sorunların akıllıca kapatıldığı bir dönem. Tutulan sözler bağınızı görünür biçimde güçlendirir."
                 ],
                 "Satürn_90": [
-                    "🚧 <b>Yapısal Direnç:</b> <i>Somut:</i> Duygusal soğukluk, ilgisizlik hissi veya iş yoğunluğunun ilişkiye engel olması. <i>Soyut:</i> Kadersel bir darboğaz; eğlence değil, sabır zamanıdır. Duvar örmek yerine yaraları sarın.",
-                    "🚧 <b>Yetersizlik Sınavı:</b> <i>Somut:</i> 'Beni sevmiyor' kuruntusu, partneri aşırı eleştirme veya kısıtlanmışlık hissi. <i>Soyut:</i> Evren ilişkinin taşıyıcı kolonlarını test ediyor; bugün alınan yaralar, eğer onarılmazsa kalıcı olur.",
-                    "🚧 <b>Karmik Duvar:</b> <i>Somut:</i> Eşinizle aranızda görünmez, soğuk bir buzdan duvar olduğunu hissettiğiniz o ağır saatler. <i>Soyut:</i> Kendi içsel yetersizliğinizi ilişkiye yansıtıyorsunuz; şefkat dilenmek yerine şefkat verin.",
-                    "🚧 <b>Görev Yorgunluğu:</b> <i>Somut:</i> Hayatın koşturmacası ve maddi dertler yüzünden ilişkinin romantizminin tamamen donduğu gün. <i>Soyut:</i> Aşkın bir rüya değil, dayanıklılık sınavı olduğunu size hatırlatan o sert kozmik çekiç."
+                    "🚧 <b>Yapısal Direnç:</b> Duygusal soğukluk, ilgisizlik hissi veya iş yoğunluğu ilişkiye engel olabilir. Sabır zamanı; duvar örmek yerine yaraları sarın.",
+                    "🚧 <b>Yetersizlik Sınavı:</b> 'Beni sevmiyor' kuruntusu, aşırı eleştiri veya kısıtlanmışlık hissi yaşanabilir. Bugün alınan yaralar onarılmazsa kalıcı olur — hemen ilgilenin.",
+                    "🚧 <b>Görünmez Duvar:</b> Eşinizle aranızda soğuk, görünmez bir duvar hissedebilirsiniz. İçsel yetersizliğinizi ilişkiye yansıtıyorsunuz; şefkat dilenmek yerine şefkat verin.",
+                    "🚧 <b>Görev Yorgunluğu:</b> Hayatın koşturmacası ve maddi dertler romantizmi dondurabilir. Bugün dayanıklılık sınavındasınız; birbirinize anlayış gösterin."
                 ],
                 "Satürn_120": [
-                    "⛰️ <b>Sarsılmaz Liman:</b> <i>Somut:</i> 'Bu insanla her şeyi yapabilirim' diyeceğiniz çok sağlam, ayakları yere basan bir gün. <i>Soyut:</i> Evrenin, aşkınızın fırtınaları aşabileceğini fısıldadığı, ruhsal aidiyetin aktığı faz.",
-                    "⛰️ <b>Güven Duvarı:</b> <i>Somut:</i> Saygının ve bağlılığın en üst seviyede hissedildiği, yaşça büyüklerden destek alınan zamanlar. <i>Soyut:</i> İlişkinin geçmişten gelen o köklü sağlamlığının meyvelerini yediğiniz çok özel ve güvenli şifa.",
-                    "⛰️ <b>Ağırbaşlı Aşk:</b> <i>Somut:</i> Büyük sözlere gerek olmadan, sadece yan yana durmanın bile muazzam bir güç verdiği saatler. <i>Soyut:</i> Zamanın ilişkinizi yıpratmadığını, aksine şarap gibi yıllandırdığını iliklerinize kadar hissettiğiniz an.",
-                    "⛰️ <b>Ortak Disiplin:</b> <i>Somut:</i> Finansal, evsel veya kariyer odaklı sorunları birlikte, olgunca ve hızla çözdüğünüz gün. <i>Soyut:</i> Kadersel sorumlulukların bir yük değil, aranızdaki o kutsal bağın harcı olduğunu anladığınız uyum."
+                    "⛰️ <b>Sarsılmaz Liman:</b> 'Bu insanla her şeyi yapabilirim' diyeceğiniz çok sağlam, ayakları yere basan bir gün. Aşkınız fırtınaları aşabilecek güçte olduğunu bugün gösteriyor.",
+                    "⛰️ <b>Güven Duvarı:</b> Saygının ve bağlılığın en üst seviyede hissedildiği, yaşça büyüklerden destek alınan zamanlar. İlişkinizin köklü sağlamlığının meyvelerini yiyorsunuz.",
+                    "⛰️ <b>Ağırbaşlı Aşk:</b> Büyük sözlere gerek yok; yan yana durmak bile muazzam bir güç veriyor. Zaman ilişkinizi yıpratmıyor, aksine şarap gibi yıllandırıyor.",
+                    "⛰️ <b>Ortak Disiplin:</b> Finansal, evsel veya kariyer odaklı sorunları birlikte, olgunca ve hızla çözebilirsiniz. Sorumluluklar bugün bir yük değil, bağınızın harcı."
                 ],
                 "Satürn_180": [
-                    "🧱 <b>Otorite Çarpışması:</b> <i>Somut:</i> Kısıtlanma hissi, partnerin baba/patron rolüne bürünmesi veya aşırı eleştirel tavırlar. <i>Soyut:</i> Kurallar ve duyguların çarpıştığı an. Üstünlük kurmaya çalışmak yerine eşinizin korkularına şefkatle yaklaşın.",
-                    "🧱 <b>Mesafe Sınavı:</b> <i>Somut:</i> Biriniz çok sıcak ve yakınlık ararken diğerinin mesafeli, iş odaklı veya kuralcı olduğu tahterevalli. <i>Soyut:</i> İlişkinin kurallarıyla, sevginin özgürlüğü arasındaki kadersel gerilim noktası.",
-                    "🧱 <b>Katı Duvarlar:</b> <i>Somut:</i> 'Senin yüzünden' diyerek eski hataların ve yapısal sorunların sertçe masaya getirildiği saatler. <i>Soyut:</i> Eşinizin hatalarını yargılarken aslında kendi karmik korkularınızı yargıladığınızı unutmayın.",
-                    "🧱 <b>Sorumluluk Yükü:</b> <i>Somut:</i> İlişkinin tüm dünyevi yükünün tek bir kişinin omuzlarına bindiği hissi ve bundan doğan soğuk öfke. <i>Soyut:</i> Evren size 'dengeyi kurmazsan duvarın altında kalırsın' uyarısı yapıyor; yükleri hemen paylaşın."
+                    "🧱 <b>Otorite Çarpışması:</b> Kısıtlanma hissi, partnerin baba/patron rolüne bürünmesi veya aşırı eleştirel tavırlar yaşanabilir. Üstünlük kurmak yerine eşinizin korkularına şefkatle yaklaşın.",
+                    "🧱 <b>Mesafe Sınavı:</b> Biriniz sıcak ve yakınlık ararken diğeri mesafeli, iş odaklı olabilir. Kurallar ile sevginin özgürlüğü bugün gerilimde; dengeyi birlikte bulun.",
+                    "🧱 <b>Katı Duvarlar:</b> 'Senin yüzünden' diyerek eski hatalar sertçe masaya getirilebilir. Eşinizin hatalarını yargılarken kendi korkularınızı yargıladığınızı unutmayın.",
+                    "🧱 <b>Sorumluluk Yükü:</b> İlişkinin tüm dünyevi yükünün tek omuzda olduğu hissi ve soğuk öfke yaşanabilir. Yükleri hemen paylaşın — denge bugün şart."
                 ],
-
-                # 🍀 JÜPİTER
                 "Jüpiter_0": [
-                    "🍀 <b>İlahi Lütuf:</b> <i>Somut:</i> Kutlama, hediyeleşme, seyahat planı veya büyük bir mutluluk anı. <i>Soyut:</i> Ruhunuzun sevinçle taştığı büyük büyüme titresimı.",
-                    "🍀 <b>Genişleyen Ufuk:</b> <i>Somut:</i> Birlikte çok eğlendiğiniz, felsefi veya manevi derin sohbetler yaptığınız şanslı saatler. <i>Soyut:</i> İlişkinin bereket çakrasının açıldığı, evrenin size cömertçe gülümsediği ilahi mühür.",
-                    "🍀 <b>Ortak İnanç:</b> <i>Somut:</i> Karamsarlıktan uzak, her şeyin çözülebileceğine dair güçlü bir umut hissettiğiniz pozitif gün. <i>Soyut:</i> Gökyüzünün aranızdaki inanç bağını tazelediği ve ilişkinizi korumaya aldığı özel kalkan.",
-                    "🍀 <b>Abartılı Neşe:</b> <i>Somut:</i> Bol bol gülme, fazla para harcama veya iştahın artması gibi keyifli ama sınırsız deneyimler. <i>Soyut:</i> Ruhsal büyümenin kapılarının ardına kadar açıldığı, neşenin ilişkiye aktığı altın uyum."
+                    "🍀 <b>Bereketli Gün:</b> Kutlama, hediyeleşme, seyahat planı veya büyük bir mutluluk anı gündemde. Ruhunuz bugün sevinçle taşıyor; bu coşkuyu paylaşın.",
+                    "🍀 <b>Genişleyen Ufuk:</b> Birlikte çok eğlendiğiniz, felsefi veya manevi derin sohbetler yaptığınız şanslı saatler. Bereket bugün size cömertçe gülümsüyor.",
+                    "🍀 <b>Ortak İnanç:</b> Karamsarlıktan uzak, her şeyin çözülebileceğine dair güçlü bir umut hissettiğiniz pozitif bir gün. İnanç bağınız bugün tazeleniyor.",
+                    "🍀 <b>Abartılı Neşe:</b> Bol bol gülme, fazla harcama veya artan iştah gibi keyifli ama sınırsız deneyimler olabilir. Neşe ilişkiye akıyor; tadını çıkarın ama sınırı unutmayın."
                 ],
                 "Jüpiter_90": [
-                    "🎈 <b>Beklenti Yanılsaması:</b> <i>Somut:</i> İsteklerin abartıldığı, lüzumsuz masraf yapılan veya tutulamayacak sözlerin verildiği gün. <i>Soyut:</i> Gerçekçi kalın; kibir ve fazla iyimserlik, yarın hayal kırıklığına dönüşebilir.",
-                    "🎈 <b>Aşırı Özgüven:</b> <i>Somut:</i> Tartışmalarda 'ben bilirim' tavrının abartılması, partnerin fikirlerini küçümseme eğilimi. <i>Soyut:</i> İlişkinin büyüme krizidir; fazla genişlemek bazen yapının esnekliğini bozabilir.",
-                    "🎈 <b>Şımarıklık Testi:</b> <i>Somut:</i> Verilen değeri yetersiz bulma, sürekli daha fazlasını talep etme ve tatminsizlik hissi. <i>Soyut:</i> Şükran duygunuzun evren tarafından test edildiği kadersel bir savrulma anı.",
-                    "🎈 <b>Felsefi Çatışma:</b> <i>Somut:</i> İnançlar, vizyonlar veya hayata bakış açıları konusunda yaşanan fanatik ve yüksek sesli tartışmalar. <i>Soyut:</i> Birbirinizi dinlemek yerine birbirinize 'vaaz verdiğiniz' körlük durumu."
+                    "🎈 <b>Beklenti Yanılsaması:</b> İsteklerin abartıldığı, lüzumsuz masraf yapılan veya tutulamayacak sözlerin verildiği bir gün olabilir. Gerçekçi kalın; fazla iyimserlik yarın hayal kırıklığına dönüşebilir.",
+                    "🎈 <b>Aşırı Özgüven:</b> 'Ben bilirim' tavrının abartılması veya partnerin fikirlerini küçümseme eğilimi olabilir. Fazla genişleme yapının esnekliğini bozabilir; ölçüyü bugün koruyun.",
+                    "🎈 <b>Şımarıklık Testi:</b> Verilen değeri yetersiz bulma, sürekli daha fazlasını talep etme ve tatminsizlik hissi olabilir. Şükran duygunuzu bugün hatırlayın; elinizdekilerin kıymetini görün.",
+                    "🎈 <b>Felsefi Çatışma:</b> İnançlar, vizyonlar veya hayata bakış açıları konusunda yüksek sesli tartışmalar yaşanabilir. Birbirinize vaaz vermek yerine dinlemeyi seçin."
                 ],
-
-                # ⚡ URANÜS
                 "Uranüs_0": [
-                    "⚡ <b>Elektrikli Uyanış:</b> <i>Somut:</i> Beklenmedik sürprizler, ani program değişiklikleri ve sıra dışı fikirler. <i>Soyut:</i> İlişkinizin rutini kadersel bir şokla tazeleniyor, devrimci bir dokunuşa hazır olun.",
-                    "⚡ <b>Sıra Dışı Çekim:</b> <i>Somut:</i> İlişkiye ilk günkü o heyecanlı kıvılcımın tekrar düştüğü, çok eğlenceli ve isyankar saatler. <i>Soyut:</i> Kalıpların yıkıldığı, ilişkinin yeni bir boyuta aniden evrildiği 'evreka' anı.",
-                    "⚡ <b>Zincirleri Kırmak:</b> <i>Somut:</i> Sizi sıkan veya daraltan her türlü kuraldan eşinizle birlikte kaçıp kurtulma arzusu. <i>Soyut:</i> Özgürlüğün ve bireyselliğin, ilişkiye zarar vermeden entegre edildiği yüksek uyanış.",
-                    "⚡ <b>Sürpriz Rota:</b> <i>Somut:</i> Ani gelişen bir seyahat, beklenmedik bir haber veya zihin açıcı teknolojik/modern bir gelişme. <i>Soyut:</i> Kadersel monotonluğun evrenin şimşekleriyle parçalandığı ve ilişkinin nefes aldığı döngü."
+                    "⚡ <b>Sürprizli Gün:</b> Beklenmedik sürprizler, ani program değişiklikleri ve sıra dışı fikirler gündemde. Rutininiz bugün devrimci bir dokunuşla tazeleniyor.",
+                    "⚡ <b>Sıra Dışı Çekim:</b> İlişkiye ilk günkü heyecanlı kıvılcımın tekrar düştüğü, çok eğlenceli ve isyankar saatler. Kalıplar yıkılıyor; ilişkiniz yeni bir boyuta evriliyor.",
+                    "⚡ <b>Zincirleri Kırmak:</b> Sizi sıkan veya daraltan kuralardan eşinizle birlikte kaçıp kurtulma arzusu güçlü. Özgürlük ve bireysellik bugün ilişkiye zarar vermeden entegre ediliyor.",
+                    "⚡ <b>Sürpriz Rota:</b> Ani gelişen bir seyahat, beklenmedik bir haber veya zihin açıcı modern bir gelişme olabilir. Monotonluk bugün parçalanıyor; bu nefes alışın tadını çıkarın."
                 ],
                 "Uranüs_90": [
-                    "⚡ <b>Özgürlük İsyanı:</b> <i>Somut:</i> Boğulma hissi, 'bana karışma' triplerinin kırıcılığa dönüşebileceği an. <i>Soyut:</i> Birbirinize nefes alacak bağımsız alanlar bırakın, aksi halde bağlar şok edici kopuşlarla sınanabilir.",
-                    "⚡ <b>Ani Yıkım Güdüsü:</b> <i>Somut:</i> Sinirlerin çok gergin olduğu, en ufak şeye parlayıp 'her şeyi bırakıp gitme' isteğinin tetiklendiği saatler. <i>Soyut:</i> Düzeni korumak ile isyan etmek arasındaki o yıkıcı fay hattında yürüyorsunuz.",
-                    "⚡ <b>Elektrik Yüklü Kriz:</b> <i>Somut:</i> Partnerinizin tamamen öngörülemez ve tutarsız davrandığı, sizi şoka sokan ani tartışmalar. <i>Soyut:</i> İlişkinin statükosunun şiddetle sarsıldığı, fevri kararlardan kaçınılması gereken kırmızı alarm.",
-                    "⚡ <b>Mesafe Kopuşu:</b> <i>Somut:</i> Birinizin yoğun bir şekilde bireyselleşmek ve yalnız kalmak istemesi, diğerinin bunu reddedilme sanması. <i>Soyut:</i> Uzay-zaman sürekliliğinizde geçici bir 'veri kaybı'; üstüne gitmeyin, kendi haline bırakın."
+                    "⚡ <b>Özgürlük İsyanı:</b> Boğulma hissi, 'bana karışma' tavırlarının kırıcılığa dönüşebileceği anlar olabilir. Birbirinize nefes alacak bağımsız alanlar bırakın; aksi halde bağlar kopuşlarla sınanabilir.",
+                    "⚡ <b>Ani Değişimler:</b> Sinirler çok gergin; en ufak şeye parlayıp 'her şeyi bırakıp gitme' isteği tetiklenebilir. Düzeni korumak ile isyan etmek arasındaki fay hattındasınız.",
+                    "⚡ <b>Elektrikli Kriz:</b> Partneriniz tamamen öngörülemez ve tutarsız davranabilir, ani tartışmalar sizi şoka sokabilir. Fevri kararlardan bugün kaçının; fırtına geçicidir.",
+                    "⚡ <b>Mesafe Kopuşu:</b> Biriniz yoğun şekilde bireyselleşmek ve yalnız kalmak isteyebilir; diğeri bunu reddedilme sanabilir. Üstüne gitmeyin, kendi haline bırakın; bu geçici bir mesafe."
                 ],
-
-                # 🌊 NEPTÜN
                 "Neptün_0": [
-                    "🌊 <b>Ruhsal Simya:</b> <i>Somut:</i> Birlikte hayal kurmak, film izlemek, sanatsal bir şey yapmak veya sadece sarılıp uyumak. <i>Soyut:</i> Muazzam bir empati, fedakarlık ve ruhsal kenetlenme. (Ancak gerçeklerden kopmamaya dikkat edin.)",
-                    "🌊 <b>İlahi Çözülme:</b> <i>Somut:</i> Affetmenin çok kolay olduğu, şefkatin ve gözyaşının ilişkiyi tertemiz yıkadığı duygu dolu anlar. <i>Soyut:</i> Egoların tamamen eridiği, ruhlarınızın birbirine ilahi bir pamuk ipliğiyle bağlandığı masal saati.",
-                    "🌊 <b>Telepatik Teslimiyet:</b> <i>Somut:</i> Eşinizin ne hissettiğini o daha söylemeden gözlerinden anladığınız, çok derin ve mistik bir gün. <i>Soyut:</i> Savunma kalkanlarının indiği, ilişkinin koşulsuz sevgiyle kutsandığı kozmik şifa sığınağı.",
-                    "🌊 <b>Tatlı İllüzyon:</b> <i>Somut:</i> Dünyevi dertleri kapının dışında bırakıp, partnerinizi mükemmelleştirerek izlediğiniz romantik faz. <i>Soyut:</i> Evrenin ilişkinize sunduğu bir rüya molası; tadını çıkarın ama büyük imzalar atmayın."
+                    "🌊 <b>Duygusal Gün:</b> Birlikte hayal kurmak, film izlemek, sanatsal bir şey yapmak veya sarılıp uyumak için güzel bir gün. Empati ve ruhsal kenetlenme bugün zirvede; gerçeklerden kopmamaya dikkat edin.",
+                    "🌊 <b>Affetme Kolaylığı:</b> Affetmek bugün çok kolay; şefkat ve belki gözyaşı ilişkiyi tertemiz yıkıyor. Egolar eriyor, ruhlarınız birbirine yakınlaşıyor.",
+                    "🌊 <b>Sezgisel Anlayış:</b> Eşinizin ne hissettiğini o söylemeden gözlerinden anlayabileceğiniz çok derin bir gün. Savunma kalkanları indi; koşulsuz sevgi akışı bugün güçlü.",
+                    "🌊 <b>Tatlı İllüzyon:</b> Dünyevi dertleri kapının dışında bırakıp partnerinizi mükemmelleştirerek izlediğiniz romantik bir faz. Tadını çıkarın ama büyük imzalar atmayın."
                 ],
                 "Neptün_90": [
-                    "🌫️ <b>Sis Perdesi:</b> <i>Somut:</i> Yanlış anlaşılmalar, söylenen yalanların veya gizlenen şeylerin şüphesi, yoğun bir kafa karışıklığı. <i>Soyut:</i> Gerçeklerin çarpıtılabildiği gün. Bugün büyük kararlar almaktan ve yüzleşmekten kaçının.",
-                    "🌫️ <b>Kurban Psikolojisi:</b> <i>Somut:</i> 'Ben senin için saçımı süpürge ettim' hissinin verdiği o ağır melankoli ve alınganlık. <i>Soyut:</i> Sınırlarınızı koruyamadığınız için evren sizi hayal kırıklığı ile test ediyor; fedakarlığı dengeleyin.",
-                    "🌫️ <b>Hayal Kırıklığı Sınavı:</b> <i>Somut:</i> Partnerinize yüklediğiniz o 'mükemmel' anlamların gerçek hayatla örtüşmediğini fark edip üzülme anı. <i>Soyut:</i> Gerçeklikten ne kadar koptuğunuzu size gösteren kadersel bir uyanış şokudur.",
-                    "🌫️ <b>Kaçış Eğilimi:</b> <i>Somut:</i> Sorunları çözmek yerine susmayı, uyumayı veya konuyu değiştirmeyi seçtiğiniz pasif-agresif saatler. <i>Soyut:</i> İlişkinin karanlık sularında kaybolma hissi; sağlam bir zemine (Satürn'e) tutunmaya çalışın."
+                    "🌫️ <b>Sis Perdesi:</b> Yanlış anlaşılmalar, gizlenen şeylerin şüphesi veya yoğun kafa karışıklığı yaşanabilir. Bugün büyük kararlar almaktan ve yüzleşmekten kaçının; sis dağılınca göreceksiniz.",
+                    "🌫️ <b>Kurban Psikolojisi:</b> 'Ben senin için saçımı süpürge ettim' hissinin getirdiği ağır melankoli ve alınganlık olabilir. Sınırlarınızı koruyun; fedakarlığı bugün dengeleyin.",
+                    "🌫️ <b>Hayal Kırıklığı Sınavı:</b> Partnerinize yüklediğiniz 'mükemmel' anlamların gerçek hayatla örtüşmediğini fark edip üzülebilirsiniz. Bu, gerçeklikten kopuşunuzu gösteren bir uyarı; onu olduğu gibi kabul edin.",
+                    "🌫️ <b>Kaçış Eğilimi:</b> Sorunları çözmek yerine susmayı, uyumayı veya konuyu değiştirmeyi seçebilirsiniz. Sağlam bir zemine tutunmaya çalışın; yüzleşmek bugün gerekli."
                 ],
-
-                # 🌋 PLÜTON
                 "Plüton_0": [
-                    "🦇 <b>Küllerinden Doğuş:</b> <i>Somut:</i> Gizli kalmış sırların döküldüğü, derin bir yüzleşmenin ardından gelen yoğun rahatlama ve tutku. <i>Soyut:</i> Cinselliğin veya psikolojik sırların yüzeye çıkıp aşkın yakıcı gücüyle onarıldığı simyasal gün.",
-                    "🦇 <b>Hipnotik Çekim:</b> <i>Somut:</i> Bakışların çok derinleştiği, vazgeçilmezlik hissinin ve aidiyetin neredeyse saplantılı bir hal aldığı anlar. <i>Soyut:</i> Ruhlarınızın en karanlık dehlizlerde bile birbirini tanıyıp kucakladığı yeraltı mühürü.",
-                    "🦇 <b>Dönüştürücü Güç:</b> <i>Somut:</i> Ortak bir krizin üstesinden muazzam bir güç birliğiyle geldiğiniz, korkularınızı birlikte yendiğiniz saatler. <i>Soyut:</i> İlişkinin deri değiştirdiği, eski toksik kalıpların ölüp yerine sarsılmaz bir gücün doğduğu faz.",
-                    "🦇 <b>Sessiz İttifak:</b> <i>Somut:</i> Dış dünyaya karşı tamamen kapalı, sadece ikinizin bildiği derin bir titresimta anlaştığınız mistik gün. <i>Soyut:</i> Gökyüzünün, ilişkinizin köklerine Plütonyen bir dayanıklılık enjekte ettiği özel zaman."
+                    "🦇 <b>Derin Dönüşüm:</b> Gizli kalmış sırların döküldüğü, derin bir yüzleşmenin ardından yoğun rahatlama ve tutku gelebilir. Aşkın yakıcı gücü bugün onarıcı.",
+                    "🦇 <b>Güçlü Bağ:</b> Bakışlar çok derinleşiyor; vazgeçilmezlik hissi ve aidiyet güçleniyor. Ruhlarınız birbirini tanıyıp kucaklıyor; bu derin bağı takdir edin.",
+                    "🦇 <b>Dönüştürücü Güç:</b> Ortak bir krizin üstesinden güç birliğiyle gelip korkularınızı birlikte yenebilirsiniz. Eski toksik kalıplar ölüyor; yerine sarsılmaz bir güç doğuyor.",
+                    "🦇 <b>Sessiz İttifak:</b> Dış dünyaya kapalı, sadece ikinizin bildiği derin bir anlaşma içinde olduğunuz mistik bir gün. İlişkinizin kökleri bugün besleniyor."
                 ],
                 "Plüton_90": [
-                    "🌋 <b>Karanlık Sınav:</b> <i>Somut:</i> Kıskançlık, manipülasyon, telefon karıştırma veya 'ya benimsin ya toprağın' tarzı toksik baskılar. <i>Soyut:</i> Kontrol manyaklığının hortladığı derin kriz! Evren sizden gücü bırakıp teslimiyet istiyor.",
-                    "🌋 <b>Güç Savaşı:</b> <i>Somut:</i> 'Sana bunu ödeteceğim' mantığıyla hareket edilen, inatlaşmanın ve kin gütmenin ilişkiyi zehirlediği anlar. <i>Soyut:</i> Egonuzun en karanlık tarafıyla yüzleşiyorsunuz; partnerinizi yok etmeye çalışırken ilişkiyi kanatıyorsunuz.",
-                    "🌋 <b>Paranoya Fazı:</b> <i>Somut:</i> Eşinizin her hareketinden şüphelenme, en ufak sözün altında büyük bir komplo arama yorgunluğu. <i>Soyut:</i> Geçmiş yaşamlardan veya çocukluktan gelen terk edilme korkularınızın kadersel olarak tetiklenmesi.",
-                    "🌋 <b>Yıkıcı Uretim Gucu:</b> <i>Somut:</i> Bastırılmış tüm öfkenin aniden patladığı, köprüleri yakıp atma isteğinin tavan yaptığı kırmızı çizgi. <i>Soyut:</i> Bu enerji bir zehirdir; eğer panzehiri (şefkati) devreye sokmazsanız kalıcı hasar bırakabilir."
+                    "🌋 <b>Karanlık Sınav:</b> Kıskançlık, manipülasyon veya 'ya benimsin ya toprağın' tarzı toksik baskılar tetiklenebilir. Gücü bırakıp teslimiyete yönelin; kontrol bırakıldıkça bağ güçlenir.",
+                    "🌋 <b>Güç Savaşı:</b> 'Sana bunu ödeteceğim' mantığıyla hareket edilip kin güdülebilir. Egonuzun karanlık tarafıyla yüzleşiyorsunuz; partnerinizi yok etmeye çalışmak ilişkiyi kanatır.",
+                    "🌋 <b>Endişe Fazı:</b> Eşinizin her hareketinden şüphelenme, en ufak sözün altında komplo arama yorgunluğu olabilir. Terk edilme korkularınız bugün tetikleniyor; bu onun değil, sizin meseleniz.",
+                    "🌋 <b>Yıkıcı Üretim Gücü:</b> Bastırılmış öfke aniden patlayabilir; köprüleri yakıp atma isteği tavan yapabilir. Bu enerji bir zehirdir; panzehiri (şefkati) bugün devreye sokun."
                 ]
             }
         
