@@ -1055,8 +1055,8 @@ def _generate_natal_pdf(motor):
     if arap_listesi:
         bolum_no[0] += 1
         yeni_sayfa()
-        y = sayfa_basligi("Arap Noktaları — Kadersel Hassas Noktalar", numara=str(bolum_no[0]))
-        y = metin_yaz(SOL, y, "Arap noktaları, doğum haritanızdaki Yükselen ve gezegenlerin özel kombinasyonlarından türetilen kadersel hassas noktalardır; hayatınızın hangi alanında şans, ruh, aşk, bağlılık, tutku ve bolluğun size nasıl açılacağını gösterir.", "DejaVu", 8, acik, 92)
+        y = sayfa_basligi("Arap Noktaları — Sembolik Hassas Noktalar", numara=str(bolum_no[0]))
+        y = metin_yaz(SOL, y, "Arap noktaları, doğum haritanızdaki Yükselen ve gezegenlerin özel kombinasyonlarından türetilen sembolik hassas noktalardır; hayatınızın hangi alanında şans, ruh, aşk, bağlılık, tutku ve bolluk temalarının öne çıktığını gösterir.", "DejaVu", 8, acik, 92)
         y -= 10
         for _nokta_adi, _bilgi in arap_listesi:
             if not isinstance(_bilgi, dict):
@@ -1253,8 +1253,8 @@ def _generate_natal_pdf(motor):
     # ═══════════════════════════════════════════
     # SOLAR / LUNAR RETURN — sub-sections
     # ═══════════════════════════════════════════
-    for baslik, anahtar, html_anahtar in [("Solar Return — Yıllık Öngörü", "solar_return", "solar_return_html"),
-                                          ("Lunar Return — Aylık Öngörü", "lunar_return", "lunar_return_html")]:
+    for baslik, anahtar, html_anahtar in [("Solar Return — Yıllık Döngü", "solar_return", "solar_return_html"),
+                                          ("Lunar Return — Aylık Döngü", "lunar_return", "lunar_return_html")]:
         icerik = data.get(anahtar, "")
         if icerik and len(str(icerik)) > 20:
             bolum_no[0] += 1
