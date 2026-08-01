@@ -817,6 +817,36 @@ def _generate_natal_pdf(motor):
     sari_cizgi = HexColor('#8A6D2B')
     bar_zemin = HexColor('#2A2A30')
 
+    # ── Element pastel palette (color-coded life areas) ──
+    ELEMENT_RENK = {
+        "Ateş": HexColor('#F2A65A'),
+        "Toprak": HexColor('#A9C97E'),
+        "Hava": HexColor('#8FC0E8'),
+        "Su": HexColor('#9FB2E8'),
+    }
+    ELEMENT_DEGER = {
+        "Ateş": ("#F2A65A", "#4A2C10"),
+        "Toprak": ("#A9C97E", "#24381A"),
+        "Hava": ("#8FC0E8", "#1C2E40"),
+        "Su": ("#9FB2E8", "#232B4A"),
+    }
+    # ── Astrological glyphs (all verified in DejaVuSans) ──
+    GEZEGEN_GLIF = {
+        "Güneş": "☉", "Ay": "☽", "Merkür": "☿", "Venüs": "♀", "Mars": "♂",
+        "Jüpiter": "♃", "Satürn": "♄", "Uranüs": "♅", "Neptün": "♆", "Plüton": "♇",
+        "Chiron": "✕", "Lilith": "⚸",
+    }
+    ACI_GLIF = {"Kavuşum": "☌", "Karşıt": "☍", "Kare": "□", "Trigon": "△", "Sekstil": "⚹"}
+    # ── Global Kader Pusulası category colors ──
+    KAT_RENK = {
+        "para": HexColor('#A9C97E'),
+        "huzur": HexColor('#8FC0E8'),
+        "tutku": HexColor('#F2A65A'),
+        "kriz": HexColor('#C78F9E'),
+    }
+
+    toc_cizildi = [False]  # mutable flag: back-to-TOC links drawn once TOC page exists
+
     SAYFA_UST = h - 60
     SAYFA_ALT = 55
     SOL = 55
@@ -832,6 +862,19 @@ def _generate_natal_pdf(motor):
         c.setStrokeColor(altin)
         c.setLineWidth(0.5)
         c.line(50, 45, w - 50, 45)
+        # Page number bottom-right
+        c.setFillColor(HexColor('#8A8A8A'))
+        c.setFont("DejaVu", 7)
+        c.drawRightString(w - 55, 22, f"Sayfa {c.getPageNumber()}")
+        # "Back to contents" link — bottom-left
+        if toc_cizildi[0]:
+            c.linkAbsolute("", "icindekiler", (SOL, 26, SOL + 130, 42))
+            c.setFillColor(acik)
+            c.setFont("DejaVu", 7)
+            c.drawString(SOL + 2, 29, "↑ İçindekilere Dön")
+        c.setFillColor(HexColor('#5A5348'))
+        c.setFont("DejaVu", 7)
+        c.drawString(SOL + 2, 22, "FAST · Asartepe Sinastri Tekniği")
 
     def sayfa_basligi(baslik, y=SAYFA_UST, numara=""):
         c.setFont("DejaVu-Bold", 18)
@@ -862,9 +905,10 @@ def _generate_natal_pdf(motor):
         c.setLineWidth(0.6)
         c.roundRect(x, y, genislik, yukseklik, 6, fill=0, stroke=1)
         if baslik:
+            icon_temiz = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3]', '', str(baslik_icon))
             c.setFillColor(bordo)
             c.setFont("DejaVu-Bold", 10)
-            c.drawString(x + 12, y + yukseklik - 18, f"{baslik_icon} {baslik}" if baslik_icon else baslik)
+            c.drawString(x + 12, y + yukseklik - 18, f"{icon_temiz} {baslik}" if icon_temiz else baslik)
             c.setStrokeColor(sari_cizgi)
             c.setLineWidth(0.4)
             c.line(x + 12, y + yukseklik - 24, x + genislik - 12, y + yukseklik - 24)
@@ -970,14 +1014,81 @@ def _generate_natal_pdf(motor):
     bolum_no = [0]  # mutable counter for closures
 
     # ═══════════════════════════════════════════
-    # CHART WHEEL PAGE
+    # PRE-COMPUTE sections availability (for clickable TOC)
     # ═══════════════════════════════════════════
+    try:
+        mp6_entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=180)
+    except:
+        mp6_entries = []
+    chart_png = ""
     try:
         motor.haritalari_ciz()
         chart_png = os.path.join(_PROJECT_ROOT, f"{motor._session_id}_Situa_A.png")
-        chart_svg = os.path.join(_PROJECT_ROOT, f"{motor._session_id}_Situa_A.svg")
-        if os.path.exists(chart_png):
+    except Exception as e:
+        print(f"[PDF] Harita üretilemedi: {e}")
+    sim = data.get("simulasyon", {})
+    toc_bolumler = []
+    if chart_png and os.path.exists(chart_png):
+        toc_bolumler.append(("Doğum Haritası", "bolum_harita"))
+    if len(str(data.get("chart_yorumu", ""))) > 30:
+        toc_bolumler.append(("Doğum Haritası Yorumu", "bolum_yorum"))
+    if data.get("arap_noktalari"):
+        toc_bolumler.append(("Arap Noktaları", "bolum_arap"))
+    if data.get("asteroitler") or data.get("asteroit_konumlar"):
+        toc_bolumler.append(("Asteroit Bulguları", "bolum_asteroit"))
+    if data.get("hayat_alanlari"):
+        toc_bolumler.append(("Hayat Alanları Detayı", "bolum_hayat"))
+    if data.get("sifa_receteleri") or data.get("sifa_receteleri_detay"):
+        toc_bolumler.append(("Şifa Reçeteleri", "bolum_sifa"))
+    if data.get("sabianlar"):
+        toc_bolumler.append(("Sabian Sembolleri", "bolum_sabian"))
+    if len(str(data.get("solar_return", ""))) > 20:
+        toc_bolumler.append(("Solar Return — Yıllık Döngü", "bolum_solar"))
+    if len(str(data.get("lunar_return", ""))) > 20:
+        toc_bolumler.append(("Lunar Return — Aylık Döngü", "bolum_lunar"))
+    if isinstance(mp6_entries, list) and mp6_entries:
+        toc_bolumler.append(("6 Aylık Minor Progress — Gün Gün", "bolum_minor"))
+    if sim and any(v for v in sim.values()):
+        toc_bolumler.append(("Global Kader Pusulası", "bolum_kader"))
+
+    # ═══════════════════════════════════════════
+    # TABLE OF CONTENTS — clickable page
+    # ═══════════════════════════════════════════
+    if toc_bolumler:
+        yeni_sayfa()
+        toc_cizildi[0] = True
+        c.bookmarkPage("icindekiler")
+        y = sayfa_basligi("İçindekiler", numara="☰")
+        c.setFont("DejaVu", 8.5)
+        c.setFillColor(acik)
+        c.drawString(SOL, y, "Raporunuzun bölümlerine gitmek için başlıklara tıklayın.")
+        y -= 22
+        for i, (toc_baslik, toc_hedef) in enumerate(toc_bolumler, 1):
+            satir_h = 30
+            if y - satir_h < SAYFA_ALT:
+                yeni_sayfa(); y = SAYFA_UST
+            c.setFillColor(altin)
+            c.roundRect(SOL, y - satir_h + 4, 22, 20, 3, fill=1, stroke=0)
+            c.setFillColor(HexColor('#FFFFFF'))
+            c.setFont("DejaVu-Bold", 10)
+            c.drawCentredString(SOL + 11, y - satir_h + 10, str(i))
+            c.setFillColor(koyu)
+            c.setFont("DejaVu-Bold", 10.5)
+            c.drawString(SOL + 32, y - satir_h + 8, toc_baslik)
+            c.linkAbsolute("", toc_hedef, (SOL - 6, y - satir_h - 4, SAG, y + 4))
+            c.setStrokeColor(sari_cizgi)
+            c.setLineWidth(0.3)
+            c.line(SOL + 32, y - satir_h - 6, SAG - 6, y - satir_h - 6)
+            y -= satir_h + 6
+        y -= 16
+
+    # ═══════════════════════════════════════════
+    # CHART WHEEL PAGE
+    # ═══════════════════════════════════════════
+    try:
+        if chart_png and os.path.exists(chart_png):
             yeni_sayfa()
+            c.bookmarkPage("bolum_harita")
             y = SAYFA_UST - 10
             c.setFont("DejaVu-Bold", 18)
             c.setFillColor(koyu)
@@ -998,6 +1109,7 @@ def _generate_natal_pdf(motor):
     if chart_yorum and len(chart_yorum) > 30:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_yorum")
         y = sayfa_basligi("Doğum Haritası Yorumu", numara=str(bolum_no[0]))
         gez_parag_metin = " ".join(b.get("metin", "") for b in gez_bolumler if b.get("metin"))
         aci_parag_metin = " ".join(b.get("metin", "") for b in aci_bolumler if b.get("metin"))
@@ -1014,7 +1126,9 @@ def _generate_natal_pdf(motor):
                         yeni_sayfa(); y = SAYFA_UST
                     c.setFont("DejaVu-Bold", 9.5)
                     c.setFillColor(bordo)
-                    c.drawString(SOL + 6, y - 2, f"✦ {zb.get('baslik', zb.get('gezegen', ''))}")
+                    gez_isim = zb.get('gezegen', '')
+                    gez_glif = GEZEGEN_GLIF.get(gez_isim, '✦')
+                    c.drawString(SOL + 6, y - 2, f"✦ {gez_glif} {zb.get('baslik', gez_isim)}")
                     c.setStrokeColor(sari_cizgi)
                     c.setLineWidth(0.4)
                     c.line(SOL + 6, y - 7, SAG - 6, y - 7)
@@ -1030,7 +1144,16 @@ def _generate_natal_pdf(motor):
                         yeni_sayfa(); y = SAYFA_UST
                     c.setFont("DejaVu-Bold", 9.5)
                     c.setFillColor(bordo)
-                    c.drawString(SOL + 6, y - 2, f"✦ {zb.get('baslik', '')}")
+                    baslik_metni = zb.get('baslik', '')
+                    g1 = baslik_metni.split('–')[0].strip() if '–' in baslik_metni else ''
+                    g2 = baslik_metni.split('–')[1].split('(')[0].strip() if '–' in baslik_metni and '(' in baslik_metni else ''
+                    aci_adi = ''
+                    if '(' in baslik_metni and ')' in baslik_metni:
+                        aci_adi = baslik_metni.split('(')[1].split(')')[0].strip()
+                    c.drawString(SOL + 6, y - 2, f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1} – {GEZEGEN_GLIF.get(g2, '')} {g2}")
+                    if aci_adi:
+                        c.setFillColor(altin)
+                        c.drawString(SOL + 8 + c.stringWidth(f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1} – {GEZEGEN_GLIF.get(g2, '')} {g2}", "DejaVu-Bold", 9.5), y - 2, f"{ACI_GLIF.get(aci_adi, '')} {aci_adi}")
                     c.setStrokeColor(sari_cizgi)
                     c.setLineWidth(0.4)
                     c.line(SOL + 6, y - 7, SAG - 6, y - 7)
@@ -1055,6 +1178,7 @@ def _generate_natal_pdf(motor):
     if arap_listesi:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_arap")
         y = sayfa_basligi("Arap Noktaları — Sembolik Hassas Noktalar", numara=str(bolum_no[0]))
         y = metin_yaz(SOL, y, "Arap noktaları, doğum haritanızdaki Yükselen ve gezegenlerin özel kombinasyonlarından türetilen sembolik hassas noktalardır; hayatınızın hangi alanında şans, ruh, aşk, bağlılık, tutku ve bolluk temalarının öne çıktığını gösterir.", "DejaVu", 8, acik, 92)
         y -= 10
@@ -1098,6 +1222,7 @@ def _generate_natal_pdf(motor):
     if isinstance(asteroitler, list) and (asteroitler or asteroit_konumlar):
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_asteroit")
         y = sayfa_basligi("Asteroit Bulguları — Ruhsal Mühürler", numara=str(bolum_no[0]))
         y = metin_yaz(SOL, y, "Asteroitler, doğum haritanızdaki gezegenlerle 5°'lik kavuşum orbunun içine girdiğinde ruhsal bir mühür oluşturur; Juno (evlilik), Ceres (beslenme), Pallas (bilgelik) ve Vesta (adanmışlık) temalarını açığa çıkarır.", "DejaVu", 8, acik, 92)
         y -= 10
@@ -1155,6 +1280,7 @@ def _generate_natal_pdf(motor):
     if ha_list:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_hayat")
         y = sayfa_basligi("Hayat Alanları Detayı", numara=str(bolum_no[0]))
         for ha in ha_list:
             yorum_text = ha.get("yorum", "")
@@ -1169,18 +1295,29 @@ def _generate_natal_pdf(motor):
                 yeni_sayfa(); y = SAYFA_UST
 
             kart_ciz(SOL, y - card_h, SAG - SOL, card_h, ha.get('etiket',''), ha.get('icon',''))
+            # Element badge — color-coded pastel badge next to title
+            element_adi = ha.get("element", "")
+            if element_adi in ELEMENT_RENK:
+                e_rengi = ELEMENT_RENK[element_adi]
+                e_bx = SOL + 12 + c.stringWidth(ha.get('etiket',''), "DejaVu-Bold", 10) + 16
+                c.setFillColor(e_rengi)
+                c.circle(e_bx + 4, y - card_h + card_h - 13, 4, fill=1, stroke=0)
+                c.setFillColor(e_rengi)
+                c.setFont("DejaVu-Bold", 7.5)
+                c.drawString(e_bx + 12, y - card_h + card_h - 16, element_adi)
             inner_y = y - 30
-            # Score bar
-            bar_w = 70
+            # Score bar — wide, element-colored progress bar
+            bar_w = 115
             skor = ha.get("skor", 50)
             dolu = int(bar_w * min(skor, 100) / 100)
+            bar_x = SAG - bar_w - 45
             c.setFillColor(bar_zemin)
-            c.rect(SAG - bar_w - 40, y - 22, bar_w, 9, fill=1)
-            c.setFillColor(altin)
-            c.rect(SAG - bar_w - 40, y - 22, dolu, 9, fill=1)
+            c.rect(bar_x, y - 22, bar_w, 11, fill=1)
+            c.setFillColor(ELEMENT_RENK.get(ha.get("element",""), altin))
+            c.rect(bar_x, y - 22, dolu, 11, fill=1)
             c.setFont("DejaVu-Bold", 8)
             c.setFillColor(koyu)
-            c.drawString(SAG - 35, y - 21, f"%{skor}")
+            c.drawString(SAG - 38, y - 21, f"%{skor}")
             # Yorum
             inner_y = metin_yaz(SOL + 12, inner_y - 4, yorum_text, "DejaVu", 8.5, koyu, 86)
             # Öneriler
@@ -1204,10 +1341,39 @@ def _generate_natal_pdf(motor):
     if sifa or sifa_detay:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_sifa")
         y = sayfa_basligi("Şifa Reçeteleri", numara=str(bolum_no[0]))
         if sifa:
-            y = metin_yaz(SOL, y, str(sifa)[:600], "DejaVu", 8.5, acik, 92)
-            y -= 10
+            sifa_metin = str(sifa)
+            sifa_metin = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3]', '', sifa_metin)
+            sifa_metin = sifa_metin.replace("<br/>", " ").replace("<br>", " ").replace("<b>", "").replace("</b>", "")
+            # Call-out box for phase-title (Ustalık Aşaması / Kalfalık / Çıraklık)
+            if "Aşama" in sifa_metin or "Faz" in sifa_metin:
+                if ":" in sifa_metin:
+                    sifa_baslik, sifa_acik = sifa_metin.split(":", 1)
+                else:
+                    sifa_baslik, sifa_acik = sifa_metin, ""
+                call_h = 24 + yazi_olcul(sifa_acik.strip(), "DejaVu", 8.5, 88) + 10
+                if y - call_h < SAYFA_ALT:
+                    yeni_sayfa(); y = SAYFA_UST
+                c.setFillColor(HexColor('#1E1C14'))
+                c.roundRect(SOL, y - call_h, SAG - SOL, call_h, 5, fill=1, stroke=0)
+                c.setStrokeColor(altin)
+                c.setLineWidth(1.2)
+                c.roundRect(SOL, y - call_h, SAG - SOL, call_h, 5, fill=0, stroke=1)
+                c.setFillColor(altin)
+                c.rect(SOL + 2, y - call_h + 6, 3, call_h - 12, fill=1, stroke=0)
+                c.setFont("DejaVu-Bold", 10)
+                c.setFillColor(altin)
+                c.drawString(SOL + 14, y - 18, f"✦ {sifa_baslik.strip()}")
+                c.setStrokeColor(sari_cizgi)
+                c.setLineWidth(0.4)
+                c.line(SOL + 14, y - 24, SAG - 14, y - 24)
+                y = metin_yaz(SOL + 16, y - 36, sifa_acik.strip(), "DejaVu", 8.5, koyu, 88)
+                y -= 10
+            else:
+                y = metin_yaz(SOL, y, sifa_metin[:600], "DejaVu", 8.5, acik, 92)
+                y -= 10
         if sifa_detay:
             for rec in sifa_detay:
                 rec_h = yazi_olcul(rec, "DejaVu", 8, 88) + 16
@@ -1233,22 +1399,46 @@ def _generate_natal_pdf(motor):
     if sabianlar:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_sabian")
         y = sayfa_basligi("Sabian Sembolleri", numara=str(bolum_no[0]))
         for s in sabianlar:
             sembol = _strip_html(str(s.get('sembol','')))[:250]
-            sembol_h = yazi_olcul(sembol, "DejaVu", 8, 88) + 20
+            sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*Sabian Şifresi \(\d+°\):\s*', '', sembol)
+            sembol = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3\u200D]', '', sembol)
+            muhur = ""
+            if "Mühür:" in sembol:
+                sembol, muhur = sembol.split("Mühür:", 1)
+                muhur = ("Mühür: " + muhur.strip())[:170]
+            gez_isim = s.get('gezegen','')
+            sembol_h = 30
+            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86)
+            if muhur:
+                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6
             if y - sembol_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
-            c.setFillColor(kart_bg)
-            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 4, fill=1, stroke=0)
-            c.setStrokeColor(gri)
-            c.setLineWidth(0.3)
-            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 4, fill=0, stroke=1)
-            c.setFont("DejaVu-Bold", 9)
+            # Call-out card — gold accent
+            c.setFillColor(HexColor('#1A1812'))
+            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 5, fill=1, stroke=0)
+            c.setStrokeColor(altin)
+            c.setLineWidth(1.1)
+            c.roundRect(SOL, y - sembol_h, SAG - SOL, sembol_h, 5, fill=0, stroke=1)
+            c.setFillColor(altin)
+            c.rect(SOL + 2, y - sembol_h + 6, 3, sembol_h - 12, fill=1, stroke=0)
+            c.setFont("DejaVu-Bold", 9.5)
             c.setFillColor(bordo)
-            c.drawString(SOL + 10, y - 16, f"{s.get('gezegen','')}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
-            metin_yaz(SOL + 10, y - 28, sembol, "DejaVu", 8, acik, 86)
-            y -= sembol_h + 8
+            c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {gez_isim}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
+            c.setFillColor(altin)
+            c.setFont("DejaVu-Bold", 7)
+            c.drawRightString(SAG - 14, y - 16, "✦ Sabian Şifresi")
+            c.setStrokeColor(sari_cizgi)
+            c.setLineWidth(0.4)
+            c.line(SOL + 14, y - 23, SAG - 14, y - 23)
+            inner_y = y - 30
+            inner_y = metin_yaz(SOL + 16, inner_y, sembol.strip(), "DejaVu", 8, acik, 86)
+            if muhur:
+                inner_y -= 4
+                inner_y = metin_yaz(SOL + 16, inner_y, muhur, "DejaVu-Oblique", 8, koyu, 86)
+            y -= sembol_h + 10
 
     # ═══════════════════════════════════════════
     # SOLAR / LUNAR RETURN — sub-sections
@@ -1259,6 +1449,7 @@ def _generate_natal_pdf(motor):
         if icerik and len(str(icerik)) > 20:
             bolum_no[0] += 1
             yeni_sayfa()
+            c.bookmarkPage("bolum_solar" if anahtar == "solar_return" else "bolum_lunar")
             y = sayfa_basligi(baslik, numara=str(bolum_no[0]))
             bolumler = _html_bolumleri_ayir(data.get(html_anahtar, ""))
             if bolumler:
@@ -1281,47 +1472,128 @@ def _generate_natal_pdf(motor):
                 y = metin_yaz(SOL, y, str(icerik)[:3000], "DejaVu", 8.5, acik, 92)
 
     # ═══════════════════════════════════════════
-    # 6-MONTH MINOR PROGRESS — per-day cards
+    # 6-MONTH MINOR PROGRESS — calendar grid
     # ═══════════════════════════════════════════
-    try:
-        mp6_entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=180)
-    except:
-        mp6_entries = []
     if isinstance(mp6_entries, list) and mp6_entries:
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_minor")
         y = sayfa_basligi("6 Aylık Minor Progress — Gün Gün", numara=str(bolum_no[0]))
         c.setFont("DejaVu", 7.5)
         c.setFillColor(acik)
-        c.drawString(SOL, y, "İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, gün gün aşağıda listelenmiştir.")
-        y -= 18
+        c.drawString(SOL, y, "İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir.")
+        y -= 4
+        c.setFillColor(HexColor('#8FC0E8'))
+        c.drawString(SOL, y, "■ Uyumlu açı (Trigon · Sekstil) · ")
+        c.setFillColor(HexColor('#D08A96'))
+        c.drawString(SOL + 150, y, "■ Zorlayıcı açı (Kare · Karşıt) · ")
+        c.setFillColor(acik)
+        c.drawString(SOL + 330, y, "□ Açı yoğunluğu düşük")
+        y -= 16
+
+        import datetime as _dt_mod
+        AY_ADLARI_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
+        HAFTALAR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"]
+        HUCRE_W = (SAG - SOL - 14) / 7.0
+        HUCRE_H = 24.0
+
+        gun_verileri = {}
         for p in mp6_entries:
-            tarih = p.get("tarih", "")
-            if not tarih:
+            t = p.get("tarih", "")
+            if not t:
                 continue
-            gun_ad = p.get("gun_ad", "")
-            baslik = f"{tarih} ({gun_ad})"
-            yorumlar = (p.get("yorumlar") or [])[:2]
-            ay_info = f"Ay: {p.get('ay_burc','')} ({p.get('ay_ev',0)}. Ev)  |  Güneş: {p.get('gunes_burc','')}"
-            mp_h = 38 + sum(yazi_olcul("\u2022 " + yrm, "DejaVu", 7.5, 76) for yrm in yorumlar)
-            if y - mp_h < SAYFA_ALT:
-                yeni_sayfa(); y = SAYFA_UST
-            c.setFillColor(kart_bg)
-            c.roundRect(SOL, y - mp_h, SAG - SOL, mp_h, 4, fill=1, stroke=0)
-            c.setStrokeColor(gri)
-            c.setLineWidth(0.3)
-            c.roundRect(SOL, y - mp_h, SAG - SOL, mp_h, 4, fill=0, stroke=1)
-            c.setFont("DejaVu-Bold", 9)
-            c.setFillColor(bordo)
-            c.drawString(SOL + 10, y - 15, baslik)
-            c.setFont("DejaVu", 7.5)
-            c.setFillColor(acik)
-            c.drawString(SOL + 10, y - 26, ay_info)
-            inner_y = y - 36
-            for yorum in yorumlar:
-                inner_y = metin_yaz(SOL + 12, inner_y, f"\u2022 {yorum}", "DejaVu", 7.5, koyu, 76)
-                inner_y -= 4
-            y -= mp_h + 8
+            try:
+                gd = _dt_mod.datetime.strptime(t, "%Y-%m-%d").date()
+                gun_verileri[gd] = p
+            except:
+                pass
+
+        if gun_verileri:
+            ay_listesi = []
+            for gd in sorted(gun_verileri.keys()):
+                ay_anahtar = (gd.year, gd.month)
+                if ay_listesi and ay_listesi[-1]["anahtar"] == ay_anahtar:
+                    ay_listesi[-1]["gunler"].append(gd)
+                else:
+                    ay_listesi.append({"anahtar": ay_anahtar, "gunler": [gd]})
+
+            for ay_kayit in ay_listesi:
+                yy, mm = ay_kayit["anahtar"]
+                ay_gunleri = ay_kayit["gunler"]
+                ilk_hafta_gun = _dt_mod.date(yy, mm, 1).weekday()
+                satir_sayisi = -(-(ilk_hafta_gun + len(ay_gunleri)) // 7)
+                grid_h = 18 + 14 + satir_sayisi * HUCRE_H + 12
+                onemli = [gd for gd in ay_gunleri if (gun_verileri[gd].get("aspekt_adet") or 0) >= 2]
+                if onemli:
+                    grid_h += 18 + len(onemli[:4]) * 13 + 8
+
+                if y - grid_h - 6 < SAYFA_ALT:
+                    yeni_sayfa(); y = SAYFA_UST
+                # Month card
+                c.setFillColor(kart_bg)
+                c.roundRect(SOL, y - grid_h, SAG - SOL, grid_h, 5, fill=1, stroke=0)
+                c.setStrokeColor(gri)
+                c.setLineWidth(0.4)
+                c.roundRect(SOL, y - grid_h, SAG - SOL, grid_h, 5, fill=0, stroke=1)
+                c.setFillColor(altin)
+                c.setFont("DejaVu-Bold", 11)
+                c.drawString(SOL + 12, y - 17, f"{AY_ADLARI_TR[mm-1]} {yy}")
+                c.setStrokeColor(sari_cizgi)
+                c.setLineWidth(0.4)
+                c.line(SOL + 12, y - 23, SAG - 12, y - 23)
+                # Weekday headers
+                c.setFillColor(acik)
+                c.setFont("DejaVu-Bold", 7)
+                for hafta_i in range(7):
+                    c.drawCentredString(SOL + 8 + hafta_i * HUCRE_W, y - 33, HAFTALAR[hafta_i])
+                # Cells
+                gd_renk = {}
+                for gd in ay_gunleri:
+                    yrm_metin = " ".join(gun_verileri[gd].get("yorumlar") or [])
+                    if any(k in yrm_metin for k in ("Kare", "Karşıt")):
+                        gd_renk[gd] = HexColor('#D08A96')
+                    elif any(k in yrm_metin for k in ("Trigon", "Sekstil", "Kavuşum")):
+                        gd_renk[gd] = HexColor('#8FC0E8')
+                    else:
+                        gd_renk[gd] = None
+                col = ilk_hafta_gun
+                row = 0
+                for gd in ay_gunleri:
+                    cx = SOL + 6 + col * HUCRE_W
+                    cy = y - 42 - row * HUCRE_H
+                    renk = gd_renk.get(gd)
+                    if renk:
+                        c.setFillColor(renk)
+                        c.roundRect(cx, cy + 2, HUCRE_W - 4, HUCRE_H - 4, 3, fill=1, stroke=0)
+                        c.setFillColor(HexColor('#12121A'))
+                        c.setFont("DejaVu-Bold", 8)
+                    else:
+                        c.setStrokeColor(HexColor('#3A3A42'))
+                        c.setLineWidth(0.5)
+                        c.roundRect(cx, cy + 2, HUCRE_W - 4, HUCRE_H - 4, 3, fill=0, stroke=1)
+                        c.setFillColor(acik)
+                        c.setFont("DejaVu", 8)
+                    c.drawCentredString(cx + (HUCRE_W - 4) / 2, cy + 8.5, str(gd.day))
+                    col += 1
+                    if col == 7:
+                        col = 0; row += 1
+                # Featured days
+                if onemli:
+                    ly = y - 46 - satir_sayisi * HUCRE_H - 2
+                    c.setFillColor(bordo)
+                    c.setFont("DejaVu-Bold", 8)
+                    c.drawString(SOL + 12, ly, f"✦ Bu Ayın Öne Çıkan Günleri ({len(onemli)})")
+                    for gd in onemli[:4]:
+                        ly -= 13
+                        p_entry = gun_verileri[gd]
+                        ilk_yorum = (p_entry.get("yorumlar") or ["Açı bulunamadı"])[0]
+                        c.setFillColor(koyu)
+                        c.setFont("DejaVu-Bold", 7.5)
+                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI_TR[mm-1]} · {p_entry.get('ay_burc','')} Ay")
+                        c.setFillColor(acik)
+                        c.setFont("DejaVu", 7)
+                        c.drawString(SOL + 118, ly, ilk_yorum[:135])
+                y -= grid_h + 12
 
     # ═══════════════════════════════════════════
     # SIMULATION — Global Kader Pusulası
@@ -1330,6 +1602,7 @@ def _generate_natal_pdf(motor):
     if sim and any(v for v in sim.values()):
         bolum_no[0] += 1
         yeni_sayfa()
+        c.bookmarkPage("bolum_kader")
         y = sayfa_basligi("Global Kader Pusulası", numara=str(bolum_no[0]))
         c.setFont("DejaVu", 8)
         c.setFillColor(acik)
@@ -1346,10 +1619,10 @@ def _generate_natal_pdf(motor):
         metin_yaz(SOL + 14, y - teknik_h + 22, teknik, "DejaVu", 7.5, acik, 90)
         y -= teknik_h + 12
         SIM_KAT_PDF = [
-            ("para", "💰", "Para & Bolluk"),
-            ("huzur", "🕊️", "Huzur & İç Sakinlik"),
-            ("tutku", "🔥", "Tutku & Macera"),
-            ("kriz", "⚡", "Kriz & Dönüşüm"),
+            ("para", "⚖", "Para & Bolluk"),
+            ("huzur", "✦", "Huzur & İç Sakinlik"),
+            ("tutku", "★", "Tutku & Macera"),
+            ("kriz", "✕", "Kriz & Dönüşüm"),
         ]
         KAT_ACIKLAMA = {
             "para": "Maddi kazanç, bolluk ve fırsat enerjilerinin en güçlü olduğu şehir.",
@@ -1366,6 +1639,9 @@ def _generate_natal_pdf(motor):
                 yeni_sayfa()
                 y = sayfa_basligi("Global Kader Pusulası (devam)")
             kart_ciz(SOL, y - kat_h, SAG - SOL, kat_h, label, icon)
+            # Category color stripe on the left edge
+            c.setFillColor(KAT_RENK.get(kat_key, altin))
+            c.rect(SOL + 2, y - kat_h + 6, 3, kat_h - 12, fill=1, stroke=0)
             inner_y = y - 28
             for i, city in enumerate(cities):
                 sehir_adi = city.get("sehir", "")[:42]
@@ -1373,16 +1649,16 @@ def _generate_natal_pdf(motor):
                 c.setFont("DejaVu-Bold", 8)
                 c.setFillColor(koyu)
                 c.drawString(SOL + 16, inner_y, f"{i+1}. {sehir_adi}")
-                bar_x = SAG - 75
-                bar_w = 50
+                bar_w = 90
+                bar_x = SAG - bar_w - 55
                 dolu = int(bar_w * min(skor_val, 99) / 99)
                 c.setFillColor(bar_zemin)
-                c.rect(bar_x, inner_y - 2, bar_w, 7, fill=1)
-                c.setFillColor(altin)
-                c.rect(bar_x, inner_y - 2, dolu, 7, fill=1)
+                c.rect(bar_x, inner_y - 2, bar_w, 10, fill=1)
+                c.setFillColor(KAT_RENK.get(kat_key, altin))
+                c.rect(bar_x, inner_y - 2, dolu, 10, fill=1)
                 c.setFont("DejaVu-Bold", 7)
                 c.setFillColor(koyu)
-                c.drawString(bar_x + bar_w + 4, inner_y - 1, f"%{skor_val}")
+                c.drawString(bar_x + bar_w + 5, inner_y - 1, f"%{skor_val}")
                 inner_y -= 13
                 etkiler = city.get("etkiler") or []
                 if etkiler:
@@ -2803,6 +3079,7 @@ def _natal_hayat_alani_analizi(motor):
                 "icon": alan["icon"],
                 "image": alan["image"],
                 "skor": skor,
+                "element": dominan,
                 "yorum": yorum.strip(),
                 "oneriler": oneriler[:8],
             })
