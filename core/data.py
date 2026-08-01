@@ -147,7 +147,7 @@ fbst_sabian = {
         26: ("Taşıyabileceğinden daha fazla yeteneğe sahip olan bir adam", "İlişkinin potansiyelinin taşması; bu çok yoğun kadersel enerjiyi dağıtmadan odaklayıp doğru şekilde yönetme sınavı."),
         27: ("Hayal gücü sayesinde kaybedilmiş bir fırsatın yeniden kazanılması", "Geçmişte yapılmış hataların veya kaçırılan şansların, güçlü bir sevgi ve inançla onarılıp kadersel rotanın yeniden çizilmesi."),
         28: ("Hayal kırıklığına uğramış büyük bir izleyici kitlesiyle yüzleşen performans sanatçısı", "İlişkideki aşırı beklentilerin gerçeklikle çarpışması; maskelerin düşerek çıplak gerçeğin sevgiyle, olduğu gibi kabul edilmesi sınavı."),
-        29: ("Göksel kürelerin (gezegenlerin) müziği", "Ruhlarınızın evrensel titresimla tam bir uyuma girdiği, kelimelere ihtiyaç duyulmayan o ilahi ve kozmik senkronizasyon noktası."),
+        29: ("Göksel kürelerin (gezegenlerin) müziği", "Ruhlarınızın evrensel titreşimle tam bir uyuma girdiği, kelimelere ihtiyaç duyulmayan o ilahi ve kozmik senkronizasyon noktası."),
         30: ("Bir ördek göleti ve yavruları", "Kadersel yolculuğun bu fazında sükunete erme; ait olma, huzurlu bir yuva kurma ve mutlak bir korunma alanının tamamlanması.")
     },
     "Boga": {
@@ -163,7 +163,7 @@ fbst_sabian = {
         10: ("Bir Kızılhaç hemşiresi", "Koşulsuz şefkat, fedakarlık ve partnerin en zayıf, yaralı anında onun en büyük ruhsal şifacısı olma kontratı."),
         11: ("Bahçesindeki çiçekleri sulayan bir kadın", "Sevginin ancak günlük, istikrarlı ve pratik bir emekle beslendiğinde yıkılmaz ve kalıcı bir yuvaya dönüşeceği bilgeliği."),
         12: ("Vitrinlere bakan genç bir çift", "Ortak hayaller kurma, geleceği birlikte inşa etme ve ilişkinin dünyevi/maddi hedeflerini neşeyle belirleme fazı."),
-        13: ("Ağır yükler taşıyan bir hamal", "İlişkinin maddi veya kadersel yüklerini cesaretle omuzlama; sadakatin ve sorumluluğun ağır bir sabir testine dönüşmesi."),
+        13: ("Ağır yükler taşıyan bir hamal", "İlişkinin maddi veya kadersel yüklerini cesaretle omuzlama; sadakatin ve sorumluluğun ağır bir sabır testine dönüşmesi."),
         14: ("Sahilde oynayan çocuklar ve suyun kenarındaki deniz kabukluları", "Doğal sınırlar içinde güvenle neşeyi yaşama; huzurlu bir yuva alanında çocuksu, korunaklı ve saf duygulara teslimiyet."),
         15: ("Kafasını kalın bir atkıyla sarmış adam", "Dış dünyanın gürültüsüne ve toksik müdahalelerine karşı ilişkinin mahremiyetini koruma; sadece birbirinizin iç sesini dinleme ihtiyacı."),
         16: ("Öğrencilerinin ilgisini çekemeyen yaşlı bir öğretmen", "İlişkide eski, işe yaramayan kalıpları bırakma vakti; inatlaşılan kurallar yerine yeni ve ilham verici bir ortak dil bulma zorunluluğu."),
@@ -200,7 +200,7 @@ fbst_sabian = {
         15: ("Kendi aralarında konuşan iki Hollandalı çocuk", "Karmaşık felsefeleri bir kenara bırakıp, ilişkinin en saf, en neşeli ve sadece ikinizin anladığı o basit ortak dili kurabilme mucizesi."),
         16: ("Duygusal bir konuşma yapan kadın aktivist", "İnançlar ve ortak hedefler uğruna tutkulu bir savunma; ilişkinin zihinsel enerjisinin dış dünyaya karşı bir kalkana dönüşmesi."),
         17: ("Gürbüz bir gencin kafasının olgun bir düşünürün kafasına dönüşmesi", "İlişkinin zihinsel olarak seviye atlaması; çocuksu merakın ve fevriliğin, deneyimle harmanlanarak derin bir kadersel bilgeliğe evrilmesi."),
-        18: ("Amerikan kalabalığı içinde kendi anadillerinde konuşan iki Çinli", "Dış dünyanın kalabalığı ve gürültüsü içinde, sadece ikinizin çözebildiği o gizli zihinsel titresim ve özel şifrelerle iletişim kurma."),
+        18: ("Amerikan kalabalığı içinde kendi anadillerinde konuşan iki Çinli", "Dış dünyanın kalabalığı ve gürültüsü içinde, sadece ikinizin çözebildiği o gizli zihinsel titreşim ve özel şifrelerle iletişim kurma."),
         19: ("Geleneksel bilgeliği ortaya çıkaran büyük arkaik bir cilt (kitap)", "İlişkinin köklerini, geçmişten veya kadim öğretilerden alınan büyük bir dersle, felsefi bir aydınlanmayla besleme anı."),
         20: ("Çok sayıda seçeneğin bulunduğu bir kafeterya", "Zihinsel dağınıklık veya kararsızlık sınavı; birçok fikir veya seçenek arasından ilişkinin kadersel rotasını ortak bir akılla seçebilme gücü."),
         21: ("Gürültülü bir işçi gösterisi", "Mantık ve duyguların, haklılık ve haksızlığın sert çatışması; ilişkide birikmiş zihinsel basıncın tahliye edilmesi gereken darboğaz."),
@@ -259,7 +259,7 @@ fbst_sabian = {
         10: ("Güneş ışığı tarlayı doldururken parlayan sabah çiy damlaları", "Karanlık bir dönemin ardından gelen taptaze bir ruhsal uyanış; ilişkinin her sabah yeniden, umutla ve ilahi bir iyimserlikle yıkanması."),
         11: ("Devasa bir meşe ağacının dallarından sarkan salıncakta sallanan çocuklar", "Çok köklü, korunaklı ve sarsılmaz bir güvenin (meşe ağacı) gölgesinde; ilişkinin en masum, eğlenceli ve çocuksu tarafını korkusuzca yaşama lütfu."),
         12: ("Süslü fenerlerle aydınlatılmış bir çimenlikte yetişkinlerin akşam partisi", "İlişkinin sosyal vitrininde parlama zamanı; gururla, estetikle ve dış dünyanın da onaylayıp hayran kalacağı bir uyumla sahneye çıkma."),
-        13: ("Kulübesinin verandasında sallanan yaşlı bir deniz kaptanı", "Büyük fırtınaları, krizleri ve sabir testlerini atlatmış bir ilişkinin, artık deneyim ve bilgelikle geçmişe gülümseyerek baktığı o huzurlu demlenme anı."),
+        13: ("Kulübesinin verandasında sallanan yaşlı bir deniz kaptanı", "Büyük fırtınaları, krizleri ve sabır testlerini atlatmış bir ilişkinin, artık deneyim ve bilgelikle geçmişe gülümseyerek baktığı o huzurlu demlenme anı."),
         14: ("Dışavurum fırsatları arayan bir insan ruhu", "Sadece kalplerde gizli kalan sevginin artık somut dünyada bir esere, bir evliliğe veya kalıcı bir ortak yaratıma dönüşme ihtiyacının patlaması."),
         15: ("Tezahürat yapan kalabalık bir caddede ilerleyen görkemli bir geçit töreni", "İlişkinin kendi krallığını ilan etmesi; gösterişli, cesur ve çevreden yüksek onay (alkış) alan asil bir kadersel zirve noktası."),
         16: ("Fırtına dindiğinde, doğanın parlak güneş ışığı altında sevinci", "Çok ağır bir krizin veya güç savaşının ardından gelen o muazzam rahatlama; gözyaşlarının yerini yıkanmış, tertemiz bir aşka bırakması."),
@@ -491,7 +491,7 @@ fbst_sabian = {
         18: ("Sessizce akan nehrin üzerindeki köprü", "Duygusal geçişler; krizli sulardan, sarsılmaz bir mantık ve şefkat köprüsü kurarak birbirinize ulaşabilme."),
         19: ("Kendi iç dünyasında dev bir şehir kuran mimar", "İlişkinin dış dünyadan çok, birbirinizin ruhunun o uçsuz bucaksız, zengin ve huzurlu dünyasında var olması."),
         20: ("Alevlerin içinden çıkan anka kuşu", "Mutlak yıkım ve diriliş! İlişkinin bittiği denilen noktasında, bir mucizeyle tüm acıların şifaya dönüşüp çok daha yüce bir formda canlanması."),
-        21: ("Kendi eliyle yaptığı müzik aletiyle çalan müzisyen", "İlişkinin uyumunun başka kimseden değil, tamamen kendi içinizden gelen o özel titresimta, özgün bir şekilde üretilmesi."),
+        21: ("Kendi eliyle yaptığı müzik aletiyle çalan müzisyen", "İlişkinin uyumunun başka kimseden değil, tamamen kendi içinizden gelen o özel titreşimle, özgün bir şekilde üretilmesi."),
         22: ("Eski bir tapınağın kalıntıları arasında açan orkideler", "İlişkideki eski krizlerin ve yıkılmışlıkların, artık nadide bir güzellikle iyileştirilmesi."),
         23: ("Bir adamın gözlerinde parlayan merak", "Sorgulamanın ve keşfetmenin hiç bitmemesi; partnerinizi her gün yeniden keşfetme arzusu."),
         24: ("Yağmurun altında ıslanan bir çiçek", "İlişkinin o en yoğun ve bazen sert (yağmurlu) süreçlerinde, aslında birbirinizi temizleyip ruhsal olarak daha da canlı kıldığınız gerçeği."),
@@ -697,7 +697,7 @@ fbst_sabit_yildizlar = {
         "etkiler": {
             "evlilik": {
                 "Satürn": "Kıskançlık yüzünden iç uyumun tamamen bozulması riski.",
-                "Uranüs": "İç uyumsuzluk ve ani kopuş titresimları."
+                "Uranüs": "İç uyumsuzluk ve ani kopuş titreşimleri."
             },
             "ask": {
                 "Genel": "Tutkuların yönlendirdiği, kadersel derinliği olan etkileşimler."
