@@ -789,16 +789,17 @@ def _generate_natal_pdf(motor):
     w, h = A4
     c = canvas.Canvas(yol, pagesize=A4)
 
-    # ── Colors ──
-    altin = HexColor('#B8860B')
-    koyu = HexColor('#2C2C2C')
-    acik = HexColor('#555555')
-    gri = HexColor('#D4C5A9')
-    bg = HexColor('#FDFAF5')
-    kart_bg = HexColor('#F5EFE0')
-    bordo = HexColor('#8B4513')
-    yesil = HexColor('#5A7A5A')
-    sari_cizgi = HexColor('#E8DCC8')
+    # ── Colors — black & polished-gold theme ──
+    altin = HexColor('#E6C14F')
+    koyu = HexColor('#F0E6D2')
+    acik = HexColor('#B8A87F')
+    gri = HexColor('#D4AF37')
+    bg = HexColor('#0B0B0F')
+    kart_bg = HexColor('#16161C')
+    bordo = HexColor('#E6C14F')
+    yesil = HexColor('#8FBF8F')
+    sari_cizgi = HexColor('#8A6D2B')
+    bar_zemin = HexColor('#2A2A30')
 
     SAYFA_UST = h - 60
     SAYFA_ALT = 55
@@ -909,7 +910,7 @@ def _generate_natal_pdf(motor):
     # ═══════════════════════════════════════════
     # COVER PAGE — big logo
     # ═══════════════════════════════════════════
-    c.setFillColor(koyu)
+    c.setFillColor(bg)
     c.rect(0, 0, w, h, fill=1)
     c.setFillColor(altin)
     c.rect(0, h - 14, w, 14, fill=1)
@@ -934,7 +935,7 @@ def _generate_natal_pdf(motor):
         print(f"[PDF] Logo çizilemedi: {e}")
     # Name + version + birth info at bottom of cover
     c.setFont("DejaVu-Bold", 16)
-    c.setFillColor(HexColor('#D4C5A9'))
+    c.setFillColor(altin)
     c.drawCentredString(w / 2, 152, motor.p1_isim or "Kişisel Analiz")
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor('#999999'))
@@ -977,11 +978,13 @@ def _generate_natal_pdf(motor):
     # ═══════════════════════════════════════════
     chart_yorum = data.get("chart_yorumu", "")
     gez_bolumler = data.get("chart_yorumu_gezegenler", []) or []
+    aci_bolumler = data.get("chart_yorumu_acilar", []) or []
     if chart_yorum and len(chart_yorum) > 30:
         bolum_no[0] += 1
         yeni_sayfa()
         y = sayfa_basligi("Doğum Haritası Yorumu", numara=str(bolum_no[0]))
         gez_parag_metin = " ".join(b.get("metin", "") for b in gez_bolumler if b.get("metin"))
+        aci_parag_metin = " ".join(b.get("metin", "") for b in aci_bolumler if b.get("metin"))
         paragraflar = chart_yorum.split("\n\n")
         for para in paragraflar:
             if not para.strip():
@@ -1003,6 +1006,22 @@ def _generate_natal_pdf(motor):
                     y = metin_yaz(SOL + 10, y, zb.get("metin", ""), "DejaVu", 8, koyu, 90)
                     y -= 8
                 continue
+            # Aspects paragraph → one sub-section per aspect
+            if aci_bolumler and aci_parag_metin and para.strip() == aci_parag_metin.strip():
+                for zb in aci_bolumler:
+                    alt_h = 16 + yazi_olcul(zb.get("metin", ""), "DejaVu", 8, 90) + 6
+                    if y - alt_h < SAYFA_ALT:
+                        yeni_sayfa(); y = SAYFA_UST
+                    c.setFont("DejaVu-Bold", 9.5)
+                    c.setFillColor(bordo)
+                    c.drawString(SOL + 6, y - 2, f"✦ {zb.get('baslik', '')}")
+                    c.setStrokeColor(sari_cizgi)
+                    c.setLineWidth(0.4)
+                    c.line(SOL + 6, y - 7, SAG - 6, y - 7)
+                    y -= 16
+                    y = metin_yaz(SOL + 10, y, zb.get("metin", ""), "DejaVu", 8, koyu, 90)
+                    y -= 8
+                continue
             if y < 80:
                 yeni_sayfa(); y = SAYFA_UST
             y = metin_yaz(SOL, y, para.strip(), "DejaVu", 8.5, acik, 92)
@@ -1017,11 +1036,11 @@ def _generate_natal_pdf(motor):
         yeni_sayfa()
         y = sayfa_basligi("Hayat Alanları Detayı", numara=str(bolum_no[0]))
         for ha in ha_list:
-            yorum_text = ha.get("yorum", "")[:400]
+            yorum_text = ha.get("yorum", "")
             oneriler = ha.get("oneriler", [])[:3]
             # Calculate card height
             card_h = 28  # header
-            card_h += yazi_olcul(yorum_text, "DejaVu", 8.5, 88) + 4
+            card_h += yazi_olcul(yorum_text, "DejaVu", 8.5, 86) + 4
             card_h += len(oneriler) * 14 + 6
             card_h += 10  # padding
 
@@ -1034,7 +1053,7 @@ def _generate_natal_pdf(motor):
             bar_w = 70
             skor = ha.get("skor", 50)
             dolu = int(bar_w * min(skor, 100) / 100)
-            c.setFillColor(HexColor('#E0D8C8'))
+            c.setFillColor(bar_zemin)
             c.rect(SAG - bar_w - 40, y - 22, bar_w, 9, fill=1)
             c.setFillColor(altin)
             c.rect(SAG - bar_w - 40, y - 22, dolu, 9, fill=1)
@@ -1045,12 +1064,14 @@ def _generate_natal_pdf(motor):
             inner_y = metin_yaz(SOL + 12, inner_y - 4, yorum_text, "DejaVu", 8.5, koyu, 86)
             # Öneriler
             for oneri in oneriler:
-                metin = oneri.get("metin", "")[:130]
+                metin_oneri = oneri.get("metin", "")
+                if len(metin_oneri) > 127:
+                    metin_oneri = metin_oneri[:127].rsplit(" ", 1)[0] + "…"
                 if inner_y < SAYFA_ALT:
                     break
                 c.setFont("DejaVu-Oblique", 7.5)
                 c.setFillColor(acik)
-                c.drawString(SOL + 18, inner_y, f"\u2022 {metin}")
+                c.drawString(SOL + 18, inner_y, f"\u2022 {metin_oneri}")
                 inner_y -= 12
             y -= card_h + 12
 
@@ -1201,9 +1222,9 @@ def _generate_natal_pdf(motor):
                   "gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. "
                   "Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. "
                   "Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder.")
-        teknik_h = yazi_olcul(teknik, "DejaVu", 7.5, 95) + 12
+        teknik_h = 24 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 12
         kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, "Hesaplama Tekniği", "🔮")
-        metin_yaz(SOL + 12, y - 24, teknik, "DejaVu", 7.5, acik, 91)
+        metin_yaz(SOL + 14, y - teknik_h + 22, teknik, "DejaVu", 7.5, acik, 90)
         y -= teknik_h + 12
         SIM_KAT_PDF = [
             ("para", "💰", "Para & Bolluk"),
@@ -1236,7 +1257,7 @@ def _generate_natal_pdf(motor):
                 bar_x = SAG - 75
                 bar_w = 50
                 dolu = int(bar_w * min(skor_val, 99) / 99)
-                c.setFillColor(HexColor('#E0D8C8'))
+                c.setFillColor(bar_zemin)
                 c.rect(bar_x, inner_y - 2, bar_w, 7, fill=1)
                 c.setFillColor(altin)
                 c.rect(bar_x, inner_y - 2, dolu, 7, fill=1)
@@ -1244,11 +1265,12 @@ def _generate_natal_pdf(motor):
                 c.setFillColor(koyu)
                 c.drawString(bar_x + bar_w + 4, inner_y - 1, f"%{skor_val}")
                 inner_y -= 13
-                acik_yazi = KAT_ACIKLAMA.get(kat_key, "")
                 etkiler = city.get("etkiler") or []
                 if etkiler:
-                    ana_etki = _etki_temizle(etkiler[0])
-                    acik_yazi = f"{acik_yazi} Ana etki: {ana_etki}."
+                    etki_list = "; ".join(_etki_temizle(e) for e in etkiler[:2])
+                    acik_yazi = f"Etkiler: {etki_list}."
+                else:
+                    acik_yazi = KAT_ACIKLAMA.get(kat_key, "")
                 c.setFont("DejaVu", 7)
                 c.setFillColor(acik)
                 c.drawString(SOL + 16, inner_y, acik_yazi[:150])
@@ -2767,6 +2789,7 @@ def _natal_chart_yorumu(motor):
             kutuphane = {}
 
         aspekt_cumleleri = []
+        aci_bolumler = []
         for a in acilar[:12]:
             pk = tuple(sorted([a["g1"], a["g2"]]))
             pair_key = f"{pk[0]}-{pk[1]}"
@@ -2780,6 +2803,7 @@ def _natal_chart_yorumu(motor):
                 yorum = f"{a['g1']} ve {a['g2']} arasındaki {aci} açısı size {etiket.get(aci,'bir gerilim getiriyor')}."
                 if sifa: yorum += f" {sifa}"
             aspekt_cumleleri.append(yorum)
+            aci_bolumler.append({"baslik": f"{a['g1']} – {a['g2']} ({aci})", "metin": yorum})
 
         aspekt_parag = " ".join(aspekt_cumleleri) if aspekt_cumleleri else ""
 
@@ -2825,10 +2849,10 @@ def _natal_chart_yorumu(motor):
         if diger_not:
             paragraf.append(diger_not)
 
-        return "\n\n".join(paragraf), gez_bolumler
+        return "\n\n".join(paragraf), gez_bolumler, aci_bolumler
     except Exception as e:
         import traceback; traceback.print_exc()
-        return f"Harita yorumu hazırlanamadı: {e}", []
+        return f"Harita yorumu hazırlanamadı: {e}", [], []
 
 def _olumsuz_aci_sifasi(g1, g2, aci_turu):
     """Returns a healing suggestion for a challenging aspect — natural, varied, specific."""
@@ -3048,15 +3072,22 @@ def _collect_natal_data(motor):
     # Comprehensive chart interpretation
     try:
         cy = _natal_chart_yorumu(motor)
-        if isinstance(cy, tuple):
+        if isinstance(cy, tuple) and len(cy) >= 3:
             data["chart_yorumu"] = cy[0]
             data["chart_yorumu_gezegenler"] = cy[1]
+            data["chart_yorumu_acilar"] = cy[2]
+        elif isinstance(cy, tuple):
+            data["chart_yorumu"] = cy[0]
+            data["chart_yorumu_gezegenler"] = cy[1]
+            data["chart_yorumu_acilar"] = []
         else:
             data["chart_yorumu"] = cy
             data["chart_yorumu_gezegenler"] = []
+            data["chart_yorumu_acilar"] = []
     except:
         data["chart_yorumu"] = ""
         data["chart_yorumu_gezegenler"] = []
+        data["chart_yorumu_acilar"] = []
     # Expanded healing prescriptions (negative aspects + fall/detriment)
     try:
         data["sifa_receteleri_detay"] = _natal_sifa_receteleri(motor)
