@@ -37,12 +37,90 @@ def sehir_veritabani_yukle():
     with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+def _normalize_metin(metin):
+    """Aksan ve büyük/küçük harf duyarsız karşılaştırma için sadeleştirir."""
+    import unicodedata
+    metin = unicodedata.normalize("NFKD", metin or "")
+    metin = "".join(c for c in metin if not unicodedata.combining(c))
+    return metin.lower().strip()
+
+def sehir_ara(arama_metni, limit=15):
+    """cities_db.json içinde ülke ve şehir adlarında aksan duyarsız arama yapar.
+
+    Önce ülke adında, sonra şehir adında eşleşme arar. Her sonuç
+    {'sehir', 'ulke', 'lat', 'lon', 'tam_ad'} sözlüğü olarak döner.
+    """
+    q = _normalize_metin(arama_metni)
+    if not q or len(q) < 2:
+        return []
+    try:
+        db = sehir_veritabani_yukle()
+    except Exception:
+        return []
+    sonuc = []
+    gorulen = set()
+    def _ekle(sehir, ulke, koor):
+        lat = koor["lat"] if isinstance(koor, dict) else koor[0]
+        lon = koor["lon"] if isinstance(koor, dict) else koor[1]
+        anahtar = (sehir, ulke)
+        if anahtar in gorulen:
+            return
+        gorulen.add(anahtar)
+        sonuc.append({"sehir": sehir, "ulke": ulke, "lat": lat, "lon": lon,
+                      "tam_ad": f"{sehir}, {ulke}"})
+    # 1) Şehir adı tam eşleşmesi
+    for ulke in sorted(db):
+        for sehir, koor in db[ulke].items():
+            if _normalize_metin(sehir) == q:
+                _ekle(sehir, ulke, koor)
+                if len(sonuc) >= limit:
+                    return sonuc
+    # 2) Ülke adı tam eşleşmesi (o ülkenin şehirleri)
+    for ulke in sorted(db):
+        if _normalize_metin(ulke) == q:
+            for sehir, koor in db[ulke].items():
+                _ekle(sehir, ulke, koor)
+                if len(sonuc) >= limit:
+                    return sonuc
+    # 3) Şehir adı eşleşmesi (önek önce)
+    for ulke in sorted(db):
+        for sehir, koor in db[ulke].items():
+            if _normalize_metin(sehir).startswith(q):
+                _ekle(sehir, ulke, koor)
+                if len(sonuc) >= limit:
+                    return sonuc
+    # 4) Ülke adı içeren eşleşme
+    for ulke in sorted(db):
+        if q in _normalize_metin(ulke):
+            for sehir, koor in db[ulke].items():
+                _ekle(sehir, ulke, koor)
+                if len(sonuc) >= limit:
+                    return sonuc
+    # 5) Şehir adı içeren eşleşme
+    if len(sonuc) < limit:
+        for ulke in sorted(db):
+            for sehir, koor in db[ulke].items():
+                if q in _normalize_metin(sehir):
+                    _ekle(sehir, ulke, koor)
+                    if len(sonuc) >= limit:
+                        return sonuc
+    return sonuc
+
 def _get_geolocator():
     from geopy.geocoders import Nominatim
     return Nominatim(user_agent="fbst_kadersel_navigasyon_v2", timeout=10)
 
 def sehir_bul(arama_metni):
-    """Dünyanın herhangi bir şehrini enlem/boylam olarak çözer."""
+    """Dünyanın herhangi bir şehrini enlem/boylam olarak çözer.
+
+    Önce yerel cities_db.json içinde aksan duyarsız arar, bulamazsa
+    geopy (Nominatim) ile çevrimiçi çözmeyi dener.
+    """
+    yerel = sehir_ara(arama_metni, limit=1)
+    if yerel:
+        s = yerel[0]
+        return {"lat": s["lat"], "lon": s["lon"], "sehir": s["sehir"],
+                "ulke": s["ulke"], "tam_ad": s["tam_ad"], "kaynak": "yerel"}
     geo = _get_geolocator()
     try:
         konum = geo.geocode(arama_metni, language="tr", exactly_one=True)
@@ -55,7 +133,7 @@ def sehir_bul(arama_metni):
             return {
                 "lat": konum.latitude, "lon": konum.longitude,
                 "sehir": sehir or arama_metni, "ulke": ulke,
-                "tam_ad": konum.address
+                "tam_ad": konum.address, "kaynak": "geopy"
             }
     except Exception:
         pass
@@ -77,7 +155,7 @@ ULKE_SEHIR_DB = {
     "Fransa": ["Paris", "Marsilya", "Lyon", "Nice", "Toulouse", "Bordeaux", "Strazburg", "Nantes"],
     "İtalya": ["Roma", "Milano", "Napoli", "Floransa", "Venedik", "Torino", "Palermo", "Bologna"],
     "İspanya": ["Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Malaga", "Granada", "San Sebastián"],
-    "Portekiz": ["Lizbon", "Porto", "Braga", "Faro", "Coimbra"],
+    "Portekiz": ["Lizbon", "Porto", "Braga", "Faro", "Coimbra", "Funchal"],
     "Yunanistan": ["Atina", "Selanik", "Santorini", "Midilli", "Girit", "Rodos"],
     "Hollanda": ["Amsterdam", "Rotterdam", "Lahey", "Utrecht", "Eindhoven"],
     "Belçika": ["Brüksel", "Antwerp", "Brugge", "Gent", "Liege"],

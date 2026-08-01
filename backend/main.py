@@ -21,7 +21,7 @@ from core.data import ARAP_ILISKI
 from core.utils import (
     GEZEGENLER, get_planetary_position, kadersel_yildiz_taramasi,
     aci_farki_safe, sehir_veritabani_yukle, sehir_bul,
-    get_safe_flags, dereceyi_burca_cevir,
+    get_safe_flags, dereceyi_burca_cevir, sehir_ara,
     ULKE_SEHIR_DB as ULKE_SEHIR_DB,
 )
 
@@ -603,6 +603,12 @@ app_fast.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+try:
+    from starlette.middleware.gzip import GZipMiddleware
+    app_fast.add_middleware(GZipMiddleware, minimum_size=1024)
+except Exception:
+    pass
 
 # ─── In-memory engine cache ───
 _ENGINE_CACHE = {}
@@ -3246,9 +3252,29 @@ def health():
 
 @app_fast.get("/api/ulkeler")
 def ulkeler_listesi():
-    """Ülke -> şehir listesi döndürür."""
-    ulkeler = sorted(ULKE_SEHIR_DB.keys())
-    return {"ulkeler": ulkeler, "sehirler": ULKE_SEHIR_DB}
+    """Tüm ülkeler ve her ülkenin şehir listesi (cities_db.json'dan, 223 ülke)."""
+    try:
+        db = sehir_veritabani_yukle()
+    except Exception:
+        db = ULKE_SEHIR_DB
+    ulkeler = sorted(db.keys())
+    sehirler = {}
+    for u in ulkeler:
+        seh_liste = db[u]
+        if isinstance(seh_liste, dict):
+            sehirler[u] = sorted(seh_liste.keys())
+        elif isinstance(seh_liste, list):
+            sehirler[u] = seh_liste
+    return {"ulkeler": ulkeler, "sehirler": sehirler}
+
+@app_fast.get("/api/sehir_ara")
+def sehir_ara_endpoint(q: str = "", limit: int = 15):
+    """Aksan duyarsız şehir/ülke araması — otomatik tanıma için."""
+    q = (q or "").strip()
+    if len(q) < 2:
+        return {"sonuc": []}
+    sonuc = sehir_ara(q, limit=max(1, min(limit, 50)))
+    return {"sonuc": sonuc}
 
 @app_fast.post("/api/astrokartografi")
 def astrokartografi_analiz(input: AstroInput):
