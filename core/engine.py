@@ -8696,7 +8696,12 @@ class FBST_Engine:
         try:
             from datetime import datetime
             try:
-                dogum_tarihi = self.p1 if isinstance(self.p1, date) else datetime.strptime(str(self.p1), "%Y-%m-%d").date()
+                if isinstance(self.p1, datetime):
+                    dogum_tarihi = self.p1.date()
+                elif isinstance(self.p1, date):
+                    dogum_tarihi = self.p1
+                else:
+                    dogum_tarihi = datetime.strptime(str(self.p1), "%Y-%m-%d").date()
             except Exception:
                 dogum_tarihi = None
             yas = None
