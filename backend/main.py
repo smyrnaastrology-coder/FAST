@@ -711,6 +711,65 @@ def _generate_pdf(motor, tip="rapor"):
     else:
         motor.pdf_potansiyel_rapor_uret(dosya_adi=f"{motor._session_id}_Potansiyel_Yetenek.pdf")
 
+def _html_bolumleri_ayir(html):
+    """Split '<b>Baslik:</b> icerik' HTML into (baslik, icerik) pairs.
+    Kurallar:
+    - '📅' ile baslayan ilk kalin etiket (sayfa basligi) atlanir.
+    - Iki nokta icermeyen TAMAMI BUYUK kalin etiket = ust baslik (parent).
+    - ':' ile biten kalin etiket = bolum basligi.
+    - Diger kalinlar (orn. burc adi) icerige karistirilir.
+    Icerigi olmayan basliklar bir sonraki dolan bolume baglanir."""
+    bolumler = []
+    if not html or not isinstance(html, str):
+        return bolumler
+
+    def _tag_ayikla(s):
+        return re.sub(r"<[^>]+>", "", s or "")
+
+    parcalar = re.split(r"<b>(.*?)</b>", html)
+    metin = ""
+    son_heading = None
+    parent = None
+    for i in range(0, len(parcalar), 2):
+        metin += _tag_ayikla(parcalar[i])
+        if i + 1 >= len(parcalar):
+            break
+        bold = _tag_ayikla(parcalar[i + 1]).strip()
+        if not bold:
+            continue
+        if bold.startswith("📅") and parent is None:
+            metin = ""
+            continue
+        if ":" not in bold and bold.upper() == bold:
+            parent = bold
+            metin = ""
+            continue
+        if bold.endswith(":"):
+            icerik = " ".join(metin.split())
+            if icerik:
+                bolumler.append(((parent or son_heading) or "", icerik))
+                parent = None
+            son_heading = bold
+            metin = ""
+        else:
+            metin += bold + " "
+    icerik = " ".join(metin.split())
+    if icerik:
+        bolumler.append(((parent or son_heading) or "", icerik))
+    return bolumler
+
+def _etki_temizle(etki):
+    """Clean a raw city-effect line for the PDF."""
+    e = str(etki).replace("[K]", "").replace("[S]", "").replace("⚠️", "").strip()
+    e = e.replace("↑ Yükselen", "Yükselen ekseni").replace("↓ Alçalan", "Alçalan ekseni")
+    e = e.replace("⌃ MC", "MC ekseni").replace("⌄ IC", "IC ekseni")
+    if "→" in e:
+        oncesi, sonrasi = e.split("→", 1)
+        e = oncesi.strip() + (f": {sonrasi.strip()}" if sonrasi.strip() else "")
+    else:
+        e = e.strip()
+    return e
+
 def _generate_natal_pdf(motor):
     """Generate a professional Bireysel Natal PDF — clean cards, proper spacing."""
     from reportlab.lib.pagesizes import A4
@@ -848,7 +907,7 @@ def _generate_natal_pdf(motor):
     data["simulasyon"] = sim_data
 
     # ═══════════════════════════════════════════
-    # COVER PAGE
+    # COVER PAGE — big logo
     # ═══════════════════════════════════════════
     c.setFillColor(koyu)
     c.rect(0, 0, w, h, fill=1)
@@ -856,56 +915,40 @@ def _generate_natal_pdf(motor):
     c.rect(0, h - 14, w, 14, fill=1)
     c.setFillColor(altin)
     c.rect(0, 0, w, 10, fill=1)
-    # title
-    c.setFont("DejaVu-Bold", 34)
-    c.setFillColor(HexColor('#FDFAF5'))
-    c.drawCentredString(w / 2, h - 150, "Bireysel Natal")
-    c.drawCentredString(w / 2, h - 190, "Analiz Raporu")
-    c.setStrokeColor(altin)
-    c.setLineWidth(1)
-    c.line(w / 2 - 110, h - 212, w / 2 + 110, h - 212)
-    c.setFont("DejaVu", 15)
-    c.setFillColor(HexColor('#CCCCCC'))
-    c.drawCentredString(w / 2, h - 240, motor.p1_isim or "Kişisel Analiz")
+    try:
+        logo_yol = os.path.join(_PROJECT_ROOT, "kapak1.png")
+        if os.path.exists(logo_yol):
+            logo_boyut = 520
+            lx = (w - logo_boyut) / 2
+            ly = h - logo_boyut - 56
+            c.drawImage(logo_yol, lx, ly, width=logo_boyut, height=logo_boyut, mask=None)
+        else:
+            c.setFont("DejaVu-Bold", 34)
+            c.setFillColor(HexColor('#FDFAF5'))
+            c.drawCentredString(w / 2, h - 150, "Bireysel Natal")
+            c.drawCentredString(w / 2, h - 190, "Analiz Raporu")
+            c.setStrokeColor(altin)
+            c.setLineWidth(1)
+            c.line(w / 2 - 110, h - 212, w / 2 + 110, h - 212)
+    except Exception as e:
+        print(f"[PDF] Logo çizilemedi: {e}")
+    # Name + version + birth info at bottom of cover
+    c.setFont("DejaVu-Bold", 16)
+    c.setFillColor(HexColor('#D4C5A9'))
+    c.drawCentredString(w / 2, 152, motor.p1_isim or "Kişisel Analiz")
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor('#999999'))
-    c.drawCentredString(w / 2, h - 262, "FAST — Sinastri Tekniği  |  v4.0")
-    # Birth info on cover
+    c.drawCentredString(w / 2, 130, "FAST — Sinastri Tekniği  |  v4.0")
     try:
         dogum_bilgi = f"Doğum: {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
         yer_bilgi = f"Konum: {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
         c.setFont("DejaVu", 8)
         c.setFillColor(HexColor('#999999'))
         if dogum_bilgi:
-            c.drawCentredString(w / 2, h - 285, dogum_bilgi)
+            c.drawCentredString(w / 2, 112, dogum_bilgi)
         if yer_bilgi:
-            c.drawCentredString(w / 2, h - 298, yer_bilgi)
+            c.drawCentredString(w / 2, 96, yer_bilgi)
     except: pass
-
-    # Life areas summary on cover
-    ha_list = data.get("hayat_alanlari", [])
-    if ha_list:
-        y = h - 320
-        c.setFont("DejaVu-Bold", 11)
-        c.setFillColor(HexColor('#D4C5A9'))
-        c.drawCentredString(w / 2, y, "Hayat Alanları Puanları")
-        y -= 20
-        col1 = 90; col2 = w / 2 + 30
-        for i, ha in enumerate(ha_list):
-            cx = col1 if i < 7 else col2
-            cy = y - (i % 7) * 26
-            c.setFont("DejaVu", 8)
-            c.setFillColor(HexColor('#BBBBBB'))
-            c.drawString(cx, cy, f"{ha.get('icon','')} {ha.get('etiket','')}")
-            bar_w = 55
-            dolu = int(bar_w * min(ha.get("skor", 50), 100) / 100)
-            c.setFillColor(HexColor('#444444'))
-            c.rect(cx + 80, cy - 2, bar_w, 7, fill=1)
-            c.setFillColor(altin)
-            c.rect(cx + 80, cy - 2, dolu, 7, fill=1)
-            c.setFillColor(HexColor('#AAAAAA'))
-            c.setFont("DejaVu-Bold", 7)
-            c.drawString(cx + 80 + bar_w + 5, cy - 1, f"%{ha.get('skor','')}")
 
     bolum_no = [0]  # mutable counter for closures
 
@@ -930,17 +973,35 @@ def _generate_natal_pdf(motor):
         print(f"[PDF] Harita eklenemedi: {e}")
 
     # ═══════════════════════════════════════════
-    # CHART INTERPRETATION — flowing text
+    # CHART INTERPRETATION — sub-sections per planet
     # ═══════════════════════════════════════════
     chart_yorum = data.get("chart_yorumu", "")
+    gez_bolumler = data.get("chart_yorumu_gezegenler", []) or []
     if chart_yorum and len(chart_yorum) > 30:
         bolum_no[0] += 1
         yeni_sayfa()
         y = sayfa_basligi("Doğum Haritası Yorumu", numara=str(bolum_no[0]))
+        gez_parag_metin = " ".join(b.get("metin", "") for b in gez_bolumler if b.get("metin"))
         paragraflar = chart_yorum.split("\n\n")
         for para in paragraflar:
             if not para.strip():
                 y -= 8
+                continue
+            # Planet paragraph → one sub-section per planet
+            if gez_bolumler and gez_parag_metin and para.strip() == gez_parag_metin.strip():
+                for zb in gez_bolumler:
+                    alt_h = 16 + yazi_olcul(zb.get("metin", ""), "DejaVu", 8, 90) + 6
+                    if y - alt_h < SAYFA_ALT:
+                        yeni_sayfa(); y = SAYFA_UST
+                    c.setFont("DejaVu-Bold", 9.5)
+                    c.setFillColor(bordo)
+                    c.drawString(SOL + 6, y - 2, f"✦ {zb.get('baslik', zb.get('gezegen', ''))}")
+                    c.setStrokeColor(sari_cizgi)
+                    c.setLineWidth(0.4)
+                    c.line(SOL + 6, y - 7, SAG - 6, y - 7)
+                    y -= 16
+                    y = metin_yaz(SOL + 10, y, zb.get("metin", ""), "DejaVu", 8, koyu, 90)
+                    y -= 8
                 continue
             if y < 80:
                 yeni_sayfa(); y = SAYFA_UST
@@ -950,6 +1011,7 @@ def _generate_natal_pdf(motor):
     # ═══════════════════════════════════════════
     # LIFE AREAS DETAIL — cards
     # ═══════════════════════════════════════════
+    ha_list = data.get("hayat_alanlari", [])
     if ha_list:
         bolum_no[0] += 1
         yeni_sayfa()
@@ -1047,28 +1109,59 @@ def _generate_natal_pdf(motor):
             y -= sembol_h + 8
 
     # ═══════════════════════════════════════════
-    # SOLAR / LUNAR RETURN
+    # SOLAR / LUNAR RETURN — sub-sections
     # ═══════════════════════════════════════════
-    for baslik, icerik in [("Solar Return — Yıllık Öngörü", data.get("solar_return")),
-                           ("Lunar Return — Aylık Öngörü", data.get("lunar_return"))]:
+    for baslik, anahtar, html_anahtar in [("Solar Return — Yıllık Öngörü", "solar_return", "solar_return_html"),
+                                          ("Lunar Return — Aylık Öngörü", "lunar_return", "lunar_return_html")]:
+        icerik = data.get(anahtar, "")
         if icerik and len(str(icerik)) > 20:
             bolum_no[0] += 1
             yeni_sayfa()
             y = sayfa_basligi(baslik, numara=str(bolum_no[0]))
-            metin_yaz(SOL, y, str(icerik)[:3000], "DejaVu", 8.5, acik, 92)
+            bolumler = _html_bolumleri_ayir(data.get(html_anahtar, ""))
+            if bolumler:
+                for b_baslik, b_metin in bolumler:
+                    if not b_metin.strip():
+                        continue
+                    alt_h = 16 + yazi_olcul(b_metin, "DejaVu", 8, 90) + 6
+                    if y - alt_h < SAYFA_ALT:
+                        yeni_sayfa(); y = SAYFA_UST
+                    c.setFont("DejaVu-Bold", 9.5)
+                    c.setFillColor(bordo)
+                    c.drawString(SOL + 6, y - 2, f"✦ {b_baslik}")
+                    c.setStrokeColor(sari_cizgi)
+                    c.setLineWidth(0.4)
+                    c.line(SOL + 6, y - 7, SAG - 6, y - 7)
+                    y -= 16
+                    y = metin_yaz(SOL + 10, y, b_metin, "DejaVu", 8, koyu, 90)
+                    y -= 8
+            else:
+                y = metin_yaz(SOL, y, str(icerik)[:3000], "DejaVu", 8.5, acik, 92)
 
     # ═══════════════════════════════════════════
-    # MINOR PROGRESS — 3 DAY
+    # 6-MONTH MINOR PROGRESS — per-day cards
     # ═══════════════════════════════════════════
-    mp_data = data.get("minor_progress", [])
-    if isinstance(mp_data, list) and mp_data:
+    try:
+        mp6_entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=180)
+    except:
+        mp6_entries = []
+    if isinstance(mp6_entries, list) and mp6_entries:
         bolum_no[0] += 1
         yeni_sayfa()
-        y = sayfa_basligi("Minor Progress — Önümüzdeki 3 Gün", numara=str(bolum_no[0]))
-        for p in mp_data:
-            baslik = f"{p.get('tarih','')} ({p.get('gun_ad','')})" if p.get('tarih') else f"İlerleme Yılı: {p.get('yil','')}"
-            yorumlar = p.get("yorumlar", [])
-            mp_h = 30 + len(yorumlar) * 12 + 10
+        y = sayfa_basligi("6 Aylık Minor Progress — Gün Gün", numara=str(bolum_no[0]))
+        c.setFont("DejaVu", 7.5)
+        c.setFillColor(acik)
+        c.drawString(SOL, y, "İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, gün gün aşağıda listelenmiştir.")
+        y -= 18
+        for p in mp6_entries:
+            tarih = p.get("tarih", "")
+            if not tarih:
+                continue
+            gun_ad = p.get("gun_ad", "")
+            baslik = f"{tarih} ({gun_ad})"
+            yorumlar = (p.get("yorumlar") or [])[:2]
+            ay_info = f"Ay: {p.get('ay_burc','')} ({p.get('ay_ev',0)}. Ev)  |  Güneş: {p.get('gunes_burc','')}"
+            mp_h = 34 + len(yorumlar) * 11 + 8
             if y - mp_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
             c.setFillColor(kart_bg)
@@ -1076,33 +1169,19 @@ def _generate_natal_pdf(motor):
             c.setStrokeColor(gri)
             c.setLineWidth(0.3)
             c.roundRect(SOL, y - mp_h, SAG - SOL, mp_h, 4, fill=0, stroke=1)
-            c.setFont("DejaVu-Bold", 10)
+            c.setFont("DejaVu-Bold", 9)
             c.setFillColor(bordo)
-            c.drawString(SOL + 10, y - 16, baslik)
-            ay_info = f"Ay: {p.get('ay_burc','')} ({p.get('ay_ev','')}. Ev)  |  Güneş: {p.get('gunes_burc','')}"
-            c.setFont("DejaVu", 8)
+            c.drawString(SOL + 10, y - 15, baslik)
+            c.setFont("DejaVu", 7.5)
             c.setFillColor(acik)
-            c.drawString(SOL + 10, y - 28, ay_info)
-            ortam = p.get("ortam", "")
-            inner_y = y - 40
-            if ortam:
-                inner_y = metin_yaz(SOL + 14, inner_y, ortam, "DejaVu-Oblique", 7.5, HexColor('#888888'), 86)
+            c.drawString(SOL + 10, y - 26, ay_info)
+            inner_y = y - 36
             for yorum in yorumlar:
-                c.setFont("DejaVu", 8)
+                c.setFont("DejaVu", 7.5)
                 c.setFillColor(koyu)
-                c.drawString(SOL + 14, inner_y, f"\u2022 {yorum[:130]}")
-                inner_y -= 11
-            y -= mp_h + 10
-
-    # ═══════════════════════════════════════════
-    # 6-MONTH MINOR PROGRESS
-    # ═══════════════════════════════════════════
-    mp6 = data.get("minor_progress_6month", "")
-    if mp6 and len(mp6) > 20:
-        bolum_no[0] += 1
-        yeni_sayfa()
-        y = sayfa_basligi("6 Aylık Minor Progress", numara=str(bolum_no[0]))
-        metin_yaz(SOL, y, mp6.replace("<br/>"," | ").replace("<b>","").replace("</b>",""), "DejaVu", 7.5, acik, 95)
+                c.drawString(SOL + 12, inner_y, f"\u2022 {str(yorum)[:120]}")
+                inner_y -= 10
+            y -= mp_h + 8
 
     # ═══════════════════════════════════════════
     # SIMULATION — Global Kader Pusulası
@@ -1115,27 +1194,43 @@ def _generate_natal_pdf(motor):
         c.setFont("DejaVu", 8)
         c.setFillColor(acik)
         c.drawString(SOL, y, "Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır.")
-        y -= 24
+        y -= 22
+        # ── Calculation technique explanation ──
+        teknik = ("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. "
+                  "Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; "
+                  "gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. "
+                  "Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. "
+                  "Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder.")
+        teknik_h = yazi_olcul(teknik, "DejaVu", 7.5, 95) + 12
+        kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, "Hesaplama Tekniği", "🔮")
+        metin_yaz(SOL + 12, y - 24, teknik, "DejaVu", 7.5, acik, 91)
+        y -= teknik_h + 12
         SIM_KAT_PDF = [
             ("para", "💰", "Para & Bolluk"),
             ("huzur", "🕊️", "Huzur & İç Sakinlik"),
             ("tutku", "🔥", "Tutku & Macera"),
             ("kriz", "⚡", "Kriz & Dönüşüm"),
         ]
+        KAT_ACIKLAMA = {
+            "para": "Maddi kazanç, bolluk ve fırsat enerjilerinin en güçlü olduğu şehir.",
+            "huzur": "İç sakinlik, duygusal denge ve huzurlu bir yaşam enerjisinin en güçlü olduğu şehir.",
+            "tutku": "Tutku, macera ve girişimcilik enerjisinin en yüksek olduğu şehir.",
+            "kriz": "Dönüşüm, kriz ve güçlü değişim rüzgârlarının estiği şehir.",
+        }
         for kat_key, icon, label in SIM_KAT_PDF:
-            cities = sim.get(kat_key, [])[:3]
+            cities = sim.get(kat_key, [])
             if not cities:
                 continue
-            kat_h = 28 + len(cities) * 16 + 8
+            kat_h = 28 + len(cities) * 26 + 8
             if y - kat_h < SAYFA_ALT:
                 yeni_sayfa()
                 y = sayfa_basligi("Global Kader Pusulası (devam)")
             kart_ciz(SOL, y - kat_h, SAG - SOL, kat_h, label, icon)
             inner_y = y - 28
             for i, city in enumerate(cities):
-                sehir_adi = city.get("sehir", "")[:48]
+                sehir_adi = city.get("sehir", "")[:42]
                 skor_val = city.get("skor", 0)
-                c.setFont("DejaVu", 8)
+                c.setFont("DejaVu-Bold", 8)
                 c.setFillColor(koyu)
                 c.drawString(SOL + 16, inner_y, f"{i+1}. {sehir_adi}")
                 bar_x = SAG - 75
@@ -1148,7 +1243,16 @@ def _generate_natal_pdf(motor):
                 c.setFont("DejaVu-Bold", 7)
                 c.setFillColor(koyu)
                 c.drawString(bar_x + bar_w + 4, inner_y - 1, f"%{skor_val}")
-                inner_y -= 16
+                inner_y -= 13
+                acik_yazi = KAT_ACIKLAMA.get(kat_key, "")
+                etkiler = city.get("etkiler") or []
+                if etkiler:
+                    ana_etki = _etki_temizle(etkiler[0])
+                    acik_yazi = f"{acik_yazi} Ana etki: {ana_etki}."
+                c.setFont("DejaVu", 7)
+                c.setFillColor(acik)
+                c.drawString(SOL + 16, inner_y, acik_yazi[:150])
+                inner_y -= 13
             y -= kat_h + 10
 
     c.save()
@@ -1781,6 +1885,10 @@ def _collect_solar_lunar_data(motor):
             sr_clean = _bireysellestir(_strip_html(sr))
             if len(sr_clean) > 20:
                 data["solar_return"] = sr_clean
+            try:
+                data["solar_return_html"] = _bireysellestir(sr)
+            except:
+                data["solar_return_html"] = ""
     except:
         pass
     try:
@@ -1792,6 +1900,10 @@ def _collect_solar_lunar_data(motor):
             lr_clean = _bireysellestir(_strip_html(lr))
             if len(lr_clean) > 20:
                 data["lunar_return"] = lr_clean
+            try:
+                data["lunar_return_html"] = _bireysellestir(lr)
+            except:
+                data["lunar_return_html"] = ""
     except:
         pass
     try:
@@ -2607,6 +2719,7 @@ def _natal_chart_yorumu(motor):
         # ── PARAGRAPH 2: Planet story ──
         ozne_gezegenler = ["Güneş","Ay","Merkür","Venüs","Mars","Jüpiter","Satürn","Uranüs","Neptün","Plüton","Chiron"]
         gez_parcalar = []
+        gez_bolumler = []
         for g in ozne_gezegenler:
             if g not in gez_poz: continue
             p = gez_poz[g]
@@ -2637,7 +2750,9 @@ def _natal_chart_yorumu(motor):
                 "Chiron": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). En derin yaranız ve aynı zamanda en büyük iyileşme gücünüz burada.",
             }.get(g, "")
             if giris:
-                gez_parcalar.append(f"{giris}{notu}")
+                tam_metin = f"{giris}{notu}"
+                gez_parcalar.append(tam_metin)
+                gez_bolumler.append({"gezegen": g, "baslik": f"{g} — {burc}, {ev}. Ev", "metin": tam_metin})
 
         # Connect first 3-4 planets with transitions, rest as separate sentences
         if len(gez_parcalar) <= 4:
@@ -2710,10 +2825,10 @@ def _natal_chart_yorumu(motor):
         if diger_not:
             paragraf.append(diger_not)
 
-        return "\n\n".join(paragraf)
+        return "\n\n".join(paragraf), gez_bolumler
     except Exception as e:
         import traceback; traceback.print_exc()
-        return f"Harita yorumu hazırlanamadı: {e}"
+        return f"Harita yorumu hazırlanamadı: {e}", []
 
 def _olumsuz_aci_sifasi(g1, g2, aci_turu):
     """Returns a healing suggestion for a challenging aspect — natural, varied, specific."""
@@ -2932,9 +3047,16 @@ def _collect_natal_data(motor):
         data["sifa_receteleri"] = ""
     # Comprehensive chart interpretation
     try:
-        data["chart_yorumu"] = _natal_chart_yorumu(motor)
+        cy = _natal_chart_yorumu(motor)
+        if isinstance(cy, tuple):
+            data["chart_yorumu"] = cy[0]
+            data["chart_yorumu_gezegenler"] = cy[1]
+        else:
+            data["chart_yorumu"] = cy
+            data["chart_yorumu_gezegenler"] = []
     except:
         data["chart_yorumu"] = ""
+        data["chart_yorumu_gezegenler"] = []
     # Expanded healing prescriptions (negative aspects + fall/detriment)
     try:
         data["sifa_receteleri_detay"] = _natal_sifa_receteleri(motor)
@@ -3398,15 +3520,15 @@ def _result_kategorize(radar):
         sehir_ad, ulke = raw.rsplit(", ", 1) if ", " in raw else (raw, "")
         if (ulke in EXCLUDED) or (ulke and any(e in raw.lower() for e in excluded_any)): continue
         for kat in sirali:
-            sirali[kat].append((sehir_ad, ulke, c[kat], c.get("lat"), c.get("lon")))
+            sirali[kat].append((sehir_ad, ulke, c[kat], c.get("lat"), c.get("lon"), c.get("etkiler", [])))
     for kat in sirali:
         sirali[kat].sort(key=lambda x: x[2], reverse=True)
         gorulen = set()
         tekil = []
-        for sehir_ad, ulke, skor, lat, lon in sirali[kat]:
+        for sehir_ad, ulke, skor, lat, lon, etkiler in sirali[kat]:
             if ulke not in gorulen:
                 gorulen.add(ulke)
-                tekil.append({"sehir": f"{sehir_ad}, {ulke}", "skor": round(skor, 2), "lat": lat, "lon": lon})
+                tekil.append({"sehir": f"{sehir_ad}, {ulke}", "skor": round(skor, 2), "lat": lat, "lon": lon, "etkiler": list(etkiler or [])[:2]})
                 if len(tekil) == 10: break
         sirali[kat] = tekil
     return sirali, len(radar)
