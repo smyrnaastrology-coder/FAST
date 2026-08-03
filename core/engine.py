@@ -6432,6 +6432,30 @@ class FBST_Engine:
         story.append(Paragraph("© 2026 Fatih Asartepe — Bu çalışmaya ait tüm haklar saklıdır. izinsiz kopyalanması, yayılması veya ticari amaçla kullanılması yasaktır.", styles['CoverFooter']))
         story.append(PageBreak())
 
+        # ⚠️ YASAL VE ETİK UYARI (rapor başına eklendi)
+        story.append(Spacer(1, 10))
+        feragat_bas_metni = (
+            "<b><font color='#C9A96E' size='13'>⚠️ YASAL VE ETİK UYARI</font></b><br/><br/>"
+            "<font color='#4A5568' size='9.5'>"
+            "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
+            "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
+            "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
+            "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
+            "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
+            "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir.</font>"
+        )
+        uyari_tablo = Table([[Paragraph(feragat_bas_metni, styles['TurkishNormal'])]], colWidths=[500])
+        uyari_tablo.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,-1), '#FBF7F4'),
+            ('BOX', (0,0), (-1,-1), 2, '#C9A96E'),
+            ('TOPPADDING', (0,0), (-1,-1), 14),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 14),
+            ('LEFTPADDING', (0,0), (-1,-1), 14),
+            ('RIGHTPADDING', (0,0), (-1,-1), 14),
+        ]))
+        story.append(uyari_tablo)
+        story.append(Spacer(1, 14))
+
         # 🗺️ 3. BÖLÜM: TEKNİK VE GEOMETRİK KOORDİNATLAR
         if self.mod == "ebeveyn_cocuk":
             baslik_karti_ekle("EBEVEYN-ÇOCUK İLİŞKİ RAPORU", alt_baslik=f"{self.p1_isim} & {self.p2_isim} | {self.city}", emoji="📋")
