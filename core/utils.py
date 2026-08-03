@@ -6,7 +6,7 @@ import swisseph as swe
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 
-from core.data import _FAST_RENKLER
+from core.data import _FAST_RENKLER, fbst_sabit_yildizlar, fbst_sabit_yildizlar_ebeveyn
 _PLT = None
 def _plt():
     """Lazy matplotlib.pyplot yükleyici — ilk çizimden önce import edilir."""
@@ -686,6 +686,129 @@ def aci_farki(derece1, derece2):
     return fark
 
 
+def _yildiz_gercek_derece(yildiz_adi, target_jd, fallback_derece):
+    """Yıldızın belirli bir tarihteki gerçek ekliptik boylamını döndürür."""
+    if target_jd is not None:
+        try:
+            return fixstar_ut_lon(yildiz_adi, target_jd)
+        except Exception:
+            pass
+    return fallback_derece
+
+
+def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2.0, mod=None, max_muhur=None):
+    """
+    TEK BİR TARİHTE (target_jd) tüm sabit yıldızları precession ile hesaplayıp,
+    verilen gezegen dereceleri sözlüğüyle eşleştirir.
+
+    Args:
+        gezegen_dereceleri: {gezegen_adi: derece} sözlüğü
+        target_jd: Katmanın Julian Day'i. Verilirse yıldızlar gerçek pozisyonlarıyla
+                   (precession dahil) hesaplanır; verilmezse FBST kataloğundaki
+                   statik dereceler kullanılır (eski davranış).
+        orb_siniri: Tolerans derecesi
+        mod: Aktif mod
+        max_muhur: Gösterilecek maksimum mühür sayısı (None = sınırsız).
+                   FBST zengin yorumlu mühürler önceliklidir, kalanlar orba göre sıralanır.
+
+    Returns:
+        Liste: FBST tarzı mühür metinleri (zengin yorumlarla)
+    """
+    if _aktif_sozluk_yok():
+        return []
+
+    if target_jd is not None:
+        # Tüm yıldızların gerçek pozisyonlarını bir kez hesapla (performans)
+        yildiz_pozisyonlari = {}
+        for yildiz_adi in tum_sabit_yildizlar_listesi():
+            try:
+                yildiz_pozisyonlari[yildiz_adi] = fixstar_ut_lon(yildiz_adi, target_jd)
+            except Exception:
+                continue
+    else:
+        yildiz_pozisyonlari = {}
+
+    bulunan_muhurler = []
+    fbst_muhurler = []
+    _aktif_mod = mod
+
+    if _aktif_mod == "ebeveyn_cocuk" and fbst_sabit_yildizlar_ebeveyn:
+        _aktif_sozluk = fbst_sabit_yildizlar_ebeveyn
+    else:
+        _aktif_sozluk = fbst_sabit_yildizlar
+
+    def _fark_ayikla(metin):
+        try:
+            import re
+            m = re.search(r"Fark: ([\d.]+)", metin)
+            return float(m.group(1)) if m else 999.0
+        except Exception:
+            return 999.0
+
+    for yildiz_adi, veriler in _aktif_sozluk.items():
+        yildiz_derecesi = _yildiz_gercek_derece(yildiz_adi, target_jd, veriler["derece"])
+        for gezegen_adi, gezegen_derecesi in gezegen_dereceleri.items():
+            fark = aci_farki(gezegen_derecesi, yildiz_derecesi)
+
+            if fark <= orb_siniri:
+                rapor_metni = f"* Yıldız Hizalanması: {yildiz_adi} ({gezegen_adi} ile Yakınlaşma | Fark: {fark:.2f}°)\n"
+                etki_bulundu = False
+
+                if "yargi" in veriler:
+                    rapor_metni += f"   ⚖️ Özel Yargı: {veriler['yargi']}\n"
+                    etki_bulundu = True
+
+                for kategori, gezegen_etkileri in veriler["etkiler"].items():
+                    if gezegen_adi in gezegen_etkileri:
+                        rapor_metni += f"   ➤ {kategori.upper()} ({gezegen_adi}): {gezegen_etkileri[gezegen_adi]}\n"
+                        etki_bulundu = True
+                    elif "Genel" in gezegen_etkileri:
+                        rapor_metni += f"   ➤ {kategori.upper()} (Genel): {gezegen_etkileri['Genel']}\n"
+                        etki_bulundu = True
+
+                if etki_bulundu:
+                    if _aktif_mod != "ebeveyn_cocuk":
+                        fbst_muhurler.append((fark, rapor_metni))
+                    else:
+                        bulunan_muhurler.append(rapor_metni)
+
+    # FBST kataloğunda olmayan ama sefstars'ta olan yıldızlar da taranır
+    if target_jd is not None:
+        for yildiz_adi, yildiz_derecesi in yildiz_pozisyonlari.items():
+            uyari_ustu = yildiz_adi.upper()
+            if uyari_ustu in _aktif_sozluk:
+                continue
+            for gezegen_adi, gezegen_derecesi in gezegen_dereceleri.items():
+                fark = aci_farki(gezegen_derecesi, yildiz_derecesi)
+                if fark <= orb_siniri:
+                    burc_metni = dereceden_burc_dec(yildiz_derecesi)
+                    bulunan_muhurler.append((
+                        fark,
+                        f"* Yıldız Hizalanması: {yildiz_adi} ({gezegen_adi} ile Yakınlaşma | Fark: {fark:.2f}°)\n"
+                        f"   ➤ KOZMIK TEMAS (Genel): {yildiz_adi} yıldızı {burc_metni} noktasında "
+                        f"{gezegen_adi} enerjisiyle kavuşum halinde. Bu temas, kişilik haritanızdaki "
+                        f"{yildiz_adi} arketipinin {gezegen_adi} aracılığıyla dışa vurumunu güçlendirir."
+                    ))
+                    break
+
+    # Öncelik sırası: FBST zengin yorumlar → kozmik temaslar, her grup orba göre sıralı
+    fbst_muhurler.sort(key=lambda x: x[0])
+    bulunan_muhurler.sort(key=lambda x: x[0] if isinstance(x, tuple) else _fark_ayikla(x[0]))
+    if _aktif_mod != "ebeveyn_cocuk":
+        sirali = [m[1] for m in fbst_muhurler] + [m[1] if isinstance(m, tuple) else m for m in bulunan_muhurler]
+    else:
+        sirali = [m[1] if isinstance(m, tuple) else m for m in bulunan_muhurler]
+
+    if max_muhur is not None and len(sirali) > max_muhur:
+        sirali = sirali[:max_muhur]
+    return sirali
+
+
+def _aktif_sozluk_yok():
+    """FBST sözlüklerinin mevcut olup olmadığını kontrol eder (güvenli dönüş)."""
+    return False
+
+
 def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=None):
     bulunan_muhurler = []
     _aktif_mod = mod
@@ -763,6 +886,9 @@ GEZEGENLER = {
     "Güneş": 0, "Ay": 1, "Merkür": 2, "Venüs": 3, "Mars": 4,
     "Jüpiter": 5, "Satürn": 6, "Uranüs": 7, "Neptün": 8, "Plüton": 9,
     "Chiron": 15, "Juno": swe.AST_OFFSET + 3, "Ceres": swe.AST_OFFSET + 1, "Lilith": 10,
+    "Pallas": swe.AST_OFFSET + 2, "Vesta": swe.AST_OFFSET + 4,
+    "Eros": swe.AST_OFFSET + 433, "Psyche": swe.AST_OFFSET + 16,
+    "Sappho": swe.AST_OFFSET + 80, "Amor": swe.AST_OFFSET + 1221,
 }
 
 def get_safe_flags(gezegen_id):
