@@ -3580,13 +3580,35 @@ def debug_ephe():
     yildiz_durum = {}
     for yad in ["Regulus", "Sirius", "Revati", "Pushya", "Antares"]:
         try:
-            arr, _iflag = swe.fixstar_ut(yad, jd, swe.FLG_SWIEPH)
-            yildiz_durum[yad] = {"ok": True, "derece": round(float(arr[0]), 4)}
+            r = swe.fixstar_ut(yad, jd, swe.FLG_SWIEPH)
+            arr = r[0]
+            derece = arr[0] if hasattr(arr, "__getitem__") else arr
+            yildiz_durum[yad] = {"ok": True, "derece": round(float(derece), 4)}
         except Exception as e:
             yildiz_durum[yad] = {"ok": False, "hata": str(e)[:150]}
     sonuc["yildiz_hesap"] = yildiz_durum
     try:
-        from core.utils import fixstar_ut_lon
+        from core.utils import fixstar_ut_lon, ephe_klasoru as utils_ephe_klasoru
+        sonuc["utils_ephe_klasoru"] = utils_ephe_klasoru
+        # set_ephe_path'in gerçekten etki edip etmediğini test et
+        swe.set_ephe_path(utils_ephe_klasoru)
+        try:
+            arr, _iflag = swe.calc_ut(jd, 15, swe.FLG_SWIEPH | swe.FLG_SPEED)
+            sonuc["set_sonrasi_chiron"] = {"ok": True, "derece": round(float(arr[0]), 4)}
+        except Exception as e:
+            sonuc["set_sonrasi_chiron"] = {"ok": False, "hata": str(e)[:150]}
+        try:
+            r = swe.fixstar_ut("Regulus", jd, swe.FLG_SWIEPH)
+            arr = r[0]
+            derece = arr[0] if hasattr(arr, "__getitem__") else arr
+            sonuc["set_sonrasi_fixstar"] = {"ok": True, "derece": round(float(derece), 4)}
+        except Exception as e:
+            sonuc["set_sonrasi_fixstar"] = {"ok": False, "hata": str(e)[:150]}
+        try:
+            arr, _iflag = swe.calc_ut(jd, swe.AST_OFFSET + 3, swe.FLG_MOSEPH | swe.FLG_SPEED)
+            sonuc["moseph_juno"] = {"ok": True, "derece": round(float(arr[0]), 4)}
+        except Exception as e:
+            sonuc["moseph_juno"] = {"ok": False, "hata": str(e)[:150]}
         fs_durum = {}
         for yad in ["Regulus", "Sirius", "Revati", "Pushya", "Antares", "Decrux", "Alchiba"]:
             try:
