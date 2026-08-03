@@ -1890,6 +1890,9 @@ def _parse_time(t: str) -> str:
         return "12:00"
 
 def _engine_es(p: EsSevgiliInput, ek_charts=False):
+    _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(_ephe_yolu):
+        swe.set_ephe_path(_ephe_yolu)
     motor = FBST_Engine(
         p1=_parse_date(p.p1_tarih), p2=_parse_date(p.p2_tarih),
         event_date=_parse_date(p.event_tarih), event_time=_parse_time(p.event_saat),
@@ -1905,6 +1908,9 @@ def _engine_es(p: EsSevgiliInput, ek_charts=False):
     return motor
 
 def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
+    _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(_ephe_yolu):
+        swe.set_ephe_path(_ephe_yolu)
     motor = FBST_Engine(
         p1=_parse_date(p.cocuk_tarih), p2=_parse_date(p.ebeveyn_tarih),
         event_date=_parse_date(p.cocuk_tarih), event_time=_parse_time(p.cocuk_saat),
@@ -1922,6 +1928,9 @@ def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
 
 def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
     tarih = _parse_date(p.tarih)
+    _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(_ephe_yolu):
+        swe.set_ephe_path(_ephe_yolu)
     motor = FBST_Engine(
         p1=tarih, p2=tarih,
         event_date=tarih, event_time=_parse_time(p.saat),
@@ -1938,6 +1947,9 @@ def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
 
 def _engine_natal(p: BireyselNatalInput, ek_charts=False):
     tarih = _parse_date(p.tarih)
+    _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(_ephe_yolu):
+        swe.set_ephe_path(_ephe_yolu)
     motor = FBST_Engine(
         p1=tarih, p2=tarih,
         event_date=tarih, event_time=_parse_time(p.saat),

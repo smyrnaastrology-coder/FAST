@@ -6278,6 +6278,11 @@ class FBST_Engine:
         return alarmlar
     
     def pdf_rapor_uret(self, dosya_adi="FBST_Kadersel_Kontrat.pdf"):
+        # Efemeris yolunu hesaplamalardan hemen önce yeniden ayarla
+        # (sunucuda import sırasında yapılan set bazen etkisiz kalabiliyor).
+        _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+        if os.path.isdir(_ephe_yolu):
+            swe.set_ephe_path(_ephe_yolu)
         from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
