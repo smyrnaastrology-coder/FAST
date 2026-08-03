@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import json
 import time
@@ -4058,10 +4058,7 @@ class FBST_Engine:
             ax.set_ylim(0, 1.18)
 
             plt.tight_layout()
-            plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
-            svg_adi = dosya_adi.replace('.png', '.svg')
-            if svg_adi != dosya_adi:
-                plt.savefig(svg_adi, facecolor=fig.get_facecolor(), format='svg')
+            plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
             plt.close(fig)
             
         ciz(j_ileri, f"{self._session_id}_Situa_A.png", f"{self.p1_isim} Haritası")
@@ -4122,10 +4119,7 @@ class FBST_Engine:
             spine.set_linewidth(0.5)
             
         plt.tight_layout()
-        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
-        svg_adi = dosya_adi.replace('.png', '.svg')
-        if svg_adi != dosya_adi:
-            plt.savefig(svg_adi, facecolor=fig.get_facecolor(), format='svg')
+        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
         return dosya_adi
 
@@ -4498,10 +4492,7 @@ class FBST_Engine:
 
         plt.title("Composite Harita\n(İlişkinin Ortak Ruh Haritası)",
                   color='#3D2E50', fontsize=12, fontweight='bold', pad=20)
-        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
-        svg_adi = dosya_adi.replace('.png', '.svg')
-        if svg_adi != dosya_adi:
-            plt.savefig(svg_adi, facecolor=fig.get_facecolor(), format='svg')
+        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
         return dosya_adi
 
@@ -4615,10 +4606,7 @@ class FBST_Engine:
 
         plt.title("Açı Mühürleri Gridi\n(Dış: P1 | İç: P2)",
                   color='#3D2E50', fontsize=11, fontweight='bold', pad=25)
-        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
-        svg_adi = dosya_adi.replace('.png', '.svg')
-        if svg_adi != dosya_adi:
-            plt.savefig(svg_adi, facecolor=fig.get_facecolor(), format='svg')
+        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
         return dosya_adi
 
@@ -4754,7 +4742,7 @@ class FBST_Engine:
             pass
 
         plt.title(baslik, color='#3D2E50', fontsize=11, fontweight='bold', pad=20)
-        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
+        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
         return dosya_adi
 
@@ -4837,10 +4825,7 @@ class FBST_Engine:
 
         plt.title("Arap Noktaları Radar Karşılaştırması", color='#C9A96E',
                   fontsize=12, fontweight='bold', pad=25)
-        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=300)
-        svg_adi = dosya_adi.replace('.png', '.svg')
-        if svg_adi != dosya_adi:
-            plt.savefig(svg_adi, facecolor=fig.get_facecolor(), format='svg')
+        plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
         return dosya_adi
 

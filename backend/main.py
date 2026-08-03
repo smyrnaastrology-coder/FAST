@@ -612,7 +612,7 @@ except Exception:
 
 # ─── In-memory engine cache ───
 _ENGINE_CACHE = {}
-_ENGINE_CACHE_MAX = 20
+_ENGINE_CACHE_MAX = 12
 
 def _cache_engine(motor):
     sid = motor._session_id
