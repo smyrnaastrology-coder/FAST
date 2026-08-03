@@ -3527,6 +3527,83 @@ def _collect_natal_data(motor):
 def health():
     return {"status": "ok", "version": "4.0"}
 
+@app_fast.get("/api/debug_ephe")
+def debug_ephe():
+    """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
+    import os as _os
+    sonuc = {}
+    try:
+        sonuc["swe_version"] = swe.version
+    except Exception as e:
+        sonuc["swe_version"] = f"HATA: {e}"
+    try:
+        sonuc["swe_ephe_path"] = swe.get_ephe_path()
+    except Exception as e:
+        sonuc["swe_ephe_path"] = f"HATA: {e}"
+    try:
+        sonuc["ephe_dizin_var"] = _os.path.isdir(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), 'ephe'))
+    except Exception as e:
+        sonuc["ephe_dizin_var"] = f"HATA: {e}"
+    for alt in ["", "ast0", "ast1", "ast2"]:
+        try:
+            d = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), 'ephe', alt)
+            if alt == "":
+                sonuc["ephe_icerik"] = sorted(_os.listdir(d)) if _os.path.isdir(d) else "YOK"
+            else:
+                icerik = sorted(_os.listdir(d)) if _os.path.isdir(d) else "YOK"
+                sonuc[f"ephe_{alt}_dosya_sayisi"] = len(icerik) if isinstance(icerik, list) else icerik
+        except Exception as e:
+            sonuc[f"ephe_{alt}_dosya_sayisi"] = f"HATA: {e}"
+
+    from datetime import datetime as _dt
+    jd = swe.julday(2026, 8, 3, 12.0)
+    cisimler = {
+        "Gunes": 0, "Ay": 1, "Merkur": 2, "Venus": 3, "Mars": 4,
+        "Jupiter": 5, "Saturne": 6, "Uranus": 7, "Neptun": 8, "Pluto": 9,
+        "Lilith_apog": 10, "Chiron": 15, "Juno": swe.AST_OFFSET + 3,
+        "Ceres": swe.AST_OFFSET + 1, "Pallas": swe.AST_OFFSET + 2,
+        "Vesta": swe.AST_OFFSET + 4, "Eros": swe.AST_OFFSET + 433,
+        "Psyche": swe.AST_OFFSET + 16, "Sappho": swe.AST_OFFSET + 80,
+        "Amor": swe.AST_OFFSET + 1221,
+    }
+    cisim_durum = {}
+    for ad, gid in cisimler.items():
+        try:
+            flaglar = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_NOABERR if gid >= 10 else swe.FLG_SWIEPH | swe.FLG_SPEED
+            arr, _iflag = swe.calc_ut(jd, gid, flaglar)
+            derece = float(arr[0])
+            cisim_durum[ad] = {"ok": True, "derece": round(derece, 4)}
+        except Exception as e:
+            cisim_durum[ad] = {"ok": False, "hata": str(e)[:150]}
+    sonuc["cisim_hesap"] = cisim_durum
+
+    yildiz_durum = {}
+    for yad in ["Regulus", "Sirius", "Revati", "Pushya", "Antares"]:
+        try:
+            arr, _iflag = swe.fixstar_ut(yad, jd, swe.FLG_SWIEPH)
+            yildiz_durum[yad] = {"ok": True, "derece": round(float(arr[0]), 4)}
+        except Exception as e:
+            yildiz_durum[yad] = {"ok": False, "hata": str(e)[:150]}
+    sonuc["yildiz_hesap"] = yildiz_durum
+    try:
+        from core.utils import fixstar_ut_lon
+        fs_durum = {}
+        for yad in ["Regulus", "Sirius", "Revati", "Pushya", "Antares", "Decrux", "Alchiba"]:
+            try:
+                fs_durum[yad] = fixstar_ut_lon(yad, jd)
+            except Exception as e:
+                fs_durum[yad] = f"HATA: {str(e)[:120]}"
+        sonuc["fixstar_ut_lon_motor"] = fs_durum
+    except Exception as e:
+        sonuc["fixstar_ut_lon_motor"] = f"içe aktarılamadı: {str(e)[:120]}"
+    try:
+        from core.utils import tum_sabit_yildizlar_listesi
+        liste = tum_sabit_yildizlar_listesi()
+        sonuc["sefstars_yildiz_sayisi"] = len(liste) if isinstance(liste, list) else str(type(liste))
+    except Exception as e:
+        sonuc["sefstars_yildiz_sayisi"] = f"HATA: {e}"
+    return sonuc
+
 @app_fast.get("/api/ulkeler")
 def ulkeler_listesi():
     """Tüm ülkeler ve her ülkenin şehir listesi (cities_db.json'dan, 223 ülke)."""
