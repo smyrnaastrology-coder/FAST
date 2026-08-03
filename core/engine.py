@@ -34,7 +34,7 @@ from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocato
     fixstar_ut_lon, dereceden_burc_dec, dereceyi_dakikaya_cevir,
     tum_sabit_yildizlar_listesi, sabit_yildiz_precession_tarama,
     sabit_yildiz_tarihe_gore, bagil_harita_yildiz_donusumu,
-    aci_farki_safe, aci_farki, kadersel_yildiz_taramasi,
+    aci_farki_safe, aci_farki, kadersel_yildiz_taramasi, kadersel_yildiz_harita_tara,
     get_safe_flags, asteroid_ephe_mevcut_mu, asteroit_tahmini_derece,
     dereceyi_burca_cevir, dereceyi_eve_ata,
     acg_pozisyon_hesapla, astro_kartografi_skor,
@@ -1445,16 +1445,16 @@ class FBST_Engine:
         # Astroloji kurallarına göre 0.01 derece 1. derecedir. (Örn: 14.2 = 15. derece)
         sabian_derece = math.floor(mutlak_derece % 30) + 1 
         
-        # Gezegenin temel fıtratını yapi olarak belirliyoruz
+        # Gezegenin temel fıtratını yapi olarak belirliyoruz (doğal/insani dil)
         gez_fitrat_sozlugu = {
-            "Güneş": "iradesi ve ego vitrini", "Ay": "duygusal aidiyet ihtiyacı",
-            "Merkür": "zihinsel titreşimi", "Venüs": "özdeğer algısı ve aşkı",
-            "Mars": "eylemsel gucu ve tutkusu", "Jüpiter": "kadersel vizyonu",
-            "Satürn": "sarsılmaz sadakati", "Uranüs": "isyankar özgürlüğü",
-            "Neptün": "ilahi teslimiyeti", "Plüton": "yeraltı simyası",
-            "Chiron": "kadersel yarası ve şifası", "Juno": "eş sözleşmesi",
-            "Ceres": "ruhsal beslenme gücü", "Lilith": "gölge arzuları",
-            "KAD": "tekamül rotası", "GAD": "karmik borcu"
+            "Güneş": "iradesi ve kendini ifade etme biçimi", "Ay": "duygusal güven arayışı",
+            "Merkür": "düşünce ve iletişim tarzı", "Venüs": "sevgi ve özdeğer algısı",
+            "Mars": "enerjisi ve tutkusu", "Jüpiter": "büyüme vizyonu",
+            "Satürn": "sorumluluk ve sadakat anlayışı", "Uranüs": "özgürlük ihtiyacı",
+            "Neptün": "hayal ve inanç dünyası", "Plüton": "dönüşüm gücü",
+            "Chiron": "yaraları ve şifası", "Juno": "bağlılık anlayışı",
+            "Ceres": "bakım ve besleme tarzı", "Lilith": "gizli arzuları",
+            "KAD": "tekamül yolu", "GAD": "karmik öğretileri"
         }
         gez_fitrat = gez_fitrat_sozlugu.get(gezegen_isim, "kadersel enerjisi")
         
@@ -1467,16 +1467,16 @@ class FBST_Engine:
         sembol_vizyonu = sabian_verisi[0]
         sembol_yorumu = sabian_verisi[1]
         
-        # ReportLab (PDF) uyumlu şık tipografi
+        # ReportLab (PDF) uyumlu şık tipografi — doğal ve insani cümlelerle
         if _aktif_mod == "ebeveyn_cocuk":
-            sentez = f"👁️‍🗨️ <b>Sabian Şifresi ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'><b>Mühür:</b> {gez_fitrat}, bu vizyonla mühürlenmiştir. {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += f"<font color='#555555'>Bu sembol, aranızdaki bağda <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
         elif _aktif_mod == "bireysel_natal":
-            sentez = f"👁️‍🗨️ <b>Sabian Şifresi ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'><b>Mühür:</b> {gez_fitrat}, bu vizyonla mühürlenmiştir. {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += f"<font color='#555555'>Bu sembol, sizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
         else:
-            sentez = f"👁️‍🗨️ <b>Sabian Şifresi ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'><b>Mühür:</b> Partnerinizin {gez_fitrat}, bu vizyonla mühürlenmiştir. {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += f"<font color='#555555'>Bu sembol, partnerinizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
         
         return sentez
    
@@ -6545,6 +6545,28 @@ class FBST_Engine:
             story.append(PageBreak())
             gezegen_dokumu(j_geri, f"🦅 {self.p2_isim}'in Kadersel Haritası (Ebeveyn)", geri_str, f"{self._session_id}_Situa_B.png", rol="ebeveyn")
         else:
+            story.append(PageBreak())
+            baslik_karti_ekle("KİŞİSEL PERSPEKTİFLER", alt_baslik=f"{self.p1_isim} ve {self.p2_isim} perspektifleri", emoji="🧭")
+            story.append(Spacer(1, 10))
+            story.append(Paragraph(
+                "Aşağıdaki iki perspektif, ilişkinizi her bir kişinin kendi gözünden okur. "
+                "KÖK RUH perspektifi, geçmişin getirdiği bilgeliği ve kişinin ilişkiye taşıdığı temel enerjiyi anlatır; "
+                "REHBER RUH perspektifi ise geleceğin vizyonunu ve kişinin ilişkideki yönlendirici rolünü ortaya koyar. "
+                "Her bölümdeki gezegen konumları o kişinin durumsal haritasından alınır ve ilişkinin bütününe etkisi yorumlanır.",
+                styles['TurkishNormal']))
+            story.append(Spacer(1, 12))
+            story.append(Paragraph(
+                f"<b>🌱 {self.p1_isim} Perspektifi:</b> Bu bölüm, {self.p1_isim}'in ilişkideki rolünü, "
+                "geçmiş yaşantıların bilgeliğiyle getirdiği güçlü yanları ve taşıdığı kadersel sorumlulukları anlatır. "
+                "Buradaki her gezegen, bu kişinin ilişkiye nasıl bir enerji kattığının anahtarını taşır.",
+                styles['TurkishNormal']))
+            story.append(Spacer(1, 12))
+            story.append(Paragraph(
+                f"<b>🦅 {self.p2_isim} Perspektifi:</b> Bu bölüm, {self.p2_isim}'in ilişkideki rolünü, "
+                "geleceğe dair vizyonunu ve bu beraberliği ileriye taşıyan rehber enerjisini anlatır. "
+                "Buradaki her gezegen, bu kişinin ilişkiyi hangi yöne şekillendirdiğini ve ortak kaderi nasıl yönlendirdiğini gösterir.",
+                styles['TurkishNormal']))
+            story.append(Spacer(1, 12))
             gezegen_dokumu(j_ileri, f"🌱 KÖK RUH (Geçmişin Bilgeliği): {self.p1_isim} Perspektifi", ileri_str, f"{self._session_id}_Situa_A.png")
             story.append(PageBreak())
             gezegen_dokumu(j_geri, f"🦅 REHBER RUH (Geleceğin Vizyonu): {self.p2_isim} Perspektifi", geri_str, f"{self._session_id}_Situa_B.png")
@@ -6708,6 +6730,15 @@ class FBST_Engine:
         baslik_karti_ekle("ORTALAMA HARİTA", 
                           alt_baslik="İki kişinin haritasının ortalamasından oluşan ortak harita", 
                           emoji="🔮")
+        story.append(Spacer(1, 10))
+        story.append(Paragraph(
+            "<b>Composite (Ortalama) harita nedir?</b> Bu harita, iki kişinin doğum haritalarındaki "
+            "gezegenlerin orta noktaları alınarak oluşturulan <b>üçüncü, bağımsız bir ruhu</b> temsil eder. "
+            "İlişkinin bireysel kimliklerden ayrı olarak kendi başına taşıdığı enerjiyi, ortak hedefleri ve "
+            "birlikteyken ortaya çıkan 'biz' karakterini gösterir. Bu harita, ilişkinin doğum haritası gibidir: "
+            "hangi alanlarda doğal bir uyum yakalayacağınızı, hangi temalarda birlikte olgunlaşacağınızı ve "
+            "ortak geleceğinizin hangi yıldızlar altında yazıldığını ortaya koyar.",
+            styles['TurkishNormal']))
         story.append(Spacer(1, 10))
         try:
             composite_dosya = self.ciz_composite_harita(dosya_adi="FBST_Composite_PDF.png")
@@ -7343,6 +7374,7 @@ class FBST_Engine:
                 story.append(Spacer(1, 8))
                 
                 katman_muhurleri = []
+                katman_gezegen_dereceleri = {}
 
                 for gezegen_adi, gezegen_id in GEZEGENLER.items():
                     try:
@@ -7359,15 +7391,32 @@ class FBST_Engine:
                                 flags = get_safe_flags(gezegen_id)
                                 g_derecesi = swe.calc_ut(katman["jd"], gezegen_id, flags)[0][0]
 
-                        # Sabit Yıldız okuyucu global fonksiyon
-                        if 'kadersel_yildiz_taramasi' in globals():
-                            sonuclar = kadersel_yildiz_taramasi(gezegen_adi, g_derecesi, orb_siniri=2.0, mod=self.mod)
-                            if sonuclar:
-                                for sonuc in sonuclar:
-                                    kisisel_muhur = sonuc.replace("Kavuşumu", f"Kavuşumu [{katman['isim']}]")
-                                    katman_muhurleri.append(kisisel_muhur)
+                        if g_derecesi is not None:
+                            katman_gezegen_dereceleri[gezegen_adi] = g_derecesi
                     except Exception:
                         continue
+
+                # Sabit Yıldız okuyucu global fonksiyon — precession ile tüm yıldızları tarar
+                if katman_gezegen_dereceleri:
+                    try:
+                        if 'kadersel_yildiz_harita_tara' in globals():
+                            sonuclar = kadersel_yildiz_harita_tara(
+                                katman_gezegen_dereceleri,
+                                target_jd=katman["jd"],
+                                orb_siniri=2.0,
+                                mod=self.mod,
+                                max_muhur=15
+                            )
+                        else:
+                            sonuclar = []
+                        if not sonuclar and 'kadersel_yildiz_taramasi' in globals():
+                            for gezegen_adi, g_derecesi in katman_gezegen_dereceleri.items():
+                                sonuclar.extend(kadersel_yildiz_taramasi(gezegen_adi, g_derecesi, orb_siniri=2.0, mod=self.mod))
+                        for sonuc in sonuclar:
+                            kisisel_muhur = sonuc.replace("Kavuşumu", f"Kavuşumu [{katman['isim']}]")
+                            katman_muhurleri.append(kisisel_muhur)
+                    except Exception:
+                        pass
 
                 # O Katmanda Mühür Yoksa Verilecek Zarif Uyarı
                 if not katman_muhurleri:
@@ -7484,7 +7533,7 @@ class FBST_Engine:
                 burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
                 return burclar[int(derece / 30) % 12], derece % 30
 
-            def jd_derece_al(jd, gezegen_adi):
+            def jd_derece_al(jd, gezegen_adi, natal_jd=None):
                 try:
                     if gezegen_adi == "KAD": 
                         return swe.calc_ut(jd, swe.MEAN_NODE)[0][0]
@@ -7498,8 +7547,24 @@ class FBST_Engine:
                                 return swe.calc_ut(jd, gez_id, flags)[0][0]
                             except Exception:
                                 pass
+                            # Asteroidler çok eski (M.Ö.) bağıl tarihlerde hesaplanamıyorsa
+                            # natal pozisyona düş — asteroid konumları yavaş değişir, anlamlıdır.
+                            if natal_jd is not None:
+                                try:
+                                    flags = get_safe_flags(gez_id)
+                                    return swe.calc_ut(natal_jd, gez_id, flags)[0][0]
+                                except Exception:
+                                    pass
                         return asteroit_tahmini_derece(gezegen_adi, jd)
                 except Exception:
+                    if natal_jd is not None and gezegen_adi not in ("KAD", "GAD"):
+                        gez_id = GEZEGENLER.get(gezegen_adi)
+                        if gez_id is not None:
+                            try:
+                                flags = get_safe_flags(gez_id)
+                                return swe.calc_ut(natal_jd, gez_id, flags)[0][0]
+                            except Exception:
+                                pass
                     return asteroit_tahmini_derece(gezegen_adi, jd)
 
             if self.mod == "ebeveyn_cocuk":
@@ -7514,23 +7579,25 @@ class FBST_Engine:
                 hedef_gezegenler = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton", "Chiron"]
 
             taramalar = [
-                {"kaynak_jd": j_ileri, "hedef_jd": j_geri, "sahip": isim_a, "hedef": isim_b},
-                {"kaynak_jd": j_geri, "hedef_jd": j_ileri, "sahip": isim_b, "hedef": isim_a}
+                {"kaynak_jd": j_ileri, "hedef_jd": j_geri, "sahip": isim_a, "hedef": isim_b, "sahip_kimlik": "p1", "hedef_kimlik": "p2"},
+                {"kaynak_jd": j_geri, "hedef_jd": j_ileri, "sahip": isim_b, "hedef": isim_a, "sahip_kimlik": "p2", "hedef_kimlik": "p1"}
             ]
 
             for tarama in taramalar:
                 satirlar = []
                 toplam_muhur = 0
+                sahip_natal_jd = self.get_natal_julian_day(tarama["sahip_kimlik"])
+                hedef_natal_jd = self.get_natal_julian_day(tarama["hedef_kimlik"])
 
                 for asteroit_adi in taranacak_asteroidler:
-                    ast_deg = jd_derece_al(tarama["kaynak_jd"], asteroit_adi)
+                    ast_deg = jd_derece_al(tarama["kaynak_jd"], asteroit_adi, natal_jd=sahip_natal_jd)
                     if ast_deg is None:
                         continue
 
                     ast_burc, _ = yerel_zodyak_bul(ast_deg)
 
                     for hedef_adi in hedef_gezegenler:
-                        hedef_deg = jd_derece_al(tarama["hedef_jd"], hedef_adi)
+                        hedef_deg = jd_derece_al(tarama["hedef_jd"], hedef_adi, natal_jd=hedef_natal_jd)
                         if hedef_deg is None:
                             continue
 
@@ -8081,6 +8148,20 @@ class FBST_Engine:
                 ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ]))
             story.append(muhur_tablo)
+
+            # 📜 FERAGAT / UYARI BİLDİRİMİ
+            story.append(Spacer(1, 20))
+            feragat_metni = (
+                "<b><font color='#718096' size='9'>⚠️ YASAL VE ETİK UYARI:</font></b>"
+                "<font color='#718096' size='8.5'><br/>"
+                "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
+                "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
+                "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
+                "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
+                "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
+                "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir.</font>"
+            )
+            story.append(Paragraph(feragat_metni, styles['TurkishNormal']))
 
         except Exception as e:
             story.append(Paragraph(f"<font color='red'>Nihai özet oluşturulurken hata: {str(e)}</font>", styles['TurkishNormal']))
