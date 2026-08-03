@@ -1315,6 +1315,575 @@ fbst_sabit_yildizlar = {
             }
         }
     },
+
+    "ALGIEBA": {
+        "derece": 149.99,  # 29°59' Aslan (γ Leo)
+        "yargi": "Algieba, Aslan'ın alnındaki cesaret ve şeref mührüdür. Eğer bu mühür aktifse, ilişkinizdeki liderlik, koruyuculuk ve cömertlik duyguları güçlenir; ancak gurur kontrolden çıkarsa itibar kazanımları ani sarsıntılara açık hale gelir. Yargısı şudur: Sahip olduğunuz taht, ancak kibirden ve sertlikten arındığında korunabilir; cesareti sevgiyle, otoriteyi şefkatle harmanladığınızda bu mühür sizi kalıcı bir onura taşır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Koruyucu ve onurlu bir sevgi; partnerinizi güçlü bir şekilde sahiplenme ve gözetme."
+            },
+            "evlilik": {
+                "Genel": "Saygın, korumacı ve lider ruhlu bir birliktelik; ancak egonun sınırlanması şarttır."
+            },
+            "maddi": {
+                "Genel": "Onur ve çabayla gelen kazançlar; itibar kaynaklı fırsatlar."
+            },
+            "kaza": {
+                "Mars": "Gurur kaynaklı ani çatışma ve sarsıntılara açıklık; dikkatli olunmalı."
+            },
+            "zihinsel": {
+                "Genel": "Keskin, kararlı ve cesur bir zihin yapısı."
+            }
+        }
+    },
+
+    "ALMACH": {
+        "derece": 44.59,  # 14°35' Boğa (γ And) — Almaak/Almak/Almac varyantlarıyla aynı yıldız
+        "yargi": "Almach, sanatın ve zarafetin kozmik mührüdür. Bu mühür aktifse, ilişkinizde estetik duyarlılık, müzik ve kültürel paylaşımlar öne çıkar; sevginizi ifade etme biçiminiz incelik kazanır. Yargısı şudur: Güzelliği yüzeysel bir süs olarak değil, birleştirici bir dil olarak kullandığınızda bu mühür size hem sanatsal başarı hem de derin bir romantik çekim bahşeder; ancak aşırılıklardan kaçınmazsanız tutkular dengeden sapabilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Zarif, sanatsal ve çekici bir aşk enerjisi; estetik zevkler ortak payda olur."
+            },
+            "evlilik": {
+                "Venüs": "Kültürel ve estetik uyum üzerine kurulu, incelikli bir birliktelik."
+            },
+            "cinsellik": {
+                "Genel": "Sanat ve sevgiyi birleştiren, zarif ama tutkulu bir cinsel enerji."
+            },
+            "is_hayati": {
+                "Genel": "Sanat, müzik ve kültür alanlarında başarı fırsatları."
+            },
+            "kaza": {
+                "Genel": "Hızlı hareketler ve yüksek yerlerle ilgili dikkat gerektiren durumlar."
+            }
+        }
+    },
+
+    "ALCHIBA": {
+        "derece": 192.24,  # 12°14' Terazi (α Crv) — Alchita varyantıyla aynı yıldız
+        "yargi": "Alchiba, kuzgunun taşıdığı kehanet mührüdür; mesajların ve sezgilerin diliyle örülü bir yoldur. Bu mühür aktifse, ilişkinizde söylenmemiş olanı sezme ve doğru zamanda doğru sözü söyleme yeteneği belirir; birbirinizin zihnini okur gibi anlarsınız. Yargısı şudur: Gelen haberin ve sezginin dilini çözdüğünüzde bu mühür size keskin bir anlayış kazandırır; ancak zekâ, oyunlara ve gizli hesaplara dönüşmemelidir. Kuzgun gerçeği yüksekten görür; sevgi ise onu yumuşak bir yere kondurur.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Sezgisel ve zeki bir iletişimle örülen, anlam derinliği yüksek bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "Akıl ve sezginin ortak dil kurduğu; mesajlaşmanın kaderi bağladığı bir birliktelik."
+            },
+            "zihinsel": {
+                "Genel": "Keskin, sezgisel ve sembolleri hızla çözen bir zihin."
+            },
+            "gizlilikler": {
+                "Genel": "Saklı mesajlar ve gizli anlamlar; doğru çözüldüğünde büyük bir avantaj."
+            },
+            "arkadaslar": {
+                "Genel": "Zekâ oyunlarıyla kurulan, entelektüel derinliği olan dostluklar."
+            }
+        }
+    },
+
+    "DECRUX": {
+        "derece": 215.66,  # 5°40' Akrep (δ Cru) — Güney Haçı'nın işareti
+        "yargi": "Decrux, Güney Haçı'nın işaretidir; kaderin en karanlık yönünde bile yön bulmayı öğreten bir mühürdür. Bu mühür aktifse, ilişkinizde birlikte katlanılan fedakârlıklar derin bir anlam kazanır; güçlü bir amaç uğruna sevmek, sıradan bir bağı aşar. Yargısı şudur: Haçın ağırlığını birlikte taşımayı seçtiğinizde bu mühür size kalıcı bir ruhsal derinlik kazandırır; ancak yük tek tarafa kalırsa kırılma yaşanır. Birlikte katlanılan karanlık, en parlak ışığı doğurur.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Fedakârlık ve derin sadakatle yoğrulmuş, kaderin sınadığı bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "Zorlukları birlikte aşan, kutsal bir amaç etrafında kenetlenen bir birliktelik."
+            },
+            "cinsellik": {
+                "Genel": "Tutkuyu ruhsallıkla harmanlayan, birleşmeyi kutsal kılan bir enerji."
+            },
+            "gizlilikler": {
+                "Genel": "Aileye ve geçmişe dair kadersel sırlar; ortak yüzleşmeyle aydınlanır."
+            },
+            "saglik": {
+                "Genel": "Aşırı yüklenme ve tükenmişliğe karşı dikkat; dinlenme, fedakârlıkla çelişmemeli."
+            }
+        }
+    },
+
+    "SHIR": {
+        "derece": 156.39,  # 6°23' Başak (ρ Leo) — Aslan'ın şarkısı
+        "yargi": "Shir, aslanın gururla söylediği şarkıdır; içteki sese güvenip kendini ifade etme mührüdür. Bu mühür aktifse, ilişkinizde açık sözlülük ve içten ifade öne çıkar; duygularınız saklanmadan, gururla ve net biçimde dışa akar. Yargısı şudur: Sesinizi yükseltmekten korkmadığınızda bu mühür size hem özgüven hem hayranlık kazandırır; ancak sözler yara açacak kadar keskinleşmemelidir. Doğru zamanda söylenen şarkı, yalnızlığı bile onarır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Kendini net ve gururla ifade eden, cesur ve içten bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "Açık sözlülük üzerine kurulu; gurur ve saygının dengelendiği bir birliktelik."
+            },
+            "maddi": {
+                "Genel": "Kendini değerli görme ve görünür olma; yetenekleri duyurmanın getirdiği kazanç."
+            },
+            "zihinsel": {
+                "Genel": "Yaratıcı, ifade gücü yüksek ve cesur bir zihin."
+            }
+        }
+    },
+
+    "RASALAS": {
+        "derece": 141.43,  # 21°26' Aslan (μ Leo) — Ras Elased Borealis varyantıyla aynı yıldız
+        "yargi": "Rasalas, aslanın kuzey başıdır; cesareti taşıyan ama gurura karşı uyaran bir mühürdür. Bu mühür aktifse, ilişkinizde koruyuculuk ve atılganlık öne çıkar; sevdiğinizi savunmak için gösterdiğiniz cesaret, bağınızın görünür bir kanıtı olur. Yargısı şudur: Cesaretinizi sevginin emrine verdiğinizde bu mühür size onur ve sadakat kazandırır; ancak gurur savaşçıyı yalnızlaştırır. Gücünüzü koruyucu değil, yıkıcı kullandığınızda tahtınız sarsılır; aslanın asaleti, yumuşaklıkla dengelenen güçtedir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Koruyucu, cesur ve sahiplenici bir sevgi; sevdiğini savunmak için risk alır."
+            },
+            "evlilik": {
+                "Genel": "Güçlü bir koruma içgüdüsü üzerine kurulu; gururun saygıyla dengelendiği birliktelik."
+            },
+            "cinsellik": {
+                "Genel": "Atılgan, tutkulu ve sahiplenici bir cinsel enerji."
+            },
+            "kaza": {
+                "Genel": "Ani gurur kırılmaları ve öfke patlamalarına bağlı çatışma riski."
+            },
+            "zihinsel": {
+                "Genel": "Cesur, kararlı ve savunmacı bir zihin yapısı."
+            }
+        }
+    },
+
+    "MENKAR": {
+        "derece": 44.69,  # 14°41' Boğa (α Cet)
+        "yargi": "Menkar, balinanın burun deliğindeki sınav ve bilgelik mührüdür. Bu mühür aktifse, ilişkinizde sağlık ve dayanıklılık konuları öne çıkar; birbirinizin zayıf anlarında hekim gibi davranma görevi yüklenirsiniz. Yargısı şudur: Karşılaştığınız güçlükler, çözüm ve şifa yeteneğinizi geliştirmek için yazılmıştır; krize değil çareye odaklandığınızda bu mühür size hem bilgi hem iyileşme gücü kazandırır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Şefkatli ve iyileştirici bir sevgi; partneri zorlukta koruma dürtüsü."
+            },
+            "saglik": {
+                "Genel": "Hastalıklara ve yorgunluğa karşı hassasiyet; düzenli bakım gerekir."
+            },
+            "evlilik": {
+                "Genel": "Birlikte zorlukları aşan, dayanıklı ve bakım odaklı bir bağ."
+            },
+            "zihinsel": {
+                "Genel": "Tıp, bilim ve araştırma konularına yatkın, keskin bir zihin."
+            }
+        }
+    },
+
+    "RASALHAGUE": {
+        "derece": 262.83,  # 22°50' Yay (α Oph)
+        "yargi": "Rasalhague, yılan taşıyıcısının başındaki şifa ve bilgelik mührüdür. Bu mühür aktifse, ilişkinizde iyileştirici bir güç ve hakikat arayışı belirir; birbirinizin duygusal yaralarını sarmada doğal bir yeteneğiniz vardır. Yargısı şudur: Bilgeliğinizi güç aracı olarak değil, şifa aracı olarak kullandığınızda bu mühür size sarsılmaz bir bütünlük ve derin bir bağ kazandırır; ancak gizli çekişmeler ve zehirli sözler bağınızı yıpratmamalıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Şifacı ruhlu, bilge ve derin bir sevgi bağı."
+            },
+            "evlilik": {
+                "Genel": "Karşılıklı anlayış, dürüstlük ve manevi destek üzerine kurulu bir birliktelik."
+            },
+            "saglik": {
+                "Genel": "İyileşme kapasitesi yüksek; hem kendi hem partnerin sağlığına şifa verir."
+            },
+            "zihinsel": {
+                "Genel": "Tıp, felsefe ve derin araştırma konularına yatkın, analitik bir zihin."
+            },
+            "gizlilikler": {
+                "Genel": "Gizli düşmanlıklara ve imalara karşı dikkatli olunmalıdır."
+            }
+        }
+    },
+
+    "WASAT": {
+        "derece": 108.89,  # 18°53' Yengeç (δ Gem)
+        "yargi": "Wasat, ikizlerin ortasındaki denge ve şeref mührüdür. Bu mühür aktifse, ilişkinizde edebi ve bilimsel paylaşımlar, ortak okumalar ve fikir alışverişleri öne çıkar; adalet duygunuz güçlenir. Yargısı şudur: Dürüstlük ve ölçüden ayrılmadığınızda bu mühür size hem maddi hem manevi itibar kazandırır; ancak kötü niyetli çevrelerden gelebilecek yönlendirmelere karşı seçici olmanız gerekir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Dengeli, dürüst ve entelektüel bir sevgi dili."
+            },
+            "evlilik": {
+                "Genel": "Ortak fikirler ve adalet anlayışı üzerine kurulu sağlam bir bağ."
+            },
+            "maddi": {
+                "Genel": "İtibar ve emek yoluyla gelen istikrarlı kazançlar."
+            },
+            "arkadaslar": {
+                "Genel": "Çevrenin etkisine açık olma; güvenilir dostluklar seçilmelidir."
+            }
+        }
+    },
+
+    "TEJAT": {
+        "derece": 95.67,  # 5°40' Yengeç (μ Gem)
+        "yargi": "Tejat, yaratıcılığın ve anlatım gücünün mührüdür. Bu mühür aktifse, ilişkinizde sanatsal üretim, el becerisi ve sözel yetenek öne çıkar; duygularınızı ifade etmekte usta olursunuz. Yargısı şudur: Yaratıcı enerjinizi ortak bir projeye dönüştürdüğünüzde bu mühür size hem ilham hem bereket getirir; ancak dürtüsellik ve dikkatsizlik kazalara ve sözlerin kırıcılığına açık kapı bırakabilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Yaratıcı, esprili ve canlı bir sevgi enerjisi."
+            },
+            "cinsellik": {
+                "Genel": "İfadesi güçlü, sanatsal ve coşkulu bir cinsel enerji."
+            },
+            "is_hayati": {
+                "Genel": "Sanat, yazı ve iletişim alanlarında başarı fırsatları."
+            },
+            "kaza": {
+                "Genel": "Su, yol ve ani hareketlerle ilgili dikkat gerektiren durumlar."
+            }
+        }
+    },
+
+    "DABIH": {
+        "derece": 304.43,  # 4°26' Kova (β Cap)
+        "yargi": "Dabih, oğlak kesicisinin emek ve kader mührüdür. Bu mühür aktifse, ilişkinizde kazançlar emek ve mücadeleyle gelir; kolay para vaadi sizi yanıltabilir. Yargısı şudur: Ticari konularda şeffaflıktan ve dürüstlükten ayrılmadığınızda bu mühür size kalıcı servet getirir; ancak kısa yoldan kazanç ve belirsiz ortaklıklar kadersel kayıplara yol açabilir. Bu yüzleşme, ahlaki sağlamlığınızın sınavıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Emekle büyüyen, istikrarlı ve ciddi bir sevgi bağı."
+            },
+            "evlilik": {
+                "Genel": "Ortak çaba ve mücadeleyle güçlenen, kalıcı bir birliktelik."
+            },
+            "maddi": {
+                "Genel": "Mücadeleyle gelen kazançlar; riskli ortaklıklardan kaçınılmalıdır."
+            },
+            "is_hayati": {
+                "Genel": "Ticaret ve iş dünyasında sabırlı çalışmayla yükselme."
+            }
+        }
+    },
+
+    "ARNEB": {
+        "derece": 81.75,  # 21°45' İkizler (α Lep)
+        "yargi": "Arneb, tavşanın çeviklik ve teyakkuz mührüdür. Bu mühür aktifse, ilişkinizde hızlı düşünme ve pratik çözümler öne çıkar; ani fırsatları yakalamakta usta olursunuz. Yargısı şudur: Çevikliğinizi yön ve amaçla birleştirdiğinizde bu mühür size avantaj sağlar; ancak acelecilik ve plansızlık sizi gereksiz risklere sürükleyebilir. Dengeli bir tempo, bu mührün en büyük anahtarıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Canlı, atılgan ve sürprizlerle dolu bir sevgi enerjisi."
+            },
+            "evlilik": {
+                "Genel": "Hareketli ve esnek bir birliktelik; sabitliğe ihtiyaç duyar."
+            },
+            "maddi": {
+                "Genel": "Hızlı fırsatlar ve kısa vadeli kazançlar; risk yönetimi şart."
+            },
+            "zihinsel": {
+                "Genel": "Çevik, hızlı ve fırsatları sezen bir zihin."
+            }
+        }
+    },
+
+    "CHARA": {
+        "derece": 168.07,  # 18°04' Başak (β CVn) — Asterion varyantıyla aynı yıldız
+        "yargi": "Chara, sadık köpeğin dostluk ve vefâ mührüdür. Bu mühür aktifse, ilişkinizde sadakat, koruma ve karşılıklı güven öne çıkar; birlikteliğiniz sevgi dolu bir sığınağa dönüşür. Yargısı şudur: Sadakatiniz koşulsuz olduğunda bu mühür size ömür boyu süren güvenilir bir bağ bahşeder; ancak aşırı korumacılık özgürlüğü kısıtlamamalıdır. Sevgi, güvenle özgürlüğün dansıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Sadık, koruyucu ve içten bir sevgi; gerçek dostluğun aşkı."
+            },
+            "evlilik": {
+                "Genel": "Güven, vefâ ve sadakat üzerine kurulu çok sağlam bir birliktelik."
+            },
+            "arkadaslar": {
+                "Genel": "Güvenilir, sadık ve kalıcı dostluklar kurma yeteneği."
+            },
+            "zihinsel": {
+                "Genel": "Sadakat ve sezgiyi birleştiren, içten ve anlayışlı bir zihin."
+            }
+        }
+    },
+
+    "ANSER": {
+        "derece": 299.88,  # 29°53' Oğlak (α Vul)
+        "yargi": "Anser, tilki ve kazın kurnazlık mührüdür. Bu mühür aktifse, ilişkinizde stratejik düşünme ve kıvrak zekâ öne çıkar; zorlu meseleleri zarafetle çözersiniz. Yargısı şudur: Zekânızı dürüstlükle birleştirdiğinizde bu mühür size üstünlük sağlar; ancak aldatma ve gizli oyunlar güveni zedeler. Şeffaflık, bu mührün karanlık yüzünü dengeleyen tek anahtardır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Zeki, oyuncu ve stratejik bir sevgi dili; gizlilikten kaçınılmalıdır."
+            },
+            "evlilik": {
+                "Genel": "Kurnazlık yerine dürüstlük üzerine kurulması gereken bir birliktelik."
+            },
+            "maddi": {
+                "Genel": "Zekâ ve stratejiyle gelen kazançlar; etik sınırlar korunmalıdır."
+            },
+            "zihinsel": {
+                "Genel": "Kıvrak, stratejik ve olayları önceden sezen bir zihin."
+            }
+        }
+    },
+
+    "ELECTRA": {
+        "derece": 59.78,  # 29°47' Boğa (17 Tau)
+        "yargi": "Electra, Ülker'in hüznü ve hırsıyla yoğrulmuş bir mührüdür. Bu mühür aktifse, ilişkinizde büyük hedefler ve tutkulu bir ilerleme arzusu belirir; ancak geçmişten gelen kayıp ve özlem temaları zaman zaman yüzeye çıkabilir. Yargısı şudur: Hırsınızı sevgiyle dengeleyip geçmişin yüklerini bıraktığınızda bu mühür size görkemli bir başarı kazandırır; kayıplar, sizi birbirinize daha sıkı bağlayan derslere dönüşür.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Tutkulu, hırslı ve derin bir sevgi; kayıp korkusuyla sınanır."
+            },
+            "evlilik": {
+                "Genel": "Büyük hedeflere ortak olan, özlem ve hırsın dengelenmesi gereken bir bağ."
+            },
+            "maddi": {
+                "Genel": "Hırs ve çabayla gelen büyük kazançlar; itibar odaklı ilerleme."
+            },
+            "arkadaslar": {
+                "Genel": "Etkili çevreler; ancak geçmiş bağlar zaman zaman gündeme gelir."
+            }
+        }
+    },
+
+    "CELAENO": {
+        "derece": 59.80,  # 29°48' Boğa (16 Tau) — Celeano varyantıyla aynı yıldız
+        "yargi": "Celaeno, Ülker'in karanlıkta kalan kız kardeşidir; kayıp ve kederle sınanan bir mührüdür. Bu mühür aktifse, ilişkinizde zaman zaman hüzün ve geçmiş yaralar belirir; ancak bu derinlik, bağınıza şefkat ve olgunluk katar. Yargısı şudur: Kederi inkâr etmek yerine birlikte dönüştürdüğünüzde bu mühür size güçlü bir dayanıklılık kazandırır; ortak acılarınız, en derin bağlarınızın temeli olur.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Derin, şefkatli ve zaman zaman hüzünlü bir sevgi; iyileşme gerektirir."
+            },
+            "evlilik": {
+                "Genel": "Ortak yaraları saran, sabır ve şefkatle güçlenen bir birliktelik."
+            },
+            "saglik": {
+                "Genel": "Duygusal yorgunluk ve kederin bedensel yansımalarına dikkat."
+            },
+            "gizlilikler": {
+                "Genel": "Geçmişin saklı yaraları; birlikte yüzleşildiğinde şifaya dönüşür."
+            }
+        }
+    },
+
+    "BEID": {
+        "derece": 59.80,  # 29°48' Boğa (ο1 Eri)
+        "yargi": "Beid, nehrin sularındaki bilgelik ve sınav mührüdür. Bu mühür aktifse, ilişkinizde araştırmacı bir ruh ve gizli bilgilere merak belirir; derin konularda birlikte çalışmaktan keyif alırsınız. Yargısı şudur: Zorlukları bilgiye dönüştürdüğünüzde bu mühür size sezgisel bir derinlik kazandırır; ancak belirsizlik ve kararsızlık, net sınırlar koymadığınızda ilişkiyi zayıflatabilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Meraklı, araştırmacı ve derin bir sevgi; netlik gerektirir."
+            },
+            "maddi": {
+                "Genel": "Dalgalanmalara açık kazançlar; planlı ilerleme şarttır."
+            },
+            "zihinsel": {
+                "Genel": "Ezoterik ve bilimsel konulara yatkın, sezgisel bir zihin."
+            },
+            "gizlilikler": {
+                "Genel": "Saklı gerçekleri görme yeteneği; gizlilikte dikkatli olunmalıdır."
+            }
+        }
+    },
+
+    "ZIBAL": {
+        "derece": 44.20,  # 14°12' Boğa (ζ Eri)
+        "yargi": "Zibal, ırmaktaki yıldızın güç ve dikkat mührüdür. Bu mühür aktifse, ilişkinizde enerji, atılganlık ve mücadele ruhu öne çıkar; birlikte zorlu engelleri aşacak güce sahipsinizdir. Yargısı şudur: Gücünüzü öfkeye değil yapıcı hedeflere yönelttiğinizde bu mühür size sarsılmaz bir dayanıklılık kazandırır; ancak dürtüsellik ve ani tepkiler ilişkide gereksiz yaralar açabilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Tutkulu, atılgan ve korumacı bir sevgi; öfke kontrolü gerekir."
+            },
+            "evlilik": {
+                "Genel": "Ortak mücadele ve dayanıklılık üzerine kurulu güçlü bir bağ."
+            },
+            "kaza": {
+                "Genel": "Acelecilik ve ani hareketlerle ilgili dikkat gerektiren durumlar."
+            },
+            "zihinsel": {
+                "Genel": "Güçlü, kararlı ve mücadeleden yılmayan bir zihin."
+            }
+        }
+    },
+
+    "ZHANG": {
+        "derece": 156.06,  # 6°04' Başak (υ1 Hya)
+        "yargi": "Zhang, Çin takvimindeki tören ve düzen mührüdür. Bu mühür aktifse, ilişkinizde protokol, saygı ve ortak kurallara bağlılık öne çıkar; birlikteliğiniz görgülü ve onurlu bir çerçeveye kavuşur. Yargısı şudur: Düzen ve zerafeti sevgiyle buluşturduğunuzda bu mühür size toplumsal saygınlık kazandırır; ancak aşırı kuralcılık samimiyeti soğutabilir. Denge, bu mührün en büyük erdemidir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Zarif, saygılı ve ölçülü bir sevgi dili."
+            },
+            "evlilik": {
+                "Genel": "Düzen, görgü ve karşılıklı saygı üzerine kurulu onurlu bir birliktelik."
+            },
+            "is_hayati": {
+                "Genel": "Kamu, sanat ve törensel işlerde başarı fırsatları."
+            },
+            "arkadaslar": {
+                "Genel": "Saygın ve güvenilir çevreler; itibarı koruyan dostluklar."
+            }
+        }
+    },
+
+    "GIEDI_SECUNDA": {
+        "derece": 304.24,  # 4°14' Kova (α² Cap)
+        "yargi": "Giedi Secunda, keçinin fedakârlık ve sorumluluk mührüdür. Bu mühür aktifse, ilişkinizde özveri, dürüstlük ve toplumsal yarar öne çıkar; birlikteliğiniz çevrenize örnek olur. Yargısı şudur: Sorumluluklarınızı sevgiyle üstlendiğinizde bu mühür size kalıcı bir saygınlık kazandırır; ancak kendinizi tüketen bir fedakârlık, ilişkinin dengesini bozabilir. Özveri, karşılıklı olduğunda kutsaldır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Dürüst, özverili ve sorumluluk sahibi bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "Sadakat, görev bilinci ve ortak yarar üzerine kurulu sağlam bir bağ."
+            },
+            "maddi": {
+                "Genel": "Dürüst çalışmayla gelen istikrarlı kazançlar."
+            },
+            "kaza": {
+                "Genel": "Yüksek yerler ve düşme riskiyle ilgili dikkat gerektiren durumlar."
+            }
+        }
+    },
+
+    "ADHAFERA": {
+        "derece": 147.93,  # 27°56' Aslan (ζ Leo)
+        "yargi": "Adhafera, Aslan'ın orağının keskin hırs mührüdür. Bu mühür aktifse, ilişkinizde yükselme arzusu ve güçlü bir hedef odaklılık belirir; birlikte büyük hedeflere yürürken birbirinizi motive edersiniz. Yargısı şudur: Hırsınızı ittifaka dönüştürdüğünüzde bu mühür size zirveyi gösterir; ancak gurur ve tahakküm eğilimi, kazandıklarınızı kaybettirebilir. Başarı, tevazuyla taçlandığında kalıcıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Tutkulu, hırslı ve hedef odaklı bir sevgi; egonun kontrolü gerekir."
+            },
+            "evlilik": {
+                "Genel": "Ortak hedefler ve yükselme arzusuyla şekillenen dinamik bir birliktelik."
+            },
+            "maddi": {
+                "Genel": "Hırs ve çabayla gelen kazançlar; itibar kaynaklı fırsatlar."
+            },
+            "kaza": {
+                "Genel": "Gurur kaynaklı ani düşüşlere karşı dikkatli olunmalıdır."
+            }
+        }
+    },
+
+    "ALAGEMIN": {
+        "derece": 5.06,  # 5°04' Koç (η Cep)
+        "yargi": "Alagemin, Kral'ın yalnız ama asil mührüdür. Bu mühür aktifse, ilişkinizde derin bir içe dönüklük ve manevi olgunluk öne çıkar; birlikte sessiz anların değerini bilirsiniz. Yargısı şudur: Yalnızlığı yalnızlık olarak değil, içsel güç olarak gördüğünüzde bu mühür size sarsılmaz bir karakter kazandırır; ancak duygusal mesafe, bağınızın sıcaklığını azaltmamalıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Derin, olgun ve sessiz güven üzerine kurulu bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "İstikrarlı, manevi ve duygusal açıklık gerektiren bir birliktelik."
+            },
+            "zihinsel": {
+                "Genel": "Manevi ve felsefi konulara yatkın, derin düşünen bir zihin."
+            },
+            "arkadaslar": {
+                "Genel": "Az ama öz, güvenilir dostluklar; kalabalık içinde yalnızlık eğilimi."
+            }
+        }
+    },
+
+    "KAHT": {
+        "derece": 17.90,  # 17°54' Koç (ε Psc)
+        "yargi": "Kaht, balıkların ağındaki sanat ve hayal mührüdür. Bu mühür aktifse, ilişkinizde şiirsel ifade, yaratıcılık ve zengin bir hayal dünyası öne çıkar; sevginizi sembollerle ve sözlerle zarafetle anlatırsınız. Yargısı şudur: Hayal gücünüzü gerçekliğe bağladığınızda bu mühür size sanatsal başarı ve romantik derinlik kazandırır; ancak hayallere fazla kapılmak, somut adımları geciktirebilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Şiirsel, hayalperest ve romantik bir sevgi dili."
+            },
+            "cinsellik": {
+                "Genel": "Hayal gücüyle zenginleşen, incelikli ve romantik bir enerji."
+            },
+            "is_hayati": {
+                "Genel": "Sanat, yazı ve yaratıcı işlerde başarı fırsatları."
+            },
+            "zihinsel": {
+                "Genel": "Sezgisel, sanatsal ve sembolleri okuyan bir zihin."
+            }
+        }
+    },
+
+    "HECATEBOLUS": {
+        "derece": 285.21,  # 15°13' Oğlak (τ Sgr)
+        "yargi": "Hecatebolus, okçunun isabet ve dikkat mührüdür. Bu mühür aktifse, ilişkinizde hassas zamanlama ve doğru hedef seçimi öne çıkar; kritik anlarda isabetli kararlar alırsınız. Yargısı şudur: Odağınızı sevgiyle birleştirdiğinizde bu mühür size keskin bir sezgi kazandırır; ancak ani ve keskin tepkiler, ilişkide gereksiz yaralar açabilir. Nişan almadan ok atmamak, bu mührün temel kuralıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Tutkulu, keskin ve hedef odaklı bir sevgi; sözler dikkatle seçilmelidir."
+            },
+            "evlilik": {
+                "Genel": "Ortak hedeflere isabet eden, planlı ve kararlı bir birliktelik."
+            },
+            "kaza": {
+                "Genel": "Ani kazalara ve keskin aletlere karşı dikkat gerektiren durumlar."
+            },
+            "zihinsel": {
+                "Genel": "Keskin, isabetli ve stratejik düşünen bir zihin."
+            }
+        }
+    },
+
+    "KEBASH": {
+        "derece": 109.15,  # 19°09' Yengeç (λ Gem)
+        "yargi": "Kebash, ikizlerin kıvrak zekâ mührüdür. Bu mühür aktifse, ilişkinizde hızlı iletişim, espri ve zihinsel uyum öne çıkar; birbirinizi kelimelerin ötesinde yakalarsınız. Yargısı şudur: Zihinsel enerjinizi istikrarla birleştirdiğinizde bu mühür size hem iletişim hem anlayış gücü kazandırır; ancak kararsızlık ve dağınıklık, söz verdiğiniz konularda güveni zedeleyebilir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Zeki, esprili ve iletişimi güçlü bir sevgi dili."
+            },
+            "evlilik": {
+                "Genel": "Sohbet, zihinsel uyum ve espri üzerine kurulu canlı bir bağ."
+            },
+            "is_hayati": {
+                "Genel": "Yazı, ticaret ve iletişim alanlarında başarı fırsatları."
+            },
+            "zihinsel": {
+                "Genel": "Hızlı, kıvrak ve çok yönlü bir zihin; odaklanma gerektirir."
+            }
+        }
+    },
+
+    "QIN": {
+        "derece": 228.72,  # 18°43' Akrep (δ Ser)
+        "yargi": "Qin, yılanın süzülüşündeki strateji ve iç çatışma mührüdür. Bu mühür aktifse, ilişkinizde gizli gündemler yerine dürüst müzakere öne çıkmalıdır; aklınız ve kalbiniz arasında denge kurmanız gerekir. Yargısı şudur: Stratejik zekânızı şeffaflıkla kullandığınızda bu mühür size üstünlük kazandırır; ancak manipülasyon ve gizlilik, güveni en hızlı yıpratan zehirdir. Açıklık, bu mührün şifasıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Derin, stratejik ama şeffaflık gerektiren bir sevgi; gizlilikten kaçınılmalıdır."
+            },
+            "evlilik": {
+                "Genel": "Dürüst müzakere ve açık iletişim üzerine kurulması gereken bir bağ."
+            },
+            "zihinsel": {
+                "Genel": "Stratejik, derin ve olayların ötesini gören bir zihin."
+            },
+            "gizlilikler": {
+                "Genel": "Gizli sırlara ve imalara karşı dikkatli olunmalıdır."
+            }
+        }
+    },
+
+    "COPERNICUS": {
+        "derece": 128.10,  # 8°06' Aslan (55 Cnc)
+        "yargi": "Copernicus, gözlemin ve bilimsel merakın mührüdür. Bu mühür aktifse, ilişkinizde analitik bakış, öğrenme aşkı ve detaylara dikkat öne çıkar; birlikte dünyayı keşfetmekten keyif alırsınız. Yargısı şudur: Merakınızı paylaşım olarak yaşadığınızda bu mühür size hem anlayış hem başarı kazandırır; ancak aşırı eleştirellik ve duygusal mesafe, sıcaklığı azaltabilir. Kalbinizi de gözlemleyin, sadece yıldızları değil.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Meraklı, öğrenmeye açık ve analitik bir sevgi dili."
+            },
+            "evlilik": {
+                "Genel": "Ortak keşifler ve öğrenme üzerine kurulu, gelişen bir birliktelik."
+            },
+            "zihinsel": {
+                "Genel": "Bilim ve araştırmaya yatkın, keskin gözlem gücüne sahip bir zihin."
+            },
+            "is_hayati": {
+                "Genel": "Bilim, teknoloji ve eğitim alanlarında başarı fırsatları."
+            }
+        }
+    },
+
+    "DRUS": {
+        "derece": 151.08,  # 1°05' Başak (χ Car) — Drys varyantıyla aynı yıldız
+        "yargi": "Drus, güney göğünün sabır ve dayanıklılık mührüdür. Bu mühür aktifse, ilişkinizde zorluklar karşısında yılmadan ilerleme gücü belirir; birlikte uzun vadeli hedeflere sadık kalırsınız. Yargısı şudur: Engelleri aşma kararlılığınızı şefkatle birleştirdiğinizde bu mühür size kalıcı bir güç kazandırır; ancak katılık ve inatçılık, esnek olmanız gereken anlarda sizi zorlayabilir. Sabır, akılla birleştiğinde zaferdir.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Sabırlı, dayanıklı ve uzun vadeli bir sevgi; esneklik gerektirir."
+            },
+            "evlilik": {
+                "Genel": "Zorlukları birlikte aşan, istikrarlı ve kararlı bir birliktelik."
+            },
+            "maddi": {
+                "Genel": "Sabır ve uzun vadeli planlamayla gelen kazançlar."
+            },
+            "zihinsel": {
+                "Genel": "Disiplinli, kararlı ve engelleri gören bir zihin."
+            }
+        }
+    },
+
+    "ALVASHAK": {
+        "derece": 132.21,  # 12°13' Aslan (α Lyn) — Al Fahd varyantıyla aynı yıldız
+        "yargi": "Alvashak, vaşağın keskin gözleriyle görme mührüdür. Bu mühür aktifse, ilişkinizde incelikleri fark etme ve gizli anlamları okuma yeteneği öne çıkar; birbirinizin söylenmeyen ihtiyaçlarını sezersiniz. Yargısı şudur: Keskin gözlem gücünüzü yargıya değil şefkate dönüştürdüğünüzde bu mühür size derin bir anlayış kazandırır; ancak sürekli tetikte olmak huzursuzluk yaratabilir. Görülen gerçek, sevgiyle karşılanmalıdır.",
+        "etkiler": {
+            "ask": {
+                "Genel": "Sezgisel, ince ayrıntıları fark eden ve şefkatli bir sevgi."
+            },
+            "evlilik": {
+                "Genel": "Karşılıklı sezgi ve anlayış üzerine kurulu, derin bir birliktelik."
+            },
+            "zihinsel": {
+                "Genel": "Keskin gözlem gücüne sahip, gizli anlamları okuyan bir zihin."
+            },
+            "gizlilikler": {
+                "Genel": "Saklı gerçekleri görme yeteneği; tetikte olma eğilimi dengelenmelidir."
+            }
+        }
+    },
 }
 
 

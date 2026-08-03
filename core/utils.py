@@ -7,6 +7,17 @@ from datetime import datetime, date, timedelta
 from collections import defaultdict
 
 from core.data import _FAST_RENKLER, fbst_sabit_yildizlar, fbst_sabit_yildizlar_ebeveyn
+
+# FBST kataloğundaki bazı yıldız anahtarları Swiss Ephemeris tarafından
+# doğrudan çözümlenemez; gerçek pozisyon hesabı için sefstars.txt'teki ad kullanılır.
+_YILDIZ_SEF_AD = {
+    "ALFARD": "Alphard",
+    "DENEB_ALGEDI": "Deneb Algedi",
+    "GIEDI_SECUNDA": "Giedi Secunda",
+    "ZUBEN_EL_GENUBI": "Zuben Elgenubi",
+    "ZUBEN_EL_SCHEMALI": "Zuben Eschamali",
+}
+
 _PLT = None
 def _plt():
     """Lazy matplotlib.pyplot yükleyici — ilk çizimden önce import edilir."""
@@ -690,7 +701,8 @@ def _yildiz_gercek_derece(yildiz_adi, target_jd, fallback_derece):
     """Yıldızın belirli bir tarihteki gerçek ekliptik boylamını döndürür."""
     if target_jd is not None:
         try:
-            return fixstar_ut_lon(yildiz_adi, target_jd)
+            ad = _YILDIZ_SEF_AD.get(yildiz_adi, yildiz_adi)
+            return fixstar_ut_lon(ad, target_jd)
         except Exception:
             pass
     return fallback_derece
@@ -732,6 +744,9 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
     fbst_muhurler = []
     _aktif_mod = mod
 
+    # Hangi gezegen için hangi FBST yıldızı zengin yorum üretti (fallback dedup için)
+    zengin_pozisyonlar = defaultdict(set)
+
     if _aktif_mod == "ebeveyn_cocuk" and fbst_sabit_yildizlar_ebeveyn:
         _aktif_sozluk = fbst_sabit_yildizlar_ebeveyn
     else:
@@ -767,6 +782,7 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
                         etki_bulundu = True
 
                 if etki_bulundu:
+                    zengin_pozisyonlar[gezegen_adi].add(round(yildiz_derecesi, 2))
                     if _aktif_mod != "ebeveyn_cocuk":
                         fbst_muhurler.append((fark, rapor_metni))
                     else:
@@ -781,6 +797,11 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
             for gezegen_adi, gezegen_derecesi in gezegen_dereceleri.items():
                 fark = aci_farki(gezegen_derecesi, yildiz_derecesi)
                 if fark <= orb_siniri:
+                    # FBST kataloğunda aynı pozisyonda zengin yorum üretilmişse
+                    # genel KOZMIK TEMAS fallback'ini üretme (ad eşleşme farkları için)
+                    if gezegen_adi in zengin_pozisyonlar:
+                        if any(aci_farki(yildiz_derecesi, p) <= 0.5 for p in zengin_pozisyonlar[gezegen_adi]):
+                            continue
                     burc_metni = dereceden_burc_dec(yildiz_derecesi)
                     bulunan_muhurler.append((
                         fark,

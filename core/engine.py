@@ -1835,6 +1835,30 @@ class FBST_Engine:
                 if not sessiz: print(f"UYARI: {g} hesaplanamadı ({e})")
                 continue
 
+        # Her gezegenin kişinin haritasında hangi evde olduğunu hesapla
+        def _evler_hesapla(jd, pozisyonlar):
+            evler = {}
+            try:
+                cusps, _ = swe.houses(jd, self.enlem, self.boylam, b'P')
+                for g, derece in pozisyonlar.items():
+                    for idx in range(12):
+                        h_bas = cusps[idx]
+                        h_bit = cusps[(idx + 1) % 12]
+                        if h_bas < h_bit:
+                            if h_bas <= derece < h_bit:
+                                evler[g] = idx + 1
+                                break
+                        else:
+                            if derece >= h_bas or derece < h_bit:
+                                evler[g] = idx + 1
+                                break
+            except Exception:
+                pass
+            return evler
+
+        p1_evler = _evler_hesapla(j1, p1_pos)
+        p2_evler = _evler_hesapla(j2, p2_pos)
+
         # Çapraz Açı Kontrolü
         for g1 in gezegenler_listesi:
             for g2 in gezegenler_listesi:
@@ -1872,10 +1896,20 @@ class FBST_Engine:
                                 ozel_yorum = fbst_yorumlar[alt_key][aci_deg]
                         
                         if ozel_yorum:
+                            format_degerleri = {
+                                "p1": self.p1_isim, "p2": self.p2_isim,
+                                "g1": g1, "g2": g2,
+                                "g1_burc": burc1, "g2_burc": burc2,
+                                "g1_ev": p1_evler.get(g1, "?"), "g2_ev": p2_evler.get(g2, "?"),
+                            }
+                            try:
+                                ozel_yorum_fmt = ozel_yorum.format(**format_degerleri)
+                            except Exception:
+                                ozel_yorum_fmt = ozel_yorum
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Dersi:</b> {ozel_yorum}"
+                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Dersi:</b> {ozel_yorum_fmt}"
                             else:
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Mührü:</b> {ozel_yorum}"
+                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Mührü:</b> {ozel_yorum_fmt}"
                         else:
                             p1_anlam = GEZEGEN_ANLAMLARI.get(g1, "enerji")
                             p2_anlam = GEZEGEN_ANLAMLARI.get(g2, "enerji")
@@ -5596,69 +5630,69 @@ class FBST_Engine:
         # İlişki odaklı yorum sözlüğü
         yorum_sozlugu = {
             # --- AY AÇILARI: İlişkide duygusal dinamiğin nabzını tutar ---
-            ("Ay", "Güneş", "Kavuşum"): "Duygularınız bugün tam ortak noktada — ne hissediyorsanız onu net bir şekilde görebiliyor, partnerinize de aynı berraklıkta yansıtabiliyorsunuz. Bu, 'seni anlıyorum' lafının gerçekten hissedildiği nadir anlardan biri. Kalbiniz ve benliğinizbugün birbirine çok yakın duruyor, bu da ilişkinizdeki en derin samimiyet kapısını aralıyor.",
-            ("Ay", "Güneş", "Karşıt"): "Partnerinizin bugün neye ihtiyacı varsa sizde tam tersini görüyorsunuz — bu bir çatışma değil, ayna. Belki de tam da bu zıtlık sayesinde kendi duygu dünyanızın farkına varacaksınız. Gerilim sizi birbirinizden uzaklaştırmaz, aksine 'ben ne istiyorum?' sorusunu sormaya zorlar. Bu sorunun cevabı ilişkinizi derinleştirebilir.",
-            ("Ay", "Güneş", "Kare"): "Bugün duygusal olarak biraz sıkışmış hissedebilirsiniz — ne yapacağınızı tam bilemiyor, ama bir yandan da bir şeyleri düzeltme isteği içindesiniz. Bu dürtüye kulak verin: belki de tam da şimdi, eskiden ertelediğiniz bir konuşmayı yapma zamanı gelmiştir. Sabır, bugünün anahtarı.",
-            ("Ay", "Güneş", "Trigon"): "Bugün her şey yerli yerinde — duygularınız net, partnerinize olan yakınlığınız doğal, iletişiminiz akıcı. Bu tür günlerin kıymetini bilin: bazen 'hiçbir şey yapmamak' bile en büyük eylemdir. Birlikte sessizce oturup bir çay içmek bile bugün çok derin bir tatmin verebilir.",
-            ("Ay", "Güneş", "Sekstil"): "Bugün küçük ama anlamlı bir fırsat var karşınızda: belki uzun zamandır konuşmadığınız bir konuyu açmak, ya da partnerinize minik bir sürpriz yapmak. Bu küçük adım, ilişkinizde beklenmedik bir kapı aralayabilir. Fırsatı değerlendirin, pişman olmazsınız.",
+            ("Ay", "Güneş", "Kavuşum"): "Duygularınız bu dönem tam ortak noktada — ne hissediyorsanız onu net bir şekilde görebiliyor, partnerinize de aynı berraklıkta yansıtabiliyorsunuz. Bu, 'seni anlıyorum' lafının gerçekten hissedildiği nadir anlardan biri. Kalbiniz ve benliğinizbu dönem birbirine çok yakın duruyor, bu da ilişkinizdeki en derin samimiyet kapısını aralıyor.",
+            ("Ay", "Güneş", "Karşıt"): "Partnerinizin bu dönem neye ihtiyacı varsa sizde tam tersini görüyorsunuz — bu bir çatışma değil, ayna. Belki de tam da bu zıtlık sayesinde kendi duygu dünyanızın farkına varacaksınız. Gerilim sizi birbirinizden uzaklaştırmaz, aksine 'ben ne istiyorum?' sorusunu sormaya zorlar. Bu sorunun cevabı ilişkinizi derinleştirebilir.",
+            ("Ay", "Güneş", "Kare"): "Bu dönem duygusal olarak biraz sıkışmış hissedebilirsiniz — ne yapacağınızı tam bilemiyor, ama bir yandan da bir şeyleri düzeltme isteği içindesiniz. Bu dürtüye kulak verin: belki de tam da şimdi, eskiden ertelediğiniz bir konuşmayı yapma zamanı gelmiştir. Sabır, bu dönemin anahtarı.",
+            ("Ay", "Güneş", "Trigon"): "Bu dönem her şey yerli yerinde — duygularınız net, partnerinize olan yakınlığınız doğal, iletişiminiz akıcı. Bu tür anların kıymetini bilin: bazen 'hiçbir şey yapmamak' bile en büyük eylemdir. Birlikte sessizce oturup bir çay içmek bile bu dönem çok derin bir tatmin verebilir.",
+            ("Ay", "Güneş", "Sekstil"): "Bu dönem küçük ama anlamlı bir fırsat var karşınızda: belki uzun zamandır konuşmadığınız bir konuyu açmak, ya da partnerinize minik bir sürpriz yapmak. Bu küçük adım, ilişkinizde beklenmedik bir kapı aralayabilir. Fırsatı değerlendirin, pişman olmazsınız.",
 
-            ("Ay", "Venüs", "Kavuşum"): "Sevgi bugün tam zirvede — ne veriyorsunuz, ne alıyorsunuz, hepsi dengeli ve güzel. Partnerinize sarıldığınızda dünyanın geri kalanı bir anda anlamsızlaşıyor. Bu hissi kucaklayın, çünkü bu tür anlar ilişkiye yıllar katacak hatıralar bırakır.",
-            ("Ay", "Venüs", "Karşıt"): "Sevgi dili bugün farklı çalışıyor: sizin 'seviyorum' dediğiniz yerde partneriniz farklı bir şey duyuyor olabilir. Bu bir uyumsuzluk değil, bir öğrenme fırsatı. Belki de partnerinizin sevgiyi nasıl algıladığını sorma zamanı gelmiştir. Cevap sizi şaşırtabilir.",
-            ("Ay", "Venüs", "Kare"): "Bugün sevgi konusunda biraz tökezleyebilirsiniz — belki partnerinizden beklediğiniz ilgiyi göremiyor, belki de siz ona yeterince ulaşamıyorsunuz. Ama unutmayın: en güçlü köprüler en zorlu sularda kurulur. Bugün attığınız küçük adım, yarın büyük bir dönüşümün tohumu olur.",
-            ("Ay", "Venüs", "Trigon"): "Sevgi bugün çok doğal ve özgürce akıyor — tıpkı bir nehir gibi, hiç zorlanmadan. Partnerinize olan sevginizi göstermek için özel bir çaba harcamanıza gerek yok, zaten her halinizden belli. Bu huzurun tadını çıkarın.",
-            ("Ay", "Venüs", "Sekstil"): "Bugün partnerinize güzel bir şey yapmak için içinizde tatlı bir dürtü var — belki bir çiçek, belki güzel bir mesaj, belki sadece bir gülümseme. Bu küçük jestlerin büyüklüğünü küçümsemeyin: ilişki küçük taşlarla örülür.",
+            ("Ay", "Venüs", "Kavuşum"): "Sevgi bu dönem tam zirvede — ne veriyorsunuz, ne alıyorsunuz, hepsi dengeli ve güzel. Partnerinize sarıldığınızda dünyanın geri kalanı bir anda anlamsızlaşıyor. Bu hissi kucaklayın, çünkü bu tür anlar ilişkiye yıllar katacak hatıralar bırakır.",
+            ("Ay", "Venüs", "Karşıt"): "Sevgi dili bu dönem farklı çalışıyor: sizin 'seviyorum' dediğiniz yerde partneriniz farklı bir şey duyuyor olabilir. Bu bir uyumsuzluk değil, bir öğrenme fırsatı. Belki de partnerinizin sevgiyi nasıl algıladığını sorma zamanı gelmiştir. Cevap sizi şaşırtabilir.",
+            ("Ay", "Venüs", "Kare"): "Bu dönem sevgi konusunda biraz tökezleyebilirsiniz — belki partnerinizden beklediğiniz ilgiyi göremiyor, belki de siz ona yeterince ulaşamıyorsunuz. Ama unutmayın: en güçlü köprüler en zorlu sularda kurulur. Bu dönem attığınız küçük adım, yarın büyük bir dönüşümün tohumu olur.",
+            ("Ay", "Venüs", "Trigon"): "Sevgi bu dönem çok doğal ve özgürce akıyor — tıpkı bir nehir gibi, hiç zorlanmadan. Partnerinize olan sevginizi göstermek için özel bir çaba harcamanıza gerek yok, zaten her halinizden belli. Bu huzurun tadını çıkarın.",
+            ("Ay", "Venüs", "Sekstil"): "Bu dönem partnerinize güzel bir şey yapmak için içinizde tatlı bir dürtü var — belki bir çiçek, belki güzel bir mesaj, belki sadece bir gülümseme. Bu küçük jestlerin büyüklüğünü küçümsemeyin: ilişki küçük taşlarla örülür.",
 
-            ("Ay", "Mars", "Kavuşum"): "Enerji ve tutku bugün tavan yapmış durumda — birlikte yapacağınız her şeyde ekstra bir canlılık var. Ama dikkat: aynı enerji tartışmaya da dönüşebilir. Bu gücü sportif bir aktiviteye ya da ortak bir projeye yönlendirmek, ilişkinin en parlak tarafını ortaya çıkarır.",
-            ("Ay", "Mars", "Karşıt"): "Bugün tetikte olmanız gereken bir gün — küçük bir söz bile karşılıklı öfkeyi ateşleyebilir. Ama bu baskisin arkasında büyük bir gerçeklik yatıyor: belki de uzun zamandır konuşulmayan bir şey bugün su yüzüne çıkacak. Sakin kalın, ama gerçeği de göz ardı etmeyin.",
-            ("Ay", "Mars", "Kare"): "Tartışmalar bugün kolayca alevlenebilir — her ikiniz de biraz daha sabırsız, biraz daha gerginsiniz. Ama bu bir sınav: öfkenizi yapıcı bir güce dönüştürebilir misiniz? Spor, yürüyüş ya da birlikte ter atmak bugünün en iyi ilacı olabilir.",
-            ("Ay", "Mars", "Trigon"): "Bugün birlikte çok enerjik ve canlı hissediyorsunuz — macera, hareket, heyecan hepsi sizin yanınızda. Bu enerjiyi iyi değerlendirin: belki uzun zamandır ertelediğiniz bir planı bugün hayata geçirebilirsiniz. Birlikte koşmak, gülmek, nefes almak bugün en güzel aktivite.",
-            ("Ay", "Mars", "Sekstil"): "Bugün ufak bir heyecan sizi bekliyor — belki beklenmedik bir telefon, belki sokakta karşılaştığınız eski bir hatıra, belki de partnerinizin size yaptığı küçük bir süpriz. Bu enerjiyi yakalayın ve birlikte keyifli bir an yaratın.",
+            ("Ay", "Mars", "Kavuşum"): "Enerji ve tutku bu dönem tavan yapmış durumda — birlikte yapacağınız her şeyde ekstra bir canlılık var. Ama dikkat: aynı enerji tartışmaya da dönüşebilir. Bu gücü sportif bir aktiviteye ya da ortak bir projeye yönlendirmek, ilişkinin en parlak tarafını ortaya çıkarır.",
+            ("Ay", "Mars", "Karşıt"): "Bu dönem tetikte olmanız gereken bir süreç — küçük bir söz bile karşılıklı öfkeyi ateşleyebilir. Ama bu baskisin arkasında büyük bir gerçeklik yatıyor: belki de uzun zamandır konuşulmayan bir şey bu dönem su yüzüne çıkacak. Sakin kalın, ama gerçeği de göz ardı etmeyin.",
+            ("Ay", "Mars", "Kare"): "Tartışmalar bu dönem kolayca alevlenebilir — her ikiniz de biraz daha sabırsız, biraz daha gerginsiniz. Ama bu bir sınav: öfkenizi yapıcı bir güce dönüştürebilir misiniz? Spor, yürüyüş ya da birlikte ter atmak bu dönemin en iyi ilacı olabilir.",
+            ("Ay", "Mars", "Trigon"): "Bu dönem birlikte çok enerjik ve canlı hissediyorsunuz — macera, hareket, heyecan hepsi sizin yanınızda. Bu enerjiyi iyi değerlendirin: belki uzun zamandır ertelediğiniz bir planı bu dönem hayata geçirebilirsiniz. Birlikte koşmak, gülmek, nefes almak bu dönem en güzel aktivite.",
+            ("Ay", "Mars", "Sekstil"): "Bu dönem ufak bir heyecan sizi bekliyor — belki beklenmedik bir telefon, belki sokakta karşılaştığınız eski bir hatıra, belki de partnerinizin size yaptığı küçük bir süpriz. Bu enerjiyi yakalayın ve birlikte keyifli bir an yaratın.",
 
-            ("Ay", "Jüpiter", "Kavuşum"): "Genişleme ve bollukbugün çok güçlü — hayatınızda güzel şeylerin biriktiği bir dönemdesiniz. Partnerinizle birlikte geleceğe dair büyük planlar yapmak, hayaller kurmak için mükemmel bir zaman. Bu enerjiyi besleyin: ne ekerseniz onu biçersiniz.",
-            ("Ay", "Jüpiter", "Karşıt"): "Aşırılıklara bugün dikkat — fazla harcama, fazla yeme, fazla vaat... hepsi güzel görünür ama dengesizlik yaratır. Partnerinizle aranızda 'daha fazla' talepleri çatışabilir. Dengeyi bulmakbugün en büyük başarınız olabilir.",
-            ("Ay", "Jüpiter", "Kare"): "Büyük beklentiler bugün hayal kırıklığına dönüşebilir — belki partnerinizden çok şey bekliyor, belki de siz kendi kendinize baskı yapıyorsunuz. Küçük şeylere odaklanın: bazen bir bardak çay, bir gülümseme bile büyük bir mutluluk kaynağıdır.",
-            ("Ay", "Jüpiter", "Trigon"): "Şans bugün sizin yanınızda — ama şansı sadece 'kazanmak' olarak değil, birlikte büyüme fırsatı olarak görün. Partnerinizle birlikte yeni bir şey öğrenmek, yeni bir deneyim yaşamak için harika bir gün. Bu fırsatı kaçırmayın.",
-            ("Ay", "Jüpiter", "Sekstil"): "Bugün küçük ama değerli bir fırsat kapınızı çalabilir — belki beklenmedik bir davet, belki birlikte katılabileceğiniz güzel bir etkinlik. Bu fırsatı değerlendirin: ilişki küçük deneyimlerle beslenir.",
+            ("Ay", "Jüpiter", "Kavuşum"): "Genişleme ve bollukbu dönem çok güçlü — hayatınızda güzel şeylerin biriktiği bir dönemdesiniz. Partnerinizle birlikte geleceğe dair büyük planlar yapmak, hayaller kurmak için mükemmel bir zaman. Bu enerjiyi besleyin: ne ekerseniz onu biçersiniz.",
+            ("Ay", "Jüpiter", "Karşıt"): "Aşırılıklara bu dönem dikkat — fazla harcama, fazla yeme, fazla vaat... hepsi güzel görünür ama dengesizlik yaratır. Partnerinizle aranızda 'daha fazla' talepleri çatışabilir. Dengeyi bulmakbu dönem en büyük başarınız olabilir.",
+            ("Ay", "Jüpiter", "Kare"): "Büyük beklentiler bu dönem hayal kırıklığına dönüşebilir — belki partnerinizden çok şey bekliyor, belki de siz kendi kendinize baskı yapıyorsunuz. Küçük şeylere odaklanın: bazen bir bardak çay, bir gülümseme bile büyük bir mutluluk kaynağıdır.",
+            ("Ay", "Jüpiter", "Trigon"): "Şans bu dönem sizin yanınızda — ama şansı sadece 'kazanmak' olarak değil, birlikte büyüme fırsatı olarak görün. Partnerinizle birlikte yeni bir şey öğrenmek, yeni bir deneyim yaşamak için harika bir dönem. Bu fırsatı kaçırmayın.",
+            ("Ay", "Jüpiter", "Sekstil"): "Bu dönem küçük ama değerli bir fırsat kapınızı çalabilir — belki beklenmedik bir davet, belki birlikte katılabileceğiniz güzel bir etkinlik. Bu fırsatı değerlendirin: ilişki küçük deneyimlerle beslenir.",
 
-            ("Ay", "Satürn", "Kavuşum"): "Ciddiyet ve yapı bugün ön planda — ilişkinizde uzun vadeli planlar yapmak, sorumlulukları netleştirmek için ideal bir dönem. Bugünkü konuşmalarınız yıllar sonra meyvesini verebilir. Sabırlı ve istikrarlı olun, emeğinizin karşılığını alacaksınız.",
-            ("Ay", "Satürn", "Karşıt"): "Bugün biraz mesafe hissedebilirsiniz — belki partneriniz sessizleşmiş, belki siz duygusal olarak geri çekilmişsiniz. Ama bu bir kopma değil, bir dinlenme anı. Her ilişki gibi, sizin de molaya ihtiyacınız var. Bu molayı değerlendirin, ama iletişimi koparmayın.",
-            ("Ay", "Satürn", "Kare"): "Sorumluluklar bugün biraz bunaltıcı olabilir — iş, aile, ilişki hepsi aynı anda baskı yaratıyor. Ama bu baskı sizi güçlendirir: dayanıklılığınızı test eder ve sınır koymanın değerini öğretir. Bugün 'hayır' demek bile bir başarıdır.",
-            ("Ay", "Satürn", "Trigon"): "Olgunluk bugün ilişkinize çok yakışıyor — birbirinize güveniyor, birbirinize destek oluyorsunuz. Bu güveni inşa etmek yıllar aldı ve artık meyvelerini topluyorsunuz. Bugün aldığınız kararlar uzun vadede çok sağlam temeller atacak.",
-            ("Ay", "Satürn", "Sekstil"): "Bugün küçük ama önemli bir adım atma zamanı — belki resmi bir başvuru, belki uzun vadeli bir sözleşme, belki de sadece 'birlikte yürüyeceğiz' demek. Bu adım küçüktür ama anlam büyüktür. Cesaretinizi toplayın.",
+            ("Ay", "Satürn", "Kavuşum"): "Ciddiyet ve yapı bu dönem ön planda — ilişkinizde uzun vadeli planlar yapmak, sorumlulukları netleştirmek için ideal bir dönem. Bu dönemin konuşmalarınız yıllar sonra meyvesini verebilir. Sabırlı ve istikrarlı olun, emeğinizin karşılığını alacaksınız.",
+            ("Ay", "Satürn", "Karşıt"): "Bu dönem biraz mesafe hissedebilirsiniz — belki partneriniz sessizleşmiş, belki siz duygusal olarak geri çekilmişsiniz. Ama bu bir kopma değil, bir dinlenme anı. Her ilişki gibi, sizin de molaya ihtiyacınız var. Bu molayı değerlendirin, ama iletişimi koparmayın.",
+            ("Ay", "Satürn", "Kare"): "Sorumluluklar bu dönem biraz bunaltıcı olabilir — iş, aile, ilişki hepsi aynı anda baskı yaratıyor. Ama bu baskı sizi güçlendirir: dayanıklılığınızı test eder ve sınır koymanın değerini öğretir. Bu dönem 'hayır' demek bile bir başarıdır.",
+            ("Ay", "Satürn", "Trigon"): "Olgunluk bu dönem ilişkinize çok yakışıyor — birbirinize güveniyor, birbirinize destek oluyorsunuz. Bu güveni inşa etmek yıllar aldı ve artık meyvelerini topluyorsunuz. Bu dönem aldığınız kararlar uzun vadede çok sağlam temeller atacak.",
+            ("Ay", "Satürn", "Sekstil"): "Bu dönem küçük ama önemli bir adım atma zamanı — belki resmi bir başvuru, belki uzun vadeli bir sözleşme, belki de sadece 'birlikte yürüyeceğiz' demek. Bu adım küçüktür ama anlam büyüktür. Cesaretinizi toplayın.",
 
-            ("Ay", "Uranüs", "Kavuşum"): "Sürprizler bugün kapınızı çalabilir — belki ani bir karar, belki beklenmedik bir gelişme, belki de partnerinizin size söylediği çok şaşırtıcı bir şey. Bu değişime direnmeyin: Uranüs size yeni bir pencere açıyor. Esnek olun, hayatı kucaklayın.",
-            ("Ay", "Uranüs", "Karşıt"): "Özgürlük ihtiyacı bugün biraz gerilim yaratabilir — belki siz çok bağlanmak istiyorsunuz, belki partneriniz biraz alan arıyor. Bu zıtlık doğal: her bireyin kendi ritmi var. Birbirinize alan tanımak, aslında birbirinize daha da yakınlaştıracaktır.",
-            ("Ay", "Uranüs", "Kare"): "Ani tartışmalar veya beklenmedik olaylar bugün strese yol açabilir. Ama bu gerginlik geçicidir ve altında büyük bir değişim tohumu yatar. Bugünkü tartışmanız belki de yıllardır ertelediğiniz bir gerçeğin yüzeye çıkmasına vesile olur.",
-            ("Ay", "Uranüs", "Trigon"): "Yenilikçi ve yaratıcı bir gün sizi bekliyor — birlikte yeni bir şey deneyin, rutinden çıkın. Belki farklı bir restorana gidin, belki farklı bir rota çizin. Bu küçük macera ilişkinize taze bir soluk getirecektir.",
-            ("Ay", "Uranüs", "Sekstil"): "Bugün küçük bir sürpriz ya da beklenmedik bir gelişme ilişkinizi renklendirebilir. Esnek ve açık fikirli olun: beklenmedik olan her şey bugün sizin lehinize çalışıyor.",
+            ("Ay", "Uranüs", "Kavuşum"): "Sürprizler bu dönem kapınızı çalabilir — belki ani bir karar, belki beklenmedik bir gelişme, belki de partnerinizin size söylediği çok şaşırtıcı bir şey. Bu değişime direnmeyin: Uranüs size yeni bir pencere açıyor. Esnek olun, hayatı kucaklayın.",
+            ("Ay", "Uranüs", "Karşıt"): "Özgürlük ihtiyacı bu dönem biraz gerilim yaratabilir — belki siz çok bağlanmak istiyorsunuz, belki partneriniz biraz alan arıyor. Bu zıtlık doğal: her bireyin kendi ritmi var. Birbirinize alan tanımak, aslında birbirinize daha da yakınlaştıracaktır.",
+            ("Ay", "Uranüs", "Kare"): "Ani tartışmalar veya beklenmedik olaylar bu dönem strese yol açabilir. Ama bu gerginlik geçicidir ve altında büyük bir değişim tohumu yatar. Bu dönemin tartışmanız belki de yıllardır ertelediğiniz bir gerçeğin yüzeye çıkmasına vesile olur.",
+            ("Ay", "Uranüs", "Trigon"): "Yenilikçi ve yaratıcı bir dönem sizi bekliyor — birlikte yeni bir şey deneyin, rutinden çıkın. Belki farklı bir restorana gidin, belki farklı bir rota çizin. Bu küçük macera ilişkinize taze bir soluk getirecektir.",
+            ("Ay", "Uranüs", "Sekstil"): "Bu dönem küçük bir sürpriz ya da beklenmedik bir gelişme ilişkinizi renklendirebilir. Esnek ve açık fikirli olun: beklenmedik olan her şey bu dönem sizin lehinize çalışıyor.",
 
-            ("Ay", "Neptün", "Kavuşum"): "Manevi derinleşme bugün çok güçlü — birlikte meditasyon yapın, sanatla ilgilenin ya da sadece gözlerinizi kapatıp birbirinizi hissedin. Bu tür anlar, ilişkinin en güzel hazineleridir. Ruhunuz bugün birbiriyle konuşuyor.",
-            ("Ay", "Neptün", "Karşıt"): "Yanılsamalarbugün biraz kafa karıştırıcı olabilir — belki partnerinizin söylediği bir şeyi farklı anladınız, belki de kendi hayal gücünüz gerçeği bulanıklaştırdı. Net iletişim bugün çok önemli: 'ben şunu anladım, doğru mu?' diye sormaktan çekinmeyin.",
-            ("Ay", "Neptün", "Kare"): "Duygusal bulanıklık bugün hâkim olabilir — ne hissettiğinizi tam bilemiyor, belki de partnerinizin niyetinden emin olamıyorsunuz. Ama bu bulanıklık geçicidir: sakin olun, sabırlı olun, su durulduğunda her şey çok daha net görünecektir.",
-            ("Ay", "Neptün", "Trigon"): "Bugün çok romantik ve manevi bir gün — birbirinize olan bağınız çok derin ve güçlü. Bu hissi kucaklayın: belki birlikte bir şarkı dinleyin, belki yıldızlara bakın, belki de sadece sessizce birbirinize sarılın. Bu anlar ruhunuzu besler.",
-            ("Ay", "Neptün", "Sekstil"): "Bugün küçük ama derin bir deneyim sizi bekliyor — belki birlikte bir sanat eserine bakarken aynı duyguyu paylaşacaksınız, belki de bir filmin sahnesinde birbirinize bakıp 'aynı şeyi düşünüyoruz' diyeceksiniz. Bu senkronizasyon çok değerli.",
+            ("Ay", "Neptün", "Kavuşum"): "Manevi derinleşme bu dönem çok güçlü — birlikte meditasyon yapın, sanatla ilgilenin ya da sadece gözlerinizi kapatıp birbirinizi hissedin. Bu tür anlar, ilişkinin en güzel hazineleridir. Ruhunuz bu dönem birbiriyle konuşuyor.",
+            ("Ay", "Neptün", "Karşıt"): "Yanılsamalarbu dönem biraz kafa karıştırıcı olabilir — belki partnerinizin söylediği bir şeyi farklı anladınız, belki de kendi hayal gücünüz gerçeği bulanıklaştırdı. Net iletişim bu dönem çok önemli: 'ben şunu anladım, doğru mu?' diye sormaktan çekinmeyin.",
+            ("Ay", "Neptün", "Kare"): "Duygusal bulanıklık bu dönem hâkim olabilir — ne hissettiğinizi tam bilemiyor, belki de partnerinizin niyetinden emin olamıyorsunuz. Ama bu bulanıklık geçicidir: sakin olun, sabırlı olun, su durulduğunda her şey çok daha net görünecektir.",
+            ("Ay", "Neptün", "Trigon"): "Bu dönem çok romantik ve manevi bir dönem — birbirinize olan bağınız çok derin ve güçlü. Bu hissi kucaklayın: belki birlikte bir şarkı dinleyin, belki yıldızlara bakın, belki de sadece sessizce birbirinize sarılın. Bu anlar ruhunuzu besler.",
+            ("Ay", "Neptün", "Sekstil"): "Bu dönem küçük ama derin bir deneyim sizi bekliyor — belki birlikte bir sanat eserine bakarken aynı duyguyu paylaşacaksınız, belki de bir filmin sahnesinde birbirinize bakıp 'aynı şeyi düşünüyoruz' diyeceksiniz. Bu senkronizasyon çok değerli.",
 
-            ("Ay", "Plüton", "Kavuşum"): "Dönüşümbugün çok güçlü — ilişkinizde derin bir değişim yaşanıyor. Belki uzun zamandır bastırdığınız bir duygu bugün yüzeye çıkıyor. Bu yüzleşme korkutucu olabilir ama aynı zamanda çok şifa verici: eskisini yıkarak yeniyi inşa ediyorsunuz.",
-            ("Ay", "Plüton", "Karşıt"): "Güç mücadeleleribugün biraz belirgin olabilir — kontrol, güven, bağımlılık konuları gündeme gelebilir. Ama bu yüzleşme bir fırsat: kendinize 'ben nerede kontrolü kaybediyorum?' diye sorun. Cevap, ilişkinizin derinliklerinde sizi bekliyor.",
-            ("Ay", "Plüton", "Kare"): "Yoğun duygusal deneyimlerbugün yaşanabilir — eski yaralar, korkular, güvensizlikler yüzeye çıkabilir. Ama bu yüzleşme şifanın başladığı andır: acıya bakabilmek, onu dönüştürebilmek büyük cesaret gerektirir. Bu cesareti gösterin.",
-            ("Ay", "Plüton", "Trigon"): "Derin bir dönüşüm bugün ilişkinizi yeniden şekillendiriyor — eski kalıplar kırılıyor, yeni ve daha sağlıklı bir düzen kuruluyor. Bu süreci kucaklayın: değişim korkutucu olabilir ama sonuç, çok daha güçlü bir birliktelik olacak.",
-            ("Ay", "Plüton", "Sekstil"): "Bugün küçük ama derin bir değişim yaşanıyor — belki partnerinize daha çok güvenmeye başladınız, belki de kendi duygularınızla daha barışık oldunuz. Bu küçük ilerleme, büyük bir dönüşümün habercisi. Sabırlı olun, meyvelerini toplayacaksınız.",
+            ("Ay", "Plüton", "Kavuşum"): "Dönüşümbu dönem çok güçlü — ilişkinizde derin bir değişim yaşanıyor. Belki uzun zamandır bastırdığınız bir duygu bu dönem yüzeye çıkıyor. Bu yüzleşme korkutucu olabilir ama aynı zamanda çok şifa verici: eskisini yıkarak yeniyi inşa ediyorsunuz.",
+            ("Ay", "Plüton", "Karşıt"): "Güç mücadeleleribu dönem biraz belirgin olabilir — kontrol, güven, bağımlılık konuları gündeme gelebilir. Ama bu yüzleşme bir fırsat: kendinize 'ben nerede kontrolü kaybediyorum?' diye sorun. Cevap, ilişkinizin derinliklerinde sizi bekliyor.",
+            ("Ay", "Plüton", "Kare"): "Yoğun duygusal deneyimlerbu dönem yaşanabilir — eski yaralar, korkular, güvensizlikler yüzeye çıkabilir. Ama bu yüzleşme şifanın başladığı andır: acıya bakabilmek, onu dönüştürebilmek büyük cesaret gerektirir. Bu cesareti gösterin.",
+            ("Ay", "Plüton", "Trigon"): "Derin bir dönüşüm bu dönem ilişkinizi yeniden şekillendiriyor — eski kalıplar kırılıyor, yeni ve daha sağlıklı bir düzen kuruluyor. Bu süreci kucaklayın: değişim korkutucu olabilir ama sonuç, çok daha güçlü bir birliktelik olacak.",
+            ("Ay", "Plüton", "Sekstil"): "Bu dönem küçük ama derin bir değişim yaşanıyor — belki partnerinize daha çok güvenmeye başladınız, belki de kendi duygularınızla daha barışık oldunuz. Bu küçük ilerleme, büyük bir dönüşümün habercisi. Sabırlı olun, meyvelerini toplayacaksınız.",
 
             # --- GÜNEŞ AÇILARI: Kimlik ve ego etkileşimi ---
-            ("Güneş", "Venüs", "Kavuşum"): "Kendinizi bugün çok sevimli ve çekici hissediyorsunuz — partneriniz de bunu fark ediyor. Bu enerjiyi birlikte güzel bir aktiviteye dönüştürün: belki romantik bir akşam yemeği, belki sadece birlikte gülmek. Sevgi bugün çok doğal akıyor.",
-            ("Güneş", "Venüs", "Karşıt"): "Kendi ihtiyaçlarınız ile partnerinizin ihtiyaçları arasında bir denge arayışıbugün çok belirgin: belki siz çok şey verirken, partneriniz çok şey alıyor — ya da tam tersi. Bu farkı konuşmak, ilişkinizi çok daha dengeli bir hale getirecektir.",
-            ("Güneş", "Venüs", "Kare"): "Değerler ve zevkler konusunda bugün küçük farklılıklar yaşanabilir — belki farklı müzik tarzları, belki farklı tatil planları. Ama unutmayın: farklılıklar ilişkiyi zenginleştirir. Uzlaşmaya açık olun, yeni bir ortak zevk keşfedebilirsiniz.",
-            ("Güneş", "Venüs", "Trigon"): "Bugün doğal bir uyum var — partnerinizle aynı dili konuşuyor, aynı şeylere gülüyorsunuz. Bu uyumun tadını çıkarın: ilişki böyle anlarla beslenir. Belki birlikte bir kitap okuyun, bir yürüyüşe çıkın ya da sadece sessizce oturun.",
+            ("Güneş", "Venüs", "Kavuşum"): "Kendinizi bu dönem çok sevimli ve çekici hissediyorsunuz — partneriniz de bunu fark ediyor. Bu enerjiyi birlikte güzel bir aktiviteye dönüştürün: belki romantik bir akşam yemeği, belki sadece birlikte gülmek. Sevgi bu dönem çok doğal akıyor.",
+            ("Güneş", "Venüs", "Karşıt"): "Kendi ihtiyaçlarınız ile partnerinizin ihtiyaçları arasında bir denge arayışıbu dönem çok belirgin: belki siz çok şey verirken, partneriniz çok şey alıyor — ya da tam tersi. Bu farkı konuşmak, ilişkinizi çok daha dengeli bir hale getirecektir.",
+            ("Güneş", "Venüs", "Kare"): "Değerler ve zevkler konusunda bu dönem küçük farklılıklar yaşanabilir — belki farklı müzik tarzları, belki farklı tatil planları. Ama unutmayın: farklılıklar ilişkiyi zenginleştirir. Uzlaşmaya açık olun, yeni bir ortak zevk keşfedebilirsiniz.",
+            ("Güneş", "Venüs", "Trigon"): "Bu dönem doğal bir uyum var — partnerinizle aynı dili konuşuyor, aynı şeylere gülüyorsunuz. Bu uyumun tadını çıkarın: ilişki böyle anlarla beslenir. Belki birlikte bir kitap okuyun, bir yürüyüşe çıkın ya da sadece sessizce oturun.",
 
-            ("Güneş", "Mars", "Kavuşum"): "Enerji ve cesaret bugün çok yüksek — birlikte yeni bir maceraya atılmak, cesur adımlar atmak için harika bir zaman. Bu enerjiyi yapıcı kullanın: ortak bir hedefe yönelmek, spor yapmak ya da tutkunuzu paylaşmak bugün çok keyifli olacak.",
-            ("Güneş", "Mars", "Karşıt"): "Ego ve öfkebugün biraz tetikte olabilir — her ikiniz de kendi bildiğinizde ısrar edebilirsiniz. Ama bu çatışma bir fırsat: 'ben haklıyım' demek yerine 'sen ne hissediyorsun?' diye sormak, ilişkinizi çok derinleştirebilir.",
-            ("Güneş", "Mars", "Kare"): "Sürtünme ve gerilim bugün yaşanabilir — belki planlarınız uyuşmuyor, belki de enerjileriniz çarpışıyor. Ama bu sürtünme sizi güçlendirir: dayanıklılığınızı test eder ve nasıl uzlaşılacağını öğretir. Sabırlı olun.",
-            ("Güneş", "Mars", "Trigon"): "Bugün birlikte çok güçlü ve enerjik hissediyorsunuz — ortak hedefler için birleşmek, birlikte bir şeyleri başarmak için mükemmel bir zaman. Bu enerjiyi iyi değerlendirin: birlikte atacağınız adım, uzun veden çok parlak sonuçlar doğurabilir.",
+            ("Güneş", "Mars", "Kavuşum"): "Enerji ve cesaret bu dönem çok yüksek — birlikte yeni bir maceraya atılmak, cesur adımlar atmak için harika bir zaman. Bu enerjiyi yapıcı kullanın: ortak bir hedefe yönelmek, spor yapmak ya da tutkunuzu paylaşmak bu dönem çok keyifli olacak.",
+            ("Güneş", "Mars", "Karşıt"): "Ego ve öfkebu dönem biraz tetikte olabilir — her ikiniz de kendi bildiğinizde ısrar edebilirsiniz. Ama bu çatışma bir fırsat: 'ben haklıyım' demek yerine 'sen ne hissediyorsun?' diye sormak, ilişkinizi çok derinleştirebilir.",
+            ("Güneş", "Mars", "Kare"): "Sürtünme ve gerilim bu dönem yaşanabilir — belki planlarınız uyuşmuyor, belki de enerjileriniz çarpışıyor. Ama bu sürtünme sizi güçlendirir: dayanıklılığınızı test eder ve nasıl uzlaşılacağını öğretir. Sabırlı olun.",
+            ("Güneş", "Mars", "Trigon"): "Bu dönem birlikte çok güçlü ve enerjik hissediyorsunuz — ortak hedefler için birleşmek, birlikte bir şeyleri başarmak için mükemmel bir zaman. Bu enerjiyi iyi değerlendirin: birlikte atacağınız adım, uzun veden çok parlak sonuçlar doğurabilir.",
 
-            ("Güneş", "Satürn", "Kavuşum"): "Ciddiyet ve yapı bugün ön planda — ilişkinizde önemli bir adım atma zamanı olabilir. Belki resmi bir karar, belki uzun vadeli bir plan, belki de sadece 'birlikte yürüyeceğiz' demek. Bu adım küçüktür ama temeli çok sağlam atar.",
-            ("Güneş", "Satürn", "Karşıt"): "Bugün biraz baskı ve mesafe hissedebilirsiniz — belki partnerinizden beklediğiniz desteği göremiyor, belki de kendi sorumluluklarınız sizi bunaltıyor. Ama bu geçici bir durum: sabırlı olun, bu dönem de geçecek ve geride çok daha güçlü bir ilişki bırakacak.",
-            ("Güneş", "Satürn", "Kare"): "Zorlu bir sınavbugün kapınızı çalıyor — sabır, kararlılık ve esneklik gerektiren bir dönemdesiniz. Ama bu sınav sizi olgunlaştırır: dayanıklılığınızı test eder ve 'birlikte zor zamanları aşmanın' değerini öğretir.",
-            ("Güneş", "Satürn", "Trigon"): "Olgunluk ve derinleşme bugün çok yakışıyor ilişkinize — birbirinize güveniyor, birbirinize destek oluyorsunuz. Bu güveni besleyin: bugün attığınız adım, yıllar sonra çok sağlam bir temelin üzerine kurulmuş olacak.",
+            ("Güneş", "Satürn", "Kavuşum"): "Ciddiyet ve yapı bu dönem ön planda — ilişkinizde önemli bir adım atma zamanı olabilir. Belki resmi bir karar, belki uzun vadeli bir plan, belki de sadece 'birlikte yürüyeceğiz' demek. Bu adım küçüktür ama temeli çok sağlam atar.",
+            ("Güneş", "Satürn", "Karşıt"): "Bu dönem biraz baskı ve mesafe hissedebilirsiniz — belki partnerinizden beklediğiniz desteği göremiyor, belki de kendi sorumluluklarınız sizi bunaltıyor. Ama bu geçici bir durum: sabırlı olun, bu dönem de geçecek ve geride çok daha güçlü bir ilişki bırakacak.",
+            ("Güneş", "Satürn", "Kare"): "Zorlu bir sınavbu dönem kapınızı çalıyor — sabır, kararlılık ve esneklik gerektiren bir dönemdesiniz. Ama bu sınav sizi olgunlaştırır: dayanıklılığınızı test eder ve 'birlikte zor zamanları aşmanın' değerini öğretir.",
+            ("Güneş", "Satürn", "Trigon"): "Olgunluk ve derinleşme bu dönem çok yakışıyor ilişkinize — birbirinize güveniyor, birbirinize destek oluyorsunuz. Bu güveni besleyin: bu dönem attığınız adım, yıllar sonra çok sağlam bir temelin üzerine kurulmuş olacak.",
         }
 
         # Dönem hesaplamalarını al
@@ -5700,16 +5734,16 @@ class FBST_Engine:
             genel_yorumlari = {
                 "Koç": "İlerletilmiş Ay'ınız Koç burcunda — cesaret ve bağımsızlık ön planda. İlişkinizde liderlik almak, inisiyatif kullanmak için güçlü bir dönem. Ama dikkat: acelecilik partnerinizi üzebilir. Tutkunuzu sabırla harmanlayın.",
                 "Boğa": "İlerletilmiş Ay'ınız Boğa burcunda — istikrar ve güven arayışınız çok belirgin. İlişkinizde somut adımlar atma, maddi konuları netleştirme zamanı. Değişim korkutucu olabilir ama bu dönem sizi daha sağlam temellere taşıyacak.",
-                "İkizler": "İlerletilmiş Ay'ınız İkizler burcunda — iletişim ve merak çok yüksek. Partnerinizle uzun sohbetler, fikir alışverişleri bugün çok keyifli olacak. Ama yüzeysellikten kaçının: derinleşmek için de fırsat var.",
-                "Yengeç": "İlerletilmiş Ay'ınız Yengeç burcunda — duygusal derinlik ve aidiyet ihtiyacı çok belirgin. İlişkinizde güvende hissetmek, partnerinize yakın olmak bugün çok önemli. Geçmişle yüzleşmek, yaraları sarmak için harika bir dönem.",
+                "İkizler": "İlerletilmiş Ay'ınız İkizler burcunda — iletişim ve merak çok yüksek. Partnerinizle uzun sohbetler, fikir alışverişleri bu dönem çok keyifli olacak. Ama yüzeysellikten kaçının: derinleşmek için de fırsat var.",
+                "Yengeç": "İlerletilmiş Ay'ınız Yengeç burcunda — duygusal derinlik ve aidiyet ihtiyacı çok belirgin. İlişkinizde güvende hissetmek, partnerinize yakın olmak bu dönem çok önemli. Geçmişle yüzleşmek, yaraları sarmak için harika bir dönem.",
                 "Aslan": "İlerletilmiş Ay'ınız Aslan burcunda — yaratıcılık ve parlama zamanı. İlişkinizde sevginizi göstermek, birlikte eğlenmek, hayatı kutlamak için ideal bir dönem. Ama egonuza çok kapılmayın: partnerinizin de ışığı var.",
                 "Başak": "İlerletilmiş Ay'ınız Başak burcunda — detaylar ve mükemmeliyetçilik ön planda. İlişkinizde küçük ama anlamlı düzenlemeler yapmak, alışkanlıkları iyileştirmek için harika bir zaman. Ama eleştirinizi yapıcı tutun.",
                 "Terazi": "İlerletilmiş Ay'ınız Terazi burcunda — uyum ve denge arayışınız çok güçlü. İlişkinizde barış, güzellik ve estetik ön planda. Uzlaşmaya açık olun ama kendi ihtiyaçlarınızı da ihmal etmeyin.",
                 "Akrep": "İlerletilmiş Ay'ınız Akrep burcunda — yoğunluk ve dönüşüm dönemi. İlişkinizde derinlemesine yüzleşmeler, tutkulu anlar yaşanabilir. Eski yaralar yüzeye çıkabilir ama bu yüzleşme şifanın başladığı andır.",
                 "Yay": "İlerletilmiş Ay'ınız Yay burcunda — özgürlük ve macera arayışınız çok belirgin. İlişkinizde yeni ufuklar açmak, birlikte öğrenmek ve keşfetmek için harika bir dönem. Rutinden çıkın, hayatı genişletin.",
                 "Oğlak": "İlerletilmiş Ay'ınız Oğlak burcunda — sorumluluk ve yapı kurma ön planda. İlişkinizde uzun vadeli planlar yapmak, ciddi adımlar atmak için ideal bir dönem. Emeklerinizin karşılığını alacaksınız.",
-                "Kova": "İlerletilmiş Ay'ınız Kova burcunda — yenilik ve özgünlük çok belirgin. İlişkinizde alışılmadık deneyimler, farklı bakış açıları bugün çok değerli. Sıradanlıktan çıkın, birlikte yeni bir şey keşfedin.",
-                "Balık": "İlerletilmiş Ay'ınız Balık burcunda — sezgisellik ve manevi derinleşme çok güçlü. İlişkinizde ruhsal bağ güçleniyor, birbirinizi çok derinden anlayabilirsiniz. Sanat, müzik veya meditasyon bugün çok iyi gelecektir.",
+                "Kova": "İlerletilmiş Ay'ınız Kova burcunda — yenilik ve özgünlük çok belirgin. İlişkinizde alışılmadık deneyimler, farklı bakış açıları bu dönem çok değerli. Sıradanlıktan çıkın, birlikte yeni bir şey keşfedin.",
+                "Balık": "İlerletilmiş Ay'ınız Balık burcunda — sezgisellik ve manevi derinleşme çok güçlü. İlişkinizde ruhsal bağ güçleniyor, birbirinizi çok derinden anlayabilirsiniz. Sanat, müzik veya meditasyon bu dönem çok iyi gelecektir.",
             }
             genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"İlerletilmiş Ay'ınız {sonuc['ay_burcu']} burcunda — dengeli ve uyumlu bir dönemdesiniz.")
 
