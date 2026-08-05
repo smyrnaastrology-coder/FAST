@@ -1773,7 +1773,9 @@ def _collect_extra_data(motor):
             data["arap_sinastri"] = arap_sin if isinstance(arap_sin, list) else []
     except: data["arap_sinastri"] = []
     try:
-        j_ileri, j_geri = motor.get_julian_dates()
+        # Gerçek natal doğum tarihlerini kullan (göreli/Milat tarihleri seas_*.se1 gerektirir ve sunucuda eksik)
+        j_ileri = motor.get_natal_julian_day("p1")
+        j_geri = motor.get_natal_julian_day("p2")
         ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
         swe.set_ephe_path(ephe_yolu)
         # MOSEPH (analitik) sadece bu 4 asteroidi dosyasız hesaplar; ephe dosyaları eksik olduğundan diğerleri atlanır
