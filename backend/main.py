@@ -3719,12 +3719,12 @@ def harita_es(input: EsSevgiliInput):
 @app_fast.post("/api/analiz/es_sevgili")
 def analiz_es(input: EsSevgiliInput):
     global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
-    motor = _engine_es(input)
+    motor = _engine_es(input, ek_charts=True)
     uyum = motor.calculate_altin_oran_muhru()
     tork = round(motor.calculate_tork_skoru(), 1)
     fraktal = round(motor.calculate_fraktal_uyum(), 1)
     _generate_pdf(motor, "rapor")
-    return {
+    base = {
         "session_id": motor._session_id,
         "p1_isim": motor.p1_isim,
         "p2_isim": motor.p2_isim,
@@ -3732,21 +3732,51 @@ def analiz_es(input: EsSevgiliInput):
         "tork": tork,
         "fraktal": fraktal,
         "mod": "es_sevgili",
+        "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
     }
+    base.update(_collect_extra_data(motor))
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
 
 @app_fast.post("/api/analiz/ebeveyn_cocuk")
 def analiz_eb(input: EbeveynCocukInput):
     global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
-    motor = _engine_eb(input)
+    motor = _engine_eb(input, ek_charts=True)
     uyum = motor.calculate_altin_oran_muhru()
+    tork = round(motor.calculate_tork_skoru(), 1)
+    fraktal = round(motor.calculate_fraktal_uyum(), 1)
     _generate_pdf(motor, "rapor")
-    return {
+    base = {
         "session_id": motor._session_id,
         "ebeveyn": motor.p2_isim,
         "cocuk": motor.p1_isim,
         "uyum_orani": uyum,
+        "tork": tork,
+        "fraktal": fraktal,
         "mod": "ebeveyn_cocuk",
+        "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
     }
+    base.update(_collect_extra_data(motor))
+    base["event_tarih"] = motor.event_date_str
+    base["event_saat"] = motor.event_time_str
+    try:
+        pot = motor.potansiyel_hesapla()
+        base["potansiyel_alanlar"] = pot[:5] if isinstance(pot, list) else []
+    except: base["potansiyel_alanlar"] = []
+    try:
+        mes = motor.meslek_onerileri()
+        base["meslek_onerileri"] = mes[:7] if isinstance(mes, list) else []
+    except: base["meslek_onerileri"] = []
+    try:
+        astro = _collect_astro_data(motor)
+        if astro: base["astrokartografi"] = astro
+    except: pass
+    return base
 
 @app_fast.post("/api/analiz/ebeveyn_cocuk/detayli")
 def analiz_eb_detayli(input: EbeveynCocukInput):
