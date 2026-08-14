@@ -14,13 +14,19 @@ pillow>=10.0.0
 
 # PDF raporlama
 reportlab>=4.0.0
+pypdf>=4.0.0
 
 # Veri / Cografya
 numpy>=1.24.0
 geopy>=2.4.0
+pytz>=2023.3
+timezonefinder>=6.2.0
 
 # Test
 pytest>=7.4.0
 
 # Opsiyonel
 stripe>=7.0.0
+
+# Gorsellestirme (astrokartografi haritasi)
+plotly>=5.18.0

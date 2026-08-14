@@ -1,5 +1,8 @@
 #!/bin/bash
-echo "=== FBST START SCRIPT v2 ==="
+echo "=== FBST START SCRIPT v3 ==="
+cd "$(dirname "$0")"
+echo "--- CWD ---"
+pwd
 echo "--- Python ---"
 python --version
 echo "--- PORT env ---"
