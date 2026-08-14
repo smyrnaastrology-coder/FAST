@@ -1,0 +1,72 @@
+# ───────────────────────────────────────────────────────────
+# FBST Project — kök .gitignore
+# Amaç: Üretilmiş (runtime) çıktıları ve araç dizinlerini hariç
+# tutmak; kaynak kodu, core motorunu, fontları, ephemeris verisini
+# ve uygulama görsellerini (assets) korumak.
+# NOT: Bu dosya diske hiçbir şey yapmaz, yalnızca git'in neyi
+# takip edeceğini belirler.
+# ───────────────────────────────────────────────────────────
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+server.log
+startup.log
+server_stderr.log
+
+# ─── Üretilmiş analiz çıktıları (runtime PNG / SVG / PDF) ───
+*.png
+*.svg
+*.pdf
+
+# Gerçek kaynak görselleri (uygulama asset'leri) koru
+!fast_mobile/flutter_app/assets/**
+!FBST_Project/frontend/src/assets/**
+!FBST_Project/frontend/public/**
+!**/Asartepe_Kapak.pdf
+!**/kapak1.png
+
+# ─── Flutter / Dart ───
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+build/
+coverage/
+.idea/
+.vscode/
+.metadata
+
+# ─── Node (frontend) ───
+node_modules/
+dist/
+
+# ─── Derleme çıktıları (build artifacts) ───
+*.apk
+*.aab
+*.ipa
+
+# ─── Dev / deneme artıkları (scratch) ───
+*.out
+*.err
+output*.txt
+*_out.txt
+*_err.txt
+*_stderr.txt
+*_output.txt
+*_result.txt
+result_test*.txt
+
+# ─── OS / Editör / Çöp ───
+.DS_Store
+Thumbs.db
+*.lnk
+AppData/

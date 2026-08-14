@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+pyswisseph
+matplotlib
+reportlab
+numpy
+pillow
+geopy
+stripe
+streamlit
+pypdf

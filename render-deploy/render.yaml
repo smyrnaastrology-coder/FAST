@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fbst-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "true"
+      - key: MPLBACKEND
+        value: "Agg"
+      - key: PYTHON_VERSION
+        value: "3.12.8"

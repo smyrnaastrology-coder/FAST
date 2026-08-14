@@ -1,0 +1,26 @@
+# FBST Project Requirements
+# Ana uygulama
+streamlit>=1.28.0
+pyswisseph>=2.10.0
+
+# Backend API
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+
+# Gorsellestirme
+matplotlib>=3.7.0
+pillow>=10.0.0
+
+# PDF raporlama
+reportlab>=4.0.0
+
+# Veri / Cografya
+numpy>=1.24.0
+geopy>=2.4.0
+
+# Test
+pytest>=7.4.0
+
+# Opsiyonel
+stripe>=7.0.0
