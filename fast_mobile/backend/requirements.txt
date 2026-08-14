@@ -7,5 +7,9 @@ reportlab
 numpy
 pillow
 geopy
-
 stripe
+streamlit
+pypdf
+plotly
+pytz
+timezonefinder
