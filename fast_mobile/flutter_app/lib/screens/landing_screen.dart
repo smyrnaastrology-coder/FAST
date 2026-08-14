@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
+import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
 import 'analyzer_screen.dart';
 
@@ -46,68 +49,68 @@ class _LandingScreenState extends State<LandingScreen> {
     ));
   }
 
-  static const _modes = [
-    {'key': 'es_sevgili', 'title': 'Eş / Sevgili', 'desc': '6 aylık gökyüzü akışı ile çiftler arası bağ analizi', 'badge': 'Çift', 'icon': '💑'},
-    {'key': 'ebeveyn_cocuk', 'title': 'Ebeveyn / Çocuk', 'desc': 'Nesiller arası bağ, çocuk gelişimi ve potansiyel tespiti', 'badge': 'Aile', 'icon': '👨‍👩‍👧‍👦'},
-    {'key': 'bireysel_natal', 'title': 'Bireysel Natal', 'desc': 'Kişisel doğum haritasıyla hayatın tüm alanları için derin analiz', 'badge': 'Kişisel', 'icon': '⭐'},
-    {'key': 'potansiyel_yetenek', 'title': 'Potansiyel / Yetenek', 'desc': 'Doğum haritası ile meslek yönlendirme ve yetenek keşfi', 'badge': 'Bireysel', 'icon': '🌟'},
+  List<Map<String, dynamic>> _modes(AppLocalizations l10n) => [
+    {'key': 'es_sevgili', 'title': l10n.modeEsTitle, 'desc': l10n.modeEsDesc, 'badge': l10n.modeEsBadge, 'icon': '💑'},
+    {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.modeEbDesc, 'badge': l10n.modeEbBadge, 'icon': '👨‍👩‍👧‍👦'},
+    {'key': 'bireysel_natal', 'title': l10n.modeNatalTitle, 'desc': l10n.modeNatalDesc, 'badge': l10n.modeNatalBadge, 'icon': '⭐'},
+    {'key': 'potansiyel_yetenek', 'title': l10n.modePyTitle, 'desc': l10n.modePyDesc, 'badge': l10n.modePyBadge, 'icon': '🌟'},
   ];
 
-  static const _features = [
-    {'icon': '🔮', 'title': 'Sinastri Analizi', 'desc': 'Çift, ebeveyn-çocuk, bireysel natal veya potansiyel harita ile gezegen konumlarınızın derin analizi.'},
-    {'icon': '🌍', 'title': 'Astrocartography', 'desc': '15.000+ şehirde yıldız uyumu haritanız; gezegenlerin dünya üzerindeki izdüşümlerini keşfedin.'},
-    {'icon': '🌟', 'title': 'Yıldız Mühürleri', 'desc': '21 yıllık göksel döngüde gezegen mühürleriniz ve göksel kontrat analizi.'},
-    {'icon': '📅', 'title': 'Gökyüzü Zaman Akışı', 'desc': 'Günlük, aylık ve yıllık gökyüzü akışlarıyla ilişki, gelişim ve fırsat pencereleri.'},
-    {'icon': '🧬', 'title': 'Potansiyel & Yetenek', 'desc': '7 farklı alanda doğal yetenek tespiti ve meslek yönlendirme önerileri.'},
-    {'icon': '👑', 'title': 'Asteroit Etkileşimleri', 'desc': 'Juno, Ceres, Pallas, Vesta, Eros, Psyche — 8 asteroidin çapraz temasları.'},
-    {'icon': '🌙', 'title': 'Arap Noktaları', 'desc': 'Kozmik noktaların sinastri bağları ve ev konumlarıyla analizi.'},
-    {'icon': '📄', 'title': 'PDF Raporu', 'desc': 'Tüm analizler profesyonel PDF raporunda; sınırsız indirme ve e-posta teslimi.'},
+  List<Map<String, String>> _features(AppLocalizations l10n) => [
+    {'icon': '🔮', 'title': l10n.feature1Title, 'desc': l10n.feature1Desc},
+    {'icon': '🌍', 'title': l10n.feature2Title, 'desc': l10n.feature2Desc},
+    {'icon': '🌟', 'title': l10n.feature3Title, 'desc': l10n.feature3Desc},
+    {'icon': '📅', 'title': l10n.feature4Title, 'desc': l10n.feature4Desc},
+    {'icon': '🧬', 'title': l10n.feature5Title, 'desc': l10n.feature5Desc},
+    {'icon': '👑', 'title': l10n.feature6Title, 'desc': l10n.feature6Desc},
+    {'icon': '🌙', 'title': l10n.feature7Title, 'desc': l10n.feature7Desc},
+    {'icon': '📄', 'title': l10n.feature8Title, 'desc': l10n.feature8Desc},
   ];
 
-  static const _howSteps = [
-    {'step': '1', 'icon': '📝', 'title': 'Analiz Türünü Seçin', 'desc': 'Çift, ebeveyn-çocuk, bireysel natal veya potansiyel analizi — size uygun olanı seçin.'},
-    {'step': '2', 'icon': '🔮', 'title': 'Bilgileri Girin', 'desc': 'İsim, doğum tarihi ve konum bilgilerinizle 21 yıllık analiz saniyeler içinde hazır.'},
-    {'step': '3', 'icon': '📥', 'title': 'PDF Raporu Alın', 'desc': 'Detaylı raporunuzu PDF olarak indirin, dilediğinizce saklayın veya e-posta ile alın.'},
+  List<Map<String, String>> _howSteps(AppLocalizations l10n) => [
+    {'step': '1', 'icon': '📝', 'title': l10n.step1Title, 'desc': l10n.step1Desc},
+    {'step': '2', 'icon': '🔮', 'title': l10n.step2Title, 'desc': l10n.step2Desc},
+    {'step': '3', 'icon': '📥', 'title': l10n.step3Title, 'desc': l10n.step3Desc},
   ];
 
-  static const _plans = [
+  List<Map<String, dynamic>> _plans(AppLocalizations l10n) => [
     {
-      'name': 'Temel', 'badge': 'Ücretsiz', 'price': 0, 'desc': 'Analizi deneyimleyin',
-      'features': ['Tüm analiz sonuçları ekranda', '2 harita görüntüleme', 'Temel uyum skorları', 'Gökyüzü akışı', 'Sınırlı asteroid verisi'],
-      'disabled': ['PDF Raporu', 'Astrocartography', 'Yıldız Mühürleri', 'Arap Noktaları', 'E-posta PDF'],
+      'name': l10n.planFreeName, 'badge': l10n.planFreeBadge, 'price': 0, 'desc': l10n.planFreeDesc,
+      'features': [l10n.planFreeFeat1, l10n.planFreeFeat2, l10n.planFreeFeat3, l10n.planFreeFeat4, l10n.planFreeFeat5],
+      'disabled': [l10n.planFreeDisabled1, l10n.planFreeDisabled2, l10n.planFreeDisabled3, l10n.planFreeDisabled4, l10n.planFreeDisabled5],
       'highlight': false,
     },
     {
-      'name': 'Premium', 'badge': 'En Popüler', 'price': 129, 'desc': 'Profesyonel analiz paketi',
-      'features': ['Temeldeki her şey', 'PDF Raporu (sınırsız indirme)', 'Astrocartography dünya haritası', 'Yıldız Mühürleri tam liste', 'Arap Noktaları + sinastri', 'Tüm haritalar SVG (7+ grafik)', 'E-posta ile PDF teslimi'],
+      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 129, 'desc': l10n.planPremiumDesc,
+      'features': [l10n.planPremiumFeat1, l10n.planPremiumFeat2, l10n.planPremiumFeat3, l10n.planPremiumFeat4, l10n.planPremiumFeat5, l10n.planPremiumFeat6, l10n.planPremiumFeat7],
       'disabled': <String>[],
       'highlight': true,
     },
     {
-      'name': 'Pro', 'badge': 'VIP', 'price': 249, 'desc': 'Kişisel danışmanlık dahil',
-      'features': ['Premiumdaki her şey', 'Kişisel astroloji yorumu', '30 dakika WhatsApp danışmanlık', '1 yıl güncelleme hakkı', 'Öncelikli destek'],
+      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 249, 'desc': l10n.planProDesc,
+      'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4, l10n.planProFeat5],
       'disabled': <String>[],
       'highlight': false,
     },
   ];
 
-  static const _testimonials = [
-    {'name': 'Zeynep K.', 'text': 'Eşimle aramızdaki bağı çok farklı bir perspektiften görmemi sağladı. PDF raporu inanılmaz detaylıydı.'},
-    {'name': 'Ahmet T.', 'text': 'Astrocartography özelliği sayesinde taşınmamız gereken şehri bulduk. Şu anda çok mutluyuz.'},
-    {'name': 'Selin A.', 'text': 'Yıldız haritamız sayesinde ilişkimizdeki zorlu dönemlerin dinamiklerini anladık ve iletişimimizi güçlendirdik.'},
-    {'name': 'Mehmet B.', 'text': 'Oğlumun yeteneklerini keşfetmek için kullandım. Meslek yönlendirme önerileri çok isabetli.'},
-    {'name': 'Ayşe K.', 'text': 'Kendim için potansiyel analizi yaptırdım. Daha önce fark etmediğim yetenek alanlarımı keşfettim. Kariyer değişikliği yapmama vesile oldu.'},
+  List<Map<String, String>> _testimonials(AppLocalizations l10n) => [
+    {'name': l10n.t1Name, 'text': l10n.t1Text},
+    {'name': l10n.t2Name, 'text': l10n.t2Text},
+    {'name': l10n.t3Name, 'text': l10n.t3Text},
+    {'name': l10n.t4Name, 'text': l10n.t4Text},
+    {'name': l10n.t5Name, 'text': l10n.t5Text},
   ];
 
-  static const _faqs = [
-    {'q': 'Analiz nasıl çalışır?', 'a': 'Doğum tarihi, saati ve konum bilgilerinizle astrolojik haritanız çıkarılır. FAST tekniği ile bağıl haritalar hesaplanır ve 21 yıllık göksel döngü analiz edilir.'},
-    {'q': 'Hangi analiz türünü seçmeliyim?', 'a': 'Evli veya sevgili iseniz "Eş/Sevgili" modu, çocuğunuzun yeteneklerini keşfetmek için "Ebeveyn/Çocuk" modunu kullanabilirsiniz.'},
-    {'q': 'Doğum saatini bilmiyorum, ne yapmalıyım?', 'a': 'Doğum saati olmadan da analiz yapılabilir ancak ev haritası ve bazı detaylı hesaplamalar için saat gereklidir. Saat yoksa 12:00 varsayılan olarak kullanılır.'},
-    {'q': 'PDF raporu nasıl alırım?', 'a': 'Premium veya Pro paket satın alarak PDF raporunuzu sınırsız şekilde indirebilirsiniz. Rapor e-posta ile de teslim edilir.'},
-    {'q': 'Ödeme yöntemleri nelerdir?', 'a': 'Kredi kartı, banka kartı ve havale/EFT seçenekleri mevcuttur. Tüm ödemeler 256-bit SSL ile korunur.'},
-    {'q': 'Para iade garantiniz var mı?', 'a': 'Evet, 14 gün içinde koşulsuz para iade garantisi sunuyoruz. Memnun kalmazsanız ücretiniz iade edilir.'},
-    {'q': 'Astrocartography nedir?', 'a': 'Doğum haritanızdaki gezegenlerin dünya üzerinde en güçlü etkiye sahip olduğu şehirleri bulur.'},
-    {'q': 'Potansiyel analizi nasıl çalışır?', 'a': 'Doğum haritanızdaki gezegen açıları taranarak 7 farklı alanda doğal yetenekleriniz tespit edilir.'},
+  List<Map<String, String>> _faqs(AppLocalizations l10n) => [
+    {'q': l10n.faq1Q, 'a': l10n.faq1A},
+    {'q': l10n.faq2Q, 'a': l10n.faq2A},
+    {'q': l10n.faq3Q, 'a': l10n.faq3A},
+    {'q': l10n.faq4Q, 'a': l10n.faq4A},
+    {'q': l10n.faq5Q, 'a': l10n.faq5A},
+    {'q': l10n.faq6Q, 'a': l10n.faq6A},
+    {'q': l10n.faq7Q, 'a': l10n.faq7A},
+    {'q': l10n.faq8Q, 'a': l10n.faq8A},
   ];
 
   @override
@@ -118,28 +121,30 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SingleChildScrollView(
         controller: _scrollCtrl,
         child: Column(
           children: [
-            _navbar(),
-            _hero(),
-            _modeSection(),
-            _featuresSection(),
-            _howSection(),
-            _pricingSection(),
-            _testimonialSection(),
-            _faqSection(),
-            _ctaSection(),
-            _footer(),
+            _navbar(l10n),
+            _hero(l10n),
+            _modeSection(l10n),
+            _featuresSection(l10n),
+            _howSection(l10n),
+            _pricingSection(l10n),
+            _testimonialSection(l10n),
+            _faqSection(l10n),
+            _ctaSection(l10n),
+            _footer(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _navbar() {
+  Widget _navbar(AppLocalizations l10n) {
+    final lp = context.read<LocaleProvider>();
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
@@ -164,16 +169,43 @@ class _LandingScreenState extends State<LandingScreen> {
             const Spacer(),
             Flexible(child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(
               children: [
-                _navLink('Özellikler', () => _scrollTo(900)),
+                _navLink(l10n.navFeatures, () => _scrollTo(900)),
                 const SizedBox(width: 12),
-                _navLink('Fiyatlandırma', () => _scrollTo(1800)),
+                _navLink(l10n.navPricing, () => _scrollTo(1800)),
                 const SizedBox(width: 12),
-                _navLink('SSS', () => _scrollTo(2600)),
+                _navLink(l10n.navFaq, () => _scrollTo(2600)),
                 const SizedBox(width: 12),
-                _goldBtn('Analiz Başlat', () => _startAnalysis(), height: 34, fontSize: 11),
+                _languageDropdown(lp),
+                const SizedBox(width: 12),
+                _goldBtn(l10n.navStartAnalysis, () => _startAnalysis(), height: 34, fontSize: 11),
               ],
             ))),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _languageDropdown(LocaleProvider lp) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: FastTheme.border),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: lp.locale.languageCode,
+          dropdownColor: FastTheme.cardBg,
+          icon: const Icon(Icons.language, size: 16, color: FastTheme.accentGold),
+          style: const TextStyle(color: FastTheme.text, fontSize: 12),
+          items: const [
+            DropdownMenuItem(value: 'tr', child: Text('Türkçe', style: TextStyle(color: FastTheme.text, fontSize: 12))),
+            DropdownMenuItem(value: 'en', child: Text('English', style: TextStyle(color: FastTheme.text, fontSize: 12))),
+          ],
+          onChanged: (v) {
+            if (v != null) lp.setLanguage(v);
+          },
         ),
       ),
     );
@@ -200,7 +232,8 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _hero() {
+  Widget _hero(AppLocalizations l10n) {
+    final stats = _stats;
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 60),
       decoration: const BoxDecoration(
@@ -218,21 +251,21 @@ class _LandingScreenState extends State<LandingScreen> {
               border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text('YILDIZLARIN YERY\u00dcZ\u00dcNE \u0130ZD\u00dc\u015e\u00dcM\u00dc', style: TextStyle(color: FastTheme.accentGold, fontSize: 11, letterSpacing: 1)),
+            child: Text(l10n.heroBadge.toUpperCase(), style: const TextStyle(color: FastTheme.accentGold, fontSize: 11, letterSpacing: 1)),
           ),
           const SizedBox(height: 24),
           Text.rich(
             TextSpan(
-              text: 'Ba\u011f\u0131n\u0131z\u0131n G\u00f6ksel\n',
+              text: l10n.heroTitle,
               style: GoogleFonts.cormorantGaramond(fontSize: 48, fontWeight: FontWeight.w700, color: FastTheme.text, height: 1.15),
-              children: [TextSpan(text: 'Haritas\u0131n\u0131 Ke\u015ffedin', style: TextStyle(color: FastTheme.accentGold, shadows: [Shadow(color: FastTheme.accentGoldGlow, blurRadius: 40)]))],
+              children: [TextSpan(text: l10n.heroTitleAccent, style: const TextStyle(color: FastTheme.accentGold, shadows: [Shadow(color: FastTheme.accentGoldGlow, blurRadius: 40)]))],
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
-            child: Text('Fatih Asartepe Sinastri Tekniği (FAST) ile ilişkinizin derinliklerini, çocuğunuzun potansiyelini veya kendi yeteneklerinizi keşfedin.',
+            child: Text(l10n.heroSubtitle,
               textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.textMuted, fontSize: 16, height: 1.6)),
           ),
           const SizedBox(height: 24),
@@ -243,9 +276,8 @@ class _LandingScreenState extends State<LandingScreen> {
               border: Border.all(color: FastTheme.border),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text('Bilgilendirme: Bu \u00e7al\u0131\u015fma gelecekte olacak olaylar\u0131 \u00f6ng\u00f6rmez; kehanet, fal veya kesin yarg\u0131 de\u011fildir. '
-              'Do\u011fum an\u0131ndaki g\u00f6ky\u00fcz\u00fcn\u00fcn yery\u00fcz\u00fcne izd\u00fc\u015f\u00fcm\u00fcn\u00fc, ki\u015fisel fark\u0131ndal\u0131k ve geli\u015fim perspektifiyle anlatan bir analiz rehberidir.',
-              textAlign: TextAlign.center, style: TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
+            child: Text(l10n.heroDisclaimer,
+              textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
           ),
           const SizedBox(height: 32),
           Wrap(
@@ -253,11 +285,11 @@ class _LandingScreenState extends State<LandingScreen> {
             spacing: 16,
             runSpacing: 12,
             children: [
-              _goldBtn('🔮 Ücretsiz Analiz Başlat', () => _startAnalysis(), height: 50, fontSize: 14),
+              _goldBtn(l10n.freeAnalysis, () => _startAnalysis(), height: 50, fontSize: 14),
               OutlinedButton.icon(
                 onPressed: () => _scrollTo(400),
                 icon: const Icon(Icons.arrow_downward, size: 18, color: FastTheme.accentGold),
-                label: const Text('Analiz Türünü Seç', style: TextStyle(color: FastTheme.accentGold, fontSize: 14)),
+                label: Text(l10n.chooseAnalysisType, style: const TextStyle(color: FastTheme.accentGold, fontSize: 14)),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: FastTheme.accentGold, width: 2),
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
@@ -270,11 +302,11 @@ class _LandingScreenState extends State<LandingScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _stat('${_stats['total_analysis']}+', 'Analiz'),
+              _stat('${stats['total_analysis']}+', l10n.statAnalysis),
               const SizedBox(width: 40),
-              _stat('21', 'Yıllık Döngü'),
+              _stat('21', l10n.statYearCycle),
               const SizedBox(width: 40),
-              _stat('${_stats['total_cities']}+', 'Şehir'),
+              _stat('${stats['total_cities']}+', l10n.statCities),
             ],
           ),
         ],
@@ -291,15 +323,15 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _modeSection() {
+  Widget _modeSection(AppLocalizations l10n) {
     return _section(
-      'Analiz Türünüzü Seçin',
-      'Size en uygun analizi başlatın',
+      l10n.modeSectionTitle,
+      l10n.modeSectionDesc,
       isAlt: true,
       child: Wrap(
         spacing: 20,
         runSpacing: 20,
-        children: _modes.map((m) => _modeCard(m)).toList(),
+        children: _modes(l10n).map((m) => _modeCard(m)).toList(),
       ),
     );
   }
@@ -343,12 +375,12 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _featuresSection() {
-    return _section('Neler Sunuyoruz?', 'FAST ile astrolojik analizlerin her boyutunu keşfedin',
+  Widget _featuresSection(AppLocalizations l10n) {
+    return _section(l10n.featuresTitle, l10n.featuresDesc,
       child: Wrap(
         spacing: 16,
         runSpacing: 16,
-        children: _features.map((f) => Container(
+        children: _features(l10n).map((f) => Container(
           width: 240,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -370,13 +402,13 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _howSection() {
-    return _section('Nasıl Çalışır?', '3 adımda yıldız bağı analiziniz', isAlt: true,
+  Widget _howSection(AppLocalizations l10n) {
+    return _section(l10n.howTitle, l10n.howDesc, isAlt: true,
       child: Column(
         children: [
           Wrap(
             spacing: 24, runSpacing: 24,
-            children: _howSteps.map((s) => Container(
+            children: _howSteps(l10n).map((s) => Container(
               width: 260,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(color: FastTheme.cardBg, border: Border.all(color: FastTheme.border), borderRadius: BorderRadius.circular(12)),
@@ -395,14 +427,14 @@ class _LandingScreenState extends State<LandingScreen> {
             )).toList(),
           ),
           const SizedBox(height: 32),
-          _goldBtn('🔮 Hemen Analiz Başlat', () => _startAnalysis(), height: 50, fontSize: 14),
+          _goldBtn(l10n.howStart, () => _startAnalysis(), height: 50, fontSize: 14),
         ],
       ),
     );
   }
 
-  Widget _pricingSection() {
-    return _section('Fiyatlandırma', 'Size en uygun paketi seçin',
+  Widget _pricingSection(AppLocalizations l10n) {
+    return _section(l10n.pricingTitle, l10n.pricingDesc,
       child: Column(
         children: [
           Row(
@@ -410,7 +442,7 @@ class _LandingScreenState extends State<LandingScreen> {
             children: [
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = false),
-                child: Text('Aylık', style: TextStyle(fontSize: 13, color: _priceYearly ? FastTheme.textDim : FastTheme.accentGold, fontWeight: _priceYearly ? FontWeight.normal : FontWeight.w600)),
+                child: Text(l10n.pricingMonthly, style: TextStyle(fontSize: 13, color: _priceYearly ? FastTheme.textDim : FastTheme.accentGold, fontWeight: _priceYearly ? FontWeight.normal : FontWeight.w600)),
               ),
               const SizedBox(width: 12),
               GestureDetector(
@@ -440,9 +472,9 @@ class _LandingScreenState extends State<LandingScreen> {
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = true),
                 child: Text.rich(TextSpan(
-                  text: 'Yıllık ',
+                  text: '${l10n.pricingYearly} ',
                   style: TextStyle(fontSize: 13, color: _priceYearly ? FastTheme.accentGold : FastTheme.textDim, fontWeight: _priceYearly ? FontWeight.w600 : FontWeight.normal),
-                  children: [TextSpan(text: '%20 indirim', style: const TextStyle(color: FastTheme.success, fontSize: 10))],
+                  children: [TextSpan(text: l10n.pricingDiscount, style: const TextStyle(color: FastTheme.success, fontSize: 10))],
                 )),
               ),
             ],
@@ -450,14 +482,14 @@ class _LandingScreenState extends State<LandingScreen> {
           const SizedBox(height: 32),
           Wrap(
             spacing: 20, runSpacing: 20,
-            children: _plans.map((p) => _planCard(p)).toList(),
+            children: _plans(l10n).map((p) => _planCard(p, l10n)).toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _planCard(Map p) {
+  Widget _planCard(Map p, AppLocalizations l10n) {
     final highlight = p['highlight'] as bool;
     final price = p['price'] as int;
     final discPrice = _priceYearly ? (price * 10 * 0.8).round() : price;
@@ -491,12 +523,12 @@ class _LandingScreenState extends State<LandingScreen> {
               Text(p['desc'] as String, style: const TextStyle(fontSize: 11, color: FastTheme.textDim)),
               const SizedBox(height: 16),
               price == 0
-                  ? Text('Ücretsiz', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold))
+                  ? Text(l10n.planFree, style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold))
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('₺$discPrice', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                        Text('/${_priceYearly ? 'yıl' : 'ay'}', style: const TextStyle(fontSize: 13, color: FastTheme.textDim)),
+                        Text(_priceYearly ? l10n.planPerYear : l10n.planPerMonth, style: const TextStyle(fontSize: 13, color: FastTheme.textDim)),
                       ],
                     ),
               const SizedBox(height: 16),
@@ -506,7 +538,7 @@ class _LandingScreenState extends State<LandingScreen> {
               SizedBox(
                 width: double.infinity,
                 child: highlight
-                    ? _goldBtn(p['price'] == 0 ? 'Ücretsiz Dene' : '${p['name']}a Başla', () => _startAnalysis(), height: 44, fontSize: 13)
+                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), () => _startAnalysis(), height: 44, fontSize: 13)
                     : OutlinedButton(
                         onPressed: () => _startAnalysis(),
                         style: OutlinedButton.styleFrom(
@@ -515,7 +547,7 @@ class _LandingScreenState extends State<LandingScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text(p['price'] == 0 ? 'Ücretsiz Dene' : '${p['name']}a Başla', style: const TextStyle(fontSize: 13)),
+                        child: Text(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), style: const TextStyle(fontSize: 13)),
                       ),
               ),
             ],
@@ -539,26 +571,27 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _testimonialSection() {
-    return _section('Kullanıcı Yorumları', 'Gerçek kullanıcı deneyimleri', isAlt: true,
+  Widget _testimonialSection(AppLocalizations l10n) {
+    final testimonials = _testimonials(l10n);
+    return _section(l10n.testimonialsTitle, l10n.testimonialsDesc, isAlt: true,
       child: Column(
         children: [
-          Text('★' * _testimonials[_testimonialIdx]['rating'].toString().length, style: const TextStyle(fontSize: 22, color: FastTheme.accentGold, letterSpacing: 4)),
+          const Text('★★★★★', style: TextStyle(fontSize: 22, color: FastTheme.accentGold, letterSpacing: 4)),
           const SizedBox(height: 12),
-          Text('"${_testimonials[_testimonialIdx]['text']}"', textAlign: TextAlign.center,
+          Text('"${testimonials[_testimonialIdx]['text']}"', textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, color: FastTheme.text, fontStyle: FontStyle.italic, height: 1.7)),
           const SizedBox(height: 12),
-          Text('— ${_testimonials[_testimonialIdx]['name']}', style: const TextStyle(fontSize: 13, color: FastTheme.accentGold, fontWeight: FontWeight.w600)),
+          Text('— ${testimonials[_testimonialIdx]['name']}', style: const TextStyle(fontSize: 13, color: FastTheme.accentGold, fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_testimonials.length, (i) => GestureDetector(
+            children: List.generate(testimonials.length, (i) => GestureDetector(
               onTap: () => setState(() => _testimonialIdx = i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: _testimonialIdx == i ? 24 : 8, height: 8, margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(_testimonialIdx == i ? 4 : 4),
+                  borderRadius: BorderRadius.circular(4),
                   color: _testimonialIdx == i ? FastTheme.accentGold : FastTheme.border,
                 ),
               ),
@@ -569,12 +602,13 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _faqSection() {
-    return _section('Sıkça Sorulan Sorular', 'Merak ettikleriniz',
+  Widget _faqSection(AppLocalizations l10n) {
+    final faqs = _faqs(l10n);
+    return _section(l10n.faqTitle, l10n.faqDesc,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 700),
         child: Column(
-          children: List.generate(_faqs.length, (i) {
+          children: List.generate(faqs.length, (i) {
             final open = _faqOpen == i;
             return GestureDetector(
               onTap: () => setState(() => _faqOpen = open ? -1 : i),
@@ -592,13 +626,13 @@ class _LandingScreenState extends State<LandingScreen> {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: Text(_faqs[i]['q'] as String, style: TextStyle(fontSize: 14, color: open ? FastTheme.accentGold : FastTheme.text, fontWeight: FontWeight.w600))),
+                        Expanded(child: Text(faqs[i]['q'] as String, style: TextStyle(fontSize: 14, color: open ? FastTheme.accentGold : FastTheme.text, fontWeight: FontWeight.w600))),
                         Text(open ? '▾' : '▸', style: const TextStyle(color: FastTheme.textDim, fontSize: 12)),
                       ],
                     ),
                     if (open) ...[
                       const SizedBox(height: 8),
-                      Text(_faqs[i]['a'] as String, style: const TextStyle(fontSize: 13, color: FastTheme.textMuted, height: 1.6)),
+                      Text(faqs[i]['a'] as String, style: const TextStyle(fontSize: 13, color: FastTheme.textMuted, height: 1.6)),
                     ],
                   ],
                 ),
@@ -610,7 +644,7 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _ctaSection() {
+  Widget _ctaSection(AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
@@ -619,20 +653,20 @@ class _LandingScreenState extends State<LandingScreen> {
       ),
       child: Column(
         children: [
-          Text('Yıldız Haritanızı Keşfetmeye Hazır Mısınız?', textAlign: TextAlign.center,
+          Text(l10n.ctaTitle, textAlign: TextAlign.center,
             style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
           const SizedBox(height: 10),
-          Text('İlişki, aile, bireysel natal veya potansiyel analizi — 21 yıllık göksel döngünüzü keşfetmek için hemen başlatın.',
+          Text(l10n.ctaDesc,
             textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: FastTheme.textDim)),
           const SizedBox(height: 24),
           Wrap(
             spacing: 12, runSpacing: 12,
             children: [
-              _goldBtn('🔮 Çift Analizi Başlat', () => _startAnalysis('es_sevgili'), height: 52, fontSize: 16),
+              _goldBtn(l10n.ctaCouple, () => _startAnalysis('es_sevgili'), height: 52, fontSize: 16),
               OutlinedButton.icon(
                 onPressed: () => _startAnalysis('ebeveyn_cocuk'),
                 icon: const Icon(Icons.family_restroom, size: 18),
-                label: const Text('👨‍👩‍👧‍👦 Ebeveyn-Çocuk'),
+                label: Text(l10n.ctaParentChild),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
@@ -644,7 +678,7 @@ class _LandingScreenState extends State<LandingScreen> {
               OutlinedButton.icon(
                 onPressed: () => _startAnalysis('bireysel_natal'),
                 icon: const Icon(Icons.person, size: 18),
-                label: const Text('⭐ Bireysel Natal'),
+                label: Text(l10n.ctaNatal),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
@@ -656,7 +690,7 @@ class _LandingScreenState extends State<LandingScreen> {
               OutlinedButton.icon(
                 onPressed: () => _startAnalysis('potansiyel_yetenek'),
                 icon: const Icon(Icons.auto_awesome, size: 18),
-                label: const Text('🌟 Potansiyel Analizi'),
+                label: Text(l10n.ctaPotential),
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
@@ -672,7 +706,7 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  Widget _footer() {
+  Widget _footer(AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 48, 24, 48),
@@ -690,20 +724,20 @@ class _LandingScreenState extends State<LandingScreen> {
                   Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold),
                     child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 18)))),
                   const SizedBox(height: 8),
-                  const Text('Fatih Asartepe Sinastri Tekniği (FAST) ile yıldız bağı analizi.', style: TextStyle(fontSize: 12, color: FastTheme.textDim, height: 1.5)),
+                  Text(l10n.footerTagline, style: const TextStyle(fontSize: 12, color: FastTheme.textDim, height: 1.5)),
                 ],
               ),
             ),
-            _footerCol('Hızlı Linkler', [
-              _footerLink('Özellikler', () => _scrollTo(900)),
-              _footerLink('Fiyatlandırma', () => _scrollTo(1800)),
-              _footerLink('SSS', () => _scrollTo(2600)),
-              _footerLink('Analiz Başlat', () => _startAnalysis()),
+            _footerCol(l10n.footerQuickLinks, [
+              _footerLink(l10n.navFeatures, () => _scrollTo(900)),
+              _footerLink(l10n.navPricing, () => _scrollTo(1800)),
+              _footerLink(l10n.navFaq, () => _scrollTo(2600)),
+              _footerLink(l10n.navStartAnalysis, () => _startAnalysis()),
             ]),
-            _footerCol('İletişim', [
+            _footerCol(l10n.footerContact, [
               const Text('info@fatihasartepe.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
               const SizedBox(height: 4),
-              const Text('© 2024 FAST. Tüm hakları saklıdır.', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              Text(l10n.footerRights, style: const TextStyle(fontSize: 12, color: FastTheme.textDim)),
             ]),
           ],
         ),

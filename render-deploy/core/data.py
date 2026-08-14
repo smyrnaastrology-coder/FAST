@@ -2,6 +2,8 @@
 import os
 import importlib.util as _iu
 
+from .i18n import LangDict, set_lang, get_lang
+
 _FAST_RENKLER = {
     "birincil": "#B8A9C9",    # lavender
     "ikincil": "#8FB8CA",     # sage
@@ -554,6 +556,33 @@ def _load_ext_dict(filename):
             return _v
     return {}
 
+def _load_en_dict(filename):
+    """Ayni anahtarlarin INGILIZCE karsiligini tasiyan dosyayi yukler (yoksa {}).
+
+    Dosya adi dogrultusu: bu fonksiyon, verilen filename'in yaninda
+    '_EN' son ekli bir surumu arar. Ornek:
+      FBST_YORUMLAR_BURC.py  ->  FBST_YORUMLAR_BURC_EN.py
+    """
+    _base = filename[:-3] if filename.endswith(".py") else filename
+    _en_filename = _base + "_EN.py"
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    _path = os.path.join(_dir, _en_filename)
+    if not os.path.exists(_path):
+        _path = os.path.join(os.path.dirname(_dir), _en_filename)
+    if not os.path.exists(_path):
+        return {}
+    _spec = _iu.spec_from_file_location("_mod_en_" + _en_filename, _path)
+    _mod = _iu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    for _k, _v in vars(_mod).items():
+        if isinstance(_v, dict) and not _k.startswith("_"):
+            return _v
+    return {}
+
+def _load_i18n_dict(filename):
+    """TR+EN birlestiren, aktife gore ceviri yapan LangDict yukler."""
+    return LangDict(_load_ext_dict(filename), _load_en_dict(filename))
+
 fbst_sabian_ebeveyn = _load_ext_dict("fbst_sabian_ebeveyn.py")
 fbst_sabit_yildizlar_ebeveyn = _load_ext_dict("fbst_sabit_yildizlar_ebeveyn.py")
 fbst_sabit_yildizlar_ask = _load_ext_dict("fbst_sabit_yildizlar_ask.py")
@@ -564,7 +593,7 @@ FBST_YORUMLAR_EBEVEYN = _load_ext_dict("FBST_YORUMLAR_EBEVEYN.py")
 FBST_GELISIM_DONEMleri_EBEVEYN = _load_ext_dict("FBST_GELISIM_DONEMleri_EBEVEYN.py")
 FBST_POTANSIYEL_EBEVEYN = _load_ext_dict("FBST_POTANSIYEL_EBEVEYN.py")
 FBST_MESLEK_EBEVEYN = _load_ext_dict("FBST_MESLEK_EBEVEYN.py")
-FBST_YORUMLAR_BURC = _load_ext_dict("FBST_YORUMLAR_BURC.py")
+FBST_YORUMLAR_BURC = _load_i18n_dict("FBST_YORUMLAR_BURC.py")
 FBST_YORUMLAR_EV = _load_ext_dict("FBST_YORUMLAR_EV.py")
 FBST_SINASTRI_OZEL = _load_ext_dict("FBST_SINASTRI_OZEL.py")
 

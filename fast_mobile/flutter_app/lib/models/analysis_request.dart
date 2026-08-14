@@ -14,6 +14,7 @@ class AnalysisRequest {
   final double lon;
   final double? utcOffset;
   final String mod;
+  final String lang;
 
   AnalysisRequest({
     this.p1Isim = '',
@@ -31,11 +32,13 @@ class AnalysisRequest {
     required this.lon,
     this.utcOffset,
     this.mod = 'es_sevgili',
+    this.lang = 'tr',
   });
 
   Map<String, dynamic> toJson() {
     final base = <String, dynamic>{
       'sehir': city, 'ulke': country, 'enlem': lat, 'boylam': lon,
+      'lang': lang,
     };
     if (utcOffset != null) base['utc_offset'] = utcOffset;
     switch (mod) {

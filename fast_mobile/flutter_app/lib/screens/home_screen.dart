@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import 'input_form_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -8,6 +9,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -29,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                   child: ClipOval(child: Image.asset('assets/logo.png', fit: BoxFit.cover)),
                 ),
                 const SizedBox(height: 24),
-                Text('Fatih Asartepe\nSinastri Tekni\u011fi',
+                Text(l10n.homeTitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.cormorantGaramond(
                     fontSize: 28, fontWeight: FontWeight.w700,
@@ -37,11 +39,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('FAST \u2014 Y\u0131ld\u0131z Ba\u011f Analizi Sistemi',
-                  style: TextStyle(fontSize: 13, color: FastTheme.textLight, letterSpacing: 2),
+                Text(l10n.homeSubtitle,
+                  style: const TextStyle(fontSize: 13, color: FastTheme.textLight, letterSpacing: 2),
                 ),
                 const SizedBox(height: 6),
-                Text('S\u00fcr\u00fcm 4.0', style: TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                Text(l10n.homeVersion, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -50,22 +52,20 @@ class HomeScreen extends StatelessWidget {
                     border: Border.all(color: FastTheme.border),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Bilgilendirme: Bu \u00e7al\u0131\u015fma gelecekte olacak olaylar\u0131 \u00f6ng\u00f6rmez; kehanet, fal veya kesin yarg\u0131 de\u011fildir. '
-                    'Do\u011fum an\u0131ndaki g\u00f6ky\u00fcz\u00fcn\u00fcn yery\u00fcz\u00fcne izd\u00fc\u015f\u00fcm\u00fcn\u00fc, ki\u015fisel fark\u0131ndal\u0131k ve geli\u015fim '
-                    'perspektifiyle anlatan bir analiz rehberidir.',
+                  child: Text(
+                    l10n.heroDisclaimer,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, color: FastTheme.textMuted, height: 1.5),
+                    style: const TextStyle(fontSize: 11, color: FastTheme.textMuted, height: 1.5),
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildModeCard(context, 'E\u015f / Sevgili', Icons.favorite, FastTheme.rose),
+                _buildModeCard(context, l10n.modeEsTitle, Icons.favorite, FastTheme.rose),
                 const SizedBox(height: 16),
-                _buildModeCard(context, 'Ebeveyn \u2013 \u00c7ocuk', Icons.family_restroom, FastTheme.secondary),
+                _buildModeCard(context, l10n.modeEbTitle, Icons.family_restroom, FastTheme.secondary),
                 const SizedBox(height: 16),
-                _buildModeCard(context, 'Potansiyel / Yetenek', Icons.auto_awesome, FastTheme.accent),
+                _buildModeCard(context, l10n.modePyTitle, Icons.auto_awesome, FastTheme.accent),
                 const SizedBox(height: 16),
-                _buildModeCard(context, 'Bireysel Natal', Icons.person, FastTheme.primary),
+                _buildModeCard(context, l10n.modeNatalTitle, Icons.person, FastTheme.primary),
                 const SizedBox(height: 40),
               ],
             ),

@@ -17,6 +17,7 @@ os.chdir(_PROJECT_ROOT)
 
 import swisseph as swe
 from core import FBST_Engine
+from core.i18n import pdf_label, get_lang as _i18n_get_lang
 from core.data import ARAP_ILISKI
 from core.utils import (
     GEZEGENLER, get_planetary_position, kadersel_yildiz_taramasi,
@@ -688,6 +689,7 @@ class EsSevgiliInput(BaseModel):
     enlem: float = 41.0082
     boylam: float = 28.9784
     utc_offset: Optional[float] = None
+    lang: str = "tr"
 
 class EbeveynCocukInput(BaseModel):
     ebeveyn_isim: str = ""
@@ -701,6 +703,7 @@ class EbeveynCocukInput(BaseModel):
     enlem: float = 41.0082
     boylam: float = 28.9784
     utc_offset: Optional[float] = None
+    lang: str = "tr"
 
 class PotansiyelYetenekInput(BaseModel):
     isim: str = ""
@@ -711,6 +714,7 @@ class PotansiyelYetenekInput(BaseModel):
     enlem: float = 41.0082
     boylam: float = 28.9784
     utc_offset: Optional[float] = None
+    lang: str = "tr"
 
 class BireyselNatalInput(BaseModel):
     isim: str = ""
@@ -721,6 +725,7 @@ class BireyselNatalInput(BaseModel):
     enlem: float = 41.0082
     boylam: float = 28.9784
     utc_offset: Optional[float] = None
+    lang: str = "tr"
 
 class SehirInput(BaseModel):
     arama: str
@@ -915,16 +920,16 @@ def _generate_natal_pdf(motor):
         # Page number bottom-right
         c.setFillColor(HexColor('#8A8A8A'))
         c.setFont("DejaVu", 7)
-        c.drawRightString(w - 55, 22, f"Sayfa {c.getPageNumber()}")
+        c.drawRightString(w - 55, 22, f"{pdf_label('Sayfa')} {c.getPageNumber()}")
         # "Back to contents" link — bottom-left
         if toc_cizildi[0]:
             c.linkAbsolute("", "icindekiler", (SOL, 26, SOL + 130, 42))
             c.setFillColor(acik)
             c.setFont("DejaVu", 7)
-            c.drawString(SOL + 2, 29, "↑ İçindekilere Dön")
+            c.drawString(SOL + 2, 29, pdf_label("↑ İçindekilere Dön"))
         c.setFillColor(HexColor('#5A5348'))
         c.setFont("DejaVu", 7)
-        c.drawString(SOL + 2, 22, "FAST · Asartepe Sinastri Tekniği")
+        c.drawString(SOL + 2, 22, pdf_label("FAST · Asartepe Sinastri Tekniği"))
 
     def sayfa_basligi(baslik, y=SAYFA_UST, numara=""):
         c.setFont("DejaVu-Bold", 18)
@@ -1036,8 +1041,8 @@ def _generate_natal_pdf(motor):
         else:
             c.setFont("DejaVu-Bold", 34)
             c.setFillColor(HexColor('#FDFAF5'))
-            c.drawCentredString(w / 2, h - 150, "Bireysel Natal")
-            c.drawCentredString(w / 2, h - 190, "Analiz Raporu")
+            c.drawCentredString(w / 2, h - 150, pdf_label("Bireysel Natal"))
+            c.drawCentredString(w / 2, h - 190, pdf_label("Analiz Raporu"))
             c.setStrokeColor(altin)
             c.setLineWidth(1)
             c.line(w / 2 - 110, h - 212, w / 2 + 110, h - 212)
@@ -1046,13 +1051,13 @@ def _generate_natal_pdf(motor):
     # Name + version + birth info at bottom of cover
     c.setFont("DejaVu-Bold", 16)
     c.setFillColor(altin)
-    c.drawCentredString(w / 2, 152, motor.p1_isim or "Kişisel Analiz")
+    c.drawCentredString(w / 2, 152, motor.p1_isim or pdf_label("Kişisel Analiz"))
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor('#999999'))
     c.drawCentredString(w / 2, 130, "FAST — Sinastri Tekniği  |  v4.0")
     try:
-        dogum_bilgi = f"Doğum: {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
-        yer_bilgi = f"Konum: {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
+        dogum_bilgi = f"{pdf_label('Doğum:')} {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
+        yer_bilgi = f"{pdf_label('Konum:')} {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
         c.setFont("DejaVu", 8)
         c.setFillColor(HexColor('#999999'))
         if dogum_bilgi:
@@ -1079,27 +1084,27 @@ def _generate_natal_pdf(motor):
     sim = data.get("simulasyon", {})
     toc_bolumler = []
     if chart_png and os.path.exists(chart_png):
-        toc_bolumler.append(("Doğum Haritası", "bolum_harita"))
+        toc_bolumler.append((pdf_label("Doğum Haritası"), "bolum_harita"))
     if len(str(data.get("chart_yorumu", ""))) > 30:
-        toc_bolumler.append(("Doğum Haritası Yorumu", "bolum_yorum"))
+        toc_bolumler.append((pdf_label("Doğum Haritası Yorumu"), "bolum_yorum"))
     if data.get("arap_noktalari"):
-        toc_bolumler.append(("Arap Noktaları", "bolum_arap"))
+        toc_bolumler.append((pdf_label("Arap Noktaları"), "bolum_arap"))
     if data.get("asteroitler") or data.get("asteroit_konumlar"):
-        toc_bolumler.append(("Asteroit Bulguları", "bolum_asteroit"))
+        toc_bolumler.append((pdf_label("Asteroit Bulguları"), "bolum_asteroit"))
     if data.get("hayat_alanlari"):
-        toc_bolumler.append(("Hayat Alanları Detayı", "bolum_hayat"))
+        toc_bolumler.append((pdf_label("Hayat Alanları Detayı"), "bolum_hayat"))
     if data.get("sifa_receteleri") or data.get("sifa_receteleri_detay"):
-        toc_bolumler.append(("Şifa Reçeteleri", "bolum_sifa"))
+        toc_bolumler.append((pdf_label("Şifa Reçeteleri"), "bolum_sifa"))
     if data.get("sabianlar"):
-        toc_bolumler.append(("Sabian Sembolleri", "bolum_sabian"))
+        toc_bolumler.append((pdf_label("Sabian Sembolleri"), "bolum_sabian"))
     if len(str(data.get("solar_return", ""))) > 20:
-        toc_bolumler.append(("Solar Return — Yıllık Döngü", "bolum_solar"))
+        toc_bolumler.append((pdf_label("Solar Return — Yıllık Döngü"), "bolum_solar"))
     if len(str(data.get("lunar_return", ""))) > 20:
-        toc_bolumler.append(("Lunar Return — Aylık Döngü", "bolum_lunar"))
+        toc_bolumler.append((pdf_label("Lunar Return — Aylık Döngü"), "bolum_lunar"))
     if isinstance(mp6_entries, list) and mp6_entries:
-        toc_bolumler.append(("6 Aylık Minor Progress — Gün Gün", "bolum_minor"))
+        toc_bolumler.append((pdf_label("6 Aylık Minor Progress — Gün Gün"), "bolum_minor"))
     if sim and any(v for v in sim.values()):
-        toc_bolumler.append(("Global Kader Pusulası", "bolum_kader"))
+        toc_bolumler.append((pdf_label("Global Kader Pusulası"), "bolum_kader"))
 
     # ═══════════════════════════════════════════
     # TABLE OF CONTENTS — clickable page
@@ -1108,10 +1113,10 @@ def _generate_natal_pdf(motor):
         yeni_sayfa()
         toc_cizildi[0] = True
         c.bookmarkPage("icindekiler")
-        y = sayfa_basligi("İçindekiler", numara="☰")
+        y = sayfa_basligi(pdf_label("İçindekiler"), numara="☰")
         c.setFont("DejaVu", 8.5)
         c.setFillColor(acik)
-        c.drawString(SOL, y, "Raporunuzun bölümlerine gitmek için başlıklara tıklayın.")
+        c.drawString(SOL, y, pdf_label("Raporunuzun bölümlerine gitmek için başlıklara tıklayın."))
         y -= 22
         for i, (toc_baslik, toc_hedef) in enumerate(toc_bolumler, 1):
             satir_h = 30
@@ -1229,8 +1234,8 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_arap")
-        y = sayfa_basligi("Arap Noktaları — Sembolik Hassas Noktalar", numara=str(bolum_no[0]))
-        y = metin_yaz(SOL, y, "Arap noktaları, doğum haritanızdaki Yükselen ve gezegenlerin özel kombinasyonlarından türetilen sembolik hassas noktalardır; hayatınızın hangi alanında şans, ruh, aşk, bağlılık, tutku ve bolluk temalarının öne çıktığını gösterir.", "DejaVu", 8, acik, 92)
+        y = sayfa_basligi(pdf_label("Arap Noktaları — Sembolik Hassas Noktalar"), numara=str(bolum_no[0]))
+        y = metin_yaz(SOL, y, pdf_label("Arap noktaları, doğum haritanızdaki Yükselen ve gezegenlerin özel kombinasyonlarından türetilen sembolik hassas noktalardır; hayatınızın hangi alanında şans, ruh, aşk, bağlılık, tutku ve bolluk temalarının öne çıktığını gösterir."), "DejaVu", 8, acik, 92)
         y -= 10
         for _nokta_adi, _bilgi in arap_listesi:
             if not isinstance(_bilgi, dict):
@@ -1240,7 +1245,7 @@ def _generate_natal_pdf(motor):
             derece = _bilgi.get("derece", 0)
             burc_yorum = _bilgi.get("burc_yorum", "") or ""
             ev_yorumu = _bilgi.get("ev_yorumu", "") or ""
-            ust_bilgi = f"{burc} burcu, {ev_no}. Ev ({derece}°)" if burc else f"{ev_no}. Ev ({derece}°)"
+            ust_bilgi = (f"{pdf_label(burc)}, House {ev_no} ({derece}°)" if _i18n_get_lang() == "en" else f"{burc} burcu, {ev_no}. Ev ({derece}°)") if burc else (f"House {ev_no} ({derece}°)" if _i18n_get_lang() == "en" else f"{ev_no}. Ev ({derece}°)")
             parag = " ".join(p for p in [burc_yorum, ev_yorumu] if p)
             nokta_h = 16 + 12 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
             if y - nokta_h < SAYFA_ALT:
@@ -1273,8 +1278,8 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_asteroit")
-        y = sayfa_basligi("Asteroit Bulguları — Ruhsal Mühürler", numara=str(bolum_no[0]))
-        y = metin_yaz(SOL, y, "Asteroitler, doğum haritanızdaki gezegenlerle 5°'lik kavuşum orbunun içine girdiğinde ruhsal bir mühür oluşturur; Juno (evlilik), Ceres (beslenme), Pallas (bilgelik) ve Vesta (adanmışlık) temalarını açığa çıkarır.", "DejaVu", 8, acik, 92)
+        y = sayfa_basligi(pdf_label("Asteroit Bulguları — Ruhsal Mühürler"), numara=str(bolum_no[0]))
+        y = metin_yaz(SOL, y, pdf_label("Asteroitler, doğum haritanızdaki gezegenlerle 5°'lik kavuşum orbunun içine girdiğinde ruhsal bir mühür oluşturur; Juno (evlilik), Ceres (beslenme), Pallas (bilgelik) ve Vesta (adanmışlık) temalarını açığa çıkarır."), "DejaVu", 8, acik, 92)
         y -= 10
         if asteroitler:
             for _ab in asteroitler[:16]:
@@ -1307,7 +1312,7 @@ def _generate_natal_pdf(motor):
                 y -= ast_h - 34 + 10
             y -= 8
         if asteroit_konumlar:
-            y = metin_yaz(SOL, y, "Doğum haritanızdaki asteroit konumları:", "DejaVu-Bold", 8.5, koyu, 92)
+            y = metin_yaz(SOL, y, pdf_label("Doğum haritanızdaki asteroit konumları:"), "DejaVu-Bold", 8.5, koyu, 92)
             y -= 6
             for _ak in asteroit_konumlar:
                 if not isinstance(_ak, dict):
@@ -1331,7 +1336,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_hayat")
-        y = sayfa_basligi("Hayat Alanları Detayı", numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("Hayat Alanları Detayı"), numara=str(bolum_no[0]))
         for ha in ha_list:
             yorum_text = ha.get("yorum", "")
             oneriler = ha.get("oneriler", [])[:3]
@@ -1354,7 +1359,7 @@ def _generate_natal_pdf(motor):
                 c.circle(e_bx + 4, y - card_h + card_h - 13, 4, fill=1, stroke=0)
                 c.setFillColor(e_rengi)
                 c.setFont("DejaVu-Bold", 7.5)
-                c.drawString(e_bx + 12, y - card_h + card_h - 16, element_adi)
+                c.drawString(e_bx + 12, y - card_h + card_h - 16, pdf_label(element_adi))
             inner_y = y - 30
             # Score bar — wide, element-colored progress bar
             bar_w = 115
@@ -1392,7 +1397,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_sifa")
-        y = sayfa_basligi("Şifa Reçeteleri", numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("Şifa Reçeteleri"), numara=str(bolum_no[0]))
         if sifa:
             sifa_metin = str(sifa)
             sifa_metin = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3]', '', sifa_metin)
@@ -1450,7 +1455,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_sabian")
-        y = sayfa_basligi("Sabian Sembolleri", numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("Sabian Sembolleri"), numara=str(bolum_no[0]))
         for s in sabianlar:
             sembol = _strip_html(str(s.get('sembol','')))[:250]
             sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*Sabian Şifresi \(\d+°\):\s*', '', sembol)
@@ -1476,7 +1481,7 @@ def _generate_natal_pdf(motor):
             c.rect(SOL + 2, y - sembol_h + 6, 3, sembol_h - 12, fill=1, stroke=0)
             c.setFont("DejaVu-Bold", 9.5)
             c.setFillColor(bordo)
-            c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {gez_isim}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
+            c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {pdf_label(gez_isim)}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
             c.setFillColor(altin)
             c.setFont("DejaVu-Bold", 7)
             c.drawRightString(SAG - 14, y - 16, "✦ Sabian Şifresi")
@@ -1493,8 +1498,8 @@ def _generate_natal_pdf(motor):
     # ═══════════════════════════════════════════
     # SOLAR / LUNAR RETURN — sub-sections
     # ═══════════════════════════════════════════
-    for baslik, anahtar, html_anahtar in [("Solar Return — Yıllık Döngü", "solar_return", "solar_return_html"),
-                                          ("Lunar Return — Aylık Döngü", "lunar_return", "lunar_return_html")]:
+    for baslik, anahtar, html_anahtar in [(pdf_label("Solar Return — Yıllık Döngü"), "solar_return", "solar_return_html"),
+                                          (pdf_label("Lunar Return — Aylık Döngü"), "lunar_return", "lunar_return_html")]:
         icerik = data.get(anahtar, "")
         if icerik and len(str(icerik)) > 20:
             bolum_no[0] += 1
@@ -1528,22 +1533,22 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_minor")
-        y = sayfa_basligi("6 Aylık Minor Progress — Gün Gün", numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("6 Aylık Minor Progress — Gün Gün"), numara=str(bolum_no[0]))
         c.setFont("DejaVu", 7.5)
         c.setFillColor(acik)
-        c.drawString(SOL, y, "İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir.")
+        c.drawString(SOL, y, pdf_label("İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir."))
         y -= 4
         c.setFillColor(HexColor('#8FC0E8'))
-        c.drawString(SOL, y, "■ Uyumlu açı (Trigon · Sekstil) · ")
+        c.drawString(SOL, y, pdf_label("■ Uyumlu açı (Trigon · Sekstil) · "))
         c.setFillColor(HexColor('#D08A96'))
-        c.drawString(SOL + 150, y, "■ Zorlayıcı açı (Kare · Karşıt) · ")
+        c.drawString(SOL + 150, y, pdf_label("■ Zorlayıcı açı (Kare · Karşıt) · "))
         c.setFillColor(acik)
-        c.drawString(SOL + 330, y, "□ Açı yoğunluğu düşük")
+        c.drawString(SOL + 330, y, pdf_label("□ Açı yoğunluğu düşük"))
         y -= 16
 
         import datetime as _dt_mod
-        AY_ADLARI_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
-        HAFTALAR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"]
+        AY_ADLARI_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"] if _i18n_get_lang() != "en" else ["January","February","March","April","May","June","July","August","September","October","November","December"]
+        HAFTALAR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"] if _i18n_get_lang() != "en" else ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
         HUCRE_W = (SAG - SOL - 14) / 7.0
         HUCRE_H = 24.0
 
@@ -1632,14 +1637,14 @@ def _generate_natal_pdf(motor):
                     ly = y - 46 - satir_sayisi * HUCRE_H - 2
                     c.setFillColor(bordo)
                     c.setFont("DejaVu-Bold", 8)
-                    c.drawString(SOL + 12, ly, f"✦ Bu Ayın Öne Çıkan Günleri ({len(onemli)})")
+                    c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(onemli)})" if _i18n_get_lang() == "en" else f"✦ Bu Ayın Öne Çıkan Günleri ({len(onemli)})")
                     for gd in onemli[:4]:
                         ly -= 13
                         p_entry = gun_verileri[gd]
-                        ilk_yorum = (p_entry.get("yorumlar") or ["Açı bulunamadı"])[0]
+                        ilk_yorum = (p_entry.get("yorumlar") or [pdf_label("Açı bulunamadı")])[0]
                         c.setFillColor(koyu)
                         c.setFont("DejaVu-Bold", 7.5)
-                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI_TR[mm-1]} · {p_entry.get('ay_burc','')} Ay")
+                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI_TR[mm-1]} · {p_entry.get('ay_burc','')} {pdf_label('Ay')}")
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 7)
                         c.drawString(SOL + 118, ly, ilk_yorum[:135])
@@ -1653,32 +1658,32 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_kader")
-        y = sayfa_basligi("Global Kader Pusulası", numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("Global Kader Pusulası"), numara=str(bolum_no[0]))
         c.setFont("DejaVu", 8)
         c.setFillColor(acik)
-        c.drawString(SOL, y, "Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır.")
+        c.drawString(SOL, y, pdf_label("Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır."))
         y -= 22
         # ── Calculation technique explanation ──
-        teknik = ("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. "
-                  "Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; "
-                  "gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. "
-                  "Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. "
-                  "Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder.")
+        teknik = (pdf_label("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. ") +
+                  pdf_label("Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; ") +
+                  pdf_label("gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. ") +
+                  pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. ") +
+                  pdf_label("Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder."))
         teknik_h = 24 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 12
-        kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, "Hesaplama Tekniği", "🔮")
+        kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, pdf_label("Hesaplama Tekniği"), "🔮")
         metin_yaz(SOL + 14, y - teknik_h + 22, teknik, "DejaVu", 7.5, acik, 90)
         y -= teknik_h + 12
         SIM_KAT_PDF = [
-            ("para", "⚖", "Para & Bolluk"),
-            ("huzur", "✦", "Huzur & İç Sakinlik"),
-            ("tutku", "★", "Tutku & Macera"),
-            ("kriz", "✕", "Kriz & Dönüşüm"),
+            ("para", "⚖", pdf_label("Para & Bolluk")),
+            ("huzur", "✦", pdf_label("Huzur & İç Sakinlik")),
+            ("tutku", "★", pdf_label("Tutku & Macera")),
+            ("kriz", "✕", pdf_label("Kriz & Dönüşüm")),
         ]
         KAT_ACIKLAMA = {
-            "para": "Maddi kazanç, bolluk ve fırsat enerjilerinin en güçlü olduğu şehir.",
-            "huzur": "İç sakinlik, duygusal denge ve huzurlu bir yaşam enerjisinin en güçlü olduğu şehir.",
-            "tutku": "Tutku, macera ve girişimcilik enerjisinin en yüksek olduğu şehir.",
-            "kriz": "Dönüşüm, kriz ve güçlü değişim rüzgârlarının estiği şehir.",
+            "para": pdf_label("Maddi kazanç, bolluk ve fırsat enerjilerinin en güçlü olduğu şehir."),
+            "huzur": pdf_label("İç sakinlik, duygusal denge ve huzurlu bir yaşam enerjisinin en güçlü olduğu şehir."),
+            "tutku": pdf_label("Tutku, macera ve girişimcilik enerjisinin en yüksek olduğu şehir."),
+            "kriz": pdf_label("Dönüşüm, kriz ve güçlü değişim rüzgârlarının estiği şehir."),
         }
         for kat_key, icon, label in SIM_KAT_PDF:
             cities = sim.get(kat_key, [])
@@ -1687,7 +1692,7 @@ def _generate_natal_pdf(motor):
             kat_h = 28 + len(cities) * 26 + 8
             if y - kat_h < SAYFA_ALT:
                 yeni_sayfa()
-                y = sayfa_basligi("Global Kader Pusulası (devam)")
+                y = sayfa_basligi(pdf_label("Global Kader Pusulası") + " (devam)" if _i18n_get_lang() != "en" else "Global Destiny Compass (continued)")
             kart_ciz(SOL, y - kat_h, SAG - SOL, kat_h, label, icon)
             # Category color stripe on the left edge
             c.setFillColor(KAT_RENK.get(kat_key, altin))
@@ -1713,7 +1718,7 @@ def _generate_natal_pdf(motor):
                 etkiler = city.get("etkiler") or []
                 if etkiler:
                     etki_list = "; ".join(_etki_temizle(e) for e in etkiler[:2])
-                    acik_yazi = f"Etkiler: {etki_list}."
+                    acik_yazi = f"{pdf_label('Etkiler:')} {etki_list}."
                 else:
                     acik_yazi = KAT_ACIKLAMA.get(kat_key, "")
                 c.setFont("DejaVu", 7)
@@ -1952,6 +1957,7 @@ def _engine_es(p: EsSevgiliInput, ek_charts=False):
         lat=p.enlem, lon=p.boylam,
         p1_isim=p.p1_isim, p2_isim=p.p2_isim,
         mod="es_sevgili", utc_offset=p.utc_offset,
+        lang=p.lang,
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
@@ -1969,6 +1975,7 @@ def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
         p1_isim=p.cocuk_isim, p2_isim=p.ebeveyn_isim,
         mod="ebeveyn_cocuk", ebeveyn_rolu=p.ebeveyn_rolu,
         utc_offset=p.utc_offset,
+        lang=p.lang,
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
@@ -1986,6 +1993,7 @@ def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
         lat=p.enlem, lon=p.boylam,
         p1_isim=p.isim, p2_isim="",
         mod="potansiyel_yetenek", utc_offset=p.utc_offset,
+        lang=p.lang,
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
@@ -2003,6 +2011,7 @@ def _engine_natal(p: BireyselNatalInput, ek_charts=False):
         lat=p.enlem, lon=p.boylam,
         p1_isim=p.isim, p2_isim="",
         mod="bireysel_natal", utc_offset=p.utc_offset,
+        lang=p.lang,
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)

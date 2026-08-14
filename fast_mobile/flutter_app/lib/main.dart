@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'config/theme.dart';
-import 'screens/landing_screen.dart';
-import 'screens/analyzer_screen.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/analysis_provider.dart';
+import 'providers/locale_provider.dart';
+import 'screens/landing_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AnalysisProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => AnalysisProvider()),
+      ],
       child: const FastApp(),
     ),
   );
@@ -19,11 +24,23 @@ class FastApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FAST',
-      debugShowCheckedModeBanner: false,
-      theme: FastTheme.dark,
-      home: const LandingScreen(),
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        return MaterialApp(
+          title: 'FAST',
+          debugShowCheckedModeBanner: false,
+          theme: FastTheme.dark,
+          locale: localeProvider.locale,
+          supportedLocales: LocaleProvider.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: const LandingScreen(),
+        );
+      },
     );
   }
 }

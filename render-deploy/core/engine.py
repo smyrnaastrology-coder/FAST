@@ -30,6 +30,7 @@ from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     OGRENME_MOTIVASYON_MERKUR, EGITIM_3EV, BESLENME_RUTIN_AY,
     OZGURLUK_SINIR_SATURN, YAS_DONEMLERI, ELEMENT_UYUM_ANNE_COCUK,
     OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET)
+from core.i18n import set_lang as _core_set_lang, get_lang as _core_get_lang, pdf_label as pdf_label
 from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocator,
     sehir_bul, _turkiye_utc_offset_hesapla, _nci_pazar_gunu,
     _dst_kuzey_us, _dst_kuzey_ab, _dst_guney, otomatik_utc_offset,
@@ -48,11 +49,13 @@ from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocato
 class FBST_Engine:
 
     
-    def __init__(self, p1, p2, event_date, event_time="12:00", city="Ankara", country="Türkiye", lat=39.9334, lon=32.8597, p1_isim="", p2_isim="", mod="es_sevgili", ebeveyn_rolu="anne", utc_offset=None):
+    def __init__(self, p1, p2, event_date, event_time="12:00", city="Ankara", country="Türkiye", lat=39.9334, lon=32.8597, p1_isim="", p2_isim="", mod="es_sevgili", ebeveyn_rolu="anne", utc_offset=None, lang="tr"):
         
         self._session_id = uuid.uuid4().hex[:12]
         self.mod = mod
         self.ebeveyn_rolu = ebeveyn_rolu
+        self._lang = lang if lang in ("tr", "en") else "tr"
+        _core_set_lang(self._lang)
         
         # 1. Metinleri tarihe çevir
         t1 = datetime.strptime(p1, "%Y-%m-%d")
@@ -1417,13 +1420,23 @@ class FBST_Engine:
         rx_mi = " (Rx)" in burc_ad
         temiz_burc = burc_ad.replace(" (Rx)", "")
 
+        # Harita motoru burc adlarini aksansiz gecerken (Koc, Boga, Oglak...)
+        # sozlukler aksanli anahtarlar kullanir (Koc, Boga, Ogulak...). Bu esleme
+        # aksansiz gelen anahtar disagasini dogru sozluk anahtarina tasir.
+        _aksansiz_burc = {
+            "Koc": "Koç", "Boga": "Boğa", "Ikizler": "İkizler", "Yengec": "Yengeç",
+            "Aslan": "Aslan", "Basak": "Başak", "Terazi": "Terazi", "Akrep": "Akrep",
+            "Yay": "Yay", "Oglak": "Oğlak", "Kova": "Kova", "Balik": "Balık",
+        }
+        _dict_burc = _aksansiz_burc.get(temiz_burc, temiz_burc)
+
         metin = None
         if self.mod == "ebeveyn_cocuk" and rol and FBST_GEZEGEN_EV_COCUK and FBST_GEZEGEN_EV_EBEVEYN:
             sozluk = FBST_GEZEGEN_EV_COCUK if rol == "cocuk" else FBST_GEZEGEN_EV_EBEVEYN
             metin = sozluk.get((gezegen_ad, ev_no))
         else:
-            if FBST_YORUMLAR_BURC and (gezegen_ad, temiz_burc) in FBST_YORUMLAR_BURC:
-                metin = FBST_YORUMLAR_BURC[(gezegen_ad, temiz_burc)]
+            if FBST_YORUMLAR_BURC and (gezegen_ad, _dict_burc) in FBST_YORUMLAR_BURC:
+                metin = FBST_YORUMLAR_BURC[(gezegen_ad, _dict_burc)]
             elif FBST_YORUMLAR_EV and (gezegen_ad, str(ev_no)) in FBST_YORUMLAR_EV:
                 metin = FBST_YORUMLAR_EV[(gezegen_ad, str(ev_no))]
 
@@ -1440,7 +1453,10 @@ class FBST_Engine:
         if metin:
             cumle = metin
         else:
-            cumle = f"{gezegen_ad} burcu {temiz_burc} takımyıldızında yer alıyor ve {ev_no}. ev alanını etkiliyor."
+            if self._lang == "en":
+                cumle = f"The planet {gezegen_ad} lies in the constellation of {temiz_burc} and influences the {ev_no}. house area."
+            else:
+                cumle = f"{gezegen_ad} burcu {temiz_burc} takımyıldızında yer alıyor ve {ev_no}. ev alanını etkiliyor."
 
         if rx_mi:
             if self.mod == "ebeveyn_cocuk":
@@ -6356,7 +6372,7 @@ class FBST_Engine:
             w, h = A4
             canvas.setFont('DejaVuSans', 8)
             canvas.setFillColor(HexColor('#718096'))
-            canvas.drawString(40, h - 25, "ASARTEPE SİNASTRİ AKADEMİSİ")
+            canvas.drawString(40, h - 25, pdf_label("ASARTEPE SİNASTRİ AKADEMİSİ"))
             canvas.drawRightString(w - 40, h - 25, f"{self.p1_isim} & {self.p2_isim}")
             canvas.setStrokeColor(HexColor('#C9A96E'))
             canvas.setLineWidth(0.5)
@@ -6369,13 +6385,15 @@ class FBST_Engine:
             canvas.drawCentredString(w / 2, 20, f"- {doc.page} -")
             canvas.setFont('DejaVuSans', 7)
             canvas.setFillColor(HexColor('#4A5568'))
-            canvas.drawRightString(w - 40, 20, "Fatih Asartepe — © 2026 Tüm hakları saklıdır")
+            canvas.drawRightString(w - 40, 20, pdf_label("Fatih Asartepe — © 2026 Tüm hakları saklıdır"))
             canvas.restoreState()
 
         def baslik_karti_ekle(baslik_metni, alt_baslik=None, emoji="", hedef=None):
             """Bölüm başlıklarını renkli kutu kartı olarak ekler. hedef verilirse story yerine o listeye ekler."""
             eklenenler = hedef if hedef is not None else story
-            tam_baslik = f"{emoji} {baslik_metni}" if emoji else baslik_metni
+            tam_baslik = (f"{emoji} {pdf_label(baslik_metni)}" if emoji else pdf_label(baslik_metni))
+            if alt_baslik:
+                alt_baslik = pdf_label(alt_baslik)
             kart_html = f"""
             <table width="100%" cellpadding="8">
             <tr>
@@ -6426,29 +6444,29 @@ class FBST_Engine:
         else:
             story.append(Spacer(1, 60))
 
-        story.append(Paragraph("<b>ASARTEPE SİNASTRİ AKADEMİSİ</b>", styles['CoverTitle']))
+        story.append(Paragraph("<b>" + pdf_label("ASARTEPE SİNASTRİ AKADEMİSİ") + "</b>", styles['CoverTitle']))
         story.append(Spacer(1, 8))
-        story.append(Paragraph("<font color='#C9A96E' size='16'>Fatih Asartepe Sinastri Tekniği (FAST)</font>", styles['CoverTitle']))
+        story.append(Paragraph("<font color='#C9A96E' size='16'>" + pdf_label("Fatih Asartepe Sinastri Tekniği (FAST)") + "</font>", styles['CoverTitle']))
         story.append(Spacer(1, 20))
 
         if self.mod == "ebeveyn_cocuk":
-            story.append(Paragraph("<font color='#1A1A2E' size='14'>EBEVEYN-ÇOCUK İLİŞKİ ANALİZİ</font>", styles['CoverTitle']))
+            story.append(Paragraph("<font color='#1A1A2E' size='14'>" + pdf_label("EBEVEYN-ÇOCUK İLİŞKİ ANALİZİ") + "</font>", styles['CoverTitle']))
         else:
-            story.append(Paragraph("<font color='#1A1A2E' size='14'>İLİŞKİ ANALİZİ RAPORU</font>", styles['CoverTitle']))
+            story.append(Paragraph("<font color='#1A1A2E' size='14'>" + pdf_label("İLİŞKİ ANALİZİ RAPORU") + "</font>", styles['CoverTitle']))
         story.append(Spacer(1, 25))
 
         kullanici_bilgisi = [
-            [Paragraph(f"<b>Kök ve Rehber Ruhlar:</b> {self.p1_isim} & {self.p2_isim}", styles['CoverSub'])],
-            [Paragraph(f"<b>Kadersel Akış Miladı:</b> {datetime.now().strftime('%d.%m.%Y')}", styles['CoverSub'])]
+            [Paragraph("<b>" + pdf_label("Kök ve Rehber Ruhlar:") + "</b> " + f"{self.p1_isim} & {self.p2_isim}", styles['CoverSub'])],
+            [Paragraph("<b>" + pdf_label("Kadersel Akış Miladı:") + "</b> " + datetime.now().strftime('%d.%m.%Y'), styles['CoverSub'])]
         ]
         bilgi_tablosu = Table(kullanici_bilgisi, colWidths=[480])
         bilgi_tablosu.setStyle(TableStyle([('ALIGN', (0,0), (-1,-1), 'CENTER'), ('BOTTOMPADDING', (0,0), (-1,-1), 4)]))
         story.append(bilgi_tablosu)
         
         story.append(Spacer(1, 100))
-        story.append(Paragraph("Bu doküman, Fatih Asartepe Sinastri Tekniği (FAST) ile kişiye özel üretilmiştir.", styles['CoverFooter']))
+        story.append(Paragraph(pdf_label("Bu doküman, Fatih Asartepe Sinastri Tekniği (FAST) ile kişiye özel üretilmiştir."), styles['CoverFooter']))
         story.append(Spacer(1, 15))
-        story.append(Paragraph("© 2026 Fatih Asartepe — Bu çalışmaya ait tüm haklar saklıdır. izinsiz kopyalanması, yayılması veya ticari amaçla kullanılması yasaktır.", styles['CoverFooter']))
+        story.append(Paragraph(pdf_label("© 2026 Fatih Asartepe — Bu çalışmaya ait tüm haklar saklıdır. izinsiz kopyalanması, yayılması veya ticari amaçla kullanılması yasaktır."), styles['CoverFooter']))
         story.append(PageBreak())
 
         # ⚠️ YASAL VE ETİK UYARI (rapor başına eklendi)
@@ -6501,7 +6519,7 @@ class FBST_Engine:
         story.append(meta_table)
         story.append(Spacer(1, 15))
         
-        story.append(Paragraph("ILISKININ ENERJISI VE DAYANIKLILIGI", styles['TurkishHeading']))
+        story.append(Paragraph(pdf_label("ILISKININ ENERJISI VE DAYANIKLILIGI"), styles['TurkishHeading']))
         # BURAYA: Ki kutuphane metni eklenecek
         tork_metni = self.calculate_tork()
         story.append(Paragraph(tork_metni, styles['TurkishNormal']))
@@ -6513,12 +6531,12 @@ class FBST_Engine:
         
         titresim_resmi = self.ciz_titresim_grafigi()
 
-        story.append(Paragraph("İLİŞKİ ENERJİSİ GRAFİĞİ", styles['TurkishHeading']))
+        story.append(Paragraph(pdf_label("İLİŞKİ ENERJİSİ GRAFİĞİ"), styles['TurkishHeading']))
         frekans_blok = []
         cerceveli_gorsel_ekle(titresim_resmi, 500, 160, "Sinüs Frekans Grafiği", hedef=frekans_blok)
         story.append(KeepTogether(frekans_blok))
         
-        story.append(Paragraph("ORTAK GELECEK REHBERİ (21 Yıllık Öngörü)", styles['TurkishHeading']))
+        story.append(Paragraph(pdf_label("ORTAK GELECEK REHBERİ (21 Yıllık Öngörü)"), styles['TurkishHeading']))
         for kavsak in self.calculate_gelecek_navigasyonu(pdf_icin=True):
             story.append(Paragraph(f"• {kavsak}", styles['TurkishNormal']))
         story.append(Spacer(1, 15))
@@ -6547,7 +6565,7 @@ class FBST_Engine:
         
         def gezegen_dokumu(j_gun, taraf_adi, tarih_str, harita_dosyasi, rol=None):
             gorsel_blok = []
-            cerceveli_gorsel_ekle(harita_dosyasi, 450, 450, f"{taraf_adi} Durumsal Haritası", hedef=gorsel_blok)
+            cerceveli_gorsel_ekle(harita_dosyasi, 450, 450, f"{taraf_adi} {pdf_label('Durumsal Haritası')}", hedef=gorsel_blok)
             story.append(KeepTogether([Paragraph(f"{taraf_adi} ({tarih_str})", styles['TurkishHeading'])] + gorsel_blok))
                 
             asc_burc = self.yukselen_bul(j_gun)
@@ -6559,7 +6577,7 @@ class FBST_Engine:
                         yorum = fbst_yukselenler_ebeveyn.get(asc_burc, "Bu vitrin henüz tanımlanmadı.")
                 else:
                     yorum = fbst_yukselenler.get(asc_burc, "Bu vitrin henüz tanımlanmadı.")
-                story.append(Paragraph(f"<b>Yükselen Vitrini ({asc_burc}):</b> {yorum}", styles['TurkishNormal']))
+                story.append(Paragraph(f"<b>{pdf_label('Yükselen Vitrini')} ({pdf_label(asc_burc)}):</b> {yorum}", styles['TurkishNormal']))
                 story.append(Spacer(1, 8))
 
             burclar_tr = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
@@ -6588,7 +6606,8 @@ class FBST_Engine:
                 burc_arg_key = f"{burc_key} (Rx)" if rx_str else burc_key
                 ev_no = self.ev_konumu_bul(j_gun, gezegen_id)
                 
-                gosterim_hatti = f"🪐 <b>{gezegen_ad}:</b> {burc_adi_tr} {deg}° {mnt:02d}'{rx_str} — {ev_no}. Ev"
+                suf = f" — {ev_no}. Ev" if _core_get_lang() != "en" else f" — House {ev_no}"
+                gosterim_hatti = f"🪐 <b>{pdf_label(gezegen_ad)}:</b> {pdf_label(burc_adi_tr)} {deg}° {mnt:02d}'{rx_str}{suf}"
                 story.append(Paragraph(f"<font color='#1A1A2E'><b>{gosterim_hatti}</b></font>", styles['TurkishNormal']))
                 
                 yorum_gezegen = self.kadersel_cumle_kur(gezegen_ad, burc_arg_key, ev_no, rol=rol)
@@ -6601,7 +6620,7 @@ class FBST_Engine:
             story.append(Spacer(1, 10))
             story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.0)) # Buraya ince çizgi daha şık olur
             story.append(Spacer(1, 10))
-            story.append(Paragraph("DERİN KARMİK MÜHÜRLER VE ASTEROİTLER", styles['TurkishHeading']))
+            story.append(Paragraph(pdf_label("DERİN KARMİK MÜHÜRLER VE ASTEROİTLER"), styles['TurkishHeading']))
             
             for gezegen_ad in karmik_noktalar:
                 if gezegen_ad not in GEZEGENLER: continue
@@ -6620,7 +6639,8 @@ class FBST_Engine:
                 mnt = int(((mutlak_derece % 30) - deg) * 60)
                 ev_no = self.ev_konumu_bul(j_gun, gezegen_id)
                 
-                gosterim_hatti = f"🩸 <b>{gezegen_ad}:</b> {burc_adi_tr} {deg}° {mnt:02d}' — {ev_no}. Ev"
+                suf = f" — {ev_no}. Ev" if _core_get_lang() != "en" else f" — House {ev_no}"
+                gosterim_hatti = f"🩸 <b>{pdf_label(gezegen_ad)}:</b> {pdf_label(burc_adi_tr)} {deg}° {mnt:02d}'{suf}"
                 story.append(Paragraph(f"<font color='#8A1538'><b>{gosterim_hatti}</b></font>", styles['TurkishNormal']))
                 
                 yorum_gezegen = self.kadersel_cumle_kur(gezegen_ad, burc_key, ev_no, rol=rol)
@@ -6629,34 +6649,56 @@ class FBST_Engine:
 
         # GEZEGEN DÖKÜMÜ FONKSİYONU SADECE BİR KERE ÇAĞRILIYOR!
         if self.mod == "ebeveyn_cocuk":
-            gezegen_dokumu(j_ileri, f"🌱 {self.p1_isim}'in Kadersel Haritası (Çocuk)", ileri_str, f"{self._session_id}_Situa_A.png", rol="cocuk")
+            saga = f"{self.p1_isim}, Kadersel Haritası (Çocuk)" if _core_get_lang() != "en" else f"{self.p1_isim}'s Karmic Chart (Child)"
+            sagb = f"{self.p2_isim}, Kadersel Haritası (Ebeveyn)" if _core_get_lang() != "en" else f"{self.p2_isim}'s Karmic Chart (Parent)"
+            gezegen_dokumu(j_ileri, f"🌱 {saga}", ileri_str, f"{self._session_id}_Situa_A.png", rol="cocuk")
             story.append(PageBreak())
-            gezegen_dokumu(j_geri, f"🦅 {self.p2_isim}'in Kadersel Haritası (Ebeveyn)", geri_str, f"{self._session_id}_Situa_B.png", rol="ebeveyn")
+            gezegen_dokumu(j_geri, f"🦅 {sagb}", geri_str, f"{self._session_id}_Situa_B.png", rol="ebeveyn")
         else:
             baslik_karti_ekle("KİŞİSEL PERSPEKTİFLER", alt_baslik=f"{self.p1_isim} ve {self.p2_isim} perspektifleri", emoji="🧭")
             story.append(Spacer(1, 10))
-            story.append(Paragraph(
-                "Aşağıdaki iki perspektif, ilişkinizi her bir kişinin kendi gözünden okur. "
-                "KÖK RUH perspektifi, geçmişin getirdiği bilgeliği ve kişinin ilişkiye taşıdığı temel enerjiyi anlatır; "
-                "REHBER RUH perspektifi ise geleceğin vizyonunu ve kişinin ilişkideki yönlendirici rolünü ortaya koyar. "
-                "Her bölümdeki gezegen konumları o kişinin durumsal haritasından alınır ve ilişkinin bütününe etkisi yorumlanır.",
-                styles['TurkishNormal']))
+            if _core_get_lang() == "en":
+                story.append(Paragraph(
+                    "The following two perspectives read your relationship through the eyes of each person. "
+                    "The ROOT SOUL perspective speaks of the wisdom carried from the past and the fundamental energy each person brings into the relationship; "
+                    "the GUIDE SOUL perspective reveals the vision of the future and the guiding role each person plays within it. "
+                    "The planetary positions in each section are drawn from that person's situational chart and interpreted for their effect on the relationship as a whole.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🌱 {self.p1_isim} Perspective:</b> This section describes {self.p1_isim}'s role in the relationship, "
+                    "the strengths carried from the wisdom of past experiences, and the karmic responsibilities held. "
+                    "Every planet here carries the key to the energy this person contributes to the relationship.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🦅 {self.p2_isim} Perspective:</b> This section describes {self.p2_isim}'s role in the relationship, "
+                    "the vision for the future, and the guiding energy that moves this union forward. "
+                    "Every planet here shows how this person shapes the direction of the relationship and how they guide the shared destiny.",
+                    styles['TurkishNormal']))
+            else:
+                story.append(Paragraph(
+                    "Aşağıdaki iki perspektif, ilişkinizi her bir kişinin kendi gözünden okur. "
+                    "KÖK RUH perspektifi, geçmişin getirdiği bilgeliği ve kişinin ilişkiye taşıdığı temel enerjiyi anlatır; "
+                    "REHBER RUH perspektifi ise geleceğin vizyonunu ve kişinin ilişkideki yönlendirici rolünü ortaya koyar. "
+                    "Her bölümdeki gezegen konumları o kişinin durumsal haritasından alınır ve ilişkinin bütününe etkisi yorumlanır.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🌱 {self.p1_isim} Perspektifi:</b> Bu bölüm, {self.p1_isim}'in ilişkideki rolünü, "
+                    "geçmiş yaşantıların bilgeliğiyle getirdiği güçlü yanları ve taşıdığı kadersel sorumlulukları anlatır. "
+                    "Buradaki her gezegen, bu kişinin ilişkiye nasıl bir enerji kattığının anahtarını taşır.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🦅 {self.p2_isim} Perspektifi:</b> Bu bölüm, {self.p2_isim}'in ilişkideki rolünü, "
+                    "geleceğe dair vizyonunu ve bu beraberliği ileriye taşıyan rehber enerjisini anlatır. "
+                    "Buradaki her gezegen, bu kişinin ilişkiyi hangi yöne şekillendirdiğini ve ortak kaderi nasıl yönlendirdiğini gösterir.",
+                    styles['TurkishNormal']))
             story.append(Spacer(1, 12))
-            story.append(Paragraph(
-                f"<b>🌱 {self.p1_isim} Perspektifi:</b> Bu bölüm, {self.p1_isim}'in ilişkideki rolünü, "
-                "geçmiş yaşantıların bilgeliğiyle getirdiği güçlü yanları ve taşıdığı kadersel sorumlulukları anlatır. "
-                "Buradaki her gezegen, bu kişinin ilişkiye nasıl bir enerji kattığının anahtarını taşır.",
-                styles['TurkishNormal']))
-            story.append(Spacer(1, 12))
-            story.append(Paragraph(
-                f"<b>🦅 {self.p2_isim} Perspektifi:</b> Bu bölüm, {self.p2_isim}'in ilişkideki rolünü, "
-                "geleceğe dair vizyonunu ve bu beraberliği ileriye taşıyan rehber enerjisini anlatır. "
-                "Buradaki her gezegen, bu kişinin ilişkiyi hangi yöne şekillendirdiğini ve ortak kaderi nasıl yönlendirdiğini gösterir.",
-                styles['TurkishNormal']))
-            story.append(Spacer(1, 12))
-            gezegen_dokumu(j_ileri, f"🌱 KÖK RUH (Geçmişin Bilgeliği): {self.p1_isim} Perspektifi", ileri_str, f"{self._session_id}_Situa_A.png")
+            gezegen_dokumu(j_ileri, "🌱 " + pdf_label("KÖK RUH (Geçmişin Bilgeliği)") + ("" if _core_get_lang() == "en" else ":"), ileri_str, f"{self._session_id}_Situa_A.png")
             story.append(PageBreak())
-            gezegen_dokumu(j_geri, f"🦅 REHBER RUH (Geleceğin Vizyonu): {self.p2_isim} Perspektifi", geri_str, f"{self._session_id}_Situa_B.png")
+            gezegen_dokumu(j_geri, "🦅 " + pdf_label("REHBER RUH (Geleceğin Vizyonu)") + ("" if _core_get_lang() == "en" else ":"), geri_str, f"{self._session_id}_Situa_B.png")
 
         # 🌍 ASTROCARTOGRAPHY + GLOBAL KADER PUSULASI (PDF - BİRLEŞİK)
         if self.mod == "ebeveyn_cocuk":
@@ -6771,7 +6813,7 @@ class FBST_Engine:
             story.append(Spacer(1, 15))
             story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.0))
             story.append(Spacer(1, 10))
-            story.append(Paragraph("EN UYGUN LOKASYONLAR", styles['TurkishHeading']))
+            story.append(Paragraph(pdf_label("EN UYGUN LOKASYONLAR"), styles['TurkishHeading']))
             if 'radar_top_para' in st.session_state and st.session_state['radar_top_para']:
                 hassasiyet_metni = "Sistem, şehirlerin enlem ve boylam koordinatlarındaki milimetrik sapmaları hesaplayarak evrensel dalga boyu imzanıza en uygun lokasyonları tespit etmiştir."
                 story.append(Paragraph(hassasiyet_metni, styles['TurkishNormal']))
@@ -7244,7 +7286,7 @@ class FBST_Engine:
         story.append(Spacer(1, 15))
         
         # --- YENİ SİNASTRİ VE ŞİFA REÇETELERİ ENTEGRASYONU ---
-        story.append(Paragraph("GEZEGEN ETKİLEŞİMLERİ", styles['TurkishHeading']))
+        story.append(Paragraph(pdf_label("GEZEGEN ETKİLEŞİMLERİ"), styles['TurkishHeading']))
         
         # Yeni motorumuzdan tek parça HTML dönen veriyi alıyoruz
         sinastri_html = self.sinastri_hesapla(sessiz=True)
@@ -7271,7 +7313,7 @@ class FBST_Engine:
         # 🌋 5. BÖLÜM: DÖNÜŞÜM SINAVLARI VE GLOBAL RADAR
         # =========================================================
         story.append(Spacer(1, 15))
-        story.append(Paragraph("ÖNEMLİ DÖNEMLER", styles['TurkishHeading']))
+        story.append(Paragraph(pdf_label("ÖNEMLİ DÖNEMLER"), styles['TurkishHeading']))
         story.append(Paragraph(
             f"Aşağıdaki tarihler, {self.p1_isim} ve {self.p2_isim} arasındaki ilişkinin en yoğun hissedileceği, "
             "küçük olayların büyük farkındalıklara yol açabileceği dönemlerdir. "
@@ -8473,7 +8515,7 @@ class FBST_Engine:
             w, h = A4
             canvas.setFont('DejaVuSans', 8)
             canvas.setFillColor(HexColor('#718096'))
-            canvas.drawString(40, h - 25, "ASARTEPE SİNASTRİ AKADEMİSİ")
+            canvas.drawString(40, h - 25, pdf_label("ASARTEPE SİNASTRİ AKADEMİSİ"))
             canvas.drawRightString(w - 40, h - 25, f"{self.p1_isim}")
             canvas.setStrokeColor(HexColor('#C9A96E'))
             canvas.setLineWidth(0.5)
@@ -8486,11 +8528,13 @@ class FBST_Engine:
             canvas.drawCentredString(w / 2, 20, f"- {doc.page} -")
             canvas.setFont('DejaVuSans', 7)
             canvas.setFillColor(HexColor('#4A5568'))
-            canvas.drawRightString(w - 40, 20, "Fatih Asartepe — © 2026 Tüm hakları saklıdır")
+            canvas.drawRightString(w - 40, 20, pdf_label("Fatih Asartepe — © 2026 Tüm hakları saklıdır"))
             canvas.restoreState()
 
         def baslik_karti_ekle(baslik_metni, alt_baslik=None, emoji=""):
-            tam_baslik = f"{emoji} {baslik_metni}" if emoji else baslik_metni
+            tam_baslik = (f"{emoji} {pdf_label(baslik_metni)}" if emoji else pdf_label(baslik_metni))
+            if alt_baslik:
+                alt_baslik = pdf_label(alt_baslik)
             kart_html = f"""
             <table width="100%" cellpadding="8">
             <tr>
@@ -8520,7 +8564,7 @@ class FBST_Engine:
                 story.append(Spacer(1, 20))
                 story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=3.0))
                 story.append(Spacer(1, 20))
-                story.append(Paragraph("POTANSİYEL VE YETENEK RAPORU", styles['CoverSub']))
+                story.append(Paragraph("POTANSİYEL VE YETENEK RAPORU" if _core_get_lang() != "en" else "POTENTIAL AND TALENT REPORT", styles['CoverSub']))
                 story.append(Spacer(1, 30))
                 story.append(Paragraph(f"<b>{self.p1_isim}</b>", styles['CoverSub']))
             story.append(PageBreak())
