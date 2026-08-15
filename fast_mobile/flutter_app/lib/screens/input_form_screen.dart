@@ -5,6 +5,7 @@ import '../models/analysis_request.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
 import '../providers/locale_provider.dart';
+import '../widgets/language_switcher.dart';
 import 'results_screen.dart';
 
 class InputFormScreen extends StatefulWidget {
@@ -199,7 +200,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.mod)),
+      appBar: AppBar(title: Text(widget.mod), actions: const [LanguageSwitcher()]),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

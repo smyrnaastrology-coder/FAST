@@ -15,6 +15,7 @@ import '../widgets/frekans_chart.dart';
 import '../widgets/aci_gridi.dart';
 import '../widgets/composite_chart.dart';
 import '../widgets/acg_map.dart';
+import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.request.modLabel)),
+      appBar: AppBar(title: Text(widget.request.modLabel), actions: const [LanguageSwitcher()]),
       body: Consumer<AnalysisProvider>(
         builder: (context, provider, _) {
           switch (provider.status) {

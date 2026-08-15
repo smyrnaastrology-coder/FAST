@@ -13,6 +13,7 @@ import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
+import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart' as w;
 
 class AnalyzerScreen extends StatefulWidget {
@@ -285,6 +286,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             )),
             title: Text('FAST — ${_modeLabel(l10n)}'),
             actions: [
+              const LanguageSwitcher(),
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () => Navigator.pop(context),
