@@ -8,6 +8,16 @@ from collections import defaultdict
 
 from core.data import _FAST_RENKLER, fbst_sabit_yildizlar, fbst_sabit_yildizlar_ebeveyn, fbst_sabit_yildizlar_ask
 
+try:
+    from core.i18n import get_lang as _uget_lang
+except Exception:
+    def _uget_lang():
+        return "tr"
+
+
+def _uEN():
+    return _uget_lang() == "en"
+
 # FBST kataloğundaki bazı yıldız anahtarları Swiss Ephemeris tarafından
 # doğrudan çözümlenemez; gerçek pozisyon hesabı için sefstars.txt'teki ad kullanılır.
 _YILDIZ_SEF_AD = {
@@ -726,6 +736,7 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
     Returns:
         Liste: FBST tarzı mühür metinleri (zengin yorumlarla)
     """
+    _EN = _uEN()
     if _aktif_sozluk_yok():
         return []
 
@@ -763,20 +774,33 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
             return 999.0
 
     for yildiz_adi, veriler in _aktif_sozluk.items():
+        if _EN and getattr(_aktif_sozluk, "_en", None):
+            _ev = _aktif_sozluk._en.get(yildiz_adi)
+            if isinstance(_ev, dict):
+                veriler = _ev
         yildiz_derecesi = _yildiz_gercek_derece(yildiz_adi, target_jd, veriler["derece"])
         for gezegen_adi, gezegen_derecesi in gezegen_dereceleri.items():
             fark = aci_farki(gezegen_derecesi, yildiz_derecesi)
 
             if fark <= orb_siniri:
-                rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
+                if _EN:
+                    rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {gezegen_adi} | Diff: {fark:.2f}°)\n"
+                else:
+                    rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
                 etki_bulundu = False
 
                 if "yargi" in veriler:
-                    rapor_metni += f"   💫 Yıldızın anlamı: {veriler['yargi']}\n"
+                    if _EN:
+                        rapor_metni += f"   💫 Star's meaning: {veriler['yargi']}\n"
+                    else:
+                        rapor_metni += f"   💫 Yıldızın anlamı: {veriler['yargi']}\n"
                     etki_bulundu = True
 
                 for kategori, gezegen_etkileri in veriler["etkiler"].items():
-                    _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
+                    if _EN:
+                        _kategori_ad = _KATEGORI_DUZ_AD_EN.get(kategori, kategori.replace("_", " ").title())
+                    else:
+                        _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
                     if gezegen_adi in gezegen_etkileri:
                         rapor_metni += f"   ➤ {_kategori_ad} ({gezegen_adi}): {gezegen_etkileri[gezegen_adi]}\n"
                         etki_bulundu = True
@@ -805,23 +829,42 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
                     if gezegen_adi in zengin_pozisyonlar:
                         if any(aci_farki(yildiz_derecesi, p) <= 0.5 for p in zengin_pozisyonlar[gezegen_adi]):
                             continue
-                    if _aktif_mod == "ebeveyn_cocuk":
-                        _baglam = "çocuğunuzla aranızdaki bağda"
-                        _alan = "o alanı"
-                    elif _aktif_mod == "es_sevgili":
-                        _baglam = "ilişkinizde"
-                        _alan = "o alanı"
+                    if _EN:
+                        if _aktif_mod == "ebeveyn_cocuk":
+                            _baglam = "the bond you share with your child"
+                            _alan = "that area"
+                        elif _aktif_mod == "es_sevgili":
+                            _baglam = "your relationship"
+                            _alan = "that area"
+                        else:
+                            _baglam = "your life"
+                            _alan = "that area"
+                        _gezegen_anlami = _GEZEGEN_DUZ_ANLAM_EN.get(gezegen_adi, gezegen_adi)
+                        bulunan_muhurler.append((
+                            fark,
+                            f"* Star Link: {yildiz_adi} (in {gezegen_adi}'s zone | Diff: {fark:.2f}°)\n"
+                            f"   ➤ What does it mean? {yildiz_adi}, an ancient star in the sky, aligns with "
+                            f"{gezegen_adi} ({_gezegen_anlami}) in your chart. This union amplifies the star's "
+                            f"power in {_baglam}, making this theme more visible and pronounced in your life."
+                        ))
                     else:
-                        _baglam = "hayatınızda"
-                        _alan = "o alanı"
-                    _gezegen_anlami = _GEZEGEN_DUZ_ANLAM.get(gezegen_adi, gezegen_adi)
-                    bulunan_muhurler.append((
-                        fark,
-                        f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} bölgesinde | Fark: {fark:.2f}°)\n"
-                        f"   ➤ Bu ne demek? {yildiz_adi} adlı eski bir gökyüzü yıldızı, doğum haritanızda "
-                        f"{gezegen_adi} noktasına ({_gezegen_anlami}) denk geliyor. Bu buluşma, yıldızın gücünü "
-                        f"{_baglam} {_alan} güçlendirir; bu temanın etkisi hayatınızda daha görünür ve belirgin hale gelir."
-                    ))
+                        if _aktif_mod == "ebeveyn_cocuk":
+                            _baglam = "çocuğunuzla aranızdaki bağda"
+                            _alan = "o alanı"
+                        elif _aktif_mod == "es_sevgili":
+                            _baglam = "ilişkinizde"
+                            _alan = "o alanı"
+                        else:
+                            _baglam = "hayatınızda"
+                            _alan = "o alanı"
+                        _gezegen_anlami = _GEZEGEN_DUZ_ANLAM.get(gezegen_adi, gezegen_adi)
+                        bulunan_muhurler.append((
+                            fark,
+                            f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} bölgesinde | Fark: {fark:.2f}°)\n"
+                            f"   ➤ Bu ne demek? {yildiz_adi} adlı eski bir gökyüzü yıldızı, doğum haritanızda "
+                            f"{gezegen_adi} noktasına ({_gezegen_anlami}) denk geliyor. Bu buluşma, yıldızın gücünü "
+                            f"{_baglam} {_alan} güçlendirir; bu temanın etkisi hayatınızda daha görünür ve belirgin hale gelir."
+                        ))
                     break
 
     # Öncelik sırası: FBST zengin yorumlar → kozmik temaslar, her grup orba göre sıralı
@@ -843,6 +886,7 @@ def _aktif_sozluk_yok():
 
 
 def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=None):
+    _EN = _uEN()
     bulunan_muhurler = []
     _aktif_mod = mod
 
@@ -854,22 +898,35 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
         _aktif_sozluk = fbst_sabit_yildizlar
 
     for yildiz_adi, veriler in _aktif_sozluk.items():
+        if _EN and getattr(_aktif_sozluk, "_en", None):
+            _ev = _aktif_sozluk._en.get(yildiz_adi)
+            if isinstance(_ev, dict):
+                veriler = _ev
         yildiz_derecesi = veriler["derece"]
         fark = aci_farki(gezegen_derecesi, yildiz_derecesi)
 
         if fark <= orb_siniri:
             # Raporlama şablonu
-            rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
+            if _EN:
+                rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {gezegen_adi} | Diff: {fark:.2f}°)\n"
+            else:
+                rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
             etki_bulundu = False
 
             # Yıldızın genel yorumu
             if "yargi" in veriler:
-                rapor_metni += f"   💫 Yıldızın anlamı: {veriler['yargi']}\n"
+                if _EN:
+                    rapor_metni += f"   💫 Star's meaning: {veriler['yargi']}\n"
+                else:
+                    rapor_metni += f"   💫 Yıldızın anlamı: {veriler['yargi']}\n"
                 etki_bulundu = True
 
             # Klasik etkileri tara
             for kategori, gezegen_etkileri in veriler["etkiler"].items():
-                _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
+                if _EN:
+                    _kategori_ad = _KATEGORI_DUZ_AD_EN.get(kategori, kategori.replace("_", " ").title())
+                else:
+                    _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
                 if gezegen_adi in gezegen_etkileri:
                     rapor_metni += f"   ➤ {_kategori_ad} ({gezegen_adi}): {gezegen_etkileri[gezegen_adi]}\n"
                     etki_bulundu = True
@@ -921,6 +978,31 @@ _GEZEGEN_DUZ_ANLAM = {
     "ASC": "dış dünyaya gösterdiğiniz yüz ve ilk izleniminiz",
 }
 
+# Sabit yıldız fallback metinlerinde geçen gezegen/asteroid adlarının düz İngilizce açıklaması
+_GEZEGEN_DUZ_ANLAM_EN = {
+    "Güneş": "your identity, life force, and way of self-expression",
+    "Ay": "your emotions, inner world, and where you feel safe",
+    "Merkür": "your mind, communication, and way of learning",
+    "Venüs": "love, relationships, and your sense of beauty",
+    "Mars": "your energy, courage, and drive",
+    "Jüpiter": "your area of luck, growth, and expansion",
+    "Satürn": "your area of responsibility, discipline, and maturity",
+    "Uranüs": "your area of freedom, innovation, and sudden change",
+    "Neptün": "your imagination, intuition, and spiritual sensitivity",
+    "Plüton": "your area of transformation, depth, and power",
+    "KAD": "the north lunar node; the direction you need to grow in your life journey",
+    "GAD": "the south lunar node; habits you carry from the past",
+    "Chiron": "your wounds and the healing power born from them",
+    "Ceres": "your need for nourishment and care",
+    "Juno": "your sense of commitment, marriage, and equality",
+    "Vesta": "your devotion, focus, and dedication to your essence",
+    "Pallas": "your wisdom, strategy, and creative intelligence",
+    "Lilith": "your suppressed desires and liberated self",
+    "MC": "your career and societal goals",
+    "Yükselen": "the face you show the world and your first impression",
+    "ASC": "the face you show the world and your first impression",
+}
+
 # Yıldız etkisi kategorilerinin düz Türkçe başlıkları
 _KATEGORI_DUZ_AD = {
     "ask": "Aşk Hayatı",
@@ -945,6 +1027,32 @@ _KATEGORI_DUZ_AD = {
     "egitim_ve_ogrenme": "Eğitim ve Öğrenme",
     "ebeveynlik": "Ebeveynlik",
     "karmik_bag": "Kadersel Bağ",
+}
+
+# Yıldız etkisi kategorilerinin düz İngilizce başlıkları (EN modda kullanılır)
+_KATEGORI_DUZ_AD_EN = {
+    "ask": "Love Life",
+    "evlilik": "Marriage",
+    "cinsellik": "Sexuality and Intimacy",
+    "cekim": "Attraction and Charisma",
+    "karmik_ask": "Fated Love",
+    "zihinsel": "Mind and Thought",
+    "saglik": "Health",
+    "kaza": "Risk and Trials",
+    "gizlilikler": "Mystery and Intuition",
+    "is_hayati": "Career",
+    "arkadaslar": "Friendships",
+    "maddi": "Money and Financial Matters",
+    "sorumluluk_ogrenme": "Responsibility and Learning",
+    "sinav_ve_donusum": "Trial and Transformation",
+    "duygusal_saglik": "Emotional Health",
+    "sosyal_cevre": "Social Circle",
+    "cocuk_gelisimi": "Your Child's Development",
+    "bedensel_saglik": "Physical Health",
+    "zihinsel_gelisim": "Mental Development",
+    "egitim_ve_ogrenme": "Education and Learning",
+    "ebeveynlik": "Parenting",
+    "karmik_bag": "Fated Bond",
 }
 
 

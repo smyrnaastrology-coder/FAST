@@ -61,6 +61,7 @@ def _strip_html(text):
 def _bireysellestir(text):
     """Replace relationship-focused language with individual life language."""
     if not text or not isinstance(text, str): return text
+    if _i18n_get_lang() == "en": return text
     subs = [
         ("İlişkinin", "Hayatın"), ("ilişkinin", "hayatın"),
         ("ilişkinizde", "hayatınızda"), ("ilişkinizden", "hayatınızdan"),
@@ -368,12 +369,14 @@ AY_EV_TANIMLARI = {
 
 def _ay_ortami_yorumu(ay_burc, ay_ev):
     """Ay'ın bulunduğu burç ve eve göre ortam tanımı döndürür."""
-    burc_tanim = AY_BURC_TANIMLARI.get(ay_burc, "Ay duygusal dünyanızı şekillendiriyor.")
+    _EN = _i18n_get_lang() == "en"
+    burc_tanim = AY_BURC_TANIMLARI.get(ay_burc, ("Your Moon is shaping your emotional world." if _EN else "Ay duygusal dünyanızı şekillendiriyor."))
     ev_tanim = AY_EV_TANIMLARI.get(ay_ev, "")
     return f"{burc_tanim} {ev_tanim}"
 
 def _aspekt_yorumu_sec(gezegen1, gezegen2, aci_turu, index=0):
     """NATAL_AY_ACISI_YORUMLARI'ndan bir yorum seçer."""
+    _EN = _i18n_get_lang() == "en"
     key = (gezegen1, gezegen2, aci_turu)
     if key in NATAL_AY_ACISI_YORUMLARI:
         return NATAL_AY_ACISI_YORUMLARI[key][index % 3]
@@ -389,6 +392,15 @@ def _aspekt_yorumu_sec(gezegen1, gezegen2, aci_turu, index=0):
         "Trigon": "Bu uyumlu açı duygusal akışınızı destekliyor.",
         "Sekstil": "Bu fırsat açısı duygusal gelişim için bir kapı aralıyor.",
     }
+    FALLBACK_EN = {
+        "Kavuşum": "This conjunction energy is strengthening your emotional world.",
+        "Karşıt": "This opposition is testing your emotional balance, bringing awareness.",
+        "Kare": "This challenging aspect offers a test for emotional growth.",
+        "Trigon": "This harmonious aspect supports your emotional flow.",
+        "Sekstil": "This opportunity aspect opens a door for emotional development.",
+    }
+    if _EN:
+        return FALLBACK_EN.get(aci_turu, "This aspect is affecting your emotional world.")
     return FALLBACK.get(aci_turu, "Bu açı duygusal dünyanızı etkiliyor.")
 
 def _natal_gunluk_hava_durumu(motor):
@@ -475,6 +487,8 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
     import datetime
     from datetime import timedelta
     try:
+        _EN = _i18n_get_lang() == "en"
+        GUN_AD = (["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] if _EN else ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"])
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
 
         jd_natal = motor.get_natal_julian_day("p1")
@@ -532,7 +546,7 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
                     aspekt_yorumlari.append(f"{hedef} {aci_turu}: {yorum}")
             
             if not aspekt_yorumlari:
-                aspekt_yorumlari.append("Bu dönem için belirgin bir Ay açısı bulunamadı.")
+                aspekt_yorumlari.append(("No prominent Moon aspect was found for this period." if _EN else "Bu dönem için belirgin bir Ay açısı bulunamadı."))
             
             # Pick 2-3 aspects max
             if len(aspekt_yorumlari) > 3:
@@ -546,7 +560,7 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
             
             entry = {
                 "tarih": gun_tarih.strftime("%Y-%m-%d"),
-                "gun_ad": ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"][gun_tarih.weekday()],
+                "gun_ad": GUN_AD[gun_tarih.weekday()],
                 "yil": prog_yili,
                 "ay_burc": ay_burc,
                 "gunes_burc": gunes_burc,
@@ -560,7 +574,8 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
     except Exception as e:
         import traceback, sys
         traceback.print_exc(file=sys.stdout)
-        return [{"tarih":"","gun_ad":"Hata","yil":0,"ay_burc":"","gunes_burc":"","ay_ev":0,"ortam":"","aspekt_adet":0,"yorumlar":[f"İlerleme yorumu alınamadı: {e}"]}]
+        _EN_err = _i18n_get_lang() == "en"
+        return [{"tarih":"","gun_ad":("Error" if _EN_err else "Hata"),"yil":0,"ay_burc":"","gunes_burc":"","ay_ev":0,"ortam":"","aspekt_adet":0,"yorumlar":[("Progress interpretation could not be retrieved: " if _EN_err else "İlerleme yorumu alınamadı: ") + str(e)]}]
 
 def _natal_minor_progress_6month(motor):
     """6-month daily minor progress for PDF — returns a pre-formatted HTML string."""
@@ -775,6 +790,11 @@ def _generate_ek_charts(motor):
     motor.ciz_arap_noktalari_radar(dosya_adi=f"{sid}_Arap_Noktalari.png")
 
 def _generate_pdf(motor, tip="rapor"):
+    try:
+        from core.i18n import set_lang as _pdflang
+        _pdflang(motor._lang)
+    except Exception:
+        pass
     if tip == "natal":
         _generate_natal_pdf(motor)
     elif tip == "potansiyel":
@@ -832,7 +852,10 @@ def _html_bolumleri_ayir(html):
 def _etki_temizle(etki):
     """Clean a raw city-effect line for the PDF."""
     e = str(etki).replace("[K]", "").replace("[S]", "").replace("⚠️", "").strip()
-    e = e.replace("↑ Yükselen", "Yükselen ekseni").replace("↓ Alçalan", "Alçalan ekseni")
+    if _i18n_get_lang() == "en":
+        e = e.replace("↑ Yükselen", "↑ Ascendant").replace("↓ Alçalan", "↓ Descendant")
+    else:
+        e = e.replace("↑ Yükselen", "Yükselen ekseni").replace("↓ Alçalan", "Alçalan ekseni")
     e = e.replace("⌃ MC", "MC ekseni").replace("⌄ IC", "IC ekseni")
     if "→" in e:
         oncesi, sonrasi = e.split("→", 1)
@@ -843,6 +866,12 @@ def _etki_temizle(etki):
 
 def _generate_natal_pdf(motor):
     """Generate a professional Bireysel Natal PDF — clean cards, proper spacing."""
+    try:
+        from core.i18n import set_lang as _pdflang2
+        _pdflang2(motor._lang)
+    except Exception:
+        pass
+    _EN = _i18n_get_lang() == "en"
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.colors import HexColor
     from reportlab.pdfgen import canvas
@@ -1054,7 +1083,7 @@ def _generate_natal_pdf(motor):
     c.drawCentredString(w / 2, 152, motor.p1_isim or pdf_label("Kişisel Analiz"))
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor('#999999'))
-    c.drawCentredString(w / 2, 130, "FAST — Sinastri Tekniği  |  v4.0")
+    c.drawCentredString(w / 2, 130, "FAST — Synastry Technique  |  v4.0" if _EN else "FAST — Sinastri Tekniği  |  v4.0")
     try:
         dogum_bilgi = f"{pdf_label('Doğum:')} {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
         yer_bilgi = f"{pdf_label('Konum:')} {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
@@ -1147,7 +1176,7 @@ def _generate_natal_pdf(motor):
             y = SAYFA_UST - 10
             c.setFont("DejaVu-Bold", 18)
             c.setFillColor(koyu)
-            c.drawCentredString(w / 2, y, "Doğum Haritası")
+            c.drawCentredString(w / 2, y, pdf_label("Doğum Haritası"))
             c.setStrokeColor(altin)
             c.setLineWidth(1)
             c.line(w / 2 - 100, y - 8, w / 2 + 100, y - 8)
@@ -1165,7 +1194,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_yorum")
-        y = sayfa_basligi("Doğum Haritası Yorumu", numara=str(bolum_no[0]))
+        y = sayfa_basligi("Natal Chart Interpretation" if _EN else "Doğum Haritası Yorumu", numara=str(bolum_no[0]))
         gez_parag_metin = " ".join(b.get("metin", "") for b in gez_bolumler if b.get("metin"))
         aci_parag_metin = " ".join(b.get("metin", "") for b in aci_bolumler if b.get("metin"))
         paragraflar = chart_yorum.split("\n\n")
@@ -1183,7 +1212,7 @@ def _generate_natal_pdf(motor):
                     c.setFillColor(bordo)
                     gez_isim = zb.get('gezegen', '')
                     gez_glif = GEZEGEN_GLIF.get(gez_isim, '✦')
-                    c.drawString(SOL + 6, y - 2, f"✦ {gez_glif} {zb.get('baslik', gez_isim)}")
+                    c.drawString(SOL + 6, y - 2, f"✦ {gez_glif} {zb.get('baslik') or pdf_label(gez_isim)}")
                     c.setStrokeColor(sari_cizgi)
                     c.setLineWidth(0.4)
                     c.line(SOL + 6, y - 7, SAG - 6, y - 7)
@@ -1292,8 +1321,8 @@ def _generate_natal_pdf(motor):
                 yorum = _ab.get("yorum", "") or ""
                 parag = " ".join(p for p in [yorum, etki] if p)
                 if not parag:
-                    parag = f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."
-                baslik = f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)"
+                    parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda.")
+                baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)")
                 ast_h = 16 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
                 if y - ast_h < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
@@ -1403,7 +1432,7 @@ def _generate_natal_pdf(motor):
             sifa_metin = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3]', '', sifa_metin)
             sifa_metin = sifa_metin.replace("<br/>", " ").replace("<br>", " ").replace("<b>", "").replace("</b>", "")
             # Call-out box for phase-title (Ustalık Aşaması / Kalfalık / Çıraklık)
-            if "Aşama" in sifa_metin or "Faz" in sifa_metin:
+            if any(k in sifa_metin for k in ("Aşama", "Faz", "Phase", "Stage")):
                 if ":" in sifa_metin:
                     sifa_baslik, sifa_acik = sifa_metin.split(":", 1)
                 else:
@@ -1458,12 +1487,14 @@ def _generate_natal_pdf(motor):
         y = sayfa_basligi(pdf_label("Sabian Sembolleri"), numara=str(bolum_no[0]))
         for s in sabianlar:
             sembol = _strip_html(str(s.get('sembol','')))[:250]
-            sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*Sabian Şifresi \(\d+°\):\s*', '', sembol)
+            sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*(?:Sabian Şifresi|Sabian Cipher) \(\d+°\):\s*', '', sembol)
             sembol = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3\u200D]', '', sembol)
             muhur = ""
-            if "Mühür:" in sembol:
-                sembol, muhur = sembol.split("Mühür:", 1)
-                muhur = ("Mühür: " + muhur.strip())[:170]
+            _muhur_etiketi = "Seal:" if _EN else "Mühür:"
+            if "Mühür:" in sembol or "Seal:" in sembol:
+                _ayrac = "Mühür:" if "Mühür:" in sembol else "Seal:"
+                sembol, muhur = sembol.split(_ayrac, 1)
+                muhur = (_muhur_etiketi + " " + muhur.strip())[:170]
             gez_isim = s.get('gezegen','')
             sembol_h = 30
             sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86)
@@ -1484,7 +1515,7 @@ def _generate_natal_pdf(motor):
             c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {pdf_label(gez_isim)}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
             c.setFillColor(altin)
             c.setFont("DejaVu-Bold", 7)
-            c.drawRightString(SAG - 14, y - 16, "✦ Sabian Şifresi")
+            c.drawRightString(SAG - 14, y - 16, "✦ Sabian Cipher" if _EN else "✦ Sabian Şifresi")
             c.setStrokeColor(sari_cizgi)
             c.setLineWidth(0.4)
             c.line(SOL + 14, y - 23, SAG - 14, y - 23)
@@ -1664,10 +1695,14 @@ def _generate_natal_pdf(motor):
         c.drawString(SOL, y, pdf_label("Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır."))
         y -= 22
         # ── Calculation technique explanation ──
-        teknik = (pdf_label("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. ") +
-                  pdf_label("Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; ") +
-                  pdf_label("gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. ") +
-                  pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. ") +
+        teknik = ((("Calculation Method: Your planets' natal positions are compared against the coordinates of "
+                    "more than 15,000 cities worldwide. ") if _EN else pdf_label("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. ")) +
+                  (("For each city, the day's sky axes — the Ascendant (AC), Midheaven (MC), Descendant (DC) and "
+                    "Imum Coeli (IC) — are computed; ") if _EN else pdf_label("Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; ")) +
+                  (("Your planets' closeness (orb) to these axes up to 5° is scored together with the planet's nature — "
+                    "the sharper the angle, the stronger the influence. ") if _EN else pdf_label("gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. ")) +
+                  (("Each city is assessed with 4 core scores: Wealth & Abundance, Peace & Inner Calm, "
+                    "Passion & Adventure, Crisis & Transformation. ") if _EN else pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. ")) +
                   pdf_label("Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder."))
         teknik_h = 24 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 12
         kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, pdf_label("Hesaplama Tekniği"), "🔮")
@@ -1803,7 +1838,7 @@ def _collect_extra_data(motor):
                         for s in sonuc:
                             if len(yildiz_liste) >= 3: break
                             satirlar = s.split("\n")
-                            yildiz_liste.append({"baslik": satirlar[0].replace("Kavuşumu", f"Kavuşumu ({harita['isim']})"), "icerik": "\n".join(satirlar[1:])})
+                            yildiz_liste.append({"baslik": satirlar[0].replace("Kavuşumu", f"Kavuşumu ({harita['isim']})").replace("Conjunction", f"Conjunction ({harita['isim']})"), "icerik": "\n".join(satirlar[1:])})
                 except: continue
             if len(yildiz_liste) >= 3: break
         data["yildiz_muhurleri"] = yildiz_liste
@@ -2047,6 +2082,33 @@ def _aspect_interpretasyon_kutuphanesi():
     """Dev interpretasyon kütüphanesi: gezegen profilleri × açı türleri × ev bağlamı.
     Her çift için 5 açı tipinde doğrudan yorum + üretici ile eksikleri tamamlama."""
 
+    _EN = _i18n_get_lang() == "en"
+
+    _EN_OZ = {
+        "Güneş": "core self, identity, life purpose, creative power, authority, leadership",
+        "Ay": "emotions, inner world, mother, nurturing, habits, intuition, need for security",
+        "Merkür": "mind, communication, logic, learning, analysis, writing, short journeys",
+        "Venüs": "love, beauty, values, harmony, aesthetics, attraction, money, comfort",
+        "Mars": "action, passion, courage, anger, competition, will, fighting energy",
+        "Jüpiter": "abundance, luck, expansion, philosophy, faith, learning, optimism",
+        "Satürn": "discipline, limits, responsibility, maturity, structure, fear, patience, lessons",
+        "Uranüs": "freedom, revolution, sudden change, invention, rebellious spirit, independence, genius",
+        "Neptün": "dreams, inspiration, intuition, haze, spirituality, idealism, confusion",
+        "Plüton": "transformation, power, death and rebirth, obsession, depth, hidden power",
+        "Chiron": "wound, vulnerability, healing, wisdom, healer's wound, acceptance",
+        "Juno": "commitment, marriage, loyalty, partnership, justice, relationship vows",
+        "Ceres": "nurturing, motherhood, loss, acceptance, compassion, nourishment, nature",
+        "Pallas": "wisdom, strategy, creative intelligence, artistic talent, warrior spirit, foresight",
+        "Vesta": "devotion, focus, sacred fire, inner discipline, service, the Temple",
+        "Eros": "passionate love, desire, sexuality, lust, creative passion, zest for life",
+        "Psyche": "soul, psychology, deep bond, vulnerability, intuition, spiritual love",
+        "Ruh Noktası": "life purpose, spiritual direction, career path, destiny, source of inspiration",
+        "Evlilik Noktası": "relationship potential, marriage theme, long-term partnership, search for harmony",
+        "Aşk Noktası": "love potential, romantic attraction, emotional bonding, sexual harmony",
+        "Tutku Noktası": "intense passion, desire, ambition, obsession, deep attraction, sexual energy",
+        "Para Noktası": "material potential, financial luck, value creation, abundance",
+    }
+
     GEZEGENLER = {
         "Güneş": {"oz": "öz benlik, kimlik, hayati amaç, yaratıcı güç, otorite, liderlik",
                   "ev": {1:"dış görünüş ve kişilik",2:"değerler ve maddi güvenlik",3:"iletişim ve yakın çevre",4:"kökler ve aile",5:"yaratıcılık ve aşk",6:"sağlık ve günlük rutin",7:"ilişkiler ve ortaklıklar",8:"dönüşüm ve ortak kaynaklar",9:"inançlar ve yüksek öğrenim",10:"kariyer ve toplumsal statü",11:"sosyal çevre ve idealler",12:"bilinçaltı ve ruhsal yolculuk"}},
@@ -2220,6 +2282,126 @@ def _aspect_interpretasyon_kutuphanesi():
         ("Para Noktası","Plüton"): "maddi potansiyel ile güç arasında derin dönüşüm",
     }
 
+    CIFT_TEMA_EN = {
+        ("Güneş","Ay"): "the bridge between the core self and the emotional world",
+        ("Güneş","Merkür"): "the direct link between identity and the mind",
+        ("Güneş","Venüs"): "the harmony between the core self and love and values",
+        ("Güneş","Mars"): "the powerful bond between identity and action and passion",
+        ("Güneş","Jüpiter"): "the support between the self and abundance and expansion",
+        ("Güneş","Satürn"): "the balance between the self and responsibility and limits",
+        ("Güneş","Uranüs"): "the break between identity and freedom and revolution",
+        ("Güneş","Neptün"): "the haziness between the self and dreams and intuitions",
+        ("Güneş","Plüton"): "the deep bond between the self and power and transformation",
+        ("Güneş","Chiron"): "the wound of the self and the struggle for acceptance",
+        ("Ay","Merkür"): "the bridge between emotion and the mind",
+        ("Ay","Venüs"): "the deep harmony between the emotional world and love",
+        ("Ay","Mars"): "the conflict and passion between emotions and action",
+        ("Ay","Jüpiter"): "the expansion between emotional security and abundance",
+        ("Ay","Satürn"): "the demanding balance between feelings and limits",
+        ("Ay","Uranüs"): "the sudden ruptures between the inner world and freedom",
+        ("Ay","Neptün"): "the deep intuition between feelings and dreams",
+        ("Ay","Plüton"): "the intense transformation between the emotional world and power",
+        ("Ay","Chiron"): "the emotional wound and the need for nurturing",
+        ("Ay","KAD"): "the bond between family roots and emotional habits",
+        ("Ay","Lilith"): "emotional secrecy and repressed desire",
+        ("Merkür","Venüs"): "the harmony between mind and charm",
+        ("Merkür","Mars"): "speed between thought and action",
+        ("Merkür","Jüpiter"): "the abundance between mind and expansion",
+        ("Merkür","Satürn"): "the seriousness between thought and limits",
+        ("Merkür","Uranüs"): "the genius between mind and revolution",
+        ("Merkür","Neptün"): "the misty intellect between thought and dream",
+        ("Merkür","Plüton"): "the deep analysis between mind and power",
+        ("Merkür","Chiron"): "the wound of communication and the difficulty of expression",
+        ("Merkür","KAD"): "communication patterns in family roots",
+        ("Merkür","Lilith"): "mental secrecy and repressed thought",
+        ("Venüs","Mars"): "the powerful attraction between charm and passion",
+        ("Venüs","Jüpiter"): "the expansion between love and abundance",
+        ("Venüs","Satürn"): "maturation between love and limits",
+        ("Venüs","Uranüs"): "the sudden change between values and revolution",
+        ("Venüs","Neptün"): "idealism between love and dream",
+        ("Venüs","Plüton"): "the intense transformation between love and power",
+        ("Venüs","Chiron"): "the wound of love and the search for acceptance",
+        ("Venüs","KAD"): "patterns of love and values in family roots",
+        ("Venüs","Lilith"): "secrecy in love and repressed desire",
+        ("Mars","Jüpiter"): "the expansion between passion and abundance",
+        ("Mars","Satürn"): "discipline between action and limits",
+        ("Mars","Uranüs"): "the sudden explosions between passion and revolution",
+        ("Mars","Neptün"): "the misty struggle between action and dream",
+        ("Mars","Plüton"): "the intense war between passion and power",
+        ("Mars","Chiron"): "the wound of battle and fragile courage",
+        ("Mars","KAD"): "war and protection in family roots",
+        ("Mars","Lilith"): "passionate secrecy and repressed anger",
+        ("Jüpiter","Satürn"): "the balance between abundance and limits",
+        ("Jüpiter","Uranüs"): "the sudden luck between expansion and revolution",
+        ("Jüpiter","Neptün"): "the spiritual expansion between faith and dream",
+        ("Jüpiter","Plüton"): "the deep expansion between abundance and power",
+        ("Jüpiter","Chiron"): "the wound of faith and spiritual healing",
+        ("Jüpiter","KAD"): "abundance and faith in family roots",
+        ("Jüpiter","Lilith"): "secrecy and expansion in faith",
+        ("Satürn","Uranüs"): "the demanding balance between limit and revolution",
+        ("Satürn","Neptün"): "the misty structure between discipline and dream",
+        ("Satürn","Plüton"): "the intense structure between limit and power",
+        ("Satürn","Chiron"): "the wound of fear and maturation",
+        ("Satürn","KAD"): "responsibility and limits in family roots",
+        ("Satürn","Lilith"): "secrecy at the limit and repressed fear",
+        ("Uranüs","Neptün"): "the spiritual change between revolution and dream",
+        ("Uranüs","Plüton"): "the deep revolution between freedom and power",
+        ("Uranüs","Chiron"): "the wound of freedom and acceptance",
+        ("Uranüs","KAD"): "revolution and sudden change in family roots",
+        ("Uranüs","Lilith"): "secrecy in freedom and the rebellious spirit",
+        ("Neptün","Plüton"): "the spiritual transformation between dream and power",
+        ("Neptün","Chiron"): "the wound of dreams and spiritual healing",
+        ("Neptün","KAD"): "dreams and fog in family roots",
+        ("Neptün","Lilith"): "secrecy in dreams and repressed intuition",
+        ("Plüton","Chiron"): "the wound of transformation and deep healing",
+        ("Plüton","KAD"): "power and deep transformation in family roots",
+        ("Plüton","Lilith"): "secrecy in power and repressed passion",
+        ("Juno","Güneş"): "the powerful bond between commitment and identity",
+        ("Juno","Ay"): "the deep harmony between commitment and feelings",
+        ("Juno","Venüs"): "the marriage theme between commitment and charm",
+        ("Juno","Mars"): "the demanding balance between commitment and passion",
+        ("Ceres","Güneş"): "the mother energy between nurturing and identity",
+        ("Ceres","Ay"): "the deep compassion between nurturing and feelings",
+        ("Ceres","Venüs"): "unconditional love between nurturing and charm",
+        ("Ceres","Merkür"): "caring communication between nurturing and mind",
+        ("Pallas","Güneş"): "wisdom between strategy and identity",
+        ("Pallas","Merkür"): "analytical power between strategy and mind",
+        ("Pallas","Satürn"): "structural wisdom between strategy and limits",
+        ("Pallas","Plüton"): "deep foresight between strategy and power",
+        ("Vesta","Güneş"): "the sacred fire between devotion and identity",
+        ("Vesta","Ay"): "inner discipline between devotion and feelings",
+        ("Vesta","Venüs"): "sacred love between devotion and charm",
+        ("Vesta","Plüton"): "deep focus between devotion and power",
+        ("Eros","Venüs"): "lustful love between passion and charm",
+        ("Eros","Mars"): "intense desire between passion and action",
+        ("Eros","Plüton"): "the deep transformation between passion and power",
+        ("Eros","Güneş"): "zest for life between passion and identity",
+        ("Psyche","Ay"): "the deep bond between soul and feelings",
+        ("Psyche","Venüs"): "spiritual love between soul and charm",
+        ("Psyche","Plüton"): "psychological transformation between soul and power",
+        ("Psyche","Neptün"): "spiritual intuition between soul and dream",
+        ("Ruh Noktası","Güneş"): "the deep bond between life purpose and identity",
+        ("Ruh Noktası","Ay"): "the intuitive direction between life purpose and feelings",
+        ("Ruh Noktası","Venüs"): "the aesthetic direction between life purpose and charm",
+        ("Ruh Noktası","Mars"): "the action-oriented direction between life purpose and passion",
+        ("Evlilik Noktası","Venüs"): "the strong harmony between relationship potential and charm",
+        ("Evlilik Noktası","Jüpiter"): "the expansion between relationship potential and abundance",
+        ("Evlilik Noktası","Satürn"): "the serious commitment between relationship potential and limits",
+        ("Evlilik Noktası","Neptün"): "the idealist relationship between relationship potential and dream",
+        ("Aşk Noktası","Venüs"): "the strong romance between love potential and charm",
+        ("Aşk Noktası","Mars"): "passionate love between love potential and passion",
+        ("Aşk Noktası","Plüton"): "the intense transformation between love potential and power",
+        ("Aşk Noktası","Güneş"): "self-love between love potential and identity",
+        ("Tutku Noktası","Mars"): "the strong ambition between intense passion and action",
+        ("Tutku Noktası","Plüton"): "deep obsession between intense passion and power",
+        ("Tutku Noktası","Venüs"): "lustful energy between intense passion and charm",
+        ("Tutku Noktası","Ay"): "deep desire between intense passion and feelings",
+        ("Para Noktası","Jüpiter"): "the strong luck between material potential and abundance",
+        ("Para Noktası","Satürn"): "structure between material potential and limits",
+        ("Para Noktası","Venüs"): "the aesthetic value between material potential and charm",
+        ("Para Noktası","Plüton"): "the deep transformation between material potential and power",
+    }
+
     OZEL_YORUMLAR = {
         ("Güneş","Ay","Kavuşum"): "Güneş ve Ay'ınız aynı burçta birleşmiş. Öz benliğiniz ile duygusal dünyanız tam uyum içinde — ne istediğiniz ve neye ihtiyacınız olduğu konusunda doğal bir berraklığınız var. Bu kavuşum, hayatınızda güçlü bir iç tutarlılık sağlar.",
         ("Güneş","Ay","Karşıt"): "Güneş ve Ay'ınız zıt burçlarda. Öz benliğiniz ile duygusal ihtiyaçlarınız sürekli denge arayışında — ne istediğiniz ile neye ihtiyacınız olduğu arasında gidip gelirsiniz. Bu karşıtlık, her iki tarafı da tam olarak anlamanızı gerektirir.",
@@ -2348,11 +2530,156 @@ def _aspect_interpretasyon_kutuphanesi():
         ("Neptün","Plüton","Sekstil"): "Neptün ve Plüton'uz sekstil açıda. Hayal ile güç arasında destekleyici bir bağ var. Manevi dönüşümlerinizi yapıcı bir şekilde hayata geçirebilirsiniz.",
     }
 
+    OZEL_YORUMLAR_EN = {
+        ("Güneş","Ay","Kavuşum"): "Your Sun and Moon are united in the same sign. Your core self and emotional world are in perfect harmony — you have a natural clarity about what you want and what you need. This conjunction provides a strong inner coherence throughout your life.",
+        ("Güneş","Ay","Karşıt"): "Your Sun and Moon are in opposing signs. Your core self and emotional needs are constantly seeking balance — you move between what you want and what you need. This opposition requires you to fully understand both sides.",
+        ("Güneş","Ay","Kare"): "Your Sun and Moon are in a square. The tension between your identity and your emotional world can lead to inner conflict. Yet this struggle offers a powerful opportunity to know yourself more deeply.",
+        ("Güneş","Ay","Trigon"): "Your Sun and Moon are in a trine. Your core self and your feelings are in natural harmony — you have an inner clarity about what you want. You can channel this energy into your creative projects.",
+        ("Güneş","Ay","Sekstil"): "Your Sun and Moon are in a sextile. There is a supportive bond between the core self and the emotional world. By making use of this opportunity, you can combine your emotional intelligence and personal power.",
+        ("Güneş","Merkür","Kavuşum"): "Your Sun and Mercury are conjunct. Your identity and mental power meet at the same point — your way of thinking and communicating reflects your self. Your mind works quickly, and you express your ideas boldly.",
+        ("Güneş","Merkür","Karşıt"): "Your Sun and Mercury are in opposing signs. There is a search for balance between your core self and your way of thinking — what you say you want may contradict what you actually think.",
+        ("Güneş","Merkür","Kare"): "Your Sun and Mercury are in a square. There is tension between your identity and mental analysis — while speaking boldly, you may not fully express your thoughts. This is an opportunity to develop your communication skills.",
+        ("Güneş","Merkür","Trigon"): "Your Sun and Mercury are in a trine. Thought and identity are in natural harmony — your mind is clear, your communication is fluid, and you easily bring your ideas into being.",
+        ("Güneş","Merkür","Sekstil"): "Your Sun and Mercury are in a sextile. There is a supportive bond between your mental abilities and your identity. You can express your creative ideas with strength.",
+        ("Güneş","Venüs","Kavuşum"): "Your Sun and Venus are conjunct. Your core self and your love language meet at the same point — your capacity to love and value yourself is strong. Your charm and personal magnetism shine naturally.",
+        ("Güneş","Venüs","Karşıt"): "Your Sun and Venus are in opposing signs. There is a search for balance between self and love — while expressing yourself, you also need to consider the needs of your loved ones.",
+        ("Güneş","Venüs","Kare"): "Your Sun and Venus are in a square. Tension between your identity and your love language can create challenges in your relationships. Yet this struggle is an opportunity to understand love more deeply.",
+        ("Güneş","Venüs","Trigon"): "Your Sun and Venus are in a trine. Your core self and your charm energy are in natural harmony — you have an inner clarity when it comes to love and values.",
+        ("Güneş","Venüs","Sekstil"): "Your Sun and Venus are in a sextile. There is a supportive bond between identity and love. You can build a strong balance in your relationships and creativity.",
+        ("Güneş","Mars","Kavuşum"): "Your Sun and Mars are conjunct. Your identity and warrior spirit meet at the same point — your courage, passion and drive are powerful. You have the nature of a natural leader and fighter.",
+        ("Güneş","Mars","Karşıt"): "Your Sun and Mars are in opposing signs. There is a search for balance between the self and action — you are passionate about what you want but can sometimes be impatient.",
+        ("Güneş","Mars","Kare"): "Your Sun and Mars are in a square. Tension between identity and passion can create anger and impatience. Yet channeling this powerful energy into creative projects can lead to great achievements.",
+        ("Güneş","Mars","Trigon"): "Your Sun and Mars are in a trine. Self and action are in natural harmony — you have a courageous, energetic and passionate nature. You can use this energy to reach your goals.",
+        ("Güneş","Mars","Sekstil"): "Your Sun and Mars are in a sextile. There is a supportive bond between identity and passion. You can make bold moves to bring your dreams to life.",
+        ("Güneş","Jüpiter","Kavuşum"): "Your Sun and Jupiter are conjunct. Your core self and abundance energy meet at the same point — your optimism, generosity and capacity for expansion are strong. There is a natural flow of luck and blessing in your life.",
+        ("Güneş","Jüpiter","Karşıt"): "Your Sun and Jupiter are in opposing signs. There is a search for balance between self and abundance — you may swing between excessive optimism and realism.",
+        ("Güneş","Jüpiter","Kare"): "Your Sun and Jupiter are in a square. Tension between identity and expansion can strengthen the tendency to go to extremes. Yet balancing this energy creates great opportunities.",
+        ("Güneş","Jüpiter","Trigon"): "Your Sun and Jupiter are in a trine. Self and abundance are in natural harmony — you are an optimistic, generous and broad-minded person.",
+        ("Güneş","Jüpiter","Sekstil"): "Your Sun and Jupiter are in a sextile. There is a supportive bond between identity and expansion. You can contribute to your personal growth and to others.",
+        ("Güneş","Satürn","Kavuşum"): "Your Sun and Saturn are conjunct. Your core self and responsibilities meet at the same point — you have a disciplined, serious and structured nature. A strong energy of maturity presides over your life.",
+        ("Güneş","Satürn","Karşıt"): "Your Sun and Saturn are in opposing signs. There is a search for balance between self and limits — the tension between freedom and responsibility is one of your fundamental life lessons.",
+        ("Güneş","Satürn","Kare"): "Your Sun and Saturn are in a square. Tension between identity and limits can make you overly harsh with yourself. Learning this lesson is the key to true maturity.",
+        ("Güneş","Satürn","Trigon"): "Your Sun and Saturn are in a trine. Self and structure are in natural harmony — you are a disciplined, determined and responsible person.",
+        ("Güneş","Satürn","Sekstil"): "Your Sun and Saturn are in a sextile. There is a supportive bond between identity and limits. With disciplined steps you can bring large projects to life.",
+        ("Güneş","Uranüs","Kavuşum"): "Your Sun and Uranus are conjunct. Your identity and revolutionary spirit meet at the same point — your freedom, independence and creative genius are powerful. Sudden changes are prominent in your life.",
+        ("Güneş","Uranüs","Karşıt"): "Your Sun and Uranus are in opposing signs. There is a search for balance between freedom and tradition — a constant tension between your rebellious spirit and social expectations.",
+        ("Güneş","Uranüs","Kare"): "Your Sun and Uranus are in a square. Tension between identity and revolution can lead to sudden breaks. Used constructively, this energy can transform your life.",
+        ("Güneş","Uranüs","Trigon"): "Your Sun and Uranus are in a trine. Self and freedom are in natural harmony — you are an innovative, creative and independent person.",
+        ("Güneş","Uranüs","Sekstil"): "Your Sun and Uranus are in a sextile. There is a supportive bond between identity and revolution. You can initiate innovative changes.",
+        ("Güneş","Neptün","Kavuşum"): "Your Sun and Neptune are conjunct. Your self and your dreams meet at the same point — you are an intuitive, creative and spiritual person. Your artistic abilities are strong.",
+        ("Güneş","Neptün","Karşıt"): "Your Sun and Neptune are in opposing signs. There is a search for balance between realism and dream — you may drift between the real world and the world of imagination.",
+        ("Güneş","Neptün","Kare"): "Your Sun and Neptune are in a square. Tension between identity and haze can create confusion. Yet channeling this energy into artistic creativity produces powerful results.",
+        ("Güneş","Neptün","Trigon"): "Your Sun and Neptune are in a trine. Self and intuition are in natural harmony — your spiritual world is rich and your creative inspiration is abundant.",
+        ("Güneş","Neptün","Sekstil"): "Your Sun and Neptune are in a sextile. There is a supportive bond between identity and dream. You can bring your artistic and spiritual projects to life.",
+        ("Güneş","Plüton","Kavuşum"): "Your Sun and Pluto are conjunct. Your identity and power energy meet at the same point — you carry deep transformation, determination and inner strength. Powerful cycles of rebirth shape your life.",
+        ("Güneş","Plüton","Karşıt"): "Your Sun and Pluto are in opposing signs. There is a search for balance between self and power — a tension between others' power dynamics and your own authority.",
+        ("Güneş","Plüton","Kare"): "Your Sun and Pluto are in a square. Tension between identity and power can draw control struggles and power games into your life. Learning to let go brings deep transformation.",
+        ("Güneş","Plüton","Trigon"): "Your Sun and Pluto are in a trine. Self and power are in natural harmony — you carry deep determination, inner strength and transformative energy.",
+        ("Güneş","Plüton","Sekstil"): "Your Sun and Pluto are in a sextile. There is a supportive bond between identity and power. You can accelerate your personal transformation.",
+        ("Ay","Merkür","Kavuşum"): "Your Moon and Mercury are conjunct. Your feelings and mental power meet at the same point — your emotional intelligence is high, and your intuition and analytical ability are powerfully interwoven.",
+        ("Ay","Merkür","Karşıt"): "Your Moon and Mercury are in opposing signs. There is a search for balance between feelings and logic — your emotions and your thoughts may occasionally contradict each other.",
+        ("Ay","Merkür","Kare"): "Your Moon and Mercury are in a square. Tension between emotion and mind can complicate your decision-making. Yet learning this balance strengthens your emotional intelligence.",
+        ("Ay","Merkür","Trigon"): "Your Moon and Mercury are in a trine. Feelings and thought are in natural harmony — your intuitive analysis is strong, and your communication is fluid and empathetic.",
+        ("Ay","Merkür","Sekstil"): "Your Moon and Mercury are in a sextile. There is a supportive bond between the emotional world and the mind. You can increase your emotional clarity.",
+        ("Ay","Venüs","Kavuşum"): "Your Moon and Venus are conjunct. Your emotional world and love language meet at the same point — your capacity to love yourself and others is strong, and your inner peace and aesthetic sense come naturally.",
+        ("Ay","Venüs","Karşıt"): "Your Moon and Venus are in opposing signs. There is a search for balance between emotional needs and love language — your need to be loved and the way you love may occasionally conflict.",
+        ("Ay","Venüs","Kare"): "Your Moon and Venus are in a square. Tension between feeling and charm can cause emotional fluctuations in your relationships. An opportunity to strengthen your love language.",
+        ("Ay","Venüs","Trigon"): "Your Moon and Venus are in a trine. Feelings and love are in natural harmony — you are an empathetic, compassionate person with a strong aesthetic sense.",
+        ("Ay","Venüs","Sekstil"): "Your Moon and Venus are in a sextile. There is a supportive bond between the emotional world and love. You can build deep harmony in your relationships.",
+        ("Ay","Mars","Kavuşum"): "Your Moon and Mars are conjunct. Your feelings and warrior spirit meet at the same point — your emotional reactions are quick and strong, and your protective instinct is high.",
+        ("Ay","Mars","Karşıt"): "Your Moon and Mars are in opposing signs. There is a search for balance between the emotional world and action — your feelings and your actions may occasionally conflict.",
+        ("Ay","Mars","Kare"): "Your Moon and Mars are in a square. Tension between feeling and passion can lead to anger and emotional reactions. Channeling this energy constructively is a great source of power.",
+        ("Ay","Mars","Trigon"): "Your Moon and Mars are in a trine. Feelings and action are in natural harmony — you are a courageous, energetic and emotionally balanced person.",
+        ("Ay","Mars","Sekstil"): "Your Moon and Mars are in a sextile. There is a supportive bond between the emotional world and passion. You can strengthen your emotional courage.",
+        ("Ay","Jüpiter","Kavuşum"): "Your Moon and Jupiter are conjunct. Your feelings and abundance energy meet at the same point — emotional expansion, generosity and optimism are your inner nature.",
+        ("Ay","Jüpiter","Karşıt"): "Your Moon and Jupiter are in opposing signs. There is a search for balance between emotional security and expansion — your emotional needs and your desire to grow may conflict.",
+        ("Ay","Jüpiter","Kare"): "Your Moon and Jupiter are in a square. Tension between feeling and expansion can strengthen the tendency to go to extremes. You must find a balance to create emotional abundance.",
+        ("Ay","Jüpiter","Trigon"): "Your Moon and Jupiter are in a trine. Feelings and abundance are in natural harmony — you are emotionally expansive, generous and optimistic.",
+        ("Ay","Jüpiter","Sekstil"): "Your Moon and Jupiter are in a sextile. There is a supportive bond between the emotional world and expansion. You can increase your emotional abundance.",
+        ("Ay","Satürn","Kavuşum"): "Your Moon and Saturn are conjunct. Your feelings and limits meet at the same point — you are emotionally disciplined, serious and structured. Your need for security is strong.",
+        ("Ay","Satürn","Karşıt"): "Your Moon and Saturn are in opposing signs. There is a search for balance between the emotional world and limits — your emotional needs and your responsibilities may conflict.",
+        ("Ay","Satürn","Kare"): "Your Moon and Saturn are in a square. Tension between feeling and limit can lead to emotional restriction and fear. Learning this lesson is the key to emotional maturity.",
+        ("Ay","Satürn","Trigon"): "Your Moon and Saturn are in a trine. Feelings and structure are in natural harmony — you are emotionally mature, disciplined and reliable.",
+        ("Ay","Satürn","Sekstil"): "Your Moon and Saturn are in a sextile. There is a supportive bond between the emotional world and limits. You can strengthen your emotional security.",
+        ("Merkür","Venüs","Kavuşum"): "Your Mercury and Venus are conjunct. Your mind and your charm meet at the same point — your communication style is naturally attractive, and your social intelligence and aesthetic sense are strong.",
+        ("Merkür","Venüs","Karşıt"): "Your Mercury and Venus are in opposing signs. There is a search for balance between logic and charm — your thoughts and your love language may occasionally conflict.",
+        ("Merkür","Venüs","Kare"): "Your Mercury and Venus are in a square. Tension between mind and charm can create difficulties in communication. An opportunity to develop your social skills.",
+        ("Merkür","Venüs","Trigon"): "Your Mercury and Venus are in a trine. Mind and charm are in natural harmony — your communication is fluid and your social intelligence is strong.",
+        ("Merkür","Venüs","Sekstil"): "Your Mercury and Venus are in a sextile. There is a supportive bond between thought and charm. You can enhance your communication skills and social intelligence.",
+        ("Mars","Jüpiter","Kavuşum"): "Your Mars and Jupiter are conjunct. Passion and abundance meet at the same point — you are a courageous, energetic and broad-minded person. There is a natural flow of luck and blessing when you take action.",
+        ("Mars","Jüpiter","Karşıt"): "Your Mars and Jupiter are in opposing signs. There is a search for balance between action and expansion — your passion and your optimism may occasionally conflict.",
+        ("Mars","Jüpiter","Kare"): "Your Mars and Jupiter are in a square. Tension between passion and expansion can strengthen the tendency to go to extremes. Yet balancing this energy leads to great achievements.",
+        ("Mars","Jüpiter","Trigon"): "Your Mars and Jupiter are in a trine. Passion and abundance are in natural harmony — you are courageous, energetic and resourceful.",
+        ("Mars","Jüpiter","Sekstil"): "Your Mars and Jupiter are in a sextile. There is a supportive bond between action and expansion. You can seize great opportunities with bold steps.",
+        ("Mars","Satürn","Kavuşum"): "Your Mars and Saturn are conjunct. Passion and discipline meet at the same point — you carry strong will, determination and structured fighting energy.",
+        ("Mars","Satürn","Karşıt"): "Your Mars and Saturn are in opposing signs. There is a search for balance between action and limits — your passion and your constraints may occasionally conflict.",
+        ("Mars","Satürn","Kare"): "Your Mars and Saturn are in a square. Tension between passion and limit can lead to a powerful inner struggle. Learning this lesson transforms your willpower.",
+        ("Mars","Satürn","Trigon"): "Your Mars and Saturn are in a trine. Action and structure are in natural harmony — you are disciplined, determined and strong.",
+        ("Mars","Satürn","Sekstil"): "Your Mars and Saturn are in a sextile. There is a supportive bond between passion and limits. With disciplined steps you can bring large projects to life.",
+        ("Venüs","Mars","Kavuşum"): "Your Venus and Mars are conjunct. Charm and passion meet at the same point — your romantic and sexual energy is strong, and your physical and emotional attraction potential is high.",
+        ("Venüs","Mars","Karşıt"): "Your Venus and Mars are in opposing signs. There is a search for balance between love and passion — the dynamics of attraction and repulsion form the foundation of your relationships.",
+        ("Venüs","Mars","Kare"): "Your Venus and Mars are in a square. Tension between charm and passion can create a passionate but demanding dynamic in your relationships.",
+        ("Venüs","Mars","Trigon"): "Your Venus and Mars are in a trine. Love and passion are in natural harmony — you carry a romantic, passionate and harmonious relationship energy.",
+        ("Venüs","Mars","Sekstil"): "Your Venus and Mars are in a sextile. There is a supportive bond between charm and passion. You can build a romantic and passionate balance.",
+        ("Venüs","Satürn","Kavuşum"): "Your Venus and Saturn are conjunct. Love and limits meet at the same point — you bring seriousness and structure to your relationships. You have strong potential for long-term commitment.",
+        ("Venüs","Satürn","Karşıt"): "Your Venus and Saturn are in opposing signs. There is a search for balance between love and limits — dynamics of seriousness and restriction run through your love life.",
+        ("Venüs","Satürn","Kare"): "Your Venus and Saturn are in a square. Tension between charm and limit can create challenges in your relationships. Yet this lesson will mature you.",
+        ("Venüs","Satürn","Trigon"): "Your Venus and Saturn are in a trine. Love and structure are in natural harmony — you build mature, determined and structured relationships.",
+        ("Venüs","Satürn","Sekstil"): "Your Venus and Saturn are in a sextile. There is a supportive bond between love and limits. You can build long-term and valuable relationships.",
+        ("Jüpiter","Satürn","Kavuşum"): "Your Jupiter and Saturn are conjunct. Abundance and limits meet at the same point — you build a strong balance between expansion and structure. A natural strategic ability in long-term projects.",
+        ("Jüpiter","Satürn","Karşıt"): "Your Jupiter and Saturn are in opposing signs. There is a search for balance between expansion and structure — the tension between optimism and reality is one of your fundamental life lessons.",
+        ("Jüpiter","Satürn","Kare"): "Your Jupiter and Saturn are in a square. Tension between abundance and limit causes you to experience opportunities and constraints at the same time.",
+        ("Jüpiter","Satürn","Trigon"): "Your Jupiter and Saturn are in a trine. Expansion and structure are in natural harmony — you are strategic, determined and broad-minded.",
+        ("Jüpiter","Satürn","Sekstil"): "Your Jupiter and Saturn are in a sextile. There is a supportive bond between abundance and limits. You can bring large projects into being in a structured way.",
+        ("Jüpiter","Neptün","Kavuşum"): "Your Jupiter and Neptune are conjunct. Faith and dream meet at the same point — spiritual expansion, inspiration and intuitive clarity are your inner nature.",
+        ("Jüpiter","Neptün","Karşıt"): "Your Jupiter and Neptune are in opposing signs. There is a search for balance between realistic expansion and idealist dream — optimism and haze may occasionally conflict.",
+        ("Jüpiter","Neptün","Kare"): "Your Jupiter and Neptune are in a square. Tension between faith and dream can create confusion and disillusionment. Yet pursuing spiritual development brings powerful results.",
+        ("Jüpiter","Neptün","Trigon"): "Your Jupiter and Neptune are in a trine. Faith and dream are in natural harmony — your spiritual world is expansive, your inspiration abundant and your intuition strong.",
+        ("Jüpiter","Neptün","Sekstil"): "Your Jupiter and Neptune are in a sextile. There is a supportive bond between faith and dream. You can bring your spiritual projects and dreams to life.",
+        ("Jüpiter","Plüton","Kavuşum"): "Your Jupiter and Pluto are conjunct. Abundance and power meet at the same point — your potential for deep expansion, transformation and power is strong. Great transformation cycles shape your life.",
+        ("Jüpiter","Plüton","Karşıt"): "Your Jupiter and Pluto are in opposing signs. There is a search for balance between expansion and power — the tension between abundance and power can lead to great imbalances.",
+        ("Jüpiter","Plüton","Kare"): "Your Jupiter and Pluto are in a square. Tension between abundance and power can draw control struggles and power games into your life. Yet balancing this energy creates great transformations.",
+        ("Jüpiter","Plüton","Trigon"): "Your Jupiter and Pluto are in a trine. Abundance and power are in natural harmony — you carry deep expansion, determination and transformative energy.",
+        ("Jüpiter","Plüton","Sekstil"): "Your Jupiter and Pluto are in a sextile. There is a supportive bond between abundance and power. You can bring deep transformations to life constructively.",
+        ("Satürn","Plüton","Kavuşum"): "Your Saturn and Pluto are conjunct. Limit and power meet at the same point — you carry structural transformation, deep responsibility and powerful determination.",
+        ("Satürn","Plüton","Karşıt"): "Your Saturn and Pluto are in opposing signs. There is a search for balance between structure and power — the tension between limits and power can lead to great structural transformations.",
+        ("Satürn","Plüton","Kare"): "Your Saturn and Pluto are in a square. Tension between limit and power can lead to structural crises and deep transformations. Learning this lesson brings strong maturity.",
+        ("Satürn","Plüton","Trigon"): "Your Saturn and Pluto are in a trine. Structure and power are in natural harmony — you are disciplined, determined and transformative.",
+        ("Satürn","Plüton","Sekstil"): "Your Saturn and Pluto are in a sextile. There is a supportive bond between limit and power. You can bring structural transformations to life strategically.",
+        ("Uranüs","Plüton","Kavuşum"): "Your Uranus and Pluto are conjunct. Freedom and power meet at the same point — you carry deep revolution, sudden change and powerful transformative energy. Radical innovations shape your life.",
+        ("Uranüs","Plüton","Karşıt"): "Your Uranus and Pluto are in opposing signs. There is a search for balance between freedom and power — the tension between the rebellious spirit and power can lead to great conflicts.",
+        ("Uranüs","Plüton","Kare"): "Your Uranus and Pluto are in a square. Tension between freedom and power can lead to sudden breaks and deep transformations. Used constructively, this energy can transform your life.",
+        ("Uranüs","Plüton","Trigon"): "Your Uranus and Pluto are in a trine. Freedom and power are in natural harmony — you are innovative, determined and transformative.",
+        ("Uranüs","Plüton","Sekstil"): "Your Uranus and Pluto are in a sextile. There is a supportive bond between freedom and power. You can bring deep revolutions to life constructively.",
+        ("Neptün","Plüton","Kavuşum"): "Your Neptune and Pluto are conjunct. Dream and power meet at the same point — you carry spiritual transformation, deep intuition and powerful psychic energy.",
+        ("Neptün","Plüton","Karşıt"): "Your Neptune and Pluto are in opposing signs. There is a search for balance between dream and power — the tension between the spiritual world and power can lead to deep spiritual transformations.",
+        ("Neptün","Plüton","Kare"): "Your Neptune and Pluto are in a square. Tension between dream and power can lead to spiritual crises and deep transformations. Pursuing spiritual development brings powerful results.",
+        ("Neptün","Plüton","Trigon"): "Your Neptune and Pluto are in a trine. Dream and power are in natural harmony — your spiritual world is deep, your intuition strong, and you carry transformative energy.",
+        ("Neptün","Plüton","Sekstil"): "Your Neptune and Pluto are in a sextile. There is a supportive bond between dream and power. You can bring your spiritual transformations to life constructively.",
+    }
+
     tum = list(GEZEGENLER.keys()) + list(ASTEROITLER.keys()) + list(ARAP_NOKTALARI.keys())
 
-    def _urun(p1, p2, aci):
+    def _urun(p1, p2, aci, en=False):
         key = (p1, p2, aci)
         key_t = (p2, p1, aci)
+        if en:
+            if key in OZEL_YORUMLAR_EN: return OZEL_YORUMLAR_EN[key]
+            if key_t in OZEL_YORUMLAR_EN: return OZEL_YORUMLAR_EN[key_t]
+            pair = (p1, p2) if (p1, p2) in CIFT_TEMA_EN else ((p2, p1) if (p2, p1) in CIFT_TEMA_EN else None)
+            tema = CIFT_TEMA_EN.get(pair, f"the connection between the energies of {p1} and {p2}") if pair else f"the connection between the energies of {p1} and {p2}"
+            p1o = _EN_OZ.get(p1) or f"{p1} energy"; p2o = _EN_OZ.get(p2) or f"{p2} energy"
+            if aci == "Kavuşum":
+                return f"{p1} and {p2} energies merge at the same point. {tema}. The {p1o} of {p1} and the {p2o} of {p2} form a unified whole. This conjunction allows you to experience both energies with great intensity."
+            elif aci == "Karşıt":
+                return f"{p1} and {p2} stand at opposite poles. {tema}. There is constant search for balance between the {p1o} of {p1} and the {p2o} of {p2}. This opposition requires you to fully understand both sides."
+            elif aci == "Kare":
+                return f"The square between {p1} and {p2} creates tension around {tema}. This demanding energy pushes you beyond your comfort zone and forces growth. The struggle between the {p1o} of {p1} and the {p2o} of {p2} is one of your most powerful transformation opportunities."
+            elif aci == "Trigon":
+                return f"The trine between {p1} and {p2} creates a natural harmony around {tema}. Used consciously, this energy can create flow in your life. The {p1o} of {p1} and the {p2o} of {p2} naturally build a bridge."
+            elif aci == "Sekstil":
+                return f"The sextile between {p1} and {p2} offers opportunities around {tema}. To activate this energy, you need to take a conscious step. There is a supportive bond between the {p1o} of {p1} and the {p2o} of {p2}."
+            return ""
         if key in OZEL_YORUMLAR: return OZEL_YORUMLAR[key]
         if key_t in OZEL_YORUMLAR: return OZEL_YORUMLAR[key_t]
         pair = (p1, p2) if (p1, p2) in CIFT_TEMA else ((p2, p1) if (p2, p1) in CIFT_TEMA else None)
@@ -2372,7 +2699,8 @@ def _aspect_interpretasyon_kutuphanesi():
             return f"{p1} ile {p2} arasındaki sekstil açısı, {tema} konusunda fırsatlar sunuyor. Bu enerjiyi harekete geçirmek için bilinçli bir adım atmanız gerekiyor. {p1}in {p1o} yönü ile {p2}nin {p2o} yönü arasında destekleyici bir bağ var."
         return ""
 
-    kutuphane = {}
+    _sozluk_tr = {}
+    _sozluk_en = None
     islenen = set()
     for p1 in tum:
         for p2 in tum:
@@ -2380,10 +2708,17 @@ def _aspect_interpretasyon_kutuphanesi():
             pk = tuple(sorted([p1, p2]))
             if pk in islenen: continue
             islenen.add(pk)
-            kutuphane[f"{pk[0]}-{pk[1]}"] = {}
+            _sozluk_tr[f"{pk[0]}-{pk[1]}"] = {}
+            if _EN:
+                if _sozluk_en is None: _sozluk_en = {}
+                _sozluk_en[f"{pk[0]}-{pk[1]}"] = {}
             for aci in ["Kavuşum","Karşıt","Kare","Trigon","Sekstil"]:
-                kutuphane[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci)
-    return kutuphane
+                _sozluk_tr[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, en=False)
+                if _sozluk_en is not None:
+                    _sozluk_en[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, en=True)
+    if _sozluk_en is not None:
+        return _sozluk_en
+    return _sozluk_tr
 
 def _collect_solar_lunar_data(motor):
     """Solar return and lunar return predictions for the natal chart. Individual-focused."""
@@ -3159,7 +3494,9 @@ def _natal_hayat_alani_analizi(motor):
 def _natal_chart_yorumu(motor):
     """Natal chart interpretation as flowing narrative — like a human astrologer."""
     try:
+        _EN = _i18n_get_lang() == "en"
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+        EN_EV = {1:"1st",2:"2nd",3:"3rd",4:"4th",5:"5th",6:"6th",7:"7th",8:"8th",9:"9th",10:"10th",11:"11th",12:"12th"}
 
         jd = motor.get_natal_julian_day("p1")
         cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
@@ -3171,6 +3508,12 @@ def _natal_chart_yorumu(motor):
             4:"kökler ve aile", 5:"yaratıcılık ve aşk", 6:"sağlık ve günlük rutin",
             7:"ilişkiler ve ortaklıklar", 8:"dönüşüm ve ortak kaynaklar", 9:"inançlar ve yüksek öğrenim",
             10:"kariyer ve toplumsal statü", 11:"sosyal çevre ve idealler", 12:"bilinçaltı ve ruhsal yolculuk"
+        }
+        EV_ANLAM_EN = {
+            1:"personality and outward appearance", 2:"values and material security", 3:"communication and close environment",
+            4:"roots and family", 5:"creativity and love", 6:"health and daily routine",
+            7:"relationships and partnerships", 8:"transformation and shared resources", 9:"beliefs and higher learning",
+            10:"career and social standing", 11:"social circle and ideals", 12:"the subconscious and the spiritual journey"
         }
 
         gez_poz = {}
@@ -3222,12 +3565,25 @@ def _natal_chart_yorumu(motor):
             "Hava": "Hava elementi ağır basıyor — zihniniz sürekli aktif, fikirler üretiyor ve bağlantılar kuruyorsunuz. İletişim ve sosyal çevre hayatınızın merkezinde.",
             "Su": "Su elementi ağır basıyor — derin bir sezgisel zekaya ve empati yeteneğine sahipsiniz. Duygusal dünyanız, aldığınız kararları ve ilişkilerinizi şekillendiriyor.",
         }
+        element_acik_en = {
+            "Ateş": "The Fire element prevails — you are a natural pioneer and source of inspiration. You take bold steps in life and channel your inner passion outward.",
+            "Toprak": "The Earth element prevails — you have a grounded, reliable and productive nature built on solid foundations. You turn your dreams into reality through concrete steps.",
+            "Hava": "The Air element prevails — your mind is constantly active, generating ideas and building connections. Communication and your social circle stand at the center of your life.",
+            "Su": "The Water element prevails — you possess deep intuitive intelligence and empathy. Your emotional world shapes your decisions and relationships.",
+        }
         eksik_element = [e for e, s in eleman_say.items() if s == 0]
         eksik_not = ""
         if eksik_element:
-            eksik_not = f" Öte yandan haritanızda { ' ve '.join(eksik_element) } elementinde gezegen bulunmuyor; bu alanları dengelemek için bilinçli bir gelişim yolculuğu sizi bekliyor olabilir."
+            if _EN:
+                _eks = {"Ateş":"Fire","Toprak":"Earth","Hava":"Air","Su":"Water"}
+                eksik_not = f" Meanwhile, your chart holds no planets in the { ' and '.join(_eks.get(e, e) for e in eksik_element) } element; a conscious journey of growth may await you to bring these areas into balance."
+            else:
+                eksik_not = f" Öte yandan haritanızda { ' ve '.join(eksik_element) } elementinde gezegen bulunmuyor; bu alanları dengelemek için bilinçli bir gelişim yolculuğu sizi bekliyor olabilir."
 
-        par1 = f"Yükselen burcunuz {asc_burc} ve MC'niz {mc_burc} ile hayata geliş tarzınız ve toplumsal hedefleriniz şekilleniyor. {element_acik.get(bask_element, 'Element dağılımınız dengeli ve uyumlu.')}{eksik_not}"
+        if _EN:
+            par1 = f"With your Ascendant in {asc_burc} and your MC in {mc_burc}, your approach to life and your social goals take shape. {element_acik_en.get(bask_element, 'Your elemental distribution is balanced and harmonious.')}{eksik_not}"
+        else:
+            par1 = f"Yükselen burcunuz {asc_burc} ve MC'niz {mc_burc} ile hayata geliş tarzınız ve toplumsal hedefleriniz şekilleniyor. {element_acik.get(bask_element, 'Element dağılımınız dengeli ve uyumlu.')}{eksik_not}"
 
         # ── PARAGRAPH 2: Planet story ──
         ozne_gezegenler = ["Güneş","Ay","Merkür","Venüs","Mars","Jüpiter","Satürn","Uranüs","Neptün","Plüton","Chiron"]
@@ -3238,6 +3594,7 @@ def _natal_chart_yorumu(motor):
             p = gez_poz[g]
             burc = p["burc"]; ev = p["ev"]
             e_anlam = EV_ANLAM.get(ev, "hayat")
+            e_anlam_en = EV_ANLAM_EN.get(ev, "life")
             DUSUK_ZARAR = {
                 "Güneş": ("Terazi","Kova"), "Ay": ("Akrep","Oğlak"), "Merkür": ("Balık","Yay"),
                 "Venüs": ("Başak","Akrep"), "Mars": ("Boğa","Terazi"), "Jüpiter": ("Oğlak","Başak"),
@@ -3246,8 +3603,8 @@ def _natal_chart_yorumu(motor):
             }
             dusuk, zarar = DUSUK_ZARAR.get(g, ("",""))
             notu = ""
-            if burc == zarar: notu = " Burada enerjisi sınanıyor — bilinçli çaba gerektiren bir alan."
-            elif burc == dusuk: notu = " Burada ifadesi zayıflıyor ama telafisi mümkün — farkındalıkla güçlenebilir."
+            if burc == zarar: notu = (" Here its energy is challenged — an area that requires conscious effort." if _EN else " Burada enerjisi sınanıyor — bilinçli çaba gerektiren bir alan.")
+            elif burc == dusuk: notu = (" Here its expression is weakened but can be restored — it can be strengthened with awareness." if _EN else " Burada ifadesi zayıflıyor ama telafisi mümkün — farkındalıkla güçlenebilir.")
 
             giris = {
                 "Güneş": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) konumlanmış. Öz benliğiniz ve hayattaki temel amacınız bu kesişimde şekilleniyor.",
@@ -3262,10 +3619,25 @@ def _natal_chart_yorumu(motor):
                 "Plüton": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Derin dönüşüm, güç dinamikleri ve yeniden doğuş potansiyeliniz bu konumda saklı.",
                 "Chiron": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). En derin yaranız ve aynı zamanda en büyük iyileşme gücünüz burada.",
             }.get(g, "")
+            giris_en = {
+                "Güneş": f"{g} is placed in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your core self and your life's fundamental purpose take shape at this intersection.",
+                "Ay": f"{g} sits in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your emotional world and instinctive reactions are nourished by this placement.",
+                "Merkür": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your mental structure and communication style draw strength from this placement.",
+                "Venüs": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your love language, aesthetic sense and what you value bear the imprint of this position.",
+                "Mars": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your will, passions and fighting energy are governed from here.",
+                "Jüpiter": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your domain of luck, abundance and personal expansion reveals itself in this position.",
+                "Satürn": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your responsibilities, limits and most important life lessons lie hidden in this placement.",
+                "Uranüs": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your originality, sudden changes and the areas you rebel against are linked to this position.",
+                "Neptün": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your dreams, intuitions and spiritual connections draw inspiration from here.",
+                "Plüton": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Deep transformation, power dynamics and your potential for rebirth are stored in this position.",
+                "Chiron": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your deepest wound and, at the same time, your greatest healing power reside here.",
+            }.get(g, "")
             if giris:
                 tam_metin = f"{giris}{notu}"
+                if _EN:
+                    tam_metin = f"{giris_en}{notu}"
                 gez_parcalar.append(tam_metin)
-                gez_bolumler.append({"gezegen": g, "baslik": f"{g} — {burc}, {ev}. Ev", "metin": tam_metin})
+                gez_bolumler.append({"gezegen": g, "baslik": (f"{g} — {burc}, {EN_EV.get(ev, str(ev))} House" if _EN else f"{g} — {burc}, {ev}. Ev"), "metin": tam_metin})
 
         # Connect first 3-4 planets with transitions, rest as separate sentences
         if len(gez_parcalar) <= 4:
@@ -3290,8 +3662,12 @@ def _natal_chart_yorumu(motor):
                 yorum = kutuphane[pair_key][aci]
             if not yorum:
                 sifa = _olumsuz_aci_sifasi(a["g1"], a["g2"], aci) if aci in ("Kare","Karşıt") else ""
-                etiket = {"Kavuşum":"birleşme ve güçlenme","Trigon":"doğal akış ve uyum","Sekstil":"fırsat ve destek","Kare":"meydan okuyor","Karşıt":"denge çağrısı yapıyor"}
-                yorum = f"{a['g1']} ve {a['g2']} arasındaki {aci} açısı size {etiket.get(aci,'bir gerilim getiriyor')}."
+                if _EN:
+                    etiket = {"Kavuşum":"a union and strengthening","Trigon":"natural flow and harmony","Sekstil":"opportunity and support","Kare":"a challenge","Karşıt":"a call for balance"}
+                    yorum = f"The {aci} aspect between {a['g1']} and {a['g2']} brings you {etiket.get(aci, 'some tension')}."
+                else:
+                    etiket = {"Kavuşum":"birleşme ve güçlenme","Trigon":"doğal akış ve uyum","Sekstil":"fırsat ve destek","Kare":"meydan okuyor","Karşıt":"denge çağrısı yapıyor"}
+                    yorum = f"{a['g1']} ve {a['g2']} arasındaki {aci} açısı size {etiket.get(aci,'bir gerilim getiriyor')}."
                 if sifa: yorum += f" {sifa}"
             aspekt_cumleleri.append(yorum)
             aci_bolumler.append({"baslik": f"{a['g1']} – {a['g2']} ({aci})", "metin": yorum})
@@ -3303,7 +3679,10 @@ def _natal_chart_yorumu(motor):
         try:
             mp = motor.meslek_arap_noktasi_hesapla()
             if mp and mp.get("ruh_burc"):
-                diger_not += f"Ruh noktanız {mp['ruh_burc']} burcunda ({mp['ruh_ev']}. ev) — kariyer ve yaşam amacı yolculuğunuzda size pusula görevi görüyor. "
+                if _EN:
+                    diger_not += f"Your Part of Spirit is in {mp['ruh_burc']} (the {EN_EV.get(mp['ruh_ev'], str(mp['ruh_ev']))} house) — it serves as a compass on your career and life-purpose journey. "
+                else:
+                    diger_not += f"Ruh noktanız {mp['ruh_burc']} burcunda ({mp['ruh_ev']}. ev) — kariyer ve yaşam amacı yolculuğunuzda size pusula görevi görüyor. "
         except: pass
         try:
             ap = motor.arap_noktasi_hesapla()
@@ -3314,12 +3693,15 @@ def _natal_chart_yorumu(motor):
                     eklenen = []
                     for nokta_ad, nokta_data in ap_list:
                         if isinstance(nokta_data, dict) and nokta_data.get("burc"):
-                            eklenen.append(f"{nokta_ad} {nokta_data['burc']} burcunda ({nokta_data.get('ev','?')}. ev)")
+                            if _EN:
+                                eklenen.append(f"{nokta_ad} in {nokta_data['burc']} (the {EN_EV.get(nokta_data.get('ev'), str(nokta_data.get('ev','?')))} house)")
+                            else:
+                                eklenen.append(f"{nokta_ad} {nokta_data['burc']} burcunda ({nokta_data.get('ev','?')}. ev)")
                     if eklenen:
-                        diger_not += f"Arap noktalarından {', '.join(eklenen)} öne çıkıyor. "
+                        diger_not += (f"Among the Arabic parts, {', '.join(eklenen)} stand out. " if _EN else f"Arap noktalarından {', '.join(eklenen)} öne çıkıyor. ")
         except: pass
         try:
-            ast_anahtar = {"Juno":"bağlılık","Ceres":"beslenme","Pallas":"bilgelik","Vesta":"adanma","Eros":"tutku","Psyche":"ruhsal bağ"}
+            ast_anahtar = {"Juno":"commitment","Ceres":"nurturing","Pallas":"wisdom","Vesta":"devotion","Eros":"passion","Psyche":"spiritual bond"} if _EN else {"Juno":"bağlılık","Ceres":"beslenme","Pallas":"bilgelik","Vesta":"adanma","Eros":"tutku","Psyche":"ruhsal bağ"}
             ast_list = []
             for ast_isim, ast_tema in ast_anahtar.items():
                 ast_id = GEZEGENLER.get(ast_isim)
@@ -3328,7 +3710,7 @@ def _natal_chart_yorumu(motor):
                     ast_burc = BURCLAR[int(deg // 30)]
                     ast_list.append(f"{ast_isim} ({ast_burc} — {ast_tema})")
             if ast_list:
-                diger_not += f"Asteroitlerden {', '.join(ast_list[:4])} haritanızda belirgin temalar taşıyor."
+                diger_not += (f"Among the asteroids, {', '.join(ast_list[:4])} carry prominent themes in your chart." if _EN else f"Asteroitlerden {', '.join(ast_list[:4])} haritanızda belirgin temalar taşıyor.")
         except: pass
 
         # ── Assemble ──
@@ -3343,10 +3725,12 @@ def _natal_chart_yorumu(motor):
         return "\n\n".join(paragraf), gez_bolumler, aci_bolumler
     except Exception as e:
         import traceback; traceback.print_exc()
-        return f"Harita yorumu hazırlanamadı: {e}", [], []
+        _EN_err = _i18n_get_lang() == "en"
+        return (f"Chart interpretation could not be prepared: {e}" if _EN_err else f"Harita yorumu hazırlanamadı: {e}"), [], []
 
 def _olumsuz_aci_sifasi(g1, g2, aci_turu):
     """Returns a healing suggestion for a challenging aspect — natural, varied, specific."""
+    _EN = _i18n_get_lang() == "en"
     SIFA_DICT = {
         # ── Güneş ──
         ("Güneş","Satürn"): "Özgüveninizle sorumluluklarınız arasında sıkışmış hissediyorsunuz. Kendinize 'yeterli olmadığınızı' söyleyen iç sesi fark edin ve ona meydan okuyun. Küçük başarılarınızı kutlamak bu gerilimi azaltacak.",
@@ -3430,10 +3814,85 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
         ("Mars","Jüpiter"): "Risk almayı seviyorsunuz ama bazen aşırıya kaçabiliyor. 'Ya hep ya hiç' yaklaşımınız sizi yakabilir. Büyük resmi görmek güzel ama adım adım ilerlemek daha kalıcı sonuçlar getirecek.",
         ("Güneş","Ay"): "Kimliğinizle duygusal dünyanız çatışıyor. Biri bir şey isterken diğeri başka bir şey istiyor. İçsel bütünlük için bu iki parçayı uzlaştırmalısınız. İkisini de dinleyin, birini tercih etmeyin.",
     }
+
+    SIFA_DICT_EN = {
+        ("Güneş","Satürn"): "You feel trapped between your self-confidence and your responsibilities. Notice the inner voice telling you that you are 'not enough' and challenge it. Celebrating your small wins will ease this tension.",
+        ("Güneş","Plüton"): "Power struggles and control dynamics are on your agenda. Instead of trying to change others, face your own shadow sides. Once you discover your own power, the struggles outside will lose their meaning.",
+        ("Güneş","Neptün"): "A veil of fog is lifting around your identity. Stop shaping yourself to others' expectations. Meditation and time alone will remind you of your true self.",
+        ("Güneş","Uranüs"): "Your need for freedom clashes with your responsibilities. Instead of rebelling for its own sake, question which patterns truly feel too tight for you. Finding your own path does not require rejecting others.",
+        ("Güneş","Merkür"): "There is a mismatch between your thoughts and your core self. What you say and what you feel may not align. Be honest with yourself, and do not share ideas you have not fully made your own.",
+        ("Güneş","Venüs"): "Your way of expressing yourself and your love language may contradict. To please others, you push your own desires aside. First, recognize your own needs.",
+        ("Güneş","Mars"): "You are caught between will and desire. You may want something intensely yet fear taking action. Take the first step; the rest will follow.",
+        ("Güneş","Jüpiter"): "Your need to prove yourself can go to extremes. Instead of trying to prove something to everyone, allow yourself simply to exist. You are enough; nothing more is needed.",
+        ("Güneş","KAD"): "Family patterns from the past and habits inherited from your ancestors make it difficult to build your own identity. To chart your own path, learn to free yourself from family ties without rejecting them. Making peace with your roots will strengthen you.",
+        ("Güneş","Lilith"): "You struggle to accept your anger and your repressed sides. Claiming the parts of you that society deems 'inappropriate' will set you free. Facing your shadow is the only way to find your light.",
+        ("Ay","Satürn"): "Emotionally, you feel restricted. Your inner child may have been silenced. Allow yourself: cry, hug, drink something warm. Lower your protective walls, slowly.",
+        ("Ay","Plüton"): "Your emotions are as deep as an ocean and sometimes suffocating. Notice your possessive and jealous tendencies. Remind yourself that you can feel safe without depending on someone.",
+        ("Ay","Neptün"): "You absorb others' energy like a sponge and cannot tell where you end and others begin. Ten minutes of silence each day will help you draw emotional boundaries.",
+        ("Ay","Uranüs"): "Your emotional swings can be unpredictable — happy one moment, restless the next. This volatility is the source of your creativity but can also lead to instability. Daily routines will anchor you.",
+        ("Ay","Mars"): "Your reactions are sudden and strong. Your anger and your sensitivity are intertwined. When something upsets you, take a deep breath before responding. Moving your body will transform this energy.",
+        ("Ay","Venüs"): "There is a contradiction between your emotional needs and what pleases you. You may be forcing yourself to be loved and approved. Show yourself unconditional love first.",
+        ("Ay","Merkür"): "You struggle to put your feelings into words. Something stirs inside you, yet you cannot express it. Keeping a journal and creative writing will help you break through this block.",
+        ("Ay","Jüpiter"): "Your emotions tend toward exaggeration. You may magnify a small event or carry a moment's sadness for days. Consult someone you trust to develop a realistic perspective.",
+        ("Ay","KAD"): "You carry the emotional weight of your family history. Emotional habits were bequeathed to you by your mother or your elders. It is time to notice these patterns and make conscious choices. Do not let the past define you.",
+        ("Ay","Lilith"): "There is tension between your femininity, your sensitivity and the sides of you that go unaccepted. Your repressed emotional responses may surface at the most unexpected moments. Create safe spaces where you can express yourself without fear of judgment.",
+        ("Merkür","Neptün"): "Your mind dwells in a cloud of fog. Distinguishing dream from reality grows difficult. Putting your thoughts on paper — writing and drawing — will bring you clarity. Trust your intuition, but never let go of reality checks.",
+        ("Merkür","Plüton"): "Your mind is deep and investigative, but it can also fall into obsessive thought loops. You struggle to let a subject go and keep replaying the same idea. Try meditation and physical activity to empty your mind.",
+        ("Merkür","Uranüs"): "Your ideas are unconventional and pioneering, but you can leave others behind when expressing them. Your sudden outbursts and unexpected remarks may strain relationships. Pause for a second before sharing your thoughts.",
+        ("Merkür","Satürn"): "Your mind is critical and disciplined but can turn excessively pessimistic. You over-question even your own thoughts and struggle to decide. Sharing an imperfect idea is better than staying still.",
+        ("Merkür","Mars"): "Your thoughts can be quick and aggressive. In argument, words can become weapons. Defending your view does not mean belittling someone else. You can communicate without fighting.",
+        ("Merkür","KAD"): "Old thought patterns — belief systems inherited from your family — shape your mind. It is time to question which beliefs are not truly yours. Declare your mental freedom.",
+        ("Merkür","Lilith"): "Unspoken words, repressed ideas and taboo subjects occupy your mind. Find the courage to speak the unspoken. Own the thoughts you believed were forbidden.",
+        ("Venüs","Satürn"): "You feel distant and insecure in relationships. The fear of 'not being loved enough' pulls you back. Start expressing your love through small gestures and try to learn the other person's language.",
+        ("Venüs","Plüton"): "Your relationships are intense and passionate, yet they can carry possessiveness and control. The fear of losing someone makes you cling too tightly. Learning to trust is your greatest lesson.",
+        ("Venüs","Neptün"): "Your boundaries in love are blurred. Romantic dreams can override reality. Instead of seeing someone as they are, you idealize them. Open your eyes: true love also includes disappointment.",
+        ("Venüs","Uranüs"): "You oscillate between freedom and attachment. The closer you get to someone, the more you feel the need to pull away. Accept that you need space in your relationships — and learn to say so.",
+        ("Venüs","Mars"): "You are searching for a balance between love and passion. One calls to your heart, the other to your body. A creative outlet — dance, painting, music — can bring these two energies into harmony.",
+        ("Venüs","KAD"): "The habits of love in your family roots affect your adult relationships. The love language you learned in childhood may no longer meet your needs. It is never too late to learn a new love language.",
+        ("Venüs","Lilith"): "You experience inner conflict around sexuality, attraction and forbidden desire. You may feel trapped between society's scripts about women and sex and your own truth. Owning your body and desires will set you free.",
+        ("Mars","Satürn"): "You struggle to express anger, or you experience uncontrolled outbursts — two faces of the same problem: a cycle of suppression and explosion. Regular physical exercise channels this energy healthily.",
+        ("Mars","Plüton"): "Your anger is volcanic: silent for a long time, then a destructive eruption. You get drawn into power struggles and can treat everything as a battlefield. Remember that real power lies not in control but in letting go.",
+        ("Mars","Neptün"): "Your energy is scattered; you struggle to find motivation. You feel you do not know where you are heading. Set small, clear goals. Moving step by step is more effective than trying to achieve everything at once.",
+        ("Mars","Uranüs"): "Sudden outbursts of anger and impulsive actions are the most prominent feature of this aspect. Acting without thinking can bring regret. Recognize your triggers and count to three before reacting.",
+        ("Mars","Jüpiter"): "Excessive optimism and exaggerated moves can lead you to take risks. You want everything at once, then burn out. Slow down, focus on a single goal, and do not let go until you reach it.",
+        ("Mars","KAD"): "The roots of your anger may lie in your family history. There is a pattern of anger inherited from your father or elders. You do not have to repeat your ancestors' battles in your own life. Simply recognizing this cycle is healing.",
+        ("Mars","Lilith"): "Repressed anger and forbidden desires accumulate in your body. Finding healthy ways to express anger matters for both your physical and emotional health. Martial arts, intense exercise and voice therapy can help.",
+        ("Jüpiter","Satürn"): "You swing between expansion and restriction. You build grand dreams, then stop yourself. Do not wait for the perfect moment; start with what you have. Dreams that rise on solid foundations come true.",
+        ("Jüpiter","Plüton"): "Power, abundance and control are intertwined. The desire to have more can consume you. True abundance comes from appreciating what you have. Remember that what you share multiplies.",
+        ("Jüpiter","Neptün"): "Boundless optimism can pull you away from being realistic. You believe so strongly that everything will be fine that you miss the warning signs. Balance: find a middle ground between dreaming and being realistic.",
+        ("Jüpiter","Uranüs"): "Your desire for freedom and adventure is so strong that you can overlook stability entirely. Sudden decisions and unplanned moves can bring regret. Freedom is not irresponsibility; do not confuse the two.",
+        ("Jüpiter","KAD"): "You may feel trapped between the belief systems inherited from your family and your own dreams. Question the 'this is how we do things' patterns. Your ancestors' limits are not your limits.",
+        ("Jüpiter","Lilith"): "Forbidden knowledge, taboo subjects and repressed truths attract you. You are drawn to what society deems 'excessive' or 'inappropriate'. Channel this curiosity into creative and constructive fields.",
+        ("Satürn","Uranüs"): "You are stuck between tradition and revolution. You want security on one hand and freedom on the other. Before making a radical change, try small innovations. Transform old patterns instead of tearing them down overnight.",
+        ("Satürn","Neptün"): "There is a conflict between your responsibilities and your dreams. The closer you get to one, the further the other drifts. Find a way to pursue your dreams without neglecting your duties.",
+        ("Satürn","Plüton"): "You are confronting life's heaviest lessons: loss, control, power. This aspect teaches you endurance but can also harden you. Softening is not weakness; it is a sign of maturity.",
+        ("Satürn","KAD"): "You carry the burden of responsibility from your family history. Your ancestors' unresolved issues may rest on your shoulders. Putting this burden down may feel like betrayal, but the real betrayal is not living your own life.",
+        ("Satürn","Lilith"): "Repressed emotions and the sides of you deemed forbidden are trapped behind your walls of responsibility. Because you cannot fully show who you are, you feel constricted inside. Embracing your shadow will set you free.",
+        ("Chiron","Satürn"): "Your deepest wound is tied to responsibility and a sense of inadequacy. The belief 'I am never enough' blocks your healing. Accept that your flaws are what make you human. You do not have to be perfect.",
+        ("Chiron","Plüton"): "You stand on a bridge between past trauma and transformation. The place that hurts most holds your greatest healing potential. You do not have to do this alone — seek professional support.",
+        ("Chiron","Neptün"): "You long to heal but do not know how. You search for escape routes and may turn toward dependencies. True healing comes from facing your pain, not fleeing it.",
+        ("Chiron","KAD"): "An unhealed wound may have been inherited from your family history. It may feel like your own, yet it could come from your ancestors. Breaking this cycle is in your hands; it is part of your destiny journey.",
+        ("Chiron","Lilith"): "The fear of rejection, exclusion and not being accepted is your most tender point. You feel 'too much'. Yet what makes you different is precisely your healing power. Wherever you feel excluded, you can be a healer to others.",
+        ("KAD","Lilith"): "When the shadow of the past meets today's repressed sides, a powerful karmic weight emerges. There are silenced stories inherited from your ancestors. Breaking this silence will liberate both you and your lineage.",
+        ("KAD","Plüton"): "There may have been power struggles, inheritance feuds or traumatic losses in your family history. This intense energy circulates in your subconscious. Unearthing family secrets can be frightening, but it is the key to your liberation.",
+        ("KAD","Neptün"): "There may be an unresolved story of victimhood, sacrifice or disappointment in your family history. Your tendency to sacrifice yourself for others originates here. Sacrifice is not love. Take care of yourself first.",
+        ("KAD","Uranüs"): "You are fighting a battle between family patterns and your independence. You reject the traditional roles imposed on you yet cannot fully break away. Liberation is not rejection; it is making your own choice.",
+        ("Lilith","Plüton"): "Repressed sexuality, forbidden desires and shadow impulses call for deep transformation. The sides of you you most shame hold your greatest power. Making peace with your dark side will make you whole.",
+        ("Lilith","Neptün"): "You may be lost in a victim-redeemer cycle. While trying to save others, you lose yourself — or you wait for a savior. Recognize that true salvation lies not in someone else but within you.",
+        ("Uranüs","Lilith"): "Rebellion and repressed desires are intertwined. Breaking the rules does not free you; it only constricts you more. True freedom lies in setting your own boundaries. Instead of fighting external authority, question the authority within you.",
+        ("Uranüs","KAD"): "You feel squeezed between the urge to break away from your family past and the need to belong. Rather than severing your ties to your roots, redefine them according to your own needs. Belonging is not surrender.",
+        ("Lilith","Mars"): "There is a bond between your anger and your repressed sides. You fear acting in an area where you believe self-expression is 'forbidden'. Moving your body and raising your voice will break these chains.",
+        ("Venüs","Jüpiter"): "Excess indulgence and exaggerated expectations can create imbalance in your relationships. You try to keep up with everyone and please everyone. Learning to say no will balance this energy.",
+        ("Merkür","Venüs"): "There is a mismatch between what you say and what you feel. You can be insincere when complimenting or too harsh when criticizing. Bring what is in your heart and what comes from your tongue into alignment.",
+        ("Ay","Jüpiter"): "Your emotional reactions are big and sweeping. A small joy excites you, while a small disappointment can flatten you. Try breathing exercises and grounding techniques to balance your emotional ups and downs.",
+        ("Mars","Jüpiter"): "You love taking risks, but sometimes you go overboard. Your 'all or nothing' approach can burn you. Seeing the big picture is good, but moving step by step brings more lasting results.",
+        ("Güneş","Ay"): "Your identity and emotional world conflict. One wants one thing while the other wants another. You must reconcile these two parts for inner wholeness. Listen to both; do not favor one.",
+    }
     key = (g1, g2)
     rev_key = (g2, g1)
-    if key in SIFA_DICT: return SIFA_DICT[key]
-    if rev_key in SIFA_DICT: return SIFA_DICT[rev_key]
+    sifa_dict = SIFA_DICT_EN if _EN else SIFA_DICT
+    if key in sifa_dict: return sifa_dict[key]
+    if rev_key in sifa_dict: return sifa_dict[rev_key]
     # Varied generic fallbacks
     import random
     rng = random.Random(g1 + g2 + aci_turu)
@@ -3451,6 +3910,23 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
         f"{g1} ile {g2} arasında bir çekim-itiş dinamiği var. Yaklaştıkça uzaklaşıyor, uzaklaştıkça özlüyorsunuz. Bu döngüyü kırmak için her iki enerjiyi de kucaklayacak bir orta yol bulun.",
         f"{g1} ve {g2} arasındaki karşıtlık, bir ilişkide veya durumda denge arayışınızı simgeliyor. Siyah-beyaz düşünmek yerine gri alanları keşfedin. Gerçek çözüm, ikisinin de ötesinde.",
     ]
+    generic_kare_en = [
+        f"The square between {g1} and {g2} creates tension between the two. Instead of suppressing this energy, listen to what each is telling you. One does not have to destroy the other.",
+        f"This demanding aspect between {g1} and {g2} asks you to question a habit. Where the two conflict actually lies your growth opportunity. Look closely at what disturbs you.",
+        f"This square is a test for harmonizing the energies of {g1} and {g2}. You do not have to choose one; you can embrace both. What matters is finding the balance between them.",
+        f"The tension between {g1} and {g2} says something inside you must change. Listen to this discomfort. It may be time to release old habits.",
+        f"The square between {g1} and {g2} pushes you beyond your comfort zone. This is a demanding yet deeply instructive cycle. Try channeling this tension into a creative project.",
+    ]
+    generic_karsit_en = [
+        f"The opposition between {g1} and {g2} makes you swing between two separate poles. To find a point of balance, learn to stand at equal distance from both sides.",
+        f"This opposition between {g1} and {g2} points to a mechanism of projection. What you see in front of you may be a part of yourself you do not accept.",
+        f"This opposing aspect can make you feel forced to choose a side in the realms of {g1} and {g2}. Yet the real matter is finding a way to keep both areas in your life.",
+        f"There is an attraction-repulsion dynamic between {g1} and {g2}. The closer you get, the further you drift; the further you drift, the more you long. To break this cycle, find a middle path that embraces both energies.",
+        f"The opposition between {g1} and {g2} symbolizes your search for balance in a relationship or situation. Instead of black-and-white thinking, explore the gray areas. The real solution lies beyond both.",
+    ]
+    if _EN:
+        generic_kare = generic_kare_en
+        generic_karsit = generic_karsit_en
     if aci_turu == "Kare":
         return rng.choice(generic_kare)
     elif aci_turu == "Karşıt":
@@ -3459,8 +3935,10 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
 
 def _natal_sifa_receteleri(motor):
     """Expanded healing prescriptions for negative aspects + fallen/detriment planets."""
+    _EN = _i18n_get_lang() == "en"
     try:
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+        BURCLAR_EN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]
 
         jd = motor.get_natal_julian_day("p1")
         cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
@@ -3492,6 +3970,18 @@ def _natal_sifa_receteleri(motor):
             "Neptün": {"Başak": "Maneviyatınızı pratik bir temele oturtun. Meditasyonu günlük rutininize ekleyin. Kristaller (ametist, lapis lazuli) ve tütsü odaklanmanıza yardımcı olur.", "Kova": "Hayallerinizi gerçekleştirmek için bir topluluk bulun. İdealist enerjinizi pratik projelere dönüştürmek sizi topraklayacak."},
             "Plüton": {"Başak": "Kontrol ihtiyacınızı bırakmak en büyük dönüşümünüz olacak. Detaylara takılmak yerine büyük resme odaklanın. Derin nefes çalışmaları dönüşümü kolaylaştırır.", "Boğa": "Sahiplenme ve kontrol dürtülerinizi fark edin. Bir şeyleri bırakmak, kaybetmek korkunuzla yüzleşin. Bağışlama ve şükür pratikleri dönüşümü hızlandırır."},
         }
+        SAGALTIM_TEKNIKLERI_EN = {
+            "Güneş": {"Terazi": "Learn to value yourself. Notice your need for approval and let your inner light shine without waiting for external validation. Sun salutations (Surya Namaskar) and self-confidence affirmations.", "Kova": "Embrace your uniqueness, but do not completely cut off from community. Find ways to share your unique gifts with others. Meditation and community work."},
+            "Ay": {"Akrep": "Channel your emotional intensity into creative fields. Journaling, writing your feelings and expressing through art will do you good. Spend time near water.", "Oğlak": "You struggle to express your emotions. Set aside ten minutes each day to turn inward and show yourself compassion. Herbal teas and warm baths are soothing."},
+            "Merkür": {"Balık": "Your thoughts may feel scattered. Daily writing practice and mind maps will help you focus. Try working in a quiet environment.", "Yay": "Do more research before sharing your ideas. Paying attention to details and listening patiently will make you a more effective communicator."},
+            "Venüs": {"Başak": "Stop searching for perfect love. Accepting small flaws and developing realistic expectations will improve your relationships. Buy yourself a flower or create a beautiful environment.", "Akrep": "Notice your possessive and jealous tendencies in relationships. Do trust exercises and give your partner space. Dancing dissolves emotional blockages."},
+            "Mars": {"Boğa": "Instead of suppressing your anger, express it healthily through physical activity. Grounding exercises and nature walks will balance your energy.", "Terazi": "Avoid passive-aggressive behavior. Learn to express your needs clearly and kindly. Yoga and breathing work help with anger management."},
+            "Jüpiter": {"Oğlak": "Create a disciplined plan to realize your big dreams. Do abundance affirmations and keep a gratitude journal.", "Başak": "Do not let perfectionism keep you from the big picture. Learn to tolerate risk and celebrate every small success."},
+            "Satürn": {"Yengeç": "Your need for emotional security can conflict with your responsibilities. Facing your family history and becoming emotionally stronger will bring you freedom.", "Koç": "Patience is your greatest lesson. Instead of expecting quick results, trust the process. Bone broth, calcium supplements and a regular routine do you good."},
+            "Uranüs": {"Boğa": "Instead of resisting change, open up to innovation in small steps. Making small changes in your routine will open the door to great transformation.", "Aslan": "Do not fear expressing your uniqueness. Follow sudden inspiration in creative projects. Electric blue and purple raise your vibration."},
+            "Neptün": {"Başak": "Ground your spirituality in a practical foundation. Add meditation to your daily routine. Crystals (amethyst, lapis lazuli) and incense help you focus.", "Kova": "Find a community to realize your dreams. Turning your idealistic energy into practical projects will ground you."},
+            "Plüton": {"Başak": "Letting go of your need for control will be your greatest transformation. Instead of getting stuck on details, focus on the big picture. Deep breathing exercises ease transformation.", "Boğa": "Notice your possessive and controlling impulses. Face your fear of letting go and losing. Forgiveness and gratitude practices accelerate transformation."},
+        }
 
         receteler = []
         # Hard aspects
@@ -3506,25 +3996,44 @@ def _natal_sifa_receteleri(motor):
                     if abs(fark - aci_dk) <= orb_max and fark >= 1:
                         sifa = _olumsuz_aci_sifasi(g1, g2, aci_ad)
                         if sifa:
-                            receteler.append(f"🔴 {g1} {aci_ad} {g2}: {sifa}")
+                            if _EN:
+                                aci_label = "Opposition" if aci_ad == "Karşıt" else "Square"
+                            else:
+                                aci_label = aci_ad
+                            receteler.append(f"🔴 {g1} {aci_label} {g2}: {sifa}")
                         break
 
         # Fall / detriment remedies
+        diki = SAGALTIM_TEKNIKLERI_EN if _EN else SAGALTIM_TEKNIKLERI
+        fark_tr = "Awareness and conscious work are needed." if _EN else "Farkındalık ve bilinçli çalışma gerekiyor."
         for gez, burc in gez_poz.items():
             if gez in DUSUK_ZARAR:
                 dusuk, zarar = DUSUK_ZARAR[gez]
                 if burc["burc"] == zarar:
-                    teknik = SAGALTIM_TEKNIKLERI.get(gez, {}).get(zarar, "Farkındalık ve bilinçli çalışma gerekiyor.")
-                    receteler.append(f"🟠 {gez} Zarar ({zarar}): {teknik}")
+                    teknik = diki.get(gez, {}).get(zarar, fark_tr)
+                    if _EN:
+                        zarar_label = BURCLAR_EN[BURCLAR.index(zarar)]
+                        receteler.append(f"🟠 {gez} Detriment ({zarar_label}): {teknik}")
+                    else:
+                        receteler.append(f"🟠 {gez} Zarar ({zarar}): {teknik}")
                 elif burc["burc"] == dusuk:
-                    teknik = SAGALTIM_TEKNIKLERI.get(gez, {}).get(dusuk, "Farkındalık ve bilinçli çalışma gerekiyor.")
-                    receteler.append(f"🟡 {gez} Düşük ({dusuk}): {teknik}")
+                    teknik = diki.get(gez, {}).get(dusuk, fark_tr)
+                    if _EN:
+                        dusuk_label = BURCLAR_EN[BURCLAR.index(dusuk)]
+                        receteler.append(f"🟡 {gez} Fall ({dusuk_label}): {teknik}")
+                    else:
+                        receteler.append(f"🟡 {gez} Düşük ({dusuk}): {teknik}")
 
         if not receteler:
-            receteler.append("Haritanızda belirgin bir zorlu açı veya zarar/düşük pozisyonu bulunmuyor. Enerjiniz doğal akışında.")
+            if _EN:
+                receteler.append("Your chart does not feature a prominent hard aspect or fall/detriment placement. Your energy is flowing naturally.")
+            else:
+                receteler.append("Haritanızda belirgin bir zorlu açı veya zarar/düşük pozisyonu bulunmuyor. Enerjiniz doğal akışında.")
         return receteler
     except Exception as e:
         import traceback; traceback.print_exc()
+        if _EN:
+            return [f"Healing prescriptions could not be prepared: {e}"]
         return [f"Şifa reçeteleri hazırlanamadı: {e}"]
 
 def _collect_natal_data(motor):

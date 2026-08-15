@@ -2,7 +2,7 @@
 import os
 import importlib.util as _iu
 
-from .i18n import LangDict, set_lang, get_lang
+from .i18n import LangDict, LangList, set_lang, get_lang
 
 _FAST_RENKLER = {
     "birincil": "#B8A9C9",    # lavender
@@ -106,6 +106,138 @@ fbst_retrolar_ebeveyn = {
     "Lilith": "📝 <b>[Karmik Retro Mührü]:</b> <i>Ebeveynlikte bastırılmış vahşilik! Toplumsal beklentilerin dışında, çocuğunuza en otantik ve sınırsız sevginizi gösterme korkunuzla yüzleşme zamanı.</i>"
 }
 
+
+
+# ── INGILIZCE (EN) surumler ──
+# Ayni anahtarlar, dogal ve akici Ingilizce ceviriler.
+_EN_fbst_yukselenler = {
+    "Koc": "You step out into the world with a bold, initiative-taking and pioneering display. You give love's passion and its power to act concrete form through victories won in the world.",
+    "Boga": "You step out into the world with an unshakable, calming and trustworthy display. You build the roots of the relationship in the world on lasting material security and loyalty.",
+    "Ikizler": "You step out into the world with a mentally harmonious, lively and cheerful display. You give that sweet curiosity which opens each other's horizons concrete form in the world by building networks of knowledge and communication.",
+    "Yengec": "You step out into the world with a protective, tender and embracing display. You show that deep sense of belonging in your love in the world by building an unshakable spiritual home and a warm haven.",
+    "Aslan": "You step out into the world with a radiant, generous and noble display. You crown the magnificent glory of your love in the world with creativity and the power to lead.",
+    "Basak": "You step out into the world with a flawlessly functioning, refined and analytical display. You give the healing tenderness you devote to each other concrete form in the world through practical order and impeccable service.",
+    "Terazi": "You step out into the world with the display of grace and harmony. You give the fairytale balance of love concrete form in the world through absolute fairness, diplomacy and perfect aesthetics.",
+    "Akrep": "You step out into the world with an intensely reserved, deep and mysterious display. You reflect the hypnotic passion of your love in the world by establishing a transforming and unshakable center of power far from superficiality.",
+    "Yay": "You step out into the world with an adventurous, boundaryless and optimistic display. You give the exuberant freedom of love concrete form in the world by exploring distant horizons and building a shared vision.",
+    "Oglak": "You step out into the world with a dignified, authoritative and timeless display. You show the eternal trust that no storm can shake in the world by building social standing and an indestructible fortress.",
+    "Kova": "You step out into the world with a rule-breaking, convention-shattering and electric display. You give the rebellious nature of your love concrete form in the world through futuristic ideals and collective projects.",
+    "Balik": "You step out into the world with a mystical, compassionate display that seems not to belong to this dimension. You give the unconditional surrender of your love concrete form in the world through divine healing and artistic creation."
+}
+
+_EN_fbst_retrolar = {
+    "Merkür": "📝 <b>[Karmic Retro Seal]:</b> <i>Mental turning inward! You carry unsaid words from past karmic lifetimes. In this relationship, communication will be resolved not through outward talk but through telepathic and deeply intuitive understanding.</i>",
+    "Venüs": "📝 <b>[Karmic Retro Seal]:</b> <i>A test of self-worth! The energy of love has withdrawn from outward display and hidden in the deepest recesses of the soul. You carry an unfinished love contract with your partner from the past; now you have come to heal it.</i>",
+    "Mars": "📝 <b>[Karmic Retro Seal]:</b> <i>Internalizing action! Anger and passion have turned into an inner power instead of exploding outward. You are being tested to transform past misuse of force or passive-aggressive energies into love within this relationship.</i>",
+    "Jüpiter": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner wisdom! It is time to reject the world's moral and religious rules and create your own spiritual philosophy. This relationship will help you find abundance within yourself rather than seeking luck outside.</i>",
+    "Satürn": "📝 <b>[Karmic Retro Seal]:</b> <i>Heavy karmic debt! You have an unfinished test concerning authority figures and responsibilities from past lives. You must set the rules of the relationship not by the world's demands but by your own unshakable inner authority.</i>",
+    "Uranüs": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner revolution! Your rebellious energy will work not against society but against the chains within your own inner world. You are both secret anarchists who will liberate each other's souls within this bond.</i>",
+    "Neptün": "📝 <b>[Karmic Retro Seal]:</b> <i>Hidden illusions! Your spiritual perceptions are wide open, yet you risk falling into victim psychology. Your dreams and intuitions will guide you; trust the divine voice within rather than the noise of the outer world.</i>",
+    "Plüton": "📝 <b>[Karmic Retro Seal]:</b> <i>Underground alchemy! Power struggles and the desire for manipulation feed on the deepest buried fears. This relationship will confront you with your greatest psychological weaknesses and quietly rebirth you from your own ashes.</i>",
+    "Chiron": "📝 <b>[Karmic Retro Seal]:</b> <i>The ancient wound! Healing energy must turn toward yourself before it reaches outward. You cannot heal your partner before healing yourself. This bond mirrors the most hidden pains of the soul and becomes their balm.</i>",
+    "Juno": "📝 <b>[Karmic Retro Seal]:</b> <i>The karmic partner contract! An unfinished marriage or loyalty vow from past lives returns to the table. You will break the superficial rules of commitment and test spiritual loyalty at its deepest level.</i>",
+    "Ceres": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner nourishment! While expecting tenderness from your partner, you are in a special karmic cycle of learning to be self-sufficient and to nourish your own soul.</i>",
+    "Lilith": "📝 <b>[Karmic Retro Seal]:</b> <i>The retreat of the shadow! Suppressed taboos, sexuality and untamed wild energy are internalized not as surface experience but as the darkest and most fascinating mystery of the relationship.</i>"
+}
+
+_EN_fbst_yukselenler_ebeveyn = {
+    "Koc": "You step out into the world with a bold, protective parent's display. You embody an energy that takes initiative in parenting and defies the world to protect your child.",
+    "Boga": "You step out into the world with an unshakable, reassuring and secure parent's display. You build a deep-rooted home that provides your child with material and emotional security.",
+    "Ikizler": "You step out into the world with a communication-focused, cheerful and curious parent's display. You become a parent who shares knowledge and discovers everything together with your child.",
+    "Yengec": "You step out into the world with a protective, tender and embracing parent's display. You build an unshakable emotional haven for your child.",
+    "Aslan": "You step out into the world with a radiant, generous and proud parent's display. You become a parent who puts your child's talents on stage and takes pride in them.",
+    "Basak": "You step out into the world with a perfectly organized, practical and detail-oriented parent's display. You create a system that meets your child's every need to the millimeter.",
+    "Terazi": "You step out into the world with an elegant, balanced and fair parent's display. You become a parent who builds a just relationship with your child, always seeking balance.",
+    "Akrep": "You step out into the world with a deep, mysterious and protective parent's display. You practice an occult form of parenting, alert to every danger for your child.",
+    "Yay": "You step out into the world with an adventurous, optimistic and freedom-loving parent's display. You become a parent who explores life together with your child and instills a broad vision.",
+    "Oglak": "You step out into the world with a dignified, disciplined and responsible parent's display. You become a parent who gives your child structure and discipline, preparing them for life.",
+    "Kova": "You step out into the world with an innovative, freedom-loving and unconventional parent's display. You become a parent who never forces your child into molds and respects their individuality.",
+    "Balik": "You step out into the world with a mystical, compassionate and intuitive parent's display. You become a parent who forms a spiritual bond with your child and focuses on their spiritual growth."
+}
+
+_EN_fbst_yukselenler_cocuk = {
+    "Koc": "The child comes into the world with a bold, energetic and pioneering energy. They have a curious, exploratory nature that draws its own path.",
+    "Boga": "The child comes into the world with a calm, peaceful and reliable energy. They cling tightly to their loved ones and show their finest side when they feel safe.",
+    "Ikizler": "The child comes into the world with a cheerful, curious and communicative energy. They love asking questions, learn quickly and share everything they discover.",
+    "Yengec": "The child comes into the world with a tender, protective and intuitive energy. They are deeply attached to their family and the warmth of home.",
+    "Aslan": "The child comes into the world with a bright, generous and joyful energy. They love attention and appreciation, standing out through their creativity.",
+    "Basak": "The child comes into the world with an orderly, meticulous and helpful energy. They care about details and are inclined toward learning and practical solutions.",
+    "Terazi": "The child comes into the world with a harmonious, graceful and fair energy. They seek balance and peace in their friendships.",
+    "Akrep": "The child comes into the world with a deep, mysterious and powerful energy. They feel their emotions intensely and remain loyal to those they bond with.",
+    "Yay": "The child comes into the world with an adventurous, optimistic and freedom-loving energy. They love exploring, learning new places and new ideas.",
+    "Oglak": "The child comes into the world with a mature, serious and responsible energy. They focus on their goals and are disciplined and determined.",
+    "Kova": "The child comes into the world with an innovative, original and independent energy. They never fit into molds and freely defend their own ideas.",
+    "Balik": "The child comes into the world with a dreamy, compassionate and intuitive energy. Their inner world is rich; they are deeply attached to art and imagination."
+}
+
+_EN_fbst_retrolar_cocuk = {
+    "Merkür": "📝 <b>[Karmic Retro Seal]:</b> <i>Mental turning inward! The child's world of thought is deep and intuitive rather than outward; they speak more through what they feel than what they say.</i>",
+    "Venüs": "📝 <b>[Karmic Retro Seal]:</b> <i>A test of self-worth! The energy of love is turned inward; the child experiences love not through display but through deep and loyal bonds. They carry a lesson of love from the past.</i>",
+    "Mars": "📝 <b>[Karmic Retro Seal]:</b> <i>Internalizing action! Anger and energy turn into inner strength instead of exploding outward. The child learns to use their power with patience rather than anger.</i>",
+    "Jüpiter": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner wisdom! The child values the belief and philosophy that come from within rather than patterns imposed from outside. Growth happens as they discover their own inner world.</i>",
+    "Satürn": "📝 <b>[Karmic Retro Seal]:</b> <i>Heavy karmic debt! A test carried from the past concerning authority figures and responsibilities. The child matures by learning rules from within themselves rather than from outside.</i>",
+    "Uranüs": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner revolution! Rebellious energy works against patterns in their inner world rather than outward. The child finds freedom by discovering it from within, not by seeking outside permission.</i>",
+    "Neptün": "📝 <b>[Karmic Retro Seal]:</b> <i>Hidden illusions! Their intuitions are wide open, yet there may be a tendency to escape into fantasy. Dreams and the inner voice show the child the truest path.</i>",
+    "Plüton": "📝 <b>[Karmic Retro Seal]:</b> <i>Underground alchemy! Power struggles and deep fears are hidden at the core. The child transforms quietly and powerfully as they confront their inner world.</i>",
+    "Chiron": "📝 <b>[Karmic Retro Seal]:</b> <i>The ancient wound! Healing must first turn toward the self. As the child heals themselves, they also heal those around them; their deepest wound becomes the source of their greatest wisdom.</i>",
+    "Juno": "📝 <b>[Karmic Retro Seal]:</b> <i>The karmic partner contract! A vow of commitment carried from the past. The child experiences loyalty not through superficial rules but through a deep devotion born within.</i>",
+    "Ceres": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner nourishment! A special karmic cycle in which the child must learn to be self-sufficient before expecting tenderness. As they learn to nourish themselves, they receive love in full measure.</i>",
+    "Lilith": "📝 <b>[Karmic Retro Seal]:</b> <i>The retreat of the shadow! Suppressed emotions and a free spirit turn inward rather than outward. The child finds their authentic identity as they accept their darker sides.</i>"
+}
+
+_EN_fbst_retrolar_ebeveyn = {
+    "Merkür": "📝 <b>[Karmic Retro Seal]:</b> <i>Communication turns inward in parenting! The bond between you and your child goes beyond words; you are expected to connect through intuitive and telepathic understanding.</i>",
+    "Venüs": "📝 <b>[Karmic Retro Seal]:</b> <i>Relearning self-worth and the language of love! The way you show love to your child is deeply shaped by your own childhood experiences.</i>",
+    "Mars": "📝 <b>[Karmic Retro Seal]:</b> <i>Internalizing the protective instinct! Your balance of anger and patience is tested; a cycle in which you must find inner equilibrium in the power dynamic with your child.</i>",
+    "Jüpiter": "📝 <b>[Karmic Retro Seal]:</b> <i>Rebuilding the philosophy of teaching! The values and beliefs you pass on to your child must pass through a deep inquiry within yourself.</i>",
+    "Satürn": "📝 <b>[Karmic Retro Seal]:</b> <i>Karmic debt in parenting discipline! A test in which you must restructure the legacy you received from your own parents around setting limits and establishing authority.</i>",
+    "Uranüs": "📝 <b>[Karmic Retro Seal]:</b> <i>Inner parenting revolution! A karmic cycle in which you must overcome your own dependencies and fears while supporting your child's freedom.</i>",
+    "Neptün": "📝 <b>[Karmic Retro Seal]:</b> <i>Illusion and the ideal parent! Your dream of being the perfect mother or father must be balanced with realistic limits. Your intuitions are strong, but clarity is needed.</i>",
+    "Plüton": "📝 <b>[Karmic Retro Seal]:</b> <i>Parenting power transformation! As your child grows, your own identity changes deeply; a test of letting go of control and being reborn.</i>",
+    "Chiron": "📝 <b>[Karmic Retro Seal]:</b> <i>The generational wound! You cannot fully heal your child without healing the wounds you received from your own parents. An awareness of the generational healing chain.</i>",
+    "Juno": "📝 <b>[Karmic Retro Seal]:</b> <i>The parenting loyalty contract! The unconditional loyalty you promised your child is tested against your own inner conflicts.</i>",
+    "Ceres": "📝 <b>[Karmic Retro Seal]:</b> <i>The balance of nourishing and letting go! A karmic cycle in which you must learn to nourish your child while simultaneously allowing them to become independent.</i>",
+    "Lilith": "📝 <b>[Karmic Retro Seal]:</b> <i>Suppressed wildness in parenting! The time to face your fear of showing your most authentic and boundless love to your child, beyond society's expectations.</i>"
+}
+
+_EN_KRIZ_KUTUPHANESI_EBEVEYN = [
+    {
+        "baslik": "The First Awakening: The Secret of the Body (0-6 Months)",
+        "yorum": "With the birth, both you and your baby have undergone a massive transformation. Sleepless nights, feeding routines and the first steps of the parental identity are the fundamental tests of this period. This crisis is the first door that turns you from being an individual into a mother or father."
+    },
+    {
+        "baslik": "The Root Bond: The Seeds of Separation (6 Months - 2 Years)",
+        "yorum": "As your baby begins to walk, talk and explore the world, it is time to build secure attachment beyond the physical bond between you. This is the home of the first 'no's and the first separations."
+    },
+    {
+        "baslik": "The Test of Egocentrism (2-4 Years)",
+        "yorum": "Dealing with a child who says 'No!', tests boundaries and confronts toilet training is the first great test of parental patience. The art of setting limits is learned here."
+    },
+    {
+        "baslik": "Reflection in the Social Mirror (4-7 Years)",
+        "yorum": "Your child starts school, makes friends and discovers the rules of the world beyond you. It is time to support their social abilities while confronting your own parental anxieties."
+    },
+    {
+        "baslik": "The Gates of the Temple of Knowledge (7-12 Years)",
+        "yorum": "Academic pressure, the discovery of talents and the trap of comparison are the tests of this period. This is the critical period when you must balance social expectations while allowing your child to find their own path."
+    },
+    {
+        "baslik": "The Storm of Adolescence: Identity Crisis (12-16 Years)",
+        "yorum": "Hormonal changes, battles for independence and the search for identity are the core pillars of this period. Your child now wants to be an individual; you still want to protect. This conflict is the most critical test of the parent-child relationship."
+    },
+    {
+        "baslik": "The Separation Protocol (16-18 Years)",
+        "yorum": "University, leaving home and the first steps of independent life are taken in this period. The time has come to loosen the bond you have built for years and to let go."
+    },
+    {
+        "baslik": "Reflection: Seeing Yourself (18-21 Years)",
+        "yorum": "Your now-adult child begins to see you as an individual. It is a process of recognizing parental mistakes, forgiving, and rebalancing the relationship."
+    },
+    {
+        "baslik": "The Gate of Equality: Adult Friendship (21+ Years)",
+        "yorum": "The parent-child relationship transforms from hierarchy into respect and friendship between two adults. This is the time to harvest the sweetest reward of parenting."
+    }
+]
 
 
 KRIZ_KUTUPHANESI_EBEVEYN = [
@@ -583,19 +715,29 @@ def _load_i18n_dict(filename):
     """TR+EN birlestiren, aktife gore ceviri yapan LangDict yukler."""
     return LangDict(_load_ext_dict(filename), _load_en_dict(filename))
 
-fbst_sabian_ebeveyn = _load_ext_dict("fbst_sabian_ebeveyn.py")
-fbst_sabit_yildizlar_ebeveyn = _load_ext_dict("fbst_sabit_yildizlar_ebeveyn.py")
-fbst_sabit_yildizlar_ask = _load_ext_dict("fbst_sabit_yildizlar_ask.py")
-ASTEROID_SINASTRI_YORUMLARI_EBEVEYN = _load_ext_dict("ASTEROID_SINASTRI_YORUMLARI_EBEVEYN.py")
-FBST_GEZEGEN_EV_COCUK = _load_ext_dict("FBST_GEZEGEN_EV_COCUK.py")
-FBST_GEZEGEN_EV_EBEVEYN = _load_ext_dict("FBST_GEZEGEN_EV_EBEVEYN.py")
-FBST_YORUMLAR_EBEVEYN = _load_ext_dict("FBST_YORUMLAR_EBEVEYN.py")
-FBST_GELISIM_DONEMleri_EBEVEYN = _load_ext_dict("FBST_GELISIM_DONEMleri_EBEVEYN.py")
-FBST_POTANSIYEL_EBEVEYN = _load_ext_dict("FBST_POTANSIYEL_EBEVEYN.py")
-FBST_MESLEK_EBEVEYN = _load_ext_dict("FBST_MESLEK_EBEVEYN.py")
+fbst_sabian_ebeveyn = _load_i18n_dict("fbst_sabian_ebeveyn.py")
+fbst_sabit_yildizlar_ebeveyn = _load_i18n_dict("fbst_sabit_yildizlar_ebeveyn.py")
+fbst_sabit_yildizlar_ask = _load_i18n_dict("fbst_sabit_yildizlar_ask.py")
+ASTEROID_SINASTRI_YORUMLARI_EBEVEYN = _load_i18n_dict("ASTEROID_SINASTRI_YORUMLARI_EBEVEYN.py")
+FBST_GEZEGEN_EV_COCUK = _load_i18n_dict("FBST_GEZEGEN_EV_COCUK.py")
+FBST_GEZEGEN_EV_EBEVEYN = _load_i18n_dict("FBST_GEZEGEN_EV_EBEVEYN.py")
+FBST_YORUMLAR_EBEVEYN = _load_i18n_dict("FBST_YORUMLAR_EBEVEYN.py")
+FBST_GELISIM_DONEMleri_EBEVEYN = _load_i18n_dict("FBST_GELISIM_DONEMleri_EBEVEYN.py")
+FBST_POTANSIYEL_EBEVEYN = _load_i18n_dict("FBST_POTANSIYEL_EBEVEYN.py")
+FBST_MESLEK_EBEVEYN = _load_i18n_dict("FBST_MESLEK_EBEVEYN.py")
 FBST_YORUMLAR_BURC = _load_i18n_dict("FBST_YORUMLAR_BURC.py")
-FBST_YORUMLAR_EV = _load_ext_dict("FBST_YORUMLAR_EV.py")
-FBST_SINASTRI_OZEL = _load_ext_dict("FBST_SINASTRI_OZEL.py")
+FBST_YORUMLAR_EV = _load_i18n_dict("FBST_YORUMLAR_EV.py")
+FBST_SINASTRI_OZEL = _load_i18n_dict("FBST_SINASTRI_OZEL.py")
+
+# ── Inline sozluklerin EN surumleriyle baglanmasi ──
+fbst_yukselenler = LangDict(fbst_yukselenler, _EN_fbst_yukselenler)
+fbst_retrolar = LangDict(fbst_retrolar, _EN_fbst_retrolar)
+fbst_yukselenler_ebeveyn = LangDict(fbst_yukselenler_ebeveyn, _EN_fbst_yukselenler_ebeveyn)
+fbst_yukselenler_cocuk = LangDict(fbst_yukselenler_cocuk, _EN_fbst_yukselenler_cocuk)
+fbst_retrolar_cocuk = LangDict(fbst_retrolar_cocuk, _EN_fbst_retrolar_cocuk)
+fbst_retrolar_ebeveyn = LangDict(fbst_retrolar_ebeveyn, _EN_fbst_retrolar_ebeveyn)
+KRIZ_KUTUPHANESI_EBEVEYN = LangList(KRIZ_KUTUPHANESI_EBEVEYN, _EN_KRIZ_KUTUPHANESI_EBEVEYN)
+fbst_sabian = LangDict(fbst_sabian, _load_en_dict("fbst_sabian.py"))
 
 def _load_all_ext_dicts(filename):
     """Dış Python dosyasındaki TÜM dict değişkenlerini tek bir dict olarak yükler."""
@@ -1959,5 +2101,7 @@ fbst_sabit_yildizlar = {
         }
     },
 }
+
+fbst_sabit_yildizlar = LangDict(fbst_sabit_yildizlar, _load_en_dict("fbst_sabit_yildizlar.py"))
 
 

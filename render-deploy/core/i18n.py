@@ -70,6 +70,29 @@ class LangDict(dict):
         return dict.get(self, key, default)
 
 
+class LangList(list):
+    """TR listesinin EN kopyasini 'en' aktifken donduren liste proxy.
+
+    Elemanlar esit sayida ve ayni sirada olmalidir; EN'de bos eleman TR'ye duser.
+    """
+
+    def __init__(self, data, en_data=None):
+        super().__init__(data or [])
+        self._en = en_data or []
+
+    def __getitem__(self, index):
+        item = list.__getitem__(self, index)
+        if get_lang() == "en" and index < len(self._en):
+            en_item = self._en[index]
+            if en_item:
+                return en_item
+        return item
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
+
+
 class _Missing:
     def __repr__(self):
         return "<missing>"

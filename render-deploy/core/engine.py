@@ -2832,6 +2832,7 @@ class FBST_Engine:
         Çoklu Bonus:     Her ek açı için +1.5 puan
         MC Bonus:        MC burcu + yöneticisi + sabit yıldızlar
         """
+        _EN = _core_get_lang() == "en"
         if not FBST_POTANSIYEL_EBEVEYN or not FBST_MESLEK_EBEVEYN:
             return []
 
@@ -2958,6 +2959,25 @@ class FBST_Engine:
             "Girişimcilik":         ["İş Geliştirme", "Risk", "Yaratıcı", "Teknoloji", "Modern", "Yatırım", "Pazarlama"],
             "Akademik/Araştırma":   ["Bilimsel", "Araştırma", "Veri", "Yayın", "Laboratuvar", "Bilim İletişimi", "Proje Yönetimi"],
             "Yenilikçilik":         ["Teknoloji", "Yenilik", "Modern", "Dijital", "İnovasyon", "Startup"],
+        }
+
+        KATEGORI_ETIKETLERI_EN = {
+            "Sanatsal Yetenek":     ["Creative", "Aesthetic", "Visual", "Performance", "Literature", "Music", "Design", "Film"],
+            "Zihinsel Yetenek":     ["Analytical", "Planning", "Mathematics", "Logic", "Data", "Scientific", "Statistics", "Engineering"],
+            "Liderlik":             ["Management", "Influence", "Corporate", "Decision Making", "Leadership"],
+            "Yardımseverlik":       ["People-Oriented", "Social", "Support", "Community", "Volunteer", "Civil Society", "Charity"],
+            "Bilgelik":             ["Academic", "Teaching", "Counseling", "Philosophy", "Mentoring"],
+            "İletişim":             ["Media", "Writing", "Presentation", "Relationships", "Branding", "Public Relations", "Digital Media"],
+            "Maneviyat":            ["People-Oriented", "Counseling", "Therapy", "Coaching", "Mental Health", "Guidance", "Psychology"],
+            "Sağlık/Tıp":           ["People-Oriented", "Scientific", "Health", "Care", "Treatment", "Research", "Surgery", "Nursing", "Pharmacy"],
+            "Spor":                 ["Physical", "Performance", "Training", "Health", "Teamwork", "Sports Science", "Physiotherapy"],
+            "Zanaatkarlık":         ["Technical", "Hands-on Skill", "Production", "Expertise", "Construction", "Technology", "Mechatronics", "Automation"],
+            "Askeriye":             ["Discipline", "Strategy", "Security", "Protection", "Logistics", "Intelligence"],
+            "Hukuk/Politika":       ["Legal", "Regulation", "Public Sector", "Ethics", "Authority", "Legislation", "Diplomacy", "Public Administration"],
+            "Stratejik Zeka":       ["Strategy", "Analytical", "Intelligence", "Research", "Planning", "Risk Management"],
+            "Girişimcilik":         ["Business Development", "Risk", "Creative", "Technology", "Modern", "Investment", "Marketing"],
+            "Akademik/Araştırma":   ["Scientific", "Research", "Data", "Publishing", "Laboratory", "Science Communication", "Project Management"],
+            "Yenilikçilik":         ["Technology", "Innovation", "Modern", "Digital", "Innovation", "Startup"],
         }
 
         # ═══ GEZEGEN BURÇ KURALLARI (303 öğrenci + 50 ünlü verisinden) ═══
@@ -3320,7 +3340,7 @@ class FBST_Engine:
                     for k, v in kurallar_burc.items():
                         if k in raw:
                             raw[k] += v * g_agirlik
-                            detay_bilgi[k].append(f"{g_isim} {burc} (Ev{ev})")
+                            detay_bilgi[k].append(f"{g_isim} {burc} ({'House' if _EN else 'Ev'}{ev})")
 
                     if ev in (2, 6, 10):
                         kurallar_ev = GEZEGEN_EV_KURALLARI.get((g_isim, ev), {})
@@ -3462,7 +3482,7 @@ class FBST_Engine:
                         ek = min(puan, 5.0 - pot_kat_puanlari[alan])
                         raw[alan] += ek
                         pot_kat_puanlari[alan] += ek
-                        detay_bilgi[alan].append(f"Aci:{p.get('aci','')} {aci_turu}")
+                        detay_bilgi[alan].append(f"{'Aspect:' if _EN else 'Aci:'}{p.get('aci','')} {aci_turu}")
 
         # ═══ ÇAPRAZ BONUS: Liderlik ↔ Hukuk/Politika ═══
         ldr = raw["Liderlik"]
@@ -3573,7 +3593,7 @@ class FBST_Engine:
                     for k, v in yon_kurallar.items():
                         if k in raw:
                             raw[k] += v * agirlik * 0.2
-                            detay_bilgi[k].append(f"{ev_no}.Ev Yön. {yonetici} {yon_burc} (Ev{yon_ev})")
+                            detay_bilgi[k].append(f"{'House' if _EN else 'Ev'}{ev_no}. {'Ruler' if _EN else 'Ev Yön.'} {yonetici} {yon_burc} ({'House' if _EN else 'Ev'}{yon_ev})")
                     if yon_ev in EV_KATEGORI:
                         for k, v in EV_KATEGORI[yon_ev].items():
                             if k in raw:
@@ -3632,7 +3652,7 @@ class FBST_Engine:
 
             if secilen_meslekler:
                 # Mesleklere kategori etiketlerini ve modern meslek etiketlerini ekle
-                kategori_etiketleri = KATEGORI_ETIKETLERI.get(alan, [])
+                kategori_etiketleri = KATEGORI_ETIKETLERI_EN.get(alan, []) if _EN else KATEGORI_ETIKETLERI.get(alan, [])
                 for m in secilen_meslekler:
                     m["kategori_etiketleri"] = kategori_etiketleri
                     m["modern_etiketler"] = self._meslek_modern_etiketleri(m["meslek"], alan)
@@ -3650,7 +3670,10 @@ class FBST_Engine:
                     oneri["mc_yonetici"] = mc_bilgisi.get("mc_yonetici", "")
                     yonetici_k = mc_bilgisi.get("yonetici_konum", {})
                     if yonetici_k:
-                        oneri["mc_yonetici_konum"] = f"{yonetici_k.get('burc', '')} {yonetici_k.get('ev', '')}. Ev"
+                        oneri["mc_yonetici_konum"] = (
+                            f"{yonetici_k.get('burc', '')} House {yonetici_k.get('ev', '')}"
+                            if _EN else f"{yonetici_k.get('burc', '')} {yonetici_k.get('ev', '')}. Ev"
+                        )
                 ilgili_yildizlar = []
                 for y in yildiz_bilgisi.get("tum_yildizlar", []):
                     if alan in y.get("meslek_etkileri", {}):
@@ -3666,64 +3689,65 @@ class FBST_Engine:
         Meslek adından modern teknoloji/dijital/yaratıcı etiketleri çıkarır.
         FBST_MESLEK_EBEVEYN'deki mesleklerin isimlerindeki anahtar kelimelerden çıkarım yapar.
         """
+        _EN = _core_get_lang() == "en"
         etiketler = set()
         m = meslek_adi.lower()
 
         # Teknoloji / Yazılım / Dijital
         if any(k in m for k in ["yazılım", "kod", "program", "veri bil", "ai ", "yapay zeka", "sibir", "siber", "teknoloji", "dijital", "web", "mobil", "uygulama", "backend", "frontend", "fullstack", "devops", "cloud", "aws", "azure", "blockchain", "kripto", "teknoloji"]):
-            etiketler.update(["Teknoloji", "Yazılım", "Dijital", "Modern"])
+            etiketler.update(["Technology", "Software", "Digital", "Modern"] if _EN else ["Teknoloji", "Yazılım", "Dijital", "Modern"])
 
         # Bilim / Araştırma
         if any(k in m for k in ["araştır", "bilim", "akademik", "laboratuvar", "fizik", "kimya", "biyoloji", "genetik", "nöro", "matematik", "istatistik", "aktüer", "ekonomist", "analist"]):
-            etiketler.update(["Bilimsel", "Araştırma", "Analitik", "Akademik"])
+            etiketler.update(["Scientific", "Research", "Analytical", "Academic"] if _EN else ["Bilimsel", "Araştırma", "Analitik", "Akademik"])
 
         # Tasarım / Yaratıcı / Görsel
         if any(k in m for k in ["tasarım", "grafik", "ux", "ui", "moda", "iç mekan", "endüstriyel", "animasyon", "vfx", "oyun tasar", "görsel", "illüstrat", "fotoğraf"]):
-            etiketler.update(["Yaratıcı", "Tasarım", "Görsel", "Estetik"])
+            etiketler.update(["Creative", "Design", "Visual", "Aesthetic"] if _EN else ["Yaratıcı", "Tasarım", "Görsel", "Estetik"])
 
         # Medya / İçerik / İletişim
         if any(k in m for k in ["yazar", "içerik", "blog", "influencer", "youtuber", "podcast", "spiker", "sunucu", "gazeteci", "muhabir", "editör", "copywriter", "sosyal medya", "dijital medya", "halkla ilişkiler", "pr ", "marka"]):
-            etiketler.update(["Medya", "İçerik", "İletişim", "Dijital Medya", "Yazarlık"])
+            etiketler.update(["Media", "Content", "Communication", "Digital Media", "Writing"] if _EN else ["Medya", "İçerik", "İletişim", "Dijital Medya", "Yazarlık"])
 
         # Sağlık / Tıp / Bakım
         if any(k in m for k in ["doktor", "hemsire", "ebe", "fizyoterap", "rehabilitasyon", "diyetisyen", "beslenme", "psikolog", "terapist", "danışman", "koç", "psikoterapi", "cerrahi", "tıp", "sağlık", "ağr", "acil", "yoğun bakım", "ameliyat"]):
-            etiketler.update(["Sağlık", "Bakım", "Tedavi", "İnsan Odaklı", "Bilimsel"])
+            etiketler.update(["Health", "Care", "Treatment", "People-Oriented", "Scientific"] if _EN else ["Sağlık", "Bakım", "Tedavi", "İnsan Odaklı", "Bilimsel"])
 
         # Mühendislik / Teknik / Üretim
         if any(k in m for k in ["mühendis", "elektrik", "makine", "inşaat", "mekatronik", "otomasyon", "robotik", "elektronik", "teknisyen", "elektrikçi", "tesisatçı", "kaynakçı", "metal", "boyacı", "dekoratör", "terzi", "dikim", "fırıncı", "pastacı", "aşçı", "gastronomi"]):
-            etiketler.update(["Teknik", "Mühendislik", "Üretim", "Uzmanlık", "El Becerisi"])
+            etiketler.update(["Technical", "Engineering", "Production", "Expertise", "Craftsmanship"] if _EN else ["Teknik", "Mühendislik", "Üretim", "Uzmanlık", "El Becerisi"])
 
         # Eğitim / Öğretim
         if any(k in m for k in ["öğretmen", "eğitimci", "eğitim", "özel eğitim", "rehber", "akademi", "kurs", "eğitmen", "mentor"]):
-            etiketler.update(["Eğitim", "Öğretim", "Mentorluk", "İnsan Odaklı"])
+            etiketler.update(["Education", "Teaching", "Mentoring", "People-Oriented"] if _EN else ["Eğitim", "Öğretim", "Mentorluk", "İnsan Odaklı"])
 
         # Finans / İş / Yönetim
         if any(k in m for k in ["finans", "yatırım", "portföy", "bankacılık", "sigorta", "aktüer", "risk", "yönetici", "ceo", "müdür", "kurucu", "girişimci", "satış", "pazarlama", "e-ticaret", "dijital pazarlama", "growth", "ticaret", "ihracat", "ithalat", "gayrimenkul", "franchise", "zincir"]):
-            etiketler.update(["Finans", "İş Geliştirme", "Yönetim", "Stratejik", "Modern", "Pazarlama"])
+            etiketler.update(["Finance", "Business Development", "Management", "Strategic", "Modern", "Marketing"] if _EN else ["Finans", "İş Geliştirme", "Yönetim", "Stratejik", "Modern", "Pazarlama"])
 
         # Hukuk / Adalet / Kamu
         if any(k in m for k in ["avukat", "hakim", "savcı", "hukuk", "adalet", "mevzuat", "diplomat", "siyaset", "politik", "devlet", "kamu", "etk", "yasal"]):
-            etiketler.update(["Yasal", "Kamu", "Düzenleme", "Etik", "Hakimiyet"])
+            etiketler.update(["Legal", "Public Sector", "Regulation", "Ethics", "Authority"] if _EN else ["Yasal", "Kamu", "Düzenleme", "Etik", "Hakimiyet"])
 
         # Spor / Fiziksel
         if any(k in m for k in ["spor", "antrenör", "koç", "futbol", "basketbol", "tenis", "yüzme", "atletizm", "fitnes", "beden eğitimi", "spor bilim", "spor yönet"]):
-            etiketler.update(["Spor", "Fiziksel", "Performans", "Antrenman", "Takım"])
+            etiketler.update(["Sports", "Physical", "Performance", "Coaching", "Teamwork"] if _EN else ["Spor", "Fiziksel", "Performans", "Antrenman", "Takım"])
 
         # Sanat / Edebiyat / Performans
         if any(k in m for k in ["müzisyen", "müzik", "besteci", "şarkıcı", "enstrüman", "ses", "sanatçı", "resim", "heykel", "oyuncu", "sahne", "dans", "tiyatro", "sinema", "film", "yönetmen", "yapımcı", "senarist", "şair", "edebiyat", "roman", "hikaye"]):
-            etiketler.update(["Sanat", "Yaratıcı", "Performans", "Edebiyat", "Müzik", "Görsel"])
+            etiketler.update(["Art", "Creative", "Performance", "Literature", "Music", "Visual"] if _EN else ["Sanat", "Yaratıcı", "Performans", "Edebiyat", "Müzik", "Görsel"])
 
         # Manevi / Psikoloji / Danışmanlık
         if any(k in m for k in ["meditasyon", "yoga", "mindfulness", "şifa", "enerji", "reiki", "kristal", "şaman", "astrolog", "kader", "din", "ilahiyat", "manevi", "ruhani", "içsel çocuk", "rüya"]):
-            etiketler.update(["Manevi", "Şifa", "Danışmanlık", "Ruh Sağlığı", "Koçluk"])
+            etiketler.update(["Spiritual", "Healing", "Counseling", "Mental Health", "Coaching"] if _EN else ["Manevi", "Şifa", "Danışmanlık", "Ruh Sağlığı", "Koçluk"])
 
         # Güvenlik / Savunma / Askeri
         if any(k in m for k in ["asker", "komutan", "emniyet", "polis", "güvenlik", "istihbarat", "kriz", "acil durum", "savunma"]):
-            etiketler.update(["Güvenlik", "Strateji", "Disiplin", "Koruma", "Liderlik"])
+            etiketler.update(["Security", "Strategy", "Discipline", "Protection", "Leadership"] if _EN else ["Güvenlik", "Strateji", "Disiplin", "Koruma", "Liderlik"])
 
         # Zanaat / Ustalık
         if any(k in m for k in ["kuaför", "berber", "güzellik", "marangoz", "ahşap", "mobilya", "kuyumcu", "saatçi", "taş", "maden", "kuyumculuk"]):
-            etiketler.update(["Zanaat", "El Becerisi", "Estetik", "Üretim", "Uzmanlık"])
+            etiketler.update(["Craft", "Hands-on Skill", "Aesthetic", "Production", "Expertise"] if _EN else ["Zanaat", "El Becerisi", "Estetik", "Üretim", "Uzmanlık"])
 
         return sorted(list(etiketler))
 
@@ -3871,7 +3895,30 @@ class FBST_Engine:
     def karmik_ev_aktarimlari(self, pdf_icin=False):
         j_ileri, j_geri = self.get_julian_dates()
         
-        if self.mod == "ebeveyn_cocuk":
+        if _core_get_lang() == "en":
+            # ── EN: karmik ev muhruleri (es_sevgili + ebeveyn_cocuk) ──
+            ev_muhurleri_EN_es = {
+                "Güneş": {1: "Identity and Self: The person on this vector strengthens the other's identity and sense of self. Together you help each other answer the question 'who am I?'. Your shared stance toward life polishes one another's self-confidence.", 5: "Creative Union: Giving shape to a work of art together, raising a child, or realizing a great dream is your karmic mission. When your creativity merges, the energy that emerges touches everyone around you.", 7: "Karmic Contract: The most tangible form of 'we' — here formality, commitment and a long-term alliance are established. Your karmic choice in choosing a partner is sealed in this house."},
+                "Ay": {4: "Home and Rooting: The soul's warmest, safest refuge is built on this vector. The home you build together is not merely a house but also a harbor that nourishes you emotionally.", 8: "Emotional Underworld: In this house psychological depths, subconscious fears and suppressed emotions surface. Being able to accept even each other's darkest secrets is this relationship's greatest healing space."},
+                "Jüpiter": {2: "Gate of Abundance: The person on this vector directly increases the other's material and spiritual abundance. Together you may experience investments, shared income streams or major financial leaps.", 8: "Shared Enrichment: A partner's inheritance, a joint venture or a shared investment brings karmic growth. Everything you learn together multiplies your spiritual wealth.", 10: "Social Ascension: Together you become a couple honored and inspiring in society. Your career success is the fruit of supporting one another."},
+                "Satürn": {4: "Test of Family Structure: Building a home and becoming a family demands a serious test on this vector. Responsibilities may weigh heavily, but this test lays a solid foundation.", 7: "Karmic Marriage: This union is cosmically approved for formality, marriage and long-term commitment. Though challenges may arise, this bond grows far stronger with time."},
+                "Plüton": {1: "Rebirth of Identity: This person helps the partner completely dismantle an old self and forge a stronger, more settled identity. The transformation is painful yet liberating.", 8: "Rising from the Ashes: This is the great awakening and rebirth that follows the deepest crises and psychological collapses. Standing side by side in each other's darkest hour is this relationship's most sacred practice."},
+                "Venüs": {5: "Passionate Love: Love, romance, sensuality and the joy of living beat at the heart of this union. Every moment you share becomes a work of art woven with affection.", 7: "Gift of Destiny: Harmony, aesthetics and complete alignment in love language — the most precious gift the sky bestows upon this union. The ideal energy for marriage or formal union."},
+                "Mars": {1: "Warrior Spirit: This person instills in the other an extraordinary power of action, courage and perseverance. As you face life's battles together, you become each other's strongest ally.", 10: "Journey to the Summit: Your potential to overcome obstacles together in career, goals and society is exceptionally high. When passion and resolve unite, no peak lies beyond reach."},
+                "Chiron": {4: "Family Healing: Wounds carried from past generations and family roots surface on this vector and await healing. Understanding and mending one another's wounds opens the door to generational healing.", 12: "Healer of the Subconscious: Soul aches that logic cannot solve and words cannot express are quietly healed by the simple presence of this union. Even a silent touch can dress a thousand-year-old wound."}
+            }
+            ev_muhurleri_EN_eb = {
+                "Güneş": {1: "Identity and Self-Development: This year the child's journey of self-discovery accelerates. As a parent, supporting their individual stance guides them to express their own being with strength.", 5: "Creativity and Self-Expression: The child's artistic or creative potential shines in this house. When the parent nurtures this energy, it becomes the key to the child's confident self-expression.", 7: "Relationship and Mutual Respect: The balance and mutual respect between parent and child are tested in this period. As both express their needs, they learn the lesson of 'co-existing'."},
+                "Ay": {4: "Home and Safe Harbor: The child's emotional roots deepen during this period. The secure atmosphere the parent creates lays the foundation for the child's emotional resilience.", 8: "Emotional Transformation: Intense inner shifts unfold in the child's world. The parent's patient and understanding manner allows this transformation to progress healthily."},
+                "Jüpiter": {2: "Building Worth and Self-Confidence: The child's self-belief and awareness of their abilities grow in this period. The parent's appreciation and support are the most nourishing fertilizer for this process.", 8: "Shared Learning and Exchange: Parent and child experience deep learning together. Reading together, watching documentaries or mastering a new skill every day strengthens the spiritual bond.", 10: "Achievement and Recognition: The child's successes in school or social arenas are remarkable. The parent's shared pride and encouraging messages multiply the child's motivation."},
+                "Satürn": {4: "Family Responsibility and Structure: Family rules and boundaries become clear during this period. Understanding the child's need for discipline while building structure is the foundation of long-term trust.", 7: "Mutual Responsibility: Parent and child become aware of their responsibilities toward each other. This is the most intense period of the lesson of mutual trust and commitment."},
+                "Plüton": {1: "Identity Transformation: The child's sense of self is fundamentally reshaped. The parent's support without interference allows the child to discover their own center of power.", 8: "Deepened Bond and Sharing: A period when unspoken subjects between parent and child rise to the surface. Emotional deepening forms the strongest test of mutual trust."},
+                "Venüs": {5: "Learning the Language of Love and Appreciation: A pedagogical period in which you discover the most beautiful ways to express your love for each other. Practice appreciation, gratitude and tenderness.", 7: "Lesson of Balance and Harmony: Finding balance in the parent-child relationship and mutually recognizing each other's needs is the most precious gain of this period."},
+                "Mars": {1: "Training in Action and Courage: The child's desire to act independently grows. The parent's encouragement within safe boundaries helps the child discover their own sources of power and courage.", 10: "Setting Goals and Resolve: The child's determination toward academic or personal goals rises. The parent's structured support for these goals nourishes the child's motivation."},
+                "Chiron": {4: "Healing Family Wounds: Emotional wounds inherited from past generations open to healing in this period. The parent's own confrontation with their wounds offers the child the most powerful model of healing.", 12: "Healing of the Subconscious: The child's subconscious fears and worries may surface during this period. The parent's patient, understanding approach is the key to turning this process into healing."}
+            }
+            ev_muhurleri = ev_muhurleri_EN_eb if self.mod == "ebeveyn_cocuk" else ev_muhurleri_EN_es
+        elif self.mod == "ebeveyn_cocuk":
             ev_muhurleri = {
                 "Güneş": {1: "Kimlik ve Benlik Gelişimi: Bu yıl çocuğun kendi kimliğini keşfetme süreci hızlanır. Ebeveyn olarak onun bireysel duruşunu desteklemek, kendi benliğini güçlü bir şekilde ortaya koymasına rehberlik eder.", 5: "Yaratıcılık ve Kendini İfade: Çocuğun sanatsal veya yaratıcı potansiyeli bu evde parlar. Ebeveynin bu enerjiyi beslemesi, çocuğun kendini güvenle ifade etmesinin anahtarıdır.", 7: "İlişki ve Karşılıklı Saygı: Ebeveyn-çocuk arasındaki denge ve karşılıklı saygı bu dönemde test edilir. İkisi de kendi ihtiyaçlarını ifade ederken 'birlikte var olmanın' dersini öğrenir."},
                 "Ay": {4: "Yuva ve Güvenli Liman: Çocuğun duygusal kökleri bu dönemde derinleşir. Ebeveynin yarattığı güvenli atmosfer, çocuğun duygusal dayanıklılığının temelini atar.", 8: "Duygusal Dönüşüm: Çocuğun iç dünyasında yoğun değişimler yaşanır. Ebeveynin sabırlı ve anlayışlı tavrı, bu dönüşüm sürecinin sağlıklı ilerlemesini sağlar."},
@@ -3896,6 +3943,7 @@ class FBST_Engine:
         
         rapor_A = []
         rapor_B = []
+        _ev_etk = lambda ev_no: (f"House {ev_no}" if _core_get_lang() == "en" else f"{ev_no}. Ev")
         
         for gezegen, ev_detaylari in ev_muhurleri.items():
             gid = GEZEGENLER[gezegen]
@@ -3903,22 +3951,22 @@ class FBST_Engine:
             ev_A = self.ev_konumu_bul(j_ileri, gid)
             if ev_A in ev_detaylari:
                 if pdf_icin:
-                    rapor_A.append(f"<font name='DejaVuSans-Bold'>{gezegen} {ev_A}. Evde:</font> {ev_detaylari[ev_A]}")
+                    rapor_A.append(f"<font name='DejaVuSans-Bold'>{gezegen} {_ev_etk(ev_A)}:</font> {ev_detaylari[ev_A]}")
                 else:
                     if self.mod == "ebeveyn_cocuk":
-                        rapor_A.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #8FB8CA; margin-bottom:5px;'><font color='#5A9BAD'><b>{gezegen} {ev_A}. Evde:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_A]}</font></div>")
+                        rapor_A.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #8FB8CA; margin-bottom:5px;'><font color='#5A9BAD'><b>{gezegen} {_ev_etk(ev_A)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_A]}</font></div>")
                     else:
-                        rapor_A.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #8FB8CA; margin-bottom:5px;'><font color='#5A9BAD'><b>{gezegen} {ev_A}. Evde:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_A]}</font></div>")
+                        rapor_A.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #8FB8CA; margin-bottom:5px;'><font color='#5A9BAD'><b>{gezegen} {_ev_etk(ev_A)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_A]}</font></div>")
                     
             ev_B = self.ev_konumu_bul(j_geri, gid)
             if ev_B in ev_detaylari:
                 if pdf_icin:
-                    rapor_B.append(f"<font name='DejaVuSans-Bold'>{gezegen} {ev_B}. Evde:</font> {ev_detaylari[ev_B]}")
+                    rapor_B.append(f"<font name='DejaVuSans-Bold'>{gezegen} {_ev_etk(ev_B)}:</font> {ev_detaylari[ev_B]}")
                 else:
                     if self.mod == "ebeveyn_cocuk":
-                        rapor_B.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #C9A96E; margin-bottom:5px;'><font color='#C9A96E'><b>{gezegen} {ev_B}. Evde:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_B]}</font></div>")
+                        rapor_B.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #C9A96E; margin-bottom:5px;'><font color='#C9A96E'><b>{gezegen} {_ev_etk(ev_B)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_B]}</font></div>")
                     else:
-                        rapor_B.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #D4878F; margin-bottom:5px;'><font color='#D4878F'><b>{gezegen} {ev_B}. Evde:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_B]}</font></div>")
+                        rapor_B.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #D4878F; margin-bottom:5px;'><font color='#D4878F'><b>{gezegen} {_ev_etk(ev_B)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_B]}</font></div>")
                     
         return rapor_A, rapor_B
 
@@ -4900,6 +4948,7 @@ class FBST_Engine:
         import datetime
         import numpy as np
         
+        _EN = _core_get_lang() == "en"
         milat_tarihi = self.event_date
         ks_yil = self.calculate_ks()
         faz = ks_yil % (2 * np.pi)
@@ -4916,9 +4965,10 @@ class FBST_Engine:
             rol_b = "ebeveyn" if self.ebeveyn_rolu == "anne" else "ebeveyn"
             rol_a = "çocuk"
             kriz_kutuphane = []
-            for k in KRIZ_KUTUPHANESI_EBEVEYN:
+            _kriz_n = len(KRIZ_KUTUPHANESI_EBEVEYN)
+            for _ki, k in enumerate(KRIZ_KUTUPHANESI_EBEVEYN):
                 kriz_kutuphane.append({
-                    "yil_araligi": (0, 21.5) if k == KRIZ_KUTUPHANESI_EBEVEYN[-1] else (KRIZ_KUTUPHANESI_EBEVEYN.index(k) * 3, (KRIZ_KUTUPHANESI_EBEVEYN.index(k) + 1) * 3),
+                    "yil_araligi": (0, 21.5) if _ki == _kriz_n - 1 else (_ki * 3, (_ki + 1) * 3),
                     "baslik": k["baslik"],
                     "tema": k["baslik"].split("(")[1].rstrip(")") if "(" in k["baslik"] else "",
                     "pdf_yorum": k["yorum"],
@@ -5017,6 +5067,94 @@ class FBST_Engine:
                     "html_yorum": f"♾️ <b>Son Hasat:</b> Kadersel mührün vurulduğu an."
                 }
             ]
+            kriz_kutuphane_en = [
+                {
+                    "yil_araligi": (0, 1.0),
+                    "baslik": "The Falling of the Veil",
+                    "tema": "The First Disenchantment",
+                    "pdf_yorum": f"The blinding idealization between {isim_a} and {isim_b} collides for the first time with the harsh winds of reality.",
+                    "html_yorum": f"💔 <b>The First Disenchantment:</b> The initial idealization collides with the harsh winds of reality."
+                },
+                {
+                    "yil_araligi": (1.0, 2.5),
+                    "baslik": "Confronting the Shadow Self",
+                    "tema": "Ego War",
+                    "pdf_yorum": f"The relationship's first great 'Who am I, and who are you?' test.",
+                    "html_yorum": f"⚔️ <b>Ego War:</b> Tension stirs between the need for independence and the demand for security."
+                },
+                {
+                    "yil_araligi": (2.5, 4.0),
+                    "baslik": "The Pearl in the Routine Inferno",
+                    "tema": "Test of Monotony",
+                    "pdf_yorum": f"The critical threshold where excitement fades and routines bind into monotony.",
+                    "html_yorum": f"🌫️ <b>Test of Monotony:</b> Small gestures and courage are the only way out of the swamp."
+                },
+                {
+                    "yil_araligi": (4.0, 5.5),
+                    "baslik": "The Breaking of the Mirror",
+                    "tema": "Shift of Roles",
+                    "pdf_yorum": f"The critical turn where the relationship's roles and expectations must be redefined.",
+                    "html_yorum": f"🪞 <b>Shift of Roles:</b> Old patterns are breaking; a new balance is being sought."
+                },
+                {
+                    "yil_araligi": (5.5, 7.5),
+                    "baslik": "Saturn's Gate",
+                    "tema": "Structural Test",
+                    "pdf_yorum": f"On the threshold of the 7th year, the universe stands before you. The foundation itself is being tested.",
+                    "html_yorum": f"🏛️ <b>Saturn's Gate:</b> A structural test. Foundations built with honesty grow stronger."
+                },
+                {
+                    "yil_araligi": (7.5, 9.5),
+                    "baslik": "Saturn's Shadow",
+                    "tema": "Deep Test",
+                    "pdf_yorum": f"The shadow side of the structural test. Suppressed matters rise to the surface.",
+                    "html_yorum": f"🌑 <b>Deep Test:</b> Suppressed matters come to the surface. Time to confront them."
+                },
+                {
+                    "yil_araligi": (9.5, 11.5),
+                    "baslik": "Karmic Contamination",
+                    "tema": "First Cleansing",
+                    "pdf_yorum": f"The karmic wounds carried from the past leak into the relationship.",
+                    "html_yorum": f"🩹 <b>First Cleansing:</b> An invitation to heal old wounds."
+                },
+                {
+                    "yil_araligi": (11.5, 14.0),
+                    "baslik": "Karmic Purification",
+                    "tema": "Deep Healing",
+                    "pdf_yorum": f"A time to descend to the deepest core of karmic cycles and undergo a profound purification.",
+                    "html_yorum": f"✨ <b>Deep Healing:</b> Time to go into the core of karmic cycles."
+                },
+                {
+                    "yil_araligi": (14.0, 16.5),
+                    "baslik": "The Midlife Awakening",
+                    "tema": "Vision Renewal",
+                    "pdf_yorum": f"The masks of the roles begin to slip. An opportunity to chart a new vision.",
+                    "html_yorum": f"🌅 <b>Vision Renewal:</b> A chance for a new vision and a second spring."
+                },
+                {
+                    "yil_araligi": (16.5, 18.5),
+                    "baslik": "The First Mark of the Eternal Seal",
+                    "tema": "Karmic Seal",
+                    "pdf_yorum": f"The moment the karmic seal is first imprinted. The relationship takes on a lasting form.",
+                    "html_yorum": f"🔒 <b>Karmic Seal:</b> The relationship takes on a lasting form."
+                },
+                {
+                    "yil_araligi": (18.5, 20.0),
+                    "baslik": "The Middle of the Eternal Seal",
+                    "tema": "Mid Harvest",
+                    "pdf_yorum": f"A time to harvest the fruits of years of effort. Maturity and wisdom are at their peak.",
+                    "html_yorum": f"🌾 <b>Mid Harvest:</b> Time to reap the fruits of years of effort."
+                },
+                {
+                    "yil_araligi": (20.0, 21.5),
+                    "baslik": "The Final Mark of the Eternal Seal",
+                    "tema": "Final Harvest",
+                    "pdf_yorum": f"The final turn of karmic companions. A test of letting go freely.",
+                    "html_yorum": f"♾️ <b>Final Harvest:</b> The moment the karmic seal is imprinted."
+                }
+            ]
+            if _EN:
+                kriz_kutuphane = kriz_kutuphane_en
         
         kriz_listesi = []
         
@@ -5043,10 +5181,10 @@ class FBST_Engine:
 
                 if pdf_icin:
                     metin = (f"<font name='DejaVuSans-Bold'>{baslik_yazi}</font><br/>"
-                             f"<font name='DejaVuSans-Bold'>📅 {hedef_tarih.strftime('%d %B %Y')} ({kriz_yili:.1f}. Yıl):</font> "
+                             f"<font name='DejaVuSans-Bold'>📅 {hedef_tarih.strftime('%d %B %Y')} ({kriz_yili:.1f}{' Yr' if _EN else '. Yıl'}):</font> "
                              f"{uygun_kutup['pdf_yorum']}")
                 else:
-                    donem_adi = f"Ebeveyn-Çocuk Bağı ({kriz_yili:.1f}. Yıl)" if self.mod == "ebeveyn_cocuk" else f"İlişkinin {kriz_yili:.1f}. Yılı"
+                    donem_adi = f"Ebeveyn-Çocuk Bağı ({kriz_yili:.1f}. Yıl)" if self.mod == "ebeveyn_cocuk" else (f"Relationship's Year {kriz_yili:.1f}" if _EN else f"İlişkinin {kriz_yili:.1f}. Yılı")
                     metin = (
                         f"<div style='background-color:#0d0d1a; color:#e8e8f0; padding:14px; border-left:4px solid #7b2ff7; margin-bottom:12px; border-radius:6px;'>"
                         f"<div style='font-size:17px; color:#c084fc; margin-bottom:4px;'>{baslik_yazi}</div>"
@@ -5062,6 +5200,7 @@ class FBST_Engine:
         import datetime
         milat_tarihi = self.event_date
         aktif_mod = getattr(self, 'mod', 'es_sevgili')
+        _EN = _core_get_lang() == "en"
         
         if aktif_mod == "ebeveyn_cocuk":
             donemecler = [
@@ -5099,6 +5238,43 @@ class FBST_Engine:
                     "yil": 21.0, 
                     "ad": "Karmik Ustalık ve Son Hasat (21. Yıl)", 
                     "yorum": "Zamanın, krizlerin ve dünyevi dertlerin ötesine geçmiş o nadir, ebedi bağ! Siz artık sadece bir ebeveyn ve çocuk değilsiniz, evrensel bir sınavı başarıyla tamamlamış kadersel yoldaşlarsınız. Tüm o Satürn döngülerini, sınır testlerini ve hayatın yorucu fırtınalarını aşarak ruhsal mührünüzü tamamladınız. Artık bu bağ, dış dünyadan gelen hiçbir rüzgarla kolay kolay yıkılmayacak asil bir ustalığa erişmiştir. Çocuğunuz artık kendi yolunu çizmiş, ancak aranızdaki güven okyanusu sarsılmaz ve ebedi bir şekilde devam etmektedir."
+                }
+            ]
+            donemecler_en = [
+                {
+                    "yil": 1.375,
+                    "ad": "1. Golden Ratio Awakening: Discovery and Bonding (Year 1.375)",
+                    "yorum": "This is the enchanting 'discovery' phase at the very beginning of your parent-child bond — a process of getting to know one another and building trust. In these early months, the hormonal haze slowly lifts, and you begin to recognize not only your child's endearing qualities but also their true needs and boundaries. It is precisely here that the universal 'Golden Ratio' protection comes into play. Your anxious concern of 'how should I appear' gives way to the feeling of 'I am here for them.' You stand at that first magical threshold where you draw the real boundaries of the relationship you are building together, moving beyond novelty and beginning to hold one another with a karmic bond that is hard to break."
+                },
+                {
+                    "yil": 2.225,
+                    "ad": "Fractal Rooting: Building a Shared Memory (Year 2.225)",
+                    "yorum": "As parent and child, you are in the phase of invisibly interlocking and forming a 'shared karmic memory.' At this threshold, the system begins to repair itself. So much so that when your child grows restless for no apparent reason, you sense it, or when you stumble in your work life, your child's pure support instantly steps in to close that gap. Plans you once thought of separately now begin to merge organically into a single crucible. This is the period when the parent-child bond develops its own immune system and takes on a self-sufficient, unshakable structure resistant to outside interference."
+                },
+                {
+                    "yil": 2.4,
+                    "ad": "The Great Cosmic Pull and Boundary Test (Year 2.4)",
+                    "yorum": "Attention! This stop is the universe's first great endurance test of your parent-child bond. The seamless flow of the early days may give way to boundary struggles, 'my space — your space' pressures, or stress from outside sources (school, friend groups, relocations) reflecting onto your relationship. The conflicts experienced during this period are not proof that your bond is deteriorating; quite the opposite, they are proof that your power to climb life's steep hills together is being tested. The only way to pass this test is to let go of stubbornness and protect the team by asking, 'How can we solve this problem shoulder to shoulder?'"
+                },
+                {
+                    "yil": 4.0,
+                    "ad": "Elemental Serenity and Shared Flow (Year 4)",
+                    "yorum": "You are in a period of peace and productivity in which the first crises, power struggles, and growing pains are behind you, and fire, water, earth, and air are balanced flawlessly between you. The bond is no longer an exhausting effort but has settled into a natural, tireless, and deeply sweet flow within daily life. This year — when waking up together, sharing responsibilities without being asked, and enjoying each other's silence reaches its peak — is that well-earned breathing stop where the universe says, 'Rest, take root, and begin to savor the fruits of the beautiful bond you have built.'"
+                },
+                {
+                    "yil": 7.0,
+                    "ad": "1st Saturn Seal: The Test of Structural Construction (Year 7)",
+                    "yorum": "You have reached astrology's most famous 7-year karmic threshold! The universe stands before you with all seriousness and asks: 'Are you ready to take on the responsibility of sustaining this bond for a lifetime?' All the expectations and boundaries postponed until now and avoided in conversation are laid clearly on the table. This is a 'make or break' year. While weak foundations tremble, foundations built on honesty, patience, and shoulder-to-shoulder commitment emerge from this turn with a far more lasting, structural seal. Finding the balance between your child's need for independence and your guiding role is the greatest task of this period."
+                },
+                {
+                    "yil": 14.0,
+                    "ad": "2nd Saturn Test: Maturation and Redefinition (Year 14)",
+                    "yorum": "This is the 'midlife awakening' of the parent-child bond in spiritual terms. The entire emotional accumulation of the first 14 years is re-evaluated as your child grows. The question 'Who are we, and how do we want to live our bond from now on?' is the main agenda. Your child, now an adolescent, is searching for their own identity; in this natural process, your parental role is being redefined. This stop is that deep transformation phase in which your bond will either take on an entirely new, visionary, and exciting form or leap to a far higher, philosophical spiritual level and gain wisdom."
+                },
+                {
+                    "yil": 21.0,
+                    "ad": "Karmic Mastery and the Final Harvest (Year 21)",
+                    "yorum": "That rare, eternal bond that has moved beyond time, crises, and earthly cares! You are no longer merely a parent and a child but karmic companions who have successfully passed a universal examination. Having overcome all those Saturn cycles, boundary tests, and life's wearying storms, you have completed your spiritual seal. This bond has now attained a noble mastery that no wind from the outside world can easily bring down. Your child has now charted their own path, yet the ocean of trust between you continues, unshakable and eternal."
                 }
             ]
         else:
@@ -5139,6 +5315,46 @@ class FBST_Engine:
                 "yorum": "Zamanın, krizlerin ve dünyevi dertlerin ötesine geçmiş o nadir, ebedi kontrat! Siz artık sadece birer eş değil, evrensel bir sınavı başarıyla tamamlamış kadersel yoldaşlarsınız. Tüm o sert Satürn döngülerini, kozmik çekim testlerini ve hayatın yorucu fırtınalarını aşarak ruhsal mührünüzü tamamladınız. Artık bu bağ, dış dünyadan gelen hiçbir rüzgarla, parayla, hastalıkla veya dedikoduyla kolay kolay yıkılmayacak asil bir ustalığa erişmiştir. Gençliğin o telaşlı aşkı, yerini birbirinin ruhunu bir kitap gibi okuyabilen, kelimelere ihtiyaç duymayan sarsılmaz ve ebedi bir güven okyanusuna bırakmıştır."
             }
         ]
+            donemecler_en = [
+            {
+                "yil": 1.375,
+                "ad": "1. Golden Ratio Awakening (Year 1.375)",
+                "yorum": "This represents the enchanting 'blinding excitement' phase at the very beginning of your relationship — a hazy period in which dopamine rises and you see your partner as an 'ideal.' Yet at this first threshold, the hormonal haze gradually lifts; you begin to discover not only your partner's most beloved traits but also the reality that can, at times, be challenging within daily life. And it is precisely here that the universal 'Golden Ratio' protection comes into play. Your anxiety of 'I must impress them' gives way to the feeling of 'I feel safe in their presence.' You stand at that first magical threshold where you draw the real boundaries of the life you are building together, move beyond infatuation, and begin holding one another with 'belonging' — a karmic bond that is hard to break."
+            },
+            {
+                "yil": 2.225,
+                "ad": "Fractal Rooting (Year 2.225)",
+                "yorum": "You are in the phase where two different, independent lives invisibly interlock and form a 'shared karmic memory.' At this threshold, the system begins to repair itself. So much so that when one of you grows restless for no apparent reason, the other senses it, or when one of you stumbles in your career, the other instantly steps in as a psychological buffer, closing that gap. Financial or social future plans you once considered separately now begin to merge organically into a single crucible. This is the period when your relationship develops its own immune system and takes on a self-sufficient, unshakable structure resistant to outside interference."
+            },
+            {
+                "yil": 2.4,
+                "ad": "The Great Cosmic Pull and Crisis Test (Year 2.4)",
+                "yorum": "Attention! This stop is the universe's first great endurance and 'ego' test of your relationship. The seamless flow of the early days may give way to differences of opinion, 'my space — your space' struggles, or stress from outside sources (work, family, relocations) reflecting onto the relationship. The conflicts experienced during this period are not proof that your relationship is deteriorating; quite the opposite, they are proof that your power to climb life's steep hills together — that is, the 'Cosmic Pull Force' (Generative Power) between you — is being tested by the universe. The only way to pass this test is to abandon stubbornness and the urge to be right, and to protect the team by asking, 'How can we solve this problem shoulder to shoulder?'"
+            },
+            {
+                "yil": 4.0,
+                "ad": "Elemental Serenity and Shared Flow (Year 4)",
+                "yorum": "You are in a period of peace and productivity in which the first crises, power struggles, and growing pains of harmony are behind you, and fire, water, earth, and air are balanced flawlessly between you. The relationship is no longer an exhausting effort but has settled into a natural, tireless, and deeply sweet flow within daily life. This year — when waking up together, sharing shared responsibilities without being asked, and enjoying each other's silence reaches its peak — is that well-earned, peaceful breathing stop where the universe says, 'Rest, take root, and begin to savor the fruits of this beautiful love you have built.'"
+            },
+            {
+                "yil": 7.0,
+                "ad": "1st Saturn Seal: The Test of Structural Construction (Year 7)",
+                "yorum": "You have reached astrology's most famous 7-year karmic threshold! The universe stands before you with all seriousness and asks: 'Are you ready to take on the worldly and spiritual responsibility of transforming this relationship into an empire?' All the problems and expectations swept under the rug until now and avoided in conversation are laid clearly on the table. This is a 'make or break' year. While weak and insecure foundations tremble, foundations built on honesty, loyalty, and shoulder-to-shoulder commitment emerge from this turn with a far more lasting, structural seal — such as marriage, a joint investment, having children, or an unshakable vow of spiritual loyalty."
+            },
+            {
+                "yil": 14.0,
+                "ad": "2nd Saturn Test: The Awakening of Roots and Vision (Year 14)",
+                "yorum": "This is the 'midlife awakening' of the relationship in spiritual terms. The entire emotional and financial accumulation of the first 14 years, and the years spent with children or within life's routines, are re-evaluated. The question 'Who are we, and how do we want to live the rest of our lives?' is the main agenda. You stand at that critical karmic turn where routine, habits, and the risk of sliding into 'roommate-ness' must be broken — otherwise, boredom may begin. This stop is that deep transformation phase in which your relationship will either take on an entirely new, visionary, and exciting form (a second spring) or leap to a far higher, philosophical spiritual level and gain wisdom."
+            },
+            {
+                "yil": 21.0,
+                "ad": "Karmic Mastery and the Final Harvest (Year 21)",
+                "yorum": "That rare, eternal contract that has moved beyond time, crises, and earthly cares! You are no longer merely a couple but karmic companions who have successfully passed a universal examination. Having overcome all those harsh Saturn cycles, cosmic pull tests, and life's wearying storms, you have completed your spiritual seal. This bond has now attained a noble mastery that no wind from the outside world — no money, illness, or gossip — can easily bring down. The restless love of youth has given way to an unshakable and eternal ocean of trust, where two souls read each other like a book, needing no words."
+            }
+        ]
+        
+        if _EN:
+            donemecler = donemecler_en
         
         rapor = []
         for dnm in donemecler:
@@ -5147,7 +5363,8 @@ class FBST_Engine:
                 metin = f"<font name='DejaVuSans-Bold'>[*] {dnm['ad']} ({hedef.strftime('%d %B %Y')}):</font> {dnm['yorum']}"
             else:
                 renk_sol = "#B8A9C9" if aktif_mod == "ebeveyn_cocuk" else "#C9A96E"
-                metin = f"<div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid {renk_sol}; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'><b style='font-size:18px; color:#4A3F5C;'>{dnm['ad']}</b><br><span style='color:#6B5B7B; font-size:14px;'>Kilit Tarihi: {hedef.strftime('%d %B %Y')}</span><p style='margin-top:5px; color:#4A4A4A;'>{dnm['yorum']}</p></div>"
+                tarih_etiket = "Key Date:" if _EN else "Kilit Tarihi:"
+                metin = f"<div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid {renk_sol}; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'><b style='font-size:18px; color:#4A3F5C;'>{dnm['ad']}</b><br><span style='color:#6B5B7B; font-size:14px;'>{tarih_etiket} {hedef.strftime('%d %B %Y')}</span><p style='margin-top:5px; color:#4A4A4A;'>{dnm['yorum']}</p></div>"
             rapor.append(metin)
         return rapor
 
@@ -5355,8 +5572,11 @@ class FBST_Engine:
         minor_oran = 27.32166 / 365.2422
         bugun = datetime.datetime.now()
         gecen_gun = (bugun - self.event_date).days
+        _EN = _core_get_lang() == "en"
         
         if gecen_gun < 0:
+            if _EN:
+                return "<div style='color:#a0a0a0;'>The bond has not yet begun (a future milestone was selected).</div>"
             return "<div style='color:#a0a0a0;'>Bağ henüz başlamadı (Gelecek bir milat seçildi).</div>"
             
         ilerletilmis_gokyuzu_gunu = gecen_gun * minor_oran
@@ -5372,36 +5592,69 @@ class FBST_Engine:
         derece_A = konum_A[0]
         derece_B = konum_B[0]
         burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
+        if _EN:
+            burcl_en = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
         
         burc_A = burclar[int(derece_A // 30)]
         burc_B = burclar[int(derece_B // 30)]
+        if _EN:
+            burc_A = burcl_en[int(derece_A // 30)]
+            burc_B = burcl_en[int(derece_B // 30)]
         
         if self.mod == "ebeveyn_cocuk":
-            html_cikti = f"""
-            <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                <b style='font-size:18px; color:#4A3F5C;'>Pedagojik BSP Ay İklimi (Minör Progress)</b><br>
-                <span style='color:#6B5B7B; font-size:14px;'>Ebeveyn-Çocuk bağınızın anlık duygusal gelişim haritası (1 Ay = 1 Yıl titreşimi)</span>
-                <hr style='border-color:#E8E0D8; margin:8px 0;'>
-                <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
-                    <b>{self.p1_isim} (Çocuk):</b> İlerletilmiş duygusal zeka şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda evriliyor.<br>
-                    <b>{self.p2_isim} (Ebeveyn):</b> İlerletilmiş rehberlik enerjisi şu an <b style='color:#C9A96E;'>{burc_B}</b> burcunda evriliyor.
-                </p>
-                <span style='color:#8A7F96; font-size:12px;'>Odak Noktası: Çocuğun gelişim ihtiyacı ve ebeveynin rehberlik kapasitesi bu faz üzerinden okunur.</span>
-            </div>
-            """
+            if _EN:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Pedagogical BSP Moon Climate (Minor Progress)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>The evolving emotional blueprint of your parent-child bond (1 Month = 1 Year vibration)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim} (Child):</b> The progressed emotional intelligence is currently evolving in <b style='color:#B8A9C9;'>{burc_A}</b>.<br>
+                        <b>{self.p2_isim} (Parent):</b> The progressed guiding energy is currently evolving in <b style='color:#C9A96E;'>{burc_B}</b>.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Focus: The child's developmental needs and the parent's guiding capacity are read through this phase.</span>
+                </div>
+                """
+            else:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Pedagojik BSP Ay İklimi (Minör Progress)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>Ebeveyn-Çocuk bağınızın anlık duygusal gelişim haritası (1 Ay = 1 Yıl titreşimi)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim} (Çocuk):</b> İlerletilmiş duygusal zeka şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda evriliyor.<br>
+                        <b>{self.p2_isim} (Ebeveyn):</b> İlerletilmiş rehberlik enerjisi şu an <b style='color:#C9A96E;'>{burc_B}</b> burcunda evriliyor.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Odak Noktası: Çocuğun gelişim ihtiyacı ve ebeveynin rehberlik kapasitesi bu faz üzerinden okunur.</span>
+                </div>
+                """
         else:
-            html_cikti = f"""
-            <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                <b style='font-size:18px; color:#4A3F5C;'>Güncel BSP Ay İklimi (Minör Progress)</b><br>
-                <span style='color:#6B5B7B; font-size:14px;'>İlişkinizin anlık duygusal röntgeni (1 Ay = 1 Yıl titreşimi)</span>
-                <hr style='border-color:#E8E0D8; margin:8px 0;'>
-                <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
-                    <b>{self.p1_isim}:</b> İlerletilmiş duygu dünyası şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda transit ediyor.<br>
-                    <b>{self.p2_isim}:</b> İlerletilmiş duygu dünyası şu an <b style='color:#C9A96E;'>{burc_B}</b> burcunda transit ediyor.
-                </p>
-                <span style='color:#8A7F96; font-size:12px;'>Odak Noktası: İçsel dünyanızdaki aylık/yıllık duygusal değişimler bu faz üzerinden okunur.</span>
-            </div>
-            """
+            if _EN:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Current BSP Moon Climate (Minor Progress)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>The live emotional snapshot of your relationship (1 Month = 1 Year vibration)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim}:</b> The progressed inner world is currently transiting <b style='color:#B8A9C9;'>{burc_A}</b>.<br>
+                        <b>{self.p2_isim}:</b> The progressed inner world is currently transiting <b style='color:#C9A96E;'>{burc_B}</b>.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Focus: The monthly/yearly inner emotional shifts in your shared world are read through this phase.</span>
+                </div>
+                """
+            else:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Güncel BSP Ay İklimi (Minör Progress)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>İlişkinizin anlık duygusal röntgeni (1 Ay = 1 Yıl titreşimi)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim}:</b> İlerletilmiş duygu dünyası şu an <b style='color:#B8A9C9;'>{burc_A}</b> burcunda transit ediyor.<br>
+                        <b>{self.p2_isim}:</b> İlerletilmiş duygu dünyası şu an <b style='color:#C9A96E;'>{burc_B}</b> burcunda transit ediyor.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Odak Noktası: İçsel dünyanızdaki aylık/yıllık duygusal değişimler bu faz üzerinden okunur.</span>
+                </div>
+                """
         return html_cikti
 
     def secondary_progression_analizi(self, pdf_icin=False):
@@ -5659,9 +5912,10 @@ class FBST_Engine:
             return []
 
         yorumlar = []
+        _EN = _core_get_lang() == "en"
 
         # İlişki odaklı yorum sözlüğü
-        yorum_sozlugu = {
+        yorum_sozlugu_tr = {
             # --- AY AÇILARI: İlişkide duygusal dinamiğin nabzını tutar ---
             ("Ay", "Güneş", "Kavuşum"): "Duygularınız bu dönem tam ortak noktada — ne hissediyorsanız onu net bir şekilde görebiliyor, partnerinize de aynı berraklıkta yansıtabiliyorsunuz. Bu, 'seni anlıyorum' lafının gerçekten hissedildiği nadir anlardan biri. Kalbiniz ve benliğinizbu dönem birbirine çok yakın duruyor, bu da ilişkinizdeki en derin samimiyet kapısını aralıyor.",
             ("Ay", "Güneş", "Karşıt"): "Partnerinizin bu dönem neye ihtiyacı varsa sizde tam tersini görüyorsunuz — bu bir çatışma değil, ayna. Belki de tam da bu zıtlık sayesinde kendi duygu dünyanızın farkına varacaksınız. Gerilim sizi birbirinizden uzaklaştırmaz, aksine 'ben ne istiyorum?' sorusunu sormaya zorlar. Bu sorunun cevabı ilişkinizi derinleştirebilir.",
@@ -5728,6 +5982,73 @@ class FBST_Engine:
             ("Güneş", "Satürn", "Trigon"): "Olgunluk ve derinleşme bu dönem çok yakışıyor ilişkinize — birbirinize güveniyor, birbirinize destek oluyorsunuz. Bu güveni besleyin: bu dönem attığınız adım, yıllar sonra çok sağlam bir temelin üzerine kurulmuş olacak.",
         }
 
+        yorum_sozlugu_en = {
+            ("Ay", "Güneş", "Kavuşum"): "Your feelings are perfectly in sync this period — you can see clearly what you feel and mirror it to your partner just as clearly. These are among the rare moments when 'I understand you' is truly felt. Your heart and your self stand very close to each other now, opening the door to the deepest intimacy in your relationship.",
+            ("Ay", "Güneş", "Karşıt"): "Whatever your partner needs right now, you see the exact opposite in them — this is not a conflict, but a mirror. Perhaps it is precisely through this contrast that you will become aware of your own emotional world. The tension will not drive you apart; on the contrary, it forces you to ask 'what do I really want?'. The answer to that question can deepen your relationship.",
+            ("Ay", "Güneş", "Kare"): "You may feel emotionally a little stuck this period — unsure of what to do, yet at the same time driven to fix things. Listen to that impulse: perhaps now is precisely the time to have the conversation you have been putting off. Patience is the key to this period.",
+            ("Ay", "Güneş", "Trigon"): "Everything falls into place this period — your feelings are clear, your closeness to your partner is natural, and your communication flows. Cherish such moments: sometimes even 'doing nothing' is the greatest act. Simply sitting quietly together with a cup of tea can bring deep satisfaction now.",
+            ("Ay", "Güneş", "Sekstil"): "A small but meaningful opportunity lies before you this period: perhaps opening a subject you have not discussed for a long time, or making a little surprise for your partner. That small step could open an unexpected door in your relationship. Seize the opportunity — you will not regret it.",
+
+            ("Ay", "Venüs", "Kavuşum"): "Love is at its peak this period — what you give and what you receive are both balanced and beautiful. When you hold your partner, the rest of the world suddenly fades into oblivion. Embrace that feeling, because such moments leave memories that will add years to your relationship.",
+            ("Ay", "Venüs", "Karşıt"): "Your love language runs on a different frequency this period: where you say 'I love you', your partner may be hearing something else. This is not a mismatch, but an opportunity to learn. Perhaps it is time to ask how your partner perceives love. The answer may surprise you.",
+            ("Ay", "Venüs", "Kare"): "You may stumble a little in love this period — perhaps you are not receiving the attention you expect from your partner, or perhaps you are not reaching them enough. But remember: the strongest bridges are built on the most difficult waters. A small step you take now becomes the seed of a great transformation tomorrow.",
+            ("Ay", "Venüs", "Trigon"): "Love flows so naturally and freely this period — like a river, without effort. You do not need to make a special effort to show your partner your love; it shows in everything you do. Savor this peace.",
+            ("Ay", "Venüs", "Sekstil"): "You feel a sweet urge to do something lovely for your partner this period — perhaps flowers, a beautiful message, or simply a smile. Do not underestimate the power of these small gestures: a relationship is built from small stones.",
+
+            ("Ay", "Mars", "Kavuşum"): "Energy and passion are at their peak this period — everything you do together has an extra spark of vitality. But be careful: the same energy can turn into an argument. Channeling this power into a sportive activity or a shared project will bring out the brightest side of your relationship.",
+            ("Ay", "Mars", "Karşıt"): "This is a period when you need to stay alert — even a small word can ignite mutual anger. But a great truth lies behind this pressure: perhaps something long unspoken will surface this period. Stay calm, but do not ignore the truth either.",
+            ("Ay", "Mars", "Kare"): "Arguments can easily flare up this period — you are both a little more impatient, a little more on edge. But this is a test: can you turn your anger into constructive power? Sports, walking, or breaking a sweat together could be the best medicine this period.",
+            ("Ay", "Mars", "Trigon"): "You feel very energetic and alive together this period — adventure, movement, and excitement are all on your side. Put this energy to good use: perhaps you can finally bring a long-postponed plan to life now. Running, laughing, and breathing together are the finest activities this period.",
+            ("Ay", "Mars", "Sekstil"): "A little excitement awaits you this period — perhaps an unexpected phone call, perhaps an old memory you meet on the street, or a small surprise from your partner. Catch this energy and create a joyful moment together.",
+
+            ("Ay", "Jüpiter", "Kavuşum"): "Expansion and abundance are very strong this period — you are in a phase where beautiful things accumulate in your life. It is a perfect time to make big plans for the future and dream together with your partner. Nurture this energy: you reap what you sow.",
+            ("Ay", "Jüpiter", "Karşıt"): "Watch out for excess this period — overspending, overeating, overpromising... it all looks good but creates imbalance. Demands for 'more' can clash between you and your partner. Finding balance could be your greatest achievement this period.",
+            ("Ay", "Jüpiter", "Kare"): "Big expectations can turn into disappointment this period — perhaps you expect too much from your partner, or perhaps you are putting pressure on yourself. Focus on the small things: sometimes a cup of tea or a smile is a great source of happiness.",
+            ("Ay", "Jüpiter", "Trigon"): "Luck is on your side this period — but see it not merely as 'winning', but as an opportunity to grow together. It is a wonderful time to learn something new with your partner and share a new experience. Do not miss this opportunity.",
+            ("Ay", "Jüpiter", "Sekstil"): "A small but precious opportunity may knock on your door this period — perhaps an unexpected invitation, or a lovely event you can attend together. Make the most of it: a relationship is nourished by small experiences.",
+
+            ("Ay", "Satürn", "Kavuşum"): "Seriousness and structure take center stage this period — an ideal time to make long-term plans in your relationship and clarify responsibilities. The conversations you have now can bear fruit years later. Be patient and steady; your efforts will be rewarded.",
+            ("Ay", "Satürn", "Karşıt"): "You may feel a little distance this period — perhaps your partner has gone quiet, or perhaps you have withdrawn emotionally. But this is not a break-up, it is a moment of rest. Like every relationship, yours also needs a break. Use this pause wisely, but do not sever communication.",
+            ("Ay", "Satürn", "Kare"): "Responsibilities may feel a little overwhelming this period — work, family, and relationship all exert pressure at once. But this pressure strengthens you: it tests your resilience and teaches you the value of setting boundaries. Even saying 'no' is an achievement this period.",
+            ("Ay", "Satürn", "Trigon"): "Maturity suits your relationship wonderfully this period — you trust each other and support one another. Building that trust took years, and now you are reaping the rewards. The decisions you make now will lay very solid foundations for the long term.",
+            ("Ay", "Satürn", "Sekstil"): "This is a time to take a small but significant step — perhaps an official application, a long-term commitment, or simply saying 'we will walk together'. The step is small, but its meaning is great. Gather your courage.",
+
+            ("Ay", "Uranüs", "Kavuşum"): "Surprises may knock on your door this period — perhaps a sudden decision, an unexpected development, or something very surprising your partner tells you. Do not resist the change: Uranus is opening a new window for you. Be flexible and embrace life.",
+            ("Ay", "Uranüs", "Karşıt"): "The need for freedom may create some tension this period — perhaps you want to commit more, or perhaps your partner is seeking some space. This contrast is natural: every person has their own rhythm. Giving each other space will actually bring you even closer.",
+            ("Ay", "Uranüs", "Kare"): "Sudden arguments or unexpected events may cause stress this period. But this tension is temporary, and a great seed of change lies beneath it. A discussion you have now may become the occasion for a truth you have postponed for years to finally surface.",
+            ("Ay", "Uranüs", "Trigon"): "An innovative and creative period awaits you — try something new together, break out of the routine. Perhaps visit a different restaurant, or chart a different route. This little adventure will bring fresh air to your relationship.",
+            ("Ay", "Uranüs", "Sekstil"): "A small surprise or unexpected development can add color to your relationship this period. Be flexible and open-minded: everything unexpected is working in your favor now.",
+
+            ("Ay", "Neptün", "Kavuşum"): "Spiritual deepening is very strong this period — meditate together, engage with art, or simply close your eyes and feel each other. Moments like these are the loveliest treasures of a relationship. Your souls are speaking to each other now.",
+            ("Ay", "Neptün", "Karşıt"): "Illusions can be a little confusing this period — perhaps you understood something your partner said differently, or your own imagination blurred reality. Clear communication is very important now: do not hesitate to ask 'this is what I understood, is that right?'.",
+            ("Ay", "Neptün", "Kare"): "Emotional haziness may dominate this period — you cannot quite tell what you feel, and perhaps you are not sure of your partner's intentions. But this haziness is temporary: stay calm, be patient, and when the water settles everything will appear much clearer.",
+            ("Ay", "Neptün", "Trigon"): "This is a very romantic and spiritual period — your bond with each other is deep and strong. Embrace this feeling: perhaps listen to a song together, gaze at the stars, or simply hold each other in silence. These moments nourish your soul.",
+            ("Ay", "Neptün", "Sekstil"): "A small but deep experience awaits you this period — perhaps while looking at a work of art together you will share the same emotion, or during a film scene you will look at each other and say 'we are thinking the same thing'. That synchronization is very precious.",
+
+            ("Ay", "Plüton", "Kavuşum"): "Transformation is very powerful this period — a deep change is happening in your relationship. Perhaps an emotion you have long suppressed is surfacing now. This confrontation may be frightening, but it is also deeply healing: you are tearing down the old to build the new.",
+            ("Ay", "Plüton", "Karşıt"): "Power struggles may become somewhat prominent this period — issues of control, trust, and dependence may come to the surface. But this confrontation is an opportunity: ask yourself 'where am I losing control?'. The answer awaits you in the depths of your relationship.",
+            ("Ay", "Plüton", "Kare"): "Intense emotional experiences may occur this period — old wounds, fears, and insecurities may surface. But this confrontation is the moment healing begins: being able to face the pain and transform it requires great courage. Show that courage.",
+            ("Ay", "Plüton", "Trigon"): "A deep transformation is reshaping your relationship this period — old patterns are breaking, and a new, healthier order is being established. Embrace this process: change may be frightening, but the result will be a much stronger union.",
+            ("Ay", "Plüton", "Sekstil"): "A small but deep change is happening this period — perhaps you have begun to trust your partner more, or you have become more at peace with your own feelings. This small progress is the herald of a great transformation. Be patient; you will reap its fruits.",
+
+            ("Güneş", "Venüs", "Kavuşum"): "You feel very charming and attractive this period — and your partner notices it. Turn this energy into a lovely activity together: perhaps a romantic dinner, or just laughing together. Love flows very naturally this period.",
+            ("Güneş", "Venüs", "Karşıt"): "A search for balance between your own needs and your partner's needs is very prominent this period: perhaps you are giving a lot while your partner takes a lot — or the reverse. Talking about this difference will make your relationship far more balanced.",
+            ("Güneş", "Venüs", "Kare"): "Small differences in values and tastes may arise this period — perhaps different music styles, or different holiday plans. But remember: differences enrich a relationship. Be open to compromise; you might discover a new shared pleasure.",
+            ("Güneş", "Venüs", "Trigon"): "There is a natural harmony this period — you speak the same language and laugh at the same things with your partner. Enjoy this harmony: a relationship is nourished by moments like these. Perhaps read a book together, go for a walk, or simply sit in silence.",
+
+            ("Güneş", "Mars", "Kavuşum"): "Energy and courage are very high this period — a wonderful time to embark on a new adventure together and take bold steps. Use this energy constructively: focusing on a shared goal, exercising, or sharing your passion will be very enjoyable now.",
+            ("Güneş", "Mars", "Karşıt"): "Ego and anger may be a little on edge this period — you may both insist on having your own way. But this conflict is an opportunity: asking 'how do you feel?' instead of saying 'I am right' could deepen your relationship enormously.",
+            ("Güneş", "Mars", "Kare"): "Friction and tension may arise this period — perhaps your plans do not match, or your energies collide. But this friction strengthens you: it tests your resilience and teaches you how to compromise. Be patient.",
+            ("Güneş", "Mars", "Trigon"): "You feel very strong and energetic together this period — a perfect time to unite for common goals and achieve things together. Put this energy to good use: a step you take together can yield very bright results for a long time to come.",
+
+            ("Güneş", "Satürn", "Kavuşum"): "Seriousness and structure take the lead this period — it may be time to take an important step in your relationship. Perhaps an official decision, a long-term plan, or simply saying 'we will walk together'. The step is small, but it lays a very solid foundation.",
+            ("Güneş", "Satürn", "Karşıt"): "You may feel a little pressure and distance this period — perhaps you are not receiving the support you expect from your partner, or your own responsibilities are overwhelming you. But this is temporary: be patient, this period will pass and leave behind a much stronger relationship.",
+            ("Güneş", "Satürn", "Kare"): "A challenging test is knocking on your door this period — a time that demands patience, determination, and flexibility. But this test matures you: it tests your resilience and teaches you the value of 'overcoming hard times together'.",
+            ("Güneş", "Satürn", "Trigon"): "Maturity and deepening suit your relationship wonderfully this period — you trust each other and support one another. Nurture this trust: the step you take now will be built on a very solid foundation years later.",
+        }
+
+        yorum_sozlugu = yorum_sozlugu_en if _EN else yorum_sozlugu_tr
+
         # Dönem hesaplamalarını al
         donem_verileri = self.secondary_progression_donem_hesapla()
 
@@ -5764,7 +6085,7 @@ class FBST_Engine:
                     })
 
             # Genel dönem yorumu
-            genel_yorumlari = {
+            genel_yorumlari_tr = {
                 "Koç": "İlerletilmiş Ay'ınız Koç burcunda — cesaret ve bağımsızlık ön planda. İlişkinizde liderlik almak, inisiyatif kullanmak için güçlü bir dönem. Ama dikkat: acelecilik partnerinizi üzebilir. Tutkunuzu sabırla harmanlayın.",
                 "Boğa": "İlerletilmiş Ay'ınız Boğa burcunda — istikrar ve güven arayışınız çok belirgin. İlişkinizde somut adımlar atma, maddi konuları netleştirme zamanı. Değişim korkutucu olabilir ama bu dönem sizi daha sağlam temellere taşıyacak.",
                 "İkizler": "İlerletilmiş Ay'ınız İkizler burcunda — iletişim ve merak çok yüksek. Partnerinizle uzun sohbetler, fikir alışverişleri bu dönem çok keyifli olacak. Ama yüzeysellikten kaçının: derinleşmek için de fırsat var.",
@@ -5778,7 +6099,25 @@ class FBST_Engine:
                 "Kova": "İlerletilmiş Ay'ınız Kova burcunda — yenilik ve özgünlük çok belirgin. İlişkinizde alışılmadık deneyimler, farklı bakış açıları bu dönem çok değerli. Sıradanlıktan çıkın, birlikte yeni bir şey keşfedin.",
                 "Balık": "İlerletilmiş Ay'ınız Balık burcunda — sezgisellik ve manevi derinleşme çok güçlü. İlişkinizde ruhsal bağ güçleniyor, birbirinizi çok derinden anlayabilirsiniz. Sanat, müzik veya meditasyon bu dönem çok iyi gelecektir.",
             }
-            genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"İlerletilmiş Ay'ınız {sonuc['ay_burcu']} burcunda — dengeli ve uyumlu bir dönemdesiniz.")
+            genel_yorumlari_en = {
+                "Koç": "Your progressed Moon is in Aries — courage and independence take the lead. It is a powerful time to take leadership in your relationship and show initiative. But be careful: haste can hurt your partner. Blend your passion with patience.",
+                "Boğa": "Your progressed Moon is in Taurus — your search for stability and security is very pronounced. It is time to take concrete steps in your relationship and clarify material matters. Change can be scary, but this period will carry you to firmer ground.",
+                "İkizler": "Your progressed Moon is in Gemini — communication and curiosity are very high. Long conversations and exchanges of ideas with your partner will be very enjoyable this period. But avoid superficiality: there is also room to go deeper.",
+                "Yengeç": "Your progressed Moon is in Cancer — emotional depth and the need for belonging are very pronounced. Feeling safe in your relationship and being close to your partner matters greatly now. It is a wonderful time to face the past and heal old wounds.",
+                "Aslan": "Your progressed Moon is in Leo — a time for creativity and shining. It is an ideal period to show your love, have fun together, and celebrate life. But do not let your ego take over: your partner has light of their own.",
+                "Başak": "Your progressed Moon is in Virgo — details and perfectionism take the lead. It is a great time to make small but meaningful adjustments in your relationship and improve habits. But keep your criticism constructive.",
+                "Terazi": "Your progressed Moon is in Libra — your search for harmony and balance is very strong. Peace, beauty, and aesthetics come to the fore in your relationship. Be open to compromise, but do not neglect your own needs.",
+                "Akrep": "Your progressed Moon is in Scorpio — a period of intensity and transformation. Deep confrontations and passionate moments may occur in your relationship. Old wounds may surface, but this confrontation is the moment healing begins.",
+                "Yay": "Your progressed Moon is in Sagittarius — your search for freedom and adventure is very pronounced. It is a wonderful time to open new horizons in your relationship, learn and explore together. Break out of routine and expand your life.",
+                "Oğlak": "Your progressed Moon is in Capricorn — responsibility and building structure take the lead. It is an ideal period to make long-term plans in your relationship and take serious steps. You will be rewarded for your efforts.",
+                "Kova": "Your progressed Moon is in Aquarius — innovation and originality are very pronounced. Unconventional experiences and fresh perspectives are very valuable in your relationship now. Step away from the ordinary and discover something new together.",
+                "Balık": "Your progressed Moon is in Pisces — intuition and spiritual deepening are very strong. The spiritual bond in your relationship is strengthening, and you can understand each other very deeply. Art, music, or meditation will do you a lot of good this period.",
+            }
+            genel_yorumlari = genel_yorumlari_en if _EN else genel_yorumlari_tr
+            if _EN:
+                genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"Your progressed Moon is in {sonuc['ay_burcu']} — a balanced and harmonious period.")
+            else:
+                genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"İlerletilmiş Ay'ınız {sonuc['ay_burcu']} burcunda — dengeli ve uyumlu bir dönemdesiniz.")
 
             yorumlar.append({
                 "kisi": sonuc["kisi"],
@@ -5806,7 +6145,7 @@ class FBST_Engine:
             k1_grup = next((g for g, b in burc_gruplari.items() if k1["ay_burcu"] in b), "")
             k2_grup = next((g for g, b in burc_gruplari.items() if k2["ay_burcu"] in b), "")
 
-            uyum_mesajlari = {
+            uyum_mesajlari_tr = {
                 ("ateş", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — aynı element grubundasınız: tutkunuz, cesaretiniz ve enerjiniz birbirini doğal olarak besliyor. Birlikte hayatın tadını çıkarmak için yaratılmışsınız. Ama dikkat: iki ateş bir arada bazen yangın da yaratabilir — sabırlı olun.",
                 ("toprak", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprağın sağlamlığı sizde: istikrar, güven ve somut adımlar bu ilişkinin temeli. Birlikte çok güçlü bir yapı kurabilirsiniz. Ama esnekliği de elden bırakmayın: bazen biraz topraktan kalkıp rüzgara karışmak gerekir.",
                 ("hava", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — zihinsel olarak çok uyumlusunuz: sohbetleriniz bitmez, fikirleriniz birbirini besler. Birlikte dünyayı keşfetmek için harika bir ekip oluşturuyorsunuz. Ama sadece zihinle yetinmeyin: duygularınızı da paylaşın.",
@@ -5824,8 +6163,30 @@ class FBST_Engine:
                 ("hava", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — hava ve su zorlu ama zenginleştirici: siz mantığa, o duyguya önem veriyorsunuz. Bu denge çok değerli: birbirinize farklı pencerelerden bakmayı öğretirsiniz.",
                 ("su", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — su ve hava zorlu ama zenginleştirici: duygusal derinliğiniz zihinsel berraklıkla buluşuyor. Birlikte hem hissedebilir hem de anlayabilirsiniz.",
             }
+            uyum_mesajlari_en = {
+                ("ateş", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — you are in the same element group: your passion, courage, and energy naturally feed each other. You were made to enjoy life together. But beware: two fires together can sometimes create a blaze — be patient.",
+                ("toprak", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — the solidity of the earth is in you: stability, trust, and concrete steps are the foundation of this relationship. Together you can build a very strong structure. But do not let go of flexibility: sometimes you need to rise slightly from the earth and blend with the wind.",
+                ("hava", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — you are mentally very attuned: your conversations never end, and your ideas feed one another. You make a wonderful team for exploring the world together. But do not settle for the mind alone: share your feelings too.",
+                ("su", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — your emotional depth is very strong: you understand each other profoundly and can even speak through intuition. This spiritual bond is very special. But do not forget to support each other through emotional ups and downs.",
+                ("ateş", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and air are highly compatible: you bring passion and energy, they bring vision and intellect. Together you can produce brilliant ideas and dream big. This combination is highly creative.",
+                ("hava", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and fire are highly compatible: your mental intellect meets your passion. Together you can both talk and take action. This balance is very valuable.",
+                ("toprak", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and water are deeply nourishing: you form a concrete foundation, they add emotional depth. Together you can build a home that is both secure and full of feeling.",
+                ("su", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and earth are deeply nourishing: your emotional richness meets concrete steps. Together you can both dream and turn those dreams into reality.",
+                ("ateş", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and earth are a challenging but valuable combination: you want speed, they are patient. This contrast strengthens you: it protects you from haste and teaches you patience.",
+                ("toprak", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and fire are challenging but valuable: your patience and steadiness balance your partner's fire. Together you can build a relationship that is both solid and passionate.",
+                ("ateş", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and water are challenging but fascinating: you are outgoing, they are inward. This contrast completes each other but can sometimes create steam. Be patient and understanding.",
+                ("su", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and fire are challenging but fascinating: your emotional depth meets your partner's energy. Together you can experience something both passionate and emotional.",
+                ("hava", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and earth are different but complementary: you bring vision, they bring execution. Together you can bring great projects to life.",
+                ("toprak", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and air are different but complementary: your concrete steps meet your mental intellect. Together you can both dream and build those dreams.",
+                ("hava", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and water are challenging but enriching: you value logic, they value feeling. This balance is very valuable: you teach each other to look through different windows.",
+                ("su", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and air are challenging but enriching: your emotional depth meets mental clarity. Together you can both feel and understand.",
+            }
+            uyum_mesajlari = uyum_mesajlari_en if _EN else uyum_mesajlari_tr
             uyum_key = (k1_grup, k2_grup)
-            uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{k1['ay_burcu']} ve {k2['ay_burcu']} — farklı elementlerden gelmeniz zenginlik katacak. Farklılıklarınız en büyük gücünüz olacak.")
+            if _EN:
+                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{k1['ay_burcu']} and {k2['ay_burcu']} — coming from different elements will add richness. Your differences will become your greatest strength.")
+            else:
+                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{k1['ay_burcu']} ve {k2['ay_burcu']} — farklı elementlerden gelmeniz zenginlik katacak. Farklılıklarınız en büyük gücünüz olacak.")
 
             yorumlar.append({
                 "kisi": "İlişki Uyumu",
@@ -5846,6 +6207,7 @@ class FBST_Engine:
         import random
         
         # --- BSP SÖZLÜĞÜ: MODA GÖRE SEÇİM ---
+        _EN = _core_get_lang() == "en"
         aktif_mod = getattr(self, 'mod', 'es_sevgili')
         
         if aktif_mod == "ebeveyn_cocuk":
@@ -6202,6 +6564,364 @@ class FBST_Engine:
                     "🌋 <b>Yıkıcı Üretim Gücü:</b> Bastırılmış öfke aniden patlayabilir; köprüleri yakıp atma isteği tavan yapabilir. Bu enerji bir zehirdir; panzehiri (şefkati) bugün devreye sokun."
                 ]
             }
+
+        # --- EN SÖZLÜĞÜ (İNGİLİZCE ÇIKTI İÇİN) ---
+        if _EN:
+            if aktif_mod == "ebeveyn_cocuk":
+                bsp_sozlugu_en = {
+                    "Güneş_0": [
+                        "Identity Renewal: Your child's sense of self emerges powerfully today. A great day to start a new hobby or activity together; stand by them in these moments when they search for the answer to 'who am I'.",
+                        "Ego Glow: Your child wants attention today. Celebrate their successes and spare no praise; your approval is the cornerstone of their self-confidence.",
+                        "Revival Time: Your child's energy is at its peak today. Go out, run, play; channeling this enthusiasm together in a healthy way will do you both good.",
+                        "Shared Vision: A day to make beautiful plans for the future together. Set a goal or dream together; these moments where your visions meet make your bond visible."
+                    ],
+                    "Güneş_60": [
+                        "Willpower Harmony: There is a natural harmony between parent and child. Shared decisions come easily today; guidance and independence are balanced without conflict today.",
+                        "Supportive Flow: The day flows very smoothly. Small activities done together can bring great happiness; your support returns to you as your child's trust.",
+                        "Sweet Opportunities: A lovely time to surprise your child. An unexpected gift or activity plan can add delightful moments to your day; make the most of this energy.",
+                        "Soft Transition: If you're coming out of a tense period, today you can breathe easier. Do something calm together, talk; patience and understanding bear fruit today."
+                    ],
+                    "Güneş_90": [
+                        "Ego Test: Your child's 'I want it' demands may be challenging today. Be patient, balance setting limits with listening; staying calm matters in these hours when authority and individuality collide.",
+                        "Willpower Friction: Disagreements may arise between parent and child. Before arguing, ask 'why?' to understand your child's inner world; this effort softens the tension.",
+                        "Provocative Mirror: Your child's attitude may anger you. You may see your own childhood experiences in their behavior — stay calm; this mirror has something to tell you too.",
+                        "Patience Test: Hours when discipline becomes hard. Explain the rules in a clear but loving tone; this balance restores the parent-child balance of power."
+                    ],
+                    "Güneş_120": [
+                        "Effortless Shine: Your child glows naturally today. Give them the chance to display their talents; you will live moments to be proud of.",
+                        "Spiritual Feast: Every moment spent together is precious today. Read a book, talk, or go for a walk; these shares nourish you both.",
+                        "Lucky Day: An enjoyable day for both of you. Laugh with your child, have fun, celebrate life; this joy refreshes your bond.",
+                        "Sync Moments: You understand each other astonishingly well today. You may think the same things and laugh at the same time; notice this harmony and value it."
+                    ],
+                    "Güneş_180": [
+                        "Polarity Test: You may be at completely opposite poles today. Say 'I want to understand you' instead of 'I was right'; opposites in fact let you know each other better.",
+                        "See-saw Balance: You may be serious while your child is cheerful, or the reverse. A day of balance where one must adapt to the other's energy; see the rhythm difference as color, not a problem.",
+                        "Attraction and Repulsion: You may feel both very close to and very far from your child. Sense the right moment between keeping distance and hugging; attachment and independence are tested together today.",
+                        "Opposite Front: Your child may challenge your authority. This is not rebellion but a search for identity — while holding your boundaries, listen to them too."
+                    ],
+                    "Merkür_0": [
+                        "Telepathic Mind: You can communicate very fluidly with your child today. Have a long, deep conversation with them, listen to what they think; words become almost unnecessary.",
+                        "Mental Wholeness: An important decision can be discussed and resolved very easily today. Get your child's opinion, find a common path; two minds work like a single flow today.",
+                        "Intellectual Spark: Your child's creativity is very high today. Work on a project or art activity together; nurture this spark together.",
+                        "Smooth Communication: A day when misunderstandings evaporate. Even difficult topics can be discussed comfortably today; your need to be understood will be fully met."
+                    ],
+                    "Merkür_90": [
+                        "Communication Bottleneck: A day when words may be taken the wrong way. Choose your words carefully, try to think from your child's mind; today's real test is 'listening'.",
+                        "Verbal Tension: Arguments may flare easily. Watch your tone of voice, prefer listening over speaking; your communication bridge needs maintenance today.",
+                        "Misunderstanding: Your child may take your joke seriously or the reverse. Be clear and direct today, avoid innuendo; sometimes the best message is silence.",
+                        "Logic Clash: Daily plans may not align. Be flexible, rearrange plans together; even this mess can be an opportunity."
+                    ],
+                    "Merkür_120": [
+                        "Flawless Dialogue: An ideal time to bring a difficult topic to the table today. You can comfortably discuss an important subject with your child; your communication channel is wide open.",
+                        "Intellectual Dance: Read a book together, discuss a film, or have deep conversations. A great day to explore your child's mental world; this discovery enriches you both.",
+                        "Shared Bond: Your child can understand what you'll say before you even say it. Celebrate this special bond; your minds are on the same frequency today.",
+                        "Healing Words: You can easily share your concerns about your child today. Build an emotional bridge through empathy; trust is reinforced through today's conversations."
+                    ],
+                    "Merkür_180": [
+                        "Idea Duel: You may hold very different perspectives today. See your differences as richness rather than conflict; every perspective opens a horizon.",
+                        "Opposite Views: You may look at the same event from completely different angles. Try to understand your child's viewpoint, listen without judgment; it opens new windows for you.",
+                        "Questioning Phase: You may evaluate your child's decisions very critically today. Express your criticism in a constructive, supportive tone; the aim is not to break but to guide.",
+                        "Tense Negotiation: You may argue about homework, rules, or responsibilities. Set the rules together, get your child's input too; compromise is possible at today's table."
+                    ],
+                    "Venüs_0": [
+                        "Loving Day: You are very affectionate and loving toward each other today. Hug, kiss, say 'I love you' — show your love verbally and physically; this bond is renewed today.",
+                        "Charm Peak: Your child carries a very attractive and affectionate energy today. Turn this energy into an activity together; loving hours await you.",
+                        "Unconditional Harmony: The chance of quarrels or tension between you is very low today. Savor this peaceful moment, do good things together; such days are rare.",
+                        "Sweet Attraction: Beauty and aesthetics take the lead today. Paint together, listen to music, or take a nature walk; love flows within these shares."
+                    ],
+                    "Venüs_90": [
+                        "Value Test: Your child may feel unworthy today. Repeatedly tell them you love them unconditionally, give concrete examples; they deeply need this reassurance today.",
+                        "Emotional Thirst: Your child may demand extra love and attention today. This is not being spoiled but an inner need — meet it with patience.",
+                        "Aesthetic Clash: Disagreement may arise over clothing, appearance, or tastes. Respect your child's tastes, guide but don't pressure; tastes settle over time.",
+                        "Passion Bottleneck: Your child may be very emotional and touchy today. Tend to them with patience and compassion, validate their feelings; listening is more valuable than speaking today."
+                    ],
+                    "Venüs_120": [
+                        "Unconditional Attraction: Love between you flows naturally and strongly today. A soft day when you catch happiness without any effort; surrender to this flow.",
+                        "Romantic Flow: (In the parent-child bond) A wonderful time to voice your love, hug, and meet each other's eyes. Small gestures of love will be very effective today.",
+                        "Sweet Peace: Enjoy peace through a shared activity. Listen to music, cook, or spend time in the garden together; the outside world can wait today.",
+                        "Beauty Rhythm: Every setting you're in with your child becomes more beautiful today. Join social settings together, shine together; this harmony is visible from the outside too."
+                    ],
+                    "Venüs_180": [
+                        "Need for Love: Your child may need extra love today. Show how much you love them through your actions; actions speak louder than words.",
+                        "Expectation Polarity: While your child expects a lot from you, you may be trying to set boundaries. Talk openly about your expectations and listen to theirs; a middle ground can be found today.",
+                        "Cold Mirror: You may stay emotionally distant from each other today. Take the first step to close the distance, hug; coldness often comes from fear.",
+                        "Passion See-saw: Your child may be emotionally up and down today. Be patient, treat the fluctuations as normal; emotions come and go, the bond endures."
+                    ],
+                    "Mars_0": [
+                        "Passion and Action: Your child's energy is very high today. Play sports together, run, play games; turning this energy into action together is the best move.",
+                        "Volcanic Energy: Your child has tremendous energy today. Direct it into a creative project; you'll see what two strong wills can do once they unite.",
+                        "Birth of Courage: Your child is brave and enterprising today. Support and encourage them to try something new; their courage grows with your trust.",
+                        "Fast and Furious: Energy is high but patience may be low. Be patient with their impatience, channel their energy rightly; your calm sets the example."
+                    ],
+                    "Mars_90": [
+                        "Ring of Fire: Your child may get angry or irritated easily today. Listen to their anger without judgment, suggest breathing exercises; anger management is being learned today.",
+                        "Big Test: Harsh arguments may occur between parent and child. Don't raise your voices, stay calm — be the model; your patience passes its greatest test today.",
+                        "Friction and Crisis: The clash between rules and independence may escalate. Keep the boundary but don't drop empathy; their rebellion may in fact be a call.",
+                        "Patience Test: Your child's behavior may challenge you greatly today. Take a deep breath, remind yourself 'this too shall pass'; these moments are temporary."
+                    ],
+                    "Mars_120": [
+                        "Unbeatable Alliance: Today you are a very strong team as parent and child. Overcome a hard task together, show your team spirit; you'll feel that you're stronger together.",
+                        "Action Flow: You are physically very in sync. Play sports together, go for a walk, spend your energy together; moving together feels natural today.",
+                        "Teamwork: You complete the energy your child is missing. You can achieve wonderful things by supporting each other; this balance equips you with the power to overcome obstacles.",
+                        "Fast Sync: Shared decisions are put into action very quickly today. Make a plan together and start right away — timing is perfect today."
+                    ],
+                    "Mars_180": [
+                        "Big Duel: You may get into harsh arguments today. Direct your anger at the problem, not at your child; boundaries of power are being clarified today, so be careful.",
+                        "Power Struggle: 'It will be my way' standoffs may occur. Balance authority with democracy — set limits but listen; let the winner be the bond, not a side.",
+                        "Polarized Will: You may move at very different speeds today. Respect your child's rhythm, don't rush them; their different tempo is not an obstacle.",
+                        "Opposite Rhythms: When you're very fast, your child may be slow, or the reverse. Find a common tempo, adapt to each other; the rhythm difference carries a lesson today."
+                    ],
+                    "Satürn_0": [
+                        "Responsibility Day: A serious, responsibility-focused day today. Give your child an important responsibility, trust them; your trust speeds their maturation.",
+                        "Foundation Building: A great day for making concrete plans for the future. Set a goal together and plan it step by step; solid foundations are laid today.",
+                        "Responsibility Phase: Responsibilities and rules take the lead today. Teach your child the importance of discipline and order with love; this lesson leaves a lasting mark.",
+                        "Lasting Word: Your promises carry very strong weight today. Keep the promises you make to your child, build trust; kept promises strengthen your bond."
+                    ],
+                    "Satürn_90": [
+                        "Structural Resistance: Your child may resist discipline and rules today. Explain the reasons behind the rules, approach with understanding rather than pressure; rules with reasons are easier to obey.",
+                        "Inadequacy Test: You may feel like an inadequate parent. You don't have to be perfect — sincerity is enough; your child wants a parent who is present, not perfect.",
+                        "Invisible Wall: There may be an invisible wall between you and your child today. Break it down with tenderness, be close to them; walls are usually built from fear.",
+                        "Duty Fatigue: A day when you may be tired of parenting duties. Make time for yourself too, don't hesitate to ask for support; a tired parent cannot be a balanced one."
+                    ],
+                    "Satürn_120": [
+                        "Unshakeable Harbor: Today you feel you are a strong harbor for your child. Let them feel that they are safe, support them; your presence is their greatest security.",
+                        "Wall of Trust: Respect and loyalty are very strong today. Reinforce your trust in each other with concrete actions; trust grows with small, steady steps.",
+                        "Sober Love: No grand words needed; simply being side by side is enough. Spend quiet time together, and this alone is precious; time doesn't wear down your bond, it strengthens it.",
+                        "Shared Discipline: Rules and responsibilities work very harmoniously today. Your child obeys the rules willingly — appreciate it; discipline, joined with love, liberates."
+                    ],
+                    "Satürn_180": [
+                        "Authority Clash: You may clash over authority today. Use the language of 'we decided this together' rather than 'this is how grown-ups do it'; respect is earned by example, not command.",
+                        "Distance Test: When you're warm, your child may be distant, or the reverse. Keep showing your love despite the distance; the coldness is temporary, the bond is lasting.",
+                        "Rigid Walls: Rules may feel very rigid today. Also show the flexible sides of the rules, don't overwhelm your child; rigidity breaks, flexibility makes headway.",
+                        "Burden of Responsibility: You may feel that the whole parenting burden rests on your shoulders. Ask for help, share; the load lightens when shared."
+                    ],
+                    "Jüpiter_0": [
+                        "Bountiful Day: A very lucky and abundant day today. Celebrate with your child, share your joy; this enthusiasm will be contagious.",
+                        "Expanding Horizon: Your child's horizon is clearly widening today. Offer new experiences and learning opportunities; curiosity is the strongest engine of learning.",
+                        "Shared Faith: Both of you carry strong hope for the future. Turn this hope into a plan together; hope becomes real once set in motion.",
+                        "Exaggerated Joy: You may be overly cheerful and exuberant today. Channel this energy well and guard your limits; joy becomes lasting when it meets balance."
+                    ],
+                    "Jüpiter_90": [
+                        "Expectation Illusion: Your child may develop overly big expectations today. Teach realism but don't kill their dreams; the bridge between dream and reality is built with your guidance.",
+                        "Excess Confidence: Your child may be overly self-confident today. Support their courage but also remind them of realistic limits; confidence is balanced by experience.",
+                        "Spoiled Test: Your child may be overly demanding today. Learn to say 'no' with love, set boundaries; boundaries are the foundation of trust.",
+                        "Philosophical Clash: You may argue about beliefs and values. Respect your child's different perspective; each generation has its own questions."
+                    ],
+                    "Uranüs_0": [
+                        "Surprising Day: Today may be very surprising and exciting. Be open to your child's extraordinary ideas, support them; novelty may surprise you today but it makes you grow.",
+                        "Out of the Ordinary Attraction: Your child is very creative and innovative today. Take their ideas seriously, try them together; stepping outside the patterns is possible today.",
+                        "Breaking Chains: Your child may question the rules today. This is not rebellion but the growth of questioning ability — support it; asking questions is the beginning of free thought.",
+                        "Surprise Route: An unexpected development may occur. Be ready for your child's surprises, be flexible; stepping out of routine breathes life today."
+                    ],
+                    "Uranüs_90": [
+                        "Freedom Rebellion: Your child may demand extreme independence today. Give independent space but keep the boundaries too; freedom and security are tested together today.",
+                        "Sudden Shifts: Your child may display sudden, unpredictable behavior. Be patient, don't take the bait; sudden reactions are often the harbinger of a need.",
+                        "Electric Crisis: Sudden arguments or unexpected reactions may occur. Stay calm, avoid impulsive decisions — be the model; the storm passes, balance returns.",
+                        "Distance Break: Your child may feel very far from you today. This is temporary — don't push it, wait; sometimes distance is the prerequisite of closeness."
+                    ],
+                    "Neptün_0": [
+                        "Emotional Day: A very emotional and spiritual day today. Daydream together, make art, or simply hug; empathy builds a bridge between you today.",
+                        "Ease of Forgiveness: Forgiving is very easy today. Let go of old resentments, open a clean page; forgiveness heals you as much as the other.",
+                        "Intuitive Understanding: You can understand what your child feels much better today. Use this intuition to build a deep bond with them; where words fail, intuition speaks.",
+                        "Sweet Illusion: Everything may look very beautiful and rosy today. Enjoy this lovely moment but don't ignore the facts; distinguish dream from reality today."
+                    ],
+                    "Neptün_90": [
+                        "Veil of Fog: Misunderstandings may occur today. Listen to your child's words very carefully, don't assume; avoid making big decisions today.",
+                        "Victim Psychology: You may feel 'I gave everything for you'. Guard the boundaries of your sacrifice, avoid burnout; sacrifice is meaningful only with boundaries.",
+                        "Disappointment Test: Your child's reality may not match your dreams. Accept them as they are, stop idealizing; knowing them is worth more than the dreams you had about them.",
+                        "Escape Tendency: The urge to ignore problems may be strong today. Face things instead of fleeing, seek support; postponed problems return bigger."
+                    ],
+                    "Plüton_0": [
+                        "Deep Transformation: A very deep, transformative experience may unfold today. Listen to your child's deep feelings, let them feel understood; this sincerity brings healing.",
+                        "Strong Bond: The bond between you and your child is very deep and strong today. Feel and appreciate this deep bond; such moments are rare.",
+                        "Transforming Power: You can overcome a shared challenge with tremendous unity of strength. Overcome difficulties together and emerge from this experience grown; crises strengthen bonds.",
+                        "Silent Alliance: There may be special moments today when you understand each other through a single look. Value these silent moments, don't rush; communication beyond words is possible today."
+                    ],
+                    "Plüton_90": [
+                        "Dark Test: Very intense and challenging emotions may arise today. Let go of control, learn to surrender — the hardest lesson for a parent; the bond grows as control is released.",
+                        "Power Struggle: You may clash over power today. Put compassion, not power, first; today it's not a show of force but a union of strength that wins.",
+                        "Anxiety Phase: You may worry about every behavior of your child. Don't exaggerate your worries, stay realistic; fears from the past may strengthen today, so be aware.",
+                        "Destructive Creative Power: Suppressed anger may erupt today. Direct your anger at the problem, not your child — the antidote is compassion; you can emerge from this test stronger together."
+                    ]
+                }
+            else:
+                bsp_sozlugu_en = {
+                    "Güneş_0": [
+                        "☀️ <b>Identity Renewal:</b> A great day to go out together or reach a shared decision today. Your identities and wills naturally flow in the same direction; enjoy this harmony.",
+                        "☀️ <b>Ego Glow:</b> A lovely day to celebrate a shared success with your partner or draw attention to yourselves. The 'we' consciousness strengthens once again today.",
+                        "☀️ <b>Revival Time:</b> A tempo where you'll feel far more energetic and outgoing physically. Your relationship's core identity refreshes today; put this energy to use together.",
+                        "☀️ <b>Shared Vision:</b> A day to make hopeful, clear decisions about the future. An ideal time to plan together in these hours when egos step back."
+                    ],
+                    "Güneş_60": [
+                        "☀️ <b>Willpower Harmony:</b> A sweet, smooth-sailing day when things move briskly in the daily flow. Your wills serve shared goals without clashing.",
+                        "☀️ <b>Supportive Flow:</b> Hours when you can shed the day's stress easily by giving each other small helps. Communication and will meet amicably today.",
+                        "☀️ <b>Sweet Opportunities:</b> Surprising little developments or good news from outside that add delight to your relationship are on the agenda. Notice the 'keep going' signs.",
+                        "☀️ <b>Soft Transition:</b> A phase far more tolerant and harmonious than yesterday, free of tension. Enjoy the feeling of being approved together."
+                    ],
+                    "Güneş_90": [
+                        "☀️ <b>Ego Test:</b> 'It will be my way' standoffs or small glitches in plans may occur. Your sharp corners are being filed down as they strike each other; the flexible one wins today.",
+                        "☀️ <b>Willpower Friction:</b> An outside stress may spill between you, and you may feel wronged. Tolerance and flexibility are today's key.",
+                        "☀️ <b>Provocative Mirror:</b> You may struggle to reach a shared decision and find your partner's attitude bossy. Don't try to prove your power through your partner; save the rivalry for the outside world.",
+                        "☀️ <b>Patience Test:</b> You may feel your energy blocked and your need for approval unmet. Respecting differences is today's practice; patience is love's quietest proof."
+                    ],
+                    "Güneş_120": [
+                        "☀️ <b>Effortless Shine:</b> A smooth time when you enjoy your relationship and receive compliments from the outside. Your life energy flows of its own accord today.",
+                        "☀️ <b>Spiritual Feast:</b> A soothing flow in which you'll feel your best version beside your partner. You heal each other naturally, without exhausting one another.",
+                        "☀️ <b>Lucky Day:</b> A day when your affairs ease and joy and smiles between you hit the ceiling. Savor this flow to the fullest.",
+                        "☀️ <b>Sync Moments:</b> Hours when you think the same thing and laugh at once, with a very strong sense of belonging. This harmony is one of the healthiest proofs of your relationship."
+                    ],
+                    "Güneş_180": [
+                        "☀️ <b>Polarity Test:</b> Your partner may arrive with a completely opposite idea or emotional distance may grow between you. Today your partner holds up a mirror to you; this is a growth opportunity.",
+                        "☀️ <b>See-saw Balance:</b> One of you may be very eager while the other is reluctant; rhythms may not match. Opposite ends are tested today; mutual compromise is essential for balance.",
+                        "☀️ <b>Attraction and Repulsion:</b> Big physical attraction and the urge to pull away may coexist. The part you're missing takes shape in your partner; choose completion over judgment.",
+                        "☀️ <b>Opposite Front:</b> You may feel your role in the relationship questioned and your need to please grow. Stay calm and hold your center; this too shall pass."
+                    ],
+                    "Merkür_0": [
+                        "🧠 <b>Telepathic Mind:</b> A day of increased texting, wonderful conversations, or a short-trip plan. You understand each other without needing words.",
+                        "🧠 <b>Mental Wholeness:</b> Hours when you can put an important decision on the table and resolve it swiftly with shared mind. Two minds work as a single flow today.",
+                        "🧠 <b>Intellectual Spark:</b> A day when you inspire each other and talk eagerly about new projects or hobbies. Your shared vision renews intellectually.",
+                        "🧠 <b>Smooth Communication:</b> A flow where misunderstandings evaporate and even the hardest topics are spoken sweetly. Your need to be understood is fully met today."
+                    ],
+                    "Merkür_90": [
+                        "🧠 <b>Communication Bottleneck:</b> A day when words are taken wrong and paperwork/tech issues add stress to the relationship. Today's real test is to master 'listening'.",
+                        "🧠 <b>Verbal Tension:</b> Arguments may flare easily, with interruptions and stubbornness. Instead of proving yourself right, seek the reason in your partner's silence.",
+                        "🧠 <b>Misunderstanding:</b> One of you may take a joke seriously and sulk. Be clear and direct today, avoid innuendo; sometimes the best message is silence.",
+                        "🧠 <b>Logic Clash:</b> Daily plans may not align, and disorganization can turn into a nerve war. Your shared decision-making needs servicing today; stay flexible."
+                    ],
+                    "Merkür_120": [
+                        "🧠 <b>Flawless Dialogue:</b> A perfect day to bring a postponed difficult topic to the table and settle it sweetly. Your ideas flow like water today.",
+                        "🧠 <b>Intellectual Dance:</b> A wonderful flow for watching a film together, discussing a book, or long talks over coffee. You nourish each other deeply on a mental level.",
+                        "🧠 <b>Shared Bond:</b> Very sweet, cheerful communication hours when you understand what your partner will say before they say it. Your minds are on the same frequency today.",
+                        "🧠 <b>Healing Words:</b> When you share what saddens you with your partner, you can receive great advice and relax. Your communication channel is brilliantly open; trust is reinforced through words today."
+                    ],
+                    "Merkür_180": [
+                        "🧠 <b>Idea Duel:</b> Mutual criticism may rise and old books may be reopened. This can be seen as a horizon-widening storm; don't fear it, listen.",
+                        "🧠 <b>Opposite Views:</b> One of you may insist on calling what the other calls black, white. This stubbornness reveals gaps in each other's decision-making; learn from it.",
+                        "🧠 <b>Questioning Phase:</b> You may be inclined to fiercely criticize your partner's decisions or logic. You're projecting your own indecision onto your partner; look at yourself first.",
+                        "🧠 <b>Tense Negotiation:</b> You may struggle building a shared budget, plan, or timeline. Two different worlds meet at today's table of compromise; flexibility wins."
+                    ],
+                    "Venüs_0": [
+                        "❤️ <b>Loving Day:</b> You are very affectionate and loving toward each other today. A romantic date, peak physical attraction, or a shared gain is on the agenda; this bond renews today.",
+                        "❤️ <b>Charm Peak:</b> Hours when you find each other extra attractive and love is refreshed through gifts or small gestures. Your relationship's sense of self-worth strengthens today.",
+                        "❤️ <b>Unconditional Harmony:</b> A flow where quarrels are easily forgotten and resolved with hugs, ruled by peace and sweetness. Your love flows by itself today.",
+                        "❤️ <b>Sweet Attraction:</b> An ideal time to beautify together, shop, or add an aesthetic touch to your home. Love flows within these shares."
+                    ],
+                    "Venüs_90": [
+                        "💔 <b>Value Test:</b> Jealousy crises, 'you don't spend enough time with me' caprices, or financial tension may occur. The 'fear of not being loved' inside you surfaces; meet this fear with compassion.",
+                        "💔 <b>Emotional Thirst:</b> You may find your partner's gestures insufficient, feel touchy or worthless. Resetting your expectations and staying in the flow is today's healing.",
+                        "💔 <b>Aesthetic Clash:</b> Cold wars may break out over appearance, spending, or social tastes. Your give-and-take balance is tested today; speak openly.",
+                        "💔 <b>Passion Bottleneck:</b> Physical distance or a 'they don't understand me' feeling may arise. The thin line between being spoiled and tenderness is tested today; talking heals."
+                    ],
+                    "Venüs_120": [
+                        "🕊️ <b>Unconditional Attraction:</b> A soft day when you catch happiness without effort, ruled by peace. Your love flows naturally, like water today.",
+                        "🕊️ <b>Romantic Flow:</b> A wonderful time to voice your love, make small surprises, or understand each other through deep looks. You mend each other's wounds with love.",
+                        "🕊️ <b>Sweet Peace:</b> Relaxing hours when you meet in shared pleasures, perhaps resting along with music or a fine meal. Worldly stresses stay outside the door today.",
+                        "🕊️ <b>Beauty Rhythm:</b> A phase where you're an envied couple in social settings and the joy between you shows outward. Beauty and abundance pour upon you today."
+                    ],
+                    "Venüs_180": [
+                        "🪞 <b>Need for Love:</b> A feeling of indifference or a 'I give so much, they give little' reckoning may occur. Your give-and-take balance is tested today; restoring it is up to you.",
+                        "🪞 <b>Expectation Polarity:</b> One of you may be clingy while the other wants to run; love languages may not match. Beware the tendency to complete your self-worth deficit through your partner.",
+                        "🪞 <b>Cold Mirror:</b> You may be overly critical, judge your partner's tastes, or clash over finances. This tension is actually a compass balancing your relationship; assess it calmly.",
+                        "🪞 <b>Passion See-saw:</b> A volatile mood swinging between sudden jealousy and deep coldness may occur. 'How much do I belong to you?' is on the agenda today; seek the answer together."
+                    ],
+                    "Mars_0": [
+                        "🔥 <b>Passion and Action:</b> Playing sports together, handling a tiring task, or rising physical passion is on the agenda. Acting together feels natural today.",
+                        "🔥 <b>Volcanic Energy:</b> Suddenly rising energy in the relationship, quick decisions, and locking onto a shared goal. Your wills unite into a single force.",
+                        "🔥 <b>Birth of Courage:</b> Very active hours when you can overcome postponed hard tasks shoulder to shoulder. Your relationship's life fire blazes up today.",
+                        "🔥 <b>Fast and Furious:</b> A flow where you're a bit impatient but very productive, directing rivalry outward. The satisfaction of sweating together is very close today."
+                    ],
+                    "Mars_90": [
+                        "⚔️ <b>Ring of Fire:</b> Anger flare-ups over trifles or intolerance may occur. Pour this intense energy into a task that tires you; use it instead of exploding.",
+                        "⚔️ <b>Big Test:</b> A red-alert day of raised voices and 'don't tell me what to do' rebellions. Cool this energy with a deep breath; calm wins today.",
+                        "⚔️ <b>Friction and Crisis:</b> Rivalry may seep into the relationship, and stubbornness may break hearts. Your partner is not your enemy — remember that today.",
+                        "⚔️ <b>Patience Test:</b> Your partner's moves may sting you; the risk of taking the bait is high. Stepping back today is the smartest move that saves the relationship."
+                    ],
+                    "Mars_120": [
+                        "🚀 <b>Unbeatable Alliance:</b> A flow where you can overcome difficulties back to back and take brave steps. You are one heart today for a shared goal.",
+                        "🚀 <b>Action Flow:</b> You're physically very in sync; you can handle tiring tasks and have fun at once. Today is the peak of production and passion.",
+                        "🚀 <b>Teamwork:</b> The energy one of you lacks is completed by the other — a wonderful partnership. The power to 'overcome obstacles' runs high in both of you today.",
+                        "🚀 <b>Fast Sync:</b> Shared decisions turn into action very quickly; the fire between you burns sweetly. Timing works in your favor today."
+                    ],
+                    "Mars_180": [
+                        "⚔️ <b>Big Duel:</b> Harsh arguments, a 'my rules' pressure, or frayed nerves are in play. Turn the fire on the outside problems, not your partner.",
+                        "⚔️ <b>Power Struggle:</b> An authority contest over whose word rules may occur. You exist to grow each other, not destroy each other; remember that today.",
+                        "⚔️ <b>Polarized Will:</b> Your actions may block each other, reaching the point of 'if you don't, I won't either'. Lower your swords and look into each other's eyes.",
+                        "⚔️ <b>Opposite Rhythms:</b> One of you wants to move fast while the other drags their feet. You see your own lack of action in your partner and get angry at them; look into your own mirror first."
+                    ],
+                    "Satürn_0": [
+                        "⚖️ <b>Responsibility Day:</b> Taking on a serious responsibility, discussing investment, or a sober day is on the agenda. Flighty feelings give way to loyalty; this seriousness strengthens your bond.",
+                        "⚖️ <b>Foundation Building:</b> Hours of concrete plans for the future, with loyalty and rules in the lead. Your relationship's invisible pillars strengthen today.",
+                        "⚖️ <b>Responsibility Phase:</b> A weighty flow more about work, power, family duties, and seriousness than romance. A day to share the worldly burden of partnership.",
+                        "⚖️ <b>Lasting Word:</b> A period when you feel the worth of the promises you make to each other and old issues close wisely. Kept promises visibly strengthen your bond."
+                    ],
+                    "Satürn_90": [
+                        "🚧 <b>Structural Resistance:</b> Emotional coldness, a feeling of neglect, or work pressure may hinder the relationship. A time for patience; tend the wounds instead of building walls.",
+                        "🚧 <b>Inadequacy Test:</b> A 'they don't love me' delusion, overcriticism, or a feeling of restriction may arise. Wounds taken today become permanent if unmended — attend to them at once.",
+                        "🚧 <b>Invisible Wall:</b> You may feel a cold, invisible wall between you and your partner. You're projecting your inner inadequacy onto the relationship; give compassion instead of begging for it.",
+                        "🚧 <b>Duty Fatigue:</b> Life's hustle and money worries may freeze romance. You're in an endurance test today; show each other understanding."
+                    ],
+                    "Satürn_120": [
+                        "⛰️ <b>Unshakeable Harbor:</b> A rock-solid, grounded day when you'll say 'I can do everything with this person'. Today your love proves it has the strength to weather storms.",
+                        "⛰️ <b>Wall of Trust:</b> Times when respect and loyalty are felt at their peak, with support from elders. You harvest the fruits of your relationship's deep-rooted solidity.",
+                        "⛰️ <b>Sober Love:</b> No grand words needed; standing side by side gives tremendous strength. Time doesn't wear down your relationship; it ages it like fine wine.",
+                        "⛰️ <b>Shared Discipline:</b> You can solve financial, domestic, or career-focused issues together, maturely, and quickly. Today responsibilities are not a burden but the mortar of your bond."
+                    ],
+                    "Satürn_180": [
+                        "🧱 <b>Authority Clash:</b> A feeling of restriction, your partner taking on a father/boss role, or overly critical attitudes may occur. Instead of asserting superiority, approach your partner's fears with compassion.",
+                        "🧱 <b>Distance Test:</b> One of you may seek warmth and closeness while the other stays distant and work-focused. Rules and love's freedom are in tension today; find the balance together.",
+                        "🧱 <b>Rigid Walls:</b> Old mistakes may be harshly brought to the table with 'because of you'. While judging your partner's mistakes, remember that you're judging your own fears.",
+                        "🧱 <b>Burden of Responsibility:</b> The feeling that all of the relationship's worldly weight rests on one shoulder, and cold anger, may arise. Share the loads immediately — balance is essential today."
+                    ],
+                    "Jüpiter_0": [
+                        "🍀 <b>Bountiful Day:</b> Celebration, gift-giving, a travel plan, or a moment of great joy is on the agenda. Your soul overflows with joy today; share this enthusiasm.",
+                        "🍀 <b>Expanding Horizon:</b> Lucky hours of having great fun together and deep philosophical or spiritual talks. Abundance smiles on you generously today.",
+                        "🍀 <b>Shared Faith:</b> A positive day far from pessimism, with strong hope that everything can be solved. Your bond of faith refreshes today.",
+                        "🍀 <b>Exaggerated Joy:</b> Delightful but limitless experiences like lots of laughter, overspending, or a growing appetite may occur. Joy flows into the relationship; enjoy it but don't forget the limits."
+                    ],
+                    "Jüpiter_90": [
+                        "🎈 <b>Expectation Illusion:</b> A day when desires are exaggerated, unnecessary expenses are made, or promises that can't be kept are given. Stay realistic; excessive optimism may turn into disappointment tomorrow.",
+                        "🎈 <b>Excess Confidence:</b> A 'I know better' attitude may be blown up, or a tendency to belittle your partner's ideas. Over-expansion can break the structure's flexibility; keep the measure today.",
+                        "🎈 <b>Spoiled Test:</b> Finding the given value insufficient, constantly demanding more, and dissatisfaction may arise. Remember your gratitude today; see the worth of what you have.",
+                        "🎈 <b>Philosophical Clash:</b> Loud arguments over beliefs, visions, or worldviews may occur. Choose to listen instead of preaching to each other."
+                    ],
+                    "Uranüs_0": [
+                        "⚡ <b>Surprising Day:</b> Unexpected surprises, sudden schedule changes, and out-of-the-ordinary ideas are on the agenda. Your routine is refreshed with a revolutionary touch today.",
+                        "⚡ <b>Out of the Ordinary Attraction:</b> Hours when the exciting spark of the first days falls back into the relationship — very fun and rebellious. Patterns are breaking; your relationship evolves into a new dimension.",
+                        "⚡ <b>Breaking Chains:</b> A strong urge to escape and free yourselves from the rules that stifle or confine you. Freedom and individuality are integrated today without harming the relationship.",
+                        "⚡ <b>Surprise Route:</b> A sudden trip, an unexpected piece of news, or a mind-opening modern development may occur. Monotony shatters today; savor this breath of air."
+                    ],
+                    "Uranüs_90": [
+                        "⚡ <b>Freedom Rebellion:</b> A suffocating feeling, or moments when 'don't tell me what to do' attitudes turn hurtful, may occur. Leave each other independent breathing space; otherwise bonds may be tested by breaks.",
+                        "⚡ <b>Sudden Shifts:</b> Nerves are very tense; the slightest thing may spark a 'drop everything and leave' impulse. You're on the fault line between keeping order and rebelling.",
+                        "⚡ <b>Electric Crisis:</b> Your partner may act utterly unpredictable and inconsistent; sudden arguments may shock you. Avoid impulsive decisions today; the storm is temporary.",
+                        "⚡ <b>Distance Break:</b> One of you may intensely want to individualize and be alone; the other may read this as rejection. Don't push, leave them be; this distance is temporary."
+                    ],
+                    "Neptün_0": [
+                        "🌊 <b>Emotional Day:</b> A lovely day for daydreaming together, watching a film, making something artistic, or hugging to sleep. Empathy and spiritual bonding peak today; be mindful not to drift from facts.",
+                        "🌊 <b>Ease of Forgiveness:</b> Forgiving is very easy today; compassion, and maybe tears, wash the relationship spotless. Egos melt; your souls draw closer.",
+                        "🌊 <b>Intuitive Understanding:</b> A very deep day when you can read what your partner feels from their eyes before they speak. Defenses are down; the flow of unconditional love is strong today.",
+                        "🌊 <b>Sweet Illusion:</b> A romantic phase of leaving worldly troubles outside the door and watching your partner through a lens of perfection. Enjoy it, but don't sign big commitments."
+                    ],
+                    "Neptün_90": [
+                        "🌫️ <b>Veil of Fog:</b> Misunderstandings, suspicion of hidden things, or heavy confusion may occur. Avoid big decisions and confrontations today; you'll see things once the fog clears.",
+                        "🌫️ <b>Victim Psychology:</b> Heavy melancholy and touchiness from the feeling of 'I slaved for you' may arise. Guard your boundaries; balance the sacrifice today.",
+                        "🌫️ <b>Disappointment Test:</b> You may grieve that the 'perfect' meanings you loaded onto your partner don't match real life. This is a warning of your detachment from reality; accept them as they are.",
+                        "🌫️ <b>Escape Tendency:</b> You may choose silence, sleep, or changing the subject instead of solving problems. Hold onto solid ground; facing things is necessary today."
+                    ],
+                    "Plüton_0": [
+                        "🦇 <b>Deep Transformation:</b> Hidden secrets may spill out, followed by intense relief and passion after a deep confrontation. Love's burning power is restorative today.",
+                        "🦇 <b>Strong Bond:</b> Your gazes deepen; a sense of indispensability and belonging grows. Your souls recognize and embrace each other; appreciate this deep bond.",
+                        "🦇 <b>Transforming Power:</b> You can overcome a shared crisis through unity and conquer your fears together. Old toxic patterns die; in their place, unshakable strength is born.",
+                        "🦇 <b>Silent Alliance:</b> A mystical day closed to the outside world, in a deep understanding known only to the two of you. Your relationship's roots are nourished today."
+                    ],
+                    "Plüton_90": [
+                        "🌋 <b>Dark Test:</b> Jealousy, manipulation, or toxic pressures like 'you're mine or no one's' may be triggered. Let go of control and turn to surrender; the bond grows as control is released.",
+                        "🌋 <b>Power Struggle:</b> One of you may act with a 'I'll make you pay for this' logic and nurse grudges. You're facing the dark side of your ego; trying to destroy your partner bleeds the relationship.",
+                        "🌋 <b>Anxiety Phase:</b> Weariness from suspecting every move of your partner and searching for conspiracies in the slightest word may arise. Your abandonment fears are triggered today; this is your issue, not theirs.",
+                        "🌋 <b>Destructive Creative Power:</b> Suppressed anger may suddenly explode; the urge to burn every bridge may peak. This energy is poison; bring the antidote (compassion) into play today."
+                    ]
+                }
+            bsp_sozlugu = bsp_sozlugu_en
         
         minor_oran = 27.32166 / 365.2422 
         alarmlar = []
@@ -6311,6 +7031,7 @@ class FBST_Engine:
         return alarmlar
     
     def pdf_rapor_uret(self, dosya_adi="FBST_Kadersel_Kontrat.pdf"):
+        _core_set_lang(self._lang)
         # Efemeris yolunu hesaplamalardan hemen önce yeniden ayarla
         # (sunucuda import sırasında yapılan set bazen etkisiz kalabiliyor).
         _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
@@ -7271,12 +7992,12 @@ class FBST_Engine:
         baslik_karti_ekle("EV ANALİZİ VE ÖNERİLER", emoji="🎯")
 
         rapor_A_pdf, rapor_B_pdf = self.karmik_ev_aktarimlari(pdf_icin=True)
-        story.append(Paragraph(f"<b>Ev Aktarımları ({self.p1_isim.upper()})</b>", styles['TurkishHeading']))
+        story.append(Paragraph((pdf_label("Ev Aktarımları") if _core_get_lang() == "en" else f"Ev Aktarımları") + f" ({self.p1_isim.upper()})", styles['TurkishHeading']))
         if rapor_A_pdf:
             for satir in rapor_A_pdf: story.append(Paragraph(satir, styles['TurkishNormal']))
         else: story.append(Paragraph("Ağır bir karmik ev mühürlenmesi bulunamadı.", styles['TurkishNormal']))
         
-        story.append(Paragraph(f"<b>Ev Aktarımları ({self.p2_isim.upper()})</b>", styles['TurkishHeading']))
+        story.append(Paragraph(f"<b>{pdf_label('Ev Aktarımları') if _core_get_lang() == 'en' else 'Ev Aktarımları'} ({self.p2_isim.upper()})</b>", styles['TurkishHeading']))
         if rapor_B_pdf:
             for satir in rapor_B_pdf: story.append(Paragraph(satir, styles['TurkishNormal']))
         else: story.append(Paragraph("Ağır bir karmik ev mühürlenmesi bulunamadı.", styles['TurkishNormal']))
@@ -7333,7 +8054,7 @@ class FBST_Engine:
 
         # 🔮 6. BÖLÜM: İLİŞKİ ÖNGÖRÜSÜ
         story.append(PageBreak())
-        story.append(Paragraph("🔮 İLİŞKİ ÖNGÖRÜSÜ", styles['CoverTitle']))
+        story.append(Paragraph("🔮 " + pdf_label("İLİŞKİ ÖNGÖRÜSÜ"), styles['CoverTitle']))
         story.append(Paragraph("Bu bölüm ilişkinizin sırasıyla Yıllık, Aylık ve Günlük kadersel akışlarını gösterir.", styles['CoverSub']))
         story.append(Spacer(1, 30))
 
@@ -7719,6 +8440,7 @@ class FBST_Engine:
             ]
 
             for tarama in taramalar:
+                _EN = _core_get_lang() == "en"
                 satirlar = []
                 toplam_muhur = 0
                 sahip_natal_jd = self.get_natal_julian_day(tarama["sahip_kimlik"])
@@ -7743,7 +8465,7 @@ class FBST_Engine:
                         if fark <= 5.0:
                             toplam_muhur += 1
                             yorum_key = (asteroit_adi, hedef_adi)
-                            varsayilan_yorum = f"{asteroit_adi} - {hedef_adi} karmik teması"
+                            varsayilan_yorum = (f"{asteroit_adi} - {hedef_adi} karmic contact" if _EN else f"{asteroit_adi} - {hedef_adi} karmik teması")
                             _aktif_mod = st.session_state.get("sim_modu", "es_sevgili")
                             _asteroid_sinastri_sozluk = ARAP_ILISKI.get("ASTEROID_SINASTRI_YORUMLARI", {})
                             if _aktif_mod == "ebeveyn_cocuk" and ASTEROID_SINASTRI_YORUMLARI_EBEVEYN:
@@ -7752,38 +8474,38 @@ class FBST_Engine:
                                 yorum = _asteroid_sinastri_sozluk.get(yorum_key, varsayilan_yorum)
 
                             if fark <= 0.5:
-                                durum = "KUSURSUZ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐⭐⭐ Kaderin Kesin Mührü"
+                                durum = "PRISTINE SEAL" if _EN else "KUSURSUZ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐⭐⭐ Fate's Definitive Seal" if _EN else "⭐⭐⭐⭐⭐ Kaderin Kesin Mührü"
                                 renk = "#C9A96E"
                             elif fark <= 1.0:
-                                durum = "TAŞ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐⭐ Güçlü Kadersel Bağ"
+                                durum = "STONE SEAL" if _EN else "TAŞ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐⭐ Powerful Karmic Bond" if _EN else "⭐⭐⭐⭐ Güçlü Kadersel Bağ"
                                 renk = "#2E7D32"
                             elif fark <= 2.0:
-                                durum = "TUNÇ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐ Belirgin Etki"
+                                durum = "BRONZE SEAL" if _EN else "TUNÇ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐ Distinct Influence" if _EN else "⭐⭐⭐ Belirgin Etki"
                                 renk = "#1565C0"
                             elif fark <= 3.5:
-                                durum = "GÜMÜŞ MÜHÜR"
-                                guc_seviyesi = "⭐⭐ Hafif Ama Kalıcı İz"
+                                durum = "SILVER SEAL" if _EN else "GÜMÜŞ MÜHÜR"
+                                guc_seviyesi = "⭐⭐ Light Yet Lasting Mark" if _EN else "⭐⭐ Hafif Ama Kalıcı İz"
                                 renk = "#6B7280"
                             else:
-                                durum = "BRONZ MÜHÜR"
-                                guc_seviyesi = "⭐ Uzaktan Gelen Fısıltı"
+                                durum = "BRASS SEAL" if _EN else "BRONZ MÜHÜR"
+                                guc_seviyesi = "⭐ A Whisper From Afar" if _EN else "⭐ Uzaktan Gelen Fısıltı"
                                 renk = "#9E9E9E"
 
-                            sagaltim = sagaltim_matrisi.get(ast_burc, {"yara": "Yetersiz denge", "recete": "Cömert olun."})
+                            sagaltim = sagaltim_matrisi.get(ast_burc, {"yara": ("Insufficient balance" if _EN else "Yetersiz denge"), "recete": ("Be generous." if _EN else "Cömert olun.")})
 
                             satirlar.append(
                                 f"<font color='{renk}'><b>* {durum} ({fark:.1f}°): {tarama['sahip']} {asteroit_adi} ({ast_burc}) <-> {tarama['hedef']} {hedef_adi}</b></font><br/><br/>"
                                 f"<font color='#4A4A4A'><i>{yorum}</i></font><br/><br/>"
-                                f"<font color='#6B7280' size='8'>  Kuvvet: {guc_seviyesi} | Safa: {sagaltim['recete']}</font><br/><br/><br/>"
+                                f"<font color='#6B7280' size='8'>  {'Strength:' if _EN else 'Kuvvet:'} {guc_seviyesi} | {'Remedy:' if _EN else 'Safa:'} {sagaltim['recete']}</font><br/><br/><br/>"
                             )
 
                 if toplam_muhur == 0:
-                    satirlar.append(f"<font color='#4A5568'><i>{tarama['sahip']} ile {tarama['hedef']} arasında 0-5° orb sınırında asteroid sinastri mührü saptanmadı.</i></font><br/>")
+                    satirlar.append((f"<font color='#4A5568'><i>No asteroid synastry seal detected between {tarama['sahip']} and {tarama['hedef']} within the 0-5° orb limit.</i></font><br/>" if _EN else f"<font color='#4A5568'><i>{tarama['sahip']} ile {tarama['hedef']} arasında 0-5° orb sınırında asteroid sinastri mührü saptanmadı.</i></font><br/>"))
 
-                kutu_basligi = f"<b><font color='#1A1A2E' size='12'>[ {tarama['sahip']} → {tarama['hedef']} ] ASTEROİD SİNASTRİ MATRİSİ ({toplam_muhur} Mühür)</font></b><br/><br/>"
+                kutu_basligi = f"<b><font color='#1A1A2E' size='12'>[ {tarama['sahip']} → {tarama['hedef']} ] {'ASTEROID SYNASTRY MATRIX' if _EN else 'ASTEROİD SİNASTRİ MATRİSİ'} ({toplam_muhur} {'Seal' if _EN else 'Mühür'})</font></b><br/><br/>"
                 kutu_metni = kutu_basligi + "".join(satirlar)
                 hieros_kutu = Table([[Paragraph(kutu_metni, styles['TurkishNormal'])]], colWidths=['100%'])
                 hieros_kutu.setStyle(TableStyle([
@@ -7795,7 +8517,7 @@ class FBST_Engine:
                 story.append(Spacer(1, 15))
 
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'><b>Kritik Sistem Hatası (Asteroid Sinastri Modülü):</b> {str(e)}</font>", styles['Normal']))
+            story.append(Paragraph(f"<font color='red'><b>{'Critical System Error (Asteroid Synastry Module):' if _core_get_lang() == 'en' else 'Kritik Sistem Hatası (Asteroid Sinastri Modülü):'} </b>{str(e)}</font>", styles['Normal']))
         # =========================================================================================
         # BÖLÜMÜN SONU
         # =========================================================================================  
@@ -8468,6 +9190,7 @@ class FBST_Engine:
     
     def pdf_potansiyel_rapor_uret(self, dosya_adi=None):
         """Potansiyel & Yetenek modülü için tek kişilik odaklı PDF raporu üretir."""
+        _core_set_lang(self._lang)
         if dosya_adi is None:
             dosya_adi = f"{self._session_id}_Potansiyel_Yetenek.pdf"
         from reportlab.lib.pagesizes import A4
