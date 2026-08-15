@@ -17,7 +17,7 @@ android {
     namespace = "com.fastastrology.fast"
     compileSdk = 36
     buildToolsVersion = "34.0.0"
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "26.3.11579264"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

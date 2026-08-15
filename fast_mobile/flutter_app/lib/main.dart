@@ -6,6 +6,8 @@ import 'l10n/app_localizations.dart';
 import 'providers/analysis_provider.dart';
 import 'providers/locale_provider.dart';
 import 'screens/landing_screen.dart';
+import 'screens/language_intro_screen.dart';
+import 'widgets/splash_logo.dart';
 
 void main() {
   runApp(
@@ -38,9 +40,15 @@ class FastApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: const LandingScreen(),
+          home: _decideHome(localeProvider),
         );
       },
     );
+  }
+
+  Widget _decideHome(LocaleProvider lp) {
+    if (!lp.ready) return const SplashLogo();
+    if (!lp.hasChoice) return const LanguageIntroScreen();
+    return const LandingScreen();
   }
 }

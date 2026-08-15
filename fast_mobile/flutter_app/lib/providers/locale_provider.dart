@@ -6,7 +6,11 @@ class LocaleProvider extends ChangeNotifier {
   static const supportedLocales = [Locale('tr'), Locale('en')];
 
   Locale _locale = const Locale('tr');
+  bool _ready = false;
+  bool _hasChoice = false;
   Locale get locale => _locale;
+  bool get ready => _ready;
+  bool get hasChoice => _hasChoice;
 
   LocaleProvider() {
     _load();
@@ -15,14 +19,20 @@ class LocaleProvider extends ChangeNotifier {
   Future<void> _load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      _hasChoice = prefs.containsKey(_prefKey);
       final code = prefs.getString(_prefKey) ?? 'tr';
       _locale = Locale(code == 'en' ? 'en' : 'tr');
+      _ready = true;
       notifyListeners();
-    } catch (_) {}
+    } catch (_) {
+      _ready = true;
+      notifyListeners();
+    }
   }
 
   Future<void> setLocale(Locale locale) async {
     _locale = locale;
+    _hasChoice = true;
     notifyListeners();
     try {
       final prefs = await SharedPreferences.getInstance();
