@@ -166,6 +166,8 @@ class _LandingScreenState extends State<LandingScreen> {
                 ],
               ),
             ),
+            const SizedBox(width: 12),
+            _languageDropdown(lp),
             const Spacer(),
             Flexible(child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(
               children: [
@@ -174,8 +176,6 @@ class _LandingScreenState extends State<LandingScreen> {
                 _navLink(l10n.navPricing, () => _scrollTo(1800)),
                 const SizedBox(width: 12),
                 _navLink(l10n.navFaq, () => _scrollTo(2600)),
-                const SizedBox(width: 12),
-                _languageDropdown(lp),
                 const SizedBox(width: 12),
                 _goldBtn(l10n.navStartAnalysis, () => _startAnalysis(), height: 34, fontSize: 11),
               ],

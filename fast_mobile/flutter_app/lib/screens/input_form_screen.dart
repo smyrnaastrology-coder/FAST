@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../models/analysis_request.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
+import '../providers/locale_provider.dart';
 import 'results_screen.dart';
 
 class InputFormScreen extends StatefulWidget {
@@ -164,6 +166,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
       lat: double.tryParse(_latCtrl.text) ?? 41.0082,
       lon: double.tryParse(_lonCtrl.text) ?? 28.9784,
       mod: _modKey,
+      lang: context.read<LocaleProvider>().locale.languageCode,
     );
 
     Navigator.push(context, MaterialPageRoute(
