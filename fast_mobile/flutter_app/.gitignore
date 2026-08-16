@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Android uygulama kaynaklari (ikon/mipmap/drawable) git'e dahil edilsin
+!android/app/src/main/res/**
+
 # Symbolication related
 app.*.symbols
 
