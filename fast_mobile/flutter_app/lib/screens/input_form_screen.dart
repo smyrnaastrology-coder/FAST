@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../config/theme.dart';
+import '../config/country_labels.dart';
 import '../services/api_service.dart';
 import '../providers/locale_provider.dart';
 import '../widgets/language_switcher.dart';
@@ -271,7 +272,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
                   _seciliSehir = '';
                   _geoHint = l10n.analyzerSelectCity;
                 });
-              }),
+              }, labels: countryLabels(Localizations.localeOf(context).languageCode)),
               const SizedBox(height: 12),
               if (_sehirler != null)
                 _dropdownField(l10n.analyzerCity, _sehirler!, _seciliSehir, (v) {

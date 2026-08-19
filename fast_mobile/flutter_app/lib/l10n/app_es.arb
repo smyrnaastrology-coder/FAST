@@ -2,12 +2,10 @@
   "@@locale": "es",
   "appTitle": "FAST",
   "appSlogan": "Sistema de Análisis de Vínculos Estelares",
-
   "navFeatures": "Funciones",
   "navPricing": "Precios",
   "navFaq": "FAQ",
   "navStartAnalysis": "Iniciar Análisis",
-
   "heroBadge": "PROYECCIÓN DE LAS ESTRELLAS EN LA TIERRA",
   "heroTitle": "El Mapa Celestial de",
   "heroTitleAccent": "tu Vínculo Te Espera",
@@ -18,7 +16,6 @@
   "statAnalysis": "Análisis",
   "statYearCycle": "Ciclo Anual",
   "statCities": "Ciudades",
-
   "modeSectionTitle": "Elige tu Tipo de Análisis",
   "modeSectionDesc": "Inicia el análisis que mejor se adapte a ti",
   "modeEsTitle": "Pareja / Compañero",
@@ -33,7 +30,6 @@
   "modePyTitle": "Potencial / Talento",
   "modePyDesc": "Orientación profesional y descubrimiento de talentos con tu carta natal",
   "modePyBadge": "Individual",
-
   "featuresTitle": "¿Qué Ofrecemos?",
   "featuresDesc": "Explora cada dimensión del análisis astrológico con FAST",
   "feature1Title": "Análisis de Sinastría",
@@ -52,7 +48,6 @@
   "feature7Desc": "Análisis de puntos cósmicos con vínculos de sinastría y posiciones en casas.",
   "feature8Title": "Informe PDF",
   "feature8Desc": "Todos los análisis en un informe PDF profesional; descargas ilimitadas y entrega por correo electrónico.",
-
   "howTitle": "¿Cómo Funciona?",
   "howDesc": "Tu análisis de vínculo estelar en 3 pasos",
   "step1Title": "Elige el Tipo de Análisis",
@@ -62,7 +57,6 @@
   "step3Title": "Obtén tu Informe PDF",
   "step3Desc": "Descarga tu informe detallado en PDF, consérvalo como desees o recíbelo por correo electrónico.",
   "howStart": "Iniciar Análisis Ahora",
-
   "pricingTitle": "Precios",
   "pricingDesc": "Elige el paquete que mejor se adapte a ti",
   "pricingMonthly": "Mensual",
@@ -104,7 +98,6 @@
   "planProFeat3": "Consulta de 30 minutos por WhatsApp",
   "planProFeat4": "Derecho a actualización durante 1 año",
   "planProFeat5": "Soporte prioritario",
-
   "testimonialsTitle": "Opiniones de Usuarios",
   "testimonialsDesc": "Experiencias reales de usuarios",
   "t1Name": "Zeynep K.",
@@ -117,7 +110,6 @@
   "t4Text": "Lo usé para descubrir los talentos de mi hijo. Las recomendaciones de orientación profesional fueron muy precisas.",
   "t5Name": "Ayşe K.",
   "t5Text": "Hice un análisis de potencial para mí misma. Descubrí áreas de talento que antes no había notado. Me impulsó a cambiar de carrera.",
-
   "faqTitle": "Preguntas Frecuentes",
   "faqDesc": "Tus preguntas respondidas",
   "faq1Q": "¿Cómo funciona el análisis?",
@@ -136,28 +128,23 @@
   "faq7A": "Encuentra las ciudades donde los planetas de tu carta natal tienen la influencia más fuerte en la Tierra.",
   "faq8Q": "¿Cómo funciona el análisis de potencial?",
   "faq8A": "Tus talentos naturales en 7 áreas diferentes se detectan escaneando los aspectos planetarios en tu carta natal.",
-
   "ctaTitle": "¿Listo para Descubrir tu Mapa Estelar?",
   "ctaDesc": "Relación, familia, natal individual o análisis de potencial — empieza ahora para explorar tu ciclo celeste de 21 años.",
   "ctaCouple": "Iniciar Análisis de Pareja",
   "ctaParentChild": "Padre-Hijo",
   "ctaNatal": "Natal Individual",
   "ctaPotential": "Análisis de Potencial",
-
   "footerTagline": "Análisis de vínculo estelar con la Técnica de Sinastría Fatih Asartepe (FAST).",
   "footerQuickLinks": "Enlaces Rápidos",
   "footerContact": "Contacto",
   "footerRights": "© 2024 FAST. Todos los derechos reservados.",
-
   "language": "Idioma",
   "turkish": "Turco",
   "english": "Inglés",
   "spanish": "Español",
-
   "homeTitle": "Técnica de Sinastría\nFatih Asartepe",
   "homeSubtitle": "FAST — Sistema de Análisis de Vínculos Estelares",
   "homeVersion": "Versión 4.0",
-
   "analyzerSimulationSelect": "Seleccionar Simulación",
   "analyzerModeEsDesc": "Flujo celeste de 6 meses",
   "analyzerModeEbDesc": "Análisis de vínculo intergeneracional",
@@ -211,7 +198,6 @@
   "fraktalHigh": "Resonancia natural — Se entienden fácilmente, armonía intuitiva",
   "loadingSky": "Analizando tu vínculo estelar...",
   "errorTryAgain": "El análisis no se pudo completar. Revisa tu información e inténtalo de nuevo.",
-
   "analyzerSidebarTagline": "FAST — Análisis de Vínculo Estelar",
   "analyzerSidebarVersion": "Versión 4.0 | Ciclo de 21 Años",
   "analyzerHeaderDesc": "Las cartas relativas son un método desarrollado por Fatih Asartepe al ejecutar cartas existentes en un plano espacial diferente con cálculos vectoriales. Es natural y normal que los resultados no sean los mismos que en tu carta natal.",
@@ -283,14 +269,12 @@
   "analyzerSimulationScan": "Escaneo de Brújula Estelar — Se analizaron más de 15.000 ciudades. Toca la foto para abrir la página de Wikipedia, usa el botón ↻ para renovar el análisis en esa ubicación.",
   "analyzerAstroHint": "Selecciona una ubicación diferente para ver las energías de esa región (Dinero, Paz, Pasión, Crisis).",
   "analyzerStarScan": "Escaneo de Brújula Estelar",
-
   "errorTitle": "Error",
   "unknownError": "Error desconocido",
   "retryButton": "Reintentar",
   "imageLoadError": "La imagen no se pudo cargar",
   "chooseLanguage": "Elige tu idioma",
   "chooseLanguageSub": "Seleccione su idioma",
-
   "analyzerParentRole": "Rol del Padre",
   "analyzerParentNameRequired": "Ingresa el nombre del padre",
   "analyzerLocationLoading": "Obteniendo ubicación...",
@@ -343,5 +327,6 @@
   "astroBarMoney": "💰 Dinero y Carrera",
   "astroBarPeace": "🧘 Paz y Serenidad",
   "astroBarPassion": "🔥 Pasión y Amor",
-  "astroBarCrisis": "⚠️ Crisis y Desafío"
+  "astroBarCrisis": "⚠️ Crisis y Desafío",
+  "scoreBondLabel": "Puntuación del Vínculo"
 }

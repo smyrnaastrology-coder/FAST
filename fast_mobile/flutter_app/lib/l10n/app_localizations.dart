@@ -2067,6 +2067,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'⚠️ Crisis & Challenge'**
   String get astroBarCrisis;
+
+  /// No description provided for @scoreBondLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bond Score'**
+  String get scoreBondLabel;
 }
 
 class _AppLocalizationsDelegate

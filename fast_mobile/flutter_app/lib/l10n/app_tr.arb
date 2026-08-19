@@ -2,12 +2,10 @@
   "@@locale": "tr",
   "appTitle": "FAST",
   "appSlogan": "Yıldız Bağ Analizi Sistemi",
-
   "navFeatures": "Özellikler",
   "navPricing": "Fiyatlandırma",
   "navFaq": "SSS",
   "navStartAnalysis": "Analiz Başlat",
-
   "heroBadge": "YILDIZLARIN YERYÜZÜNE İZDÜŞÜMÜ",
   "heroTitle": "Bağınızın Göksel\n",
   "heroTitleAccent": "Haritasını Keşfedin",
@@ -18,7 +16,6 @@
   "statAnalysis": "Analiz",
   "statYearCycle": "Yıllık Döngü",
   "statCities": "Şehir",
-
   "modeSectionTitle": "Analiz Türünüzü Seçin",
   "modeSectionDesc": "Size en uygun analizi başlatın",
   "modeEsTitle": "Eş / Sevgili",
@@ -33,7 +30,6 @@
   "modePyTitle": "Potansiyel / Yetenek",
   "modePyDesc": "Doğum haritası ile meslek yönlendirme ve yetenek keşfi",
   "modePyBadge": "Bireysel",
-
   "featuresTitle": "Neler Sunuyoruz?",
   "featuresDesc": "FAST ile astrolojik analizlerin her boyutunu keşfedin",
   "feature1Title": "Sinastri Analizi",
@@ -52,7 +48,6 @@
   "feature7Desc": "Kozmik noktaların sinastri bağları ve ev konumlarıyla analizi.",
   "feature8Title": "PDF Raporu",
   "feature8Desc": "Tüm analizler profesyonel PDF raporunda; sınırsız indirme ve e-posta teslimi.",
-
   "howTitle": "Nasıl Çalışır?",
   "howDesc": "3 adımda yıldız bağı analiziniz",
   "step1Title": "Analiz Türünü Seçin",
@@ -62,7 +57,6 @@
   "step3Title": "PDF Raporu Alın",
   "step3Desc": "Detaylı raporunuzu PDF olarak indirin, dilediğinizce saklayın veya e-posta ile alın.",
   "howStart": "🔮 Hemen Analiz Başlat",
-
   "pricingTitle": "Fiyatlandırma",
   "pricingDesc": "Size en uygun paketi seçin",
   "pricingMonthly": "Aylık",
@@ -104,7 +98,6 @@
   "planProFeat3": "30 dakika WhatsApp danışmanlık",
   "planProFeat4": "1 yıl güncelleme hakkı",
   "planProFeat5": "Öncelikli destek",
-
   "testimonialsTitle": "Kullanıcı Yorumları",
   "testimonialsDesc": "Gerçek kullanıcı deneyimleri",
   "t1Name": "Zeynep K.",
@@ -117,7 +110,6 @@
   "t4Text": "Oğlumun yeteneklerini keşfetmek için kullandım. Meslek yönlendirme önerileri çok isabetli.",
   "t5Name": "Ayşe K.",
   "t5Text": "Kendim için potansiyel analizi yaptırdım. Daha önce fark etmediğim yetenek alanlarımı keşfettim. Kariyer değişikliği yapmama vesile oldu.",
-
   "faqTitle": "Sıkça Sorulan Sorular",
   "faqDesc": "Merak ettikleriniz",
   "faq1Q": "Analiz nasıl çalışır?",
@@ -136,28 +128,23 @@
   "faq7A": "Doğum haritanızdaki gezegenlerin dünya üzerinde en güçlü etkiye sahip olduğu şehirleri bulur.",
   "faq8Q": "Potansiyel analizi nasıl çalışır?",
   "faq8A": "Doğum haritanızdaki gezegen açıları taranarak 7 farklı alanda doğal yetenekleriniz tespit edilir.",
-
   "ctaTitle": "Yıldız Haritanızı Keşfetmeye Hazır Mısınız?",
   "ctaDesc": "İlişki, aile, bireysel natal veya potansiyel analizi — 21 yıllık göksel döngünüzü keşfetmek için hemen başlatın.",
   "ctaCouple": "🔮 Çift Analizi Başlat",
   "ctaParentChild": "👨‍👩‍👧‍👦 Ebeveyn-Çocuk",
   "ctaNatal": "⭐ Bireysel Natal",
   "ctaPotential": "🌟 Potansiyel Analizi",
-
   "footerTagline": "Fatih Asartepe Sinastri Tekniği (FAST) ile yıldız bağı analizi.",
   "footerQuickLinks": "Hızlı Linkler",
   "footerContact": "İletişim",
   "footerRights": "© 2024 FAST. Tüm hakları saklıdır.",
-
   "language": "Dil",
   "turkish": "Türkçe",
   "english": "İngilizce",
   "spanish": "İspanyolca",
-
   "homeTitle": "Fatih Asartepe\nSinastri Tekniği",
   "homeSubtitle": "FAST — Yıldız Bağ Analizi Sistemi",
   "homeVersion": "Sürüm 4.0",
-
   "analyzerSimulationSelect": "Simülasyon Seç",
   "analyzerModeEsDesc": "6 aylık gökyüzü akışı",
   "analyzerModeEbDesc": "Nesiller arası bağ analizi",
@@ -211,7 +198,6 @@
   "fraktalHigh": "✨ Doğal rezonans — Birbirinizi anlamakta zorlanmıyor, sezgisel uyum var",
   "loadingSky": "Yıldız bağı analiz ediliyor...",
   "errorTryAgain": "Analiz tamamlanamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.",
-
   "analyzerSidebarTagline": "FAST — Yıldız Bağ Analizi",
   "analyzerSidebarVersion": "Sürüm 4.0 | 21 Yıllık Döngü",
   "analyzerHeaderDesc": "Bağıl haritalar, Fatih Asartepe tarafından vektörel hesaplamalar ile var olan haritaların farklı bir uzay düzleminde çalıştırılmasıyla geliştirilmiş bir yöntemdir. Sonuçların natal haritanızdakilerle aynı çıkmayacak olması doğal ve normaldir.",
@@ -283,14 +269,12 @@
   "analyzerSimulationScan": "Yıldız Pusulası Taraması — 15.000+ şehir analiz edildi. Fotoğrafa tıklayarak Wikipedia sayfasını açabilir, 🔄 butonuyla o konumda analizi yenileyebilirsiniz.",
   "analyzerAstroHint": "Farklı bir lokasyon seçerek o bölgenin enerjilerini (Para, Huzur, Tutku, Kriz) görün.",
   "analyzerStarScan": "Yıldız Pusulası Taraması",
-
   "errorTitle": "Hata",
   "unknownError": "Bilinmeyen hata",
   "retryButton": "Tekrar Dene",
   "imageLoadError": "Görsel yüklenemedi",
   "chooseLanguage": "Dilinizi seçin",
   "chooseLanguageSub": "Choose your language",
-
   "analyzerParentRole": "Ebeveyn Rolü",
   "analyzerParentNameRequired": "Ebeveyn ismi girin",
   "analyzerLocationLoading": "Konum alınıyor...",
@@ -343,5 +327,6 @@
   "astroBarMoney": "💰 Para & Kariyer",
   "astroBarPeace": "🧘 Huzur & Sakinlik",
   "astroBarPassion": "🔥 Tutku & Aşk",
-  "astroBarCrisis": "⚠️ Kriz & Zorluk"
+  "astroBarCrisis": "⚠️ Kriz & Zorluk",
+  "scoreBondLabel": "Bağ Skoru"
 }

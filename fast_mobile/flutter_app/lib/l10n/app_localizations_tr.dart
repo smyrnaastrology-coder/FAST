@@ -1101,4 +1101,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get astroBarCrisis => '⚠️ Kriz & Zorluk';
+
+  @override
+  String get scoreBondLabel => 'Bağ Skoru';
 }

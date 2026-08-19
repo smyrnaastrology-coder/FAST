@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 class ScoreDisplay extends StatelessWidget {
   final double skor;
@@ -20,7 +21,7 @@ class ScoreDisplay extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Text('Ba\u011f Skoru', style: GoogleFonts.cormorantGaramond(
+            Text(AppLocalizations.of(context).scoreBondLabel, style: GoogleFonts.cormorantGaramond(
               fontSize: 18, fontWeight: FontWeight.w600, color: FastTheme.textLight,
             )),
             const SizedBox(height: 16),

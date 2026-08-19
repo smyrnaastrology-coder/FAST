@@ -1117,4 +1117,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get astroBarCrisis => '⚠️ Crisis y Desafío';
+
+  @override
+  String get scoreBondLabel => 'Puntuación del Vínculo';
 }

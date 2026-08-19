@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
+import '../config/country_labels.dart';
 import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
@@ -137,8 +138,13 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       final parts = text.trim().split(' ');
       if (parts.length == 3) {
         final gun = int.tryParse(parts[0]);
-        const aylar = ['ocak', 'şubat', 'mart', 'nisan', 'mayıs', 'haziran', 'temmuz', 'ağustos', 'eylül', 'ekim', 'kasım', 'aralık'];
-        final ay = aylar.indexOf(parts[1].toLowerCase());
+        const aylarTr = ['ocak', 'şubat', 'mart', 'nisan', 'mayıs', 'haziran', 'temmuz', 'ağustos', 'eylül', 'ekim', 'kasım', 'aralık'];
+        const aylarEn = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+        const aylarEs = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        final ayAdi = parts[1].toLowerCase();
+        var ay = aylarTr.indexOf(ayAdi);
+        if (ay < 0) ay = aylarEn.indexOf(ayAdi);
+        if (ay < 0) ay = aylarEs.indexOf(ayAdi);
         final yil = int.tryParse(parts[2]);
         if (gun != null && ay >= 0 && yil != null) return DateTime(yil, ay + 1, gun);
       }
@@ -717,7 +723,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         else ...[
           _dropdownField(l10n.analyzerCountry, _ulkeler ?? [], _seciliUlke, (v) {
             setState(() { _seciliUlke = v!; _seciliSehir = ''; _geoHint = l10n.analyzerSelectCity; });
-          }),
+          }, labels: countryLabels(Localizations.localeOf(context).languageCode)),
           if (_sehirler != null)
             _dropdownField(l10n.analyzerCity, _sehirler!, _seciliSehir, (v) { setState(() => _seciliSehir = v!); _geoCode(v!); }),
         ],
@@ -1570,7 +1576,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     Expanded(
                       child: _dropdownField(l10n.analyzerCountry, ((_lokasyonDB?['sehirler'] as Map? ?? {}).keys.toList()..sort()).cast<String>(), _astroUlke, (v) {
                         setState(() { _astroUlke = v ?? ''; _astroSehir = ''; provider.reset(); });
-                      }),
+                      }, labels: countryLabels(Localizations.localeOf(context).languageCode)),
                     ),
                     const SizedBox(width: 8),
                     Expanded(

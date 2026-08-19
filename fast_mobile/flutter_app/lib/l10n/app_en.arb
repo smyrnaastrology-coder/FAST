@@ -2,12 +2,10 @@
   "@@locale": "en",
   "appTitle": "FAST",
   "appSlogan": "Stellar Bond Analysis System",
-
   "navFeatures": "Features",
   "navPricing": "Pricing",
   "navFaq": "FAQ",
   "navStartAnalysis": "Start Analysis",
-
   "heroBadge": "PROJECTION OF THE STARS ON EARTH",
   "heroTitle": "Your Bond's Celestial",
   "heroTitleAccent": "Map Awaits",
@@ -18,7 +16,6 @@
   "statAnalysis": "Analyses",
   "statYearCycle": "Year Cycle",
   "statCities": "Cities",
-
   "modeSectionTitle": "Choose Your Analysis Type",
   "modeSectionDesc": "Start the analysis that suits you best",
   "modeEsTitle": "Couple / Partner",
@@ -33,7 +30,6 @@
   "modePyTitle": "Potential / Talent",
   "modePyDesc": "Career guidance and talent discovery with your birth chart",
   "modePyBadge": "Individual",
-
   "featuresTitle": "What Do We Offer?",
   "featuresDesc": "Explore every dimension of astrological analysis with FAST",
   "feature1Title": "Synastry Analysis",
@@ -52,7 +48,6 @@
   "feature7Desc": "Analysis of cosmic points with synastry bonds and house positions.",
   "feature8Title": "PDF Report",
   "feature8Desc": "All analyses in a professional PDF report; unlimited downloads and email delivery.",
-
   "howTitle": "How Does It Work?",
   "howDesc": "Your stellar bond analysis in 3 steps",
   "step1Title": "Choose Analysis Type",
@@ -62,7 +57,6 @@
   "step3Title": "Get Your PDF Report",
   "step3Desc": "Download your detailed report as PDF, keep it as you wish or receive it via email.",
   "howStart": "Start Analysis Now",
-
   "pricingTitle": "Pricing",
   "pricingDesc": "Choose the package that suits you best",
   "pricingMonthly": "Monthly",
@@ -104,7 +98,6 @@
   "planProFeat3": "30 minutes WhatsApp consultation",
   "planProFeat4": "1 year update right",
   "planProFeat5": "Priority support",
-
   "testimonialsTitle": "User Reviews",
   "testimonialsDesc": "Real user experiences",
   "t1Name": "Zeynep K.",
@@ -117,7 +110,6 @@
   "t4Text": "I used it to discover my son's talents. The career guidance recommendations were very accurate.",
   "t5Name": "Ayşe K.",
   "t5Text": "I had a potential analysis done for myself. I discovered talent areas I hadn't noticed before. It prompted me to change careers.",
-
   "faqTitle": "Frequently Asked Questions",
   "faqDesc": "Your questions answered",
   "faq1Q": "How does the analysis work?",
@@ -136,28 +128,23 @@
   "faq7A": "It finds the cities where the planets in your birth chart have the strongest influence on Earth.",
   "faq8Q": "How does potential analysis work?",
   "faq8A": "Your natural talents in 7 different areas are detected by scanning the planetary aspects in your birth chart.",
-
   "ctaTitle": "Ready to Discover Your Star Map?",
   "ctaDesc": "Relationship, family, individual natal or potential analysis — start now to explore your 21-year celestial cycle.",
   "ctaCouple": "Start Couple Analysis",
   "ctaParentChild": "Parent-Child",
   "ctaNatal": "Individual Natal",
   "ctaPotential": "Potential Analysis",
-
   "footerTagline": "Stellar bond analysis with the Fatih Asartepe Synastry Technique (FAST).",
   "footerQuickLinks": "Quick Links",
   "footerContact": "Contact",
   "footerRights": "© 2024 FAST. All rights reserved.",
-
   "language": "Language",
   "turkish": "Turkish",
   "english": "English",
   "spanish": "Spanish",
-
   "homeTitle": "Fatih Asartepe\nSynastry Technique",
   "homeSubtitle": "FAST — Stellar Bond Analysis System",
   "homeVersion": "Version 4.0",
-
   "analyzerSimulationSelect": "Select Simulation",
   "analyzerModeEsDesc": "6-month sky flow",
   "analyzerModeEbDesc": "Intergenerational bond analysis",
@@ -211,7 +198,6 @@
   "fraktalHigh": "Natural resonance — You understand each other easily, intuitive harmony",
   "loadingSky": "Analyzing your stellar bond...",
   "errorTryAgain": "Analysis could not be completed. Please check your information and try again.",
-
   "analyzerSidebarTagline": "FAST — Stellar Bond Analysis",
   "analyzerSidebarVersion": "Version 4.0 | 21-Year Cycle",
   "analyzerHeaderDesc": "Relative charts are a method developed by Fatih Asartepe by running existing charts on a different space plane with vector calculations. It is natural and normal that the results will not be the same as those in your natal chart.",
@@ -283,14 +269,12 @@
   "analyzerSimulationScan": "Star Compass Scan — 15,000+ cities analyzed. Tap the photo to open the Wikipedia page, use the ↻ button to renew the analysis at that location.",
   "analyzerAstroHint": "Select a different location to see the energies of that region (Money, Peace, Passion, Crisis).",
   "analyzerStarScan": "Star Compass Scan",
-
   "errorTitle": "Error",
   "unknownError": "Unknown error",
   "retryButton": "Try Again",
   "imageLoadError": "Image could not be loaded",
   "chooseLanguage": "Choose your language",
   "chooseLanguageSub": "Dilinizi seçin",
-
   "analyzerParentRole": "Parent Role",
   "analyzerParentNameRequired": "Enter the parent's name",
   "analyzerLocationLoading": "Fetching location...",
@@ -343,5 +327,6 @@
   "astroBarMoney": "💰 Money & Career",
   "astroBarPeace": "🧘 Peace & Serenity",
   "astroBarPassion": "🔥 Passion & Love",
-  "astroBarCrisis": "⚠️ Crisis & Challenge"
+  "astroBarCrisis": "⚠️ Crisis & Challenge",
+  "scoreBondLabel": "Bond Score"
 }
