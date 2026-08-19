@@ -695,15 +695,29 @@ def _load_en_dict(filename):
     '_EN' son ekli bir surumu arar. Ornek:
       FBST_YORUMLAR_BURC.py  ->  FBST_YORUMLAR_BURC_EN.py
     """
+    return _load_lang_dict(filename, "_EN.py")
+
+
+def _load_es_dict(filename):
+    """Ayni anahtarlarin ISPANYOLCA karsiligini tasiyan dosyayi yukler (yoksa {}).
+
+    Dosya adi dogrultusu: filename'in yaninda '_ES' son ekli surum aranir.
+      FBST_YORUMLAR_BURC.py  ->  FBST_YORUMLAR_BURC_ES.py
+    """
+    return _load_lang_dict(filename, "_ES.py")
+
+
+def _load_lang_dict(filename, suffix):
+    """Dosyanin <suffix> son ekli dil varyantindaki ilk public dict'i yukler (yoksa {})."""
     _base = filename[:-3] if filename.endswith(".py") else filename
-    _en_filename = _base + "_EN.py"
+    _lang_filename = _base + suffix
     _dir = os.path.dirname(os.path.abspath(__file__))
-    _path = os.path.join(_dir, _en_filename)
+    _path = os.path.join(_dir, _lang_filename)
     if not os.path.exists(_path):
-        _path = os.path.join(os.path.dirname(_dir), _en_filename)
+        _path = os.path.join(os.path.dirname(_dir), _lang_filename)
     if not os.path.exists(_path):
         return {}
-    _spec = _iu.spec_from_file_location("_mod_en_" + _en_filename, _path)
+    _spec = _iu.spec_from_file_location("_mod_lang_" + _lang_filename, _path)
     _mod = _iu.module_from_spec(_spec)
     _spec.loader.exec_module(_mod)
     for _k, _v in vars(_mod).items():
@@ -712,8 +726,8 @@ def _load_en_dict(filename):
     return {}
 
 def _load_i18n_dict(filename):
-    """TR+EN birlestiren, aktife gore ceviri yapan LangDict yukler."""
-    return LangDict(_load_ext_dict(filename), _load_en_dict(filename))
+    """TR+EN+ES birlestiren, aktife gore ceviri yapan LangDict yukler."""
+    return LangDict(_load_ext_dict(filename), _load_en_dict(filename), _load_es_dict(filename))
 
 fbst_sabian_ebeveyn = _load_i18n_dict("fbst_sabian_ebeveyn.py")
 fbst_sabit_yildizlar_ebeveyn = _load_i18n_dict("fbst_sabit_yildizlar_ebeveyn.py")
@@ -729,30 +743,214 @@ FBST_YORUMLAR_BURC = _load_i18n_dict("FBST_YORUMLAR_BURC.py")
 FBST_YORUMLAR_EV = _load_i18n_dict("FBST_YORUMLAR_EV.py")
 FBST_SINASTRI_OZEL = _load_i18n_dict("FBST_SINASTRI_OZEL.py")
 
-# ── Inline sozluklerin EN surumleriyle baglanmasi ──
-fbst_yukselenler = LangDict(fbst_yukselenler, _EN_fbst_yukselenler)
-fbst_retrolar = LangDict(fbst_retrolar, _EN_fbst_retrolar)
-fbst_yukselenler_ebeveyn = LangDict(fbst_yukselenler_ebeveyn, _EN_fbst_yukselenler_ebeveyn)
-fbst_yukselenler_cocuk = LangDict(fbst_yukselenler_cocuk, _EN_fbst_yukselenler_cocuk)
-fbst_retrolar_cocuk = LangDict(fbst_retrolar_cocuk, _EN_fbst_retrolar_cocuk)
-fbst_retrolar_ebeveyn = LangDict(fbst_retrolar_ebeveyn, _EN_fbst_retrolar_ebeveyn)
-KRIZ_KUTUPHANESI_EBEVEYN = LangList(KRIZ_KUTUPHANESI_EBEVEYN, _EN_KRIZ_KUTUPHANESI_EBEVEYN)
-fbst_sabian = LangDict(fbst_sabian, _load_en_dict("fbst_sabian.py"))
+# ── ISPANYOLCA (ES) inline surumler ──
+_ES_fbst_yukselenler = {
+    "Koc": "Saldís al mundo con un escaparate valiente, pionero y que toma la iniciativa. Concretáis la pasión del amor y su fuerza de acción conquistando el mundo.",
+    "Boga": "Saldís al mundo con un escaparate inquebrantable, sereno y que transmite confianza. Construís las raíces de la relación sobre una seguridad material duradera y la lealtad.",
+    "Ikizler": "Saldís al mundo con un escaparate mentalmente armonioso, vivaz y alegre. Materializáis esa dulce curiosidad que abre el horizonte del otro construyendo redes de conocimiento y comunicación en el mundo.",
+    "Yengec": "Saldís al mundo con un escaparate protector, afectuoso y que se abraza mutuamente. Mostráis ese profundo sentido de pertenencia del amor construyendo en el mundo un hogar espiritual inquebrantable y un refugio cálido.",
+    "Aslan": "Saldís al mundo con un escaparate brillante, generoso y noble. Coronáis la gloria magnífica de vuestro amor en el mundo con creatividad y poder de liderazgo.",
+    "Basak": "Saldís al mundo con un escaparate de funcionamiento impecable, refinado y analítico. Materializáis la ternura sanadora que os dedicáis con un orden práctico y un servicio sin errores.",
+    "Terazi": "Saldís al mundo con el escaparate de la elegancia y la armonía. Materializáis el equilibrio de cuento del amor con justicia absoluta, diplomacia y una estética perfecta.",
+    "Akrep": "Saldís al mundo con un escaparate sumamente reservado, profundo y misterioso. Reflejáis esa pasión hipnótica del amor estableciendo un centro de poder transformador e inquebrantable, lejos de la superficialidad.",
+    "Yay": "Saldís al mundo con un escaparate aventurero, sin límites y optimista. Materializáis la libertad exuberante del amor explorando horizontes lejanos y construyendo una visión compartida.",
+    "Oglak": "Saldís al mundo con un escaparate digno, autoritario y atemporal. Mostráis esa confianza eterna que las tormentas no pueden sacudir construyendo estatus social y una fortaleza indestructible.",
+    "Kova": "Saldís al mundo con un escaparate que rompe reglas, rompe esquemas y es eléctrico. Materializáis la naturaleza rebelde de vuestro amor a través de ideales futuristas y proyectos colectivos.",
+    "Balik": "Saldís al mundo con un escaparate místico, compasivo y como si no perteneciera a esta dimensión. Materializáis la entrega incondicional del amor con sanación divina y producción artística."
+}
+
+_ES_fbst_retrolar = {
+    "Merkür": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Introspección mental. Tenéis palabras no dichas de vidas kármicas pasadas. En esta relación, la comunicación se resolverá no con la expresión exterior sino con una comprensión telepática y profundamente interior.</i>",
+    "Venüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Prueba de autoestima. La energía del amor se ha retirado de la exhibición exterior y se ha ocultado en lo más profundo del alma. Tenéis un contrato de amor inacabado con vuestra pareja desde el pasado; ahora habéis venido a sanarlo.</i>",
+    "Mars": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Interiorización de la acción. La ira y la pasión se han convertido en una fuerza interior en lugar de estallar hacia fuera. Estáis a prueba para transformar en amor el poder mal utilizado o las energías pasivo-agresivas del pasado.</i>",
+    "Jüpiter": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Sabiduría interior. Es hora de rechazar las reglas morales y de fe del mundo exterior y crear vuestra propia filosofía espiritual. Esta relación os permitirá encontrar la abundancia en vuestro interior en lugar de buscar la suerte fuera.</i>",
+    "Satürn": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Deuda kármica pesada. Tenéis una prueba inacabada con las figuras de autoridad y las responsabilidades de vidas pasadas. Debéis establecer las reglas de la relación no según las imposiciones del mundo exterior sino con vuestra propia autoridad interior inquebrantable.</i>",
+    "Uranüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Revolución interior. Vuestra energía rebelde trabajará no contra la sociedad sino contra las cadenas de vuestro mundo interior. Ambos sois anarquistas secretos que liberarán el alma del otro dentro de este vínculo.</i>",
+    "Neptün": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Ilusiones ocultas. Vuestras percepciones espirituales están muy abiertas, pero tenéis el peligro de caer en la psicología de la víctima. Vuestros sueños e intuiciones os guiarán; confiad en la voz divina interior, no en el ruido del mundo exterior.</i>",
+    "Plüton": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Alquimia subterránea. Las luchas de poder y el deseo de manipulación se alimentan de los miedos más enterrados. Esta relación os enfrentará a vuestras mayores debilidades psicológicas y os renacerá silenciosamente de vuestras propias cenizas.</i>",
+    "Chiron": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>La herida ancestral. La energía de sanación debe dirigirse primero hacia vuestro interior. No podéis sanar a vuestra pareja sin sanaros primero a vosotros mismos. Este vínculo refleja los dolores más ocultos del alma y será su bálsamo.</i>",
+    "Juno": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El contrato de pareja kármica. Un contrato de matrimonio o de lealtad inacabado de vidas pasadas vuelve a la mesa. Romperéis las reglas superficiales del compromiso y pondréis a prueba la lealtad espiritual en su nivel más profundo.</i>",
+    "Ceres": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Nutrición interior. Mientras esperáis ternura de vuestra pareja, estáis en un ciclo kármico especial en el que debéis aprender a bastaros a vosotros mismos y a nutrir vuestra propia alma.</i>",
+    "Lilith": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El retiro de la sombra. Los tabúes reprimidos, la sexualidad y la energía salvaje que no se somete se interiorizan no como una experiencia superficial sino como el misterio más oscuro y fascinante de la relación.</i>"
+}
+
+_ES_fbst_yukselenler_ebeveyn = {
+    "Koc": "Saldís al mundo con un escaparate de padre valiente y protector. Mostráis una energía que toma la iniciativa en la crianza y desafía al mundo para proteger a vuestro hijo.",
+    "Boga": "Saldís al mundo con un escaparate de padre inquebrantable, sereno y seguro. Construís un hogar de raíces profundas que brinda a vuestro hijo seguridad material y emocional.",
+    "Ikizler": "Saldís al mundo con un escaparate de padre comunicativo, alegre y curioso. Os convertís en un padre que comparte conocimiento y descubre todo junto a su hijo.",
+    "Yengec": "Saldís al mundo con un escaparate de padre protector, afectuoso y acogedor. Construís un refugio emocional inquebrantable para vuestro hijo.",
+    "Aslan": "Saldís al mundo con un escaparate de padre brillante, generoso y orgulloso. Os convertís en un padre que pone los talentos de su hijo en el escenario y se enorgullece de él.",
+    "Basak": "Saldís al mundo con un escaparate de padre perfectamente organizado, práctico y detallista. Creáis un sistema que atiende cada necesidad de vuestro hijo al milímetro.",
+    "Terazi": "Saldís al mundo con un escaparate de padre elegante, equilibrado y justo. Os convertís en un padre que establece una relación justa con su hijo y siempre busca el equilibrio.",
+    "Akrep": "Saldís al mundo con un escaparate de padre profundo, misterioso y protector. Practicáis una crianza oculta, alerta ante todo peligro para vuestro hijo.",
+    "Yay": "Saldís al mundo con un escaparate de padre aventurero, optimista y libertario. Os convertís en un padre que descubre la vida junto a su hijo e inculca una visión amplia.",
+    "Oglak": "Saldís al mundo con un escaparate de padre digno, disciplinado y responsable. Os convertís en un padre que da estructura y disciplina a su hijo y lo prepara para la vida.",
+    "Kova": "Saldís al mundo con un escaparate de padre innovador, libertario y poco convencional. Os convertís en un padre que no encasilla a su hijo y respeta su individualidad.",
+    "Balik": "Saldís al mundo con un escaparate de padre místico, afectuoso e intuitivo. Os convertís en un padre que establece un vínculo espiritual con su hijo y se centra en su desarrollo espiritual."
+}
+
+_ES_fbst_yukselenler_cocuk = {
+    "Koc": "Sale al mundo con una energía de niño valiente, enérgico y pionero. Tiene una estructura curiosa que ama explorar y traza su propio camino.",
+    "Boga": "Sale al mundo con una energía de niño tranquila, serena y confiable. Se aferra firmemente a sus seres queridos y muestra sus mejores cualidades cuando se siente seguro.",
+    "Ikizler": "Sale al mundo con una energía de niño alegre, curiosa y comunicativa. Le encanta hacer preguntas, aprende rápido y comparte todo.",
+    "Yengec": "Sale al mundo con una energía de niño afectuosa, protectora e intuitiva. Está profundamente ligado a su familia y al calor del hogar.",
+    "Aslan": "Sale al mundo con una energía de niño brillante, generosa y alegre. Le encanta recibir atención y ser apreciado; destaca con su creatividad.",
+    "Basak": "Sale al mundo con una energía de niño ordenada, meticulosa y servicial. Presta atención a los detalles y es propenso a aprender y encontrar soluciones prácticas.",
+    "Terazi": "Sale al mundo con una energía de niño armoniosa, elegante y justa. Busca equilibrio y paz en sus relaciones de amistad.",
+    "Akrep": "Sale al mundo con una energía de niño profunda, misteriosa y fuerte. Vive sus emociones en profundidad y es leal a quienes se une.",
+    "Yay": "Sale al mundo con una energía de niño aventurera, optimista y amante de la libertad. Le encanta explorar, aprender nuevos lugares y nuevas ideas.",
+    "Oglak": "Sale al mundo con una energía de niño madura, seria y responsable. Se centra en sus objetivos, es disciplinado y decidido.",
+    "Kova": "Sale al mundo con una energía de niño innovadora, original e independiente. No cabe en moldes y defiende libremente sus propias ideas.",
+    "Balik": "Sale al mundo con una energía de niño soñadora, afectuosa e intuitiva. Su mundo interior es rico; está profundamente ligado al arte y a los sueños."
+}
+
+_ES_fbst_retrolar_cocuk = {
+    "Merkür": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Introspección mental. El mundo de pensamiento del niño es profundo e intuitivo más que extrovertido; habla más con lo que siente que con lo que dice.</i>",
+    "Venüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Prueba de autoestima. La energía del amor está vuelta hacia dentro; el niño vive el amor no con la exhibición sino con vínculos profundos y leales. Lleva una lección de amor del pasado.</i>",
+    "Mars": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Interiorización de la acción. La ira y la energía se convierten en una fuerza interior en lugar de estallar. El niño aprende a usar su poder con paciencia, no con ira.</i>",
+    "Jüpiter": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Sabiduría interior. El niño valora la fe y la filosofía que vienen de su interior, no los patrones del exterior. El crecimiento ocurre a medida que descubre su propio mundo interior.</i>",
+    "Satürn": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Deuda kármica pesada. Se carga una prueba del pasado sobre las figuras de autoridad y las responsabilidades. El niño madura aprendiendo las reglas desde su interior, no desde fuera.</i>",
+    "Uranüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Revolución interior. La energía rebelde trabaja contra los patrones de su mundo interior, no hacia afuera. El niño encuentra su libertad descubriéndola desde su interior, no pidiendo permiso al exterior.</i>",
+    "Neptün": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Ilusiones ocultas. Sus intuiciones están muy abiertas, pero puede haber tendencia a escapar al mundo de la fantasía. Sus sueños y su voz interior le muestran al niño el camino más verdadero.</i>",
+    "Plüton": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Alquimia subterránea. Las luchas de poder y los miedos profundos están ocultos en su núcleo. El niño se transforma silenciosamente y con fuerza a medida que se enfrenta a su mundo interior.</i>",
+    "Chiron": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>La herida ancestral. La sanación debe dirigirse primero hacia su interior. A medida que el niño se sana a sí mismo, también sana a quienes lo rodean; su herida más profunda es la fuente de su mayor sabiduría.</i>",
+    "Juno": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El contrato de pareja kármica. Se carga un contrato de compromiso del pasado. El niño experimenta la lealtad no con reglas superficiales sino con una devoción profunda que nace de su interior.</i>",
+    "Ceres": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Nutrición interior. Un ciclo kármico especial en el que debe aprender a bastarse a sí mismo antes de esperar ternura. A medida que aprende a nutrirse, también recibe el amor plenamente.</i>",
+    "Lilith": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El retiro de la sombra. Las emociones reprimidas y el espíritu libre están vueltos hacia el mundo interior. El niño encuentra su identidad auténtica a medida que acepta sus lados oscuros.</i>"
+}
+
+_ES_fbst_retrolar_ebeveyn = {
+    "Merkür": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>La comunicación en la crianza se vuelve hacia dentro. El vínculo con vuestro hijo está más allá de las palabras; se espera que os conectéis con una comprensión intuitiva y telepática.</i>",
+    "Venüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Reaprender el autoestima y el lenguaje del amor. La forma de mostrar vuestro amor a vuestro hijo está profundamente influida por vuestras propias experiencias de infancia.</i>",
+    "Mars": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Interiorización del instinto protector. Se pone a prueba vuestro equilibrio entre la ira y la paciencia; es un ciclo en el que debéis encontrar un equilibrio interior en la dinámica de poder con vuestro hijo.</i>",
+    "Jüpiter": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Reconstruir la filosofía de la enseñanza. Los valores y creencias que transmitís a vuestro hijo deben pasar por un profundo cuestionamiento en vuestro interior.</i>",
+    "Satürn": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Deuda kármica en la disciplina de la crianza. Una prueba en la que debéis reestructurar la herencia recibida de vuestros propios padres en cuanto a poner límites y establecer autoridad.</i>",
+    "Uranüs": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Revolución de la crianza interior. Un ciclo kármico en el que debéis superar vuestras propias dependencias y miedos mientras apoyáis la libertad de vuestro hijo.</i>",
+    "Neptün": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Ilusión y el padre ideal. Vuestro sueño de ser la madre o el padre perfecto debe equilibrarse con límites realistas. Vuestras intuiciones son fuertes, pero se necesita claridad.</i>",
+    "Plüton": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>Transformación del poder en la crianza. Con el crecimiento de vuestro hijo, vuestra propia identidad cambia profundamente; es la prueba de soltar el control y renacer.</i>",
+    "Chiron": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>La herencia de la herida generacional. Sin sanar las heridas recibidas de vuestros propios padres, no podéis sanar plenamente a vuestro hijo. Es la conciencia de la cadena de sanación generacional.</i>",
+    "Juno": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El contrato de lealtad en la crianza. La promesa de lealtad incondicional dada a vuestro hijo se pone a prueba con vuestros propios conflictos interiores.</i>",
+    "Ceres": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>El equilibrio entre nutrir y soltar. Un ciclo kármico en el que debéis aprender a nutrir a vuestro hijo y, al mismo tiempo, dejarlo ser independiente.</i>",
+    "Lilith": "📝 <b>[Sello Retrógrado Kármico]:</b> <i>La fiereza reprimida en la crianza. Es hora de enfrentar vuestro miedo a mostrar a vuestro hijo vuestro amor más auténtico e ilimitado, fuera de las expectativas sociales.</i>"
+}
+
+_ES_KRIZ_KUTUPHANESI_EBEVEYN = [
+    {
+        "baslik": "El Primer Despertar: El Secreto del Cuerpo (0-6 Meses)",
+        "yorum": "Con el nacimiento, tanto vosotros como vuestro bebé habéis pasado por una transformación enorme. Las noches sin dormir, la rutina de alimentación y los primeros pasos de la identidad parental son las pruebas fundamentales de este periodo. Esta crisis es la primera puerta que os transforma de individuos en madre o padre."
+    },
+    {
+        "baslik": "El Vínculo Raíz: Las Semillas de la Separación (6 Meses - 2 Años)",
+        "yorum": "A medida que vuestro bebé comienza a caminar, hablar y explorar el mundo, es hora de construir un apego seguro más allá del vínculo físico entre vosotros. Es el hogar de los primeros 'no' y de las primeras separaciones."
+    },
+    {
+        "baslik": "La Prueba del Egocentrismo (2-4 Años)",
+        "yorum": "Lidiar con un niño que dice '¡No!', pone a prueba los límites y se enfrenta al control de esfínteres es la primera gran prueba de la paciencia parental. Aquí se aprende el arte de poner límites."
+    },
+    {
+        "baslik": "Reflejo en el Espejo Social (4-7 Años)",
+        "yorum": "Vuestro hijo comienza la escuela, hace amigos y descubre las reglas del mundo más allá de vosotros. Es hora de apoyar sus habilidades sociales mientras os enfrentáis a vuestras propias ansiedades parentales."
+    },
+    {
+        "baslik": "Las Puertas del Templo del Conocimiento (7-12 Años)",
+        "yorum": "La presión académica, el descubrimiento de los talentos y la trampa de la comparación son las pruebas de este periodo. Es el periodo crítico en el que debéis equilibrar las expectativas sociales mientras permitís que vuestro hijo encuentre su propio camino."
+    },
+    {
+        "baslik": "La Tormenta de la Adolescencia: Crisis de Identidad (12-16 Años)",
+        "yorum": "Los cambios hormonales, las batallas por la independencia y la búsqueda de identidad son los pilares centrales de este periodo. Vuestro hijo ya quiere ser un individuo; vosotros todavía queréis proteger. Este conflicto es la prueba más crítica de la relación padre-hijo."
+    },
+    {
+        "baslik": "El Protocolo de Separación (16-18 Años)",
+        "yorum": "La universidad, la salida del hogar y los primeros pasos de la vida independiente se dan en este periodo. Ha llegado el momento de aflojar el vínculo que habéis construido durante años y de soltar."
+    },
+    {
+        "baslik": "Reflexión: Verse a Uno Mismo (18-21 Años)",
+        "yorum": "Vuestro hijo, ahora adulto, comienza a veros como individuos. Es un proceso de reconocer los errores parentales, perdonar y reequilibrar la relación."
+    },
+    {
+        "baslik": "La Puerta de la Igualdad: Amistad Adulta (21+ Años)",
+        "yorum": "La relación padre-hijo ya no es jerárquica; se transforma en respeto y amistad entre dos adultos. Es el momento de recoger la más dulce recompensa de la crianza."
+    }
+]
+
+# ── Inline sozluklerin EN/ES surumleriyle baglanmasi ──
+fbst_yukselenler = LangDict(fbst_yukselenler, _EN_fbst_yukselenler, _ES_fbst_yukselenler)
+fbst_retrolar = LangDict(fbst_retrolar, _EN_fbst_retrolar, _ES_fbst_retrolar)
+fbst_yukselenler_ebeveyn = LangDict(fbst_yukselenler_ebeveyn, _EN_fbst_yukselenler_ebeveyn, _ES_fbst_yukselenler_ebeveyn)
+fbst_yukselenler_cocuk = LangDict(fbst_yukselenler_cocuk, _EN_fbst_yukselenler_cocuk, _ES_fbst_yukselenler_cocuk)
+fbst_retrolar_cocuk = LangDict(fbst_retrolar_cocuk, _EN_fbst_retrolar_cocuk, _ES_fbst_retrolar_cocuk)
+fbst_retrolar_ebeveyn = LangDict(fbst_retrolar_ebeveyn, _EN_fbst_retrolar_ebeveyn, _ES_fbst_retrolar_ebeveyn)
+KRIZ_KUTUPHANESI_EBEVEYN = LangList(KRIZ_KUTUPHANESI_EBEVEYN, _EN_KRIZ_KUTUPHANESI_EBEVEYN, _ES_KRIZ_KUTUPHANESI_EBEVEYN)
+fbst_sabian = LangDict(fbst_sabian, _load_en_dict("fbst_sabian.py"), _load_es_dict("fbst_sabian.py"))
 
 def _load_all_ext_dicts(filename):
-    """Dış Python dosyasındaki TÜM dict değişkenlerini tek bir dict olarak yükler."""
+    """Dış Python dosyasındaki TÜM dict değişkenlerini tek bir dict olarak yükler.
+
+    Aynı dosyanın '_EN' son ekli varyantı (anahtarlar aynı, değerler İngilizce)
+    varsa her alt sözlük bir LangDict içine sarılır; böylece çeviri, yükleme
+    anına değil erişim anına göre (thread-local aktif dil) karar verilir. Örnek:
+      ARAP_ILISKI_DICTS.py -> ARAP_ILISKI_DICTS_EN.py (+ ARAP_ILISKI_DICTS_ES.py)
+    """
+    from core.i18n import LangDict as _i18n_LangDict
     _dir = os.path.dirname(os.path.abspath(__file__))
     _path = os.path.join(_dir, filename)
     if not os.path.exists(_path):
         _path = os.path.join(os.path.dirname(_dir), filename)
     if not os.path.exists(_path):
         return {}
-    _spec = _iu.spec_from_file_location("_mod_" + filename, _path)
-    _mod = _iu.module_from_spec(_spec)
-    _spec.loader.exec_module(_mod)
+
+    def _load(mod_name, p):
+        _spec = _iu.spec_from_file_location(mod_name, p)
+        _mod = _iu.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        _out = {}
+        for _k, _v in vars(_mod).items():
+            if isinstance(_v, dict) and not _k.startswith("_"):
+                _out[_k] = _v
+        return _out
+
+    _base = filename[:-3] if filename.endswith(".py") else filename
+    _en_filename = _base + "_EN.py"
+    _en_path = os.path.join(_dir, _en_filename)
+    if not os.path.exists(_en_path):
+        _en_path = os.path.join(os.path.dirname(_dir), _en_filename)
+    _es_filename = _base + "_ES.py"
+    _es_path = os.path.join(_dir, _es_filename)
+    if not os.path.exists(_es_path):
+        _es_path = os.path.join(os.path.dirname(_dir), _es_filename)
+
+    _tr = _load("_mod_tr_" + filename, _path)
+    if not os.path.exists(_en_path) and not os.path.exists(_es_path):
+        return _tr
+
+    _en = {}
+    try:
+        if os.path.exists(_en_path):
+            _en = _load("_mod_en_" + _en_filename, _en_path)
+    except Exception:
+        _en = {}
+    _es = {}
+    try:
+        if os.path.exists(_es_path):
+            _es = _load("_mod_es_" + _es_filename, _es_path)
+    except Exception:
+        _es = {}
+
     result = {}
-    for _k, _v in vars(_mod).items():
-        if isinstance(_v, dict) and not _k.startswith("_"):
+    for _k, _v in _tr.items():
+        _en_v = _en.get(_k)
+        _es_v = _es.get(_k)
+        if isinstance(_en_v, dict) and _en_v:
+            result[_k] = _i18n_LangDict(_v, _en_v, _es_v if isinstance(_es_v, dict) and _es_v else None)
+        else:
+            result[_k] = _v
+    # EN dosyasındaki TR'de olmayan özel sözlükler (örn. *_EN ad haritaları) dahil edilir
+    for _k, _v in _en.items():
+        if _k not in result:
+            result[_k] = _v
+    # ES dosyasındaki TR'de olmayan özel sözlükler de dahil edilir
+    for _k, _v in _es.items():
+        if _k not in result:
             result[_k] = _v
     return result
 
@@ -2102,6 +2300,6 @@ fbst_sabit_yildizlar = {
     },
 }
 
-fbst_sabit_yildizlar = LangDict(fbst_sabit_yildizlar, _load_en_dict("fbst_sabit_yildizlar.py"))
+fbst_sabit_yildizlar = LangDict(fbst_sabit_yildizlar, _load_en_dict("fbst_sabit_yildizlar.py"), _load_es_dict("fbst_sabit_yildizlar.py"))
 
 

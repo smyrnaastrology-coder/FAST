@@ -202,6 +202,7 @@ class _LandingScreenState extends State<LandingScreen> {
           items: const [
             DropdownMenuItem(value: 'tr', child: Text('Türkçe', style: TextStyle(color: FastTheme.text, fontSize: 12))),
             DropdownMenuItem(value: 'en', child: Text('English', style: TextStyle(color: FastTheme.text, fontSize: 12))),
+            DropdownMenuItem(value: 'es', child: Text('Español', style: TextStyle(color: FastTheme.text, fontSize: 12))),
           ],
           onChanged: (v) {
             if (v != null) lp.setLanguage(v);

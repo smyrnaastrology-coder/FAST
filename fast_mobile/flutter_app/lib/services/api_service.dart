@@ -19,13 +19,13 @@ class ApiService {
   Future<Map<String, dynamic>> _get(String url, {Duration? timeout}) async {
     final r = await http.get(Uri.parse(url)).timeout(timeout ?? ApiConfig.timeout);
     if (r.statusCode == 200) return jsonDecode(r.body);
-    throw Exception('Hata: ${r.statusCode}');
+    throw Exception('HTTP ${r.statusCode}');
   }
 
   Future<List<dynamic>> _getList(String url, {Duration? timeout}) async {
     final r = await http.get(Uri.parse(url)).timeout(timeout ?? ApiConfig.timeout);
     if (r.statusCode == 200) return jsonDecode(r.body);
-    throw Exception('Hata: ${r.statusCode}');
+    throw Exception('HTTP ${r.statusCode}');
   }
 
   Future<List<dynamic>> getUlkeler() => _getList(ApiConfig.ulkeler);

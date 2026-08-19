@@ -9,14 +9,16 @@ from collections import defaultdict
 from core.data import _FAST_RENKLER, fbst_sabit_yildizlar, fbst_sabit_yildizlar_ebeveyn, fbst_sabit_yildizlar_ask
 
 try:
-    from core.i18n import get_lang as _uget_lang
+    from core.i18n import get_lang as _uget_lang, pdf_label as _updf_label
 except Exception:
     def _uget_lang():
         return "tr"
+    def _updf_label(t):
+        return t
 
 
 def _uEN():
-    return _uget_lang() == "en"
+    return _uget_lang() in ("en", "es")
 
 # FBST kataloğundaki bazı yıldız anahtarları Swiss Ephemeris tarafından
 # doğrudan çözümlenemez; gerçek pozisyon hesabı için sefstars.txt'teki ad kullanılır.
@@ -510,7 +512,13 @@ def dereceyi_dakikaya_cevir(degree):
     sign_degree = degree - sign_index * 30
     tam_derece = int(sign_degree)
     dakika = int((sign_degree - tam_derece) * 60)
-    return f"{burclar[sign_index]} {tam_derece}°{dakika:02d}'"
+    burc_adi = burclar[sign_index]
+    try:
+        from core.i18n import pdf_label as _pl
+        burc_adi = _pl(burc_adi)
+    except Exception:
+        pass
+    return f"{burc_adi} {tam_derece}°{dakika:02d}'"
 
 
 
@@ -784,7 +792,7 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
 
             if fark <= orb_siniri:
                 if _EN:
-                    rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {gezegen_adi} | Diff: {fark:.2f}°)\n"
+                    rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {_updf_label(gezegen_adi)} | Diff: {fark:.2f}°)\n"
                 else:
                     rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
                 etki_bulundu = False
@@ -802,7 +810,7 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
                     else:
                         _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
                     if gezegen_adi in gezegen_etkileri:
-                        rapor_metni += f"   ➤ {_kategori_ad} ({gezegen_adi}): {gezegen_etkileri[gezegen_adi]}\n"
+                        rapor_metni += f"   ➤ {_kategori_ad} ({_updf_label(gezegen_adi)}): {gezegen_etkileri[gezegen_adi]}\n"
                         etki_bulundu = True
                     elif "Genel" in gezegen_etkileri:
                         rapor_metni += f"   ➤ {_kategori_ad}: {gezegen_etkileri['Genel']}\n"
@@ -842,9 +850,9 @@ def kadersel_yildiz_harita_tara(gezegen_dereceleri, target_jd=None, orb_siniri=2
                         _gezegen_anlami = _GEZEGEN_DUZ_ANLAM_EN.get(gezegen_adi, gezegen_adi)
                         bulunan_muhurler.append((
                             fark,
-                            f"* Star Link: {yildiz_adi} (in {gezegen_adi}'s zone | Diff: {fark:.2f}°)\n"
+                            f"* Star Link: {yildiz_adi} (in {_updf_label(gezegen_adi)}'s zone | Diff: {fark:.2f}°)\n"
                             f"   ➤ What does it mean? {yildiz_adi}, an ancient star in the sky, aligns with "
-                            f"{gezegen_adi} ({_gezegen_anlami}) in your chart. This union amplifies the star's "
+                            f"{_updf_label(gezegen_adi)} ({_gezegen_anlami}) in your chart. This union amplifies the star's "
                             f"power in {_baglam}, making this theme more visible and pronounced in your life."
                         ))
                     else:
@@ -908,7 +916,7 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
         if fark <= orb_siniri:
             # Raporlama şablonu
             if _EN:
-                rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {gezegen_adi} | Diff: {fark:.2f}°)\n"
+                rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {_updf_label(gezegen_adi)} | Diff: {fark:.2f}°)\n"
             else:
                 rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
             etki_bulundu = False

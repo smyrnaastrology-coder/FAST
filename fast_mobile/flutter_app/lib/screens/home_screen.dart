@@ -59,13 +59,13 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _buildModeCard(context, l10n.modeEsTitle, Icons.favorite, FastTheme.rose),
+                _buildModeCard(context, 'es_sevgili', l10n.modeEsTitle, Icons.favorite, FastTheme.rose),
                 const SizedBox(height: 16),
-                _buildModeCard(context, l10n.modeEbTitle, Icons.family_restroom, FastTheme.secondary),
+                _buildModeCard(context, 'ebeveyn_cocuk', l10n.modeEbTitle, Icons.family_restroom, FastTheme.secondary),
                 const SizedBox(height: 16),
-                _buildModeCard(context, l10n.modePyTitle, Icons.auto_awesome, FastTheme.accent),
+                _buildModeCard(context, 'potansiyel_yetenek', l10n.modePyTitle, Icons.auto_awesome, FastTheme.accent),
                 const SizedBox(height: 16),
-                _buildModeCard(context, l10n.modeNatalTitle, Icons.person, FastTheme.primary),
+                _buildModeCard(context, 'bireysel_natal', l10n.modeNatalTitle, Icons.person, FastTheme.primary),
                 const SizedBox(height: 40),
               ],
             ),
@@ -75,14 +75,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildModeCard(BuildContext context, String title, IconData icon, Color color) {
+  Widget _buildModeCard(BuildContext context, String modKey, String title, IconData icon, Color color) {
     return SizedBox(
       width: double.infinity,
       child: Card(
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () => Navigator.push(context, MaterialPageRoute(
-            builder: (_) => InputFormScreen(mod: title),
+            builder: (_) => InputFormScreen(mod: modKey),
           )),
           child: Padding(
             padding: const EdgeInsets.all(20),

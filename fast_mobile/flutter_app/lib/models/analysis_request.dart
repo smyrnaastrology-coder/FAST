@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+
 class AnalysisRequest {
   final String p1Isim;
   final String p1Tarih;
@@ -67,12 +69,12 @@ class AnalysisRequest {
     return base;
   }
 
-  String get modLabel {
+  String modLabel(AppLocalizations l10n) {
     switch (mod) {
-      case 'es_sevgili': return 'Eş / Sevgili';
-      case 'ebeveyn_cocuk': return 'Ebeveyn – Çocuk';
-      case 'potansiyel_yetenek': return 'Potansiyel / Yetenek';
-      case 'bireysel_natal': return 'Bireysel Natal';
+      case 'es_sevgili': return l10n.modeEsTitle;
+      case 'ebeveyn_cocuk': return l10n.modeEbTitle;
+      case 'potansiyel_yetenek': return l10n.modePyTitle;
+      case 'bireysel_natal': return l10n.modeNatalTitle;
       default: return mod;
     }
   }

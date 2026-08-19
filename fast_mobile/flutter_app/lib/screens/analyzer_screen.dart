@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +44,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   String _seciliSehir = 'İstanbul';
   final _latCtrl = TextEditingController(text: '41.0082');
   final _lonCtrl = TextEditingController(text: '28.9784');
-  String _geoHint = 'Şehir yazıp ara butonuna basın';
+  String? _geoHint;
   Map<String, dynamic>? _lokasyonDB;
   bool _dbLoading = true;
 
@@ -437,7 +436,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               Container(width: 72, height: 72, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
                 child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
               const SizedBox(height: 8),
-              Text('Fatih Asartepe\nSinastri Tekniği', textAlign: TextAlign.center,
+              Text(l10n.homeTitle, textAlign: TextAlign.center,
                 style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold, height: 1.3)),
               Text(l10n.analyzerSidebarTagline, style: const TextStyle(color: FastTheme.textMuted, fontSize: 10, letterSpacing: 2)),
               Text(l10n.analyzerSidebarVersion, style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
@@ -637,7 +636,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     );
   }
 
-  Widget _dropdownField(String label, List<String> items, String value, ValueChanged<String?> onChanged) {
+  Widget _dropdownField(String label, List<String> items, String value, ValueChanged<String?> onChanged, {Map<String, String>? labels}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: DropdownButtonFormField<String>(
@@ -648,7 +647,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         ),
         dropdownColor: FastTheme.cardBg,
         style: const TextStyle(color: FastTheme.text, fontSize: 13),
-        items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        items: items.map((e) => DropdownMenuItem(value: e, child: Text(labels?[e] ?? e))).toList(),
         onChanged: onChanged,
       ),
     );
@@ -676,7 +675,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         _sectionTitle(l10n.analyzerParent),
         _formField(l10n.analyzerName, _p1IsimCtrl, icon: Icons.family_restroom),
         _dateField(l10n.analyzerBirthDate, _p1TarihCtrl, l10n),
-        _dropdownField(l10n.analyzerRole, [l10n.analyzerMother, l10n.analyzerFather], _ebeveynRolu, (v) => setState(() => _ebeveynRolu = v!)),
+        _dropdownField(l10n.analyzerRole, ['anne', 'baba'], _ebeveynRolu, (v) => setState(() => _ebeveynRolu = v!),
+          labels: {'anne': l10n.analyzerMother, 'baba': l10n.analyzerFather}),
         _sectionTitle(l10n.analyzerChild),
         _formField(l10n.analyzerName, _p2IsimCtrl, icon: Icons.child_care),
         _dateField(l10n.analyzerBirthDate, _p2TarihCtrl, l10n),
@@ -728,7 +728,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             Expanded(child: _formField(l10n.analyzerLongitude, _lonCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
           ],
         ),
-        Text(_geoHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 9)),
+        Text(_geoHint ?? l10n.analyzerSearchHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 9)),
         const SizedBox(height: 6),
         SizedBox(
           width: double.infinity,
@@ -799,7 +799,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           Container(width: 72, height: 72, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
             child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
           const SizedBox(height: 12),
-          Text('Fatih Asartepe Sinastri Tekniği', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          Text(l10n.homeTitle.replaceAll('\n', ' '), style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
           Text('FAST — ${l10n.appSlogan}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 13, letterSpacing: 2)),
           const SizedBox(height: 8),
           Text(l10n.analyzerHeaderDesc,
@@ -1023,11 +1023,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_isEb ? 'Çocuğun haritasındaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.' : 'Haritanızdaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.',
+                Text(_isEb ? l10n.analyzerPotentialChildDesc : l10n.analyzerPotentialSelfDesc,
                   style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                const Text('💡 Tarayıcıda sadece ilk 5 yetenek alanı gösterilmektedir. Tüm alanlar PDF raporundadır.',
-                  style: TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerPotentialTop5Hint,
+                  style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['potansiyel_alanlar'] as List).take(5).map((p) => Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: FastTheme.border.withValues(alpha: 0.5)))),
@@ -1035,15 +1035,15 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('✨ ${p['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
-                      Text('${p['aci'] ?? ''} — ${p['aci_turu'] ?? ''}° Açısı (Orb: ${p['orb'] ?? ''})',
+                      Text(l10n.analyzerAspectOrb(p['aci'] ?? '', p['orb'] ?? '', p['aci_turu'] ?? ''),
                         style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                       if (p['metin'] != null) Text(p['metin'].toString(), style: const TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.4)),
                     ],
                   ),
                 ))),
                 const SizedBox(height: 8),
-                const Text('Tüm potansiyel ve yetenek alanları PDF raporunuzda detaylı şekilde yer almaktadır.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                Text(l10n.analyzerPotentialAllPdf,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1053,10 +1053,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_isEb ? 'Çocuğun potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğu meslek dalları.' : 'Potansiyel ve yetenek alanlarınızın senteziyle belirlenen, yatkın olduğunuz meslek dalları.',
+                Text(_isEb ? l10n.analyzerProfessionChildDesc : l10n.analyzerProfessionSelfDesc,
                   style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                const Text('💡 Tam sıralama PDF raporundadır.', style: TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerProfessionFullRanking, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['meslek_onerileri'] as List).map((m) => Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: FastTheme.border.withValues(alpha: 0.5)))),
@@ -1065,7 +1065,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     children: [
                       Text('${(r['meslek_onerileri'] as List).indexOf(m) + 1}. ${m['alan'] ?? ''}',
                         style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
-                      Text('${m['puan']?.toStringAsFixed(1) ?? ''} puan (%${m['yuzde'] ?? ''})',
+                      Text(l10n.analyzerScorePoints(m['yuzde'] ?? '', m['puan']?.toStringAsFixed(1) ?? ''),
                         style: const TextStyle(color: FastTheme.accentGold, fontSize: 11)),
                       if (m['meslekler'] is List) ...((m['meslekler'] as List).map((j) => Padding(
                         padding: const EdgeInsets.only(left: 12, top: 2),
@@ -1075,9 +1075,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     ],
                   ),
                 ))),
-                const Text('Puanlama: Gezegen-burç eşleşmesi, açı türü, orb yakınlığı, efsane boost, MC bonusu ve asteroid desteği ile hesaplanmıştır.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 10)),
-                const Text('Detaylı açıklama için PDF raporunuzu inceleyin.', style: TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                Text(l10n.analyzerProfessionScoringNote,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                Text(l10n.analyzerProfessionPdfHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1204,10 +1204,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Arap Noktaları, astrolojide kozmik noktaları temsil eder. Her iki kişinin ilişki odaklı nokta pozisyonları.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerArabicIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                const Text('💡 Detaylı burç ve ev yorumları PDF raporunuzdadır.', style: TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerArabicPdfHint, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['arap_noktalari'] as Map).entries.map((e) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
@@ -1260,8 +1260,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Tüm haritanız için kapsamlı kategori kartları — her alan için kişisel analiz ve öneriler.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                Text(l10n.analyzerLifeAreasIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 12)),
                 const SizedBox(height: 12),
                 ...((r['hayat_alanlari'] as List).asMap().entries.map((entry) {
                   final i = entry.key;
@@ -1393,8 +1393,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Gezegenlerinizin bulunduğu derecelere göre Sabian sembolleri ve yorumları.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                Text(l10n.analyzerSabianIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 12)),
                 const SizedBox(height: 8),
                 ...((r['sabianlar'] as List).map((s) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
@@ -1438,9 +1438,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 İlerleme Yılı: ${p['yil'] ?? ''}',
+                      Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 ${l10n.analyzerProgressionYear(p['yil'] ?? '')}',
                         style: const TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text('🌙 Ay: ${p['ay_burc'] ?? ''} (${p['ay_ev'] ?? ''}. Ev) | ☀️ Güneş: ${p['gunes_burc'] ?? ''}',
+                      Text(l10n.analyzerMoonSunHouse(p['ay_ev'] ?? '', p['ay_burc'] ?? '', p['gunes_burc'] ?? ''),
                         style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
                       if (p['ortam'] != null)
                         Text(p['ortam'].toString(), style: const TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
@@ -1459,8 +1459,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: FastTheme.accentGold, width: 1, style: BorderStyle.solid),
                     ),
-                    child: const Text('📄 6 aylık kapsamlı Minor Progress raporu PDF\'te sunulmuştur.',
-                      style: TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
+                    child: Text(l10n.analyzerMinorProgress6Month,
+                      style: const TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
                   ),
               ],
             )),
@@ -1471,8 +1471,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Gezegen konumları, açı kalıpları, Arap noktaları ve asteroit temalarını kapsayan bütünsel harita analizi.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerChartCommentIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
                 Text(r['chart_yorumu'].toString(), style: const TextStyle(color: FastTheme.text, fontSize: 12, height: 1.8)),
               ],
@@ -1484,8 +1484,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Doğum haritanızdaki gezegen konumlarına göre kişisel şifa ve denge önerileri.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerHealingIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
                 w.HtmlRender(r['sifa_receteleri'].toString()),
               ],
@@ -1497,8 +1497,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Zorlu açılar ve zarar/düşük pozisyonundaki gezegenler için özel sağaltım teknikleri ve öneriler.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerHealingDetailIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
                 ...((r['sifa_receteleri_detay'] as List).map((rct) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
@@ -1515,10 +1515,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho, Amor asteroidlerinin çapraz açısal temaları.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerAsteroidsIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                const Text('💡 0-5° orb aralığındaki temaslar gösterilmiştir.', style: TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerAsteroidsOrbHint, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 const SizedBox(height: 4),
                 ...((r['asteroitler'] as List).take(12).map((a) {
                   final etki = a['etki'] ?? '';
@@ -1549,8 +1549,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   );
                 })),
                 const SizedBox(height: 4),
-                const Text('Tüm asteroit etkileşimleri PDF raporunuzda detaylandırılmıştır.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                Text(l10n.analyzerAsteroidsAllPdf,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1560,8 +1560,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Farklı bir lokasyon seçerek o bölgenin enerjilerini (Para, Huzur, Tutku, Kriz) görün.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerAstroHint,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
 
                 // Astro location selector
@@ -1599,7 +1599,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 // Astro scores
                 if (provider.astroData != null || r['astrokartografi'] is Map) ...[
                   const SizedBox(height: 12),
-                  _astroScores(provider.astroData, r['astrokartografi'] as Map?),
+                  _astroScores(provider.astroData, r['astrokartografi'] as Map?, l10n),
                 ],
               ],
             )),
@@ -1610,8 +1610,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Doğum haritanızdaki gezegenlerin dünya üzerinde nerede doruk noktaya ulaştığını gösteren interaktif harita ve 15.000+ şehirdeki yıldız uyumu taraması.',
-                  style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                Text(l10n.analyzerAcgGlobalIntro,
+                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
 
                 // ACG Map
@@ -1647,8 +1647,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 const SizedBox(height: 8),
 
                 // Sim cards
-                ...List.generate(_simKategoriler.length, (i) {
-                  final kat = _simKategoriler[i];
+                ...List.generate(_simKategoriler(l10n).length, (i) {
+                  final kat = _simKategoriler(l10n)[i];
                   final katKey = kat['key'] as String;
                   final katIcon = kat['icon'] as String;
                   final katLabel = kat['label'] as String;
@@ -1768,19 +1768,21 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               border: Border.all(color: FastTheme.accentGold),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text('🔄 Simülasyon: ${r['sim_sehir']} koordinatlarında analiz yenilendi',
+            child: Text('🔄 ${l10n.analyzerSimulationRenewed(r['sim_sehir'])}',
               textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.accentGold, fontSize: 13)),
           ),
       ],
     );
   }
 
-  final _simKategoriler = [
-    {'key': 'para', 'icon': '♃', 'label': 'Para & Kariyer'},
-    {'key': 'huzur', 'icon': '☽', 'label': 'Huzur & Sakinlik'},
-    {'key': 'tutku', 'icon': '♂', 'label': 'Tutku & Aşk'},
-    {'key': 'kriz', 'icon': '♄', 'label': 'Kriz & Zorluk'},
-  ];
+  List<Map<String, String>> _simKategoriler(AppLocalizations l10n) {
+    return [
+      {'key': 'para', 'icon': '♃', 'label': l10n.simCatWealth},
+      {'key': 'huzur', 'icon': '☽', 'label': l10n.simCatPeace},
+      {'key': 'tutku', 'icon': '♂', 'label': l10n.simCatPassion},
+      {'key': 'kriz', 'icon': '♄', 'label': l10n.simCatCrisis},
+    ];
+  }
 
   Color _simKatColor(String? key) {
     switch (key) {
@@ -1806,14 +1808,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     }
   }
 
-  Widget _astroScores(Map<String, dynamic>? astroData, Map? akData) {
+  Widget _astroScores(Map<String, dynamic>? astroData, Map? akData, AppLocalizations l10n) {
     final skor = astroData?['skor'] ?? akData?['skor'];
     if (skor == null) return const SizedBox.shrink();
     final cats = [
-      {'k': 'para', 'l': '💰 Para', 'c': const Color(0xFF4caf50)},
-      {'k': 'huzur', 'l': '☮️ Huzur', 'c': const Color(0xFF2196f3)},
-      {'k': 'tutku', 'l': '🔥 Tutku', 'c': const Color(0xFFff5722)},
-      {'k': 'kriz', 'l': '⚡ Kriz', 'c': const Color(0xFFe91e63)},
+      {'k': 'para', 'l': l10n.astroScoreMoney, 'c': const Color(0xFF4caf50)},
+      {'k': 'huzur', 'l': l10n.astroScorePeace, 'c': const Color(0xFF2196f3)},
+      {'k': 'tutku', 'l': l10n.astroScorePassion, 'c': const Color(0xFFff5722)},
+      {'k': 'kriz', 'l': l10n.astroScoreCrisis, 'c': const Color(0xFFe91e63)},
     ];
     return Column(
       children: [
@@ -1985,7 +1987,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               onTap: () {}, // prevent close on image tap
               child: InteractiveViewer(
                 child: Image.network(url, fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Text('Görsel yüklenemedi', style: TextStyle(color: Colors.white)),
+                  errorBuilder: (_, __, ___) => Text(AppLocalizations.of(context).imageLoadError, style: const TextStyle(color: Colors.white)),
                 ),
               ),
             ),

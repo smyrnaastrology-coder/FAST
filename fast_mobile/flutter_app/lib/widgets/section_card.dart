@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 class SectionCard extends StatefulWidget {
   final String title;
@@ -113,7 +114,7 @@ class ChartImage extends StatelessWidget {
           child: Image.network(url, fit: BoxFit.contain, loadingBuilder: (_, child, progress) {
             if (progress == null) return child;
             return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
-          }, errorBuilder: (_, __, ___) => const SizedBox(height: 200, child: Center(child: Text('Görsel yüklenemedi')))),
+          }, errorBuilder: (context, __, ___) => SizedBox(height: 200, child: Center(child: Text(AppLocalizations.of(context).imageLoadError)))),
         ),
       ],
     );

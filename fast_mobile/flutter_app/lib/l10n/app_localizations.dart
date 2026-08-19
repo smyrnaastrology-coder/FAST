@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_tr.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
     Locale('tr'),
   ];
 
@@ -944,6 +946,12 @@ abstract class AppLocalizations {
   /// **'English'**
   String get english;
 
+  /// No description provided for @spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get spanish;
+
   /// No description provided for @homeTitle.
   ///
   /// In en, this message translates to:
@@ -1705,6 +1713,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Star Compass Scan'**
   String get analyzerStarScan;
+
+  /// No description provided for @errorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get errorTitle;
+
+  /// No description provided for @unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownError;
+
+  /// No description provided for @retryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get retryButton;
+
+  /// No description provided for @imageLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Image could not be loaded'**
+  String get imageLoadError;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get chooseLanguage;
+
+  /// No description provided for @chooseLanguageSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Dilinizi seçin'**
+  String get chooseLanguageSub;
+
+  /// No description provided for @analyzerParentRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent Role'**
+  String get analyzerParentRole;
+
+  /// No description provided for @analyzerParentNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the parent\'s name'**
+  String get analyzerParentNameRequired;
+
+  /// No description provided for @analyzerLocationLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching location...'**
+  String get analyzerLocationLoading;
+
+  /// No description provided for @analyzerPersonA.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart A'**
+  String get analyzerPersonA;
+
+  /// No description provided for @analyzerPersonB.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart B'**
+  String get analyzerPersonB;
+
+  /// No description provided for @scoreVitalityTork.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship Vitality (Torque)'**
+  String get scoreVitalityTork;
+
+  /// No description provided for @scoreFlowFraktal.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural Flow (Fractal)'**
+  String get scoreFlowFraktal;
+
+  /// No description provided for @progressionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Progression'**
+  String get progressionTitle;
+
+  /// No description provided for @weatherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sky Flow (3 Days)'**
+  String get weatherTitle;
+
+  /// No description provided for @timeMachineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Celestial Time Flow (21 Years)'**
+  String get timeMachineTitle;
+
+  /// No description provided for @astrokartografiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrocartography'**
+  String get astrokartografiTitle;
+
+  /// No description provided for @alternateUniverseScores.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternate Universe Scores'**
+  String get alternateUniverseScores;
+
+  /// No description provided for @cityCompassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🌍 City Compass'**
+  String get cityCompassTitle;
+
+  /// No description provided for @downloadPdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'📥 Download PDF ({mod})'**
+  String downloadPdfButton(Object mod);
+
+  /// No description provided for @analyzerYearLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Year: {year}'**
+  String analyzerYearLine(Object year);
+
+  /// No description provided for @analyzerMoonSun.
+  ///
+  /// In en, this message translates to:
+  /// **'🌙 Moon: {moon} | ☀️ Sun: {sun}'**
+  String analyzerMoonSun(Object moon, Object sun);
+
+  /// No description provided for @analyzerMoonSunHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'🌙 Moon: {moon} ({house}. House) | ☀️ Sun: {sun}'**
+  String analyzerMoonSunHouse(Object house, Object moon, Object sun);
+
+  /// No description provided for @analyzerMoonTransitLine.
+  ///
+  /// In en, this message translates to:
+  /// **'🌙 Moon {sign} — {house}. House ({degree}°)'**
+  String analyzerMoonTransitLine(Object degree, Object house, Object sign);
+
+  /// No description provided for @analyzerAspectOrb.
+  ///
+  /// In en, this message translates to:
+  /// **'{aspect} — {type}° Aspect (Orb: {orb})'**
+  String analyzerAspectOrb(Object aspect, Object orb, Object type);
+
+  /// No description provided for @analyzerScorePoints.
+  ///
+  /// In en, this message translates to:
+  /// **'{points} points ({percent}%)'**
+  String analyzerScorePoints(Object percent, Object points);
+
+  /// No description provided for @analyzerPotentialChildDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural talent, potential areas and career directions detected from the planetary aspects in the child\'s chart.'**
+  String get analyzerPotentialChildDesc;
+
+  /// No description provided for @analyzerPotentialSelfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural talent, potential areas and career directions detected from the planetary aspects in your chart.'**
+  String get analyzerPotentialSelfDesc;
+
+  /// No description provided for @analyzerPotentialTop5Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Only the first 5 talent areas are shown in the browser. All areas are in the PDF report.'**
+  String get analyzerPotentialTop5Hint;
+
+  /// No description provided for @analyzerPotentialAllPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'All potential and talent areas are detailed in your PDF report.'**
+  String get analyzerPotentialAllPdf;
+
+  /// No description provided for @analyzerProfessionChildDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Career fields the child is inclined toward, determined by the synthesis of their potential and talent areas.'**
+  String get analyzerProfessionChildDesc;
+
+  /// No description provided for @analyzerProfessionSelfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Career fields you are inclined toward, determined by the synthesis of your potential and talent areas.'**
+  String get analyzerProfessionSelfDesc;
+
+  /// No description provided for @analyzerProfessionFullRanking.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 The full ranking is in the PDF report.'**
+  String get analyzerProfessionFullRanking;
+
+  /// No description provided for @analyzerProfessionScoringNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Scoring: Calculated using planet-sign matches, aspect type, orb proximity, legend boost, MC bonus and asteroid support.'**
+  String get analyzerProfessionScoringNote;
+
+  /// No description provided for @analyzerProfessionPdfHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your PDF report for a detailed explanation.'**
+  String get analyzerProfessionPdfHint;
+
+  /// No description provided for @analyzerArabicIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Points represent cosmic points in astrology. The relationship-focused point positions of both people.'**
+  String get analyzerArabicIntro;
+
+  /// No description provided for @analyzerArabicPdfHint.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Detailed sign and house interpretations are in your PDF report.'**
+  String get analyzerArabicPdfHint;
+
+  /// No description provided for @analyzerLifeAreasIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Comprehensive category cards for your entire chart — personal analysis and recommendations for each area.'**
+  String get analyzerLifeAreasIntro;
+
+  /// No description provided for @analyzerSabianIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Sabian symbols and interpretations based on the degrees your planets occupy.'**
+  String get analyzerSabianIntro;
+
+  /// No description provided for @analyzerMinorProgress6Month.
+  ///
+  /// In en, this message translates to:
+  /// **'📄 A comprehensive 6-month Minor Progress report is presented in the PDF.'**
+  String get analyzerMinorProgress6Month;
+
+  /// No description provided for @analyzerChartCommentIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A holistic chart analysis covering planetary positions, aspect patterns, Arabic points and asteroid themes.'**
+  String get analyzerChartCommentIntro;
+
+  /// No description provided for @analyzerHealingIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal healing and balance recommendations based on the planetary positions in your birth chart.'**
+  String get analyzerHealingIntro;
+
+  /// No description provided for @analyzerHealingDetailIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Special remediation techniques and recommendations for challenging aspects and planets in detriment/fall.'**
+  String get analyzerHealingDetailIntro;
+
+  /// No description provided for @analyzerAsteroidsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Cross-aspect themes of the Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho and Amor asteroids.'**
+  String get analyzerAsteroidsIntro;
+
+  /// No description provided for @analyzerAsteroidsOrbHint.
+  ///
+  /// In en, this message translates to:
+  /// **'💡 Contacts within the 0-5° orb range are shown.'**
+  String get analyzerAsteroidsOrbHint;
+
+  /// No description provided for @analyzerAsteroidsAllPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'All asteroid interactions are detailed in your PDF report.'**
+  String get analyzerAsteroidsAllPdf;
+
+  /// No description provided for @analyzerAcgGlobalIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'An interactive map showing where your birth chart planets peak on Earth and a star compatibility scan across 15,000+ cities.'**
+  String get analyzerAcgGlobalIntro;
+
+  /// No description provided for @simCatWealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Money & Career'**
+  String get simCatWealth;
+
+  /// No description provided for @simCatPeace.
+  ///
+  /// In en, this message translates to:
+  /// **'Peace & Serenity'**
+  String get simCatPeace;
+
+  /// No description provided for @simCatPassion.
+  ///
+  /// In en, this message translates to:
+  /// **'Passion & Love'**
+  String get simCatPassion;
+
+  /// No description provided for @simCatCrisis.
+  ///
+  /// In en, this message translates to:
+  /// **'Crisis & Challenge'**
+  String get simCatCrisis;
+
+  /// No description provided for @astroScoreMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'💰 Money'**
+  String get astroScoreMoney;
+
+  /// No description provided for @astroScorePeace.
+  ///
+  /// In en, this message translates to:
+  /// **'☮️ Peace'**
+  String get astroScorePeace;
+
+  /// No description provided for @astroScorePassion.
+  ///
+  /// In en, this message translates to:
+  /// **'🔥 Passion'**
+  String get astroScorePassion;
+
+  /// No description provided for @astroScoreCrisis.
+  ///
+  /// In en, this message translates to:
+  /// **'⚡ Crisis'**
+  String get astroScoreCrisis;
+
+  /// No description provided for @astroBarMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'💰 Money & Career'**
+  String get astroBarMoney;
+
+  /// No description provided for @astroBarPeace.
+  ///
+  /// In en, this message translates to:
+  /// **'🧘 Peace & Serenity'**
+  String get astroBarPeace;
+
+  /// No description provided for @astroBarPassion.
+  ///
+  /// In en, this message translates to:
+  /// **'🔥 Passion & Love'**
+  String get astroBarPassion;
+
+  /// No description provided for @astroBarCrisis.
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ Crisis & Challenge'**
+  String get astroBarCrisis;
 }
 
 class _AppLocalizationsDelegate
@@ -1718,7 +2080,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'tr'].contains(locale.languageCode);
+      <String>['en', 'es', 'tr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1729,6 +2091,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'tr':
       return AppLocalizationsTr();
   }

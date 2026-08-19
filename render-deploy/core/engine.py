@@ -30,6 +30,8 @@ from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     OGRENME_MOTIVASYON_MERKUR, EGITIM_3EV, BESLENME_RUTIN_AY,
     OZGURLUK_SINIR_SATURN, YAS_DONEMLERI, ELEMENT_UYUM_ANNE_COCUK,
     OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET)
+from core.sifa_receteler_en import FBST_RECETELER_EN, FBST_RECETELER_EBEVEYN_EN
+from core.sifa_receteler_es import FBST_RECETELER_ES, FBST_RECETELER_EBEVEYN_ES
 from core.i18n import set_lang as _core_set_lang, get_lang as _core_get_lang, pdf_label as pdf_label
 from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocator,
     sehir_bul, _turkiye_utc_offset_hesapla, _nci_pazar_gunu,
@@ -54,7 +56,7 @@ class FBST_Engine:
         self._session_id = uuid.uuid4().hex[:12]
         self.mod = mod
         self.ebeveyn_rolu = ebeveyn_rolu
-        self._lang = lang if lang in ("tr", "en") else "tr"
+        self._lang = lang if lang in ("tr", "en", "es") else "tr"
         _core_set_lang(self._lang)
         
         # 1. Metinleri tarihe çevir
@@ -1441,20 +1443,31 @@ class FBST_Engine:
                 metin = FBST_YORUMLAR_EV[(gezegen_ad, str(ev_no))]
 
         if metin and self.mod == "ebeveyn_cocuk":
+            _EN_metin = _core_get_lang() == "en"
             anne_mi = self.ebeveyn_rolu == "anne"
-            rol_iyelik = "Annenin" if anne_mi else "Babanın"
-            rol_yalin = "Anne" if anne_mi else "Baba"
-            rol_kucuk_iyelik = "annenin" if anne_mi else "babanın"
+            if _EN_metin:
+                rol_iyelik = ("The mother's" if anne_mi else "The father's")
+                rol_yalin = ("Mother" if anne_mi else "Father")
+                rol_kucuk_iyelik = ("the mother's" if anne_mi else "the father's")
+                rol_sahis = ("the mother" if anne_mi else "the father")
+            else:
+                rol_iyelik = "Annenin" if anne_mi else "Babanın"
+                rol_yalin = "Anne" if anne_mi else "Baba"
+                rol_kucuk_iyelik = "annenin" if anne_mi else "babanın"
+                rol_sahis = "anne" if anne_mi else "baba"
             metin = (metin
                      .replace("{ebeveyn_iyelik}", rol_iyelik)
                      .replace("{ebeveyn_yalin}", rol_yalin)
-                     .replace("{ebeveyn_kucuk_iyelik}", rol_kucuk_iyelik))
+                     .replace("{ebeveyn_kucuk_iyelik}", rol_kucuk_iyelik)
+                     .replace("{ebeveyn_sahis}", rol_sahis))
 
         if metin:
             cumle = metin
         else:
             if self._lang == "en":
                 cumle = f"The planet {gezegen_ad} lies in the constellation of {temiz_burc} and influences the {ev_no}. house area."
+            elif self._lang == "es":
+                cumle = f"El planeta {gezegen_ad} se encuentra en la constelación de {temiz_burc} e influye en el área de la casa {ev_no}."
             else:
                 cumle = f"{gezegen_ad} burcu {temiz_burc} takımyıldızında yer alıyor ve {ev_no}. ev alanını etkiliyor."
 
@@ -1479,6 +1492,8 @@ class FBST_Engine:
         sabian_derece = math.floor(mutlak_derece % 30) + 1 
         
         # Gezegenin temel fıtratını yapi olarak belirliyoruz (doğal/insani dil)
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         gez_fitrat_sozlugu = {
             "Güneş": "iradesi ve kendini ifade etme biçimi", "Ay": "duygusal güven arayışı",
             "Merkür": "düşünce ve iletişim tarzı", "Venüs": "sevgi ve özdeğer algısı",
@@ -1489,7 +1504,29 @@ class FBST_Engine:
             "Ceres": "bakım ve besleme tarzı", "Lilith": "gizli arzuları",
             "KAD": "tekamül yolu", "GAD": "karmik öğretileri"
         }
+        gez_fitrat_sozlugu_en = {
+            "Güneş": "their will and way of self-expression", "Ay": "your quest for emotional security",
+            "Merkür": "their style of thought and communication", "Venüs": "their perception of love and self-worth",
+            "Mars": "their energy and passion", "Jüpiter": "their growth vision",
+            "Satürn": "their sense of responsibility and loyalty", "Uranüs": "their need for freedom",
+            "Neptün": "their world of dreams and beliefs", "Plüton": "their power of transformation",
+            "Chiron": "their wounds and healing", "Juno": "their understanding of commitment",
+            "Ceres": "their way of care and nurturing", "Lilith": "their hidden desires",
+            "KAD": "their path of evolution", "GAD": "their karmic teachings"
+        }
+        gez_fitrat_sozlugu_es = {
+            "Güneş": "su voluntad y forma de expresarse", "Ay": "su búsqueda de seguridad emocional",
+            "Merkür": "su estilo de pensamiento y comunicación", "Venüs": "su percepción del amor y la autoestima",
+            "Mars": "su energía y pasión", "Jüpiter": "su visión de crecimiento",
+            "Satürn": "su sentido de responsabilidad y lealtad", "Uranüs": "su necesidad de libertad",
+            "Neptün": "su mundo de sueños y creencias", "Plüton": "su poder de transformación",
+            "Chiron": "sus heridas y sanación", "Juno": "su entendimiento del compromiso",
+            "Ceres": "su forma de cuidado y nutrición", "Lilith": "sus deseos ocultos",
+            "KAD": "su camino de evolución", "GAD": "sus enseñanzas kármicas"
+        }
         gez_fitrat = gez_fitrat_sozlugu.get(gezegen_isim, "kadersel enerjisi")
+        gez_fitrat_en = gez_fitrat_sozlugu_en.get(gezegen_isim, "fated energy")
+        gez_fitrat_es = gez_fitrat_sozlugu_es.get(gezegen_isim, "energía kármica")
         
         # Sabian Sembolünü ve Yorumunu Sözlükten Çek (mode'a göre)
         _aktif_mod = getattr(self, 'mod', 'es_sevgili')
@@ -1502,39 +1539,42 @@ class FBST_Engine:
         
         # ReportLab (PDF) uyumlu şık tipografi — doğal ve insani cümlelerle
         if _aktif_mod == "ebeveyn_cocuk":
-            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'>Bu sembol, aranızdaki bağda <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>{'Sabian Symbol' if _EN else ('Símbolo Sabiano' if _ES else 'Sabian Sembolü')} ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += (f"<font color='#555555'>This symbol tells this about <b>{gez_fitrat_en}</b> in the bond between you: {sembol_yorumu}</font>" if _EN else (f"<font color='#555555'>Este símbolo comunica esto sobre <b>{gez_fitrat_es}</b> en el vínculo entre ustedes: {sembol_yorumu}</font>" if _ES else f"<font color='#555555'>Bu sembol, aranızdaki bağda <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"))
         elif _aktif_mod == "bireysel_natal":
-            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'>Bu sembol, sizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>{'Sabian Symbol' if _EN else ('Símbolo Sabiano' if _ES else 'Sabian Sembolü')} ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += (f"<font color='#555555'>This symbol tells this about your <b>{gez_fitrat_en}</b>: {sembol_yorumu}</font>" if _EN else (f"<font color='#555555'>Este símbolo comunica esto sobre su <b>{gez_fitrat_es}</b>: {sembol_yorumu}</font>" if _ES else f"<font color='#555555'>Bu sembol, sizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"))
         else:
-            sentez = f"👁️‍🗨️ <b>Sabian Sembolü ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
-            sentez += f"<font color='#555555'>Bu sembol, partnerinizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"
+            sentez = f"👁️‍🗨️ <b>{'Sabian Symbol' if _EN else ('Símbolo Sabiano' if _ES else 'Sabian Sembolü')} ({sabian_derece}°):</b> <i>\"{sembol_vizyonu}\"</i><br/>"
+            sentez += (f"<font color='#555555'>This symbol tells this about your partner's <b>{gez_fitrat_en}</b>: {sembol_yorumu}</font>" if _EN else (f"<font color='#555555'>Este símbolo comunica esto sobre <b>{gez_fitrat_es}</b> de su pareja: {sembol_yorumu}</font>" if _ES else f"<font color='#555555'>Bu sembol, partnerinizin <b>{gez_fitrat}</b> ile ilgili şunu anlatıyor: {sembol_yorumu}</font>"))
         
         return sentez
    
     def get_kadersel_durak(self):
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         bugun = datetime.now()
         iliski_suresi = (bugun - self.event_date).days / 365.25
         
         if self.mod == "ebeveyn_cocuk":
             if iliski_suresi < 2: 
-                return "🌱 Keşif ve Bağlanma Fazı (Yeni Doğan - 2 Yaş): Bu dönemde ebeveyn ve çocuk birbirlerinin enerjisini, ihtiyaçlarını ve iletişim dilini keşfeder. Bağlanma kalıpları oluşur, güven temeli atılır. Krizlerden ziyade, karşılıklı uyum ve sezgisel bağın güçlendirilmesi önceliklidir."
+                return ("🌱 Discovery and Bonding Phase (Newborn - 2 Years): During this period, parent and child discover each other's energy, needs and communication language. Bonding patterns form and the foundation of trust is laid. Rather than crises, mutual harmony and strengthening the intuitive bond take priority." if _EN else ("🌱 Fase de Descubrimiento y Vínculo (Recién Nacido - 2 Años): Durante este período, padre e hijo descubren la energía, las necesidades y el lenguaje de comunicación del otro. Se forman patrones de apego y se sientan las bases de la confianza. Más que crisis, la armonía mutua y el fortalecimiento del vínculo intuitivo son prioritarios." if _ES else "🌱 Keşif ve Bağlanma Fazı (Yeni Doğan - 2 Yaş): Bu dönemde ebeveyn ve çocuk birbirlerinin enerjisini, ihtiyaçlarını ve iletişim dilini keşfeder. Bağlanma kalıpları oluşur, güven temeli atılır. Krizlerden ziyade, karşılıklı uyum ve sezgisel bağın güçlendirilmesi önceliklidir."))
             elif 2 <= iliski_suresi < 7: 
-                return "⚙️ Sınır ve Bağımsızlık Fazı (2 - 7 Yaş): Çocuğun kendi benliğini keşfetmeye başladığı, sınırların test edildiği bir dönem. 'Neden?' soruları artar, bağımsızlık ihtiyacı güçlenir. Ebeveynin sabır ve net sınırlarla yaklaşması, çocuğun kendine güveninin gelişmesinin temelini atar."
+                return ("⚙️ Boundaries and Independence Phase (2 - 7 Years): A period in which the child begins to discover their own self and boundaries are tested. 'Why?' questions increase and the need for independence strengthens. The parent's patient approach with clear boundaries lays the foundation of the child's self-confidence." if _EN else ("⚙️ Fase de Límites e Independencia (2 - 7 Años): Un período en el que el niño comienza a descubrir su propio ser y se ponen a prueba los límites. Aumentan las preguntas de '¿Por qué?' y se fortalece la necesidad de independencia. El enfoque paciente del padre con límites claros sienta las bases de la autoconfianza del niño." if _ES else "⚙️ Sınır ve Bağımsızlık Fazı (2 - 7 Yaş): Çocuğun kendi benliğini keşfetmeye başladığı, sınırların test edildiği bir dönem. 'Neden?' soruları artar, bağımsızlık ihtiyacı güçlenir. Ebeveynin sabır ve net sınırlarla yaklaşması, çocuğun kendine güveninin gelişmesinin temelini atar."))
             else: 
-                return "🏛️ Olgunlaşma ve Rehberlik Fazı (7 Yaş Üstü): Çocuk artık kendi kararlarını verebilecek olgunluğa ulaşır. Ebeveyn-çocuk ilişkisi yönlendirmeden rehberliğe, otoriteden danışmanlığa dönüşür. Birlikte öğrenme, paylaşma ve karşılıklı saygı bu dönemin en değerli kazanımlarıdır."
+                return ("🏛️ Maturation and Guidance Phase (7+ Years): The child now reaches the maturity to make their own decisions. The parent-child relationship shifts from directing to guiding, from authority to counsel. Learning, sharing and mutual respect together are this period's most valuable gifts." if _EN else ("🏛️ Fase de Maduración y Orientación (7+ Años): El niño alcanza la madurez para tomar sus propias decisiones. La relación padre-hijo pasa de dirigir a guiar, de la autoridad al consejo. Aprender juntos, compartir y el respeto mutuo son los regalos más valiosos de este período." if _ES else "🏛️ Olgunlaşma ve Rehberlik Fazı (7 Yaş Üstü): Çocuk artık kendi kararlarını verebilecek olgunluğa ulaşır. Ebeveyn-çocuk ilişkisi yönlendirmeden rehberliğe, otoriteden danışmanlığa dönüşür. Birlikte öğrenme, paylaşma ve karşılıklı saygı bu dönemin en değerli kazanımlarıdır."))
         else:
             if iliski_suresi < 2: 
-                return "🌱 Çıraklık Aşaması (Kadersel Yeni Ay): İlişkiniz henüz kurulum fazında. Birbirinizin enerjisine, vektörel hızına ve dünyevi vitrinlerine uyumlanma sürecindesiniz. Bu dönemde krizlerden ziyade, birbirini keşfetmenin o büyüleyici ve illüzyonlu akışı devrededir."
+                return ("🌱 Apprenticeship Stage (Fated New Moon): Your relationship is still in its setup phase. You are adapting to one another's energy, vectorial speed and earthly displays. During this period, rather than crises, that enchanting and illusory flow of discovering each other takes over." if _EN else ("🌱 Etapa de Aprendizaje (Luna Nueva Kármica): Su relación aún está en fase de configuración. Se están adaptando a la energía, la velocidad vectorial y las apariencias terrenales del otro. Durante este período, más que crisis, ese flujo encantador e ilusorio del descubrimiento mutuo toma el control." if _ES else "🌱 Çıraklık Aşaması (Kadersel Yeni Ay): İlişkiniz henüz kurulum fazında. Birbirinizin enerjisine, vektörel hızına ve dünyevi vitrinlerine uyumlanma sürecindesiniz. Bu dönemde krizlerden ziyade, birbirini keşfetmenin o büyüleyici ve illüzyonlu akışı devrededir."))
             elif 2 <= iliski_suresi < 7: 
-                return "⚙️ Kalfalık Aşaması (Sabir Testi): İlişkiniz artık başlangıçtaki o illüzyonlu 'Yeni Ay' fazından çıkmış ve gerçek bir motor gibi yük taşımaya başlamıştır. FAST tekniğinde 'Bağ Gücü', iliskinin yokus çıkabilme gücüdür. Bu dönemde yaşadığınız krizler, kavgalar veya ego çarpışmaları ilişkinin kötüye gittiğini değil; aksine 'vites kutusunun' test edildiğini gösterir. Göreviniz birbirinizle savaşmak değil, aranızdaki bu yüksek sürtünmeyi (krizi) kalıcı bir üretim ilerlemesine (çözüme) dönüştürmektir."
+                return ("⚙️ Journeyman Stage (Test of Patience): Your relationship has left the illusory 'New Moon' phase behind and has begun carrying real weight like an engine. In the FAST technique, 'Bond Strength' is the relationship's ability to climb uphill. The crises, fights or ego clashes you experience during this period do not show your relationship worsening; on the contrary, they show that the 'gearbox' is being tested. Your task is not to fight one another, but to convert this high friction (crisis) between you into lasting productive progress (resolution)." if _EN else ("⚙️ Etapa de Oficial (Prueba de Paciencia): Su relación ha dejado atrás la fase ilusoria de 'Luna Nueva' y ha comenzado a soportar peso real como un motor. En la técnica FAST, la 'Fortaleza del Vínculo' es la capacidad de la relación para subir cuestas. Las crisis, peleas o choques de ego que atraviesan en este período no indican que la relación empeore; al contrario, muestran que se está probando la 'caja de cambios'. Su tarea no es luchar el uno contra el otro, sino convertir esta alta fricción (crisis) en progreso productivo duradero (resolución)." if _ES else "⚙️ Kalfalık Aşaması (Sabir Testi): İlişkiniz artık başlangıçtaki o illüzyonlu 'Yeni Ay' fazından çıkmış ve gerçek bir motor gibi yük taşımaya başlamıştır. FAST tekniğinde 'Bağ Gücü', iliskinin yokus çıkabilme gücüdür. Bu dönemde yaşadığınız krizler, kavgalar veya ego çarpışmaları ilişkinin kötüye gittiğini değil; aksine 'vites kutusunun' test edildiğini gösterir. Göreviniz birbirinizle savaşmak değil, aranızdaki bu yüksek sürtünmeyi (krizi) kalıcı bir üretim ilerlemesine (çözüme) dönüştürmektir."))
             else: 
-                return "🏛️ Ustalık Aşaması (Fraktal Büyüme): İlişkiniz tüm ağır sabır testlerinden ve Satürn döngülerinden sağ çıkarak kendi sarsılmaz imparatorluğunu kurmuştur. Artık aranızdaki bağ, ufak krizlerle sarsılmayacak kadar köklenmiş ve Altın Oran'ın o çabasız, koruyucu titreşimine yerleşmiştir."
+                return ("🏛️ Mastery Stage (Fractal Growth): Your relationship has survived all heavy tests of patience and Saturn cycles, building its own unshakeable empire. Now your bond is rooted too deeply to be shaken by minor crises, settled into that effortless, protective vibration of the Golden Ratio." if _EN else ("🏛️ Etapa de Maestría (Crecimiento Fractal): Su relación ha superado todas las duras pruebas de paciencia y los ciclos de Saturno, construyendo su propio imperio inquebrantable. Ahora su vínculo está demasiado arraigado para ser sacudido por crisis menores, asentado en esa vibración protectora y sin esfuerzo de la Proporción Áurea." if _ES else "🏛️ Ustalık Aşaması (Fraktal Büyüme): İlişkiniz tüm ağır sabır testlerinden ve Satürn döngülerinden sağ çıkarak kendi sarsılmaz imparatorluğunu kurmuştur. Artık aranızdaki bağ, ufak krizlerle sarsılmayacak kadar köklenmiş ve Altın Oran'ın o çabasız, koruyucu titreşimine yerleşmiştir."))
 
     def calculate_bagil_tarihler(self):
         import swisseph as swe
         from datetime import datetime
+        _EN = _core_get_lang() == "en"
         
         j_ileri, j_geri = self.get_julian_dates()
         
@@ -1543,15 +1583,19 @@ class FBST_Engine:
         y1, m1, d1, _ = swe.revjul(j_ileri, swe.JUL_CAL)
         y2, m2, d2, _ = swe.revjul(j_geri, swe.JUL_CAL)
         
-        # Astronomik Yıldan Tarihsel Yıla Çevrim (0 = 1 M.Ö.)
-        ileri_str = f"{int(d1):02d}.{int(m1):02d}.{abs(y1)+1:04d} M.Ö." if y1 <= 0 else f"{int(d1):02d}.{int(m1):02d}.{y1:04d} M.S."
-        geri_str = f"{int(d2):02d}.{int(m2):02d}.{abs(y2)+1:04d} M.Ö." if y2 <= 0 else f"{int(d2):02d}.{int(m2):02d}.{y2:04d} M.S."
+        # Astronomik Yıldan Tarihsel Yıla Çevrim (0 = 1 BC)
+        _eski = "BC" if _EN else ("a.C." if _core_get_lang() == "es" else "M.Ö.")
+        _yeni = "AD" if _EN else ("d.C." if _core_get_lang() == "es" else "M.S.")
+        ileri_str = f"{int(d1):02d}.{int(m1):02d}.{abs(y1)+1:04d} {_eski}" if y1 <= 0 else f"{int(d1):02d}.{int(m1):02d}.{y1:04d} {_yeni}"
+        geri_str = f"{int(d2):02d}.{int(m2):02d}.{abs(y2)+1:04d} {_eski}" if y2 <= 0 else f"{int(d2):02d}.{int(m2):02d}.{y2:04d} {_yeni}"
         
         # Arayüzdeki diğer fonksiyonlar çökmesin diye sahte obje gönderiyoruz
         dummy_date = datetime(1, 1, 1)
         return dummy_date, ileri_str, dummy_date, y2, geri_str
 
     def calculate_altin_oran_muhru(self):
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         ks_yil = self.calculate_ks()
         phi = 1.618033988749895
         uyum_sapmasi = ks_yil % phi
@@ -1560,18 +1604,18 @@ class FBST_Engine:
         
         if self.mod == "ebeveyn_cocuk":
             if abs(ks_yil - en_yakin_fib) < 0.3: 
-                return f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık zaman farkı, kozmik bir harmoni içinde. En ağır krizlerde bile bu bağ kendini otomatik olarak onarır. Birbirinden kopma neredeyse imkansız; evren bu bağı koruma altına almış."
+                return (f"The {ks_yil:.2f}-year time difference between parent and child is in cosmic harmony. Even in the heaviest crises this bond repairs itself automatically. Almost nothing can sever it; the universe has placed this bond under protection." if _EN else (f"La diferencia de tiempo de {ks_yil:.2f} años entre padre/madre e hijo está en armonía cósmica. Incluso en las crisis más graves este vínculo se repara a sí mismo automáticamente. Casi nada puede romperlo; el universo ha puesto este vínculo bajo protección." if _ES else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık zaman farkı, kozmik bir harmoni içinde. En ağır krizlerde bile bu bağ kendini otomatik olarak onarır. Birbirinden kopma neredeyse imkansız; evren bu bağı koruma altına almış."))
             elif uyum_sapmasi < 0.2 or uyum_sapmasi > 1.4: 
-                return f"{ks_yil:.2f} yıllık fark, doğal bir ritim ve uyum dalgasına sahip. Birçok sorun konuşulmadan, sezgisel bir şekilde çözülebilir. Arada sessiz bir telepati, bir akış var."
+                return (f"The {ks_yil:.2f}-year difference carries a natural rhythm and harmony wave. Many problems can be solved intuitively, without speaking. There is a quiet telepathy, a flow between you." if _EN else (f"La diferencia de {ks_yil:.2f} años lleva un ritmo natural y una onda de armonía. Muchos problemas pueden resolverse intuitivamente, sin hablar. Hay una telepatía silenciosa, un flujo entre ustedes." if _ES else f"{ks_yil:.2f} yıllık fark, doğal bir ritim ve uyum dalgasına sahip. Birçok sorun konuşulmadan, sezgisel bir şekilde çözülebilir. Arada sessiz bir telepati, bir akış var."))
             else: 
-                return f"{ks_yil:.2f} yıllık fark, doğal bir koruma kalkanı oluşturmamış. Bu bir eksiklik değil; tam tersine, ilişkide ne ekilirse aynısının biçileceği anlamına gelir. Evren kadersel bir torpille kurtarmaz ama haksız yere de cezalandırmaz. İlişkinin mimarisi tamamen size ait."
+                return (f"The {ks_yil:.2f}-year difference has not created a natural protective shield. This is not a deficiency; quite the opposite, it means whatever is planted in the relationship will be reaped. The universe will not save you with a fated shortcut, but it will not punish you unfairly either. The architecture of the relationship is entirely yours." if _EN else (f"La diferencia de {ks_yil:.2f} años no ha creado un escudo protector natural. Esto no es una deficiencia; todo lo contrario, significa que lo que se siembra en la relación se cosecha. El universo no le salvará con un atajo del destino, pero tampoco le castigará injustamente. La arquitectura de la relación es enteramente suya." if _ES else f"{ks_yil:.2f} yıllık fark, doğal bir koruma kalkanı oluşturmamış. Bu bir eksiklik değil; tam tersine, ilişkide ne ekilirse aynısının biçileceği anlamına gelir. Evren kadersel bir torpille kurtarmaz ama haksız yere de cezalandırmaz. İlişkinin mimarisi tamamen size ait."))
         else:
             if abs(ks_yil - en_yakin_fib) < 0.3: 
-                return f"Aranizdaki {ks_yil:.2f} yillik vektorsel yas farki, kozmik bir harmoni icinde. En agir krizlerde bile bu bag kendini otomatik olarak onarir. Birbirinizden kopmaniz neredeyse imkansiz; evren bu iliskiyi koruma altina almis."
+                return (f"Your {ks_yil:.2f}-year vectorial age difference between you is in cosmic harmony. Even in the heaviest crises this bond repairs itself automatically. Almost nothing can separate you; the universe has placed this relationship under protection." if _EN else (f"Su diferencia de edad vectorial de {ks_yil:.2f} años está en armonía cósmica. Incluso en las crisis más graves este vínculo se repara por sí solo. Casi nada puede separarles; el universo ha puesto esta relación bajo protección." if _ES else f"Aranizdaki {ks_yil:.2f} yillik vektorsel yas farki, kozmik bir harmoni icinde. En agir krizlerde bile bu bag kendini otomatik olarak onarir. Birbirinizden kopmaniz neredeyse imkansiz; evren bu iliskiyi koruma altina almis."))
             elif uyum_sapmasi < 0.2 or uyum_sapmasi > 1.4: 
-                return f"{ks_yil:.2f} yillik yas farkiniz, dogal bir ritim ve uyum dalgasina sahip. Bir cok sorunu konusmadan, sezgisel bir sekilde cozmeniz mumkun. Aranizda sessiz bir telepati, bir akis var."
+                return (f"Your {ks_yil:.2f}-year age difference carries a natural rhythm and harmony wave. You can resolve many problems intuitively, without speaking. There is a quiet telepathy, a flow between you." if _EN else (f"Su diferencia de edad de {ks_yil:.2f} años lleva un ritmo natural y una onda de armonía. Pueden resolver muchos problemas intuitivamente, sin hablar. Hay una telepatía silenciosa, un flujo entre ustedes." if _ES else f"{ks_yil:.2f} yillik yas farkiniz, dogal bir ritim ve uyum dalgasina sahip. Bir cok sorunu konusmadan, sezgisel bir sekilde cozmeniz mumkun. Aranizda sessiz bir telepati, bir akis var."))
             else: 
-                return f"{ks_yil:.2f} yillik yas farkiniz, dogal bir koruma kalkani olusturmamis. Bu bir eksiklik degil; tam tersine, iliskinizde ne ekerseniz aynisini bieceginiz anlamina gelir. Evren sizi kadersel bir torpille kurtarmaz ama haksiz yere de cezalandirmaz. Iliskinin mimari tamamen size ait."
+                return (f"Your {ks_yil:.2f}-year age difference has not created a natural protective shield. This is not a deficiency; quite the opposite, it means whatever you plant in your relationship, you will reap the same. The universe will not save you with a fated shortcut, but it will not punish you unfairly either. The relationship's architecture is entirely yours." if _EN else (f"Su diferencia de edad de {ks_yil:.2f} años no ha creado un escudo protector natural. Esto no es una deficiencia; todo lo contrario, significa que lo que siembran en su relación, lo cosecharán. El universo no les salvará con un atajo del destino, pero tampoco les castigará injustamente. La arquitectura de la relación es enteramente suya." if _ES else f"{ks_yil:.2f} yillik yas farkiniz, dogal bir koruma kalkani olusturmamis. Bu bir eksiklik degil; tam tersine, iliskinizde ne ekerseniz aynisini bieceginiz anlamina gelir. Evren sizi kadersel bir torpille kurtarmaz ama haksiz yere de cezalandirmaz. Iliskinin mimari tamamen size ait."))
 
     def gezegen_konumu_bul(self, julian_gun, gezegen_id):
         try:
@@ -1612,6 +1656,7 @@ class FBST_Engine:
         except Exception: return "Hesaplanamadi"
 
     def calculate_tork(self):
+        _EN = _core_get_lang() == "en"
         v_b = self.calculate_ks()
         j1 = swe.julday(self.p1.year, self.p1.month, self.p1.day, 12.0)
         j2 = swe.julday(self.p2.year, self.p2.month, self.p2.day, 12.0)
@@ -1631,11 +1676,27 @@ class FBST_Engine:
                 pass
         k_i = (v_b * e_a) + 10.0
         tork_skoru = min(k_i * 3.141592653589793, 100.0) 
-        if tork_skoru > 85: durum = "Iliskiniz kendi kendini besleyen, kendi enerjisini ureten nadir bir yapiya sahip. Dissa bagimlilik yok, kendi icinizden gelen guclu bir motor var."
-        elif tork_skoru > 60: durum = "Iliskiniz dik yokuclari kolayca asan guclu bir arac gibi. Zorluklara karsi dayanikli, ilerlemeli ve kararli."
-        elif tork_skoru > 35: durum = "Iliskiniz bir nehir gibi dogal akisinda ilerliyor. Huzurlu, dengeli ve kendi ritmini bulmus."
-        else: durum = "Iliskiniz derin bir arinma ve ic donusum doneminde. Yavas ama anlamlı bir surecten geciyorsunuz."
-        return f"Guc Skoru: {tork_skoru:.1f}/100 - {durum}"
+        if tork_skoru > 85:
+            if _EN:
+                durum = "Your relationship has a rare self-sustaining structure that produces its own energy. There is no external dependency; there is a strong motor coming from within you."
+            else:
+                durum = "Iliskiniz kendi kendini besleyen, kendi enerjisini ureten nadir bir yapiya sahip. Dissa bagimlilik yok, kendi icinizden gelen guclu bir motor var."
+        elif tork_skoru > 60:
+            if _EN:
+                durum = "Your relationship is like a strong vehicle that easily surmounts steep climbs. It is resilient against difficulties, progressive and determined."
+            else:
+                durum = "Iliskiniz dik yokuclari kolayca asan guclu bir arac gibi. Zorluklara karsi dayanikli, ilerlemeli ve kararli."
+        elif tork_skoru > 35:
+            if _EN:
+                durum = "Your relationship flows in its natural course like a river. It has found its own calm, balanced rhythm."
+            else:
+                durum = "Iliskiniz bir nehir gibi dogal akisinda ilerliyor. Huzurlu, dengeli ve kendi ritmini bulmus."
+        else:
+            if _EN:
+                durum = "Your relationship is going through a deep purification and inner transformation period. You are passing through a slow yet meaningful process."
+            else:
+                durum = "Iliskiniz derin bir arinma ve ic donusum doneminde. Yavas ama anlamlı bir surecten geciyorsunuz."
+        return f"{'Energy Score' if _EN else 'Guc Skoru'}: {tork_skoru:.1f}/100 - {durum}"
 
     def sinastri_hesapla(self, sessiz=False):
         """
@@ -1643,6 +1704,8 @@ class FBST_Engine:
         """
         import swisseph as swe
         from datetime import datetime, date
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
 
         if not sessiz:
             print("MOTOR TESTİ: Sinastri Hesaplama Fonksiyonu Tetiklendi!")
@@ -1674,11 +1737,11 @@ class FBST_Engine:
         
         # Açı Tipleri ve Orb Değerleri
         aci_tipleri = {
-            0: {"isim": "Kavuşum", "etki": "Güçlü Birleşme", "puan": 10},
-            180: {"isim": "Karşıt", "etki": "Farkındalık/Gerilim", "puan": -5},
-            90: {"isim": "Kare", "etki": "Mücadele/Dinamizm", "puan": -8},
-            120: {"isim": "Üçgen", "etki": "Doğal Akış/Şans", "puan": 8},
-            60: {"isim": "Sekstil", "etki": "Fırsat/Uyum", "puan": 5}
+            0: {"isim": (("Conjunction" if _EN else ("Conjunción" if _ES else "Kavuşum"))), "etki": (("Powerful Union" if _EN else ("Unión Poderosa" if _ES else "Güçlü Birleşme"))), "puan": 10},
+            180: {"isim": (("Opposition" if _EN else ("Oposición" if _ES else "Karşıt"))), "etki": (("Awareness/Tension" if _EN else ("Conciencia/Tensión" if _ES else "Farkındalık/Gerilim"))), "puan": -5},
+            90: {"isim": (("Square" if _EN else ("Cuadratura" if _ES else "Kare"))), "etki": (("Struggle/Dynamism" if _EN else ("Lucha/Dinamismo" if _ES else "Mücadele/Dinamizm"))), "puan": -8},
+            120: {"isim": (("Trine" if _EN else ("Trígono" if _ES else "Üçgen"))), "etki": (("Natural Flow/Luck" if _EN else ("Flujo Natural/Suerte" if _ES else "Doğal Akış/Şans"))), "puan": 8},
+            60: {"isim": (("Sextile" if _EN else ("Sextil" if _ES else "Sekstil"))), "etki": (("Opportunity/Harmony" if _EN else ("Oportunidad/Armonía" if _ES else "Fırsat/Uyum"))), "puan": 5}
         }
         
         if self.mod == "ebeveyn_cocuk":
@@ -1932,7 +1995,7 @@ class FBST_Engine:
                             format_degerleri = {
                                 "p1": self.p1_isim, "p2": self.p2_isim,
                                 "g1": g1, "g2": g2,
-                                "g1_burc": burc1, "g2_burc": burc2,
+                                "g1_burc": pdf_label(burc1), "g2_burc": pdf_label(burc2),
                                 "g1_ev": p1_evler.get(g1, "?"), "g2_ev": p2_evler.get(g2, "?"),
                             }
                             try:
@@ -1940,9 +2003,9 @@ class FBST_Engine:
                             except Exception:
                                 ozel_yorum_fmt = ozel_yorum
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Dersi:</b> {ozel_yorum_fmt}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_info['isim']} {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {ozel_yorum_fmt}"
                             else:
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Mührü:</b> {ozel_yorum_fmt}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_info['isim']} {'Seal Theme:' if _EN else ('Sello:' if _ES else 'Mührü:')}</b> {ozel_yorum_fmt}"
                         else:
                             p1_anlam = GEZEGEN_ANLAMLARI.get(g1, "enerji")
                             p2_anlam = GEZEGEN_ANLAMLARI.get(g2, "enerji")
@@ -1956,9 +2019,9 @@ class FBST_Engine:
                                 anlam1=p1_anlam, anlam2=p2_anlam, konu=konu
                             )
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {g1} ({burc1}) & {self.p2_isim} {g2} ({burc2}) {aci_info['isim']} Dersi:</b> {zengin_yorum}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_info['isim']} {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {zengin_yorum}"
                             else:
-                                yorum = f"<b>{self.p1_isim} {g1} ({burc1}) & {self.p2_isim} {g2} ({burc2}) {aci_info['isim']} Teması:</b> {zengin_yorum}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_info['isim']} {'Theme:' if _EN else ('Tema:' if _ES else 'Teması:')}</b> {zengin_yorum}"
                         
                         sinastri_verileri.append(yorum)
                         
@@ -2450,22 +2513,24 @@ class FBST_Engine:
                                 "KAD-KAD-0": "Pedagojik Protokol: Benzer kadersel yollar için birlikte misyonunuzu keşfedin.",
                                 "Chiron-Chiron-0": "Pedagojik Protokol: Benzer şifa enerjileri için birlikte şifa pratiği yapın.",
                             }
-                            if r_key in fbst_receteler_ebeveyn:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Dersi:</b> {fbst_receteler_ebeveyn[r_key]}")
-                            elif r_alt_key in fbst_receteler_ebeveyn:
-                                receteler.append(f"<b>{g2}-{g1} {aci_info['isim']} Dersi:</b> {fbst_receteler_ebeveyn[r_alt_key]}")
+                            _recete_ebeveyn = FBST_RECETELER_EBEVEYN_ES if _ES else (FBST_RECETELER_EBEVEYN_EN if _EN else fbst_receteler_ebeveyn)
+                            if r_key in _recete_ebeveyn:
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_key]}")
+                            elif r_alt_key in _recete_ebeveyn:
+                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Dersi:</b> Ortak bir aktivite belirleyin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {('Choose a shared activity and channel this tense energy into a constructive space.' if _EN else ('Elijan una actividad conjunta y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir aktivite belirleyin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
                         else:
-                            if r_key in fbst_receteler:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Şifası:</b> {fbst_receteler[r_key]}")
-                            elif r_alt_key in fbst_receteler:
-                                receteler.append(f"<b>{g2}-{g1} {aci_info['isim']} Şifası:</b> {fbst_receteler[r_alt_key]}")
+                            _recete = FBST_RECETELER_ES if _ES else (FBST_RECETELER_EN if _EN else fbst_receteler)
+                            if r_key in _recete:
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_key]}")
+                            elif r_alt_key in _recete:
+                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Şifası:</b> Ortak bir hobi edinin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {('Take up a shared hobby and channel this tense energy into a constructive space.' if _EN else ('Practiquen un pasatiempo compartido y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir hobi edinin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
 
         if not sinastri_verileri:
-            sinastri_verileri = ["Majör bir sinastri etkileşimi saptanmadı."]
+            sinastri_verileri = ["No major synastry interaction was detected." if _EN else "Majör bir sinastri etkileşimi saptanmadı."]
 
         html_cikti = """<div style="background-color: #FBF7F4; padding: 15px; border-radius: 8px; border-left: 5px solid #B8A9C9; margin-bottom: 20px;">"""
         
@@ -2475,9 +2540,9 @@ class FBST_Engine:
         html_cikti += """</div><div style="background-color: #FFF0ED; padding: 15px; border-radius: 8px; border-left: 5px solid #D4878F;">"""
         
         if self.mod == "ebeveyn_cocuk":
-            html_cikti += """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL DERSLER VE ŞİFA ÖNERİLERİ</h4>"""
+            html_cikti += ("""<h4 style="color: #C47A82; margin-top: 0;">💊 FATE LESSONS AND HEALING SUGGESTIONS</h4>""" if _EN else ("""<h4 style="color: #C47A82; margin-top: 0;">💊 LECCIONES DESTINADAS Y SUGERENCIAS DE SANACIÓN</h4>""" if _ES else """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL DERSLER VE ŞİFA ÖNERİLERİ</h4>"""))
         else:
-            html_cikti += """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL ŞİFA REÇETELERİ</h4>"""
+            html_cikti += ("""<h4 style="color: #C47A82; margin-top: 0;">💊 FATE HEALING PRESCRIPTIONS</h4>""" if _EN else ("""<h4 style="color: #C47A82; margin-top: 0;">💊 RECETAS DESTINADAS DE SANACIÓN</h4>""" if _ES else """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL ŞİFA REÇETELERİ</h4>"""))
         
         # Reçeteleri Bas
         if receteler:
@@ -2487,7 +2552,7 @@ class FBST_Engine:
                 recete_html = re.sub(r'^<br/>', '', recete_html)
                 html_cikti += f"<p style='font-size:13px; line-height:2.0; margin-bottom:14px; padding: 8px 0; border-bottom: 1px solid #E8DDD5;'>🌿 {recete_html}</p>"
         else:
-            html_cikti += "<p style='font-size:13px;'>Mevcut kadersel temaslarınız akut bir şifa reçetesi gerektirmemektedir. Doğal akışınızda kalın.</p>"
+            html_cikti += ("<p style='font-size:13px;'>Your current fate themes do not require an acute healing prescription. Stay in your natural flow.</p>" if _EN else ("<p style='font-size:13px;'>Sus temas dеstinados actuales no requieren una receta aguda de sanación. Permanezcan en su flujo natural.</p>" if _ES else "<p style='font-size:13px;'>Mevcut kadersel temaslarınız akut bir şifa reçetesi gerektirmemektedir. Doğal akışınızda kalın.</p>"))
             
         html_cikti += "</div>"
         
@@ -2833,6 +2898,7 @@ class FBST_Engine:
         MC Bonus:        MC burcu + yöneticisi + sabit yıldızlar
         """
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         if not FBST_POTANSIYEL_EBEVEYN or not FBST_MESLEK_EBEVEYN:
             return []
 
@@ -2978,6 +3044,25 @@ class FBST_Engine:
             "Girişimcilik":         ["Business Development", "Risk", "Creative", "Technology", "Modern", "Investment", "Marketing"],
             "Akademik/Araştırma":   ["Scientific", "Research", "Data", "Publishing", "Laboratory", "Science Communication", "Project Management"],
             "Yenilikçilik":         ["Technology", "Innovation", "Modern", "Digital", "Innovation", "Startup"],
+        }
+
+        KATEGORI_ETIKETLERI_ES = {
+            "Sanatsal Yetenek":     ["Creativo", "Estético", "Visual", "Performance", "Literatura", "Música", "Diseño", "Cine"],
+            "Zihinsel Yetenek":     ["Analítico", "Planificación", "Matemáticas", "Lógica", "Datos", "Científico", "Estadística", "Ingeniería"],
+            "Liderlik":             ["Gestión", "Influencia", "Corporativo", "Toma de Decisiones", "Liderazgo"],
+            "Yardımseverlik":       ["Orientado a Personas", "Social", "Apoyo", "Comunidad", "Voluntariado", "Sociedad Civil", "Caridad"],
+            "Bilgelik":             ["Académico", "Enseñanza", "Consejería", "Filosofía", "Mentoría"],
+            "İletişim":             ["Medios", "Escritura", "Presentación", "Relaciones", "Marca", "Relaciones Públicas", "Medios Digitales"],
+            "Maneviyat":            ["Orientado a Personas", "Consejería", "Terapia", "Coaching", "Salud Mental", "Orientación", "Psicología"],
+            "Sağlık/Tıp":           ["Orientado a Personas", "Científico", "Salud", "Cuidado", "Tratamiento", "Investigación", "Cirugía", "Enfermería", "Farmacia"],
+            "Spor":                 ["Físico", "Rendimiento", "Entrenamiento", "Salud", "Trabajo en Equipo", "Ciencias del Deporte", "Fisioterapia"],
+            "Zanaatkarlık":         ["Técnico", "Habilidad Manual", "Producción", "Experticia", "Construcción", "Tecnología", "Mecatrónica", "Automatización"],
+            "Askeriye":             ["Disciplina", "Estrategia", "Seguridad", "Protección", "Logística", "Inteligencia"],
+            "Hukuk/Politika":       ["Legal", "Regulación", "Sector Público", "Ética", "Autoridad", "Legislación", "Diplomacia", "Administración Pública"],
+            "Stratejik Zeka":       ["Estrategia", "Analítico", "Inteligencia", "Investigación", "Planificación", "Gestión de Riesgos"],
+            "Girişimcilik":         ["Desarrollo de Negocios", "Riesgo", "Creativo", "Tecnología", "Moderno", "Inversión", "Marketing"],
+            "Akademik/Araştırma":   ["Científico", "Investigación", "Datos", "Publicación", "Laboratorio", "Comunicación Científica", "Gestión de Proyectos"],
+            "Yenilikçilik":         ["Tecnología", "Innovación", "Moderno", "Digital", "Innovación", "Startup"],
         }
 
         # ═══ GEZEGEN BURÇ KURALLARI (303 öğrenci + 50 ünlü verisinden) ═══
@@ -3652,7 +3737,7 @@ class FBST_Engine:
 
             if secilen_meslekler:
                 # Mesleklere kategori etiketlerini ve modern meslek etiketlerini ekle
-                kategori_etiketleri = KATEGORI_ETIKETLERI_EN.get(alan, []) if _EN else KATEGORI_ETIKETLERI.get(alan, [])
+                kategori_etiketleri = KATEGORI_ETIKETLERI_EN.get(alan, []) if _EN else (KATEGORI_ETIKETLERI_ES.get(alan, []) if _ES else KATEGORI_ETIKETLERI.get(alan, []))
                 for m in secilen_meslekler:
                     m["kategori_etiketleri"] = kategori_etiketleri
                     m["modern_etiketler"] = self._meslek_modern_etiketleri(m["meslek"], alan)
@@ -3690,6 +3775,8 @@ class FBST_Engine:
         FBST_MESLEK_EBEVEYN'deki mesleklerin isimlerindeki anahtar kelimelerden çıkarım yapar.
         """
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
+        _EN = _EN or _ES
         etiketler = set()
         m = meslek_adi.lower()
 
@@ -3858,35 +3945,39 @@ class FBST_Engine:
         for g in gezegenler_listesi:
             if g in konumlar:
                 k = konumlar[g]
-                detaylar.append(f"{g} {k['burc']} ({k['element']}, {k['ev']}. Ev)")
+                detaylar.append(f"{pdf_label(g)} {pdf_label(k['burc'])} ({pdf_label(k['element'])}, {k['ev']}. {pdf_label('Ev')})")
 
         yuzdeler, baskin_element = self.element_dengesi_hesapla(gezegenler_listesi, konumlar)
 
         element_meslekleri = {
-            "Ateş": "yaratıcı, enerjik ve eylem odaklı",
-            "Toprak": "pratik, somut ve sonuç odaklı",
-            "Hava": "iletişim, düşünce ve entelektüel",
-            "Su": "duygusal, sezgisel ve şifalayıcı",
+            "Ateş": ("yaratıcı, enerjik ve eylem odaklı", "creative, energetic and action-oriented", "creativo, enérgico y orientado a la acción"),
+            "Toprak": ("pratik, somut ve sonuç odaklı", "practical, concrete and result-oriented", "práctico, concreto y orientado a resultados"),
+            "Hava": ("iletişim, düşünce ve entelektüel", "communicative, thoughtful and intellectual", "comunicativo, reflexivo e intelectual"),
+            "Su": ("duygusal, sezgisel ve şifalayıcı", "emotional, intuitive and healing", "emocional, intuitivo y sanador"),
         }
 
-        baskin_aciklama = element_meslekleri.get(baskin_element, "çok yönlü ve dengeli")
+        _lang_yrm = _core_get_lang()
+        _EN_yrm = _lang_yrm == "en"
+        _ES_yrm = _lang_yrm == "es"
+        baskin_aciklama = element_meslekleri.get(baskin_element, ("çok yönlü ve dengeli", "versatile and balanced", "versátil y equilibrado"))[1 if _EN_yrm else (2 if _ES_yrm else 0)]
 
         evler = [konumlar[g]["ev"] for g in gezegenler_listesi if g in konumlar]
         kariyer_evleri = [e for e in evler if e in [1, 2, 5, 6, 10]]
         ev_notu = ""
         if 10 in evler:
-            ev_notu = "10. evdeki gezegen güçlü bir kariyer potansiyeline işaret eder."
+            ev_notu = "A planet in the 10th house indicates strong career potential." if _EN_yrm else "Un planeta en la casa 10 indica un fuerte potencial profesional." if _ES_yrm else "10. evdeki gezegen güçlü bir kariyer potansiyeline işaret eder."
         elif 6 in evler:
-            ev_notu = "6. evdeki gezegen hizmet ve detay odaklı bir kariyere yatkınlık gösterir."
+            ev_notu = "A planet in the 6th house shows an inclination toward a service- and detail-oriented career." if _EN_yrm else "Un planeta en la casa 6 muestra inclinación hacia una carrera orientada al servicio y al detalle." if _ES_yrm else "6. evdeki gezegen hizmet ve detay odaklı bir kariyere yatkınlık gösterir."
         elif 2 in evler:
-            ev_notu = "2. evdeki gezegen maddi değerler ve somut yeteneklere güçlü bir bağlının olduğunu gösterir."
+            ev_notu = "A planet in the 2nd house shows a strong connection to material values and tangible skills." if _EN_yrm else "Un planeta en la casa 2 muestra una fuerte conexión con los valores materiales y las habilidades concretas." if _ES_yrm else "2. evdeki gezegen maddi değerler ve somut yeteneklere güçlü bir bağlının olduğunu gösterir."
         elif 1 in evler:
-            ev_notu = "1. evdeki gezegen bireysel kimliğin ve girişimcilik ruhunun güçlü olduğunu gösterir."
+            ev_notu = "A planet in the 1st house shows a strong individual identity and entrepreneurial spirit." if _EN_yrm else "Un planeta en la casa 1 muestra una fuerte identidad individual y espíritu emprendedor." if _ES_yrm else "1. evdeki gezegen bireysel kimliğin ve girişimcilik ruhunun güçlü olduğunu gösterir."
         elif 5 in evler:
-            ev_notu = "5. evdeki gezegen yaratıcılık ve kendini ifade etme potansiyeline güçlü bir bağlının olduğunu gösterir."
+            ev_notu = "A planet in the 5th house shows a strong connection to creativity and self-expression potential." if _EN_yrm else "Un planeta en la casa 5 muestra una fuerte conexión con la creatividad y el potencial de autoexpresión." if _ES_yrm else "5. evdeki gezegen yaratıcılık ve kendini ifade etme potansiyeline güçlü bir bağlının olduğunu gösterir."
 
-        ozet = "Gezegenler: " + ", ".join(detaylar) + ". "
-        ozet += f"Baskın element: {baskin_element} ({baskin_aciklama}). "
+        ozet = ("Planets: " if _EN_yrm else "Planetas: " if _ES_yrm else "Gezegenler: ") + ", ".join(detaylar) + ". "
+        _el_label = "-".join(pdf_label(p) for p in baskin_element.split("-"))
+        ozet += f"{'Dominant element' if _EN_yrm else 'Elemento dominante' if _ES_yrm else 'Baskın element'}: {_el_label} ({baskin_aciklama}). "
         if ev_notu:
             ozet += ev_notu
 
@@ -3918,6 +4009,39 @@ class FBST_Engine:
                 "Chiron": {4: "Healing Family Wounds: Emotional wounds inherited from past generations open to healing in this period. The parent's own confrontation with their wounds offers the child the most powerful model of healing.", 12: "Healing of the Subconscious: The child's subconscious fears and worries may surface during this period. The parent's patient, understanding approach is the key to turning this process into healing."}
             }
             ev_muhurleri = ev_muhurleri_EN_eb if self.mod == "ebeveyn_cocuk" else ev_muhurleri_EN_es
+        elif _core_get_lang() == "es":
+            # ── ES: karmik ev muhurleri (es_sevgili + ebeveyn_cocuk) ──
+            ev_muhurleri_ES_es = {
+                "Güneş": {1: "Identidad y Yo: La persona en este vector fortalece la identidad y el sentido del yo del otro. Juntos os ayudáis mutuamente a responder la pregunta '¿quién soy yo?'. Vuestra postura compartida hacia la vida pulirá la autoconfianza el uno del otro.", 5: "Unión Creativa: Dar forma a una obra de arte juntos, criar a un hijo o realizar un gran sueño es vuestra misión karmaica. Cuando vuestra creatividad se fusiona, la energía que emerge toca a todos a tu alrededor.", 7: "Contrato Karma: La forma más tangible de 'nosotros' — aquí se establece la formalidad, el compromiso y una alianza a largo plazo. Tu elección karmaica al elegir una pareja se sella en esta casa."},
+                "Ay": {4: "Hogar y Arraigo: El refugio más cálido y seguro del alma se construye en este vector. El hogar que construyes juntos no es solo una casa, también un puerto que te nutre emocionalmente.", 8: "Bajo el Agua Emocional: En esta casa emergen profundidades psicológicas, miedos subconscientes y emociones suprimidas. La capacidad de aceptar incluso los secretos más oscuros del otro es el espacio más sanador de esta relación."},
+                "Jüpiter": {2: "Puerta de la Abundancia: La persona en este vector aumenta directamente la abundancia material y espiritual del otro. Juntos pueden experimentar inversiones, flujos de ingresos compartidos o grandes saltos financieros.", 8: "Enriquecimiento Compartido: La herencia de un socio, una empresa conjunta o una inversión compartida trae crecimiento karmaico. Todo lo que aprendéis juntos multiplica vuestra riqueza espiritual.", 10: "Ascensión Social: Juntos sois una pareja honrada e inspiradora en la sociedad. Tu éxito profesional es el fruto de apoyaros mutuamente."},
+                "Satürn": {4: "Prueba de la Estructura Familiar: Construir un hogar y convertirse en familia exige una prueba seria en este vector. Las responsabilidades pueden ser pesadas, pero esta prueba coloca una base sólida.", 7: "Matrimonio Karma: Esta unión es aprobada cósmicamente para la formalidad, el matrimonio y el compromiso a largo plazo. Aunque surjan desafíos, este vínculo se fortalece con el tiempo."},
+                "Plüton": {1: "Renacimiento de la Identidad: Esta persona ayuda al otro a desmantelar completamente su viejo yo y forjar una identidad más fuerte y establecida. La transformación es dolorosa pero liberadora.", 8: "Renacimiento de las Cenizas: Es el gran despertar y renacimiento que sigue a las crisis más profundas y colapsos psicológicos. Estar uno al lado del otro en la hora más oscura del otro es la práctica más sagrada de esta relación."},
+                "Venüs": {5: "Amor Apasionado: El amor, el romance, la sensualidad y la alegría de vivir laten en el corazón de esta unión. Cada momento que compartes se convierte en una obra de arte tejida con afecto.", 7: "Regalo del Destino: Armonía, estética y alineación completa en el lenguaje del amor — el regalo más preciado que el cielo concede a esta unión. La energía ideal para el matrimonio o unión formal."},
+                "Mars": {1: "Espíritu Guerrero: Esta persona inculca en el otro un poder extraordinario de acción, coraje y perseverancia. Al enfrentar las batallas de la vida juntos, sois el uno el apoyo más fuerte del otro.", 10: "Viaje a la Cima: Tu potencial para superar obstáculos juntos en carrera, metas y sociedad es excepcionalmente alto. Cuando la pasión y la determinación se unen, ninguna cima está fuera de alcance."},
+                "Chiron": {4: "Sanación Familiar: Las heridas cargadas de generaciones anteriores y raíces familiares emergen en este vector y esperan ser sanadas. Comprender y reparar las heridas del otro abre la puerta a la sanación intergeneracional.", 12: "Sanador del Subconsciente: Los dolores del alma que la lógica no puede resolver y que las palabras no pueden expresar se sanan silenciosamente con la simple presencia de esta unión. Incluso un toque silencioso puede curar una herida de mil años."}
+            }
+            ev_muhurleri_EN_eb = {
+                "Güneş": {1: "Identity and Self-Development: This year the child's journey of self-discovery accelerates. As a parent, supporting their individual stance guides them to express their own being with strength.", 5: "Creativity and Self-Expression: The child's artistic or creative potential shines in this house. When the parent nurtures this energy, it becomes the key to the child's confident self-expression.", 7: "Relationship and Mutual Respect: The balance and mutual respect between parent and child are tested in this period. As both express their needs, they learn the lesson of 'co-existing'."},
+                "Ay": {4: "Home and Safe Harbor: The child's emotional roots deepen during this period. The secure atmosphere the parent creates lays the foundation for the child's emotional resilience.", 8: "Emotional Transformation: Intense inner shifts unfold in the child's world. The parent's patient and understanding manner allows this transformation to progress healthily."},
+                "Jüpiter": {2: "Building Worth and Self-Confidence: The child's self-belief and awareness of their abilities grow in this period. The parent's appreciation and support are the most nourishing fertilizer for this process.", 8: "Shared Learning and Exchange: Parent and child experience deep learning together. Reading together, watching documentaries or mastering a new skill every day strengthens the spiritual bond.", 10: "Achievement and Recognition: The child's successes in school or social arenas are remarkable. The parent's shared pride and encouraging messages multiply the child's motivation."},
+                "Satürn": {4: "Family Responsibility and Structure: Family rules and boundaries become clear during this period. Understanding the child's need for discipline while building structure is the foundation of long-term trust.", 7: "Mutual Responsibility: Parent and child become aware of their responsibilities toward each other. This is the most intense period of the lesson of mutual trust and commitment."},
+                "Plüton": {1: "Identity Transformation: The child's sense of self is fundamentally reshaped. The parent's support without interference allows the child to discover their own center of power.", 8: "Deepened Bond and Sharing: A period when unspoken subjects between parent and child rise to the surface. Emotional deepening forms the strongest test of mutual trust."},
+                "Venüs": {5: "Learning the Language of Love and Appreciation: A pedagogical period in which you discover the most beautiful ways to express your love for each other. Practice appreciation, gratitude and tenderness.", 7: "Lesson of Balance and Harmony: Finding balance in the parent-child relationship and mutually recognizing each other's needs is the most precious gain of this period."},
+                "Mars": {1: "Training in Action and Courage: The child's desire to act independently grows. The parent's encouragement within safe boundaries helps the child discover their own sources of power and courage.", 10: "Setting Goals and Resolve: The child's determination toward academic or personal goals rises. The parent's structured support for these goals nourishes the child's motivation."},
+                "Chiron": {4: "Healing Family Wounds: Emotional wounds inherited from past generations open to healing in this period. The parent's own confrontation with their wounds offers the child the most powerful model of healing.", 12: "Healing of the Subconscious: The child's subconscious fears and worries may surface during this period. The parent's patient, understanding approach is the key to turning this process into healing."}
+            }
+            ev_muhurleri_ES_eb = {
+                "Güneş": {1: "Identidad y Desarrollo Personal: Este año, el viaje de autodescubrimiento del niño se acelera. Como padre/madre, apoyar su postura individual guía al niño a expresar su ser con fuerza.", 5: "Creatividad y Autoexpresión: El potencial artístico o creativo del niño brilla en esta casa. Cuando el padre/madre nutre esta energía, se convierte en la clave para una autoexpresión segura del niño.", 7: "Relación y Respeto Mutuo: El equilibrio y el respeto mutuo entre padre/madre e hijo se ponen a prueba en este período. Mientras ambos expresan sus necesidades, aprenden la lección de 'coexistir'."},
+                "Ay": {4: "Hogar y Refugio Seguro: Las raíces emocionales del niño se profundizan durante este período. La atmósfera segura que el padre/madre crea sentada las bases de la resiliencia emocional del niño.", 8: "Transformación Emocional: Cambios internos intensos se despliegan en el mundo del niño. La actitud paciente y comprensiva del padre/madre permite que esta transformación avance saludablemente."},
+                "Jüpiter": {2: "Construyendo Autocuidado y Confianza: La autoconfianza del niño y el reconocimiento de sus habilidades crecen en este período. La apreciación y el apoyo del padre/madre son el fertilizante más nutritivo para este proceso.", 8: "Aprendizaje y Intercambio Compartidos: Padre/madre e hijo experimentan un aprendizaje profundo juntos. Leer juntos, ver documentales o dominar una nueva habilidad todos los días fortalece el vínculo espiritual.", 10: "Logro y Reconocimiento: Los éxitos del niño en la escuela o en la vida social son notables. El orgullo compartido y los mensajes de ánimo del padre/madre multiplican la motivación del niño."},
+                "Satürn": {4: "Responsabilidad Familiar y Estructura: Las reglas y fronteras familiares se aclaran en este período. Comprender la necesidad de disciplina del niño mientras se construye estructura es la base de la confianza a largo plazo.", 7: "Responsabilidad Mutua: Padre/madre e hijo se dan cuenta de sus responsabilidades hacia el otro. Este es el período más intenso de la lección de confianza y compromiso mutuo."},
+                "Plüton": {1: "Transformación de Identidad: La identidad del niño se reconfigura fundamentalmente. El apoyo del padre/madre sin interferir permite al niño descubrir su propio centro de poder.", 8: "Vinculo Profundizado y Compartido: Un período en el que los temas no pronunciados entre padre/madre e hijo emergen a la superficie. La profundidad emocional forma la prueba más fuerte de la confianza mutua."},
+                "Venüs": {5: "Aprendiendo el Idioma del Amor y la Apreciación: Un período pedagógico en el que descubren las formas más hermosas de expresar su amor mutuo. Practiquen la apreciación, la gratitud y la ternura.", 7: "Lección de Equilibrio y Armonía: Encontrar el equilibrio en la relación entre padre/madre e hijo y reconocer mutuamente las necesidades del otro es el regalo más valioso de este período."},
+                "Mars": {1: "Entrenamiento en Acción y Valentía: El deseo del niño de actuar independientemente crece. El ánimo del padre/madre dentro de límites seguros ayuda al niño a descubrir sus propias fuentes de poder y valor.", 10: "Establecer Metas y Determinación: La determinación del niño hacia metas académicas o personales aumenta. El apoyo estructurado del padre/madre para estas metas nutre la motivación del niño."},
+                "Chiron": {4: "Sana los Heridas Familiares: Las heridas emocionales heredadas de generaciones anteriores se abren a la sanación en este período. El enfrentamiento del padre/madre con sus propias heridas ofrece al niño el modelo más poderoso de sanación.", 12: "Sanación del Subconsciente: Los miedos y preocupaciones subconscientes del niño pueden emerger en este período. La actitud paciente y comprensiva del padre/madre es la clave para convertir este proceso en sanación."}
+            }
+            ev_muhurleri = ev_muhurleri_ES_eb if self.mod == "ebeveyn_cocuk" else ev_muhurleri_ES_es
         elif self.mod == "ebeveyn_cocuk":
             ev_muhurleri = {
                 "Güneş": {1: "Kimlik ve Benlik Gelişimi: Bu yıl çocuğun kendi kimliğini keşfetme süreci hızlanır. Ebeveyn olarak onun bireysel duruşunu desteklemek, kendi benliğini güçlü bir şekilde ortaya koymasına rehberlik eder.", 5: "Yaratıcılık ve Kendini İfade: Çocuğun sanatsal veya yaratıcı potansiyeli bu evde parlar. Ebeveynin bu enerjiyi beslemesi, çocuğun kendini güvenle ifade etmesinin anahtarıdır.", 7: "İlişki ve Karşılıklı Saygı: Ebeveyn-çocuk arasındaki denge ve karşılıklı saygı bu dönemde test edilir. İkisi de kendi ihtiyaçlarını ifade ederken 'birlikte var olmanın' dersini öğrenir."},
@@ -3943,7 +4067,7 @@ class FBST_Engine:
         
         rapor_A = []
         rapor_B = []
-        _ev_etk = lambda ev_no: (f"House {ev_no}" if _core_get_lang() == "en" else f"{ev_no}. Ev")
+        _ev_etk = lambda ev_no: (f"House {ev_no}" if _core_get_lang() == "en" else (f"Casa {ev_no}" if _core_get_lang() == "es" else f"{ev_no}. Ev"))
         
         for gezegen, ev_detaylari in ev_muhurleri.items():
             gid = GEZEGENLER[gezegen]
@@ -3951,7 +4075,7 @@ class FBST_Engine:
             ev_A = self.ev_konumu_bul(j_ileri, gid)
             if ev_A in ev_detaylari:
                 if pdf_icin:
-                    rapor_A.append(f"<font name='DejaVuSans-Bold'>{gezegen} {_ev_etk(ev_A)}:</font> {ev_detaylari[ev_A]}")
+                    rapor_A.append(f"<font name='DejaVuSans-Bold'>{pdf_label(gezegen)} {_ev_etk(ev_A)}:</font> {ev_detaylari[ev_A]}")
                 else:
                     if self.mod == "ebeveyn_cocuk":
                         rapor_A.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #8FB8CA; margin-bottom:5px;'><font color='#5A9BAD'><b>{gezegen} {_ev_etk(ev_A)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_A]}</font></div>")
@@ -3961,7 +4085,7 @@ class FBST_Engine:
             ev_B = self.ev_konumu_bul(j_geri, gid)
             if ev_B in ev_detaylari:
                 if pdf_icin:
-                    rapor_B.append(f"<font name='DejaVuSans-Bold'>{gezegen} {_ev_etk(ev_B)}:</font> {ev_detaylari[ev_B]}")
+                    rapor_B.append(f"<font name='DejaVuSans-Bold'>{pdf_label(gezegen)} {_ev_etk(ev_B)}:</font> {ev_detaylari[ev_B]}")
                 else:
                     if self.mod == "ebeveyn_cocuk":
                         rapor_B.append(f"<div style='background-color:#FBF7F4; padding:10px; border-left:3px solid #C9A96E; margin-bottom:5px;'><font color='#C9A96E'><b>{gezegen} {_ev_etk(ev_B)}:</b></font> <font color='#4A4A4A'>{ev_detaylari[ev_B]}</font></div>")
@@ -4605,7 +4729,7 @@ class FBST_Engine:
         except Exception:
             pass
 
-        plt.title("Composite Harita\n(İlişkinin Ortak Ruh Haritası)",
+        plt.title(("Composite Chart\n(Shared Soul Chart of the Relationship)" if (_core_get_lang() == "en") else "Composite Harita\n(İlişkinin Ortak Ruh Haritası)"),
                   color='#3D2E50', fontsize=12, fontweight='bold', pad=20)
         plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
@@ -4868,6 +4992,7 @@ class FBST_Engine:
         """
         Arap Noktalarını radar/grafik chart olarak görselleştirir.
         """
+        _EN = _core_get_lang() == "en"
         try:
             arap = self.arap_noktasi_hesapla()
         except Exception:
@@ -4887,10 +5012,16 @@ class FBST_Engine:
             arap_nokta_listesi = ["Baba Noktası", "Anne Noktası", "Çocuk Ruhu",
                                   "Koruma Noktası", "Eğitim Noktası", "Sınır Noktası",
                                   "Bağlanma Noktası", "Sorumluluk"]
+            arap_nokta_listesi_en = ["Father Point", "Mother Point", "Child Soul",
+                                     "Protection Point", "Education Point", "Boundary Point",
+                                     "Attachment Point", "Responsibility"]
         else:
             arap_nokta_listesi = ["Evlilik Noktası", "Aşk Noktası", "Tutku Noktası",
                                   "Ortaklık Noktası", "Sadakat Noktası", "Cinsellik Noktası",
                                   "Evlilik Mutluluğu", "Boşanma Noktası"]
+            arap_nokta_listesi_en = ["Marriage Point", "Love Point", "Passion Point",
+                                     "Partnership Point", "Loyalty Point", "Sexuality Point",
+                                     "Marital Happiness", "Divorce Point"]
 
         for nokta in arap_nokta_listesi:
             p1_val = arap.get(p1_isim, {}).get(nokta, {})
@@ -4902,7 +5033,11 @@ class FBST_Engine:
             p1_burc = p1_val.get("burc", "") if isinstance(p1_val, dict) else ""
             p2_burc = p2_val.get("burc", "") if isinstance(p2_val, dict) else ""
 
-            nokta_turleri.append(nokta.replace(" Noktası", ""))
+            if _EN:
+                nokta_etiketi = arap_nokta_listesi_en[arap_nokta_listesi.index(nokta)].replace(" Point", "")
+            else:
+                nokta_etiketi = nokta.replace(" Noktası", "")
+            nokta_turleri.append(nokta_etiketi)
             p1_degerleri.append((p1_derece % 360) / 360 * 100)
             p2_degerleri.append((p2_derece % 360) / 360 * 100)
 
@@ -4921,11 +5056,11 @@ class FBST_Engine:
         ax.set_facecolor('#FBF7F4')
 
         ax.plot(acilar, p1_degerleri, 'o-', color='#B8A9C9', linewidth=2,
-                label=p1_isim or ('Çocuk' if self.mod == 'ebeveyn_cocuk' else 'Kişi 1'), markersize=6)
+                label=p1_isim or ('Child' if _EN and self.mod == 'ebeveyn_cocuk' else ('Çocuk' if self.mod == 'ebeveyn_cocuk' else ('Person 1' if _EN else 'Kişi 1'))), markersize=6)
         ax.fill(acilar, p1_degerleri, alpha=0.12, color='#B8A9C9')
 
         ax.plot(acilar, p2_degerleri, 's-', color='#D4878F', linewidth=2,
-                label=p2_isim or ('Ebeveyn' if self.mod == 'ebeveyn_cocuk' else 'Kişi 2'), markersize=6)
+                label=p2_isim or ('Parent' if _EN and self.mod == 'ebeveyn_cocuk' else ('Ebeveyn' if self.mod == 'ebeveyn_cocuk' else ('Person 2' if _EN else 'Kişi 2'))), markersize=6)
         ax.fill(acilar, p2_degerleri, alpha=0.12, color='#D4878F')
 
         ax.set_xticks(acilar[:-1])
@@ -4938,7 +5073,7 @@ class FBST_Engine:
         ax.legend(loc='lower right', fontsize=9, facecolor='#FFFFFF',
                   edgecolor='#E8E0D8', labelcolor='#4A4A4A')
 
-        plt.title("Arap Noktaları Radar Karşılaştırması", color='#C9A96E',
+        plt.title("Arabic Points Radar Comparison" if (_EN or _ES) else "Arap Noktaları Radar Karşılaştırması", color='#C9A96E',
                   fontsize=12, fontweight='bold', pad=25)
         plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
         plt.close(fig)
@@ -4949,6 +5084,7 @@ class FBST_Engine:
         import numpy as np
         
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         milat_tarihi = self.event_date
         ks_yil = self.calculate_ks()
         faz = ks_yil % (2 * np.pi)
@@ -5153,8 +5289,96 @@ class FBST_Engine:
                     "html_yorum": f"♾️ <b>Final Harvest:</b> The moment the karmic seal is imprinted."
                 }
             ]
+            kriz_kutuphane_es = [
+                {
+                    "yil_araligi": (0, 1.0),
+                    "baslik": "La Caída del Velo",
+                    "tema": "El Primer Desencanto",
+                    "pdf_yorum": f"La idealización cegadora entre {isim_a} e {isim_b} choca por primera vez con los vientos duros de la realidad.",
+                    "html_yorum": f"💔 <b>El Primer Desencanto:</b> La idealización inicial choca con los vientos duros de la realidad."
+                },
+                {
+                    "yil_araligi": (1.0, 2.5),
+                    "baslik": "El Enfrentamiento del Self Sombrío",
+                    "tema": "Guerra del Ego",
+                    "pdf_yorum": f"La primera gran prueba de la relación: '¿Quién soy yo y quién eres tú?'.",
+                    "html_yorum": f"⚔️ <b>Guerra del Ego:</b> Tensión entre la necesidad de independencia y la demanda de seguridad."
+                },
+                {
+                    "yil_araligi": (2.5, 4.0),
+                    "baslik": "La Perla en el Infierno de la Rutina",
+                    "tema": "Prueba de la Monotonía",
+                    "pdf_yorum": f"El umbral crítico donde la emoción se apaga y las rutinas se atan a la monotonía.",
+                    "html_yorum": f"🌫️ <b>Prueba de la Monotonía:</b> Los pequeños gestos y el coraje son la única salida del pantano."
+                },
+                {
+                    "yil_araligi": (4.0, 5.5),
+                    "baslik": "La Rotura del Espejo",
+                    "tema": "Cambio de Roles",
+                    "pdf_yorum": f"La curva crítica donde los roles y expectativas de la relación deben redefinirse.",
+                    "html_yorum": f"🪞 <b>Cambio de Roles:</b> Los viejos patrones se rompen; se busca un nuevo equilibrio."
+                },
+                {
+                    "yil_araligi": (5.5, 7.5),
+                    "baslik": "La Puerta de Saturno",
+                    "tema": "Prueba Estructural",
+                    "pdf_yorum": f"En el umbral del séptimo año, el universo se planta ante ustedes. La base misma está siendo puesta a prueba.",
+                    "html_yorum": f"🏛️ <b>Puerta de Saturno:</b> Una prueba estructural. Los cimientos construidos con honestidad se fortalecen."
+                },
+                {
+                    "yil_araligi": (7.5, 9.5),
+                    "baslik": "La Sombra de Saturno",
+                    "tema": "Prueba Profunda",
+                    "pdf_yorum": f"El lado sombrío de la prueba estructural. Los asuntos reprimidos salen a la superficie.",
+                    "html_yorum": f"🌑 <b>Prueba Profunda:</b> Los asuntos reprimidos afloran. Es hora de enfrentarlos."
+                },
+                {
+                    "yil_araligi": (9.5, 11.5),
+                    "baslik": "Contaminación Kármica",
+                    "tema": "Primera Purificación",
+                    "pdf_yorum": f"Las heridas kármicas traídas del pasado se filtran en la relación.",
+                    "html_yorum": f"🩹 <b>Primera Purificación:</b> Una invitación a sanar las viejas heridas."
+                },
+                {
+                    "yil_araligi": (11.5, 14.0),
+                    "baslik": "Purificación Kármica",
+                    "tema": "Sanación Profunda",
+                    "pdf_yorum": f"Un tiempo para descender a lo más profundo de los ciclos kármicos y atravesar una purificación radical.",
+                    "html_yorum": f"✨ <b>Sanación Profunda:</b> Es tiempo de adentrarse en el núcleo de los ciclos kármicos."
+                },
+                {
+                    "yil_araligi": (14.0, 16.5),
+                    "baslik": "El Despertar de la Mediana Edad",
+                    "tema": "Renovación de Visión",
+                    "pdf_yorum": f"Las máscaras de los roles comienzan a caer. Una oportunidad para trazar una nueva visión.",
+                    "html_yorum": f"🌅 <b>Renovación de Visión:</b> Una oportunidad para una nueva visión y una segunda primavera."
+                },
+                {
+                    "yil_araligi": (16.5, 18.5),
+                    "baslik": "La Primera Marca del Sello Eterno",
+                    "tema": "Sello Kármico",
+                    "pdf_yorum": f"El momento en que el sello kármico se imprime por primera vez. La relación adquiere una forma perdurable.",
+                    "html_yorum": f"🔒 <b>Sello Kármico:</b> La relación adquiere una forma perdurable."
+                },
+                {
+                    "yil_araligi": (18.5, 20.0),
+                    "baslik": "El Medio del Sello Eterno",
+                    "tema": "Cosecha Media",
+                    "pdf_yorum": f"Un tiempo para recoger los frutos de años de esfuerzo. La madurez y la sabiduría están en su punto máximo.",
+                    "html_yorum": f"🌾 <b>Cosecha Media:</b> Es tiempo de recoger los frutos de años de esfuerzo."
+                },
+                {
+                    "yil_araligi": (20.0, 21.5),
+                    "baslik": "La Marca Final del Sello Eterno",
+                    "tema": "Cosecha Final",
+                    "pdf_yorum": f"La curva final de los compañeros kármicos. Una prueba de soltar con libertad.",
+                    "html_yorum": f"♾️ <b>Cosecha Final:</b> El momento en que se imprime el sello kármico."
+                }
+            ]
             if _EN:
                 kriz_kutuphane = kriz_kutuphane_en
+            elif _ES:
+                kriz_kutuphane = kriz_kutuphane_es
         
         kriz_listesi = []
         
@@ -5181,10 +5405,10 @@ class FBST_Engine:
 
                 if pdf_icin:
                     metin = (f"<font name='DejaVuSans-Bold'>{baslik_yazi}</font><br/>"
-                             f"<font name='DejaVuSans-Bold'>📅 {hedef_tarih.strftime('%d %B %Y')} ({kriz_yili:.1f}{' Yr' if _EN else '. Yıl'}):</font> "
+                             f"<font name='DejaVuSans-Bold'>📅 {hedef_tarih.strftime('%d %B %Y')} ({kriz_yili:.1f}{' Yr' if _EN else ('. año' if _ES else '. Yıl')}):</font> "
                              f"{uygun_kutup['pdf_yorum']}")
                 else:
-                    donem_adi = f"Ebeveyn-Çocuk Bağı ({kriz_yili:.1f}. Yıl)" if self.mod == "ebeveyn_cocuk" else (f"Relationship's Year {kriz_yili:.1f}" if _EN else f"İlişkinin {kriz_yili:.1f}. Yılı")
+                    donem_adi = f"Ebeveyn-Çocuk Bağı ({kriz_yili:.1f}. Yıl)" if self.mod == "ebeveyn_cocuk" else (f"Relationship's Year {kriz_yili:.1f}" if _EN else (f"Año de la Relación {kriz_yili:.1f}" if _ES else f"İlişkinin {kriz_yili:.1f}. Yılı"))
                     metin = (
                         f"<div style='background-color:#0d0d1a; color:#e8e8f0; padding:14px; border-left:4px solid #7b2ff7; margin-bottom:12px; border-radius:6px;'>"
                         f"<div style='font-size:17px; color:#c084fc; margin-bottom:4px;'>{baslik_yazi}</div>"
@@ -5201,6 +5425,7 @@ class FBST_Engine:
         milat_tarihi = self.event_date
         aktif_mod = getattr(self, 'mod', 'es_sevgili')
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         
         if aktif_mod == "ebeveyn_cocuk":
             donemecler = [
@@ -5353,7 +5578,7 @@ class FBST_Engine:
             }
         ]
         
-        if _EN:
+        if _EN or _ES:
             donemecler = donemecler_en
         
         rapor = []
@@ -5363,7 +5588,7 @@ class FBST_Engine:
                 metin = f"<font name='DejaVuSans-Bold'>[*] {dnm['ad']} ({hedef.strftime('%d %B %Y')}):</font> {dnm['yorum']}"
             else:
                 renk_sol = "#B8A9C9" if aktif_mod == "ebeveyn_cocuk" else "#C9A96E"
-                tarih_etiket = "Key Date:" if _EN else "Kilit Tarihi:"
+                tarih_etiket = "Key Date:" if _EN else ("Fecha Clave:" if _ES else "Kilit Tarihi:")
                 metin = f"<div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid {renk_sol}; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'><b style='font-size:18px; color:#4A3F5C;'>{dnm['ad']}</b><br><span style='color:#6B5B7B; font-size:14px;'>{tarih_etiket} {hedef.strftime('%d %B %Y')}</span><p style='margin-top:5px; color:#4A4A4A;'>{dnm['yorum']}</p></div>"
             rapor.append(metin)
         return rapor
@@ -5371,6 +5596,14 @@ class FBST_Engine:
     def arap_noktasi_hesapla(self):
         """Her iki kişi için Arap Noktalarını hesaplar (moda göre)."""
         import swisseph as swe
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
+        if _ES:
+            _burc_es_adlari = {
+                "Koç": "Aries", "Boğa": "Tauro", "İkizler": "Géminis", "Yengeç": "Cáncer",
+                "Aslan": "Leo", "Başak": "Virgo", "Terazi": "Libra", "Akrep": "Escorpio",
+                "Yay": "Sagitario", "Oğlak": "Capricornio", "Kova": "Acuario", "Balık": "Piscis"
+            }
         sonuclar = {}
         j_ileri, j_geri = self.get_julian_dates()
         
@@ -5431,11 +5664,16 @@ class FBST_Engine:
                     ev = dereceyi_eve_ata(derece, cusps)
                     
                     burc_yorum = _burc_sozluk.get((ad, burc), f"{ad} {burc} burcunda kadersel bir etki yaratır.")
-                    ev_yorumu = _ev_sozluk.get((ad, ev), ARAP_ILISKI.get("ARAP_EV_KISAYORUMLARI", {}).get(ev, f"{ev}. evde kadersel bir etki yaratır."))
+                    ev_yorumu = _ev_sozluk.get((ad, ev), ARAP_ILISKI.get("ARAP_EV_KISAYORUMLARI", {}).get(ev, (f"Creates a fated effect in house {ev}." if _EN else f"{ev}. evde kadersel bir etki yaratır.")))
+                    
+                    if _ES:
+                        burc_goster = _burc_es_adlari.get(burc, burc)
+                    else:
+                        burc_goster = burc
                     
                     noktalar[ad] = {
                         "derece": round(derece, 2),
-                        "burc": burc,
+                        "burc": burc_goster,
                         "ev": ev,
                         "burc_yorum": burc_yorum,
                         "ev_yorumu": ev_yorumu,
@@ -5503,9 +5741,14 @@ class FBST_Engine:
                 
                 if fark <= 5.0:
                     yorum_key = (n1_adi, n2_adi)
-                    yorum = _sinastri_sozluk.get(yorum_key, 
-                        _sinastri_sozluk.get((n2_adi, n1_adi),
-                            f"{n1_adi} ve {n2_adi} noktalari arasinda kaderin capraz bir bagi var."))
+                    if _core_get_lang() == "en":
+                        yorum = _sinastri_sozluk.get(yorum_key, 
+                            _sinastri_sozluk.get((n2_adi, n1_adi),
+                                f"There is a cross-link of destiny between the {pdf_label(n1_adi)} and the {pdf_label(n2_adi)}."))
+                    else:
+                        yorum = _sinastri_sozluk.get(yorum_key, 
+                            _sinastri_sozluk.get((n2_adi, n1_adi),
+                                f"{n1_adi} ve {n2_adi} noktalari arasinda kaderin capraz bir bagi var."))
                     bulgular.append({
                         "tip": "capraz_nokta",
                         "nokta_a": n1_adi, "nokta_b": n2_adi,
@@ -5516,9 +5759,9 @@ class FBST_Engine:
         
         # Nokta-Gezegen kavusumu: A'nin noktalari vs B'nin gezegenleri
         j_ileri, j_geri = self.get_julian_dates()
-        gezegenler = [("Gunes", swe.SUN), ("Ay", swe.MOON), ("Venüs", swe.VENUS), 
-                      ("Mars", swe.MARS), ("Jupiter", swe.JUPITER), ("Saturn", swe.SATURN),
-                      ("Pluton", swe.PLUTO)]
+        gezegenler = [("Güneş", swe.SUN), ("Ay", swe.MOON), ("Venüs", swe.VENUS), 
+                      ("Mars", swe.MARS), ("Jüpiter", swe.JUPITER), ("Satürn", swe.SATURN),
+                      ("Plüton", swe.PLUTO)]
         
         for (kaynak_isim, kaynak_noktalar, hedef_jd) in [
             (self.p1_isim, n1, j_geri),
@@ -5547,9 +5790,14 @@ class FBST_Engine:
                             guc = "Hafif"
                         
                         yorum_key = (nokta_adi, g_adi)
-                        yorum = _gezegen_sinastri_sozluk.get(yorum_key,
-                            _gezegen_sinastri_sozluk.get((g_adi, nokta_adi),
-                                f"{kaynak_isim}'in {nokta_adi}'si {hedef_isim}'in {g_adi}'yle kavusumda."))
+                        if _core_get_lang() == "en":
+                            yorum = _gezegen_sinastri_sozluk.get(yorum_key,
+                                _gezegen_sinastri_sozluk.get((g_adi, nokta_adi),
+                                    f"{kaynak_isim}'s {pdf_label(nokta_adi)} is conjunct {hedef_isim}'s {pdf_label(g_adi)}."))
+                        else:
+                            yorum = _gezegen_sinastri_sozluk.get(yorum_key,
+                                _gezegen_sinastri_sozluk.get((g_adi, nokta_adi),
+                                    f"{kaynak_isim}'in {nokta_adi}'si {hedef_isim}'in {g_adi}'yle kavusumda."))
                         
                         bulgular.append({
                             "tip": "nokta_gezegen",
@@ -5573,10 +5821,13 @@ class FBST_Engine:
         bugun = datetime.datetime.now()
         gecen_gun = (bugun - self.event_date).days
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         
         if gecen_gun < 0:
             if _EN:
                 return "<div style='color:#a0a0a0;'>The bond has not yet begun (a future milestone was selected).</div>"
+            elif _ES:
+                return "<div style='color:#a0a0a0;'>El vínculo aún no ha comenzado (se seleccionó un hito futuro).</div>"
             return "<div style='color:#a0a0a0;'>Bağ henüz başlamadı (Gelecek bir milat seçildi).</div>"
             
         ilerletilmis_gokyuzu_gunu = gecen_gun * minor_oran
@@ -5594,10 +5845,12 @@ class FBST_Engine:
         burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
         if _EN:
             burcl_en = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+        elif _ES:
+            burcl_en = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"]
         
         burc_A = burclar[int(derece_A // 30)]
         burc_B = burclar[int(derece_B // 30)]
-        if _EN:
+        if _EN or _ES:
             burc_A = burcl_en[int(derece_A // 30)]
             burc_B = burcl_en[int(derece_B // 30)]
         
@@ -5613,6 +5866,19 @@ class FBST_Engine:
                         <b>{self.p2_isim} (Parent):</b> The progressed guiding energy is currently evolving in <b style='color:#C9A96E;'>{burc_B}</b>.
                     </p>
                     <span style='color:#8A7F96; font-size:12px;'>Focus: The child's developmental needs and the parent's guiding capacity are read through this phase.</span>
+                </div>
+                """
+            elif _ES:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Pedagógico (Progresión Menor)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>El plano emocional en evolución de su vínculo padre/madre-hijo (1 Mes = 1 Año vibración)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim} (Hijo/a):</b> La inteligencia emocional progresada está evolucionando actualmente en <b style='color:#B8A9C9;'>{burc_A}</b>.<br>
+                        <b>{self.p2_isim} (Padre/Madre):</b> La energía guía progresada está evolucionando actualmente en <b style='color:#C9A96E;'>{burc_B}</b>.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Enfoque: Las necesidades de desarrollo del niño y la capacidad de guía del padre/madre se leen a través de esta fase.</span>
                 </div>
                 """
             else:
@@ -5640,6 +5906,19 @@ class FBST_Engine:
                         <b>{self.p2_isim}:</b> The progressed inner world is currently transiting <b style='color:#C9A96E;'>{burc_B}</b>.
                     </p>
                     <span style='color:#8A7F96; font-size:12px;'>Focus: The monthly/yearly inner emotional shifts in your shared world are read through this phase.</span>
+                </div>
+                """
+            elif _ES:
+                html_cikti = f"""
+                <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
+                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Actual (Progresión Menor)</b><br>
+                    <span style='color:#6B5B7B; font-size:14px;'>La instantánea emocional viva de su relación (1 Mes = 1 Año vibración)</span>
+                    <hr style='border-color:#E8E0D8; margin:8px 0;'>
+                    <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
+                        <b>{self.p1_isim}:</b> El mundo interior progresado está transitando actualmente <b style='color:#B8A9C9;'>{burc_A}</b>.<br>
+                        <b>{self.p2_isim}:</b> El mundo interior progresado está transitando actualmente <b style='color:#C9A96E;'>{burc_B}</b>.
+                    </p>
+                    <span style='color:#8A7F96; font-size:12px;'>Enfoque: Los cambios emocionales internos mensuales/anuales en su mundo compartido se leen a través de esta fase.</span>
                 </div>
                 """
             else:
@@ -5670,8 +5949,14 @@ class FBST_Engine:
 
         bugun = _dt.datetime.now()
 
+        _ES = _core_get_lang() == "es"
+        _EN = _core_get_lang() == "en"
+
         burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak",
                     "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
+        if _ES:
+            burclar = ["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo",
+                        "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"]
 
         gezegen_id = {
             "Güneş": swe.SUN, "Ay": swe.MOON, "Merkür": swe.MERCURY, "Venüs": swe.VENUS,
@@ -5680,11 +5965,11 @@ class FBST_Engine:
         }
 
         aci_tipleri = {
-            0: {"isim": "Kavuşum", "etki": "Güçlü birleşme, yoğunlaşma"},
-            60: {"isim": "Sekstil", "etki": "Fırsat, uyum"},
-            90: {"isim": "Kare", "etki": "Gerilim, mücadele"},
-            120: {"isim": "Trigon", "etki": "Doğal akış, şans"},
-            180: {"isim": "Karşıt", "etki": "Kutuplaşma, farkındalık"}
+            0: {"isim": "Kavuşum", "etki": "Güçlü birleşme, yoğunlaşma" if not (_ES or _EN) else ("Conjunction, strong union and intensity" if _EN else "Conjunción, unión fuerte e intensidad")},
+            60: {"isim": "Sekstil", "etki": "Fırsat, uyum" if not (_ES or _EN) else ("Opportunity, harmony" if _EN else "Oportunidad, armonía")},
+            90: {"isim": "Kare", "etki": "Gerilim, mücadele" if not (_ES or _EN) else ("Tension, struggle" if _EN else "Tensión, lucha")},
+            120: {"isim": "Trigon", "etki": "Doğal akış, şans" if not (_ES or _EN) else ("Natural flow, luck" if _EN else "Flujo natural, suerte")},
+            180: {"isim": "Karşıt", "etki": "Kutuplaşma, farkındalık" if not (_ES or _EN) else ("Polarization, awareness" if _EN else "Polarización, conciencia")}
         }
 
         # Bağıl harita JD'lerini al (Julian takvimde, get_julian_dates() zaten JUL_CAL kullanır)
@@ -5782,8 +6067,17 @@ class FBST_Engine:
         """
         import datetime as _dt
 
-        aylar_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-                     "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+        _EN_dh = _core_get_lang() == "en"
+        _ES_dh = _core_get_lang() == "es"
+        if _EN_dh:
+            aylar_tr = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"]
+        elif _ES_dh:
+            aylar_tr = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        else:
+            aylar_tr = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+                         "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
         burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak",
                     "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
 
@@ -5913,6 +6207,7 @@ class FBST_Engine:
 
         yorumlar = []
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
 
         # İlişki odaklı yorum sözlüğü
         yorum_sozlugu_tr = {
@@ -6047,7 +6342,14 @@ class FBST_Engine:
             ("Güneş", "Satürn", "Trigon"): "Maturity and deepening suit your relationship wonderfully this period — you trust each other and support one another. Nurture this trust: the step you take now will be built on a very solid foundation years later.",
         }
 
-        yorum_sozlugu = yorum_sozlugu_en if _EN else yorum_sozlugu_tr
+        yorum_sozlugu_es = {}  # ES için şimdilik EN fallback; ileride çeviri eklenebilir
+
+        if _ES:
+            yorum_sozlugu = yorum_sozlugu_es if yorum_sozlugu_es else yorum_sozlugu_en
+        elif _EN:
+            yorum_sozlugu = yorum_sozlugu_en
+        else:
+            yorum_sozlugu = yorum_sozlugu_tr
 
         # Dönem hesaplamalarını al
         donem_verileri = self.secondary_progression_donem_hesapla()
@@ -6077,7 +6379,7 @@ class FBST_Engine:
                                 break
 
                     kisi_yorumlari.append({
-                        "baslik": f"{aci['ilerletilmis']} ({sonuc['ay_burcu']}) → {aci['bagil']} {aci['aci']}",
+                        "baslik": f"{pdf_label(aci['ilerletilmis'])} ({pdf_label(sonuc['ay_burcu'])}) → {pdf_label(aci['bagil'])} {pdf_label(aci['aci'])}",
                         "yorum": yorum_sozlugu[key],
                         "aci_turu": aci["aci"],
                         "etki": aci["etki"],
@@ -6113,9 +6415,25 @@ class FBST_Engine:
                 "Kova": "Your progressed Moon is in Aquarius — innovation and originality are very pronounced. Unconventional experiences and fresh perspectives are very valuable in your relationship now. Step away from the ordinary and discover something new together.",
                 "Balık": "Your progressed Moon is in Pisces — intuition and spiritual deepening are very strong. The spiritual bond in your relationship is strengthening, and you can understand each other very deeply. Art, music, or meditation will do you a lot of good this period.",
             }
-            genel_yorumlari = genel_yorumlari_en if _EN else genel_yorumlari_tr
+            genel_yorumlari_es = {
+                "Aries": "Su Luna progresada está en Aries — el coraje y la independencia toman el liderazgo. Es un momento poderoso para tomar el liderazgo en su relación y mostrar iniciativa. Pero cuidado: las prisas pueden herir a su pareja. Mezcle su pasión con paciencia.",
+                "Tauro": "Su Luna progresada está en Tauro — su búsqueda de estabilidad y seguridad es muy marcada. Es tiempo de dar pasos concretos en su relación y aclarar asuntos materiales. El cambio puede dar miedo, pero este período le llevará a terreno más firme.",
+                "Géminis": "Su Luna progresada está en Géminis — la comunicación y la curiosidad son muy altas. Conversaciones largas e intercambio de ideas con su pareja serán muy agradables en este período. Pero evite la superficialidad: también hay espacio para profundizar.",
+                "Cáncer": "Su Luna progresada está en Cáncer — la profundidad emocional y la necesidad de pertenencia son muy marcadas. Sentirse seguro en su relación y estar cerca de su pareja importa mucho ahora. Es un momento maravilloso para enfrentar el pasado y sanar viejas heridas.",
+                "Leo": "Su Luna progresada está en Leo — un momento para la creatividad y brillar. Es un período ideal para mostrar su amor, divertirse juntos y celebrar la vida. Pero no deje que su ego domine: su pareja tiene su propia luz.",
+                "Virgo": "Su Luna progresada está en Virgo — los detalles y el perfeccionismo toman el liderazgo. Es un gran momento para hacer ajustes pequeños pero significativos en su relación y mejorar hábitos. Pero mantenga sus críticas constructivas.",
+                "Libra": "Su Luna progresada está en Libra — su búsqueda de armonía y equilibrio es muy fuerte. La paz, la belleza y la estética toman protagonismo en su relación. Esté abierto al compromiso, pero tampoco descuide sus propias necesidades.",
+                "Escorpio": "Su Luna progresada está en Escorpio — un período de intensidad y transformación. Pueden ocurrir confrontaciones profundas y momentos apasionados en su relación. Viejas heridas pueden salir a la superficie, pero esa confrontación es el momento en que comienza la sanación.",
+                "Sagitario": "Su Luna progresada está en Sagitario — su búsqueda de libertad y aventura es muy marcada. Es un momento maravilloso para abrir nuevos horizontes en su relación, aprender y explorar juntos. Salga de la rutina y expanda su vida.",
+                "Capricornio": "Su Luna progresada está en Capricornio — la responsabilidad y la construcción de estructura toman el liderazgo. Es un período ideal para hacer planes a largo plazo en su relación y dar pasos serios. Será recompensado por sus esfuerzos.",
+                "Acuario": "Su Luna progresada está en Acuario — la innovación y la originalidad son muy marcadas. Experiencias no convencionales y perspectivas frescas son muy valiosas en su relación ahora. Aléjese de lo ordinario y descubra algo nuevo juntos.",
+                "Piscis": "Su Luna progresada está en Piscis — la intuición y la profundización espiritual son muy fuertes. El vínculo espiritual en su relación se fortalece, y pueden entenderse muy profundamente. El arte, la música o la meditación les harán mucho bien en este período.",
+            }
+            genel_yorumlari = genel_yorumlari_en if _EN else (genel_yorumlari_es if _ES else genel_yorumlari_tr)
             if _EN:
                 genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"Your progressed Moon is in {sonuc['ay_burcu']} — a balanced and harmonious period.")
+            elif _ES:
+                genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"Su Luna progresada está en {sonuc['ay_burcu']} — un período equilibrado y armonioso.")
             else:
                 genel_yorum = genel_yorumlari.get(sonuc["ay_burcu"], f"İlerletilmiş Ay'ınız {sonuc['ay_burcu']} burcunda — dengeli ve uyumlu bir dönemdesiniz.")
 
@@ -6146,50 +6464,50 @@ class FBST_Engine:
             k2_grup = next((g for g, b in burc_gruplari.items() if k2["ay_burcu"] in b), "")
 
             uyum_mesajlari_tr = {
-                ("ateş", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — aynı element grubundasınız: tutkunuz, cesaretiniz ve enerjiniz birbirini doğal olarak besliyor. Birlikte hayatın tadını çıkarmak için yaratılmışsınız. Ama dikkat: iki ateş bir arada bazen yangın da yaratabilir — sabırlı olun.",
-                ("toprak", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprağın sağlamlığı sizde: istikrar, güven ve somut adımlar bu ilişkinin temeli. Birlikte çok güçlü bir yapı kurabilirsiniz. Ama esnekliği de elden bırakmayın: bazen biraz topraktan kalkıp rüzgara karışmak gerekir.",
-                ("hava", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — zihinsel olarak çok uyumlusunuz: sohbetleriniz bitmez, fikirleriniz birbirini besler. Birlikte dünyayı keşfetmek için harika bir ekip oluşturuyorsunuz. Ama sadece zihinle yetinmeyin: duygularınızı da paylaşın.",
-                ("su", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — duygusal derinliğiniz çok güçlü: birbirinizi çok derinden anlıyor, sezgilerinizle bile konuşabiliyorsunuz. Bu ruhsal bağ çok özel. Ama duygusal dalgalanmalara karşı birbirinizi desteklemeyi unutmayın.",
-                ("ateş", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — ateş ve hava çok uyumlu: siz tutku ve enerji getiriyorsunuz, o vizyon ve zekâ. Birlikte çok parlak fikirler üretebilir, büyük hayaller kurabilirsiniz. Bu kombinasyon çok yaratıcı.",
-                ("hava", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — hava ve ateş çok uyumlu: zihinsel zekânız tutkunuzla buluşuyor. Birlikte hem konuşabilir hem de harekete geçebilirsiniz. Bu denge çok değerli.",
-                ("toprak", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprak ve su çok besleyici: siz somut bir temel oluşturuyorsunuz, o duygusal derinlik katıyor. Birlikte hem güvenli hem de duygusal bir yuva kurabilirsiniz.",
-                ("su", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — su ve toprak çok besleyici: duygusal zenginliğiniz somut adımlarla buluşuyor. Birlikte hem hayal kurabilir hem de o hayalleri gerçeğe dönüştürebilirsiniz.",
-                ("ateş", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — ateş ve toprak zorlu ama değerli bir kombinasyon: siz hız istiyorsunuz, o sabırlı. Bu zıtlık sizi güçlendirir: acelecilikten korur, sabırlı olmayı öğretir.",
-                ("toprak", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprak ve ateş zorlu ama değerli: sabır ve istikrarınız partnerinizin ateşini dengeler. Birlikte hem sağlam hem de tutkulu bir ilişki kurabilirsiniz.",
-                ("ateş", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — ateş ve su zorlu ama büyüleyici: siz dışa dönüksünüz, o içe. Bu zıtlık birbirinizi tamamlar ama bazen buhar da yaratır. Sabırlı ve anlayışlı olun.",
-                ("su", "ateş"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — su ve ateş zorlu ama büyüleyici: duygusal derinliğiniz partnerinizin enerjisiyle buluşuyor. Birlikte hem tutkulu hem de duygusal bir deneyim yaşayabilirsiniz.",
-                ("hava", "toprak"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — hava ve toprak farklı ama tamamlayıcı: siz vizyon getiriyorsunuz, o uygulama. Birlikte büyük projeleri hayata geçirebilirsiniz.",
-                ("toprak", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — toprak ve hava farklı ama tamamlayıcı: somut adımlarınız zihinsel zekânızla buluşuyor. Birlikte hem hayal kurabilir hem de o hayalleri inşa edebilirsiniz.",
-                ("hava", "su"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — hava ve su zorlu ama zenginleştirici: siz mantığa, o duyguya önem veriyorsunuz. Bu denge çok değerli: birbirinize farklı pencerelerden bakmayı öğretirsiniz.",
-                ("su", "hava"): f"{k1['ay_burcu']} ve {k2['ay_burcu']} — su ve hava zorlu ama zenginleştirici: duygusal derinliğiniz zihinsel berraklıkla buluşuyor. Birlikte hem hissedebilir hem de anlayabilirsiniz.",
+                ("ateş", "ateş"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — aynı element grubundasınız: tutkunuz, cesaretiniz ve enerjiniz birbirini doğal olarak besliyor. Birlikte hayatın tadını çıkarmak için yaratılmışsınız. Ama dikkat: iki ateş bir arada bazen yangın da yaratabilir — sabırlı olun.",
+                ("toprak", "toprak"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — toprağın sağlamlığı sizde: istikrar, güven ve somut adımlar bu ilişkinin temeli. Birlikte çok güçlü bir yapı kurabilirsiniz. Ama esnekliği de elden bırakmayın: bazen biraz topraktan kalkıp rüzgara karışmak gerekir.",
+                ("hava", "hava"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — zihinsel olarak çok uyumlusunuz: sohbetleriniz bitmez, fikirleriniz birbirini besler. Birlikte dünyayı keşfetmek için harika bir ekip oluşturuyorsunuz. Ama sadece zihinle yetinmeyin: duygularınızı da paylaşın.",
+                ("su", "su"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — duygusal derinliğiniz çok güçlü: birbirinizi çok derinden anlıyor, sezgilerinizle bile konuşabiliyorsunuz. Bu ruhsal bağ çok özel. Ama duygusal dalgalanmalara karşı birbirinizi desteklemeyi unutmayın.",
+                ("ateş", "hava"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — ateş ve hava çok uyumlu: siz tutku ve enerji getiriyorsunuz, o vizyon ve zekâ. Birlikte çok parlak fikirler üretebilir, büyük hayaller kurabilirsiniz. Bu kombinasyon çok yaratıcı.",
+                ("hava", "ateş"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — hava ve ateş çok uyumlu: zihinsel zekânız tutkunuzla buluşuyor. Birlikte hem konuşabilir hem de harekete geçebilirsiniz. Bu denge çok değerli.",
+                ("toprak", "su"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — toprak ve su çok besleyici: siz somut bir temel oluşturuyorsunuz, o duygusal derinlik katıyor. Birlikte hem güvenli hem de duygusal bir yuva kurabilirsiniz.",
+                ("su", "toprak"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — su ve toprak çok besleyici: duygusal zenginliğiniz somut adımlarla buluşuyor. Birlikte hem hayal kurabilir hem de o hayalleri gerçeğe dönüştürebilirsiniz.",
+                ("ateş", "toprak"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — ateş ve toprak zorlu ama değerli bir kombinasyon: siz hız istiyorsunuz, o sabırlı. Bu zıtlık sizi güçlendirir: acelecilikten korur, sabırlı olmayı öğretir.",
+                ("toprak", "ateş"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — toprak ve ateş zorlu ama değerli: sabır ve istikrarınız partnerinizin ateşini dengeler. Birlikte hem sağlam hem de tutkulu bir ilişki kurabilirsiniz.",
+                ("ateş", "su"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — ateş ve su zorlu ama büyüleyici: siz dışa dönüksünüz, o içe. Bu zıtlık birbirinizi tamamlar ama bazen buhar da yaratır. Sabırlı ve anlayışlı olun.",
+                ("su", "ateş"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — su ve ateş zorlu ama büyüleyici: duygusal derinliğiniz partnerinizin enerjisiyle buluşuyor. Birlikte hem tutkulu hem de duygusal bir deneyim yaşayabilirsiniz.",
+                ("hava", "toprak"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — hava ve toprak farklı ama tamamlayıcı: siz vizyon getiriyorsunuz, o uygulama. Birlikte büyük projeleri hayata geçirebilirsiniz.",
+                ("toprak", "hava"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — toprak ve hava farklı ama tamamlayıcı: somut adımlarınız zihinsel zekânızla buluşuyor. Birlikte hem hayal kurabilir hem de o hayalleri inşa edebilirsiniz.",
+                ("hava", "su"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — hava ve su zorlu ama zenginleştirici: siz mantığa, o duyguya önem veriyorsunuz. Bu denge çok değerli: birbirinize farklı pencerelerden bakmayı öğretirsiniz.",
+                ("su", "hava"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — su ve hava zorlu ama zenginleştirici: duygusal derinliğiniz zihinsel berraklıkla buluşuyor. Birlikte hem hissedebilir hem de anlayabilirsiniz.",
             }
             uyum_mesajlari_en = {
-                ("ateş", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — you are in the same element group: your passion, courage, and energy naturally feed each other. You were made to enjoy life together. But beware: two fires together can sometimes create a blaze — be patient.",
-                ("toprak", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — the solidity of the earth is in you: stability, trust, and concrete steps are the foundation of this relationship. Together you can build a very strong structure. But do not let go of flexibility: sometimes you need to rise slightly from the earth and blend with the wind.",
-                ("hava", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — you are mentally very attuned: your conversations never end, and your ideas feed one another. You make a wonderful team for exploring the world together. But do not settle for the mind alone: share your feelings too.",
-                ("su", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — your emotional depth is very strong: you understand each other profoundly and can even speak through intuition. This spiritual bond is very special. But do not forget to support each other through emotional ups and downs.",
-                ("ateş", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and air are highly compatible: you bring passion and energy, they bring vision and intellect. Together you can produce brilliant ideas and dream big. This combination is highly creative.",
-                ("hava", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and fire are highly compatible: your mental intellect meets your passion. Together you can both talk and take action. This balance is very valuable.",
-                ("toprak", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and water are deeply nourishing: you form a concrete foundation, they add emotional depth. Together you can build a home that is both secure and full of feeling.",
-                ("su", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and earth are deeply nourishing: your emotional richness meets concrete steps. Together you can both dream and turn those dreams into reality.",
-                ("ateş", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and earth are a challenging but valuable combination: you want speed, they are patient. This contrast strengthens you: it protects you from haste and teaches you patience.",
-                ("toprak", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and fire are challenging but valuable: your patience and steadiness balance your partner's fire. Together you can build a relationship that is both solid and passionate.",
-                ("ateş", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — fire and water are challenging but fascinating: you are outgoing, they are inward. This contrast completes each other but can sometimes create steam. Be patient and understanding.",
-                ("su", "ateş"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and fire are challenging but fascinating: your emotional depth meets your partner's energy. Together you can experience something both passionate and emotional.",
-                ("hava", "toprak"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and earth are different but complementary: you bring vision, they bring execution. Together you can bring great projects to life.",
-                ("toprak", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — earth and air are different but complementary: your concrete steps meet your mental intellect. Together you can both dream and build those dreams.",
-                ("hava", "su"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — air and water are challenging but enriching: you value logic, they value feeling. This balance is very valuable: you teach each other to look through different windows.",
-                ("su", "hava"): f"{k1['ay_burcu']} and {k2['ay_burcu']} — water and air are challenging but enriching: your emotional depth meets mental clarity. Together you can both feel and understand.",
+                ("ateş", "ateş"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — you are in the same element group: your passion, courage, and energy naturally feed each other. You were made to enjoy life together. But beware: two fires together can sometimes create a blaze — be patient.",
+                ("toprak", "toprak"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — the solidity of the earth is in you: stability, trust, and concrete steps are the foundation of this relationship. Together you can build a very strong structure. But do not let go of flexibility: sometimes you need to rise slightly from the earth and blend with the wind.",
+                ("hava", "hava"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — you are mentally very attuned: your conversations never end, and your ideas feed one another. You make a wonderful team for exploring the world together. But do not settle for the mind alone: share your feelings too.",
+                ("su", "su"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — your emotional depth is very strong: you understand each other profoundly and can even speak through intuition. This spiritual bond is very special. But do not forget to support each other through emotional ups and downs.",
+                ("ateş", "hava"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — fire and air are highly compatible: you bring passion and energy, they bring vision and intellect. Together you can produce brilliant ideas and dream big. This combination is highly creative.",
+                ("hava", "ateş"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — air and fire are highly compatible: your mental intellect meets your passion. Together you can both talk and take action. This balance is very valuable.",
+                ("toprak", "su"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — earth and water are deeply nourishing: you form a concrete foundation, they add emotional depth. Together you can build a home that is both secure and full of feeling.",
+                ("su", "toprak"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — water and earth are deeply nourishing: your emotional richness meets concrete steps. Together you can both dream and turn those dreams into reality.",
+                ("ateş", "toprak"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — fire and earth are a challenging but valuable combination: you want speed, they are patient. This contrast strengthens you: it protects you from haste and teaches you patience.",
+                ("toprak", "ateş"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — earth and fire are challenging but valuable: your patience and steadiness balance your partner's fire. Together you can build a relationship that is both solid and passionate.",
+                ("ateş", "su"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — fire and water are challenging but fascinating: you are outgoing, they are inward. This contrast completes each other but can sometimes create steam. Be patient and understanding.",
+                ("su", "ateş"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — water and fire are challenging but fascinating: your emotional depth meets your partner's energy. Together you can experience something both passionate and emotional.",
+                ("hava", "toprak"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — air and earth are different but complementary: you bring vision, they bring execution. Together you can bring great projects to life.",
+                ("toprak", "hava"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — earth and air are different but complementary: your concrete steps meet your mental intellect. Together you can both dream and build those dreams.",
+                ("hava", "su"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — air and water are challenging but enriching: you value logic, they value feeling. This balance is very valuable: you teach each other to look through different windows.",
+                ("su", "hava"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — water and air are challenging but enriching: your emotional depth meets mental clarity. Together you can both feel and understand.",
             }
-            uyum_mesajlari = uyum_mesajlari_en if _EN else uyum_mesajlari_tr
+            uyum_mesajlari = uyum_mesajlari_en if (_EN or _ES) else uyum_mesajlari_tr
             uyum_key = (k1_grup, k2_grup)
-            if _EN:
-                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{k1['ay_burcu']} and {k2['ay_burcu']} — coming from different elements will add richness. Your differences will become your greatest strength.")
+            if _EN or _ES:
+                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — coming from different elements will add richness. Your differences will become your greatest strength.")
             else:
-                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{k1['ay_burcu']} ve {k2['ay_burcu']} — farklı elementlerden gelmeniz zenginlik katacak. Farklılıklarınız en büyük gücünüz olacak.")
+                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — farklı elementlerden gelmeniz zenginlik katacak. Farklılıklarınız en büyük gücünüz olacak.")
 
             yorumlar.append({
-                "kisi": "İlişki Uyumu",
+                "kisi": "Armonía de la Relación" if _ES else ("Relationship Harmony" if _EN else "İlişki Uyumu"),
                 "ilerleme_yili": 0,
                 "ay_burcu": "",
                 "gunes_burcu": "",
@@ -6208,6 +6526,7 @@ class FBST_Engine:
         
         # --- BSP SÖZLÜĞÜ: MODA GÖRE SEÇİM ---
         _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         aktif_mod = getattr(self, 'mod', 'es_sevgili')
         
         if aktif_mod == "ebeveyn_cocuk":
@@ -6565,8 +6884,8 @@ class FBST_Engine:
                 ]
             }
 
-        # --- EN SÖZLÜĞÜ (İNGİLİZCE ÇIKTI İÇİN) ---
-        if _EN:
+        # --- EN SÖZLÜĞÜ (İNGİLİZCE/ES ÇIKTISI İÇİN - ES fallback EN'e) ---
+        if _EN or _ES:
             if aktif_mod == "ebeveyn_cocuk":
                 bsp_sozlugu_en = {
                     "Güneş_0": [
@@ -6990,7 +7309,7 @@ class FBST_Engine:
                                            .replace("🚧", "").replace("⛰️", "").replace("🧱", "").replace("⚡", "")\
                                            .replace("🌌", "").replace("🌊", "").replace("🌫️", "").replace("🦇", "")\
                                            .replace("🌋", "")
-                        olaylar.append(f"<b>[{kisi_isim}] - {gez_isim} Transiti:</b><br/>{mesaj_temiz}")
+                        olaylar.append(f"<b>[{kisi_isim}] - {pdf_label(gez_isim)} {pdf_label('Transiti:')}</b><br/>{mesaj_temiz}")
                     else:
                         # STREAMLIT EKRANI İÇİN VIP DARK-MODE KART TASARIMI
                         kutu_html = f"""
@@ -6999,7 +7318,7 @@ class FBST_Engine:
                                     border-left: 6px solid {renk_kodu}; 
                                     box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                             <div style="font-size: 16px; font-weight: 800; color: {renk_kodu}; margin-bottom: 8px;">
-                                [{kisi_isim}] ➔ {gez_isim} Transiti
+                                [{kisi_isim}] ➔ {gez_isim} {'Tránsito' if _ES else 'Transiti'}
                             </div>
                             <div style="font-size: 14.5px; line-height: 1.6; color: #4A4A4A;">
                                 <span style="color: #4A4A4A;">{mesaj}</span>
@@ -7032,6 +7351,8 @@ class FBST_Engine:
     
     def pdf_rapor_uret(self, dosya_adi="FBST_Kadersel_Kontrat.pdf"):
         _core_set_lang(self._lang)
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         # Efemeris yolunu hesaplamalardan hemen önce yeniden ayarla
         # (sunucuda import sırasında yapılan set bazen etkisiz kalabiliyor).
         _ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
@@ -7193,14 +7514,31 @@ class FBST_Engine:
         # ⚠️ YASAL VE ETİK UYARI (rapor başına eklendi)
         story.append(Spacer(1, 10))
         feragat_bas_metni = (
-            "<b><font color='#C9A96E' size='13'>⚠️ YASAL VE ETİK UYARI</font></b><br/><br/>"
+            "<b><font color='#C9A96E' size='13'>" + ("⚠️ LEGAL AND ETHICAL NOTICE" if _EN else ("⚠️ AVISO LEGAL Y ÉTICO" if _ES else "⚠️ YASAL VE ETİK UYARI")) + "</font></b><br/><br/>"
             "<font color='#4A5568' size='9.5'>"
-            "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
-            "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
-            "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
-            "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
-            "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
-            "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir.</font>"
+            + (
+                "This report is an entertainment and insight tool made of astrological and symbolic interpretations; "
+                "it does not constitute a scientific diagnosis, prediction or advice. Astrology is not a discipline that promises exact results. "
+                "The content of this report in no way replaces medical, legal, financial, psychological or professional counseling. "
+                "Always consult qualified professionals in the relevant field before making important life decisions. "
+                "Your personal data has been used solely for the purpose of producing this report. "
+                "The statements in this report are general and symbolic; every individual's own free will and choices always take priority."
+                if _EN else
+                ("Este informe es una herramienta de entretenimiento e insight compuesta por interpretaciones astrológicas y simbólicas; "
+                "no constituye un diagnóstico, predicción o consejo científico. La astrología no es una disciplina que prometa resultados exactos. "
+                "El contenido de este informe no sustituye en modo alguno la asesoría médica, legal, financiera, psicológica o profesional. "
+                "Consulte siempre a profesionales cualificados antes de tomar decisiones importantes. "
+                "Sus datos personales se han utilizado únicamente para producir este informe. "
+                "Las afirmaciones de este informe son generales y simbólicas; la libre voluntad y las elecciones de cada individuo siempre tienen prioridad."
+                if _ES else
+                "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
+                "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
+                "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
+                "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
+                "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
+                "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir."
+                )
+            ) + "</font>"
         )
         uyari_tablo = Table([[Paragraph(feragat_bas_metni, styles['TurkishNormal'])]], colWidths=[500])
         uyari_tablo.setStyle(TableStyle([
@@ -7221,11 +7559,11 @@ class FBST_Engine:
             baslik_karti_ekle("İLİŞKİ RAPORU", alt_baslik=f"{self.p1_isim} & {self.p2_isim} | {self.city}", emoji="📋")
         
         meta_html = f"""
-        <b>Analiz Bolgesi:</b> {self.city}, {self.country} ({self.enlem} enlem, {self.boylam} boylam)<br/>
-        <b>Bulusma Noktasi:</b> {self.event_date_str} | {self.event_time_str}<br/>
-        <b>Zaman Cizelgesi:</b> {self.p1_isim}: {self.p1.strftime('%d.%m.%Y')} | {self.p2_isim}: {self.p2.strftime('%d.%m.%Y')}<br/>
-        <b>Analiz Yöntemi:</b> {self.get_kadersel_durak()}<br/>
-        <b>Uyum Oranı:</b> {self.calculate_altin_oran_muhru()}
+        <b>{'Analysis Region:' if _EN else ('Región de Análisis:' if _ES else 'Analiz Bolgesi:')}</b> {self.city}, {self.country} ({self.enlem} {'lat' if _EN else ('lat' if _ES else 'enlem')}, {self.boylam} {'lon' if _EN else ('lon' if _ES else 'boylam')})<br/>
+        <b>{'Meeting Point:' if _EN else ('Punto de Encuentro:' if _ES else 'Bulusma Noktasi:')}</b> {self.event_date_str} | {self.event_time_str}<br/>
+        <b>{'Timeline:' if _EN else ('Cronología:' if _ES else 'Zaman Cizelgesi:')}</b> {self.p1_isim}: {self.p1.strftime('%d.%m.%Y')} | {self.p2_isim}: {self.p2.strftime('%d.%m.%Y')}<br/>
+        <b>{'Analysis Method:' if _EN else ('Método de Análisis:' if _ES else 'Analiz Yöntemi:')}</b> {self.get_kadersel_durak()}<br/>
+        <b>{'Harmony Score:' if _EN else ('Puntuación de Armonía:' if _ES else 'Uyum Oranı:')}</b> {self.calculate_altin_oran_muhru()}
         """
         meta_table = Table([[Paragraph(meta_html, styles['TurkishNormal'])]], colWidths=[500])
         meta_table.setStyle(TableStyle([
@@ -7254,7 +7592,7 @@ class FBST_Engine:
 
         story.append(Paragraph(pdf_label("İLİŞKİ ENERJİSİ GRAFİĞİ"), styles['TurkishHeading']))
         frekans_blok = []
-        cerceveli_gorsel_ekle(titresim_resmi, 500, 160, "Sinüs Frekans Grafiği", hedef=frekans_blok)
+        cerceveli_gorsel_ekle(titresim_resmi, 500, 160, ("Sine Frequency Chart" if _EN else ("Gráfico de Frecuencia Senoidal" if _ES else "Sinüs Frekans Grafiği")), hedef=frekans_blok)
         story.append(KeepTogether(frekans_blok))
         
         story.append(Paragraph(pdf_label("ORTAK GELECEK REHBERİ (21 Yıllık Öngörü)"), styles['TurkishHeading']))
@@ -7265,17 +7603,17 @@ class FBST_Engine:
         ki_yili = self.calculate_ks()
         
         if ki_yili >= 7.0:
-            ki_sinifi = "GÜÇLÜ BAĞ"
-            ki_anlami = "Bu ilişki kendi dengesini oluşturmuş, dış etkenlerden etkilenmeyen güçlü bir yapıya sahip."
+            ki_sinifi = "STRONG BOND" if _EN else ("ENLACE FUERTE" if _ES else "GÜÇLÜ BAĞ")
+            ki_anlami = ("This relationship has formed its own equilibrium and is sturdy, unaffected by outside influences." if _EN else ("Esta relación ha formado su propio equilibrio y es sólida, inmune a influencias externas." if _ES else "Bu ilişki kendi dengesini oluşturmuş, dış etkenlerden etkilenmeyen güçlü bir yapıya sahip."))
         elif ki_yili >= 4.0:
-            ki_sinifi = "DENGELİ BAĞ"
-            ki_anlami = "İlişki ne çok hafif ne de çok ağır — tam olması gereken noktada, esnek ama sağlam."
+            ki_sinifi = "BALANCED BOND" if _EN else ("ENLACE EQUILIBRADO" if _ES else "DENGELİ BAĞ")
+            ki_anlami = ("The bond is neither too light nor too heavy — exactly where it should be, flexible yet solid." if _EN else ("El enlace no es ni demasiado ligero ni demasiado pesado — exactamente donde debe ser, flexible pero sólido." if _ES else "İlişki ne çok hafif ne de çok ağır — tam olması gereken noktada, esnek ama sağlam."))
         else:
-            ki_sinifi = "HASSAS BAĞ"
-            ki_anlami = "Bu bağ dışarıdan gelen etkilere daha açık; korunmaya ve bilinçli beslenmeye ihtiyaç duyan bir yapıya sahip."
+            ki_sinifi = "SENSITIVE BOND" if _EN else ("ENLACE SENSIBLE" if _ES else "HASSAS BAĞ")
+            ki_anlami = ("This bond is more open to outside influences; it needs protection and conscious nurturing." if _EN else ("Este enlace está más abierto a influencias externas; necesita protección y cuidado consciente." if _ES else "Bu bağ dışarıdan gelen etkilere daha açık; korunmaya ve bilinçli beslenmeye ihtiyaç duyan bir yapıya sahip."))
 
         ki_metni = f"""
-<b>🌌 Bağın Gücü: {ki_yili:.2f} — {ki_sinifi}</b>
+<b>🌌 {'Bond Strength:' if _EN else ('Fuerza del Enlace:' if _ES else 'Bağın Gücü:')} {ki_yili:.2f} — {ki_sinifi}</b>
 <br/>{ki_anlami}
 """
         story.append(Paragraph(ki_metni, styles['TurkishNormal']))
@@ -7370,13 +7708,15 @@ class FBST_Engine:
 
         # GEZEGEN DÖKÜMÜ FONKSİYONU SADECE BİR KERE ÇAĞRILIYOR!
         if self.mod == "ebeveyn_cocuk":
-            saga = f"{self.p1_isim}, Kadersel Haritası (Çocuk)" if _core_get_lang() != "en" else f"{self.p1_isim}'s Karmic Chart (Child)"
-            sagb = f"{self.p2_isim}, Kadersel Haritası (Ebeveyn)" if _core_get_lang() != "en" else f"{self.p2_isim}'s Karmic Chart (Parent)"
+            saga = f"{self.p1_isim}, Kadersel Haritası (Çocuk)" if _core_get_lang() == "tr" else (f"{self.p1_isim}'s Karmic Chart (Child)" if _core_get_lang() == "en" else f"{self.p1_isim}, Carta Kármica (Hijo)")
+            sagb = f"{self.p2_isim}, Kadersel Haritası (Ebeveyn)" if _core_get_lang() == "tr" else (f"{self.p2_isim}'s Karmic Chart (Parent)" if _core_get_lang() == "en" else f"{self.p2_isim}, Carta Kármica (Padre/Madre)")
             gezegen_dokumu(j_ileri, f"🌱 {saga}", ileri_str, f"{self._session_id}_Situa_A.png", rol="cocuk")
             story.append(PageBreak())
             gezegen_dokumu(j_geri, f"🦅 {sagb}", geri_str, f"{self._session_id}_Situa_B.png", rol="ebeveyn")
         else:
-            baslik_karti_ekle("KİŞİSEL PERSPEKTİFLER", alt_baslik=f"{self.p1_isim} ve {self.p2_isim} perspektifleri", emoji="🧭")
+            _pl = _core_get_lang()
+            alt_ab = f"{self.p1_isim} and {self.p2_isim} perspectives" if _pl == "en" else (f"{self.p1_isim} y {self.p2_isim} perspectivas" if _pl == "es" else f"{self.p1_isim} ve {self.p2_isim} perspektifleri")
+            baslik_karti_ekle("KİŞİSEL PERSPEKTİFLER", alt_baslik=alt_ab, emoji="🧭")
             story.append(Spacer(1, 10))
             if _core_get_lang() == "en":
                 story.append(Paragraph(
@@ -7396,6 +7736,25 @@ class FBST_Engine:
                     f"<b>🦅 {self.p2_isim} Perspective:</b> This section describes {self.p2_isim}'s role in the relationship, "
                     "the vision for the future, and the guiding energy that moves this union forward. "
                     "Every planet here shows how this person shapes the direction of the relationship and how they guide the shared destiny.",
+                    styles['TurkishNormal']))
+            elif _core_get_lang() == "es":
+                story.append(Paragraph(
+                    "Las dos perspectivas siguientes leen su relación a través de los ojos de cada persona. "
+                    "La perspectiva del ALMA RAÍZ habla de la sabiduría traída del pasado y de la energía fundamental que cada persona aporta a la relación; "
+                    "la perspectiva del ALMA GUÍA revela la visión del futuro y el papel orientador que cada persona desempeña en la relación. "
+                    "Las posiciones planetarias de cada sección se toman de la carta situacional de esa persona y se interpretan por su efecto sobre la relación en su conjunto.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🌱 Perspectiva de {self.p1_isim}:</b> Esta sección describe el papel de {self.p1_isim} en la relación, "
+                    "las fortalezas traídas de la sabiduría de las experiencias pasadas y las responsabilidades kármicas que sostiene. "
+                    "Cada planeta aquí guarda la clave de la energía que esta persona aporta a la relación.",
+                    styles['TurkishNormal']))
+                story.append(Spacer(1, 12))
+                story.append(Paragraph(
+                    f"<b>🦅 Perspectiva de {self.p2_isim}:</b> Esta sección describe el papel de {self.p2_isim} en la relación, "
+                    "la visión de futuro y la energía orientadora que impulsa esta unión. "
+                    "Cada planeta aquí muestra cómo esta persona da forma a la dirección de la relación y cómo guía el destino compartido.",
                     styles['TurkishNormal']))
             else:
                 story.append(Paragraph(
@@ -7511,12 +7870,12 @@ class FBST_Engine:
                         lat, lon = _sehir_koordinat_bul(sehir_adi)
                         top_sehirler_pdf.append({"sehir": sehir_adi, "lat": lat, "lon": lon, "kategori": "kriz", "skor": v["kriz"]})
                 acg_dosya, acg_abs_yol = self.ciz_astrocartography(dosya_adi="FBST_Astrocartography_PDF.png", top_sehirler=top_sehirler_pdf)
-                cerceveli_gorsel_ekle(acg_abs_yol, 500, 250, "Astrocartography Dünya Haritası")
+                cerceveli_gorsel_ekle(acg_abs_yol, 500, 250, ("Astrocartography World Map" if _EN else ("Mapa Mundial de Astrocartografía" if _ES else "Astrocartography Dünya Haritası")))
                 legend_parts = [
-                    Paragraph("<font color='#C9A96E'>★</font> <b>Para</b>", styles['TurkishNormal']),
-                    Paragraph("<font color='#C0C0C0'>★</font> <b>Huzur</b>", styles['TurkishNormal']),
-                    Paragraph("<font color='#FF6347'>★</font> <b>Tutku</b>", styles['TurkishNormal']),
-                    Paragraph("<font color='#9370DB'>★</font> <b>Kriz</b>", styles['TurkishNormal']),
+                    Paragraph("<font color='#C9A96E'>★</font> <b>" + ("Money" if _EN else ("Dinero" if _ES else "Para")) + "</b>", styles['TurkishNormal']),
+                    Paragraph("<font color='#C0C0C0'>★</font> <b>" + ("Peace" if _EN else ("Paz" if _ES else "Huzur")) + "</b>", styles['TurkishNormal']),
+                    Paragraph("<font color='#FF6347'>★</font> <b>" + ("Passion" if _EN else ("Pasión" if _ES else "Tutku")) + "</b>", styles['TurkishNormal']),
+                    Paragraph("<font color='#9370DB'>★</font> <b>" + ("Crisis" if _EN else ("Crisis" if _ES else "Kriz")) + "</b>", styles['TurkishNormal']),
                 ]
                 legend_table = Table([legend_parts], colWidths=[120, 120, 120, 120])
                 legend_table.setStyle(TableStyle([
@@ -7528,7 +7887,7 @@ class FBST_Engine:
                 ]))
                 story.append(legend_table)
             except Exception:
-                story.append(Paragraph("<i>Astrocartography haritası PDF'e eklenemedi.</i>", styles['TurkishNormal']))
+                story.append(Paragraph(("<i>The astrocartography map could not be added to the PDF.</i>" if _EN else "<i>Astrocartography haritası PDF'e eklenemedi.</i>"), styles['TurkishNormal']))
 
             # Radar sonuçları (aynı sayfada, haritanın altında)
             story.append(Spacer(1, 15))
@@ -7536,7 +7895,7 @@ class FBST_Engine:
             story.append(Spacer(1, 10))
             story.append(Paragraph(pdf_label("EN UYGUN LOKASYONLAR"), styles['TurkishHeading']))
             if 'radar_top_para' in st.session_state and st.session_state['radar_top_para']:
-                hassasiyet_metni = "Sistem, şehirlerin enlem ve boylam koordinatlarındaki milimetrik sapmaları hesaplayarak evrensel dalga boyu imzanıza en uygun lokasyonları tespit etmiştir."
+                hassasiyet_metni = ("The system calculates millimeter-level deviations in the latitude and longitude coordinates of cities, identifying the locations that best match your universal wavelength signature." if _EN else "Sistem, şehirlerin enlem ve boylam koordinatlarındaki milimetrik sapmaları hesaplayarak evrensel dalga boyu imzanıza en uygun lokasyonları tespit etmiştir.")
                 story.append(Paragraph(hassasiyet_metni, styles['TurkishNormal']))
                 story.append(Spacer(1, 10))
                 def add_top_5_to_pdf(baslik, liste_adi, skor_anahtari):
@@ -7567,47 +7926,81 @@ class FBST_Engine:
                     ]))
                     story.append(radar_table)
                     story.append(Spacer(1, 8))
-                add_top_5_to_pdf("💰 MALİ AÇIDAN EN İYİ ŞEHİRLER", 'radar_top_para', 'para')
-                add_top_5_to_pdf("🕊️ HUZUR AÇISINDAN EN İYİ ŞEHİRLER", 'radar_top_huzur', 'huzur')
-                add_top_5_to_pdf("🔥 TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER", 'radar_top_tutku', 'tutku')
-                add_top_5_to_pdf("🌋 KRİZ RİSKİ EN YÜKSEK ŞEHİRLER", 'radar_top_kriz', 'kriz')
+                add_top_5_to_pdf("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'radar_top_para', 'para')
+                add_top_5_to_pdf("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'radar_top_huzur', 'huzur')
+                add_top_5_to_pdf("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'radar_top_tutku', 'tutku')
+                add_top_5_to_pdf("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'radar_top_kriz', 'kriz')
             else:
-                uyari = "⚠️ Radar verileri henüz hesaplanmadı. Lütfen uygulamadaki 'Dünyayı Tara' butonuna basarak kadersel pusulayı aktif hale getirin."
+                uyari = ("⚠️ Radar data has not been calculated yet. Please press the 'Scan the World' button in the app to activate the destiny compass." if _EN else (("⚠️ Los datos del radar aún no se han calculado. Pulse el botón 'Explorar el Mundo' de la aplicación para activar la brújula kármica.") if _ES else "⚠️ Radar verileri henüz hesaplanmadı. Lütfen uygulamadaki 'Dünyayı Tara' butonuna basarak kadersel pusulayı aktif hale getirin."))
                 story.append(Paragraph(uyari, styles['TurkishNormal']))
 
         # 🔮 COMPOSITE HARİTA (PDF)
         story.append(Spacer(1, 15))
         composite_blok = []
-        baslik_karti_ekle("ORTALAMA HARİTA", 
-                          alt_baslik="İki kişinin haritasının ortalamasından oluşan ortak harita", 
+        baslik_karti_ekle("AVERAGE CHART" if _EN else ("CARTA COMPUESTA" if _ES else "ORTALAMA HARİTA"), 
+                          alt_baslik=("The common chart formed by the average of two people's charts" if _EN else ("La carta común formada por el promedio de las cartas de dos personas" if _ES else "İki kişinin haritasının ortalamasından oluşan ortak harita")), 
                           emoji="🔮",
                           hedef=composite_blok)
         composite_blok.append(Spacer(1, 10))
         composite_blok.append(Paragraph(
-            "<b>Composite (Ortalama) harita nedir?</b> Bu harita, iki kişinin doğum haritalarındaki "
-            "gezegenlerin orta noktaları alınarak oluşturulan <b>üçüncü, bağımsız bir ruhu</b> temsil eder. "
-            "İlişkinin bireysel kimliklerden ayrı olarak kendi başına taşıdığı enerjiyi, ortak hedefleri ve "
-            "birlikteyken ortaya çıkan 'biz' karakterini gösterir. Bu harita, ilişkinin doğum haritası gibidir: "
-            "hangi alanlarda doğal bir uyum yakalayacağınızı, hangi temalarda birlikte olgunlaşacağınızı ve "
-            "ortak geleceğinizin hangi yıldızlar altında yazıldığını ortaya koyar.",
+            ("<b>What is a composite chart?</b> This chart represents a <b>third, independent soul</b> created by taking "
+             "the midpoints of the planets in two people's birth charts. It shows the energy, shared goals and the "
+             "'we' character that the relationship carries on its own, separate from individual identities. This chart is "
+             "like the birth chart of the relationship: it reveals in which areas you will find natural harmony, in which "
+             "themes you will mature together, and under which stars your shared future is written."
+             if _EN else
+             ("<b>¿Qué es una carta compuesta?</b> Esta carta representa una <b>tercera alma independiente</b> creada a partir "
+             "de los puntos medios de los planetas en las cartas natales de dos personas. Muestra la energía, los objetivos compartidos y "
+             "el carácter 'nosotros' que la relación lleva por sí misma, separada de las identidades individuales. Esta carta es "
+             "como la carta natal de la relación: revela en qué áreas encontrarán armonía natural, en qué "
+             "temas madurarán juntos, y bajo qué estrellas está escrito su futuro compartido."
+             if _ES else
+             "<b>Composite (Ortalama) harita nedir?</b> Bu harita, iki kişinin doğum haritalarındaki "
+             "gezegenlerin orta noktaları alınarak oluşturulan <b>üçüncü, bağımsız bir ruhu</b> temsil eder. "
+             "İlişkinin bireysel kimliklerden ayrı olarak kendi başına taşıdığı enerjiyi, ortak hedefleri ve "
+             "birlikteyken ortaya çıkan 'biz' karakterini gösterir. Bu harita, ilişkinin doğum haritası gibidir: "
+             "hangi alanlarda doğal bir uyum yakalayacağınızı, hangi temalarda birlikte olgunlaşacağınızı ve "
+             "ortak geleceğinizin hangi yıldızlar altında yazıldığını ortaya koyar.")),
             styles['TurkishNormal']))
         composite_blok.append(Spacer(1, 10))
         try:
             composite_dosya = self.ciz_composite_harita(dosya_adi="FBST_Composite_PDF.png")
-            cerceveli_gorsel_ekle(composite_dosya, 350, 350, "Composite Harita", hedef=composite_blok)
+            cerceveli_gorsel_ekle(composite_dosya, 350, 350, "Composite Chart" if _EN else "Composite Harita", hedef=composite_blok)
             story.append(KeepTogether(composite_blok))
             # Composite otomatik yorum
             try:
                 j1c = swe.julday(self.p1.year, self.p1.month, self.p1.day, 12.0)
                 j2c = swe.julday(self.p2.year, self.p2.month, self.p2.day, 12.0)
-                burclar_tr = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
-                ev_isimleri = [
-                    "Benlik, Kimlik ve Beden", "Para, Değerler ve Güvenlik", "İletişim, Kardeşler ve Kısa Yolculuklar",
-                    "Aile, Kökler ve Ev", "Yaratıcılık, Çocuklar ve Eğlence", "Günlük Yaşam, Sağlık ve Hizmet",
-                    "Evlilik, Ortaklık ve Açık Düşmanlıklar", "Ölüm, Dönüşüm ve Ortak Kaynaklar",
-                    "Yükseköğretim, Felsefe ve Uzak Yolculuklar", "Kariyer, Toplumsal Statü ve İtibar",
-                    "Arkadaşlıklar, Gruplar ve Özgürlük", "Rüyalar, Bilinçaltı ve Sınırlar"
-                ]
+                burclar = (
+                    ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+                    if _EN else
+                    (["Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"]
+                     if _ES else
+                     ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"])
+                )
+                ev_isimleri = (
+                    [
+                        "Self, Identity and Body", "Money, Values and Security", "Communication, Siblings and Short Journeys",
+                        "Family, Roots and Home", "Creativity, Children and Play", "Daily Life, Health and Service",
+                        "Marriage, Partnership and Open Enemies", "Death, Transformation and Shared Resources",
+                        "Higher Education, Philosophy and Long Journeys", "Career, Social Status and Reputation",
+                        "Friendships, Groups and Freedom", "Dreams, Subconscious and Boundaries"
+                    ]
+                    if _EN else
+                    (["Uno mismo, Identidad y Cuerpo", "Dinero, Valores y Seguridad", "Comunicación, Hermanos y Viajes Cortos",
+                      "Familia, Raíces y Hogar", "Creatividad, Hijos y Juego", "Vida Diaria, Salud y Servicio",
+                      "Matrimonio, Sociedad y Enemigos Abiertos", "Muerte, Transformación y Recursos Compartidos",
+                      "Educación Superior, Filosofía y Viajes Largos", "Carrera, Estatus Social y Reputación",
+                      "Amistades, Grupos y Libertad", "Sueños, Subconsciente y Límites"]
+                     if _ES else
+                     [
+                        "Benlik, Kimlik ve Beden", "Para, Değerler ve Güvenlik", "İletişim, Kardeşler ve Kısa Yolculuklar",
+                        "Aile, Kökler ve Ev", "Yaratıcılık, Çocuklar ve Eğlence", "Günlük Yaşam, Sağlık ve Hizmet",
+                        "Evlilik, Ortaklık ve Açık Düşmanlıklar", "Ölüm, Dönüşüm ve Ortak Kaynaklar",
+                        "Yükseköğretim, Felsefe ve Uzak Yolculuklar", "Kariyer, Toplumsal Statü ve İtibar",
+                        "Arkadaşlıklar, Gruplar ve Özgürlük", "Rüyalar, Bilinçaltı ve Sınırlar"
+                    ])
+                )
                 burc_yorumlari = {
                     "Koç": "bağımsızlık, cesaret ve inici ruh",
                     "Boğa": "istikrar, somut değerler ve duyusal bağ",
@@ -7622,16 +8015,48 @@ class FBST_Engine:
                     "Kova": "özgünlük, insancılık ve vizyoner bakış",
                     "Balık": "merhamet, maneviyat ve sınırsız sevgi"
                 }
+                if _EN:
+                    burc_yorumlari = {
+                        "Aries": "independence, courage and pioneering spirit",
+                        "Taurus": "stability, tangible values and sensory bond",
+                        "Gemini": "versatility, communication and intellectual sharing",
+                        "Cancer": "emotional depth, protectiveness and belonging",
+                        "Leo": "creativity, generosity and the spotlight",
+                        "Virgo": "attention to detail, service and practical excellence",
+                        "Libra": "balance, aesthetics and pursuit of harmony",
+                        "Scorpio": "intensity, transformation and deep bonding",
+                        "Sagittarius": "freedom, discovery and philosophical expansion",
+                        "Capricorn": "responsibility, structure and long-term goals",
+                        "Aquarius": "originality, humanism and visionary outlook",
+                        "Pisces": "compassion, spirituality and boundless love"
+                    }
+                    if _ES:
+                        burc_yorumlari = {
+                            "Aries": "independencia, coraje y espíritu pionero",
+                            "Tauro": "estabilidad, valores tangibles y vínculo sensorial",
+                            "Géminis": "versatilidad, comunicación e intercambio intelectual",
+                            "Cáncer": "profundidad emocional, protección y pertenencia",
+                            "Leo": "creatividad, generosidad y protagonismo",
+                            "Virgo": "atención al detalle, servicio y excelencia práctica",
+                            "Libra": "equilibrio, estética y búsqueda de armonía",
+                            "Escorpio": "intensidad, transformación y vínculo profundo",
+                            "Sagitario": "libertad, descubrimiento y expansión filosófica",
+                            "Capricornio": "responsabilidad, estructura y metas a largo plazo",
+                            "Acuario": "originalidad, humanismo y visión",
+                            "Piscis": "compasión, espiritualidad y amor sin límites"
+                        }
 
                 def ev_hesapla(derece, asc_derece):
                     fark = (derece - asc_derece) % 360
                     return int(fark / 30) + 1
 
+                _ev_sonek = "House" if _EN else ("Casa" if _ES else "Ev'de")
+
                 comp_yorum_parts = []
                 if self.mod == "ebeveyn_cocuk":
-                    comp_yorum_parts.append("Bu harita, ebeveyn ve çocuk arasındaki enerjinin ortak ruhunu temsil eder. İki bireyin birleşiminden doğan bu bağımsız harita, ebeveynlik yolculuğunuzun kozik imzasıdır.")
+                    comp_yorum_parts.append(("This chart represents the shared soul of the energy between parent and child. This independent chart, born from the union of two individuals, is the cosmic signature of your parenting journey." if _EN else ("Esta carta representa el alma compartida de la energía entre padre e hijo. Esta carta independiente, nacida de la unión de dos individuos, es la firma cósmica de su camino como padres." if _ES else "Bu harita, ebeveyn ve çocuk arasındaki enerjinin ortak ruhunu temsil eder. İki bireyin birleşiminden doğan bu bağımsız harita, ebeveynlik yolculuğunuzun kozik imzasıdır.")))
                 else:
-                    comp_yorum_parts.append("Bu harita, iki doğum haritasının açısal ortalamasından oluşan 'üçüncü ruh' - ilişkinizin ortak kimliğidir.")
+                    comp_yorum_parts.append(("This chart is the 'third soul' formed by the angular average of two birth charts - the shared identity of your relationship." if _EN else ("Esta carta es la 'tercera alma' formada por el promedio angular de dos cartas natales: la identidad compartida de su relación." if _ES else "Bu harita, iki doğum haritasının açısal ortalamasından oluşan 'üçüncü ruh' - ilişkinizin ortak kimliğidir.")))
 
                 # Composite house cusps (equal house from ASC)
                 comp_asc = None
@@ -7645,20 +8070,40 @@ class FBST_Engine:
                     else:
                         comp_asc = (asc1 + asc2) / 2
                     comp_asc = comp_asc % 360
-                    comp_asc_burc = burclar_tr[int(comp_asc / 30)]
+                    comp_asc_burc = burclar[int(comp_asc / 30)]
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Yükselen: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
-                            f"Ebeveyn-çocuk birliğinin dış dünyaya açılan kapısı <b>{comp_asc_burc}</b> enerjisiyle şekillenir. "
-                            f"{comp_asc_burc} yükseleni, bu bağın dışarıdan ilk izlenimini ve genel atmosferini belirler. "
-                            f"Birliğiniz dışarıdan <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> özellikleriyle tanınır."
+                            (f"<b>Composite Ascendant: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                             f"The door of the parent-child union opening to the outer world is shaped by <b>{comp_asc_burc}</b> energy. "
+                             f"{comp_asc_burc} Ascendant determines the first impression and the general atmosphere of this bond from the outside. "
+                             f"Your union is recognized from the outside by <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> characteristics."
+                             if _EN else
+                             (f"<b>Ascendente Compuesto: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                              f"La puerta de la unión padre-hijo que se abre al mundo exterior está moldeada por la energía de <b>{comp_asc_burc}</b>. "
+                              f"El Ascendente {comp_asc_burc} determina la primera impresión y la atmósfera general de este vínculo desde fuera. "
+                              f"Su unión es reconocida desde fuera por características de <b>{burc_yorumlari.get(comp_asc_burc, '')}</b>."
+                              if _ES else
+                              f"<b>Composite Yükselen: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                              f"Ebeveyn-çocuk birliğinin dış dünyaya açılan kapısı <b>{comp_asc_burc}</b> enerjisiyle şekillenir. "
+                              f"{comp_asc_burc} yükseleni, bu bağın dışarıdan ilk izlenimini ve genel atmosferini belirler. "
+                              f"Birliğiniz dışarıdan <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> özellikleriyle tanınır."))
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Yükselen: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
-                            f"Bu birlikteliğin dış dünyaya açılan kapısı <b>{comp_asc_burc}</b> enerjisiyle şekillenir. "
-                            f"{burclar_tr[int(comp_asc / 30)]} yükseleni, ilişkinizin ilk izlenimini ve genel atmosferini belirler. "
-                            f"İlişkiniz dışarıdan <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> özellikleriyle tanınır."
+                            (f"<b>Composite Ascendant: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                             f"This union's door opening to the outer world is shaped by <b>{comp_asc_burc}</b> energy. "
+                             f"{comp_asc_burc} Ascendant determines your relationship's first impression and general atmosphere. "
+                             f"Your relationship is recognized from the outside by <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> characteristics."
+                             if _EN else
+                             (f"<b>Ascendente Compuesto: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                              f"La puerta de esta unión que se abre al mundo exterior está moldeada por la energía de <b>{comp_asc_burc}</b>. "
+                              f"El Ascendente {comp_asc_burc} determina la primera impresión y la atmósfera general de su relación. "
+                              f"Su relación es reconocida desde fuera por características de <b>{burc_yorumlari.get(comp_asc_burc, '')}</b>."
+                              if _ES else
+                              f"<b>Composite Yükselen: {comp_asc_burc}</b> ({comp_asc:.1f}°)<br/>"
+                              f"Bu birlikteliğin dış dünyaya açılan kapısı <b>{comp_asc_burc}</b> enerjisiyle şekillenir. "
+                              f"{comp_asc_burc} yükseleni, ilişkinizin ilk izlenimini ve genel atmosferini belirler. "
+                              f"İlişkiniz dışarıdan <b>{burc_yorumlari.get(comp_asc_burc, '')}</b> özellikleriyle tanınır."))
                         )
                 except Exception:
                     pass
@@ -7673,22 +8118,37 @@ class FBST_Engine:
                     else:
                         ort_g = (d1g + d2g) / 2
                     ort_g = ort_g % 360
-                    g_burc = burclar_tr[int(ort_g / 30)]
+                    g_burc = burclar[int(ort_g / 30)]
                     g_ev = ev_hesapla(ort_g, comp_asc) if comp_asc is not None else None
-                    ev_metni = f" <b>{g_ev}. Ev'de</b> ({ev_isimleri[g_ev - 1]})" if g_ev else ""
+                    ev_metni = f" <b>{g_ev}. {_ev_sonek}</b> ({ev_isimleri[g_ev - 1]})" if g_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Güneş: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
-                            f"Ebeveyn-çocuk birliğinin yaşam gücü <b>{g_burc}</b> burcunda atar. "
-                            f"{g_burc} enerjisi, ortak hedeflerinizi ve birlikte nasıl güçlü durduğunuzu belirler. "
-                            f"Bu bağın temel motivasyonu <b>{burc_yorumlari.get(g_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Sun: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
+                             f"The life force of the parent-child union beats in <b>{g_burc}</b>. "
+                             f"{g_burc} energy defines your shared goals and how you stand strong together. "
+                             f"The core motivation of this bond concentrates on <b>{burc_yorumlari.get(g_burc, '')}</b> themes."
+                             if _EN else
+                             (f"<b>Sol Compuesto: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
+                              f"La fuerza vital de la unión padre-hijo late en <b>{g_burc}</b>. "
+                              f"La energía de {g_burc} define sus objetivos compartidos y cómo se mantienen fuertes juntos. "
+                              f"La motivación central de este vínculo se concentra en los temas de <b>{burc_yorumlari.get(g_burc, '')}</b>."
+                              if _ES else
+                              f"<b>Composite Güneş: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
+                              f"Ebeveyn-çocuk birliğinin yaşam gücü <b>{g_burc}</b> burcunda atar. "
+                              f"{g_burc} enerjisi, ortak hedeflerinizi ve birlikte nasıl güçlü durduğunuzu belirler. "
+                              f"Bu bağın temel motivasyonu <b>{burc_yorumlari.get(g_burc, '')}</b> temalarında yoğunlaşır."))
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Güneş: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
-                            f"İlişkinizin kalbi ve yaşam gücü <b>{g_burc}</b> burcunda atar. "
-                            f"{g_burc} enerjisi, ortak hedeflerinizi ve birlikte nasıl parladığınızı belirler. "
-                            f"Birlikteliğinizin temel motivasyonu <b>{burc_yorumlari.get(g_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Sun: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
+                             f"The heart and life force of your relationship beats in <b>{g_burc}</b>. "
+                             f"{g_burc} energy defines your shared goals and how you shine together. "
+                             f"Your partnership's core motivation concentrates on <b>{burc_yorumlari.get(g_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Güneş: {g_burc}</b> ({ort_g:.1f}°){ev_metni}<br/>"
+                             f"İlişkinizin kalbi ve yaşam gücü <b>{g_burc}</b> burcunda atar. "
+                             f"{g_burc} enerjisi, ortak hedeflerinizi ve birlikte nasıl parladığınızı belirler. "
+                             f"Birlikteliğinizin temel motivasyonu <b>{burc_yorumlari.get(g_burc, '')}</b> temalarında yoğunlaşır.")
                         )
                 except Exception:
                     pass
@@ -7703,22 +8163,32 @@ class FBST_Engine:
                     else:
                         ort_a = (d1a + d2a) / 2
                     ort_a = ort_a % 360
-                    a_burc = burclar_tr[int(ort_a / 30)]
+                    a_burc = burclar[int(ort_a / 30)]
                     a_ev = ev_hesapla(ort_a, comp_asc) if comp_asc is not None else None
-                    ev_metni_a = f" <b>{a_ev}. Ev'de</b> ({ev_isimleri[a_ev - 1]})" if a_ev else ""
+                    ev_metni_a = f" <b>{a_ev}. {_ev_sonek}</b> ({ev_isimleri[a_ev - 1]})" if a_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Ay: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
-                            f"Ebeveyn-çocuk arasındaki duygusal bağ ve içsel paylaşım <b>{a_burc}</b> burcunda şekillenir. "
-                            f"Birlikte güvende hissettiğiniz anlar, {a_burc} enerjisiyle tanımlanır. "
-                            f"Ortak duygusal ihtiyaçlarınız <b>{burc_yorumlari.get(a_burc, '')}</b> ekseninde birleşir."
+                            (f"<b>Composite Moon: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
+                             f"The emotional bond and inner sharing between parent and child take shape in <b>{a_burc}</b>. "
+                             f"The moments when you feel safe together are defined by {a_burc} energy. "
+                             f"Your shared emotional needs unite around <b>{burc_yorumlari.get(a_burc, '')}</b>."
+                             if (_EN or _ES) else
+                             f"<b>Composite Ay: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
+                             f"Ebeveyn-çocuk arasındaki duygusal bağ ve içsel paylaşım <b>{a_burc}</b> burcunda şekillenir. "
+                             f"Birlikte güvende hissettiğiniz anlar, {a_burc} enerjisiyle tanımlanır. "
+                             f"Ortak duygusal ihtiyaçlarınız <b>{burc_yorumlari.get(a_burc, '')}</b> ekseninde birleşir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Ay: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
-                            f"Duygusal bağınız ve iç dünyasal paylaşımınız <b>{a_burc}</b> burcunda şekillenir. "
-                            f"Birlikte güvende hissettiğiniz anlar, {a_burc} enerjisiyle tanımlanır. "
-                            f"Ortak duygusal ihtiyaçlarınız <b>{burc_yorumlari.get(a_burc, '')}</b> ekseninde birleşir."
+                            (f"<b>Composite Moon: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
+                             f"Your emotional bond and inner sharing take shape in <b>{a_burc}</b>. "
+                             f"The moments when you feel safe together are defined by {a_burc} energy. "
+                             f"Your shared emotional needs unite around <b>{burc_yorumlari.get(a_burc, '')}</b>."
+                             if (_EN or _ES) else
+                             f"<b>Composite Ay: {a_burc}</b> ({ort_a:.1f}°){ev_metni_a}<br/>"
+                             f"Duygusal bağınız ve iç dünyasal paylaşımınız <b>{a_burc}</b> burcunda şekillenir. "
+                             f"Birlikte güvende hissettiğiniz anlar, {a_burc} enerjisiyle tanımlanır. "
+                             f"Ortak duygusal ihtiyaçlarınız <b>{burc_yorumlari.get(a_burc, '')}</b> ekseninde birleşir.")
                         )
                 except Exception:
                     pass
@@ -7733,22 +8203,32 @@ class FBST_Engine:
                     else:
                         ort_v = (d1v + d2v) / 2
                     ort_v = ort_v % 360
-                    v_burc = burclar_tr[int(ort_v / 30)]
+                    v_burc = burclar[int(ort_v / 30)]
                     v_ev = ev_hesapla(ort_v, comp_asc) if comp_asc is not None else None
-                    ev_metni_v = f" <b>{v_ev}. Ev'de</b> ({ev_isimleri[v_ev - 1]})" if v_ev else ""
+                    ev_metni_v = f" <b>{v_ev}. {_ev_sonek}</b> ({ev_isimleri[v_ev - 1]})" if v_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Venüs: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
-                            f"Ebeveyn-çocuk arasındaki sevgi dili ve duygusal bağlanma biçimi <b>{v_burc}</b> burcunda ifade bulur. "
-                            f"Birbirinize nasıl şefkat gösterdiğinizi ve hangi jestlerin bağınızı güçlendirdiğini bu burç belirler. "
-                            f"Ortak sevgi diliniz <b>{burc_yorumlari.get(v_burc, '')}</b> temalarıyla şekillenir."
+                            (f"<b>Composite Venus: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
+                             f"The love language and emotional attachment pattern between parent and child are expressed in <b>{v_burc}</b>. "
+                             f"This sign determines how you show affection to each other and which gestures strengthen your bond. "
+                             f"Your shared love language is shaped by <b>{burc_yorumlari.get(v_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Venüs: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
+                             f"Ebeveyn-çocuk arasındaki sevgi dili ve duygusal bağlanma biçimi <b>{v_burc}</b> burcunda ifade bulur. "
+                             f"Birbirinize nasıl şefkat gösterdiğinizi ve hangi jestlerin bağınızı güçlendirdiğini bu burç belirler. "
+                             f"Ortak sevgi diliniz <b>{burc_yorumlari.get(v_burc, '')}</b> temalarıyla şekillenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Venüs: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
-                            f"Aşk diliniz ve romantik çekim merkeziniz <b>{v_burc}</b> burcunda ifade bulur. "
-                            f"Birbirinize nasıl sevgi gösterdiğinizi ve hangi romantik jestlerin işe yaradığını bu burç belirler. "
-                            f"Ortak aşk diliniz <b>{burc_yorumlari.get(v_burc, '')}</b> temalarıyla şekillenir."
+                            (f"<b>Composite Venus: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
+                             f"Your love language and romantic center of attraction are expressed in <b>{v_burc}</b>. "
+                             f"This sign determines how you show love to each other and which romantic gestures work. "
+                             f"Your shared love language is shaped by <b>{burc_yorumlari.get(v_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Venüs: {v_burc}</b> ({ort_v:.1f}°){ev_metni_v}<br/>"
+                             f"Aşk diliniz ve romantik çekim merkeziniz <b>{v_burc}</b> burcunda ifade bulur. "
+                             f"Birbirinize nasıl sevgi gösterdiğinizi ve hangi romantik jestlerin işe yaradığını bu burç belirler. "
+                             f"Ortak aşk diliniz <b>{burc_yorumlari.get(v_burc, '')}</b> temalarıyla şekillenir.")
                         )
                 except Exception:
                     pass
@@ -7763,22 +8243,32 @@ class FBST_Engine:
                     else:
                         ort_m = (d1m + d2m) / 2
                     ort_m = ort_m % 360
-                    m_burc = burclar_tr[int(ort_m / 30)]
+                    m_burc = burclar[int(ort_m / 30)]
                     m_ev = ev_hesapla(ort_m, comp_asc) if comp_asc is not None else None
-                    ev_metni_m = f" <b>{m_ev}. Ev'de</b> ({ev_isimleri[m_ev - 1]})" if m_ev else ""
+                    ev_metni_m = f" <b>{m_ev}. {_ev_sonek}</b> ({ev_isimleri[m_ev - 1]})" if m_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Merkür: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
-                            f"Ebeveyn-çocuk arasındaki iletişim dili ve düşünce paylaşımı <b>{m_burc}</b> burcunda şekillenir. "
-                            f"Birlikte nasıl konuştuğunuz, birbirinize nasıl açıklama yaptığınız ve ortak zihinsel dünyanız bu burcun enerjisiyle belirlenir. "
-                            f"İletişim tarzınız <b>{burc_yorumlari.get(m_burc, '')}</b> temalarıyla biçimlenir."
+                            (f"<b>Composite Mercury: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
+                             f"The communication language and thought sharing between parent and child take shape in <b>{m_burc}</b>. "
+                             f"How you talk together, how you explain things to each other and your shared mental world are defined by this sign's energy. "
+                             f"Your communication style is formed by <b>{burc_yorumlari.get(m_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Merkür: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
+                             f"Ebeveyn-çocuk arasındaki iletişim dili ve düşünce paylaşımı <b>{m_burc}</b> burcunda şekillenir. "
+                             f"Birlikte nasıl konuştuğunuz, birbirinize nasıl açıklama yaptığınız ve ortak zihinsel dünyanız bu burcun enerjisiyle belirlenir. "
+                             f"İletişim tarzınız <b>{burc_yorumlari.get(m_burc, '')}</b> temalarıyla biçimlenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Merkür: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
-                            f"İlişkinizin iletişim dili ve düşünce paylaşımı <b>{m_burc}</b> burcunda şekillenir. "
-                            f"Birlikte nasıl konuştuğunuz, fikir alışverişleriniz ve ortak zihinsel dünyanız bu burcun enerjisiyle belirlenir. "
-                            f"İletişim tarzınız <b>{burc_yorumlari.get(m_burc, '')}</b> temalarıyla biçimlenir."
+                            (f"<b>Composite Mercury: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
+                             f"Your relationship's communication language and thought sharing take shape in <b>{m_burc}</b>. "
+                             f"How you talk together, your exchange of ideas and your shared mental world are defined by this sign's energy. "
+                             f"Your communication style is formed by <b>{burc_yorumlari.get(m_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Merkür: {m_burc}</b> ({ort_m:.1f}°){ev_metni_m}<br/>"
+                             f"İlişkinizin iletişim dili ve düşünce paylaşımı <b>{m_burc}</b> burcunda şekillenir. "
+                             f"Birlikte nasıl konuştuğunuz, fikir alışverişleriniz ve ortak zihinsel dünyanız bu burcun enerjisiyle belirlenir. "
+                             f"İletişim tarzınız <b>{burc_yorumlari.get(m_burc, '')}</b> temalarıyla biçimlenir.")
                         )
                 except Exception:
                     pass
@@ -7793,22 +8283,32 @@ class FBST_Engine:
                     else:
                         ort_ma = (d1ma + d2ma) / 2
                     ort_ma = ort_ma % 360
-                    ma_burc = burclar_tr[int(ort_ma / 30)]
+                    ma_burc = burclar[int(ort_ma / 30)]
                     ma_ev = ev_hesapla(ort_ma, comp_asc) if comp_asc is not None else None
-                    ev_metni_ma = f" <b>{ma_ev}. Ev'de</b> ({ev_isimleri[ma_ev - 1]})" if ma_ev else ""
+                    ev_metni_ma = f" <b>{ma_ev}. {_ev_sonek}</b> ({ev_isimleri[ma_ev - 1]})" if ma_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
-                            f"Ebeveyn-çocuk arasındaki enerji alışverişi, rekabet duygusu ve ortak eylem tarzı <b>{ma_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte nasıl harekete geçtiğiniz, tartışmalarınızda nasıl bir tavır sergilediğiniz ve ortak cesaretiniz bu burcun enerjisiyle şekillenir. "
-                            f"Enerji alışverişiniz <b>{burc_yorumlari.get(ma_burc, '')}</b> temalarıyla belirlenir."
+                            (f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
+                             f"The exchange of energy, sense of competition and shared style of action between parent and child are expressed in <b>{ma_burc}</b>. "
+                             f"How you act together, the stance you take in arguments and your shared courage are shaped by this sign's energy. "
+                             f"Your exchange of energy is determined by <b>{burc_yorumlari.get(ma_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
+                             f"Ebeveyn-çocuk arasındaki enerji alışverişi, rekabet duygusu ve ortak eylem tarzı <b>{ma_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte nasıl harekete geçtiğiniz, tartışmalarınızda nasıl bir tavır sergilediğiniz ve ortak cesaretiniz bu burcun enerjisiyle şekillenir. "
+                             f"Enerji alışverişiniz <b>{burc_yorumlari.get(ma_burc, '')}</b> temalarıyla belirlenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
-                            f"İlişkinizin enerji kaynağı, tutku dengesi ve eylem tarzı <b>{ma_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte nasıl harekete geçtiğiniz, tartışmalarınızda nasıl bir tavır sergilediğiniz ve ortak cesaretiniz bu burcun enerjisiyle şekillenir. "
-                            f"Enerji alışverişiniz <b>{burc_yorumlari.get(ma_burc, '')}</b> temalarıyla belirlenir."
+                            (f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
+                             f"Your relationship's energy source, passion balance and style of action are expressed in <b>{ma_burc}</b>. "
+                             f"How you act together, the stance you take in arguments and your shared courage are shaped by this sign's energy. "
+                             f"Your exchange of energy is determined by <b>{burc_yorumlari.get(ma_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Mars: {ma_burc}</b> ({ort_ma:.1f}°){ev_metni_ma}<br/>"
+                             f"İlişkinizin enerji kaynağı, tutku dengesi ve eylem tarzı <b>{ma_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte nasıl harekete geçtiğiniz, tartışmalarınızda nasıl bir tavır sergilediğiniz ve ortak cesaretiniz bu burcun enerjisiyle şekillenir. "
+                             f"Enerji alışverişiniz <b>{burc_yorumlari.get(ma_burc, '')}</b> temalarıyla belirlenir.")
                         )
                 except Exception:
                     pass
@@ -7823,22 +8323,32 @@ class FBST_Engine:
                     else:
                         ort_j = (d1j + d2j) / 2
                     ort_j = ort_j % 360
-                    j_burc = burclar_tr[int(ort_j / 30)]
+                    j_burc = burclar[int(ort_j / 30)]
                     j_ev = ev_hesapla(ort_j, comp_asc) if comp_asc is not None else None
-                    ev_metni_j = f" <b>{j_ev}. Ev'de</b> ({ev_isimleri[j_ev - 1]})" if j_ev else ""
+                    ev_metni_j = f" <b>{j_ev}. {_ev_sonek}</b> ({ev_isimleri[j_ev - 1]})" if j_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Jüpiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
-                            f"Ebeveyn-çocuk arasındaki bolluk, genişleme ve ortak inanç sistemi <b>{j_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok nerede büyüdüğünüz, hangi konularda şanslı olduğunuz ve ortak felsefi bakış açınız bu burcun enerjisiyle belirlenir. "
-                            f"Bolluk ve genişleme kaynaklarınız <b>{burc_yorumlari.get(j_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Jupiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
+                             f"The abundance, expansion and shared belief system between parent and child take shape in <b>{j_burc}</b>. "
+                             f"Where you grow the most together, in which matters you are fortunate and your shared philosophical view are defined by this sign's energy. "
+                             f"Your sources of abundance and expansion are nourished by <b>{burc_yorumlari.get(j_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Jüpiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
+                             f"Ebeveyn-çocuk arasındaki bolluk, genişleme ve ortak inanç sistemi <b>{j_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok nerede büyüdüğünüz, hangi konularda şanslı olduğunuz ve ortak felsefi bakış açınız bu burcun enerjisiyle belirlenir. "
+                             f"Bolluk ve genişleme kaynaklarınız <b>{burc_yorumlari.get(j_burc, '')}</b> temalarıyla beslenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Jüpiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
-                            f"İlişkinizin bolluk kaynağı, şanslı alanları ve ortak genişleme yönleriniz <b>{j_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok nerede büyüdüğünüz, hangi konularda talihli olduğunuz ve ortak felsefi bakış açınız bu burcun enerjisiyle belirlenir. "
-                            f"Bolluk ve genişleme kaynaklarınız <b>{burc_yorumlari.get(j_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Jupiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
+                             f"Your relationship's source of abundance, lucky areas and shared expansion directions take shape in <b>{j_burc}</b>. "
+                             f"Where you grow the most together, in which matters you are fortunate and your shared philosophical view are defined by this sign's energy. "
+                             f"Your sources of abundance and expansion are nourished by <b>{burc_yorumlari.get(j_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Jüpiter: {j_burc}</b> ({ort_j:.1f}°){ev_metni_j}<br/>"
+                             f"İlişkinizin bolluk kaynağı, şanslı alanları ve ortak genişleme yönleriniz <b>{j_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok nerede büyüdüğünüz, hangi konularda talihli olduğunuz ve ortak felsefi bakış açınız bu burcun enerjisiyle belirlenir. "
+                             f"Bolluk ve genişleme kaynaklarınız <b>{burc_yorumlari.get(j_burc, '')}</b> temalarıyla beslenir.")
                         )
                 except Exception:
                     pass
@@ -7853,22 +8363,32 @@ class FBST_Engine:
                     else:
                         ort_s = (d1s + d2s) / 2
                     ort_s = ort_s % 360
-                    s_burc = burclar_tr[int(ort_s / 30)]
+                    s_burc = burclar[int(ort_s / 30)]
                     s_ev = ev_hesapla(ort_s, comp_asc) if comp_asc is not None else None
-                    ev_metni_s = f" <b>{s_ev}. Ev'de</b> ({ev_isimleri[s_ev - 1]})" if s_ev else ""
+                    ev_metni_s = f" <b>{s_ev}. {_ev_sonek}</b> ({ev_isimleri[s_ev - 1]})" if s_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Satürn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
-                            f"Ebeveyn-çocuk arasındaki yapı, sorumluluk ve uzun vadeli öğreti <b>{s_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok hangi konularda disiplin geliştirdiğiniz, hangi sınavlarla yüzleştiğiniz ve kalıcı yapıları nasıl inşa ettiğiniz bu burcun enerjisiyle belirlenir. "
-                            f"Ortak olgunlaşma alanlarınız <b>{burc_yorumlari.get(s_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Saturn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
+                             f"The structure, responsibility and long-term teaching between parent and child take shape in <b>{s_burc}</b>. "
+                             f"Where you develop discipline together, which tests you face and how you build lasting structures are defined by this sign's energy. "
+                             f"Your shared areas of maturation concentrate on <b>{burc_yorumlari.get(s_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Satürn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
+                             f"Ebeveyn-çocuk arasındaki yapı, sorumluluk ve uzun vadeli öğreti <b>{s_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok hangi konularda disiplin geliştirdiğiniz, hangi sınavlarla yüzleştiğiniz ve kalıcı yapıları nasıl inşa ettiğiniz bu burcun enerjisiyle belirlenir. "
+                             f"Ortak olgunlaşma alanlarınız <b>{burc_yorumlari.get(s_burc, '')}</b> temalarında yoğunlaşır.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Satürn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
-                            f"İlişkinizin yapı taşı, sınav alanı ve uzun vadeli sorumluluklarınız <b>{s_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok hangi konularda disiplin geliştirdiğiniz, hangi sınavlarla yüzleştiğiniz ve kalıcı yapıları nasıl inşa ettiğiniz bu burcun enerjisiyle belirlenir. "
-                            f"Ortak olgunlaşma alanlarınız <b>{burc_yorumlari.get(s_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Saturn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
+                             f"Your relationship's building block, exam area and long-term responsibilities take shape in <b>{s_burc}</b>. "
+                             f"Where you develop discipline together, which tests you face and how you build lasting structures are defined by this sign's energy. "
+                             f"Your shared areas of maturation concentrate on <b>{burc_yorumlari.get(s_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Satürn: {s_burc}</b> ({ort_s:.1f}°){ev_metni_s}<br/>"
+                             f"İlişkinizin yapı taşı, sınav alanı ve uzun vadeli sorumluluklarınız <b>{s_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok hangi konularda disiplin geliştirdiğiniz, hangi sınavlarla yüzleştiğiniz ve kalıcı yapıları nasıl inşa ettiğiniz bu burcun enerjisiyle belirlenir. "
+                             f"Ortak olgunlaşma alanlarınız <b>{burc_yorumlari.get(s_burc, '')}</b> temalarında yoğunlaşır.")
                         )
                 except Exception:
                     pass
@@ -7883,22 +8403,32 @@ class FBST_Engine:
                     else:
                         ort_u = (d1u + d2u) / 2
                     ort_u = ort_u % 360
-                    u_burc = burclar_tr[int(ort_u / 30)]
+                    u_burc = burclar[int(ort_u / 30)]
                     u_ev = ev_hesapla(ort_u, comp_asc) if comp_asc is not None else None
-                    ev_metni_u = f" <b>{u_ev}. Ev'de</b> ({ev_isimleri[u_ev - 1]})" if u_ev else ""
+                    ev_metni_u = f" <b>{u_ev}. {_ev_sonek}</b> ({ev_isimleri[u_ev - 1]})" if u_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Uranüs: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
-                            f"Ebeveyn-çocuk arasındaki özgürlük, yenilik ve ani değişim enerjisi <b>{u_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte en çok nerede özgürleştiğiniz, hangi beklenmedik dönüşümlerle karşılaştığınız ve bağımsızlık dengeniz bu burcun enerjisiyle şekillenir. "
-                            f"Özgürlük ve yenilik kaynaklarınız <b>{burc_yorumlari.get(u_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Uranus: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
+                             f"The freedom, innovation and sudden change energy between parent and child are expressed in <b>{u_burc}</b>. "
+                             f"Where you free yourselves the most, which unexpected transformations you encounter and your independence balance are shaped by this sign's energy. "
+                             f"Your sources of freedom and innovation are nourished by <b>{burc_yorumlari.get(u_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Uranüs: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
+                             f"Ebeveyn-çocuk arasındaki özgürlük, yenilik ve ani değişim enerjisi <b>{u_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte en çok nerede özgürleştiğiniz, hangi beklenmedik dönüşümlerle karşılaştığınız ve bağımsızlık dengeniz bu burcun enerjisiyle şekillenir. "
+                             f"Özgürlük ve yenilik kaynaklarınız <b>{burc_yorumlari.get(u_burc, '')}</b> temalarıyla beslenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Uranüs: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
-                            f"İlişkinin özgürlük alanı, beklenmedik değişimleri ve yenilikçi ruhu <b>{u_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte en çok nerede özgürleştiğiniz, hangi ani dönüşümlerle karşılaştığınız ve bağımsızlık dengeniz bu burcun enerjisiyle şekillenir. "
-                            f"Özgürlük ve yenilik kaynaklarınız <b>{burc_yorumlari.get(u_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Uranus: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
+                             f"The relationship's freedom area, unexpected changes and innovative spirit are expressed in <b>{u_burc}</b>. "
+                             f"Where you free yourselves the most, which abrupt transformations you encounter and your independence balance are shaped by this sign's energy. "
+                             f"Your sources of freedom and innovation are nourished by <b>{burc_yorumlari.get(u_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Uranüs: {u_burc}</b> ({ort_u:.1f}°){ev_metni_u}<br/>"
+                             f"İlişkinin özgürlük alanı, beklenmedik değişimleri ve yenilikçi ruhu <b>{u_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte en çok nerede özgürleştiğiniz, hangi ani dönüşümlerle karşılaştığınız ve bağımsızlık dengeniz bu burcun enerjisiyle şekillenir. "
+                             f"Özgürlük ve yenilik kaynaklarınız <b>{burc_yorumlari.get(u_burc, '')}</b> temalarıyla beslenir.")
                         )
                 except Exception:
                     pass
@@ -7913,22 +8443,32 @@ class FBST_Engine:
                     else:
                         ort_n = (d1n + d2n) / 2
                     ort_n = ort_n % 360
-                    n_burc = burclar_tr[int(ort_n / 30)]
+                    n_burc = burclar[int(ort_n / 30)]
                     n_ev = ev_hesapla(ort_n, comp_asc) if comp_asc is not None else None
-                    ev_metni_n = f" <b>{n_ev}. Ev'de</b> ({ev_isimleri[n_ev - 1]})" if n_ev else ""
+                    ev_metni_n = f" <b>{n_ev}. {_ev_sonek}</b> ({ev_isimleri[n_ev - 1]})" if n_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Neptün: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
-                            f"Ebeveyn-çocuk arasındaki manevi bağ, rüya dünyası ve koşulsuz fedakarlık enerjisi <b>{n_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok nerede manevi derinlik yaşadığınız, hangi konularda hayal kırıklığına uğradığınız ve ruhsal paylaşımınız bu burcun enerjisiyle belirlenir. "
-                            f"Manevi ve ruhsal paylaşımınız <b>{burc_yorumlari.get(n_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Neptune: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
+                             f"The spiritual bond, dream world and unconditional sacrifice energy between parent and child take shape in <b>{n_burc}</b>. "
+                             f"Where you experience spiritual depth the most, in which matters you face disappointment and your soulful sharing are defined by this sign's energy. "
+                             f"Your spiritual and soulful sharing is nourished by <b>{burc_yorumlari.get(n_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Neptün: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
+                             f"Ebeveyn-çocuk arasındaki manevi bağ, rüya dünyası ve koşulsuz fedakarlık enerjisi <b>{n_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok nerede manevi derinlik yaşadığınız, hangi konularda hayal kırıklığına uğradığınız ve ruhsal paylaşımınız bu burcun enerjisiyle belirlenir. "
+                             f"Manevi ve ruhsal paylaşımınız <b>{burc_yorumlari.get(n_burc, '')}</b> temalarıyla beslenir.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Neptün: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
-                            f"İlişkinin ruhsal boyutu, hayal gücü ve koşulsuz sevgi enerjisi <b>{n_burc}</b> burcunda şekillenir. "
-                            f"Birlikte en çok nerede manevi derinlik yaşadığınız, hangi konularda hayal kırıklığına uğradığınız ve ruhsal paylaşımınız bu burcun enerjisiyle belirlenir. "
-                            f"Manevi ve ruhsal paylaşımınız <b>{burc_yorumlari.get(n_burc, '')}</b> temalarıyla beslenir."
+                            (f"<b>Composite Neptune: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
+                             f"The spiritual dimension, imagination and unconditional love energy of your relationship take shape in <b>{n_burc}</b>. "
+                             f"Where you experience spiritual depth the most, in which matters you face disillusionment and your soulful sharing are defined by this sign's energy. "
+                             f"Your spiritual and soulful sharing is nourished by <b>{burc_yorumlari.get(n_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Neptün: {n_burc}</b> ({ort_n:.1f}°){ev_metni_n}<br/>"
+                             f"İlişkinin ruhsal boyutu, hayal gücü ve koşulsuz sevgi enerjisi <b>{n_burc}</b> burcunda şekillenir. "
+                             f"Birlikte en çok nerede manevi derinlik yaşadığınız, hangi konularda hayal kırıklığına uğradığınız ve ruhsal paylaşımınız bu burcun enerjisiyle belirlenir. "
+                             f"Manevi ve ruhsal paylaşımınız <b>{burc_yorumlari.get(n_burc, '')}</b> temalarıyla beslenir.")
                         )
                 except Exception:
                     pass
@@ -7943,22 +8483,32 @@ class FBST_Engine:
                     else:
                         ort_p = (d1p + d2p) / 2
                     ort_p = ort_p % 360
-                    p_burc = burclar_tr[int(ort_p / 30)]
+                    p_burc = burclar[int(ort_p / 30)]
                     p_ev = ev_hesapla(ort_p, comp_asc) if comp_asc is not None else None
-                    ev_metni_p = f" <b>{p_ev}. Ev'de</b> ({ev_isimleri[p_ev - 1]})" if p_ev else ""
+                    ev_metni_p = f" <b>{p_ev}. {_ev_sonek}</b> ({ev_isimleri[p_ev - 1]})" if p_ev else ""
                     if self.mod == "ebeveyn_cocuk":
                         comp_yorum_parts.append(
-                            f"<b>Composite Plüton: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
-                            f"Ebeveyn-çocuk arasındaki derin dönüşüm, güç mücadelesi ve köklü değişim enerjisi <b>{p_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte en çok hangi konularda köklü dönüşümlerden geçtiğiniz, güç dengeleriniz ve ruhsal yeniden doğuşlarınız bu burcun enerjisiyle belirlenir. "
-                            f"Dönüşüm ve yeniden doğuş alanlarınız <b>{burc_yorumlari.get(p_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Pluto: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
+                             f"The deep transformation, power struggle and radical change energy between parent and child are expressed in <b>{p_burc}</b>. "
+                             f"The radical transformations you undergo together, your power balances and your spiritual rebirths are defined by this sign's energy. "
+                             f"Your areas of transformation and rebirth concentrate on <b>{burc_yorumlari.get(p_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Plüton: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
+                             f"Ebeveyn-çocuk arasındaki derin dönüşüm, güç mücadelesi ve köklü değişim enerjisi <b>{p_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte en çok hangi konularda köklü dönüşümlerden geçtiğiniz, güç dengeleriniz ve ruhsal yeniden doğuşlarınız bu burcun enerjisiyle belirlenir. "
+                             f"Dönüşüm ve yeniden doğuş alanlarınız <b>{burc_yorumlari.get(p_burc, '')}</b> temalarında yoğunlaşır.")
                         )
                     else:
                         comp_yorum_parts.append(
-                            f"<b>Composite Plüton: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
-                            f"İlişkinin en derin dönüşüm alanı, güç dinamikleri ve köklü yeniden yapılanma enerjisi <b>{p_burc}</b> burcunda ifade bulur. "
-                            f"Birlikte en çok hangi konularda köklü dönüşümlerden geçtiğiniz, güç dengeleriniz ve ruhsal yeniden doğuşlarınız bu burcun enerjisiyle belirlenir. "
-                            f"Dönüşüm ve yeniden doğuş alanlarınız <b>{burc_yorumlari.get(p_burc, '')}</b> temalarında yoğunlaşır."
+                            (f"<b>Composite Pluto: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
+                             f"The deepest transformative area, power dynamics and radical restructuring energy of your relationship are expressed in <b>{p_burc}</b>. "
+                             f"The radical transformations you undergo together, your power balances and your spiritual rebirths are defined by this sign's energy. "
+                             f"Your areas of transformation and rebirth concentrate on <b>{burc_yorumlari.get(p_burc, '')}</b> themes."
+                             if (_EN or _ES) else
+                             f"<b>Composite Plüton: {p_burc}</b> ({ort_p:.1f}°){ev_metni_p}<br/>"
+                             f"İlişkinin en derin dönüşüm alanı, güç dinamikleri ve köklü yeniden yapılanma enerjisi <b>{p_burc}</b> burcunda ifade bulur. "
+                             f"Birlikte en çok hangi konularda köklü dönüşümlerden geçtiğiniz, güç dengeleriniz ve ruhsal yeniden doğuşlarınız bu burcun enerjisiyle belirlenir. "
+                             f"Dönüşüm ve yeniden doğuş alanlarınız <b>{burc_yorumlari.get(p_burc, '')}</b> temalarında yoğunlaşır.")
                         )
                 except Exception:
                     pass
@@ -7970,37 +8520,37 @@ class FBST_Engine:
             except Exception:
                 pass
         except Exception:
-            story.append(Paragraph("<i>Composite harita PDF'e eklenemedi.</i>", styles['TurkishNormal']))
+            story.append(Paragraph(("<i>The composite map could not be added to the PDF.</i>" if _EN else "<i>Composite harita PDF'e eklenemedi.</i>"), styles['TurkishNormal']))
 
         # ⚡ AÇI GRIDİ (PDF)
         story.append(Spacer(1, 15))
         grid_blok = []
-        baslik_karti_ekle("GEZEGEN AÇILARI HARİTASI", 
-                          alt_baslik="İki harita arasındaki tüm açısal bağlantıları gösteren harita", 
+        baslik_karti_ekle(("PLANETARY ASPECT MAP" if _EN else "GEZEGEN AÇILARI HARİTASI"), 
+                          alt_baslik=("A map showing all angular connections between the two charts" if _EN else "İki harita arasındaki tüm açısal bağlantıları gösteren harita"), 
                           emoji="⚡",
                           hedef=grid_blok)
         grid_blok.append(Spacer(1, 10))
         try:
             grid_dosya = self.ciz_aci_gridi(dosya_adi="FBST_Aci_Gridi_PDF.png")
-            cerceveli_gorsel_ekle(grid_dosya, 400, 400, "Açı Mühürü Gridi", hedef=grid_blok)
+            cerceveli_gorsel_ekle(grid_dosya, 400, 400, ("Aspect Seal Grid" if _EN else ("Cuadrícula de Sellos de Aspectos" if _ES else "Açı Mühürü Gridi")), hedef=grid_blok)
             story.append(KeepTogether(grid_blok))
         except Exception:
-            story.append(Paragraph("<i>Açı gridi PDF'e eklenemedi.</i>", styles['TurkishNormal']))
+            story.append(Paragraph(("<i>The aspect grid could not be added to the PDF.</i>" if _EN else ("<i>La cuadrícula de aspectos no pudo agregarse al PDF.</i>" if _ES else "<i>Açı gridi PDF'e eklenemedi.</i>")), styles['TurkishNormal']))
 
         # 🎯 4. BÖLÜM: REÇETELER VE EV AKTARIMLARI
         story.append(PageBreak())
         baslik_karti_ekle("EV ANALİZİ VE ÖNERİLER", emoji="🎯")
 
         rapor_A_pdf, rapor_B_pdf = self.karmik_ev_aktarimlari(pdf_icin=True)
-        story.append(Paragraph((pdf_label("Ev Aktarımları") if _core_get_lang() == "en" else f"Ev Aktarımları") + f" ({self.p1_isim.upper()})", styles['TurkishHeading']))
+        story.append(Paragraph((pdf_label("Ev Aktarımları") if _core_get_lang() != "tr" else f"Ev Aktarımları") + f" ({self.p1_isim.upper()})", styles['TurkishHeading']))
         if rapor_A_pdf:
             for satir in rapor_A_pdf: story.append(Paragraph(satir, styles['TurkishNormal']))
-        else: story.append(Paragraph("Ağır bir karmik ev mühürlenmesi bulunamadı.", styles['TurkishNormal']))
+        else: story.append(Paragraph(("No heavy karmic house seal was found." if _EN else ("No se encontró un sello kármico pesado de casa." if _ES else "Ağır bir karmik ev mühürlenmesi bulunamadı.")), styles['TurkishNormal']))
         
-        story.append(Paragraph(f"<b>{pdf_label('Ev Aktarımları') if _core_get_lang() == 'en' else 'Ev Aktarımları'} ({self.p2_isim.upper()})</b>", styles['TurkishHeading']))
+        story.append(Paragraph(f"<b>{pdf_label('Ev Aktarımları') if _core_get_lang() != 'tr' else 'Ev Aktarımları'} ({self.p2_isim.upper()})</b>", styles['TurkishHeading']))
         if rapor_B_pdf:
             for satir in rapor_B_pdf: story.append(Paragraph(satir, styles['TurkishNormal']))
-        else: story.append(Paragraph("Ağır bir karmik ev mühürlenmesi bulunamadı.", styles['TurkishNormal']))
+        else: story.append(Paragraph(("No heavy karmic house seal was found." if _EN else ("No se encontró un sello kármico pesado de casa." if _ES else "Ağır bir karmik ev mühürlenmesi bulunamadı.")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
@@ -8036,9 +8586,15 @@ class FBST_Engine:
         story.append(Spacer(1, 15))
         story.append(Paragraph(pdf_label("ÖNEMLİ DÖNEMLER"), styles['TurkishHeading']))
         story.append(Paragraph(
-            f"Aşağıdaki tarihler, {self.p1_isim} ve {self.p2_isim} arasındaki ilişkinin en yoğun hissedileceği, "
-            "küçük olayların büyük farkındalıklara yol açabileceği dönemlerdir. "
-            "Her bir durak, ilişkinizin o aşamadaki önemli dersini ve fırsatını taşır.", styles['TurkishNormal']))
+            (f"The dates below mark the periods when the bond between {self.p1_isim} and {self.p2_isim} will be felt most intensely, "
+             "when small events can lead to great realizations. Each milestone carries the relationship's key lesson and opportunity at that stage."
+             if _EN else
+             (f"Las fechas siguientes marcan los períodos en que el vínculo entre {self.p1_isim} y {self.p2_isim} se sentirá con mayor intensidad, "
+              "cuando pequeños acontecimientos pueden conducir a grandes realizaciones. Cada hito contiene la lección y la oportunidad clave de la relación en esa etapa."
+              if _ES else
+              f"Aşağıdaki tarihler, {self.p1_isim} ve {self.p2_isim} arasındaki ilişkinin en yoğun hissedileceği, "
+              "küçük olayların büyük farkındalıklara yol açabileceği dönemlerdir. "
+              "Her bir durak, ilişkinizin o aşamadaki önemli dersini ve fırsatını taşır.")), styles['TurkishNormal']))
         story.append(Spacer(1, 8))
         story.append(luks_cizgi_ekle(renk="#7b2ff7", kalinlik=1.0))
         story.append(Spacer(1, 8))
@@ -8055,7 +8611,7 @@ class FBST_Engine:
         # 🔮 6. BÖLÜM: İLİŞKİ ÖNGÖRÜSÜ
         story.append(PageBreak())
         story.append(Paragraph("🔮 " + pdf_label("İLİŞKİ ÖNGÖRÜSÜ"), styles['CoverTitle']))
-        story.append(Paragraph("Bu bölüm ilişkinizin sırasıyla Yıllık, Aylık ve Günlük kadersel akışlarını gösterir.", styles['CoverSub']))
+        story.append(Paragraph(("This section shows your relationship's yearly, monthly and daily karmic flows." if _EN else ("Esta sección muestra los flujos kármicos anual, mensual y diario de su relación." if _ES else "Bu bölüm ilişkinizin sırasıyla Yıllık, Aylık ve Günlük kadersel akışlarını gösterir.")), styles['CoverSub']))
         story.append(Spacer(1, 30))
 
         baslik_karti_ekle("YILLIK ÖNGÖRÜ", alt_baslik="Güneş'in her yıl aynı tarihte burcunuza dönüş anının analizi", emoji="☀️")
@@ -8109,16 +8665,24 @@ class FBST_Engine:
 
         # --- SECONDARY PROGRESSION (İlişki Odaklı) ---
         if self.mod == "es_sevgili":
-            baslik_karti_ekle("İLERLETİLMİŞ HARİTA ANALİZİ",
-                              alt_baslik="1 gün = 1 yıl yöntemiyle ilişkinizin uzun vadeli gelişimi",
+            baslik_karti_ekle(("PROGRESSED CHART ANALYSIS" if _EN else "İLERLETİLMİŞ HARİTA ANALİZİ"),
+                              alt_baslik=("The long-term evolution of your relationship via the 1 day = 1 year method" if _EN else "1 gün = 1 yıl yöntemiyle ilişkinizin uzun vadeli gelişimi"),
                               emoji="🔮")
             story.append(Spacer(1, 10))
             story.append(Paragraph(
-                "Secondary Progression, doğum haritanızın 1 gün = 1 yıl ilerlemesiyle "
-                "ilişkinizin duygusal evrimini gösterir. İlerletilmiş gezegenlerinizin "
-                "doğum haritanızdaki gezegenlerle yaptığı açılar, ilişkinizdeki uzun vadeli "
-                "temaları ve dönüşüm süreçlerini ortaya koyar. Özellikle ilerletilmiş Ay'ın "
-                "açıları, ilişkinizin duygusal ritmini belirleyen en önemli göstergelerdir.",
+                ("Secondary Progression shows the emotional evolution of your relationship through the advancement of your natal chart by 1 day = 1 year. "
+                 "The aspects your progressed planets make to the planets of your natal chart reveal long-term themes and transformation processes in your relationship. "
+                 "The aspects of the progressed Moon in particular are the most important indicators that set your relationship's emotional rhythm."
+                 if _EN else
+                 ("La Progresión Secundaria muestra la evolución emocional de su relación mediante el avance de su carta natal por 1 día = 1 año. "
+                  "Los aspectos que sus planetas progresados hacen con los planetas de su carta natal revelan temas a largo plazo y procesos de transformación en su relación. "
+                  "Los aspectos de la Luna progresada, en particular, son los indicadores más importantes que establecen el ritmo emocional de su relación."
+                  if _ES else
+                  "Secondary Progression, doğum haritanızın 1 gün = 1 yıl ilerlemesiyle "
+                  "ilişkinizin duygusal evrimini gösterir. İlerletilmiş gezegenlerinizin "
+                  "doğum haritanızdaki gezegenlerle yaptığı açılar, ilişkinizdeki uzun vadeli "
+                  "temaları ve dönüşüm süreçlerini ortaya koyar. Özellikle ilerletilmiş Ay'ın "
+                  "açıları, ilişkinizin duygusal ritmini belirleyen en önemli göstergelerdir.")),
                 styles['TurkishNormal']))
             story.append(Spacer(1, 10))
 
@@ -8130,7 +8694,7 @@ class FBST_Engine:
                         story.append(luks_cizgi_ekle(renk="#7b2ff7", kalinlik=1.0))
                         story.append(Spacer(1, 8))
                         story.append(Paragraph(
-                            f"<b><font color='#7b2ff7' size='11'>İLİŞKİ UYUMU</font></b>",
+                            f"<b><font color='#7b2ff7' size='11'>{'RELATIONSHIP HARMONY' if _EN else ('ARMONÍA DE LA RELACIÓN' if _ES else 'İLİŞKİ UYUMU')}</font></b>",
                             styles['TurkishNormal']))
                         story.append(Paragraph(yorum["genel_yorum"], styles['TurkishNormal']))
                         story.append(Spacer(1, 10))
@@ -8138,10 +8702,10 @@ class FBST_Engine:
                         # Kişi bazlı yorum
                         story.append(Spacer(1, 10))
                         story.append(Paragraph(
-                            f"<b><font color='#1A1A2E' size='12'>[ {yorum['kisi']} ] — {yorum['ilerleme_yili']} Yıl İlerleme</font></b>",
+                            f"<b><font color='#1A1A2E' size='12'>[ {yorum['kisi']} ] — {yorum['ilerleme_yili']} {'Years Progress' if _EN else ('Años de Progresión' if _ES else 'Yıl İlerleme')}</font></b>",
                             styles['TurkishNormal']))
                         story.append(Paragraph(
-                            f"İlerletilmiş Ay: <b>{yorum['ay_burcu']}</b> | İlerletilmiş Güneş: <b>{yorum['gunes_burcu']}</b>",
+                            f"{'Progressed Moon:' if _EN else ('Luna Progresada:' if _ES else 'İlerletilmiş Ay:')} <b>{pdf_label(yorum['ay_burcu'])}</b> | {'Progressed Sun:' if _EN else ('Sol Progresado:' if _ES else 'İlerletilmiş Güneş:')} <b>{pdf_label(yorum['gunes_burcu'])}</b>",
                             styles['TurkishNormal']))
                         story.append(Spacer(1, 6))
                         story.append(Paragraph(yorum["genel_yorum"], styles['TurkishNormal']))
@@ -8169,22 +8733,22 @@ class FBST_Engine:
                             story.append(Spacer(1, 4))
 
                         story.append(Paragraph(
-                            f"<i>Toplam {yorum['toplam_aci']} ilerletilmiş açı tespit edildi.</i>",
+                            f"<i>{'A total of' if _EN else ('Se detectaron' if _ES else 'Toplam')} {yorum['toplam_aci']} {'progressed aspects detected.' if _EN else ('ángulos progresados en total.' if _ES else 'ilerletilmiş açı tespit edildi.')}</i>",
                             styles['TurkishNormal']))
             else:
-                story.append(Paragraph("Secondary Progression analizi hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Secondary Progression analysis could not be calculated." if _EN else "Secondary Progression analizi hesaplanamadı."), styles['TurkishNormal']))
 
             story.append(Spacer(1, 15))
             story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
             story.append(Spacer(1, 15))
 
-        baslik_karti_ekle("6 AYLIK GÜNLÜK AKIŞ", alt_baslik="Günlük gezegen hareketlerinin etkileri", emoji="⛅")
+        baslik_karti_ekle("6 AYLIK GÜNLÜK AKIŞ", alt_baslik=("Effects of daily planetary movements" if _EN else "Günlük gezegen hareketlerinin etkileri"), emoji="⛅")
         
         gunluk_alarmlar = self.gunluk_bsp_taramasi(gun_sayisi=180, pdf_icin=True)
         
         if gunluk_alarmlar:
             for alarm in gunluk_alarmlar:
-                tarih_metni = f"<b>Tarih: {alarm['tarih']}</b><br/>"
+                tarih_metni = f"<b>{'Date:' if _EN else 'Tarih:'} {alarm['tarih']}</b><br/>"
                 for msg in alarm['mesajlar']:
                     tarih_metni += f"- {msg}<br/>"
                 
@@ -8201,7 +8765,7 @@ class FBST_Engine:
                 story.append(progress_table)
                 story.append(Spacer(1, 8))
         else:
-            story.append(Paragraph("Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız.", styles['TurkishNormal']))
+            story.append(Paragraph(("No minor trigger is expected in the next 6 months. You are in a stable flow." if _EN else "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."), styles['TurkishNormal']))
 
         # 🌟 7. BÖLÜM: KADERSEL YILDIZ MÜHÜRLERİ 🌟
         story.append(PageBreak())
@@ -8216,8 +8780,8 @@ class FBST_Engine:
             tarama_katmanlari = [
                 {"isim": f"{self.p1_isim} (Natal)", "jd": p1_jd, "bağıl": False},
                 {"isim": f"{self.p2_isim} (Natal)", "jd": p2_jd, "bağıl": False},
-                {"isim": f"{self.p1_isim} (İleri)", "jd": j_ileri, "bağıl": True, "vektör": "ileri"},
-                {"isim": f"{self.p2_isim} (Geri)", "jd": j_geri, "bağıl": True, "vektör": "geri"}
+                {"isim": f"{self.p1_isim} ({'Progressed' if _EN else ('Progresado' if _ES else 'İleri')})", "jd": j_ileri, "bağıl": True, "vektör": "ileri"},
+                {"isim": f"{self.p2_isim} ({'Retrograde' if _EN else ('Retrógrado' if _ES else 'Geri')})", "jd": j_geri, "bağıl": True, "vektör": "geri"}
             ]
 
             # ⚙️ HER BİR KATMANI (DÜNYAYI) AYRI AYRI TARAYIP KUTULUYORUZ
@@ -8319,7 +8883,7 @@ class FBST_Engine:
                         story.append(Spacer(1, 12)) # Kutular arası boşluk
 
         except Exception as e:
-            story.append(Paragraph(f"Yıldız mühürleri işlenirken bir kalkan hatası oluştu: {str(e)}", styles['TurkishNormal']))
+            story.append(Paragraph(f"{'An error occurred while processing the star seals.' if _EN else 'Yıldız mühürleri işlenirken bir kalkan hatası oluştu:'} {str(e)}", styles['TurkishNormal']))
 
 
     # =========================================================================================
@@ -8328,29 +8892,45 @@ class FBST_Engine:
         try:
             story.append(PageBreak())
             if self.mod == "ebeveyn_cocuk":
-                baslik_karti_ekle("ASTEROİT ETKİLEŞİMLERİ",
-                                  alt_baslik="Ceres, Pallas, Vesta, Psyche, Hygiea, Euphrosyne, Nemesis, Chiron asteroitleri.",
+                baslik_karti_ekle(("ASTEROID INTERACTIONS" if (_EN or _ES) else "ASTEROİT ETKİLEŞİMLERİ"),
+                                  alt_baslik="Ceres, Pallas, Vesta, Psyche, Hygiea, Euphrosyne, Nemesis, Chiron asteroids.",
                                   emoji="🌱")
                 story.append(Spacer(1, 10))
                 story.append(Paragraph(
-                    "Bu bölüm, ebeveyn ile çocuk arasındaki <b>nesiller arası asteroit etkileşimlerini</b> tarar. "
-                    "Ceres (beslenme), Pallas (yaratıcılık), Vesta (adanmışlık), Psyche (ruh bağı), "
-                    "Hygiea (sağlık/bakım), Euphrosyne (neşe), Nemesis (karmik denge) ve Chiron (yara-şifa) "
-                    "asteroitleri arasındaki çapraz açısal temalar, ebeveyn-çocuk bağının çok boyutlu "
-                    "kadersel yapısını ortaya koyar. 0-5 derece aralığındaki bu temalar, ruhlarınızın "
-                    "hangi boyutlarda birleştiğini ve iyileşme potansiyelinizi gösterir.",
+                    ("This section scans the <b>intergenerational asteroid interactions</b> between parent and child. "
+                     "The cross-angular themes among Ceres (nurturing), Pallas (creativity), Vesta (devotion), Psyche (soul bond), "
+                     "Hygiea (health/care), Euphrosyne (joy), Nemesis (karmic balance) and Chiron (wound-healing) "
+                     "reveal the multidimensional fated structure of the parent-child bond. These themes within the 0-5 degree range "
+                     "show the dimensions in which your souls merge and your healing potential."
+                     if (_EN or _ES) else
+                     "Bu bölüm, ebeveyn ile çocuk arasındaki <b>nesiller arası asteroit etkileşimlerini</b> tarar. "
+                     "Ceres (beslenme), Pallas (yaratıcılık), Vesta (adanmışlık), Psyche (ruh bağı), "
+                     "Hygiea (sağlık/bakım), Euphrosyne (neşe), Nemesis (karmik denge) ve Chiron (yara-şifa) "
+                     "asteroitleri arasındaki çapraz açısal temalar, ebeveyn-çocuk bağının çok boyutlu "
+                     "kadersel yapısını ortaya koyar. 0-5 derece aralığındaki bu temalar, ruhlarınızın "
+                     "hangi boyutlarda birleştiğini ve iyileşme potansiyelinizi gösterir."),
                     styles['TurkishNormal']))
             else:
-                baslik_karti_ekle("ASTEROİT ETKİLEŞİMLERİ",
-                                  alt_baslik="Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho, Amor asteroidlerinin etkileri",
+                baslik_karti_ekle(("ASTEROID INTERACTIONS" if _EN else ("INTERACCIONES DE ASTEROIDES" if _ES else "ASTEROİT ETKİLEŞİMLERİ")),
+                                  alt_baslik=("The effects of the Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho, Amor asteroids" if _EN else ("Los efectos de los asteroides Juno, Ceres, Palas, Vesta, Eros, Psique, Safo y Amor" if _ES else "Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho, Amor asteroidlerinin etkileri")),
                                   emoji="👑")
                 story.append(Spacer(1, 10))
                 story.append(Paragraph(
-                    "Bu bölüm, partnerlerin Bağıl Dünyaları arasındaki <b>ilişki asteroidi etkileşimlerini</b> tarar. "
-                    "Juno (evlilik), Ceres (beslenme), Pallas (yaratıcılık), Vesta (adanmışlık), Eros (tutku), "
-                    "Psyche (ruh), Sappho (romantizm) ve Amor (koşulsuz sevgi) asteroidleri arasındaki "
-                    "çapraz açısal temalar, ilişkinizin çok boyutlu kadersel yapısını ortaya koyar. "
-                    "0-5 derece aralığındaki bu çapraz temaslar, ruhlarınızın hangi boyutlarda birleştiğini gösterir.",
+                    ("This section scans the <b>relationship asteroid interactions</b> between the partners' Relative Worlds. "
+                     "The cross-angular themes among Juno (marriage), Ceres (nurturing), Pallas (creativity), Vesta (devotion), Eros (passion), "
+                     "Psyche (soul), Sappho (romance) and Amor (unconditional love) reveal your relationship's multidimensional fated structure. "
+                     "These cross-contacts within the 0-5 degree range show the dimensions in which your souls merge."
+                     if _EN else
+                     ("Esta sección examina las <b>interacciones de asteroides de relación</b> entre los Mundos Relativos de los dos. "
+                      "Los temas angulares cruzados entre Juno (matrimonio), Ceres (nutrición), Palas (creatividad), Vesta (devoción), Eros (pasión), "
+                      "Psique (alma), Safo (romance) y Amor (amor incondicional) revelan la estructura kármica multidimensional de su relación. "
+                      "Estos contactos cruzados dentro del rango de 0-5 grados muestran las dimensiones en las que se funden sus almas."
+                      if _ES else
+                      "Bu bölüm, partnerlerin Bağıl Dünyaları arasındaki <b>ilişki asteroidi etkileşimlerini</b> tarar. "
+                      "Juno (evlilik), Ceres (beslenme), Pallas (yaratıcılık), Vesta (adanmışlık), Eros (tutku), "
+                      "Psyche (ruh), Sappho (romantizm) ve Amor (koşulsuz sevgi) asteroidleri arasındaki "
+                      "çapraz açısal temalar, ilişkinizin çok boyutlu kadersel yapısını ortaya koyar. "
+                      "0-5 derece aralığındaki bu çapraz temaslar, ruhlarınızın hangi boyutlarda birleştiğini gösterir.")),
                     styles['TurkishNormal']))
             story.append(Spacer(1, 15))
 
@@ -8369,6 +8949,20 @@ class FBST_Engine:
                     "Kova": {"yara": "Aşırı bağımsızlık veya kopukluk", "recete": "Haftada 1 kez rutin kontrol ve duygusal check-in yapın."},
                     "Balık": {"yara": "Fedakarlık aşırılığı ve sisli sınırlar", "recete": "Kendi ihtiyaçlarınızı da çocuğa model olun."}
                 }
+                sagaltim_matrisi_en = {
+                    "Koç": {"yara": "A pattern of quick temper", "recete": "Do a 10-breath exercise together with your child."},
+                    "Boğa": {"yara": "Excessive material protection", "recete": "Give the child small responsibilities and nurture their independence."},
+                    "İkizler": {"yara": "Overcommunication or disconnection", "recete": "Spend quality time once a week without any screens."},
+                    "Yengeç": {"yara": "Emotional dependency", "recete": "Give the child space to name their own emotions."},
+                    "Aslan": {"yara": "Lack of appreciation or excessive expectation", "recete": "Verbally appreciate every effort the child makes."},
+                    "Başak": {"yara": "Critical perfectionism", "recete": "Accept imperfections together, with a smile."},
+                    "Terazi": {"yara": "Seeking justice among siblings or the child", "recete": "Give special attention to each child's uniqueness."},
+                    "Akrep": {"yara": "Control and jealousy", "recete": "Respect the child's hidden world; knock before entering."},
+                    "Yay": {"yara": "Over-discipline or excessive freedom", "recete": "Find the balance between clear boundaries and wide exploration."},
+                    "Oğlak": {"yara": "Emotional distance", "recete": "Adopt a habit of physical closeness (hugging)."},
+                    "Kova": {"yara": "Excessive independence or detachment", "recete": "Do a weekly routine check-in and emotional check-up."},
+                    "Balık": {"yara": "Excessive self-sacrifice and blurry boundaries", "recete": "Model your own needs to the child as well."}
+                }
             else:
                 sagaltim_matrisi = {
                     "Koç": {"yara": "Mükemmel olma stresi", "recete": "Fakirlere veya sokak hayvanlarına et verin."},
@@ -8384,9 +8978,23 @@ class FBST_Engine:
                     "Kova": {"yara": "Kontrol edilme korkusu", "recete": "Kuş besleyin, onlara buğday atın."},
                     "Balık": {"yara": "Gizlilik ve manipülasyon", "recete": "Balık verin, manevi/dini kitaplar dağıtın."}
                 }
+                sagaltim_matrisi_en = {
+                    "Koç": {"yara": "The stress of being perfect", "recete": "Give meat to the poor or street animals."},
+                    "Boğa": {"yara": "Fear of losing status", "recete": "Give milk to a child or a cat. Avoid petty accounting."},
+                    "İkizler": {"yara": "Boundary violation", "recete": "Gift books and knowledge to people."},
+                    "Yengeç": {"yara": "Security gap", "recete": "Feed people; buy the furniture they lack for their homes."},
+                    "Aslan": {"yara": "Fear of being unloved", "recete": "Entertain orphaned children; attend to their needs."},
+                    "Başak": {"yara": "Critical perfectionism", "recete": "Learn to accept flaws. Be easygoing."},
+                    "Terazi": {"yara": "Injustice and rivalry", "recete": "Mediate. Help the poor."},
+                    "Akrep": {"yara": "Fear of betrayal", "recete": "These are past karmic reckonings. Learn to forgive."},
+                    "Yay": {"yara": "Disrespect toward beliefs", "recete": "Gift the works of different cultures."},
+                    "Oğlak": {"yara": "Wounded pride", "recete": "Find jobs for others. Be helpful."},
+                    "Kova": {"yara": "Fear of being controlled", "recete": "Feed birds; scatter wheat for them."},
+                    "Balık": {"yara": "Secrecy and manipulation", "recete": "Give fish; distribute spiritual and religious books."}
+                }
 
             def yerel_zodyak_bul(derece):
-                burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
+                burclar = (["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"] if _EN else ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"])
                 return burclar[int(derece / 30) % 12], derece % 30
 
             def jd_derece_al(jd, gezegen_adi, natal_jd=None):
@@ -8424,13 +9032,13 @@ class FBST_Engine:
                     return asteroit_tahmini_derece(gezegen_adi, jd)
 
             if self.mod == "ebeveyn_cocuk":
-                isim_a = f"Çocuk ({self.p1_isim})"
-                isim_b = f"Ebeveyn ({self.p2_isim})"
+                isim_a = f"Child ({self.p1_isim})" if _EN else (f"Hijo/a ({self.p1_isim})" if _ES else f"Çocuk ({self.p1_isim})")
+                isim_b = f"Parent ({self.p2_isim})" if _EN else (f"Padre/Madre ({self.p2_isim})" if _ES else f"Ebeveyn ({self.p2_isim})")
                 taranacak_asteroidler = ["Ceres", "Pallas", "Vesta", "Psyche", "Hygiea", "Euphrosyne", "Nemesis", "Chiron"]
                 hedef_gezegenler = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton"]
             else:
-                isim_a = f"Situa A ({self.p1_isim})"
-                isim_b = f"Situa B ({self.p2_isim})"
+                isim_a = f"Partner A ({self.p1_isim})" if _EN else f"Partner A ({self.p1_isim})"
+                isim_b = f"Partner B ({self.p2_isim})" if _EN else f"Partner B ({self.p2_isim})"
                 taranacak_asteroidler = ["Juno", "Ceres", "Pallas", "Vesta", "Eros", "Psyche", "Sappho", "Amor"]
                 hedef_gezegenler = ["Güneş", "Ay", "Merkür", "Venüs", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün", "Plüton", "Chiron"]
 
@@ -8441,6 +9049,7 @@ class FBST_Engine:
 
             for tarama in taramalar:
                 _EN = _core_get_lang() == "en"
+                _L = _EN or (_core_get_lang() == "es")
                 satirlar = []
                 toplam_muhur = 0
                 sahip_natal_jd = self.get_natal_julian_day(tarama["sahip_kimlik"])
@@ -8465,7 +9074,7 @@ class FBST_Engine:
                         if fark <= 5.0:
                             toplam_muhur += 1
                             yorum_key = (asteroit_adi, hedef_adi)
-                            varsayilan_yorum = (f"{asteroit_adi} - {hedef_adi} karmic contact" if _EN else f"{asteroit_adi} - {hedef_adi} karmik teması")
+                            varsayilan_yorum = (f"{asteroit_adi} - {pdf_label(hedef_adi)} karmic contact" if _L else f"{asteroit_adi} - {hedef_adi} karmik teması")
                             _aktif_mod = st.session_state.get("sim_modu", "es_sevgili")
                             _asteroid_sinastri_sozluk = ARAP_ILISKI.get("ASTEROID_SINASTRI_YORUMLARI", {})
                             if _aktif_mod == "ebeveyn_cocuk" and ASTEROID_SINASTRI_YORUMLARI_EBEVEYN:
@@ -8474,38 +9083,38 @@ class FBST_Engine:
                                 yorum = _asteroid_sinastri_sozluk.get(yorum_key, varsayilan_yorum)
 
                             if fark <= 0.5:
-                                durum = "PRISTINE SEAL" if _EN else "KUSURSUZ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐⭐⭐ Fate's Definitive Seal" if _EN else "⭐⭐⭐⭐⭐ Kaderin Kesin Mührü"
+                                durum = "PRISTINE SEAL" if _L else "KUSURSUZ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐⭐⭐ Fate's Definitive Seal" if _L else "⭐⭐⭐⭐⭐ Kaderin Kesin Mührü"
                                 renk = "#C9A96E"
                             elif fark <= 1.0:
-                                durum = "STONE SEAL" if _EN else "TAŞ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐⭐ Powerful Karmic Bond" if _EN else "⭐⭐⭐⭐ Güçlü Kadersel Bağ"
+                                durum = "STONE SEAL" if _L else "TAŞ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐⭐ Powerful Karmic Bond" if _L else "⭐⭐⭐⭐ Güçlü Kadersel Bağ"
                                 renk = "#2E7D32"
                             elif fark <= 2.0:
-                                durum = "BRONZE SEAL" if _EN else "TUNÇ MÜHÜR"
-                                guc_seviyesi = "⭐⭐⭐ Distinct Influence" if _EN else "⭐⭐⭐ Belirgin Etki"
+                                durum = "BRONZE SEAL" if _L else "TUNÇ MÜHÜR"
+                                guc_seviyesi = "⭐⭐⭐ Distinct Influence" if _L else "⭐⭐⭐ Belirgin Etki"
                                 renk = "#1565C0"
                             elif fark <= 3.5:
-                                durum = "SILVER SEAL" if _EN else "GÜMÜŞ MÜHÜR"
-                                guc_seviyesi = "⭐⭐ Light Yet Lasting Mark" if _EN else "⭐⭐ Hafif Ama Kalıcı İz"
+                                durum = "SILVER SEAL" if _L else "GÜMÜŞ MÜHÜR"
+                                guc_seviyesi = "⭐⭐ Light Yet Lasting Mark" if _L else "⭐⭐ Hafif Ama Kalıcı İz"
                                 renk = "#6B7280"
                             else:
-                                durum = "BRASS SEAL" if _EN else "BRONZ MÜHÜR"
-                                guc_seviyesi = "⭐ A Whisper From Afar" if _EN else "⭐ Uzaktan Gelen Fısıltı"
+                                durum = "BRASS SEAL" if _L else "BRONZ MÜHÜR"
+                                guc_seviyesi = "⭐ A Whisper From Afar" if _L else "⭐ Uzaktan Gelen Fısıltı"
                                 renk = "#9E9E9E"
 
-                            sagaltim = sagaltim_matrisi.get(ast_burc, {"yara": ("Insufficient balance" if _EN else "Yetersiz denge"), "recete": ("Be generous." if _EN else "Cömert olun.")})
+                            sagaltim = (sagaltim_matrisi_en if _L else sagaltim_matrisi).get(ast_burc, {"yara": ("Insufficient balance" if _L else "Yetersiz denge"), "recete": ("Be generous." if _L else "Cömert olun.")})
 
                             satirlar.append(
-                                f"<font color='{renk}'><b>* {durum} ({fark:.1f}°): {tarama['sahip']} {asteroit_adi} ({ast_burc}) <-> {tarama['hedef']} {hedef_adi}</b></font><br/><br/>"
+                                f"<font color='{renk}'><b>* {durum} ({fark:.1f}°): {tarama['sahip']} {asteroit_adi} ({pdf_label(ast_burc)}) <-> {tarama['hedef']} {pdf_label(hedef_adi)}</b></font><br/><br/>"
                                 f"<font color='#4A4A4A'><i>{yorum}</i></font><br/><br/>"
-                                f"<font color='#6B7280' size='8'>  {'Strength:' if _EN else 'Kuvvet:'} {guc_seviyesi} | {'Remedy:' if _EN else 'Safa:'} {sagaltim['recete']}</font><br/><br/><br/>"
+                                f"<font color='#6B7280' size='8'>  {'Strength:' if _L else 'Kuvvet:'} {guc_seviyesi} | {'Remedy:' if _L else 'Safa:'} {sagaltim['recete']}</font><br/><br/><br/>"
                             )
 
                 if toplam_muhur == 0:
-                    satirlar.append((f"<font color='#4A5568'><i>No asteroid synastry seal detected between {tarama['sahip']} and {tarama['hedef']} within the 0-5° orb limit.</i></font><br/>" if _EN else f"<font color='#4A5568'><i>{tarama['sahip']} ile {tarama['hedef']} arasında 0-5° orb sınırında asteroid sinastri mührü saptanmadı.</i></font><br/>"))
+                    satirlar.append((f"<font color='#4A5568'><i>No asteroid synastry seal detected between {tarama['sahip']} and {tarama['hedef']} within the 0-5° orb limit.</i></font><br/>" if _L else f"<font color='#4A5568'><i>{tarama['sahip']} ile {tarama['hedef']} arasında 0-5° orb sınırında asteroid sinastri mührü saptanmadı.</i></font><br/>"))
 
-                kutu_basligi = f"<b><font color='#1A1A2E' size='12'>[ {tarama['sahip']} → {tarama['hedef']} ] {'ASTEROID SYNASTRY MATRIX' if _EN else 'ASTEROİD SİNASTRİ MATRİSİ'} ({toplam_muhur} {'Seal' if _EN else 'Mühür'})</font></b><br/><br/>"
+                kutu_basligi = f"<b><font color='#1A1A2E' size='12'>[ {tarama['sahip']} → {tarama['hedef']} ] {'ASTEROID SYNASTRY MATRIX' if _L else 'ASTEROİD SİNASTRİ MATRİSİ'} ({toplam_muhur} {'Seal' if _L else 'Mühür'})</font></b><br/><br/>"
                 kutu_metni = kutu_basligi + "".join(satirlar)
                 hieros_kutu = Table([[Paragraph(kutu_metni, styles['TurkishNormal'])]], colWidths=['100%'])
                 hieros_kutu.setStyle(TableStyle([
@@ -8528,25 +9137,36 @@ class FBST_Engine:
         try:
             story.append(PageBreak())
             if self.mod == "ebeveyn_cocuk":
-                baslik_karti_ekle("ARAP NOKTALARI", alt_baslik="Ebeveyn-çocuk bağının farklı boyutları", emoji="🌙")
+                baslik_karti_ekle("ARABIC POINTS" if (_EN or _ES) else "ARAP NOKTALARI", alt_baslik=("Different dimensions of the parent-child bond" if (_EN or _ES) else "Ebeveyn-çocuk bağının farklı boyutları"), emoji="🌙")
                 story.append(Spacer(1, 10))
                 story.append(Paragraph(
-                    "Bu bölüm, ebeveyn-çocuk bağının koruma, eğitim, bağlanma ve gelişim gibi boyutlarını "
-                    "Arap Noktaları açısından inceler.",
+                    ("This section examines the dimensions of the parent-child bond such as protection, education, "
+                     "attachment and growth through the Arabic Points." if (_EN or _ES) else
+                     "Bu bölüm, ebeveyn-çocuk bağının koruma, eğitim, bağlanma ve gelişim gibi boyutlarını "
+                     "Arap Noktaları açısından inceler."),
                     styles['TurkishNormal']))
             else:
-                baslik_karti_ekle("ARAP NOKTALARI", alt_baslik="İlişkinin farklı boyutlarının analizi", emoji="🌙")
+                baslik_karti_ekle("ARABIC POINTS" if (_EN or _ES) else "ARAP NOKTALARI", alt_baslik=("Analysis of different dimensions of the relationship" if (_EN or _ES) else "İlişkinin farklı boyutlarının analizi"), emoji="🌙")
                 story.append(Spacer(1, 10))
                 story.append(Paragraph(
-                    "Bu bölüm, ilişkinizin evlilik, aşk, tutku, sadakat gibi boyutlarını "
-                    "Arap Noktaları açısından inceler.",
+                    ("This section examines the dimensions of your relationship such as marriage, love, passion and "
+                     "loyalty through the Arabic Points." if (_EN or _ES) else
+                     "Bu bölüm, ilişkinizin evlilik, aşk, tutku, sadakat gibi boyutlarını "
+                     "Arap Noktaları açısından inceler."),
                     styles['TurkishNormal']))
             story.append(Spacer(1, 10))
+            _lang = _core_get_lang()
+            _arap_ebeveyn_adlar = (ARAP_EBEVEYN.get("ARAP_EBEVEYN_NOKTA_ADLARI_ES", {}) or ARAP_EBEVEYN.get("ARAP_EBEVEYN_NOKTA_ADLARI_EN", {}) if _lang == "es" else ARAP_EBEVEYN.get("ARAP_EBEVEYN_NOKTA_ADLARI_EN", {}) if _lang == "en" else {})
+            _arap_ilisk_adlar = (ARAP_ILISKI.get("ARAP_NOKTA_ADLARI_ES", {}) or ARAP_ILISKI.get("ARAP_NOKTA_ADLARI_EN", {}) if _lang == "es" else ARAP_ILISKI.get("ARAP_NOKTA_ADLARI_EN", {}) if _lang == "en" else {})
+            def _nokta_ad_cv(tr_ad):
+                if _lang == "tr":
+                    return tr_ad
+                return _arap_ebeveyn_adlar.get(tr_ad) or _arap_ilisk_adlar.get(tr_ad) or tr_ad
             try:
                 arap_radar_dosya = self.ciz_arap_noktalari_radar(dosya_adi="FBST_Arap_Radar_PDF.png")
-                cerceveli_gorsel_ekle(arap_radar_dosya, 400, 400, "Arap Noktaları Radar Karşılaştırması")
+                cerceveli_gorsel_ekle(arap_radar_dosya, 400, 400, "Arabic Points Radar Comparison" if (_EN or _ES) else "Arap Noktaları Radar Karşılaştırması")
             except Exception:
-                story.append(Paragraph("<i>Arap Noktaları radar grafiği PDF'e eklenemedi.</i>", styles['TurkishNormal']))
+                story.append(Paragraph(("<i>The Arabic Points radar chart could not be added to the PDF.</i>" if (_EN or _ES) else "<i>Arap Noktaları radar grafiği PDF'e eklenemedi.</i>"), styles['TurkishNormal']))
             story.append(Spacer(1, 15))
             
             arap_noktalari = self.arap_noktasi_hesapla()
@@ -8554,15 +9174,16 @@ class FBST_Engine:
             
             for isim in [self.p1_isim, self.p2_isim]:
                 if isim in arap_noktalari:
-                    story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>[ {isim} ] ARAP NOKTALARI</font></b>", styles['TurkishNormal']))
+                    story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>[ {isim} ] {'ARABIC POINTS' if (_EN or _ES) else 'ARAP NOKTALARI'}</font></b>", styles['TurkishNormal']))
                     story.append(Spacer(1, 8))
                     
                     for nokta_adi, bilgi in arap_noktalari[isim].items():
                         gece_emoji = "🌙" if bilgi["gece_charti"] else "☀️"
                         pozisyon = dereceyi_dakikaya_cevir(bilgi['derece'])
+                        _nokta_gst = _nokta_ad_cv(nokta_adi)
                         tek_satir = (
-                            f"<font color='#1A1A2E'><b>{gece_emoji} {nokta_adi}</b></font><br/>"
-                            f"<font color='#4A4A4A'>Konum: {pozisyon} | Ev: {bilgi['ev']}</font><br/>"
+                            f"<font color='#1A1A2E'><b>{gece_emoji} {_nokta_gst}</b></font><br/>"
+                            f"<font color='#4A4A4A'>{(('Position: ' if (_EN or _ES) else 'Konum: ')) + pozisyon} | {'House:' if (_EN or _ES) else 'Ev:'} {bilgi['ev']}</font><br/>"
                             f"<font color='#4A5568'><i>{bilgi['burc_yorum']}</i></font><br/>"
                             f"<font color='#4A5568'><i>{bilgi['ev_yorumu']}</i></font>"
                         )
@@ -8577,24 +9198,24 @@ class FBST_Engine:
             
             # Sinastri Analizi
             if arap_sinastri:
-                story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>[ SİNASTRİ ] ARAP NOKTASI BAĞLARI</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>[ {'SYNASTRY' if (_EN or _ES) else 'SİNASTRİ'} ] {'ARABIC POINT LINKS' if (_EN or _ES) else 'ARAP NOKTASI BAĞLARI'}</font></b>", styles['TurkishNormal']))
                 story.append(Spacer(1, 8))
                 
                 sinastri_satirlar = []
                 for bag in arap_sinastri:
                     if bag["tip"] == "nokta_nokta":
                         sinastri_satirlar.append(
-                            f"<font color='#1A1A2E'><b>* {bag['nokta']} Noktasi Eslesmesi (Orb: {bag['fark']} derece)</b></font><br/>"
+                            f"<font color='#1A1A2E'><b>* {_nokta_ad_cv(bag['nokta'])} {'Point Match' if (_EN or _ES) else 'Noktasi Eslesmesi'} (Orb: {bag['fark']} {'degrees' if (_EN or _ES) else 'derece'})</b></font><br/>"
                             f"<font color='#4A4A4A'><i>{bag['yorum']}</i></font>"
                         )
                     elif bag["tip"] == "capraz_nokta":
                         sinastri_satirlar.append(
-                            f"<font color='#1A1A2E'><b>* {bag['nokta_a']} <-> {bag['nokta_b']} Capraz Bagi (Orb: {bag['fark']} derece)</b></font><br/>"
+                            f"<font color='#1A1A2E'><b>* {_nokta_ad_cv(bag['nokta_a'])} <-> {_nokta_ad_cv(bag['nokta_b'])} {'Cross Link' if (_EN or _ES) else 'Capraz Bagi'} (Orb: {bag['fark']} {'degrees' if (_EN or _ES) else 'derece'})</b></font><br/>"
                             f"<font color='#4A4A4A'><i>{bag['yorum']}</i></font>"
                         )
                     elif bag["tip"] == "nokta_gezegen":
                         sinastri_satirlar.append(
-                            f"<font color='#8B0000'><b>* {bag['kaynak']}'in {bag['nokta']} -> {bag['hedef']}'in {bag['gezegen']} Kavusumu ({bag['guc']}, Orb: {bag['fark']} derece)</b></font><br/>"
+                            f"<font color='#8B0000'><b>* {_nokta_ad_cv(bag['kaynak'])}'s {_nokta_ad_cv(bag['nokta'])} -> {_nokta_ad_cv(bag['hedef'])}'s {pdf_label(bag['gezegen'])} {'Conjunction' if (_EN or _ES) else 'Kavusumu'} ({bag['guc']}, Orb: {bag['fark']} {'degrees' if (_EN or _ES) else 'derece'})</b></font><br/>"
                             f"<font color='#4A4A4A'><i>{bag['yorum']}</i></font>"
                         )
                 
@@ -8610,7 +9231,7 @@ class FBST_Engine:
                         story.append(Spacer(1, 6))
             
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'><b>Kritik Sistem Hatası (Arap Noktaları Modülü):</b> {str(e)}</font>", styles['Normal']))
+            story.append(Paragraph(f"<font color='red'><b>{'Critical System Error (Arabic Points Module):' if (_EN or _ES) else 'Kritik Sistem Hatası (Arap Noktaları Modülü):'} {str(e)}</font>", styles['Normal']))
 
         # =========================================================================================
         # 📊 GELİŞİM DÖNEMLERİ & POTANSİYEL ANALİZİ (Sadece Ebeveyn-Çocuk PDF)
@@ -8624,17 +9245,22 @@ class FBST_Engine:
                 story.append(Spacer(1, 10))
 
                 # --- GELİŞİM DÖNEMLERİ ---
-                story.append(Paragraph("<b><font color='#1A1A2E' size='12'>GELİŞİM DÖNEMLERİ</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>{pdf_label('GELİŞİM DÖNEMLERİ')}</font></b>", styles['TurkishNormal']))
                 story.append(Paragraph(
+                    "<i><font color='#6B7280'><b>Note:</b> This section is derived from the child's natal chart. "
+                    "Development periods show the active periods calculated from your child's birth date and "
+                    "the parent-child interaction patterns during those periods.</font></i>" if (_EN or _ES) else
                     "<i><font color='#6B7280'><b>Not:</b> Bu bölüm çocuğun natal haritasına göre çıkarılmıştır. "
                     "Gelişim dönemleri, çocuğunuzun doğum tarihine göre hesaplanan aktif dönemleri ve "
                     "bu dönemdeki ebeveyn-çocuk etkileşim yapılarını gösterir.</font></i>",
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(
-                    "Her bir gezegenin developmental period'u, "
-                    "çocuğunuzun hayatının farklı aşamalarındaki temel ihtiyaçlarını ve "
-                    "sizin ebeveyn olarak bu dönemdeki en etkili tutumunuzu gösterir.",
+                    ("Each planet's developmental period shows the core needs of different stages of your child's "
+                     "life and your most effective attitude as a parent during those periods." if (_EN or _ES) else
+                     "Her bir gezegenin developmental period'u, "
+                     "çocuğunuzun hayatının farklı aşamalarındaki temel ihtiyaçlarını ve "
+                     "sizin ebeveyn olarak bu dönemdeki en etkili tutumunuzu gösterir."),
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 10))
 
@@ -8643,9 +9269,9 @@ class FBST_Engine:
                     for satir in gelisim_sonuclari:
                         konum_bilgisi = ""
                         if satir.get('burc') and satir.get('ev'):
-                            konum_bilgisi = f" — <i>{satir['burc']}, {satir['ev']}. Ev</i>"
+                            konum_bilgisi = f" — <i>{pdf_label(satir['burc'])}, {satir['ev']}. {pdf_label('Ev')}</i>"
                         gelisim_metni = (
-                            f"<font color='#1A1A2E'><b>{satir['gezegen']}{konum_bilgisi} — {satir['donem']}</b></font><br/>"
+                            f"<font color='#1A1A2E'><b>{pdf_label(satir['gezegen'])}{konum_bilgisi} — {pdf_label(satir['donem'])}</b></font><br/>"
                             f"<font color='#4A4A4A'>{satir['metin']}</font>"
                         )
                         gelisim_kutu = Table([[Paragraph(gelisim_metni, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -8657,23 +9283,28 @@ class FBST_Engine:
                         story.append(gelisim_kutu)
                         story.append(Spacer(1, 6))
                 else:
-                    story.append(Paragraph("Gelişim dönemi verisi hesaplanamadı.", styles['TurkishNormal']))
+                    story.append(Paragraph("Gelişim dönemi verisi hesaplanamadı." if not _EN and not _ES else "Development period data could not be calculated.", styles['TurkishNormal']))
 
                 story.append(Spacer(1, 15))
                 story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
                 story.append(Spacer(1, 15))
 
                 # --- POTANSİYEL VE YETENEK ALANLARI ---
-                story.append(Paragraph("<b><font color='#1A1A2E' size='12'>POTANSİYEL VE YETENEK ALANLARI</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>{pdf_label('POTANSİYEL VE YETENEK ALANLARI')}</font></b>", styles['TurkishNormal']))
                 story.append(Paragraph(
+                    "<i><font color='#6B7280'><b>Note:</b> This section is derived from the child's natal chart. "
+                    "The angles between your child's own planets are evaluated to identify "
+                    "natural talent and potential areas.</font></i>" if (_EN or _ES) else
                     "<i><font color='#6B7280'><b>Not:</b> Bu bölüm çocuğun natal haritasına göre çıkarılmıştır. "
                     "Çocuğunuzun kendi gezegenleri arasındaki açılar değerlendirilerek "
                     "doğal yetenek ve potansiyel alanları tespit edilmiştir.</font></i>",
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(
-                    "Bu bölüm, çocuğunuzun hangi alanlarda doğal bir yatkınlığa sahip olduğunu ve "
-                    "sizin bu yetenekleri nasıl besleyebileceğinizi gösterir.",
+                    ("This section shows which areas your child has a natural aptitude for and "
+                     "how you can nurture these talents." if (_EN or _ES) else
+                     "Bu bölüm, çocuğunuzun hangi alanlarda doğal bir yatkınlığa sahip olduğunu ve "
+                     "sizin bu yetenekleri nasıl besleyebileceğinizi gösterir."),
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 10))
 
@@ -8683,8 +9314,10 @@ class FBST_Engine:
                     for satir in potansiyel_sonuclari:
                         if satir['alan'] not in gorulen_alanlar:
                             gorulen_alanlar.add(satir['alan'])
+                            _alan_en = pdf_label(satir['alan'])
+                            _aci_cift = f"{pdf_label(satir['aci'].split('-')[0])}-{pdf_label(satir['aci'].split('-')[1])}"
                             potansiyel_metni = (
-                                f"<font color='#1A1A2E'><b>{satir['alan']} ({satir['aci']} — {satir['aci_turu']} Açısı)</b></font><br/>"
+                                f"<font color='#1A1A2E'><b>{_alan_en} ({_aci_cift} — {satir['aci_turu']} {pdf_label('Açısı')})</b></font><br/>"
                                 f"<font color='#4A4A4A'>{satir['metin']}</font>"
                             )
                             potansiyel_kutu = Table([[Paragraph(potansiyel_metni, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -8696,24 +9329,28 @@ class FBST_Engine:
                             story.append(potansiyel_kutu)
                             story.append(Spacer(1, 6))
                 else:
-                    story.append(Paragraph("Belirgin bir potansiyel alanı tespit edilemedi.", styles['TurkishNormal']))
+                    story.append(Paragraph("Belirgin bir potansiyel alanı tespit edilemedi." if not _EN and not _ES else "No distinct potential area could be identified.", styles['TurkishNormal']))
 
                 story.append(Spacer(1, 15))
                 story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
                 story.append(Spacer(1, 15))
 
                 # --- MESLEK YÖNLENDİRME ÖNERİLERİ ---
-                story.append(Paragraph("<b><font color='#1A1A2E' size='12'>MESLEK YÖNLENDİRME ÖNERİLERİ</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(f"<b><font color='#1A1A2E' size='12'>{pdf_label('MESLEK YÖNLENDİRME ÖNERİLERİ')}</font></b>", styles['TurkishNormal']))
                 story.append(Paragraph(
+                    "<i><font color='#6B7280'><b>Note:</b> This section is based on the synthesis of your child's potential and talent areas. "
+                    "Your child's natural predispositions and strengths are evaluated and the most suitable career branches are suggested.</font></i>" if (_EN or _ES) else
                     "<i><font color='#6B7280'><b>Not:</b> Bu bölüm, çocuğunuzun potansiyel ve yetenek alanlarının "
                     "sentezine dayanmaktadır. Çocuğunuzun doğal yatkınlıkları ve güçlü yönleri değerlendirilerek "
                     "en uygun meslek dalları önerilmiştir.</font></i>",
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 6))
                 story.append(Paragraph(
-                    "Aşağıdaki öneriler, çocuğunuzun natal haritasındaki gezegen açılarının "
-                    "potansiyel alanlarıyla eşleştirilmesi sonucu ortaya çıkmıştır. "
-                    "Her öneri, çocuğunuzun güçlü yönlerini ve doğal yatkınlıklarını yansıtır.",
+                    ("The suggestions below result from matching the planetary angles in your child's natal chart "
+                     "with potential areas. Each suggestion reflects your child's strengths and natural predispositions." if (_EN or _ES) else
+                     "Aşağıdaki öneriler, çocuğunuzun natal haritasındaki gezegen açılarının "
+                     "potansiyel alanlarıyla eşleştirilmesi sonucu ortaya çıkmıştır. "
+                     "Her öneri, çocuğunuzun güçlü yönlerini ve doğal yatkınlıklarını yansıtır."),
                     styles['TurkishNormal']))
                 story.append(Spacer(1, 10))
 
@@ -8723,12 +9360,12 @@ class FBST_Engine:
                     if meslek_onerileri:
                         # Top-6 kategori sıralaması
                         sirali = sorted(meslek_onerileri, key=lambda x: x['puan'], reverse=True)
-                        ranking_html = "<font color='#1A1A2E'><b>POTANSİYEL ALANLARI SIRALAMASI:</b></font><br/>"
+                        ranking_html = f"<font color='#1A1A2E'><b>{pdf_label('POTANSİYEL ALANLARI SIRALAMASI:')}</b></font><br/>"
                         for j, r in enumerate(sirali[:6]):
                             medal = ""
                             if j == 0: medal = " [1.]"
                             elif j == 1: medal = " [2.]"
-                            ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{r['alan']}</b> — {r['puan']:.1f} puan (%{r['yuzde']}){medal}</font><br/>"
+                            ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{pdf_label(r['alan'])}</b> — {r['puan']:.1f} {pdf_label('puan')} (%{r['yuzde']}){medal}</font><br/>"
                         ranking_kutu = Table([[Paragraph(ranking_html, styles['TurkishNormal'])]], colWidths=['100%'])
                         ranking_kutu.setStyle(TableStyle([
                             ('BACKGROUND', (0,0), (-1,-1), HexColor("#F7F3E9")),
@@ -8740,8 +9377,8 @@ class FBST_Engine:
 
                         for i, oneri in enumerate(meslek_onerileri, 1):
                             aci_sayisi = oneri.get('aci_sayisi', 0)
-                            bonus_not = f" ({aci_sayisi} aci, {oneri['puan']:.1f} puan)"
-                            oneri_baslik = f"{i}. {oneri['alan']} — %{oneri['yuzde']}{bonus_not}"
+                            bonus_not = f" ({aci_sayisi} {pdf_label('aci')}, {oneri['puan']:.1f} {pdf_label('puan')})"
+                            oneri_baslik = f"{i}. {pdf_label(oneri['alan'])} — %{oneri['yuzde']}{bonus_not}"
                             meslek_satirlari = ""
                             for m in oneri["meslekler"]:
                                 meslek_satirlari += f"<br/>• <b>{m['meslek']}</b> — {m['aciklama']}"
@@ -8764,7 +9401,7 @@ class FBST_Engine:
                             story.append(oneri_kutu)
                             story.append(Spacer(1, 6))
                     else:
-                        story.append(Paragraph("Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi.", styles['TurkishNormal']))
+                        story.append(Paragraph("Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi." if not _EN and not _ES else "No sufficient potential area for career guidance could be identified.", styles['TurkishNormal']))
                 except Exception as e:
                     story.append(Paragraph(f"<font color='red'><b>Meslek Yönlendirme Hatası:</b> {str(e)}</font>", styles['Normal']))
 
@@ -8807,9 +9444,9 @@ class FBST_Engine:
                     anne_el = element_map_uy.get(anne_gunes_burc, "")
                     cocuk_el = element_map_uy.get(cocuk_ay_burc, "")
                     anahtar = (anne_el, cocuk_el)
-                    uyum_metni = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), "Annenizin enerjisi ile çocuğunuzun duygu dünyası, dikkatli bir uyumla güçlenir."))
+                    uyum_metni = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), pdf_label("Annenizin enerjisi ile çocuğunuzun duygu dünyası, dikkatli bir uyumla güçlenir.")))
                     uyum_parcalari.append(
-                        f"<font color='#1A1A2E'><b>Annenin Güneşi ({anne_gunes_burc}) + Çocuğun Ayı ({cocuk_ay_burc}):</b></font><br/>"
+                        f"<font color='#1A1A2E'><b>{pdf_label('Annenin Güneşi')} ({pdf_label(anne_gunes_burc)}) + {pdf_label('Çocuğun Ayı')} ({pdf_label(cocuk_ay_burc)}):</b></font><br/>"
                         f"<font color='#4A4A4A'>{uyum_metni}</font>"
                     )
                 if anne_ay_uy is not None and cocuk_gunes_uy:
@@ -8818,9 +9455,9 @@ class FBST_Engine:
                     anne_el = element_map_uy.get(anne_ay_burc, "")
                     cocuk_el = element_map_uy.get(cocuk_gunes_burc, "")
                     anahtar = (anne_el, cocuk_el)
-                    uyum_metni2 = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), "Annenizin duygu dünyası ile çocuğunuzun iradesi birbirini tamamlar."))
+                    uyum_metni2 = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), pdf_label("Annenizin duygu dünyası ile çocuğunuzun iradesi birbirini tamamlar.")))
                     uyum_parcalari.append(
-                        f"<font color='#1A1A2E'><b>Annenin Ayı ({anne_ay_burc}) + Çocuğun Güneşi ({cocuk_gunes_burc}):</b></font><br/>"
+                        f"<font color='#1A1A2E'><b>{pdf_label('Annenin Ayı')} ({pdf_label(anne_ay_burc)}) + {pdf_label('Çocuğun Güneşi')} ({pdf_label(cocuk_gunes_burc)}):</b></font><br/>"
                         f"<font color='#4A4A4A'>{uyum_metni2}</font>"
                     )
                 if anne_ay_uy is not None and cocuk_ay_uy:
@@ -8829,13 +9466,13 @@ class FBST_Engine:
                     anne_el = element_map_uy.get(anne_ay_burc2, "")
                     cocuk_el = element_map_uy.get(cocuk_ay_burc2, "")
                     anahtar = (anne_el, cocuk_el)
-                    uyum_metni3 = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), "Annenizle çocuğunuzun duygu dünyası, derin bir sezgiyle buluşur."))
+                    uyum_metni3 = ELEMENT_UYUM_ANNE_COCUK.get(anahtar, ELEMENT_UYUM_ANNE_COCUK.get((anne_el, "Ateş"), pdf_label("Annenizle çocuğunuzun duygu dünyası, derin bir sezgiyle buluşur.")))
                     uyum_parcalari.append(
-                        f"<font color='#1A1A2E'><b>Annenin Ayı ({anne_ay_burc2}) + Çocuğun Ayı ({cocuk_ay_burc2}):</b></font><br/>"
+                        f"<font color='#1A1A2E'><b>{pdf_label('Annenin Ayı')} ({pdf_label(anne_ay_burc2)}) + {pdf_label('Çocuğun Ayı')} ({pdf_label(cocuk_ay_burc2)}):</b></font><br/>"
                         f"<font color='#4A4A4A'>{uyum_metni3}</font>"
                     )
                 if not uyum_parcalari:
-                    uyum_parcalari.append("<font color='#4A4A4A'>Uyum özeti için gerekli konumlar hesaplanamadı.</font>")
+                    uyum_parcalari.append(f"<font color='#4A4A4A'>{pdf_label('Uyum özeti için gerekli konumlar hesaplanamadı.')}</font>")
                 for uyum_parca in uyum_parcalari:
                     uyum_kutu = Table([[Paragraph(uyum_parca, styles['TurkishNormal'])]], colWidths=['100%'])
                     uyum_kutu.setStyle(TableStyle([
@@ -8892,14 +9529,14 @@ class FBST_Engine:
                 if bag_acilari:
                     for b in bag_acilari[:8]:
                         tema_metni = OZEL_BAG_ACI_TEMA.get(b["aci"], "")
-                        tema_metni = tema_metni.replace("{gezegen}", f"{b['anne']}").replace("{gezegen2}", f"{b['cocuk']}")
+                        tema_metni = tema_metni.replace("{gezegen}", pdf_label(b['anne'])).replace("{gezegen2}", pdf_label(b['cocuk']))
                         if tema_metni:
                             bag_parcalari.append(
-                                f"<font color='#1A1A2E'><b>{b['anne']} & {b['cocuk']} — {b['aci']} (orb {b['orb']}°)</b></font><br/>"
+                                f"<font color='#1A1A2E'><b>{pdf_label(b['anne'])} & {pdf_label(b['cocuk'])} — {pdf_label(b['aci'])} (orb {b['orb']}°)</b></font><br/>"
                                 f"<font color='#4A4A4A'>{tema_metni}</font>"
                             )
                 if not bag_parcalari:
-                    bag_parcalari.append("<font color='#4A4A4A'>Belirlenen tolerans sınırlarında güçlü bir anne-çocuk açı teması bulunmadı; bağ, doğal sevgi ve günlük temasla derinleşir.</font>")
+                    bag_parcalari.append(f"<font color='#4A4A4A'>{pdf_label('Belirlenen tolerans sınırlarında güçlü bir anne-çocuk açı teması bulunmadı; bağ, doğal sevgi ve günlük temasla derinleşir.')}</font>")
                 for bag_parca in bag_parcalari:
                     bag_kutu = Table([[Paragraph(bag_parca, styles['TurkishNormal'])]], colWidths=['100%'])
                     bag_kutu.setStyle(TableStyle([
@@ -8963,26 +9600,34 @@ class FBST_Engine:
                             nok1 = arap_noktalari[isim].get("Baba Noktası", {})
                             nok2 = arap_noktalari[isim].get("Anne Noktası", {})
                             arap_ozet[isim] = {
-                                "evlilik": f"{nok1.get('derece', 0):.1f}° {nok1.get('burc', '?')}",
-                                "ask": f"{nok2.get('derece', 0):.1f}° {nok2.get('burc', '?')}"
+                                "evlilik": f"{nok1.get('derece', 0):.1f}° {pdf_label(nok1.get('burc', '?'))}",
+                                "ask": f"{nok2.get('derece', 0):.1f}° {pdf_label(nok2.get('burc', '?'))}"
                             }
                         else:
                             evlilik_noktasi = arap_noktalari[isim].get("Evlilik Noktası", {})
                             ask_noktasi = arap_noktalari[isim].get("Aşk Noktası", {})
                             arap_ozet[isim] = {
-                                "evlilik": f"{evlilik_noktasi.get('derece', 0):.1f}° {evlilik_noktasi.get('burc', '?')}",
-                                "ask": f"{ask_noktasi.get('derece', 0):.1f}° {ask_noktasi.get('burc', '?')}"
+                                "evlilik": f"{evlilik_noktasi.get('derece', 0):.1f}° {pdf_label(evlilik_noktasi.get('burc', '?'))}",
+                                "ask": f"{ask_noktasi.get('derece', 0):.1f}° {pdf_label(ask_noktasi.get('burc', '?'))}"
                             }
             except Exception:
                 arap_ozet = {}
 
             # --- ANA METRİK KUTUSU ---
-            metrik_data = [
-                ["ILISKI ANALIZI RAPORU", "", "", ""],
-                ["Bag Gucu", f"{tork}/10", "Uyum Oranı", f"%{fraktal}"],
-                ["Yas Farki Etkisi", f"{ks_yil:.2f} Yil", "Toplam Aci", f"{toplam_aci}"],
-                [f"{self.p1_isim} Yukselen", asc_A, f"{self.p2_isim} Yukselen", asc_B],
-            ]
+            if (_EN or _ES):
+                metrik_data = [
+                    ["RELATIONSHIP ANALYSIS REPORT", "", "", ""],
+                    ["Bond Strength", f"{tork}/10", "Harmony Rate", f"%{fraktal}"],
+                    ["Age Difference Effect", f"{ks_yil:.2f} Years", "Total Aspects", f"{toplam_aci}"],
+                    [f"{self.p1_isim} Ascendant", asc_A, f"{self.p2_isim} Ascendant", asc_B],
+                ]
+            else:
+                metrik_data = [
+                    ["ILISKI ANALIZI RAPORU", "", "", ""],
+                    ["Bag Gucu", f"{tork}/10", "Uyum Oranı", f"%{fraktal}"],
+                    ["Yas Farki Etkisi", f"{ks_yil:.2f} Yil", "Toplam Aci", f"{toplam_aci}"],
+                    [f"{self.p1_isim} Yukselen", asc_A, f"{self.p2_isim} Yukselen", asc_B],
+                ]
             metrik_tablo = Table(metrik_data, colWidths=['25%', '25%', '25%', '25%'])
             metrik_tablo.setStyle(TableStyle([
                 ('BACKGROUND', (0,0), (-1,0), '#1A1A2E'),
@@ -9008,14 +9653,24 @@ class FBST_Engine:
             story.append(Spacer(1, 15))
 
             # --- SİNASTRİ DAĞILIMI ---
-            dagilim_data = [
-                ["GEZEGEN ACI DAGILIMI", "ADET", "ANLAMI"],
-                ["Kavusum (Birlesme)", str(toplam_kavusum), "Guclu cekim ve uyum"],
-                ["Ucgen (Akis)", str(toplam_3gen), "Dogal uyum ve sans akisi"],
-                ["Sekstil (Firsat)", str(toplam_sextil), "Yaratici firsat ve destek"],
-                ["Kare (Mucadele)", str(toplam_kare), "Gelisim sinavi ve dinamizm"],
-                ["Karsit (Gerilim)", str(toplam_karsit), "Farkindalik ve denge arayisi"],
-            ]
+            if (_EN or _ES):
+                dagilim_data = [
+                    ["PLANET ASPECT DISTRIBUTION", "COUNT", "MEANING"],
+                    ["Conjunction (Union)", str(toplam_kavusum), "Strong attraction and harmony"],
+                    ["Trine (Flow)", str(toplam_3gen), "Natural harmony and flow of luck"],
+                    ["Sextile (Opportunity)", str(toplam_sextil), "Creative opportunity and support"],
+                    ["Square (Challenge)", str(toplam_kare), "Growth test and dynamism"],
+                    ["Opposition (Tension)", str(toplam_karsit), "Awareness and search for balance"],
+                ]
+            else:
+                dagilim_data = [
+                    ["GEZEGEN ACI DAGILIMI", "ADET", "ANLAMI"],
+                    ["Kavusum (Birlesme)", str(toplam_kavusum), "Guclu cekim ve uyum"],
+                    ["Ucgen (Akis)", str(toplam_3gen), "Dogal uyum ve sans akisi"],
+                    ["Sekstil (Firsat)", str(toplam_sextil), "Yaratici firsat ve destek"],
+                    ["Kare (Mucadele)", str(toplam_kare), "Gelisim sinavi ve dinamizm"],
+                    ["Karsit (Gerilim)", str(toplam_karsit), "Farkindalik ve denge arayisi"],
+                ]
             dagilim_tablo = Table(dagilim_data, colWidths=['40%', '15%', '45%'])
             dagilim_tablo.setStyle(TableStyle([
                 ('BACKGROUND', (0,0), (-1,0), '#1A1A2E'),
@@ -9040,7 +9695,7 @@ class FBST_Engine:
 
             # --- EN GÜÇLÜ AÇILAR ---
             if guclu_acilar_text:
-                story.append(Paragraph("<b><font color='#C9A96E' size='11'>ÖNE ÇIKAN KADERSEL BAĞLAR</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(("<b><font color='#C9A96E' size='11'>PROMINENT KARMIC BONDS</font></b>" if (_EN or _ES) else "<b><font color='#C9A96E' size='11'>ÖNE ÇIKAN KADERSEL BAĞLAR</font></b>"), styles['TurkishNormal']))
                 story.append(Spacer(1, 8))
                 for i, aci_text in enumerate(guclu_acilar_text, 1):
                     aci_kutu = Table([[Paragraph(
@@ -9058,15 +9713,15 @@ class FBST_Engine:
             # --- ARAP NOKTALARI ÖZETİ ---
             if arap_ozet:
                 story.append(Spacer(1, 10))
-                story.append(Paragraph("<b><font color='#C9A96E' size='11'>ARAP NOKTALARI — KADERSEL KAPILAR</font></b>", styles['TurkishNormal']))
+                story.append(Paragraph(("<b><font color='#C9A96E' size='11'>ARABIC POINTS — FATE GATES</font></b>" if (_EN or _ES) else "<b><font color='#C9A96E' size='11'>ARAP NOKTALARI — KADERSEL KAPILAR</font></b>"), styles['TurkishNormal']))
                 story.append(Spacer(1, 8))
                 for isim in [self.p1_isim, self.p2_isim]:
                     if isim in arap_ozet:
                         oz = arap_ozet[isim]
                         if self.mod == "ebeveyn_cocuk":
-                            _etiket1, _etiket2 = "Baba", "Anne"
+                            _etiket1, _etiket2 = ("Father", "Mother") if _core_get_lang() in ("en", "es") else ("Baba", "Anne")
                         else:
-                            _etiket1, _etiket2 = "Evlilik", "Ask"
+                            _etiket1, _etiket2 = ("Marriage", "Love") if _core_get_lang() in ("en", "es") else ("Evlilik", "Ask")
                         arap_satir = Table([[
                             Paragraph(f"<font color='#C9A96E'><b>{isim}</b></font>", styles['TurkishNormal']),
                             Paragraph(f"<font color='#D1D5DB'>{_etiket1}: {oz['evlilik']}</font>", styles['TurkishNormal']),
@@ -9090,40 +9745,62 @@ class FBST_Engine:
 
             # Nihai yorum
             if toplam_kavusum >= 3:
-                buyuk_guc = "Kuvvetli Kavuşum Gücü"
-                buyuk_aciklama = f"{toplam_kavusum} adet kavuşum, bu ilişkinin kozmik bir manyetik alanla birbirine kenetlendiğini gösteriyor. Bu kadar yoğun birleşme noktası nadiren görülür."
+                buyuk_guc = ("Strong Conjunction Power" if (_EN or _ES) else "Kuvvetli Kavuşum Gücü")
+                buyuk_aciklama = (f"{toplam_kavusum} conjunctions show that this relationship is locked together by a cosmic magnetic field. Such an intense point of union is rarely seen." if (_EN or _ES) else f"{toplam_kavusum} adet kavuşum, bu ilişkinin kozmik bir manyetik alanla birbirine kenetlendiğini gösteriyor. Bu kadar yoğun birleşme noktası nadiren görülür.")
             elif toplam_3gen >= 3:
-                buyuk_guc = "Doğal Akış ve Uyum"
-                buyuk_aciklama = f"{toplam_3gen} adet üçgen açı, ilişkinizin doğuştan uyumlu ve akıcı olduğunu kanıtlıyor. Evren bu birlikteliği kolaylaştırmak için elinden geleni yapıyor."
+                buyuk_guc = ("Natural Flow and Harmony" if (_EN or _ES) else "Doğal Akış ve Uyum")
+                buyuk_aciklama = (f"{toplam_3gen} trine aspects prove that your relationship is naturally harmonious and flowing. The universe does everything to make this union easy." if (_EN or _ES) else f"{toplam_3gen} adet üçgen açı, ilişkinizin doğuştan uyumlu ve akıcı olduğunu kanıtlıyor. Evren bu birlikteliği kolaylaştırmak için elinden geleni yapıyor.")
             elif toplam_kare >= 3:
-                buyuk_guc = "Gelişim ve Dönüştürme Gücü"
-                buyuk_aciklama = f"{toplam_kare} adet kare açı, bu ilişkinin kolay olmadığını ama her sınavdan geçtiğinizde çok daha güçlü çıktığınızı gösteriyor. Savaşçı bir ruh eşi birlikteliği."
+                buyuk_guc = ("Growth and Transformation Power" if (_EN or _ES) else "Gelişim ve Dönüştürme Gücü")
+                buyuk_aciklama = (f"{toplam_kare} square aspects show that this relationship is not easy, but you come out much stronger each time you pass a test. A warrior soulmate union." if (_EN or _ES) else f"{toplam_kare} adet kare açı, bu ilişkinin kolay olmadığını ama her sınavdan geçtiğinizde çok daha güçlü çıktığınızı gösteriyor. Savaşçı bir ruh eşi birlikteliği.")
             else:
-                buyuk_guc = "Dengeli Kadersel İttifak"
-                buyuk_aciklama = "Açı dağılımı dengeli; bu ilişki hem huzur hem de gelişim alanlarını eşit ölçüde sunuyor."
+                buyuk_guc = ("Balanced Karmic Alliance" if (_EN or _ES) else "Dengeli Kadersel İttifak")
+                buyuk_aciklama = ("The aspect distribution is balanced; this relationship offers peace and growth areas in equal measure." if (_EN or _ES) else "Açı dağılımı dengeli; bu ilişki hem huzur hem de gelişim alanlarını eşit ölçüde sunuyor.")
 
-            nihai_yorum = (
-                f"<b><font color='#8B0000' size='12'>GENEL DEĞERLENDİRME:</font></b><br/><br/>"
-                f"<font color='#8B0000'><b>{self.p1_isim}</b> ve <b>{self.p2_isim}</b> arasındaki bu bağ, "
-                f"gezegen konumlarının ortaya koyduğu özellikler taşıyor. Yaş farkı etkisi {ks_yil:.2f} yıl, "
-                f"bağ gücü ise {tork}/10 olarak hesaplanmıştır.</font><br/><br/>"
-                f"<font color='#8B0000'><b>* {buyuk_guc}:</b></font> "
-                f"<font color='#8B0000'>{buyuk_aciklama}</font><br/><br/>"
-                f"<font color='#8B0000'>{altin_oran_metni.replace('✨ ', '').replace('🌊 ', '').replace('📏 ', '')}</font><br/><br/>"
-                f"<font color='#8B0000'><b>ÖZET:</b> Yukarıdaki analizler, iki kişi arasındaki bağın farklı boyutlarını "
-                f"göstermektedir. Gezegen konumları, açılar ve diğer astrolojik veriler "
-                f"bu raporun temelini oluşturur.</font>"
-            )
+            if (_EN or _ES):
+                nihai_yorum = (
+                    f"<b><font color='#8B0000' size='12'>OVERALL ASSESSMENT:</font></b><br/><br/>"
+                    f"<font color='#8B0000'><b>{self.p1_isim}</b> and <b>{self.p2_isim}</b> bond carries the qualities revealed by the planetary positions. "
+                    f"The age difference effect is calculated as {ks_yil:.2f} years, "
+                    f"and the bond strength as {tork}/10.</font><br/><br/>"
+                    f"<font color='#8B0000'><b>* {buyuk_guc}:</b></font> "
+                    f"<font color='#8B0000'>{buyuk_aciklama}</font><br/><br/>"
+                    f"<font color='#8B0000'>{altin_oran_metni.replace('✨ ', '').replace('🌊 ', '').replace('📏 ', '')}</font><br/><br/>"
+                    f"<font color='#8B0000'><b>SUMMARY:</b> The analyses above show the different dimensions of the bond between the two people. "
+                    f"Planetary positions, aspects and other astrological data "
+                    f"form the foundation of this report.</font>"
+                )
+            else:
+                nihai_yorum = (
+                    f"<b><font color='#8B0000' size='12'>GENEL DEĞERLENDİRME:</font></b><br/><br/>"
+                    f"<font color='#8B0000'><b>{self.p1_isim}</b> ve <b>{self.p2_isim}</b> arasındaki bu bağ, "
+                    f"gezegen konumlarının ortaya koyduğu özellikler taşıyor. Yaş farkı etkisi {ks_yil:.2f} yıl, "
+                    f"bağ gücü ise {tork}/10 olarak hesaplanmıştır.</font><br/><br/>"
+                    f"<font color='#8B0000'><b>* {buyuk_guc}:</b></font> "
+                    f"<font color='#8B0000'>{buyuk_aciklama}</font><br/><br/>"
+                    f"<font color='#8B0000'>{altin_oran_metni.replace('✨ ', '').replace('🌊 ', '').replace('📏 ', '')}</font><br/><br/>"
+                    f"<font color='#8B0000'><b>ÖZET:</b> Yukarıdaki analizler, iki kişi arasındaki bağın farklı boyutlarını "
+                    f"göstermektedir. Gezegen konumları, açılar ve diğer astrolojik veriler "
+                    f"bu raporun temelini oluşturur.</font>"
+                )
             story.append(Paragraph(nihai_yorum, styles['TurkishNormal']))
             story.append(Spacer(1, 30))
 
             # --- NİHAİ MÜHÜR ---
-            muhur_data = [
-                ["RAPOR ÖZETİ", ""],
-                [f"Bag Gucu: {tork}/10", f"Uyum Orani: %{fraktal}"],
-                [f"Toplam Aci: {toplam_aci} | Kavusum: {toplam_kavusum}", f"Yas Farki: {ks_yil:.2f} Yil"],
-                ["FAST - Fatih Asartepe Sinastri Tekniği v3.0", ""],
-            ]
+            if (_EN or _ES):
+                muhur_data = [
+                    ["REPORT SUMMARY", ""],
+                    [f"Bond Strength: {tork}/10", f"Harmony Rate: %{fraktal}"],
+                    [f"Total Aspects: {toplam_aci} | Conjunctions: {toplam_kavusum}", f"Age Difference: {ks_yil:.2f} Years"],
+                    ["FAST - Fatih Asartepe Synastry Technique v3.0", ""],
+                ]
+            else:
+                muhur_data = [
+                    ["RAPOR ÖZETİ", ""],
+                    [f"Bag Gucu: {tork}/10", f"Uyum Orani: %{fraktal}"],
+                    [f"Toplam Aci: {toplam_aci} | Kavusum: {toplam_kavusum}", f"Yas Farki: {ks_yil:.2f} Yil"],
+                    ["FAST - Fatih Asartepe Sinastri Tekniği v3.0", ""],
+                ]
             muhur_tablo = Table(muhur_data, colWidths=['50%', '50%'])
             muhur_tablo.setStyle(TableStyle([
                 ('BACKGROUND', (0,0), (-1,0), '#C9A96E'),
@@ -9149,20 +9826,43 @@ class FBST_Engine:
 
             # 📜 FERAGAT / UYARI BİLDİRİMİ
             story.append(Spacer(1, 20))
-            feragat_metni = (
-                "<b><font color='#718096' size='9'>⚠️ YASAL VE ETİK UYARI:</font></b>"
-                "<font color='#718096' size='8.5'><br/>"
-                "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
-                "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
-                "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
-                "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
-                "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
-                "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir.</font>"
-            )
+            if _EN:
+                feragat_metni = (
+                    "<b><font color='#718096' size='9'>⚠️ LEGAL AND ETHICAL NOTICE:</font></b>"
+                    "<font color='#718096' size='8.5'><br/>"
+                    "This report is an entertainment and insight tool made of astrological and symbolic interpretations; "
+                    "it does not constitute a scientific diagnosis, prediction or advice. Astrology is not a discipline that promises exact results. "
+                    "The content of this report in no way replaces medical, legal, financial, psychological or professional counseling. "
+                    "Always consult qualified professionals in the relevant field before making important life decisions. "
+                    "Your personal data has been used solely for the purpose of producing this report. "
+                    "The statements in the report are general and symbolic; every individual's own free will and choices always take priority.</font>"
+                )
+            elif _ES:
+                feragat_metni = (
+                    "<b><font color='#718096' size='9'>⚠️ AVISO LEGAL Y ÉTICO:</font></b>"
+                    "<font color='#718096' size='8.5'><br/>"
+                    "Este informe es una herramienta de entretenimiento e insight compuesta por interpretaciones astrológicas y simbólicas; "
+                    "no constituye un diagnóstico, predicción o consejo científico. La astrología no es una disciplina que prometa resultados exactos. "
+                    "El contenido de este informe no sustituye en modo alguno la asesoría médica, legal, financiera, psicológica o profesional. "
+                    "Consulte siempre a profesionales cualificados en el campo pertinente antes de tomar decisiones importantes en la vida. "
+                    "Sus datos personales han sido utilizados únicamente con el fin de producir este informe. "
+                    "Las afirmaciones del informe son generales y simbólicas; la libre voluntad y las elecciones de cada individuo siempre tienen prioridad.</font>"
+                )
+            else:
+                feragat_metni = (
+                    "<b><font color='#718096' size='9'>⚠️ YASAL VE ETİK UYARI:</font></b>"
+                    "<font color='#718096' size='8.5'><br/>"
+                    "Bu rapor, astrolojik ve sembolik yorumlardan oluşan bir eğlence ve içgörü aracıdır; "
+                    "bilimsel bir teşhis, tahmin veya tavsiye niteliği taşımaz. Astroloji, kesin sonuçlar vaat eden bir bilim dalı değildir. "
+                    "Rapor içeriği hiçbir şekilde tıbbi, hukuki, finansal, psikolojik veya mesleki danışmanlığın yerini tutmaz. "
+                    "Önemli yaşam kararları alırken mutlaka ilgili alandaki uzmanlara danışınız. "
+                    "Kişisel verileriniz yalnızca bu raporun üretilmesi amacıyla kullanılmıştır. "
+                    "Rapordaki ifadeler genel ve semboliktir; her bireyin kendi özgür iradesi ve tercihleri her zaman önceliklidir.</font>"
+                )
             story.append(Paragraph(feragat_metni, styles['TurkishNormal']))
 
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Nihai özet oluşturulurken hata: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Error while generating final summary: {str(e)}</font>" if _EN else f"<font color='red'>Nihai özet oluşturulurken hata: {str(e)}</font>"), styles['TurkishNormal']))
 
         # FİNAL DOKÜMAN BİRLEŞTİRİCİ
         doc.build(story, onFirstPage=kapak_ciz, onLaterPages=sonraki_sayfa_ciz)
@@ -9191,6 +9891,8 @@ class FBST_Engine:
     def pdf_potansiyel_rapor_uret(self, dosya_adi=None):
         """Potansiyel & Yetenek modülü için tek kişilik odaklı PDF raporu üretir."""
         _core_set_lang(self._lang)
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         if dosya_adi is None:
             dosya_adi = f"{self._session_id}_Potansiyel_Yetenek.pdf"
         from reportlab.lib.pagesizes import A4
@@ -9287,24 +9989,45 @@ class FBST_Engine:
                 story.append(Spacer(1, 20))
                 story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=3.0))
                 story.append(Spacer(1, 20))
-                story.append(Paragraph("POTANSİYEL VE YETENEK RAPORU" if _core_get_lang() != "en" else "POTENTIAL AND TALENT REPORT", styles['CoverSub']))
+                story.append(Paragraph(("POTENTIAL AND TALENT REPORT" if _EN else ("INFORME DE POTENCIAL Y TALENTO" if _ES else "POTANSİYEL VE YETENEK RAPORU")), styles['CoverSub']))
                 story.append(Spacer(1, 30))
                 story.append(Paragraph(f"<b>{self.p1_isim}</b>", styles['CoverSub']))
             story.append(PageBreak())
 
         # ═══ BİLGİ SAYFASI ═══
-        baslik_karti_ekle("KİŞİ BİLGİLERİ", alt_baslik="Doğum haritası ve potansiyel analiz özeti", emoji="📋")
+        baslik_karti_ekle("KİŞİ BİLGİLERİ", alt_baslik=("Natal chart and potential analysis summary" if _EN else ("Resumen de la carta natal y del análisis de potencial" if _ES else "Doğum haritası ve potansiyel analiz özeti")), emoji="📋")
         story.append(Spacer(1, 8))
 
-        bilgi_data = [
-            ["KİŞİ BİLGİLERİ", ""],
-            ["İsim:", self.p1_isim],
-            ["Doğum Tarihi:", self.p1.strftime("%d.%m.%Y")],
-            ["Doğum Saati:", f"{self.event_time_str} (UTC{self.utc_offset:g})" if self.utc_offset else self.event_time_str],
-            ["Doğum Yeri:", f"{self.city}, {self.country}"],
-            ["Enlem:", f"{self.enlem:.4f}"],
-            ["Boylam:", f"{self.boylam:.4f}"],
-        ]
+        if _EN:
+            bilgi_data = [
+                ["PERSONAL INFORMATION", ""],
+                ["Name:", self.p1_isim],
+                ["Date of Birth:", self.p1.strftime("%d.%m.%Y")],
+                ["Time of Birth:", f"{self.event_time_str} (UTC{self.utc_offset:g})" if self.utc_offset else self.event_time_str],
+                ["Place of Birth:", f"{self.city}, {self.country}"],
+                ["Latitude:", f"{self.enlem:.4f}"],
+                ["Longitude:", f"{self.boylam:.4f}"],
+            ]
+        elif _ES:
+            bilgi_data = [
+                ["INFORMACIÓN PERSONAL", ""],
+                ["Nombre:", self.p1_isim],
+                ["Fecha de Nacimiento:", self.p1.strftime("%d.%m.%Y")],
+                ["Hora de Nacimiento:", f"{self.event_time_str} (UTC{self.utc_offset:g})" if self.utc_offset else self.event_time_str],
+                ["Lugar de Nacimiento:", f"{self.city}, {self.country}"],
+                ["Latitud:", f"{self.enlem:.4f}"],
+                ["Longitud:", f"{self.boylam:.4f}"],
+            ]
+        else:
+            bilgi_data = [
+                ["KİŞİ BİLGİLERİ", ""],
+                ["İsim:", self.p1_isim],
+                ["Doğum Tarihi:", self.p1.strftime("%d.%m.%Y")],
+                ["Doğum Saati:", f"{self.event_time_str} (UTC{self.utc_offset:g})" if self.utc_offset else self.event_time_str],
+                ["Doğum Yeri:", f"{self.city}, {self.country}"],
+                ["Enlem:", f"{self.enlem:.4f}"],
+                ["Boylam:", f"{self.boylam:.4f}"],
+            ]
         bilgi_tablo = Table(bilgi_data, colWidths=['30%', '70%'])
         bilgi_tablo.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,0), '#1A1A2E'),
@@ -9330,20 +10053,20 @@ class FBST_Engine:
         story.append(Spacer(1, 15))
 
         # ═══ NATAL HARİTA ═══
-        baslik_karti_ekle("NATAL HARİTA", alt_baslik="Doğum anındaki gökyüzü konumları", emoji="🌟")
+        baslik_karti_ekle("NATAL HARİTA", alt_baslik=("Celestial positions at the moment of birth" if _EN else ("Posiciones celestes en el momento del nacimiento" if _ES else "Doğum anındaki gökyüzü konumları")), emoji="🌟")
         story.append(Spacer(1, 8))
 
         harita_dosya = f"{self._session_id}_Situa_A.png"
         if os.path.exists(harita_dosya):
             story.append(Image(harita_dosya, width=400, height=400))
         else:
-            story.append(Paragraph("Natal harita görseli oluşturulamadı.", styles['TurkishNormal']))
+            story.append(Paragraph(("The natal chart image could not be generated." if _EN else ("No se pudo generar la imagen de la carta natal." if _ES else "Natal harita görseli oluşturulamadı.")), styles['TurkishNormal']))
         story.append(Spacer(1, 10))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ ELEMENT VE NİTELİK DAĞILIMI ═══
-        baslik_karti_ekle("ELEMENT VE NİTELİK DAĞILIMI", alt_baslik="Doğum haritasındaki enerji dengesi", emoji="🎨")
+        baslik_karti_ekle("ELEMENT VE NİTELİK DAĞILIMI", alt_baslik=("Energy balance within the natal chart" if _EN else ("El equilibrio energético dentro de la carta natal" if _ES else "Doğum haritasındaki enerji dengesi")), emoji="🎨")
         story.append(Spacer(1, 8))
         try:
             from reportlab.graphics.shapes import Drawing, Rect, String as RLString
@@ -9366,44 +10089,59 @@ class FBST_Engine:
             toplam_nt = sum(nitelik_sayac.values()) or 1
             bar_genislik = 380
             bar_yukseklik = 14
-            story.append(Paragraph("<font color='#1A1A2E'><b>ELEMENT DAĞILIMI:</b></font>", styles['TurkishNormal']))
+            story.append(Paragraph(("<font color='#1A1A2E'><b>ELEMENT DISTRIBUTION:</b></font>" if _EN else ("<font color='#1A1A2E'><b>DISTRIBUCIÓN DE ELEMENTOS:</b></font>" if _ES else "<font color='#1A1A2E'><b>ELEMENT DAĞILIMI:</b></font>")), styles['TurkishNormal']))
             for isim_el, sayi in element_sayac.items():
                 oran = sayi / toplam_el
                 d = Drawing(500, bar_yukseklik + 4)
                 d.add(Rect(0, 2, bar_genislik, bar_yukseklik, fillColor=HexColor("#F0F4F8"), strokeColor=HexColor("#C9A96E"), strokeWidth=0.8))
                 d.add(Rect(0, 2, bar_genislik * oran, bar_yukseklik, fillColor=HexColor(element_renk.get(isim_el, "#C9A96E")), strokeWidth=0))
-                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{isim_el}: %{round(oran * 100)} ({sayi} gezegen)", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
+                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{pdf_label(isim_el)}: %{round(oran * 100)} ({sayi} {'planet' if _EN and sayi == 1 else 'planets' if _EN else ('planeta' if _ES and sayi == 1 else 'planetas' if _ES else 'gezegen')})", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
                 story.append(Spacer(1, 2))
                 story.append(d)
             story.append(Spacer(1, 6))
-            story.append(Paragraph("<font color='#1A1A2E'><b>NİTELİK DAĞILIMI:</b></font>", styles['TurkishNormal']))
+            story.append(Paragraph(("<font color='#1A1A2E'><b>QUALITY DISTRIBUTION:</b></font>" if _EN else ("<font color='#1A1A2E'><b>DISTRIBUCIÓN DE CUALIDADES:</b></font>" if _ES else "<font color='#1A1A2E'><b>NİTELİK DAĞILIMI:</b></font>")), styles['TurkishNormal']))
             for isim_nt, sayi in nitelik_sayac.items():
                 oran = sayi / toplam_nt
                 d = Drawing(500, bar_yukseklik + 4)
                 d.add(Rect(0, 2, bar_genislik, bar_yukseklik, fillColor=HexColor("#F0F4F8"), strokeColor=HexColor("#C9A96E"), strokeWidth=0.8))
                 d.add(Rect(0, 2, bar_genislik * oran, bar_yukseklik, fillColor=HexColor("#8E44AD"), strokeWidth=0))
-                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{isim_nt}: %{round(oran * 100)}", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
+                d.add(RLString(bar_genislik + 10, bar_yukseklik - 1, f"{pdf_label(isim_nt)}: %{round(oran * 100)}", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
                 story.append(Spacer(1, 2))
                 story.append(d)
             baskin_el = max(element_sayac, key=element_sayac.get)
             baskin_nt = max(nitelik_sayac, key=nitelik_sayac.get)
             element_aciklama = {
-                "Ateş": "enerji, cesaret ve eylem ön plandadır; hareket etmeden gelişemez",
-                "Toprak": "somutluk, istikrar ve üretkenlik ön plandadır; sonuç görmeden tatmin olmaz",
-                "Hava": "düşünce, iletişim ve sosyallik ön plandadır; fikir üretmeden gelişemez",
-                "Su": "duygu, sezgi ve merhamet ön plandadır; hissetmeden derinleşemez",
+                "Ateş": ("energy, courage and action take the lead; it cannot grow without moving", "enerji, cesaret ve eylem ön plandadır; hareket etmeden gelişemez", "la energía, el coraje y la acción toman la delantera; no puede crecer sin moverse"),
+                "Toprak": ("concreteness, stability and productivity take the lead; it is not satisfied without seeing results", "somutluk, istikrar ve üretkenlik ön plandadır; sonuç görmeden tatmin olmaz", "la concreción, la estabilidad y la productividad toman la delantera; no se satisface sin ver resultados"),
+                "Hava": ("thought, communication and sociability take the lead; it cannot grow without producing ideas", "düşünce, iletişim ve sosyallik ön plandadır; fikir üretmeden gelişemez", "el pensamiento, la comunicación y la sociabilidad toman la delantera; no puede crecer sin producir ideas"),
+                "Su": ("emotion, intuition and compassion take the lead; it cannot deepen without feeling", "duygu, sezgi ve merhamet ön plandadır; hissetmeden derinleşemez", "la emoción, la intuición y la compasión toman la delantera; no puede profundizar sin sentir"),
             }
             nitelik_aciklama = {
-                "Öncü": "girişimci ve başlatıcı bir enerji taşır; yeni alanlara cesaretle adım atar",
-                "Sabit": "kararlı ve sürdürücü bir enerji taşır; başladığı işi derinleştirir",
-                "Değişken": "uyumlu ve esnek bir enerji taşır; değişen koşullara hızla uyum sağlar",
+                "Öncü": ("carries an enterprising and initiating energy; it steps boldly into new areas", "girişimci ve başlatıcı bir enerji taşır; yeni alanlara cesaretle adım atar", "porta una energía emprendedora e iniciadora; se adentra con valentía en nuevas áreas"),
+                "Sabit": ("carries a determined and sustaining energy; it deepens the work it has begun", "kararlı ve sürdürücü bir enerji taşır; başladığı işi derinleştirir", "porta una energía firme y sostenida; profundiza el trabajo que ha comenzado"),
+                "Değişken": ("carries a harmonious and flexible energy; it adapts quickly to changing conditions", "uyumlu ve esnek bir enerji taşır; değişen koşullara hızla uyum sağlar", "porta una energía armoniosa y flexible; se adapta rápidamente a las condiciones cambiantes"),
             }
-            element_yorum = (
-                f"<font color='#1A1A2E'><b>Baskın Element: {baskin_el}</b></font><br/>"
-                f"<font color='#4A4A4A'>Haritanızda {baskin_el} elementinin gücü yüksektir: {element_aciklama.get(baskin_el, '')}. "
-                f"Baskın nitelik <b>{baskin_nt}</b>'dir: {nitelik_aciklama.get(baskin_nt, '')}. "
-                f"Bu denge, potansiyel alanlarının nasıl yaşanacağını şekillendirir.</font>"
-            )
+            if _EN:
+                element_yorum = (
+                    f"<font color='#1A1A2E'><b>Dominant Element: {pdf_label(baskin_el)}</b></font><br/>"
+                    f"<font color='#4A4A4A'>The power of the {pdf_label(baskin_el)} element is high in your chart: {element_aciklama.get(baskin_el, ('', '', ''))[0]}. "
+                    f"The dominant quality is <b>{pdf_label(baskin_nt)}</b>: {nitelik_aciklama.get(baskin_nt, ('', '', ''))[0]}. "
+                    f"This balance shapes how your potential areas will be lived.</font>"
+                )
+            elif _ES:
+                element_yorum = (
+                    f"<font color='#1A1A2E'><b>Elemento Dominante: {pdf_label(baskin_el)}</b></font><br/>"
+                    f"<font color='#4A4A4A'>El poder del elemento {pdf_label(baskin_el)} es alto en tu carta: {element_aciklama.get(baskin_el, ('', '', ''))[2]}. "
+                    f"La cualidad dominante es <b>{pdf_label(baskin_nt)}</b>: {nitelik_aciklama.get(baskin_nt, ('', '', ''))[2]}. "
+                    f"Este equilibrio moldea cómo se vivirán tus áreas de potencial.</font>"
+                )
+            else:
+                element_yorum = (
+                    f"<font color='#1A1A2E'><b>Baskın Element: {baskin_el}</b></font><br/>"
+                    f"<font color='#4A4A4A'>Haritanızda {baskin_el} elementinin gücü yüksektir: {element_aciklama.get(baskin_el, ('', '', ''))[1]}. "
+                    f"Baskın nitelik <b>{baskin_nt}</b>'dir: {nitelik_aciklama.get(baskin_nt, ('', '', ''))[1]}. "
+                    f"Bu denge, potansiyel alanlarının nasıl yaşanacağını şekillendirir.</font>"
+                )
             element_kutu = Table([[Paragraph(element_yorum, styles['TurkishNormal'])]], colWidths=['100%'])
             element_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
@@ -9413,14 +10151,14 @@ class FBST_Engine:
             story.append(Spacer(1, 6))
             story.append(element_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Element dağılımı hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Element distribution error: {str(e)}</font>" if _EN else f"<font color='red'>Element dağılımı hatası: {str(e)}</font>"), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ AÇI HARİTASI ═══
-        baslik_karti_ekle("AÇI HARİTASI", alt_baslik="Gezegenler arası açılar ve tolerans (orb) değerleri", emoji="📐")
+        baslik_karti_ekle("AÇI HARİTASI", alt_baslik=("Angles between planets and their tolerance (orb) values" if _EN else ("Ángulos entre planetas y sus valores de tolerancia (orbe)" if _ES else "Gezegenler arası açılar ve tolerans (orb) değerleri")), emoji="📐")
         story.append(Spacer(1, 8))
         try:
             konumlar_ah = self.gezegen_konum_analizi()
@@ -9439,10 +10177,15 @@ class FBST_Engine:
                     for ac_derece, ac_isim, orb_limit in aci_turleri:
                         orb = abs(fark - ac_derece)
                         if orb <= orb_limit:
-                            aci_satirlari.append([g1, g2, f"{ac_isim} ({ac_derece}°)", f"{orb:.1f}°"])
+                            aci_satirlari.append([pdf_label(g1), pdf_label(g2), f"{pdf_label(ac_isim)} ({ac_derece}°)", f"{orb:.1f}°"])
                             break
             if aci_satirlari:
-                ac_data = [["GEZEGEN A", "GEZEGEN B", "AÇI", "ORB"]] + aci_satirlari
+                if _EN:
+                    ac_data = [["PLANET A", "PLANET B", "ASPECT", "ORB"]] + aci_satirlari
+                elif _ES:
+                    ac_data = [["PLANETA A", "PLANETA B", "ASPECTO", "ORBE"]] + aci_satirlari
+                else:
+                    ac_data = [["GEZEGEN A", "GEZEGEN B", "AÇI", "ORB"]] + aci_satirlari
                 ac_tablo = Table(ac_data, colWidths=['25%', '25%', '30%', '20%'])
                 ac_tablo.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, 0), '#1A1A2E'),
@@ -9461,25 +10204,30 @@ class FBST_Engine:
                 ]))
                 story.append(ac_tablo)
             else:
-                story.append(Paragraph("Belirgin bir gezegen açısı tespit edilemedi.", styles['TurkishNormal']))
+                story.append(Paragraph(("No distinct planetary aspect could be detected." if _EN else ("No se pudo detectar ningún aspecto planetario distintivo." if _ES else "Belirgin bir gezegen açısı tespit edilemedi.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Açı haritası hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Aspect map error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en el mapa de aspectos: {str(e)}</font>" if _ES else f"<font color='red'>Açı haritası hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ GEZEGEN POZİSYONLARI ═══
-        baslik_karti_ekle("GEZEGEN POZİSYONLARI", alt_baslik="Doğum anındaki gezegen, asteroid ve kadersel noktalar", emoji="🪐")
+        baslik_karti_ekle("GEZEGEN POZİSYONLARI", alt_baslik=("Planets, asteroids and karmic points at the moment of birth" if _EN else ("Planetas, asteroides y puntos kármicos en el momento del nacimiento" if _ES else "Doğum anındaki gezegen, asteroid ve kadersel noktalar")), emoji="🪐")
         story.append(Spacer(1, 8))
 
         try:
             gp = self.gezegen_konum_analizi()
             if gp:
-                gp_data = [["GEZEGEN", "DERECE", "BURÇ", "EV"]]
+                if _EN:
+                    gp_data = [["PLANET", "DEGREE", "SIGN", "HOUSE"]]
+                elif _ES:
+                    gp_data = [["PLANETA", "GRADO", "SIGNO", "CASA"]]
+                else:
+                    gp_data = [["GEZEGEN", "DERECE", "BURÇ", "EV"]]
                 for g_isim, g_bilgi in gp.items():
                     derece_str = f"{g_bilgi['derece']}°{g_bilgi['dakika']}'" if 'dakika' in g_bilgi else f"{g_bilgi.get('ham_derece', 0):.2f}°"
-                    gp_data.append([g_isim, derece_str, g_bilgi.get('burc', '—'), f"{g_bilgi.get('ev', '—')}. Ev"])
+                    gp_data.append([pdf_label(g_isim), derece_str, pdf_label(g_bilgi.get('burc', '—')), f"{g_bilgi.get('ev', '—')}. {pdf_label('Ev')}"])
                 kad_bilgi = gp.get("KAD")
                 if kad_bilgi:
                     try:
@@ -9488,7 +10236,7 @@ class FBST_Engine:
                         gad_derece = int(gad_ham % 30)
                         gad_dakika = int((gad_ham % 30 - gad_derece) * 60)
                         gad_ev = ((kad_bilgi.get('ev', 1) + 5) % 12) + 1
-                        gp_data.append(["GAD (Güney Ay Düğümü)", f"{gad_derece}°{gad_dakika}'", gad_burc, f"{gad_ev}. Ev"])
+                        gp_data.append([("GAD (South Node)" if _EN else ("GAD (Nodo Sur)" if _ES else "GAD (Güney Ay Düğümü)")), f"{gad_derece}°{gad_dakika}'", pdf_label(gad_burc), f"{gad_ev}. {pdf_label('Ev')}"])
                     except Exception:
                         pass
                 gp_tablo = Table(gp_data, colWidths=['25%', '25%', '25%', '25%'])
@@ -9509,26 +10257,45 @@ class FBST_Engine:
                 ]))
                 story.append(gp_tablo)
             else:
-                story.append(Paragraph("Gezegen pozisyonları hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Planet positions could not be calculated." if _EN else ("No se pudieron calcular las posiciones planetarias." if _ES else "Gezegen pozisyonları hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Gezegen pozisyonları hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Planet positions error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en las posiciones planetarias: {str(e)}</font>" if _ES else f"<font color='red'>Gezegen pozisyonları hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ ZORLUKLAR VE ENGELLER ═══
-        baslik_karti_ekle("ZORLUKLAR VE ENGELLER", alt_baslik="Kare ve karşıt açıların gölge tarafları ve dönüşüm yolları", emoji="⚖️")
+        baslik_karti_ekle("ZORLUKLAR VE ENGELLER", alt_baslik=("Shadow sides of squares and oppositions, and paths of transformation" if _EN else ("El lado oscuro de las cuadraturas y oposiciones, y los caminos de transformación" if _ES else "Kare ve karşıt açıların gölge tarafları ve dönüşüm yolları")), emoji="⚖️")
         story.append(Spacer(1, 8))
         try:
-            gezegen_anlamlari = {
-                "Güneş": "öz benlik ve irade", "Ay": "duygusal dünya", "Merkür": "iletişim ve zihin",
-                "Venüs": "sevgi ve değerler", "Mars": "eylem ve cesaret", "Jüpiter": "genişleme ve iyimserlik",
-                "Satürn": "sınırlar ve disiplin", "Uranüs": "özgürlük ve değişim", "Neptün": "hayal gücü ve belirsizlik",
-                "Plüton": "dönüşüm ve kontrol", "Chiron": "yaralanma ve şifa", "Ceres": "beslenme ve koruma",
-                "Pallas": "strateji ve bilgelik", "Juno": "adalet ve bağlılık", "Vesta": "odak ve adanmışlık",
-                "KAD": "yaşam amacı", "GAD": "konfor alanı",
-            }
+            if _EN:
+                gezegen_anlamlari = {
+                    "Güneş": "self and will", "Ay": "emotional world", "Merkür": "communication and mind",
+                    "Venüs": "love and values", "Mars": "action and courage", "Jüpiter": "expansion and optimism",
+                    "Satürn": "boundaries and discipline", "Uranüs": "freedom and change", "Neptün": "imagination and ambiguity",
+                    "Plüton": "transformation and control", "Chiron": "wound and healing", "Ceres": "nourishment and protection",
+                    "Pallas": "strategy and wisdom", "Juno": "justice and commitment", "Vesta": "focus and devotion",
+                    "KAD": "life purpose", "GAD": "comfort zone",
+                }
+            elif _ES:
+                gezegen_anlamlari = {
+                    "Güneş": "el yo y la voluntad", "Ay": "el mundo emocional", "Merkür": "comunicación y mente",
+                    "Venüs": "amor y valores", "Mars": "acción y coraje", "Jüpiter": "expansión y optimismo",
+                    "Satürn": "límites y disciplina", "Uranüs": "libertad y cambio", "Neptün": "imaginación y ambigüedad",
+                    "Plüton": "transformación y control", "Chiron": "herida y sanación", "Ceres": "nutrición y protección",
+                    "Pallas": "estrategia y sabiduría", "Juno": "justicia y compromiso", "Vesta": "enfoque y devoción",
+                    "KAD": "propósito de vida", "GAD": "zona de confort",
+                }
+            else:
+                gezegen_anlamlari = {
+                    "Güneş": "öz benlik ve irade", "Ay": "duygusal dünya", "Merkür": "iletişim ve zihin",
+                    "Venüs": "sevgi ve değerler", "Mars": "eylem ve cesaret", "Jüpiter": "genişleme ve iyimserlik",
+                    "Satürn": "sınırlar ve disiplin", "Uranüs": "özgürlük ve değişim", "Neptün": "hayal gücü ve belirsizlik",
+                    "Plüton": "dönüşüm ve kontrol", "Chiron": "yaralanma ve şifa", "Ceres": "beslenme ve koruma",
+                    "Pallas": "strateji ve bilgelik", "Juno": "adalet ve bağlılık", "Vesta": "odak ve adanmışlık",
+                    "KAD": "yaşam amacı", "GAD": "konfor alanı",
+                }
             potansiyel_sonuclari = self.potansiyel_hesapla()
             zorluk_satirlari = [s for s in (potansiyel_sonuclari or []) if s.get('aci_turu') in ('90', '180')]
             if zorluk_satirlari:
@@ -9541,29 +10308,73 @@ class FBST_Engine:
                     g1, g2 = (satir['aci'] + "|").split("|")[0].split("-") if "-" in satir['aci'] else (satir['aci'], "")
                     g1 = g1.strip()
                     g2 = g2.strip()
-                    anlam1 = gezegen_anlamlari.get(g1, "enerji alanı")
-                    anlam2 = gezegen_anlamlari.get(g2, "enerji alanı") if g2 else ""
-                    if satir['aci_turu'] == '90':
-                        zorluk_metni = (
-                            f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki kare açı, "
-                            f"içsel bir gerilim yaratabilir. Bu gerilim; sabırsızlık, aşırılık veya zıt ihtiyaçlar "
-                            f"arasında bocalama olarak görünebilir."
+                    anlam1 = gezegen_anlamlari.get(g1, ("energy area" if _EN else ("área de energía" if _ES else "enerji alanı")))
+                    anlam2 = gezegen_anlamlari.get(g2, "") if g2 else ""
+                    if _EN:
+                        if satir['aci_turu'] == '90':
+                            zorluk_metni = (
+                                f"<b>Shadow side:</b> The square aspect between {pdf_label(g1)} ({anlam1}) and {pdf_label(g2)} ({anlam2}) "
+                                f"can create inner tension. This tension may appear as impatience, excess or wavering between opposing needs."
+                            )
+                        else:
+                            zorluk_metni = (
+                                f"<b>Shadow side:</b> The opposition aspect between {pdf_label(g1)} ({anlam1}) and {pdf_label(g2)} ({anlam2}) "
+                                f"can create a tendency to swing between two poles. It may appear as difficulty finding balance, "
+                                f"indecision or one-sidedness."
+                            )
+                        asma_yolu = (
+                            f"<b>Path of transformation:</b> Through conscious work in the {pdf_label(satir['alan'])} area, "
+                            f"this energy turns into a powerful driving force. Awareness, regular practice and patience are "
+                            f"the keys that convert tension into talent."
+                        )
+                        zorluk_metni_html = (
+                            f"<font color='#8B0000'><b>{pdf_label(satir['alan'])} — {pdf_label(g1)} & {pdf_label(g2)} ({satir['aci_turu']}° Aspect, orb {satir.get('orb', '—')}°)</b></font><br/>"
+                            f"<font color='#4A4A4A'>{zorluk_metni}<br/>{asma_yolu}</font>"
+                        )
+                    elif _ES:
+                        if satir['aci_turu'] == '90':
+                            zorluk_metni = (
+                                f"<b>Lado sombra:</b> El aspecto de cuadratura entre {pdf_label(g1)} ({anlam1}) y {pdf_label(g2)} ({anlam2}) "
+                                f"puede crear una tensión interna. Esta tensión puede aparecer como impaciencia, exceso o vacilación "
+                                f"entre necesidades opuestas."
+                            )
+                        else:
+                            zorluk_metni = (
+                                f"<b>Lado sombra:</b> El aspecto de oposición entre {pdf_label(g1)} ({anlam1}) y {pdf_label(g2)} ({anlam2}) "
+                                f"puede crear una tendencia a oscilar entre dos polos. Puede manifestarse como dificultad para encontrar "
+                                f"el equilibrio, indecisión o parcialidad."
+                            )
+                        asma_yolu = (
+                            f"<b>Camino de transformación:</b> Con un trabajo consciente en el área de {pdf_label(satir['alan'])}, "
+                            f"esta energía se convierte en una fuerza impulsora poderosa. La conciencia, la práctica regular y la paciencia "
+                            f"son las claves que convierten la tensión en talento."
+                        )
+                        zorluk_metni_html = (
+                            f"<font color='#8B0000'><b>{pdf_label(satir['alan'])} — {pdf_label(g1)} & {pdf_label(g2)} (Aspecto de {satir['aci_turu']}°, orbe {satir.get('orb', '—')}°)</b></font><br/>"
+                            f"<font color='#4A4A4A'>{zorluk_metni}<br/>{asma_yolu}</font>"
                         )
                     else:
-                        zorluk_metni = (
-                            f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki karşıt açı, "
-                            f"iki kutup arasında gidip gelme eğilimi yaratabilir. Dengeyi kurmakta zorlanma, "
-                            f"kararsızlık veya taraflı davranma olarak görünebilir."
+                        if satir['aci_turu'] == '90':
+                            zorluk_metni = (
+                                f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki kare açı, "
+                                f"içsel bir gerilim yaratabilir. Bu gerilim; sabırsızlık, aşırılık veya zıt ihtiyaçlar "
+                                f"arasında bocalama olarak görünebilir."
+                            )
+                        else:
+                            zorluk_metni = (
+                                f"<b>Gölge tarafı:</b> {g1} ({anlam1}) ile {g2} ({anlam2}) arasındaki karşıt açı, "
+                                f"iki kutup arasında gidip gelme eğilimi yaratabilir. Dengeyi kurmakta zorlanma, "
+                                f"kararsızlık veya taraflı davranma olarak görünebilir."
+                            )
+                        asma_yolu = (
+                            f"<b>Dönüşüm yolu:</b> Bu enerji, {satir['alan']} alanında bilinçli çalışmayla "
+                            f"güçlü bir itici güce dönüşür. Farkındalık, düzenli pratik ve sabır, gerilimi "
+                            f"yeteneğe çeviren anahtarlardır."
                         )
-                    asma_yolu = (
-                        f"<b>Dönüşüm yolu:</b> Bu enerji, {satir['alan']} alanında bilinçli çalışmayla "
-                        f"güçlü bir itici güce dönüşür. Farkındalık, düzenli pratik ve sabır, gerilimi "
-                        f"yeteneğe çeviren anahtarlardır."
-                    )
-                    zorluk_metni_html = (
-                        f"<font color='#8B0000'><b>{satir['alan']} — {g1} & {g2} ({satir['aci_turu']}° Açı, orb {satir.get('orb', '—')}°)</b></font><br/>"
-                        f"<font color='#4A4A4A'>{zorluk_metni}<br/>{asma_yolu}</font>"
-                    )
+                        zorluk_metni_html = (
+                            f"<font color='#8B0000'><b>{satir['alan']} — {g1} & {g2} ({satir['aci_turu']}° Açı, orb {satir.get('orb', '—')}°)</b></font><br/>"
+                            f"<font color='#4A4A4A'>{zorluk_metni}<br/>{asma_yolu}</font>"
+                        )
                     zorluk_kutu = Table([[Paragraph(zorluk_metni_html, styles['TurkishNormal'])]], colWidths=['100%'])
                     zorluk_kutu.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FDF6F0")),
@@ -9573,16 +10384,16 @@ class FBST_Engine:
                     story.append(zorluk_kutu)
                     story.append(Spacer(1, 6))
             else:
-                story.append(Paragraph("Belirgin bir kare veya karşıt açı tespit edilemedi. Enerji akışı nispeten uyumludur.", styles['TurkishNormal']))
+                story.append(Paragraph(("No distinct square or opposition aspect was detected. The energy flow is relatively harmonious." if _EN else ("No se detectó ningún aspecto de cuadratura u oposición distintivo. El flujo de energía es relativamente armonioso." if _ES else "Belirgin bir kare veya karşıt açı tespit edilemedi. Enerji akışı nispeten uyumludur.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Zorluklar bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Challenges section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de desafíos: {str(e)}</font>" if _ES else f"<font color='red'>Zorluklar bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ POTANSİYEL VE YETENEK ALANLARI ═══
-        baslik_karti_ekle("POTANSİYEL VE YETENEK ALANLARI", alt_baslik="Doğal yetenek ve potansiyel alanları açısal analizle belirlenmiştir", emoji="💡")
+        baslik_karti_ekle("POTANSİYEL VE YETENEK ALANLARI", alt_baslik=("Natural talent and potential areas determined by aspect analysis" if _EN else ("Los talentos naturales y las áreas de potencial se identificaron mediante el análisis de aspectos" if _ES else "Doğal yetenek ve potansiyel alanları açısal analizle belirlenmiştir")), emoji="💡")
         story.append(Spacer(1, 8))
 
         potansiyel_sonuclari = self.potansiyel_hesapla()
@@ -9591,10 +10402,25 @@ class FBST_Engine:
             for satir in potansiyel_sonuclari:
                 if satir['alan'] not in gorulen_alanlar:
                     gorulen_alanlar.add(satir['alan'])
-                    potansiyel_metni = (
-                        f"<font color='#1A1A2E'><b>{satir['alan']} ({satir['aci']} — {satir['aci_turu']} Açısı)</b></font><br/>"
-                        f"<font color='#4A4A4A'>{pdf_temizle(satir['metin'])}</font>"
-                    )
+                    if _EN:
+                        _aci_parcalar = [pdf_label(p.strip()) for p in satir['aci'].split("-")] if "-" in satir['aci'] else [pdf_label(satir['aci'])]
+                        _aci_cift = " & ".join(_aci_parcalar)
+                        potansiyel_metni = (
+                            f"<font color='#1A1A2E'><b>{pdf_label(satir['alan'])} ({_aci_cift} — {satir['aci_turu']} {pdf_label('Açısı')})</b></font><br/>"
+                            f"<font color='#4A4A4A'>{pdf_temizle(satir['metin'])}</font>"
+                        )
+                    elif _ES:
+                        _aci_parcalar = [pdf_label(p.strip()) for p in satir['aci'].split("-")] if "-" in satir['aci'] else [pdf_label(satir['aci'])]
+                        _aci_cift = " & ".join(_aci_parcalar)
+                        potansiyel_metni = (
+                            f"<font color='#1A1A2E'><b>{pdf_label(satir['alan'])} ({_aci_cift} — Aspecto de {satir['aci_turu']}°)</b></font><br/>"
+                            f"<font color='#4A4A4A'>{pdf_temizle(satir['metin'])}</font>"
+                        )
+                    else:
+                        potansiyel_metni = (
+                            f"<font color='#1A1A2E'><b>{satir['alan']} ({satir['aci']} — {satir['aci_turu']} Açısı)</b></font><br/>"
+                            f"<font color='#4A4A4A'>{pdf_temizle(satir['metin'])}</font>"
+                        )
                     potansiyel_kutu = Table([[Paragraph(potansiyel_metni, styles['TurkishNormal'])]], colWidths=['100%'])
                     potansiyel_kutu.setStyle(TableStyle([
                         ('BACKGROUND', (0,0), (-1,-1), KART_ARKA_PLAN),
@@ -9604,50 +10430,103 @@ class FBST_Engine:
                     story.append(potansiyel_kutu)
                     story.append(Spacer(1, 6))
         else:
-            story.append(Paragraph("Belirgin bir potansiyel alanı tespit edilemedi.", styles['TurkishNormal']))
+            story.append(Paragraph(("No distinct potential area could be detected." if _EN else ("No se pudo detectar ninguna área de potencial distintiva." if _ES else "Belirgin bir potansiyel alanı tespit edilemedi.")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ GAD VE CHİRON — RUHSAL YOL HARİTASI ═══
-        baslik_karti_ekle("AY DÜĞÜMLERİ VE CHİRON", alt_baslik="Güney Ay Düğümü, Kuzey Ay Düğümü ve Chiron'un ruhsal yolculuğu", emoji="🪐")
+        baslik_karti_ekle("AY DÜĞÜMLERİ VE CHİRON", alt_baslik=("Spiritual journey of the South Node, North Node and Chiron" if _EN else ("El viaje espiritual del Nodo Sur, el Nodo Norte y Quirón" if _ES else "Güney Ay Düğümü, Kuzey Ay Düğümü ve Chiron'un ruhsal yolculuğu")), emoji="🪐")
         story.append(Spacer(1, 8))
         try:
             konumlar_gc = self.gezegen_konum_analizi()
             kad_poz = konumlar_gc.get("KAD")
             chiron_poz = konumlar_gc.get("Chiron")
-            burc_konum_semasi = {
-                "Koç": "cesaret, bağımsızlık ve kendi yolunu çizme", "Boğa": "değer, sabır ve güven",
-                "İkizler": "iletişim, merak ve çok yönlülük", "Yengeç": "duygu, koruma ve ait olma",
-                "Aslan": "yaratıcılık, liderlik ve onur", "Başak": "detay, analiz ve hizmet",
-                "Terazi": "denge, estetik ve ilişki", "Akrep": "dönüşüm, derinlik ve güç",
-                "Yay": "özgürlük, felsefe ve genişleme", "Oğlak": "yapı, sorumluluk ve olgunluk",
-                "Kova": "yenilik, topluluk ve özgünlük", "Balık": "sezgi, merhamet ve hayal gücü",
-            }
+            if _EN:
+                burc_konum_semasi = {
+                    "Koç": "courage, independence and forging your own path", "Boğa": "value, patience and trust",
+                    "İkizler": "communication, curiosity and versatility", "Yengeç": "emotion, protection and belonging",
+                    "Aslan": "creativity, leadership and honor", "Başak": "detail, analysis and service",
+                    "Terazi": "balance, aesthetics and relationship", "Akrep": "transformation, depth and power",
+                    "Yay": "freedom, philosophy and expansion", "Oğlak": "structure, responsibility and maturity",
+                    "Kova": "innovation, community and originality", "Balık": "intuition, compassion and imagination",
+                }
+            elif _ES:
+                burc_konum_semasi = {
+                    "Koç": "coraje, independencia y forjar tu propio camino", "Boğa": "valor, paciencia y confianza",
+                    "İkizler": "comunicación, curiosidad y versatilidad", "Yengeç": "emoción, protección y pertenencia",
+                    "Aslan": "creatividad, liderazgo y honor", "Başak": "detalle, análisis y servicio",
+                    "Terazi": "equilibrio, estética y relación", "Akrep": "transformación, profundidad y poder",
+                    "Yay": "libertad, filosofía y expansión", "Oğlak": "estructura, responsabilidad y madurez",
+                    "Kova": "innovación, comunidad y originalidad", "Balık": "intuición, compasión e imaginación",
+                }
+            else:
+                burc_konum_semasi = {
+                    "Koç": "cesaret, bağımsızlık ve kendi yolunu çizme", "Boğa": "değer, sabır ve güven",
+                    "İkizler": "iletişim, merak ve çok yönlülük", "Yengeç": "duygu, koruma ve ait olma",
+                    "Aslan": "yaratıcılık, liderlik ve onur", "Başak": "detay, analiz ve hizmet",
+                    "Terazi": "denge, estetik ve ilişki", "Akrep": "dönüşüm, derinlik ve güç",
+                    "Yay": "özgürlük, felsefe ve genişleme", "Oğlak": "yapı, sorumluluk ve olgunluk",
+                    "Kova": "yenilik, topluluk ve özgünlük", "Balık": "sezgi, merhamet ve hayal gücü",
+                }
             gad_html_parcalari = []
             if kad_poz:
                 gad_ham = (kad_poz['ham_derece'] + 180) % 360
                 gad_burc = dereceyi_burca_cevir(gad_ham)
                 gad_ev = ((kad_poz.get('ev', 1) + 5) % 12) + 1
-                gad_aciklama = burc_konum_semasi.get(gad_burc, "bilinen ve güvenli eğilimler")
-                kad_aciklama = burc_konum_semasi.get(kad_poz.get('burc', ''), "büyüme alanı")
-                gad_html_parcalari.append(
-                    f"<font color='#1A1A2E'><b>Güney Ay Düğümü (GAD) — {gad_burc}, {gad_ev}. Ev:</b></font><br/>"
-                    f"<font color='#4A4A4A'>GAD, ruhun rahat ettiği ancak büyümenin durduğu konfor alanını temsil eder. "
-                    f"{gad_burc} burcundaki konumu ({gad_aciklama}) temalarında aşina ve güvenli hissetmeye işaret eder. "
-                    f"Burada kalmak kolaydır; ancak asıl gelişim, <b>Kuzey Ay Düğümü ({kad_poz.get('burc', '')}, {kad_poz.get('ev', '—')}. Ev)</b> "
-                    f"yönünde, yani {kad_aciklama} temalarına adım attıkça gerçekleşir.</font><br/><br/>"
-                )
+                gad_aciklama = burc_konum_semasi.get(gad_burc, ("known and safe tendencies" if _EN else ("tendencias conocidas y seguras" if _ES else "bilinen ve güvenli eğilimler")))
+                kad_aciklama = burc_konum_semasi.get(kad_poz.get('burc', ''), ("area of growth" if _EN else ("área de crecimiento" if _ES else "büyüme alanı")))
+                if _EN:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>South Node (GAD) — {pdf_label(gad_burc)}, {gad_ev}. {pdf_label('Ev')}:</b></font><br/>"
+                        f"<font color='#4A4A4A'>GAD represents the comfort zone where the soul feels at ease but growth stops. "
+                        f"Its position in {pdf_label(gad_burc)} points to feeling familiar and safe in the themes of ({gad_aciklama}). "
+                        f"Staying here is easy; however, real growth happens as you step toward <b>North Node ({pdf_label(kad_poz.get('burc', ''))}, {kad_poz.get('ev', '—')}. {pdf_label('Ev')})</b>, "
+                        f"that is, toward the themes of {kad_aciklama}.</font><br/><br/>"
+                    )
+                elif _ES:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Nodo Sur (GAD) — {pdf_label(gad_burc)}, {gad_ev}. {pdf_label('Ev')}:</b></font><br/>"
+                        f"<font color='#4A4A4A'>El GAD representa la zona de confort donde el alma se siente a gusto pero el crecimiento se detiene. "
+                        f"Su posición en {pdf_label(gad_burc)} señala sentirse familiar y seguro en los temas de ({gad_aciklama}). "
+                        f"Permanecer aquí es fácil; sin embargo, el verdadero crecimiento ocurre cuando avanzas hacia <b>Nodo Norte ({pdf_label(kad_poz.get('burc', ''))}, {kad_poz.get('ev', '—')}. {pdf_label('Ev')})</b>, "
+                        f"es decir, hacia los temas de {kad_aciklama}.</font><br/><br/>"
+                    )
+                else:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Güney Ay Düğümü (GAD) — {gad_burc}, {gad_ev}. Ev:</b></font><br/>"
+                        f"<font color='#4A4A4A'>GAD, ruhun rahat ettiği ancak büyümenin durduğu konfor alanını temsil eder. "
+                        f"{gad_burc} burcundaki konumu ({gad_aciklama}) temalarında aşina ve güvenli hissetmeye işaret eder. "
+                        f"Burada kalmak kolaydır; ancak asıl gelişim, <b>Kuzey Ay Düğümü ({kad_poz.get('burc', '')}, {kad_poz.get('ev', '—')}. Ev)</b> "
+                        f"yönünde, yani {kad_aciklama} temalarına adım attıkça gerçekleşir.</font><br/><br/>"
+                    )
             if chiron_poz:
-                chiron_aciklama = burc_konum_semasi.get(chiron_poz.get('burc', ''), "hassas ve şifalanan alanlar")
-                gad_html_parcalari.append(
-                    f"<font color='#1A1A2E'><b>Chiron — {chiron_poz.get('burc', '—')}, {chiron_poz.get('ev', '—')}. Ev:</b></font><br/>"
-                    f"<font color='#4A4A4A'>Chiron, en derin yaranın aynı zamanda en büyük şifa gücüne dönüştüğü noktadır. "
-                    f"{chiron_poz.get('burc', '—')} burcundaki konumu, {chiron_aciklama} temalarında hassas bir alana işaret eder. "
-                    f"Bu alan yaşandıkça ve kabul edildikçe, yalnızca kendini değil çevresindekileri de şifalandıran "
-                    f"doğal bir yardım gücüne dönüşür. Bu nedenle Chiron konumu, meslek seçiminde güçlü bir rehberdir.</font>"
-                )
+                chiron_aciklama = burc_konum_semasi.get(chiron_poz.get('burc', ''), ("sensitive and healing areas" if _EN else ("áreas sensibles y de sanación" if _ES else "hassas ve şifalanan alanlar")))
+                if _EN:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Chiron — {pdf_label(chiron_poz.get('burc', '—'))}, {chiron_poz.get('ev', '—')}. {pdf_label('Ev')}:</b></font><br/>"
+                        f"<font color='#4A4A4A'>Chiron is the point where the deepest wound turns into the greatest healing power. "
+                        f"Its position in {pdf_label(chiron_poz.get('burc', '—'))} points to a sensitive area in the themes of {chiron_aciklama}. "
+                        f"As this area is lived and accepted, it turns into a natural helping power that heals not only yourself but also those around you. "
+                        f"For this reason, the Chiron position is a strong guide in career choice.</font>"
+                    )
+                elif _ES:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Quirón — {pdf_label(chiron_poz.get('burc', '—'))}, {chiron_poz.get('ev', '—')}. {pdf_label('Ev')}:</b></font><br/>"
+                        f"<font color='#4A4A4A'>Quirón es el punto donde la herida más profunda se convierte en el mayor poder sanador. "
+                        f"Su posición en {pdf_label(chiron_poz.get('burc', '—'))} señala un área sensible en los temas de {chiron_aciklama}. "
+                        f"A medida que esta área se vive y se acepta, se convierte en un poder natural de ayuda que sana no solo a ti mismo sino también a quienes te rodean. "
+                        f"Por esta razón, la posición de Quirón es una guía fuerte en la elección de carrera.</font>"
+                    )
+                else:
+                    gad_html_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Chiron — {chiron_poz.get('burc', '—')}, {chiron_poz.get('ev', '—')}. Ev:</b></font><br/>"
+                        f"<font color='#4A4A4A'>Chiron, en derin yaranın aynı zamanda en büyük şifa gücüne dönüştüğü noktadır. "
+                        f"{chiron_poz.get('burc', '—')} burcundaki konumu, {chiron_aciklama} temalarında hassas bir alana işaret eder. "
+                        f"Bu alan yaşandıkça ve kabul edildikçe, yalnızca kendini değil çevresindekileri de şifalandıran "
+                        f"doğal bir yardım gücüne dönüşür. Bu nedenle Chiron konumu, meslek seçiminde güçlü bir rehberdir.</font>"
+                    )
             if gad_html_parcalari:
                 gad_metni = "<br/>".join(gad_html_parcalari)
                 gad_kutu = Table([[Paragraph(gad_metni, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -9658,16 +10537,16 @@ class FBST_Engine:
                 ]))
                 story.append(gad_kutu)
             else:
-                story.append(Paragraph("Ay düğümü ve Chiron konumları hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Lunar node and Chiron positions could not be calculated." if _EN else ("No se pudieron calcular las posiciones de los nodos lunares y Quirón." if _ES else "Ay düğümü ve Chiron konumları hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Ay düğümleri bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Lunar nodes section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de nodos lunares: {str(e)}</font>" if _ES else f"<font color='red'>Ay düğümleri bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ MESLEK YÖNLENDİRME ÖNERİLERİ ═══
-        baslik_karti_ekle("MESLEK YÖNLENDİRME ÖNERİLERİ", alt_baslik="Potansiyel ve yetenek alanlarının senteziyle belirlenen meslek dalları", emoji="🎯")
+        baslik_karti_ekle("MESLEK YÖNLENDİRME ÖNERİLERİ", alt_baslik=("Career fields determined by the synthesis of potential and talent areas" if _EN else ("Campos profesionales determinados al sintetizar las áreas de potencial y talento" if _ES else "Potansiyel ve yetenek alanlarının senteziyle belirlenen meslek dalları")), emoji="🎯")
         story.append(Spacer(1, 8))
 
         try:
@@ -9675,12 +10554,22 @@ class FBST_Engine:
             meslek_onerileri = self.meslek_onerileri()
             if meslek_onerileri:
                 sirali = sorted(meslek_onerileri, key=lambda x: x['puan'], reverse=True)
-                ranking_html = "<font color='#1A1A2E'><b>POTANSİYEL ALANLARI SIRALAMASI:</b></font><br/>"
+                if _EN:
+                    ranking_html = "<font color='#1A1A2E'><b>POTENTIAL AREAS RANKING:</b></font><br/>"
+                elif _ES:
+                    ranking_html = "<font color='#1A1A2E'><b>CLASIFICACIÓN DE ÁREAS DE POTENCIAL:</b></font><br/>"
+                else:
+                    ranking_html = "<font color='#1A1A2E'><b>POTANSİYEL ALANLARI SIRALAMASI:</b></font><br/>"
                 for j, r in enumerate(sirali[:6]):
                     medal = ""
                     if j == 0: medal = " [1.]"
                     elif j == 1: medal = " [2.]"
-                    ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{r['alan']}</b> — {r['puan']:.1f} puan (%{r['yuzde']}){medal}</font><br/>"
+                    if _EN:
+                        ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{pdf_label(r['alan'])}</b> — {r['puan']:.1f} {'points' if _EN else 'puan'} (%{r['yuzde']}){medal}</font><br/>"
+                    elif _ES:
+                        ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{pdf_label(r['alan'])}</b> — {r['puan']:.1f} puntos (%{r['yuzde']}){medal}</font><br/>"
+                    else:
+                        ranking_html += f"<font color='#4A4A4A'>{j+1}. <b>{r['alan']}</b> — {r['puan']:.1f} puan (%{r['yuzde']}){medal}</font><br/>"
                 ranking_kutu = Table([[Paragraph(ranking_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 ranking_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0,0), (-1,-1), HexColor("#F7F3E9")),
@@ -9694,7 +10583,7 @@ class FBST_Engine:
                 try:
                     from reportlab.graphics.shapes import Drawing, Rect, String as RLString
                     if sirali:
-                        story.append(Paragraph("<font color='#1A1A2E'><b>PUAN DAĞILIMI (GÖRSEL):</b></font>", styles['TurkishNormal']))
+                        story.append(Paragraph(("<font color='#1A1A2E'><b>SCORE DISTRIBUTION (VISUAL):</b></font>" if _EN else ("<font color='#1A1A2E'><b>DISTRIBUCIÓN DE PUNTUACIÓN (VISUAL):</b></font>" if _ES else "<font color='#1A1A2E'><b>PUAN DAĞILIMI (GÖRSEL):</b></font>")), styles['TurkishNormal']))
                         story.append(Spacer(1, 4))
                         max_puan = max(r['puan'] for r in sirali[:6]) or 1
                         bar_rows = []
@@ -9705,7 +10594,7 @@ class FBST_Engine:
                             bar_d.add(Rect(0, 2, 300 * oran, 12, fillColor=HexColor("#1A1A2E"), strokeWidth=0))
                             bar_d.add(RLString(306, 3.5, f"%{r['yuzde']}", fontName='DejaVuSans-Bold', fontSize=8.5, fillColor=HexColor("#1A1A2E")))
                             bar_rows.append([
-                                Paragraph(f"<b>{r['alan']}</b>", styles['TurkishNormal']),
+                                Paragraph(f"<b>{pdf_label(r['alan'])}</b>", styles['TurkishNormal']),
                                 bar_d,
                             ])
                         bar_tablo = Table(bar_rows, colWidths=['35%', '65%'])
@@ -9721,12 +10610,17 @@ class FBST_Engine:
                         story.append(bar_tablo)
                         story.append(Spacer(1, 8))
                 except Exception as e_bar:
-                    story.append(Paragraph(f"<font color='red'>Puan dağılımı hatası: {str(e_bar)}</font>", styles['TurkishNormal']))
+                    story.append(Paragraph((f"<font color='red'>Score distribution error: {str(e_bar)}</font>" if _EN else (f"<font color='red'>Error en la distribución de puntuación: {str(e_bar)}</font>" if _ES else f"<font color='red'>Puan dağılımı hatası: {str(e_bar)}</font>")), styles['TurkishNormal']))
 
                 for i, oneri in enumerate(meslek_onerileri, 1):
                     aci_sayisi = oneri.get('aci_sayisi', 0)
-                    bonus_not = f" ({aci_sayisi} açı, {oneri['puan']:.1f} puan)"
-                    oneri_baslik = f"{i}. {oneri['alan']} — %{oneri['yuzde']}{bonus_not}"
+                    if _EN:
+                        bonus_not = f" ({aci_sayisi} {'aspect' if _EN and aci_sayisi == 1 else 'aspects' if _EN else 'açı'}, {oneri['puan']:.1f} {'points' if _EN else 'puan'})"
+                    elif _ES:
+                        bonus_not = f" ({aci_sayisi} {'aspecto' if aci_sayisi == 1 else 'aspectos'}, {oneri['puan']:.1f} puntos)"
+                    else:
+                        bonus_not = f" ({aci_sayisi} açı, {oneri['puan']:.1f} puan)"
+                    oneri_baslik = f"{i}. {pdf_label(oneri['alan'])} — %{oneri['yuzde']}{bonus_not}"
                     meslek_satirlari = ""
                     for m in oneri["meslekler"]:
                         meslek_satirlari += f"<br/>• <b>{m['meslek']}</b> — {m['aciklama']}"
@@ -9749,9 +10643,9 @@ class FBST_Engine:
                     story.append(oneri_kutu)
                     story.append(Spacer(1, 6))
             else:
-                story.append(Paragraph("Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi.", styles['TurkishNormal']))
+                story.append(Paragraph(("Not enough potential areas were detected for career guidance." if _EN else ("No se detectaron suficientes áreas de potencial para la orientación profesional." if _ES else "Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'><b>Meslek Yönlendirme Hatası:</b> {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'><b>Career Guidance Error:</b> {str(e)}</font>" if _EN else (f"<font color='red'><b>Error de Orientación Profesional:</b> {str(e)}</font>" if _ES else f"<font color='red'><b>Meslek Yönlendirme Hatası:</b> {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
@@ -9774,35 +10668,97 @@ class FBST_Engine:
             yas = None
             if dogum_tarihi:
                 yas = (date.today() - dogum_tarihi).days // 365
-            if yas is None:
-                yas_acilis = "Doğum tarihine göre yaş dönemine uygun öneriler:"
-            elif yas < 7:
-                yas_acilis = "Erken çocukluk döneminde oyun temelli keşif ön plandadır:"
-            elif yas < 13:
-                yas_acilis = "İlkokul ve ortaokul döneminde kurs ve atölyelerle yönlendirme önerilir:"
-            elif yas < 18:
-                yas_acilis = "Ergenlik döneminde kulüp ve projelerle derinleşme önerilir:"
+            if _EN:
+                if yas is None:
+                    yas_acilis = "Recommendations suited to the age period based on date of birth:"
+                elif yas < 7:
+                    yas_acilis = "In early childhood, play-based exploration comes first:"
+                elif yas < 13:
+                    yas_acilis = "In primary and middle school, guidance through courses and workshops is recommended:"
+                elif yas < 18:
+                    yas_acilis = "In adolescence, deepening through clubs and projects is recommended:"
+                else:
+                    yas_acilis = "In adulthood, specialization and career-focused development is recommended:"
+            elif _ES:
+                if yas is None:
+                    yas_acilis = "Recomendaciones adaptadas al período de edad según la fecha de nacimiento:"
+                elif yas < 7:
+                    yas_acilis = "En la primera infancia, la exploración basada en el juego es lo primero:"
+                elif yas < 13:
+                    yas_acilis = "En la primaria y secundaria, se recomienda la orientación mediante cursos y talleres:"
+                elif yas < 18:
+                    yas_acilis = "En la adolescencia, se recomienda profundizar mediante clubes y proyectos:"
+                else:
+                    yas_acilis = "En la adultez, se recomienda la especialización y el desarrollo enfocado en la carrera:"
             else:
-                yas_acilis = "Yetişkinlik döneminde uzmanlaşma ve kariyer odaklı gelişim önerilir:"
+                if yas is None:
+                    yas_acilis = "Doğum tarihine göre yaş dönemine uygun öneriler:"
+                elif yas < 7:
+                    yas_acilis = "Erken çocukluk döneminde oyun temelli keşif ön plandadır:"
+                elif yas < 13:
+                    yas_acilis = "İlkokul ve ortaokul döneminde kurs ve atölyelerle yönlendirme önerilir:"
+                elif yas < 18:
+                    yas_acilis = "Ergenlik döneminde kulüp ve projelerle derinleşme önerilir:"
+                else:
+                    yas_acilis = "Yetişkinlik döneminde uzmanlaşma ve kariyer odaklı gelişim önerilir:"
 
-            hobi_havuzu = {
-                "Stratejik Zeka": ["Satranç ve strateji oyunları", "Bilim ve araştırma atölyeleri", "Analiz ve bulmaca temalı kitaplar"],
-                "İletişim": ["Drama ve tiyatro kursu", "Diksiyon ve sunum atölyesi", "Hikaye anlatıcılığı"],
-                "Maneviyat": ["Yoga ve nefes çalışmaları", "Farkındalık ve meditasyon atölyeleri", "Doğa yürüyüşleri"],
-                "Bilgelik": ["Felsefe ve tarih kulübü", "Kitap okuma grubu", "Akıl oyunları atölyesi"],
-                "Yardımseverlik": ["Hayvan barınağı gönüllülüğü", "Topluluk yardım projeleri", "İlk yardım eğitimi"],
-                "Hukuk/Politika": ["Münazara kulübü", "Model Birleşmiş Milletler (MUN)", "Adalet ve etik atölyeleri"],
-                "Sanatsal Yetenek": ["Resim ve heykel atölyesi", "Fotoğrafçılık kursu", "Yaratıcı yazarlık"],
-                "Spor": ["Yüzme, atletizm veya takım sporu", "Dövüş sanatları", "Hareket ve denge atölyeleri"],
-                "Zanaatkarlık": ["El becerisi atölyeleri (ahşap, seramik)", "Teknik ve tamir atölyeleri", "Mutfak atölyesi"],
-                "Askeriye": ["İzcilik ve doğa kampları", "Strateji oyunları", "Tarih ve savunma temalı okumalar"],
-                "Zihinsel Yetenek": ["Robotik ve kodlama kursu", "Akıl ve zeka oyunları", "Bilim müzesi gezileri"],
-                "Girişimcilik": ["Girişimcilik atölyeleri", "Okul pazarı projeleri", "Finansal okuryazarlık oyunları"],
-                "Yenilikçilik": ["Robotik ve yapay zeka atölyeleri", "Bilim fuarları", "Tasarım ve inovasyon atölyeleri"],
-                "Sağlık/Tıp": ["Biyoloji ve bilim atölyeleri", "İlk yardım eğitimi", "Sağlıklı yaşam atölyeleri"],
-                "Liderlik": ["Öğrenci konseyi ve kulüp liderliği", "Takım kaptanlığı", "Sunum ve liderlik atölyeleri"],
-                "Akademik/Araştırma": ["Bilimsel proje kulüpleri", "Araştırma ve deney atölyeleri", "Yazarlık ve yayın deneyimleri"],
-            }
+            if _EN:
+                hobi_havuzu = {
+                    "Stratejik Zeka": ["Chess and strategy games", "Science and research workshops", "Analysis and puzzle-themed books"],
+                    "İletişim": ["Drama and theatre course", "Diction and presentation workshop", "Storytelling"],
+                    "Maneviyat": ["Yoga and breathing exercises", "Mindfulness and meditation workshops", "Nature walks"],
+                    "Bilgelik": ["Philosophy and history club", "Book reading group", "Mind games workshop"],
+                    "Yardımseverlik": ["Animal shelter volunteering", "Community help projects", "First aid training"],
+                    "Hukuk/Politika": ["Debate club", "Model United Nations (MUN)", "Justice and ethics workshops"],
+                    "Sanatsal Yetenek": ["Painting and sculpture workshop", "Photography course", "Creative writing"],
+                    "Spor": ["Swimming, athletics or team sports", "Martial arts", "Movement and balance workshops"],
+                    "Zanaatkarlık": ["Handicraft workshops (wood, ceramics)", "Technical and repair workshops", "Kitchen workshop"],
+                    "Askeriye": ["Scouting and nature camps", "Strategy games", "History and defense-themed reading"],
+                    "Zihinsel Yetenek": ["Robotics and coding course", "Mind and intelligence games", "Science museum trips"],
+                    "Girişimcilik": ["Entrepreneurship workshops", "School market projects", "Financial literacy games"],
+                    "Yenilikçilik": ["Robotics and AI workshops", "Science fairs", "Design and innovation workshops"],
+                    "Sağlık/Tıp": ["Biology and science workshops", "First aid training", "Healthy living workshops"],
+                    "Liderlik": ["Student council and club leadership", "Team captaincy", "Presentation and leadership workshops"],
+                    "Akademik/Araştırma": ["Scientific project clubs", "Research and experiment workshops", "Writing and publishing experience"],
+                }
+            elif _ES:
+                hobi_havuzu = {
+                    "Stratejik Zeka": ["Ajedrez y juegos de estrategia", "Talleres de ciencia e investigación", "Libros de análisis y pasatiempos"],
+                    "İletişim": ["Curso de teatro y dramaturgia", "Taller de dicción y presentaciones", "Narración de historias"],
+                    "Maneviyat": ["Yoga y ejercicios de respiración", "Talleres de mindfulness y meditación", "Caminatas por la naturaleza"],
+                    "Bilgelik": ["Club de filosofía e historia", "Grupo de lectura", "Taller de juegos mentales"],
+                    "Yardımseverlik": ["Voluntariado en refugios de animales", "Proyectos de ayuda comunitaria", "Curso de primeros auxilios"],
+                    "Hukuk/Politika": ["Club de debate", "Modelo de Naciones Unidas (MUN)", "Talleres de justicia y ética"],
+                    "Sanatsal Yetenek": ["Taller de pintura y escultura", "Curso de fotografía", "Escritura creativa"],
+                    "Spor": ["Natación, atletismo o deportes de equipo", "Artes marciales", "Talleres de movimiento y equilibrio"],
+                    "Zanaatkarlık": ["Talleres de manualidades (madera, cerámica)", "Talleres técnicos y de reparación", "Taller de cocina"],
+                    "Askeriye": ["Campamentos de exploración y naturaleza", "Juegos de estrategia", "Lecturas de historia y defensa"],
+                    "Zihinsel Yetenek": ["Curso de robótica y programación", "Juegos de lógica e inteligencia", "Visitas a museos de ciencia"],
+                    "Girişimcilik": ["Talleres de emprendimiento", "Proyectos de mercado escolar", "Juegos de educación financiera"],
+                    "Yenilikçilik": ["Talleres de robótica e IA", "Ferias de ciencia", "Talleres de diseño e innovación"],
+                    "Sağlık/Tıp": ["Talleres de biología y ciencia", "Curso de primeros auxilios", "Talleres de vida saludable"],
+                    "Liderlik": ["Consejo estudiantil y liderazgo de clubes", "Capitán de equipo", "Talleres de presentación y liderazgo"],
+                    "Akademik/Araştırma": ["Clubes de proyectos científicos", "Talleres de investigación y experimentación", "Experiencias de escritura y publicación"],
+                }
+            else:
+                hobi_havuzu = {
+                    "Stratejik Zeka": ["Satranç ve strateji oyunları", "Bilim ve araştırma atölyeleri", "Analiz ve bulmaca temalı kitaplar"],
+                    "İletişim": ["Drama ve tiyatro kursu", "Diksiyon ve sunum atölyesi", "Hikaye anlatıcılığı"],
+                    "Maneviyat": ["Yoga ve nefes çalışmaları", "Farkındalık ve meditasyon atölyeleri", "Doğa yürüyüşleri"],
+                    "Bilgelik": ["Felsefe ve tarih kulübü", "Kitap okuma grubu", "Akıl oyunları atölyesi"],
+                    "Yardımseverlik": ["Hayvan barınağı gönüllülüğü", "Topluluk yardım projeleri", "İlk yardım eğitimi"],
+                    "Hukuk/Politika": ["Münazara kulübü", "Model Birleşmiş Milletler (MUN)", "Adalet ve etik atölyeleri"],
+                    "Sanatsal Yetenek": ["Resim ve heykel atölyesi", "Fotoğrafçılık kursu", "Yaratıcı yazarlık"],
+                    "Spor": ["Yüzme, atletizm veya takım sporu", "Dövüş sanatları", "Hareket ve denge atölyeleri"],
+                    "Zanaatkarlık": ["El becerisi atölyeleri (ahşap, seramik)", "Teknik ve tamir atölyeleri", "Mutfak atölyesi"],
+                    "Askeriye": ["İzcilik ve doğa kampları", "Strateji oyunları", "Tarih ve savunma temalı okumalar"],
+                    "Zihinsel Yetenek": ["Robotik ve kodlama kursu", "Akıl ve zeka oyunları", "Bilim müzesi gezileri"],
+                    "Girişimcilik": ["Girişimcilik atölyeleri", "Okul pazarı projeleri", "Finansal okuryazarlık oyunları"],
+                    "Yenilikçilik": ["Robotik ve yapay zeka atölyeleri", "Bilim fuarları", "Tasarım ve inovasyon atölyeleri"],
+                    "Sağlık/Tıp": ["Biyoloji ve bilim atölyeleri", "İlk yardım eğitimi", "Sağlıklı yaşam atölyeleri"],
+                    "Liderlik": ["Öğrenci konseyi ve kulüp liderliği", "Takım kaptanlığı", "Sunum ve liderlik atölyeleri"],
+                    "Akademik/Araştırma": ["Bilimsel proje kulüpleri", "Araştırma ve deney atölyeleri", "Yazarlık ve yayın deneyimleri"],
+                }
             meslek_onerileri_hobi = self.meslek_onerileri()
             sirali_hobi = sorted(meslek_onerileri_hobi, key=lambda x: x['puan'], reverse=True)[:4] if meslek_onerileri_hobi else []
             hobi_html = f"<font color='#1A1A2E'><b>{yas_acilis}</b></font><br/>"
@@ -9812,10 +10768,10 @@ class FBST_Engine:
                     oneriler = hobi_havuzu.get(alan)
                     if not oneriler:
                         oneriler = [kaynak for anahtar, kaynaklar in hobi_havuzu.items() if anahtar.split('/')[0] in alan or alan in anahtar]
-                        oneriler = oneriler[0] if oneriler else ["Kendini keşfeden yaratıcı atölyeler"]
-                    hobi_html += f"<br/><font color='#C9A96E'><b>• {alan}:</b></font> {', '.join(oneriler)}"
+                        oneriler = oneriler[0] if oneriler else (["Creative workshops for self-discovery"] if _EN else (["Talleres creativos para el autodescubrimiento"] if _ES else ["Kendini keşfeden yaratıcı atölyeler"]))
+                    hobi_html += f"<br/><font color='#C9A96E'><b>• {pdf_label(alan)}:</b></font> {', '.join(oneriler)}"
             else:
-                hobi_html += "<br/>Potansiyel alanları belirlenemediği için genel keşif atölyeleri önerilir."
+                hobi_html += ("<br/>General discovery workshops are recommended since potential areas could not be determined." if _EN else ("<br/>Se recomiendan talleres generales de descubrimiento, ya que no se pudieron determinar las áreas de potencial." if _ES else "<br/>Potansiyel alanları belirlenemediği için genel keşif atölyeleri önerilir."))
             hobi_kutu = Table([[Paragraph(hobi_html, styles['TurkishNormal'])]], colWidths=['100%'])
             hobi_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
@@ -9824,63 +10780,144 @@ class FBST_Engine:
             ]))
             story.append(hobi_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Hobi önerileri hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Hobby recommendations error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en las recomendaciones de pasatiempos: {str(e)}</font>" if _ES else f"<font color='red'>Hobi önerileri hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ EBEVEYN İLETİŞİM REHBERİ ═══
-        baslik_karti_ekle("EBEVEYN İLETİŞİM REHBERİ", alt_baslik="Ay ve Merkür konumlarına göre duygusal ve zihinsel iletişim dili", emoji="💬")
+        baslik_karti_ekle("EBEVEYN İLETİŞİM REHBERİ", alt_baslik=("Emotional and mental communication language based on the Moon and Mercury positions" if _EN else ("Lenguaje de comunicación emocional y mental según las posiciones de la Luna y Mercurio" if _ES else "Ay ve Merkür konumlarına göre duygusal ve zihinsel iletişim dili")), emoji="💬")
         story.append(Spacer(1, 8))
         try:
-            duygu_rehber = {
-                "Koç": "hareket ve bağımsızlıkla güvende hisseder; zorlama onu yıpratır, özgür alan ve güven verin",
-                "Boğa": "düzen, rahatlık ve tutarlılıkla güvende hisseder; aceleye getirmeyin, kararlılığını destekleyin",
-                "İkizler": "konuşarak ve soru sorarak rahatlar; sohbet ve merakını besleyen paylaşımlar önemlidir",
-                "Yengeç": "sevgi ve güvenlik hissiyle güvende hisseder; duygularını paylaşması için yumuşak bir ortam yaratın",
-                "Aslan": "takdir ve onayla parlar; başarılarını görün ve kutlayın, eleştiriyi özel ortamda yapın",
-                "Başak": "faydalı olmakla değer hisseder; aşırı eleştiriden kaçının, yaptığı işi takdir edin",
-                "Terazi": "uyum ve adaletle rahatlar; tartışmalarda hakem rolüne itmeyin, duygularını dile getirmesine izin verin",
-                "Akrep": "güven ve sadakatle bağlanır; mahremiyetine saygı gösterin, yoğun duygularını yargılamayın",
-                "Yay": "özgürlük ve macerayla güvende hisseder; deneyimlerinden öğrenmesine izin verin, derslerini anlattırın",
-                "Oğlak": "sorumluluk ve başarıyla değer hisseder; katı beklentiler yerine adım adım destek olun",
-                "Kova": "bireysellik ve dostlukla rahatlar; fikirlerine saygı gösterin, özgünlüğünü destekleyin",
-                "Balık": "empati ve sanatla beslenir; hayal dünyasına saygı gösterin, duyarlılığını yargılamayın",
-            }
-            ogrenme_rehber = {
-                "Koç": "deneyerek ve hareketle öğrenir; kısa, enerjik ve yarışma temalı etkinlikler idealdir",
-                "Boğa": "tekrar ve somut örneklerle öğrenir; adım adım ilerleyen düzenli çalışma en iyisidir",
-                "İkizler": "konuşarak ve yazarak öğrenir; çok yönlü kaynaklar ve tartışma fırsatları verin",
-                "Yengeç": "duygusal bağ kurduğunda öğrenir; güvenli ortamda, öykü ve görsellerle anlatın",
-                "Aslan": "sahne ve takdir ile öğrenir; öğrendiklerini sunmasına ve göstermesine fırsat tanıyın",
-                "Başak": "liste ve analizlerle öğrenir; net adımlar, kontrol listeleri ve düzenli tekrar işe yarar",
-                "Terazi": "işbirliği ve karşılaştırma ile öğrenir; grup çalışması ve tartışma ortamları verimlidir",
-                "Akrep": "derinlemesine ve gizemli konularla öğrenir; ilgisini çeken konuları araştırmasına izin verin",
-                "Yay": "deneyim ve seyahatle öğrenir; pratik denemeler ve geniş konular ilgisini çeker",
-                "Oğlak": "hedef ve yapıyla öğrenir; planlı çalışma ve başarı belgeleri motivasyon sağlar",
-                "Kova": "yenilik ve projelerle öğrenir; teknoloji ve farklı bakış açılarıyla öğrenmeyi sever",
-                "Balık": "hayal gücü ve müzikle öğrenir; hikaye, sanat ve görsellerle anlatım en etkilisidir",
-            }
+            if _EN:
+                duygu_rehber = {
+                    "Koç": "feels secure with action and independence; pressure wears him out, give freedom and trust",
+                    "Boğa": "feels secure with order, comfort and consistency; do not rush, support his determination",
+                    "İkizler": "relaxes by talking and asking questions; conversations and sharing that feed his curiosity matter",
+                    "Yengeç": "feels secure with love and a sense of safety; create a gentle environment for him to share his feelings",
+                    "Aslan": "shines with appreciation and approval; see and celebrate his achievements, give criticism in private",
+                    "Başak": "feels valued by being useful; avoid excessive criticism, appreciate his work",
+                    "Terazi": "relaxes with harmony and justice; do not push him into the role of referee, let him voice his feelings",
+                    "Akrep": "bonds with trust and loyalty; respect his privacy, do not judge his intense feelings",
+                    "Yay": "feels secure with freedom and adventure; let him learn from his experiences, have him tell his lessons",
+                    "Oğlak": "feels valued with responsibility and success; support him step by step instead of rigid expectations",
+                    "Kova": "relaxes with individuality and friendship; respect his ideas, support his originality",
+                    "Balık": "is nourished by empathy and art; respect his inner world, do not judge his sensitivity",
+                }
+                ogrenme_rehber = {
+                    "Koç": "learns by trying and moving; short, energetic and competition-themed activities are ideal",
+                    "Boğa": "learns with repetition and concrete examples; steady step-by-step work is best",
+                    "İkizler": "learns by talking and writing; give versatile resources and opportunities for discussion",
+                    "Yengeç": "learns when an emotional bond is formed; teach in a safe environment with stories and visuals",
+                    "Aslan": "learns with the stage and appreciation; give opportunities to present and show what he learned",
+                    "Başak": "learns with lists and analysis; clear steps, checklists and regular review work",
+                    "Terazi": "learns through cooperation and comparison; group work and discussion environments are productive",
+                    "Akrep": "learns deeply and with mysterious topics; let him research what interests him",
+                    "Yay": "learns through experience and travel; practical trials and broad topics interest him",
+                    "Oğlak": "learns with goals and structure; planned work and achievement certificates motivate",
+                    "Kova": "learns with innovation and projects; he likes learning through technology and different perspectives",
+                    "Balık": "learns with imagination and music; storytelling, art and visual presentation are most effective",
+                }
+            elif _ES:
+                duygu_rehber = {
+                    "Koç": "se siente seguro con la acción y la independencia; la presión lo agota, dale libertad y confianza",
+                    "Boğa": "se siente seguro con el orden, la comodidad y la constancia; no lo apresures, apoya su determinación",
+                    "İkizler": "se relaja conversando y haciendo preguntas; son importantes las conversaciones y los intercambios que alimentan su curiosidad",
+                    "Yengeç": "se siente seguro con el amor y la sensación de seguridad; crea un ambiente suave para que comparta sus sentimientos",
+                    "Aslan": "brilla con el aprecio y la aprobación; ve y celebra sus logros, da las críticas en privado",
+                    "Başak": "se siente valorado al ser útil; evita las críticas excesivas, aprecia su trabajo",
+                    "Terazi": "se relaja con la armonía y la justicia; no lo pongas en el papel de árbitro, deja que exprese sus sentimientos",
+                    "Akrep": "se vincula con la confianza y la lealtad; respeta su privacidad, no juzgues sus sentimientos intensos",
+                    "Yay": "se siente seguro con la libertad y la aventura; deja que aprenda de sus experiencias, pídele que cuente sus lecciones",
+                    "Oğlak": "se siente valorado con la responsabilidad y el éxito; apóyalo paso a paso en lugar de expectativas rígidas",
+                    "Kova": "se relaja con la individualidad y la amistad; respeta sus ideas, apoya su originalidad",
+                    "Balık": "se nutre de la empatía y el arte; respeta su mundo interior, no juzgues su sensibilidad",
+                }
+                ogrenme_rehber = {
+                    "Koç": "aprende probando y moviéndose; son ideales las actividades cortas, enérgicas y con tema de competencia",
+                    "Boğa": "aprende con la repetición y los ejemplos concretos; el trabajo constante paso a paso es lo mejor",
+                    "İkizler": "aprende hablando y escribiendo; dale recursos variados y oportunidades de debate",
+                    "Yengeç": "aprende cuando se forma un vínculo emocional; enséñale en un entorno seguro con historias y visuales",
+                    "Aslan": "aprende con el escenario y el aprecio; dale oportunidades de presentar y mostrar lo que aprendió",
+                    "Başak": "aprende con listas y análisis; funcionan los pasos claros, las listas de control y la revisión regular",
+                    "Terazi": "aprende con la cooperación y la comparación; el trabajo en grupo y los entornos de debate son productivos",
+                    "Akrep": "aprende en profundidad y con temas misteriosos; déjale investigar lo que le interesa",
+                    "Yay": "aprende con la experiencia y el viaje; le atraen los ensayos prácticos y los temas amplios",
+                    "Oğlak": "aprende con metas y estructura; lo motivan el trabajo planificado y los certificados de logro",
+                    "Kova": "aprende con la innovación y los proyectos; le gusta aprender con la tecnología y distintas perspectivas",
+                    "Balık": "aprende con la imaginación y la música; la narración, el arte y la presentación visual son lo más eficaz",
+                }
+            else:
+                duygu_rehber = {
+                    "Koç": "hareket ve bağımsızlıkla güvende hisseder; zorlama onu yıpratır, özgür alan ve güven verin",
+                    "Boğa": "düzen, rahatlık ve tutarlılıkla güvende hisseder; aceleye getirmeyin, kararlılığını destekleyin",
+                    "İkizler": "konuşarak ve soru sorarak rahatlar; sohbet ve merakını besleyen paylaşımlar önemlidir",
+                    "Yengeç": "sevgi ve güvenlik hissiyle güvende hisseder; duygularını paylaşması için yumuşak bir ortam yaratın",
+                    "Aslan": "takdir ve onayla parlar; başarılarını görün ve kutlayın, eleştiriyi özel ortamda yapın",
+                    "Başak": "faydalı olmakla değer hisseder; aşırı eleştiriden kaçının, yaptığı işi takdir edin",
+                    "Terazi": "uyum ve adaletle rahatlar; tartışmalarda hakem rolüne itmeyin, duygularını dile getirmesine izin verin",
+                    "Akrep": "güven ve sadakatle bağlanır; mahremiyetine saygı gösterin, yoğun duygularını yargılamayın",
+                    "Yay": "özgürlük ve macerayla güvende hisseder; deneyimlerinden öğrenmesine izin verin, derslerini anlattırın",
+                    "Oğlak": "sorumluluk ve başarıyla değer hisseder; katı beklentiler yerine adım adım destek olun",
+                    "Kova": "bireysellik ve dostlukla rahatlar; fikirlerine saygı gösterin, özgünlüğünü destekleyin",
+                    "Balık": "empati ve sanatla beslenir; hayal dünyasına saygı gösterin, duyarlılığını yargılamayın",
+                }
+                ogrenme_rehber = {
+                    "Koç": "deneyerek ve hareketle öğrenir; kısa, enerjik ve yarışma temalı etkinlikler idealdir",
+                    "Boğa": "tekrar ve somut örneklerle öğrenir; adım adım ilerleyen düzenli çalışma en iyisidir",
+                    "İkizler": "konuşarak ve yazarak öğrenir; çok yönlü kaynaklar ve tartışma fırsatları verin",
+                    "Yengeç": "duygusal bağ kurduğunda öğrenir; güvenli ortamda, öykü ve görsellerle anlatın",
+                    "Aslan": "sahne ve takdir ile öğrenir; öğrendiklerini sunmasına ve göstermesine fırsat tanıyın",
+                    "Başak": "liste ve analizlerle öğrenir; net adımlar, kontrol listeleri ve düzenli tekrar işe yarar",
+                    "Terazi": "işbirliği ve karşılaştırma ile öğrenir; grup çalışması ve tartışma ortamları verimlidir",
+                    "Akrep": "derinlemesine ve gizemli konularla öğrenir; ilgisini çeken konuları araştırmasına izin verin",
+                    "Yay": "deneyim ve seyahatle öğrenir; pratik denemeler ve geniş konular ilgisini çeker",
+                    "Oğlak": "hedef ve yapıyla öğrenir; planlı çalışma ve başarı belgeleri motivasyon sağlar",
+                    "Kova": "yenilik ve projelerle öğrenir; teknoloji ve farklı bakış açılarıyla öğrenmeyi sever",
+                    "Balık": "hayal gücü ve müzikle öğrenir; hikaye, sanat ve görsellerle anlatım en etkilisidir",
+                }
             konumlar_er = self.gezegen_konum_analizi()
             ay_poz = konumlar_er.get("Ay")
             merk_poz = konumlar_er.get("Merkür")
             er_parcalar = []
             if ay_poz:
                 ay_burc = ay_poz.get('burc', '')
-                er_parcalar.append(
-                    f"<font color='#1A1A2E'><b>Duygusal dil (Ay — {ay_burc} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{duygu_rehber.get(ay_burc, 'Duygusal ihtiyaçlarını gözlemleyerek yaklaşın.')}</font><br/><br/>"
-                )
+                if _EN:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Emotional language (Moon in {pdf_label(ay_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_rehber.get(ay_burc, 'Approach by observing their emotional needs.')}</font><br/><br/>"
+                    )
+                elif _ES:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Lenguaje emocional (Luna en {pdf_label(ay_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_rehber.get(ay_burc, 'Acércate observando sus necesidades emocionales.')}</font><br/><br/>"
+                    )
+                else:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Duygusal dil (Ay — {ay_burc} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_rehber.get(ay_burc, 'Duygusal ihtiyaçlarını gözlemleyerek yaklaşın.')}</font><br/><br/>"
+                    )
             if merk_poz:
                 merk_burc = merk_poz.get('burc', '')
-                er_parcalar.append(
-                    f"<font color='#1A1A2E'><b>Öğrenme stili (Merkür — {merk_burc} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{ogrenme_rehber.get(merk_burc, 'Öğrenme tarzını birlikte keşfedin.')}</font>"
-                )
+                if _EN:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Learning style (Mercury in {pdf_label(merk_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogrenme_rehber.get(merk_burc, 'Discover the learning style together.')}</font>"
+                    )
+                elif _ES:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Estilo de aprendizaje (Mercurio en {pdf_label(merk_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogrenme_rehber.get(merk_burc, 'Descubre juntos el estilo de aprendizaje.')}</font>"
+                    )
+                else:
+                    er_parcalar.append(
+                        f"<font color='#1A1A2E'><b>Öğrenme stili (Merkür — {merk_burc} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogrenme_rehber.get(merk_burc, 'Öğrenme tarzını birlikte keşfedin.')}</font>"
+                    )
             if er_parcalar:
                 er_metni = "<br/>".join(er_parcalar)
-                er_metni += "<br/><br/><font color='#718096'><i>İpucu: Bu rehber, çocuğunuzla iletişimde yol haritası sunar. Her birey kendine özgüdür; bu bilgiler başlangıç noktası olarak değerlendirilmelidir.</i></font>"
+                er_metni += ("<br/><br/><font color='#718096'><i>Tip: This guide offers a roadmap for communicating with your child. Every individual is unique; treat this information as a starting point.</i></font>" if _EN else ("<br/><br/><font color='#718096'><i>Consejo: Esta guía ofrece una hoja de ruta para comunicarte con tu hijo. Cada individuo es único; considera esta información como un punto de partida.</i></font>" if _ES else "<br/><br/><font color='#718096'><i>İpucu: Bu rehber, çocuğunuzla iletişimde yol haritası sunar. Her birey kendine özgüdür; bu bilgiler başlangıç noktası olarak değerlendirilmelidir.</i></font>"))
                 er_kutu = Table([[Paragraph(er_metni, styles['TurkishNormal'])]], colWidths=['100%'])
                 er_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), HexColor("#F4F9F4")),
@@ -9889,27 +10926,38 @@ class FBST_Engine:
                 ]))
                 story.append(er_kutu)
             else:
-                story.append(Paragraph("Ay ve Merkür konumları hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Moon and Mercury positions could not be calculated." if _EN else ("No se pudieron calcular las posiciones de la Luna y Mercurio." if _ES else "Ay ve Merkür konumları hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Ebeveyn rehberi hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Parent guide error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la guía para padres: {str(e)}</font>" if _ES else f"<font color='red'>Ebeveyn rehberi hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ DUYGUSAL İHTİYAÇLAR VE ANNENİN ALGISI ═══
-        baslik_karti_ekle("DUYGUSAL İHTİYAÇLAR VE ANNENİN ALGISI", alt_baslik="Ay konumuna göre çocuğun iç dünyası ve anneye bakışı", emoji="🌙")
+        baslik_karti_ekle("DUYGUSAL İHTİYAÇLAR VE ANNENİN ALGISI", alt_baslik=("The child's inner world and view of the mother based on the Moon position" if _EN else ("El mundo interior del niño y su percepción de la madre según la posición de la Luna" if _ES else "Ay konumuna göre çocuğun iç dünyası ve anneye bakışı")), emoji="🌙")
         story.append(Spacer(1, 8))
         try:
             konumlar_da = self.gezegen_konum_analizi()
             ay_da = konumlar_da.get("Ay")
             if ay_da:
                 ay_burc = ay_da.get('burc', '')
-                duygu_metni = DUYGUSAL_IHTIYAC_AY.get(ay_burc, "Duygusal ihtiyaçlarını gözlemleyerek yaklaşın.")
-                duygu_html = (
-                    f"<font color='#1A1A2E'><b>Duygusal İhtiyaçlar (Ay — {ay_burc} burcunda, {ay_da.get('ev', '—')}. Ev):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{duygu_metni}</font>"
-                )
+                duygu_metni = DUYGUSAL_IHTIYAC_AY.get(ay_burc, ("Approach by observing their emotional needs." if _EN else ("Acércate observando sus necesidades emocionales." if _ES else "Duygusal ihtiyaçlarını gözlemleyerek yaklaşın.")))
+                if _EN:
+                    duygu_html = (
+                        f"<font color='#1A1A2E'><b>Emotional Needs (Moon in {pdf_label(ay_burc)}, {ay_da.get('ev', '—')}. {pdf_label('Ev')}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_metni}</font>"
+                    )
+                elif _ES:
+                    duygu_html = (
+                        f"<font color='#1A1A2E'><b>Necesidades Emocionales (Luna en {pdf_label(ay_burc)}, {ay_da.get('ev', '—')}. {pdf_label('Ev')}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_metni}</font>"
+                    )
+                else:
+                    duygu_html = (
+                        f"<font color='#1A1A2E'><b>Duygusal İhtiyaçlar (Ay — {ay_burc} burcunda, {ay_da.get('ev', '—')}. Ev):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{duygu_metni}</font>"
+                    )
                 duygu_kutu = Table([[Paragraph(duygu_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 duygu_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
@@ -9918,26 +10966,37 @@ class FBST_Engine:
                 ]))
                 story.append(duygu_kutu)
             else:
-                story.append(Paragraph("Ay konumu hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Moon position could not be calculated." if _EN else ("No se pudo calcular la posición de la Luna." if _ES else "Ay konumu hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Duygusal ihtiyaçlar hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Emotional needs error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en necesidades emocionales: {str(e)}</font>" if _ES else f"<font color='red'>Duygusal ihtiyaçlar hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ KRİZ ANLARINDA SAKİNLEŞTİRME ═══
-        baslik_karti_ekle("KRİZ ANLARINDA SAKİNLEŞTİRME REHBERİ", alt_baslik="Ay konumuna göre duygusal dalgalanma anlarındaki en etkili yaklaşım", emoji="🫂")
+        baslik_karti_ekle("KRİZ ANLARINDA SAKİNLEŞTİRME REHBERİ", alt_baslik=("The most effective approach during emotional ups and downs based on the Moon position" if _EN else ("El enfoque más eficaz durante los altibajos emocionales según la posición de la Luna" if _ES else "Ay konumuna göre duygusal dalgalanma anlarındaki en etkili yaklaşım")), emoji="🫂")
         story.append(Spacer(1, 8))
         try:
             ay_kr = konumlar_da.get("Ay")
             if ay_kr:
                 ay_burc_kr = ay_kr.get('burc', '')
-                sakin_metni = SAKINLESME_AY.get(ay_burc_kr, "Önce sakin kalın, duygusuna eşlik edin.")
-                sakin_html = (
-                    f"<font color='#1A1A2E'><b>{ay_burc_kr} Ay'ı için sakinleştirme yolu:</b></font><br/>"
-                    f"<font color='#4A4A4A'>{sakin_metni}</font>"
-                )
+                sakin_metni = SAKINLESME_AY.get(ay_burc_kr, ("First stay calm and accompany their emotion." if _EN else ("Primero mantén la calma y acompáñalo en su emoción." if _ES else "Önce sakin kalın, duygusuna eşlik edin.")))
+                if _EN:
+                    sakin_html = (
+                        f"<font color='#1A1A2E'><b>Calming path for the {pdf_label(ay_burc_kr)} Moon:</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sakin_metni}</font>"
+                    )
+                elif _ES:
+                    sakin_html = (
+                        f"<font color='#1A1A2E'><b>Camino de calma para la Luna en {pdf_label(ay_burc_kr)}:</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sakin_metni}</font>"
+                    )
+                else:
+                    sakin_html = (
+                        f"<font color='#1A1A2E'><b>{ay_burc_kr} Ay'ı için sakinleştirme yolu:</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sakin_metni}</font>"
+                    )
                 sakin_kutu = Table([[Paragraph(sakin_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 sakin_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), HexColor("#F4F9F4")),
@@ -9946,16 +11005,16 @@ class FBST_Engine:
                 ]))
                 story.append(sakin_kutu)
             else:
-                story.append(Paragraph("Ay konumu hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Moon position could not be calculated." if _EN else ("No se pudo calcular la posición de la Luna." if _ES else "Ay konumu hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Sakinleştirme rehberi hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Calming guide error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la guía de calma: {str(e)}</font>" if _ES else f"<font color='red'>Sakinleştirme rehberi hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ EVDEN GÜVEN ORTAMI (4. EV) ═══
-        baslik_karti_ekle("EVDEN GÜVEN ORTAMI", alt_baslik="4. ev burcuna göre çocuğun yuva ve güvenlik ihtiyacı", emoji="🏡")
+        baslik_karti_ekle("EVDEN GÜVEN ORTAMI", alt_baslik=("The child's home and security need based on the 4th house sign" if _EN else ("La necesidad de hogar y seguridad del niño según el signo de la casa 4" if _ES else "4. ev burcuna göre çocuğun yuva ve güvenlik ihtiyacı")), emoji="🏡")
         story.append(Spacer(1, 8))
         try:
             d_g = self.p1 if isinstance(self.p1, date) else datetime.strptime(str(self.p1), "%Y-%m-%d").date()
@@ -9963,11 +11022,22 @@ class FBST_Engine:
             jd_g = swe.julday(d_g.year, d_g.month, d_g.day, self.saat_ondalik - uo_g)
             cusps_g, _ = swe.houses_ex(jd_g, self.enlem, self.boylam, b'P')
             ev4_burc = dereceyi_burca_cevir(cusps_g[3])
-            guven_metni = GUVEN_ORTAMI_4EV.get(ev4_burc, "Ev ortamını gözlemleyerek güven ihtiyacını karşılayın.")
-            guven_html = (
-                f"<font color='#1A1A2E'><b>Yuva Enerjisi (4. Ev — {ev4_burc} burcunda):</b></font><br/>"
-                f"<font color='#4A4A4A'>{guven_metni}</font>"
-            )
+            guven_metni = GUVEN_ORTAMI_4EV.get(ev4_burc, ("Observe the home environment to meet the need for security." if _EN else ("Observa el entorno del hogar para satisfacer la necesidad de seguridad." if _ES else "Ev ortamını gözlemleyerek güven ihtiyacını karşılayın.")))
+            if _EN:
+                guven_html = (
+                    f"<font color='#1A1A2E'><b>Home Energy (4th House in {pdf_label(ev4_burc)}):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{guven_metni}</font>"
+                )
+            elif _ES:
+                guven_html = (
+                    f"<font color='#1A1A2E'><b>Energía del hogar (Casa 4 en {pdf_label(ev4_burc)}):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{guven_metni}</font>"
+                )
+            else:
+                guven_html = (
+                    f"<font color='#1A1A2E'><b>Yuva Enerjisi (4. Ev — {ev4_burc} burcunda):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{guven_metni}</font>"
+                )
             guven_kutu = Table([[Paragraph(guven_html, styles['TurkishNormal'])]], colWidths=['100%'])
             guven_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFFAF5")),
@@ -9976,14 +11046,14 @@ class FBST_Engine:
             ]))
             story.append(guven_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Güven ortamı bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Security environment section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de entorno de seguridad: {str(e)}</font>" if _ES else f"<font color='red'>Güven ortamı bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ ZORLUKLARDA ANNENİN ROLÜ ═══
-        baslik_karti_ekle("ZORLUKLARDA ANNENİN ROLÜ", alt_baslik="Zorlayıcı açılarda annenin en yapıcı yaklaşımı", emoji="🤝")
+        baslik_karti_ekle("ZORLUKLARDA ANNENİN ROLÜ", alt_baslik=("The mother's most constructive approach in challenging aspects" if _EN else ("El enfoque más constructivo de la madre en los aspectos desafiantes" if _ES else "Zorlayıcı açılarda annenin en yapıcı yaklaşımı")), emoji="🤝")
         story.append(Spacer(1, 8))
         try:
             potansiyel_anne_z = self.potansiyel_hesapla()
@@ -9997,13 +11067,24 @@ class FBST_Engine:
                 gorulen_rol.add(g1)
                 rol_metni = ANNE_ROLU_ZORLUK.get(g1)
                 if rol_metni:
-                    anne_rol_parcalari.append(
-                        f"<font color='#1A1A2E'><b>{g1} temalı gerilimde:</b></font><br/>"
-                        f"<font color='#4A4A4A'>{rol_metni}</font>"
-                    )
+                    if _EN:
+                        anne_rol_parcalari.append(
+                            f"<font color='#1A1A2E'><b>In tension themed by {pdf_label(g1)}:</b></font><br/>"
+                            f"<font color='#4A4A4A'>{rol_metni}</font>"
+                        )
+                    elif _ES:
+                        anne_rol_parcalari.append(
+                            f"<font color='#1A1A2E'><b>En la tensión con el tema de {pdf_label(g1)}:</b></font><br/>"
+                            f"<font color='#4A4A4A'>{rol_metni}</font>"
+                        )
+                    else:
+                        anne_rol_parcalari.append(
+                            f"<font color='#1A1A2E'><b>{g1} temalı gerilimde:</b></font><br/>"
+                            f"<font color='#4A4A4A'>{rol_metni}</font>"
+                        )
             if anne_rol_parcalari:
                 anne_rol_html = "<br/><br/>".join(anne_rol_parcalari)
-                anne_rol_html += "<br/><br/><font color='#718096'><i>Bu öneriler, çocuğunuzun doğal gerilim noktalarında anne olarak en yapıcı duruşu almanıza yardımcı olur.</i></font>"
+                anne_rol_html += ("<br/><br/><font color='#718096'><i>These suggestions help you take the most constructive stance as a mother at your child's natural points of tension.</i></font>" if _EN else ("<br/><br/><font color='#718096'><i>Estas sugerencias te ayudan a tomar la postura más constructiva como madre en los puntos naturales de tensión de tu hijo.</i></font>" if _ES else "<br/><br/><font color='#718096'><i>Bu öneriler, çocuğunuzun doğal gerilim noktalarında anne olarak en yapıcı duruşu almanıza yardımcı olur.</i></font>"))
                 anne_rol_kutu = Table([[Paragraph(anne_rol_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 anne_rol_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FDF6F0")),
@@ -10012,26 +11093,37 @@ class FBST_Engine:
                 ]))
                 story.append(anne_rol_kutu)
             else:
-                story.append(Paragraph("Belirgin bir zorlayıcı açı bulunmadığından, annenin rolü genel güven ve destek üzerine kurulabilir.", styles['TurkishNormal']))
+                story.append(Paragraph(("Since no distinct challenging aspect was found, the mother's role can be built on general trust and support." if _EN else ("Dado que no se encontró ningún aspecto desafiante claro, el papel de la madre puede basarse en la confianza y el apoyo generales." if _ES else "Belirgin bir zorlayıcı açı bulunmadığından, annenin rolü genel güven ve destek üzerine kurulabilir.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Annenin rolü bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Mother's role section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección del papel de la madre: {str(e)}</font>" if _ES else f"<font color='red'>Annenin rolü bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ ÖĞRENME VE MOTİVASYON DİLİ ═══
-        baslik_karti_ekle("ÖĞRENME VE MOTİVASYON DİLİ", alt_baslik="Merkür konumuna göre öğrenme stili ve ders çalışma yöntemi", emoji="📚")
+        baslik_karti_ekle("ÖĞRENME VE MOTİVASYON DİLİ", alt_baslik=("Learning style and study method based on the Mercury position" if _EN else ("Estilo de aprendizaje y método de estudio según la posición de Mercurio" if _ES else "Merkür konumuna göre öğrenme stili ve ders çalışma yöntemi")), emoji="📚")
         story.append(Spacer(1, 8))
         try:
             merk_om = konumlar_da.get("Merkür")
             if merk_om:
                 merk_burc = merk_om.get('burc', '')
-                ogren_metni = OGRENME_MOTIVASYON_MERKUR.get(merk_burc, "Öğrenme tarzını birlikte keşfedin.")
-                ogren_html = (
-                    f"<font color='#1A1A2E'><b>Öğrenme Stili (Merkür — {merk_burc} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{ogren_metni}</font>"
-                )
+                ogren_metni = OGRENME_MOTIVASYON_MERKUR.get(merk_burc, ("Discover the learning style together." if _EN else ("Descubre juntos el estilo de aprendizaje." if _ES else "Öğrenme tarzını birlikte keşfedin.")))
+                if _EN:
+                    ogren_html = (
+                        f"<font color='#1A1A2E'><b>Learning Style (Mercury in {pdf_label(merk_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogren_metni}</font>"
+                    )
+                elif _ES:
+                    ogren_html = (
+                        f"<font color='#1A1A2E'><b>Estilo de aprendizaje (Mercurio en {pdf_label(merk_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogren_metni}</font>"
+                    )
+                else:
+                    ogren_html = (
+                        f"<font color='#1A1A2E'><b>Öğrenme Stili (Merkür — {merk_burc} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ogren_metni}</font>"
+                    )
                 ogren_kutu = Table([[Paragraph(ogren_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 ogren_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
@@ -10040,16 +11132,16 @@ class FBST_Engine:
                 ]))
                 story.append(ogren_kutu)
             else:
-                story.append(Paragraph("Merkür konumu hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Mercury position could not be calculated." if _EN else ("No se pudo calcular la posición de Mercurio." if _ES else "Merkür konumu hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Öğrenme stili hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Learning style error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en el estilo de aprendizaje: {str(e)}</font>" if _ES else f"<font color='red'>Öğrenme stili hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ EĞİTİM VE OKUL DİNAMİKLERİ ═══
-        baslik_karti_ekle("EĞİTİM VE OKUL DİNAMİKLERİ", alt_baslik="3. ev burcuna göre sınıf ortamı ve okul deneyimi", emoji="🎓")
+        baslik_karti_ekle("EĞİTİM VE OKUL DİNAMİKLERİ", alt_baslik=("Classroom environment and school experience based on the 3rd house sign" if _EN else ("El ambiente del aula y la experiencia escolar según el signo de la casa 3" if _ES else "3. ev burcuna göre sınıf ortamı ve okul deneyimi")), emoji="🎓")
         story.append(Spacer(1, 8))
         try:
             d_ek = self.p1 if isinstance(self.p1, date) else datetime.strptime(str(self.p1), "%Y-%m-%d").date()
@@ -10057,11 +11149,22 @@ class FBST_Engine:
             jd_ek = swe.julday(d_ek.year, d_ek.month, d_ek.day, self.saat_ondalik - uo_ek)
             cusps_ek, _ = swe.houses_ex(jd_ek, self.enlem, self.boylam, b'P')
             ev3_burc = dereceyi_burca_cevir(cusps_ek[2])
-            egitim_metni = EGITIM_3EV.get(ev3_burc, "Sınıf ortamını gözlemleyerek destek sağlayın.")
-            egitim_html = (
-                f"<font color='#1A1A2E'><b>Okul Enerjisi (3. Ev — {ev3_burc} burcunda):</b></font><br/>"
-                f"<font color='#4A4A4A'>{egitim_metni}</font>"
-            )
+            egitim_metni = EGITIM_3EV.get(ev3_burc, ("Observe the classroom environment to provide support." if _EN else ("Observa el ambiente del aula para brindar apoyo." if _ES else "Sınıf ortamını gözlemleyerek destek sağlayın.")))
+            if _EN:
+                egitim_html = (
+                    f"<font color='#1A1A2E'><b>School Energy (3rd House in {pdf_label(ev3_burc)}):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{egitim_metni}</font>"
+                )
+            elif _ES:
+                egitim_html = (
+                    f"<font color='#1A1A2E'><b>Energía escolar (Casa 3 en {pdf_label(ev3_burc)}):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{egitim_metni}</font>"
+                )
+            else:
+                egitim_html = (
+                    f"<font color='#1A1A2E'><b>Okul Enerjisi (3. Ev — {ev3_burc} burcunda):</b></font><br/>"
+                    f"<font color='#4A4A4A'>{egitim_metni}</font>"
+                )
             egitim_kutu = Table([[Paragraph(egitim_html, styles['TurkishNormal'])]], colWidths=['100%'])
             egitim_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), HexColor("#F0F4F8")),
@@ -10070,24 +11173,35 @@ class FBST_Engine:
             ]))
             story.append(egitim_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Eğitim bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Education section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de educación: {str(e)}</font>" if _ES else f"<font color='red'>Eğitim bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ BESLENME, UYKU VE RUTİN ═══
-        baslik_karti_ekle("BESLENME, UYKU VE RUTİN", alt_baslik="Ay konumuna göre günlük ritim ve bakım ihtiyacı", emoji="🍽️")
+        baslik_karti_ekle("BESLENME, UYKU VE RUTİN", alt_baslik=("Daily rhythm and care needs based on the Moon position" if _EN else ("Ritmo diario y necesidades de cuidado según la posición de la Luna" if _ES else "Ay konumuna göre günlük ritim ve bakım ihtiyacı")), emoji="🍽️")
         story.append(Spacer(1, 8))
         try:
             ay_ru = konumlar_da.get("Ay")
             if ay_ru:
                 ay_burc_ru = ay_ru.get('burc', '')
-                rutin_metni = BESLENME_RUTIN_AY.get(ay_burc_ru, "Düzenli ve sakin bir ritim oluşturun.")
-                rutin_html = (
-                    f"<font color='#1A1A2E'><b>Günlük Ritim (Ay — {ay_burc_ru} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{rutin_metni}</font>"
-                )
+                rutin_metni = BESLENME_RUTIN_AY.get(ay_burc_ru, ("Create a regular and calm rhythm." if _EN else ("Crea un ritmo regular y tranquilo." if _ES else "Düzenli ve sakin bir ritim oluşturun.")))
+                if _EN:
+                    rutin_html = (
+                        f"<font color='#1A1A2E'><b>Daily Rhythm (Moon in {pdf_label(ay_burc_ru)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{rutin_metni}</font>"
+                    )
+                elif _ES:
+                    rutin_html = (
+                        f"<font color='#1A1A2E'><b>Ritmo diario (Luna en {pdf_label(ay_burc_ru)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{rutin_metni}</font>"
+                    )
+                else:
+                    rutin_html = (
+                        f"<font color='#1A1A2E'><b>Günlük Ritim (Ay — {ay_burc_ru} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{rutin_metni}</font>"
+                    )
                 rutin_kutu = Table([[Paragraph(rutin_html, styles['TurkishNormal'])]], colWidths=['100%'])
                 rutin_kutu.setStyle(TableStyle([
                     ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFF8EC")),
@@ -10096,35 +11210,57 @@ class FBST_Engine:
                 ]))
                 story.append(rutin_kutu)
             else:
-                story.append(Paragraph("Ay konumu hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Moon position could not be calculated." if _EN else ("No se pudo calcular la posición de la Luna." if _ES else "Ay konumu hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Rutin bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Daily routine section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de rutina diaria: {str(e)}</font>" if _ES else f"<font color='red'>Rutin bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ ÖZGÜRLÜK VE SINIRLAR ═══
-        baslik_karti_ekle("ÖZGÜRLÜK VE SINIRLAR", alt_baslik="Satürn ve Uranüs konumlarına göre kurallar ve bağımsızlık dengesi", emoji="🕊️")
+        baslik_karti_ekle("ÖZGÜRLÜK VE SINIRLAR", alt_baslik=("Rules and independence balance based on Saturn and Uranus positions" if _EN else ("Equilibrio entre reglas e independencia según las posiciones de Saturno y Urano" if _ES else "Satürn ve Uranüs konumlarına göre kurallar ve bağımsızlık dengesi")), emoji="🕊️")
         story.append(Spacer(1, 8))
         try:
             sat_os = konumlar_da.get("Satürn")
             sinir_parcalari = []
             if sat_os:
                 sat_burc = sat_os.get('burc', '')
-                sinir_metni = OZGURLUK_SINIR_SATURN.get(sat_burc, "Net ama sevgi dolu sınırlar oluşturun.")
-                sinir_parcalari.append(
-                    f"<font color='#1A1A2E'><b>Sınırlar (Satürn — {sat_burc} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{sinir_metni}</font>"
-                )
+                sinir_metni = OZGURLUK_SINIR_SATURN.get(sat_burc, ("Create clear but loving boundaries." if _EN else ("Crea límites claros pero amorosos." if _ES else "Net ama sevgi dolu sınırlar oluşturun.")))
+                if _EN:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Boundaries (Saturn in {pdf_label(sat_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sinir_metni}</font>"
+                    )
+                elif _ES:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Límites (Saturno en {pdf_label(sat_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sinir_metni}</font>"
+                    )
+                else:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Sınırlar (Satürn — {sat_burc} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{sinir_metni}</font>"
+                    )
             uran_os = konumlar_da.get("Uranüs")
             if uran_os:
                 uran_burc = uran_os.get('burc', '')
-                ozgurluk_metni = OZGURLUK_SINIR_SATURN.get(uran_burc, "Özgürlüğüne saygı duyan bir denge kurun.")
-                sinir_parcalari.append(
-                    f"<font color='#1A1A2E'><b>Özgürlük Duygusu (Uranüs — {uran_burc} burcunda):</b></font><br/>"
-                    f"<font color='#4A4A4A'>{ozgurluk_metni}</font>"
-                )
+                ozgurluk_metni = OZGURLUK_SINIR_SATURN.get(uran_burc, ("Create a balance that respects their freedom." if _EN else ("Crea un equilibrio que respete su libertad." if _ES else "Özgürlüğüne saygı duyan bir denge kurun.")))
+                if _EN:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Sense of Freedom (Uranus in {pdf_label(uran_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ozgurluk_metni}</font>"
+                    )
+                elif _ES:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Sentido de la libertad (Urano en {pdf_label(uran_burc)}):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ozgurluk_metni}</font>"
+                    )
+                else:
+                    sinir_parcalari.append(
+                        f"<font color='#1A1A2E'><b>Özgürlük Duygusu (Uranüs — {uran_burc} burcunda):</b></font><br/>"
+                        f"<font color='#4A4A4A'>{ozgurluk_metni}</font>"
+                    )
             if sinir_parcalari:
                 sinir_html = "<br/><br/>".join(sinir_parcalari)
                 sinir_kutu = Table([[Paragraph(sinir_html, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -10135,16 +11271,16 @@ class FBST_Engine:
                 ]))
                 story.append(sinir_kutu)
             else:
-                story.append(Paragraph("Satürn ve Uranüs konumları hesaplanamadı.", styles['TurkishNormal']))
+                story.append(Paragraph(("Saturn and Uranus positions could not be calculated." if _EN else ("No se pudieron calcular las posiciones de Saturno y Urano." if _ES else "Satürn ve Uranüs konumları hesaplanamadı.")), styles['TurkishNormal']))
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Özgürlük ve sınırlar hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Freedom and boundaries error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en libertad y límites: {str(e)}</font>" if _ES else f"<font color='red'>Özgürlük ve sınırlar hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ KADRAN ANALİZİ ═══
-        baslik_karti_ekle("KADRAN ANALİZİ", alt_baslik="Evlerin dört kadrana dağılımı ve yaşam alanlarına yönelimi", emoji="🧭")
+        baslik_karti_ekle("KADRAN ANALİZİ", alt_baslik=("Distribution of houses across four quadrants and orientation to life areas" if _EN else ("La distribución de las casas en cuatro cuadrantes y el enfoque en las áreas de vida" if _ES else "Evlerin dört kadrana dağılımı ve yaşam alanlarına yönelimi")), emoji="🧭")
         story.append(Spacer(1, 8))
         try:
             kadran_sayac = {1: 0, 2: 0, 3: 0, 4: 0}
@@ -10161,20 +11297,46 @@ class FBST_Engine:
                     elif 10 <= ev_no <= 12:
                         kadran_sayac[4] += 1
             toplam_k = sum(kadran_sayac.values()) or 1
-            kadran_tanim = {
-                1: ("1. Kadran (1-3. Evler)", "Benlik, iletişim ve yakın çevre; bu çocuk kendi dünyasını kurarak, konuşarak ve öğrenerek gelişir."),
-                2: ("2. Kadran (4-6. Evler)", "Yuva, değer ve hizmet; bu çocuk güvenli bir yuva, düzen ve faydalı olma duygusuyla beslenir."),
-                3: ("3. Kadran (7-9. Evler)", "İlişkiler, dönüşüm ve anlam; bu çocuk ilişkileri ve geniş ufukları deneyimleyerek olgunlaşır."),
-                4: ("4. Kadran (10-12. Evler)", "Kariyer, topluluk ve ruh; bu çocuk toplumsal rolü ve iç dünyası arasında denge kurarak yükselir."),
-            }
+            if _EN:
+                kadran_tanim = {
+                    1: ("Quadrant 1 (Houses 1-3)", "Self, communication and close environment; this child develops by building, speaking and learning about their own world."),
+                    2: ("Quadrant 2 (Houses 4-6)", "Home, values and service; this child is nurtured by a secure home, order and a sense of being useful."),
+                    3: ("Quadrant 3 (Houses 7-9)", "Relationships, transformation and meaning; this child matures through relationships and broad horizons."),
+                    4: ("Quadrant 4 (Houses 10-12)", "Career, community and spirit; this child rises by balancing a social role with the inner world."),
+                }
+            elif _ES:
+                kadran_tanim = {
+                    1: ("Cuadrante 1 (Casas 1-3)", "Yo, comunicación y entorno cercano; este niño se desarrolla construyendo, hablando y aprendiendo sobre su propio mundo."),
+                    2: ("Cuadrante 2 (Casas 4-6)", "Hogar, valores y servicio; este niño se nutre de un hogar seguro, el orden y la sensación de ser útil."),
+                    3: ("Cuadrante 3 (Casas 7-9)", "Relaciones, transformación y significado; este niño madura a través de las relaciones y de amplios horizontes."),
+                    4: ("Cuadrante 4 (Casas 10-12)", "Carrera, comunidad y espíritu; este niño se eleva equilibrando un rol social con el mundo interior."),
+                }
+            else:
+                kadran_tanim = {
+                    1: ("1. Kadran (1-3. Evler)", "Benlik, iletişim ve yakın çevre; bu çocuk kendi dünyasını kurarak, konuşarak ve öğrenerek gelişir."),
+                    2: ("2. Kadran (4-6. Evler)", "Yuva, değer ve hizmet; bu çocuk güvenli bir yuva, düzen ve faydalı olma duygusuyla beslenir."),
+                    3: ("3. Kadran (7-9. Evler)", "İlişkiler, dönüşüm ve anlam; bu çocuk ilişkileri ve geniş ufukları deneyimleyerek olgunlaşır."),
+                    4: ("4. Kadran (10-12. Evler)", "Kariyer, topluluk ve ruh; bu çocuk toplumsal rolü ve iç dünyası arasında denge kurarak yükselir."),
+                }
             kadran_html = ""
             sirali_kadranlar = sorted(kadran_sayac.items(), key=lambda x: x[1], reverse=True)
             for kadran_no, sayi in sirali_kadranlar:
                 oran = sayi / toplam_k
                 isim_k, tanim_k = kadran_tanim[kadran_no]
-                vurgu = " <b>(en güçlü alan)</b>" if kadran_no == sirali_kadranlar[0][0] else ""
+                if _EN:
+                    vurgu = " <b>(strongest area)</b>" if kadran_no == sirali_kadranlar[0][0] else ""
+                elif _ES:
+                    vurgu = " <b>(área más fuerte)</b>" if kadran_no == sirali_kadranlar[0][0] else ""
+                else:
+                    vurgu = " <b>(en güçlü alan)</b>" if kadran_no == sirali_kadranlar[0][0] else ""
+                if _EN:
+                    kadran_sayac_metni = "planets"
+                elif _ES:
+                    kadran_sayac_metni = "planetas"
+                else:
+                    kadran_sayac_metni = "gezegen"
                 kadran_html += (
-                    f"<font color='#1A1A2E'><b>{isim_k}:</b> {sayi} gezegen (%{round(oran * 100)}){vurgu}</font><br/>"
+                    f"<font color='#1A1A2E'><b>{isim_k}:</b> {sayi} {kadran_sayac_metni} (%{round(oran * 100)}){vurgu}</font><br/>"
                     f"<font color='#4A4A4A'>{tanim_k}</font><br/><br/>"
                 )
             kadran_kutu = Table([[Paragraph(kadran_html, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -10185,14 +11347,14 @@ class FBST_Engine:
             ]))
             story.append(kadran_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Kadran analizi hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Quadrant analysis error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en el análisis de cuadrantes: {str(e)}</font>" if _ES else f"<font color='red'>Kadran analizi hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ DERİN GÖSTERGELER: SABİT YILDIZLAR VE ASTEROİTLER ═══
-        baslik_karti_ekle("DERİN GÖSTERGELER", alt_baslik="Sabit yıldız kavuşumları ve kilit asteroit noktaları", emoji="🌟")
+        baslik_karti_ekle("DERİN GÖSTERGELER", alt_baslik=("Fixed star conjunctions and key asteroid points" if _EN else ("Conjunciones de estrellas fijas y puntos clave de asteroides" if _ES else "Sabit yıldız kavuşumları ve kilit asteroit noktaları")), emoji="🌟")
         story.append(Spacer(1, 8))
         try:
             yildiz_dg = self.sabit_yildiz_analizi()
@@ -10204,14 +11366,33 @@ class FBST_Engine:
                 orb_dg = ys.get('orb', 0)
                 tip_dg = ys.get('tip', 'GEZEGEN')
                 etki_dg = ys.get('meslek_etkileri', {})
-                etki_str = ", ".join(list(etki_dg.keys())[:3]) if etki_dg else "güçlü bir kadersel mühür"
+                if etki_dg:
+                    etki_str = ", ".join([pdf_label(k) for k in list(etki_dg.keys())[:3]])
+                else:
+                    etki_str = ("a strong karmic seal" if _EN else ("un fuerte sello kármico" if _ES else "güçlü bir kadersel mühür"))
                 hedef_dg = gezegen_dg if gezegen_dg else ("MC" if tip_dg == "MC" else ("Yükselen" if tip_dg == "YUKSELEN" else "Yönetici"))
-                yildiz_dg_parcalari.append(
-                    f"<font color='#1A1A2E'><b>★ {yildiz_ad}</b> — {hedef_dg} ile kavuşum (orb {orb_dg}°)</font><br/>"
-                    f"<font color='#4A4A4A'>Bu kadersel yıldız, {etki_str} alanlarını güçlendiren doğal bir mühür taşır.</font>"
-                )
+                if _EN:
+                    yildiz_dg_parcalari.append(
+                        f"<font color='#1A1A2E'><b>★ {yildiz_ad}</b> — conjunction with {pdf_label(hedef_dg)} (orb {orb_dg}°)</font><br/>"
+                        f"<font color='#4A4A4A'>This karmic star carries a natural seal strengthening the areas of {etki_str}.</font>"
+                    )
+                elif _ES:
+                    yildiz_dg_parcalari.append(
+                        f"<font color='#1A1A2E'><b>★ {yildiz_ad}</b> — conjunción con {pdf_label(hedef_dg)} (orb {orb_dg}°)</font><br/>"
+                        f"<font color='#4A4A4A'>Esta estrella kármica lleva un sello natural que fortalece las áreas de {etki_str}.</font>"
+                    )
+                else:
+                    yildiz_dg_parcalari.append(
+                        f"<font color='#1A1A2E'><b>★ {yildiz_ad}</b> — {hedef_dg} ile kavuşum (orb {orb_dg}°)</font><br/>"
+                        f"<font color='#4A4A4A'>Bu kadersel yıldız, {etki_str} alanlarını güçlendiren doğal bir mühür taşır.</font>"
+                    )
             if not yildiz_dg_parcalari:
-                yildiz_dg_parcalari.append("<font color='#4A4A4A'>Belirlenen tolerans sınırlarında güçlü bir sabit yıldız kavuşumu bulunmadı; yine de derin göstergeler asteroid temasıyla devam ediyor.</font>")
+                if _EN:
+                    yildiz_dg_parcalari.append("<font color='#4A4A4A'>No strong fixed star conjunction was found within the set tolerance limits; deeper indicators continue with the asteroid theme.</font>")
+                elif _ES:
+                    yildiz_dg_parcalari.append("<font color='#4A4A4A'>No se encontró ninguna conjunción fuerte con estrellas fijas dentro de los límites de tolerancia establecidos; los indicadores profundos continúan con el tema de los asteroides.</font>")
+                else:
+                    yildiz_dg_parcalari.append("<font color='#4A4A4A'>Belirlenen tolerans sınırlarında güçlü bir sabit yıldız kavuşumu bulunmadı; yine de derin göstergeler asteroid temasıyla devam ediyor.</font>")
             dg_html = "<br/><br/>".join(yildiz_dg_parcalari)
 
             # Asteroit kilit noktaları (Ceres, Pallas, Vesta, Juno, Chiron)
@@ -10221,13 +11402,30 @@ class FBST_Engine:
             cusps_ast, ascmc_ast = swe.houses_ex(jd_ast, self.enlem, self.boylam, b'P')
             hedefler_ast = {"MC": ascmc_ast[1], "Yükselen": ascmc_ast[0], "Güneş": konumlar_da.get("Güneş", {}).get('ham_derece', 0), "Ay": konumlar_da.get("Ay", {}).get('ham_derece', 0)}
             asteroit_isimleri = [(swe.CERES, "Ceres"), (swe.JUNO, "Juno"), (swe.PALLAS, "Pallas"), (swe.VESTA, "Vesta"), (15, "Chiron")]
-            ast_yorum = {
-                "Ceres": "beslenme, koruma ve anne-çocuk besleyiciliği",
-                "Juno": "bağlılık, adalet ve sadakat",
-                "Pallas": "strateji, bilgelik ve yaratıcı zeka",
-                "Vesta": "odak, adanmışlık ve iç ateş",
-                "Chiron": "derin yara ve şifa gücü",
-            }
+            if _EN:
+                ast_yorum = {
+                    "Ceres": "nurture, protection and mother-child nourishment",
+                    "Juno": "commitment, justice and loyalty",
+                    "Pallas": "strategy, wisdom and creative intelligence",
+                    "Vesta": "focus, devotion and inner fire",
+                    "Chiron": "deep wound and healing power",
+                }
+            elif _ES:
+                ast_yorum = {
+                    "Ceres": "nutrición, protección y el cuidado madre-hijo",
+                    "Juno": "compromiso, justicia y lealtad",
+                    "Pallas": "estrategia, sabiduría e inteligencia creativa",
+                    "Vesta": "enfoque, devoción y fuego interior",
+                    "Chiron": "herida profunda y poder sanador",
+                }
+            else:
+                ast_yorum = {
+                    "Ceres": "beslenme, koruma ve anne-çocuk besleyiciliği",
+                    "Juno": "bağlılık, adalet ve sadakat",
+                    "Pallas": "strateji, bilgelik ve yaratıcı zeka",
+                    "Vesta": "odak, adanmışlık ve iç ateş",
+                    "Chiron": "derin yara ve şifa gücü",
+                }
             ast_dg_parcalari = []
             for a_id, a_ad in asteroit_isimleri:
                 try:
@@ -10241,12 +11439,28 @@ class FBST_Engine:
                     if fark_ast > 180:
                         fark_ast = 360 - fark_ast
                     if fark_ast <= 3.0:
-                        ast_dg_parcalari.append(
-                            f"<font color='#1A1A2E'><b>{a_ad}</b> — {hedef_ad} ile kavuşum (orb {round(fark_ast, 1)}°)</font><br/>"
-                            f"<font color='#4A4A4A'>{a_ad}, {ast_yorum.get(a_ad, 'derin bir kadersel tema')} alanında bu noktayı güçlendirir.</font>"
-                        )
+                        if _EN:
+                            ast_dg_parcalari.append(
+                                f"<font color='#1A1A2E'><b>{a_ad}</b> — conjunction with {pdf_label(hedef_ad)} (orb {round(fark_ast, 1)}°)</font><br/>"
+                                f"<font color='#4A4A4A'>{a_ad} strengthens this point in the area of {ast_yorum.get(a_ad, 'a deep karmic theme')}.</font>"
+                            )
+                        elif _ES:
+                            ast_dg_parcalari.append(
+                                f"<font color='#1A1A2E'><b>{a_ad}</b> — conjunción con {pdf_label(hedef_ad)} (orb {round(fark_ast, 1)}°)</font><br/>"
+                                f"<font color='#4A4A4A'>{a_ad} fortalece este punto en el área de {ast_yorum.get(a_ad, 'un profundo tema kármico')}.</font>"
+                            )
+                        else:
+                            ast_dg_parcalari.append(
+                                f"<font color='#1A1A2E'><b>{a_ad}</b> — {hedef_ad} ile kavuşum (orb {round(fark_ast, 1)}°)</font><br/>"
+                                f"<font color='#4A4A4A'>{a_ad}, {ast_yorum.get(a_ad, 'derin bir kadersel tema')} alanında bu noktayı güçlendirir.</font>"
+                            )
             if ast_dg_parcalari:
-                dg_html += "<br/><br/><font color='#1A1A2E'><b>Kilit Asteroit Noktaları:</b></font><br/><br/>"
+                if _EN:
+                    dg_html += "<br/><br/><font color='#1A1A2E'><b>Key Asteroid Points:</b></font><br/><br/>"
+                elif _ES:
+                    dg_html += "<br/><br/><font color='#1A1A2E'><b>Puntos clave de asteroides:</b></font><br/><br/>"
+                else:
+                    dg_html += "<br/><br/><font color='#1A1A2E'><b>Kilit Asteroit Noktaları:</b></font><br/><br/>"
                 dg_html += "<br/><br/>".join(ast_dg_parcalari[:6])
 
             dg_kutu = Table([[Paragraph(dg_html, styles['TurkishNormal'])]], colWidths=['100%'])
@@ -10257,14 +11471,14 @@ class FBST_Engine:
             ]))
             story.append(dg_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Derin göstergeler hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Deep indicators error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en los indicadores profundos: {str(e)}</font>" if _ES else f"<font color='red'>Derin göstergeler hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ 3 GÜÇLÜ YAN + 3 DİKKAT NOKTASI ═══
-        baslik_karti_ekle("3 GÜÇLÜ YAN + 3 DİKKAT NOKTASI", alt_baslik="Potansiyel alanların güçlü yönleri ve dikkat edilecek noktalar", emoji="⚡")
+        baslik_karti_ekle("3 GÜÇLÜ YAN + 3 DİKKAT NOKTASI", alt_baslik=("Strengths of potential areas and points of attention" if _EN else ("Fortalezas de las áreas de potencial y puntos de atención" if _ES else "Potansiyel alanların güçlü yönleri ve dikkat edilecek noktalar")), emoji="⚡")
         story.append(Spacer(1, 8))
         try:
             guclu_alanlar = []
@@ -10283,18 +11497,46 @@ class FBST_Engine:
                         zorluk_3.append(s['alan'])
             guclu_html = ""
             if guclu_alanlar:
-                guclu_html += "<font color='#1A1A2E'><b>💪 3 GÜÇLÜ YAN:</b></font><br/>"
-                for i, alan in enumerate(guclu_alanlar, 1):
-                    guclu_html += f"<font color='#4A4A4A'>{i}. <b>{alan}</b> — bu alan, doğal yatkınlığın ve geliştirilebilir potansiyelin en parlak noktasıdır.</font><br/>"
+                if _EN:
+                    guclu_html += "<font color='#1A1A2E'><b>💪 3 STRENGTHS:</b></font><br/>"
+                    for i, alan in enumerate(guclu_alanlar, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{pdf_label(alan)}</b> — this area is the brightest point of natural aptitude and developable potential.</font><br/>"
+                elif _ES:
+                    guclu_html += "<font color='#1A1A2E'><b>💪 3 FORTALEZAS:</b></font><br/>"
+                    for i, alan in enumerate(guclu_alanlar, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{pdf_label(alan)}</b> — esta área es el punto más brillante de la aptitud natural y del potencial desarrollable.</font><br/>"
+                else:
+                    guclu_html += "<font color='#1A1A2E'><b>💪 3 GÜÇLÜ YAN:</b></font><br/>"
+                    for i, alan in enumerate(guclu_alanlar, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{alan}</b> — bu alan, doğal yatkınlığın ve geliştirilebilir potansiyelin en parlak noktasıdır.</font><br/>"
             else:
-                guclu_html += "<font color='#4A4A4A'>Belirgin güçlü alan tespit edilemedi; gözlemle keşfedilmeyi bekliyor.</font>"
+                if _EN:
+                    guclu_html += "<font color='#4A4A4A'>No distinct strong area could be detected; it awaits discovery through observation.</font>"
+                elif _ES:
+                    guclu_html += "<font color='#4A4A4A'>No se pudo detectar un área fuerte clara; espera ser descubierta mediante la observación.</font>"
+                else:
+                    guclu_html += "<font color='#4A4A4A'>Belirgin güçlü alan tespit edilemedi; gözlemle keşfedilmeyi bekliyor.</font>"
             guclu_html += "<br/><br/>"
             if zorluk_3:
-                guclu_html += "<font color='#8B0000'><b>⚠️ 3 DİKKAT NOKTASI:</b></font><br/>"
-                for i, alan in enumerate(zorluk_3, 1):
-                    guclu_html += f"<font color='#4A4A4A'>{i}. <b>{alan}</b> — bu alanda gerilim yaşanabilir; farkındalık ve sabırla güce dönüşür.</font><br/>"
+                if _EN:
+                    guclu_html += "<font color='#8B0000'><b>⚠️ 3 POINTS OF ATTENTION:</b></font><br/>"
+                    for i, alan in enumerate(zorluk_3, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{pdf_label(alan)}</b> — tension may occur in this area; with awareness and patience it turns into strength.</font><br/>"
+                elif _ES:
+                    guclu_html += "<font color='#8B0000'><b>⚠️ 3 PUNTOS DE ATENCIÓN:</b></font><br/>"
+                    for i, alan in enumerate(zorluk_3, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{pdf_label(alan)}</b> — en esta área puede haber tensión; con conciencia y paciencia se convierte en fortaleza.</font><br/>"
+                else:
+                    guclu_html += "<font color='#8B0000'><b>⚠️ 3 DİKKAT NOKTASI:</b></font><br/>"
+                    for i, alan in enumerate(zorluk_3, 1):
+                        guclu_html += f"<font color='#4A4A4A'>{i}. <b>{alan}</b> — bu alanda gerilim yaşanabilir; farkındalık ve sabırla güce dönüşür.</font><br/>"
             else:
-                guclu_html += "<font color='#4A4A4A'>Belirgin bir gerilim noktası bulunmuyor; enerji akışı nispeten uyumludur.</font>"
+                if _EN:
+                    guclu_html += "<font color='#4A4A4A'>No distinct tension point was found; the energy flow is relatively harmonious.</font>"
+                elif _ES:
+                    guclu_html += "<font color='#4A4A4A'>No se encontró ningún punto de tensión claro; el flujo de energía es relativamente armonioso.</font>"
+                else:
+                    guclu_html += "<font color='#4A4A4A'>Belirgin bir gerilim noktası bulunmuyor; enerji akışı nispeten uyumludur.</font>"
             guclu_kutu = Table([[Paragraph(guclu_html, styles['TurkishNormal'])]], colWidths=['100%'])
             guclu_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFFAF5")),
@@ -10303,14 +11545,14 @@ class FBST_Engine:
             ]))
             story.append(guclu_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Güçlü yanlar bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Strengths section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de fortalezas: {str(e)}</font>" if _ES else f"<font color='red'>Güçlü yanlar bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ GELİŞİMSEL ZAMAN ÇİZELGESİ (YAŞ DÖNEMİ REHBERİ) ═══
-        baslik_karti_ekle("YAŞ DÖNEMİ REHBERİ VE GELİŞİMSEL ZAMAN ÇİZELGESİ", alt_baslik="Çocuğun yaşına göre gelişim dönemleri ve anne rehberliği", emoji="⏳")
+        baslik_karti_ekle("YAŞ DÖNEMİ REHBERİ VE GELİŞİMSEL ZAMAN ÇİZELGESİ", alt_baslik=("Developmental periods by the child's age and maternal guidance" if _EN else ("Períodos de desarrollo según la edad del niño y orientación materna" if _ES else "Çocuğun yaşına göre gelişim dönemleri ve anne rehberliği")), emoji="⏳")
         story.append(Spacer(1, 8))
         try:
             from datetime import datetime as _dtz
@@ -10328,25 +11570,30 @@ class FBST_Engine:
                 yas_z = (date.today() - dogum_t_z).days // 365
             if yas_z is None:
                 donem_key_z = "YETISKIN"
-                yas_donem_baslik = "Yaş dönemi bilinmediği için genel rehberlik:"
+                yas_donem_baslik = ("General guidance since the age period is unknown:" if _EN else ("Orientación general, ya que se desconoce el período de edad:" if _ES else "Yaş dönemi bilinmediği için genel rehberlik:"))
             elif yas_z < 7:
                 donem_key_z = "ERKEN"
-                yas_donem_baslik = f"Erken Çocukluk Dönemi (0-7 yaş) — şu anki dönem:"
+                yas_donem_baslik = ("Early Childhood Period (0-7 years) — the current period:" if _EN else ("Período de Primera Infancia (0-7 años) — el período actual:" if _ES else f"Erken Çocukluk Dönemi (0-7 yaş) — şu anki dönem:"))
             elif yas_z < 13:
                 donem_key_z = "ILK"
-                yas_donem_baslik = f"İlkokul ve Ortaokul Dönemi (7-13 yaş) — şu anki dönem:"
+                yas_donem_baslik = ("Primary and Middle School Period (7-13 years) — the current period:" if _EN else ("Período de Primaria y Secundaria (7-13 años) — el período actual:" if _ES else f"İlkokul ve Ortaokul Dönemi (7-13 yaş) — şu anki dönem:"))
             elif yas_z < 18:
                 donem_key_z = "ERG"
-                yas_donem_baslik = f"Ergenlik Dönemi (13-18 yaş) — şu anki dönem:"
+                yas_donem_baslik = ("Adolescence Period (13-18 years) — the current period:" if _EN else ("Período de Adolescencia (13-18 años) — el período actual:" if _ES else f"Ergenlik Dönemi (13-18 yaş) — şu anki dönem:"))
             else:
                 donem_key_z = "YETISKIN"
-                yas_donem_baslik = f"Yetişkinlik Dönemi (18 yaş ve üzeri) — şu anki dönem:"
+                yas_donem_baslik = ("Adulthood Period (18 years and above) — the current period:" if _EN else ("Período de Adultez (18 años en adelante) — el período actual:" if _ES else f"Yetişkinlik Dönemi (18 yaş ve üzeri) — şu anki dönem:"))
 
             donem_metni = YAS_DONEMLERI.get(donem_key_z, "")
             zaman_html = f"<font color='#1A1A2E'><b>{yas_donem_baslik}</b></font><br/>"
             if donem_metni:
                 zaman_html += f"<font color='#4A4A4A'>{donem_metni}</font>"
-            zaman_html += "<br/><br/><font color='#718096'><i>Gelişimsel zaman çizelgesi özeti: 0-7 oyun temelli keşif, 7-13 kurs ve atölye yönlendirmesi, 13-18 kulüp ve proje derinleşmesi, 18+ uzmanlaşma ve kariyer adımları.</i></font>"
+            if _EN:
+                zaman_html += "<br/><br/><font color='#718096'><i>Developmental timeline summary: 0-7 play-based exploration, 7-13 courses and workshops, 13-18 clubs and project deepening, 18+ specialization and career steps.</i></font>"
+            elif _ES:
+                zaman_html += "<br/><br/><font color='#718096'><i>Resumen del cronograma de desarrollo: 0-7 exploración basada en el juego, 7-13 cursos y talleres, 13-18 clubes y profundización en proyectos, 18+ especialización y pasos de carrera.</i></font>"
+            else:
+                zaman_html += "<br/><br/><font color='#718096'><i>Gelişimsel zaman çizelgesi özeti: 0-7 oyun temelli keşif, 7-13 kurs ve atölye yönlendirmesi, 13-18 kulüp ve proje derinleşmesi, 18+ uzmanlaşma ve kariyer adımları.</i></font>"
             zaman_kutu = Table([[Paragraph(zaman_html, styles['TurkishNormal'])]], colWidths=['100%'])
             zaman_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), KART_ARKA_PLAN),
@@ -10355,30 +11602,53 @@ class FBST_Engine:
             ]))
             story.append(zaman_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Yaş dönemi rehberi hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Age period guide error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la guía por edades: {str(e)}</font>" if _ES else f"<font color='red'>Yaş dönemi rehberi hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         story.append(Spacer(1, 15))
         story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
         story.append(Spacer(1, 15))
 
         # ═══ NİHAİ ÖZET ═══
-        baslik_karti_ekle("ÖZET VE DEĞERLENDİRME", alt_baslik="Potansiyel ve yetenek analizinin genel değerlendirmesi", emoji="📜")
+        baslik_karti_ekle("ÖZET VE DEĞERLENDİRME", alt_baslik=("Overall assessment of the potential and talent analysis" if _EN else ("Evaluación general del análisis de potencial y talento" if _ES else "Potansiyel ve yetenek analizinin genel değerlendirmesi")), emoji="📜")
         story.append(Spacer(1, 8))
 
         potansiyel_sayisi = len(set(s['alan'] for s in (potansiyel_sonuclari or [])))
         meslek_sayisi = len(meslek_onerileri) if meslek_onerileri else 0
 
-        ozet_html = (
-            f"<font color='#1A1A2E'><b>{self.p1_isim}</b> için potansiyel ve yetenek analizi "
-            f"{self.p1.strftime('%d.%m.%Y')} tarihinde {self.city}, {self.country} koordinatlarında "
-            f"hesaplanmıştır.</font><br/><br/>"
-            f"<font color='#4A4A4A'>"
-            f"<b>Tespit edilen potansiyel alanı sayısı:</b> {potansiyel_sayisi}<br/>"
-            f"<b>Önerilen meslek dalı sayısı:</b> {meslek_sayisi}<br/><br/>"
-            f"Bu rapor, doğum haritasındaki gezegen açılarının potansiyel alanlarıyla eşleştirilmesi "
-            f"sonucu ortaya çıkmıştır. Detaylı açıklama ve yorumlar için bir astroloji uzmanına danışmanız önerilir."
-            f"</font>"
-        )
+        if _EN:
+            ozet_html = (
+                f"<font color='#1A1A2E'><b>Potential and talent analysis for {self.p1_isim}</b> "
+                f"was calculated on {self.p1.strftime('%d.%m.%Y')} at the {self.city}, {self.country} coordinates.</font><br/><br/>"
+                f"<font color='#4A4A4A'>"
+                f"<b>Number of detected potential areas:</b> {potansiyel_sayisi}<br/>"
+                f"<b>Number of recommended career fields:</b> {meslek_sayisi}<br/><br/>"
+                f"This report results from matching planetary aspects in the natal chart with potential areas. "
+                f"It is recommended to consult an astrology specialist for detailed explanation and interpretation."
+                f"</font>"
+            )
+        elif _ES:
+            ozet_html = (
+                f"<font color='#1A1A2E'><b>Análisis de potencial y talento para {self.p1_isim}</b> "
+                f"calculado el {self.p1.strftime('%d.%m.%Y')} en las coordenadas de {self.city}, {self.country}.</font><br/><br/>"
+                f"<font color='#4A4A4A'>"
+                f"<b>Número de áreas de potencial detectadas:</b> {potansiyel_sayisi}<br/>"
+                f"<b>Número de campos profesionales recomendados:</b> {meslek_sayisi}<br/><br/>"
+                f"Este informe resulta de la correspondencia entre los aspectos planetarios de la carta natal y las áreas de potencial. "
+                f"Se recomienda consultar a un especialista en astrología para una explicación e interpretación detalladas."
+                f"</font>"
+            )
+        else:
+            ozet_html = (
+                f"<font color='#1A1A2E'><b>{self.p1_isim}</b> için potansiyel ve yetenek analizi "
+                f"{self.p1.strftime('%d.%m.%Y')} tarihinde {self.city}, {self.country} koordinatlarında "
+                f"hesaplanmıştır.</font><br/><br/>"
+                f"<font color='#4A4A4A'>"
+                f"<b>Tespit edilen potansiyel alanı sayısı:</b> {potansiyel_sayisi}<br/>"
+                f"<b>Önerilen meslek dalı sayısı:</b> {meslek_sayisi}<br/><br/>"
+                f"Bu rapor, doğum haritasındaki gezegen açılarının potansiyel alanlarıyla eşleştirilmesi "
+                f"sonucu ortaya çıkmıştır. Detaylı açıklama ve yorumlar için bir astroloji uzmanına danışmanız önerilir."
+                f"</font>"
+            )
         ozet_kutu = Table([[Paragraph(ozet_html, styles['TurkishNormal'])]], colWidths=['100%'])
         ozet_kutu.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,-1), HexColor("#FFFAF5")),
@@ -10390,14 +11660,33 @@ class FBST_Engine:
         # ═══ KAPANIŞ VE İMZA ═══
         story.append(Spacer(1, 10))
         try:
-            kapanis_html = (
-                f"<font color='#4A4A4A'>"
-                f"Bu rapor, doğum anındaki gökyüzü konumlarının potansiyel alanlarla eşleştirilmesiyle hazırlanmıştır. "
-                f"Gelecekte olacak olayları öngörmez; kehanet, fal veya kesin yargı değildir. Doğum anındaki gökyüzünün "
-                f"yeryüzüne izdüşümünü, kişisel farkındalık ve gelişim perspektifiyle anlatan bir analiz rehberidir. "
-                f"Yetenekler geliştirilebilir, engeller aşılabilir; bu harita bir başlangıç noktasıdır."
-                f"</font>"
-            )
+            if _EN:
+                kapanis_html = (
+                    f"<font color='#4A4A4A'>"
+                    f"This report was prepared by matching the celestial positions at the moment of birth with potential areas. "
+                    f"It does not predict future events; it is not prophecy, fortune-telling, or a definitive judgment. It is an analytical guide "
+                    f"explaining the projection of the sky at birth onto the earth, from the perspective of personal awareness and development. "
+                    f"Talents can be developed and obstacles can be overcome; this chart is a starting point."
+                    f"</font>"
+                )
+            elif _ES:
+                kapanis_html = (
+                    f"<font color='#4A4A4A'>"
+                    f"Este informe fue elaborado mediante la correspondencia de las posiciones celestes del momento del nacimiento con las áreas de potencial. "
+                    f"No predice eventos futuros; no es profecía, adivinación ni un juicio definitivo. Es una guía analítica "
+                    f"que explica la proyección del cielo al nacer sobre la tierra, desde la perspectiva de la conciencia y el desarrollo personal. "
+                    f"Los talentos pueden desarrollarse y los obstáculos superarse; esta carta es un punto de partida."
+                    f"</font>"
+                )
+            else:
+                kapanis_html = (
+                    f"<font color='#4A4A4A'>"
+                    f"Bu rapor, doğum anındaki gökyüzü konumlarının potansiyel alanlarla eşleştirilmesiyle hazırlanmıştır. "
+                    f"Gelecekte olacak olayları öngörmez; kehanet, fal veya kesin yargı değildir. Doğum anındaki gökyüzünün "
+                    f"yeryüzüne izdüşümünü, kişisel farkındalık ve gelişim perspektifiyle anlatan bir analiz rehberidir. "
+                    f"Yetenekler geliştirilebilir, engeller aşılabilir; bu harita bir başlangıç noktasıdır."
+                    f"</font>"
+                )
             kapanis_kutu = Table([[Paragraph(kapanis_html, styles['TurkishNormal'])]], colWidths=['100%'])
             kapanis_kutu.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, -1), HexColor("#FFF8EC")),
@@ -10407,7 +11696,7 @@ class FBST_Engine:
             story.append(kapanis_kutu)
             story.append(Spacer(1, 12))
             imza_html = (
-                f"<font color='#1A1A2E'><b>Saygılarımızla,</b></font><br/>"
+                f"<font color='#1A1A2E'><b>{'With our best regards,' if _EN else ('Atentamente,' if _ES else 'Saygılarımızla,')}</b></font><br/>"
                 f"<font color='#C9A96E'><b>Fatih Asartepe</b></font><br/>"
                 f"<font color='#4A4A4A'>Sinaatri Akademisi — FAST<br/>"
                 f"info@fatihasartepe.com | www.fatihasartepe.com</font>"
@@ -10420,7 +11709,7 @@ class FBST_Engine:
             ]))
             story.append(imza_kutu)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Kapanış bölümü hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Closing section error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la sección de cierre: {str(e)}</font>" if _ES else f"<font color='red'>Kapanış bölümü hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         # ═══ DANIŞMANLIK VE PAYLAŞIM KARTI ═══
         story.append(PageBreak())
@@ -10449,11 +11738,22 @@ class FBST_Engine:
                         gorulen_kart.add(s['alan'])
                         alanlar_kart.append(s['alan'])
                 if alanlar_kart:
-                    ilk_3_alan = "<br/>".join(f"★ {a}" for a in alanlar_kart)
+                    alan_kart_goster = [pdf_label(a) if (_EN or _ES) else a for a in alanlar_kart]
+                    ilk_3_alan = "<br/>".join(f"★ {a}" for a in alan_kart_goster)
             if not ilk_3_alan:
-                ilk_3_alan = "★ Potansiyel alanlar raporda detaylandırılmıştır"
+                if _EN:
+                    ilk_3_alan = "★ Potential areas are detailed in the report"
+                elif _ES:
+                    ilk_3_alan = "★ Las áreas de potencial se detallan en el informe"
+                else:
+                    ilk_3_alan = "★ Potansiyel alanlar raporda detaylandırılmıştır"
 
-            kart_baslik = "YILDIZ BAĞ ANALİZİ"
+            if _EN:
+                kart_baslik = "STAR CONNECTION ANALYSIS"
+            elif _ES:
+                kart_baslik = "ANÁLISIS DEL VÍNCULO ESTELAR"
+            else:
+                kart_baslik = "YILDIZ BAĞ ANALİZİ"
             kart_html = (
                 f"<table width='100%' cellpadding='14'><tr>"
                 f"<td bgcolor='#1A1A2E' align='center'>"
@@ -10461,20 +11761,35 @@ class FBST_Engine:
                 f"<font color='#FFFFFF' size='11'>FAST — Sinaatri Akademisi</font><br/><br/>"
                 f"<font color='#FFFFFF' size='12'><b>{self.p1_isim}</b></font><br/>"
                 f"<font color='#A0A0B0' size='9'>{self.p1.strftime('%d.%m.%Y')} · {self.city}, {self.country}</font><br/><br/>"
-                f"<font color='#C9A96E' size='11'><b>ÖNE ÇIKAN POTANSİYEL ALANLAR</b></font><br/>"
+                f"<font color='#C9A96E' size='11'><b>{'FEATURED POTENTIAL AREAS' if _EN else ('ÁREAS DE POTENCIAL DESTACADAS' if _ES else 'ÖNE ÇIKAN POTANSİYEL ALANLAR')}</b></font><br/>"
                 f"<font color='#FFFFFF' size='10'>{ilk_3_alan}</font><br/><br/>"
                 f"<font color='#A0A0B0' size='9'>www.fatihasartepe.com</font>"
                 f"</td></tr></table>"
             )
             kart_flow = Paragraph(kart_html, styles['TurkishNormal'])
 
-            danisma_html = (
-                f"<font color='#1A1A2E'><b>DANIŞMANLIK VE RANDEVU</b></font><br/><br/>"
-                f"<font color='#4A4A4A'>Bu raporu birlikte derinleştirmek ve sorularınızı yanıtlamak için "
-                f"danışmanlık randevusu alabilirsiniz. QR kodu okutarak veya www.fatihasartepe.com adresini "
-                f"ziyaret ederek iletişime geçebilirsiniz.<br/><br/>"
-                f"<b>info@fatihasartepe.com</b></font>"
-            )
+            if _EN:
+                danisma_html = (
+                    f"<font color='#1A1A2E'><b>CONSULTATION AND APPOINTMENT</b></font><br/><br/>"
+                    f"<font color='#4A4A4A'>You can book a consultation appointment to deepen this report together and answer your questions. "
+                    f"Reach out by scanning the QR code or visiting www.fatihasartepe.com.<br/><br/>"
+                    f"<b>info@fatihasartepe.com</b></font>"
+                )
+            elif _ES:
+                danisma_html = (
+                    f"<font color='#1A1A2E'><b>CONSULTA Y CITA</b></font><br/><br/>"
+                    f"<font color='#4A4A4A'>Puedes reservar una cita de consulta para profundizar juntos en este informe y responder tus preguntas. "
+                    f"Contacta escaneando el código QR o visitando www.fatihasartepe.com.<br/><br/>"
+                    f"<b>info@fatihasartepe.com</b></font>"
+                )
+            else:
+                danisma_html = (
+                    f"<font color='#1A1A2E'><b>DANIŞMANLIK VE RANDEVU</b></font><br/><br/>"
+                    f"<font color='#4A4A4A'>Bu raporu birlikte derinleştirmek ve sorularınızı yanıtlamak için "
+                    f"danışmanlık randevusu alabilirsiniz. QR kodu okutarak veya www.fatihasartepe.com adresini "
+                    f"ziyaret ederek iletişime geçebilirsiniz.<br/><br/>"
+                    f"<b>info@fatihasartepe.com</b></font>"
+                )
             danisma_flow = Paragraph(danisma_html, styles['TurkishNormal'])
 
             paylasim_tablo = Table(
@@ -10489,7 +11804,7 @@ class FBST_Engine:
             ]))
             story.append(paylasim_tablo)
         except Exception as e:
-            story.append(Paragraph(f"<font color='red'>Paylaşım kartı hatası: {str(e)}</font>", styles['TurkishNormal']))
+            story.append(Paragraph((f"<font color='red'>Share card error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la tarjeta de compartir: {str(e)}</font>" if _ES else f"<font color='red'>Paylaşım kartı hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
         # FİNAL
         ilk_sayfa_ciz = sayfa_ciz if _asartepe_kapak_var else kapak_ciz
@@ -10630,11 +11945,13 @@ class FBST_Engine:
 
     def calculate_solar_return_tema(self, j_referans, hedef_yil):
         import swisseph as swe
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         
         try:
             natal_gunes = swe.calc_ut(j_referans, swe.SUN)[0][0]
         except Exception:
-            return f"<b>{hedef_yil} YILI:</b> Kadersel güneş verisine ulaşılamadı."
+            return f"<b>{hedef_yil} {'YEAR:' if _EN else 'YILI:'}</b> {'Karmic Sun data unavailable.' if _EN else 'Kadersel güneş verisine ulaşılamadı.'}"
 
         ref_tarih = swe.revjul(j_referans, swe.GREG_CAL)
         ref_ay = ref_tarih[1]
@@ -10694,13 +12011,13 @@ class FBST_Engine:
                 
                 # Orblar (Sapma payları)
                 if abs(aci_farki - 0) <= 8:
-                    gunes_acilar.append({"gezegen": gez_isim, "aci": "Kavuşum", "ev": gez_evi})
+                    gunes_acilar.append({"gezegen": gez_isim, "aci": ("Conjunction" if _EN else ("Conjunción" if _ES else "Kavuşum")), "ev": gez_evi})
                 elif abs(aci_farki - 90) <= 8:
-                    gunes_acilar.append({"gezegen": gez_isim, "aci": "Kare", "ev": gez_evi})
+                    gunes_acilar.append({"gezegen": gez_isim, "aci": ("Square" if _EN else ("Cuadratura" if _ES else "Kare")), "ev": gez_evi})
                 elif abs(aci_farki - 120) <= 8:
-                    gunes_acilar.append({"gezegen": gez_isim, "aci": "Üçgen", "ev": gez_evi})
+                    gunes_acilar.append({"gezegen": gez_isim, "aci": ("Trine" if _EN else ("Trígono" if _ES else "Üçgen")), "ev": gez_evi})
                 elif abs(aci_farki - 180) <= 8:
-                    gunes_acilar.append({"gezegen": gez_isim, "aci": "Karşıt", "ev": gez_evi})
+                    gunes_acilar.append({"gezegen": gez_isim, "aci": ("Opposition" if _EN else ("Oposición" if _ES else "Karşıt")), "ev": gez_evi})
             except Exception:
                 pass
 
@@ -10716,6 +12033,8 @@ class FBST_Engine:
         return self.solar_return_metni_yaz(sr_data)
 
     def solar_return_metni_yaz(self, sr_data):
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         yil = sr_data.get("yil", "2024")
         asc = sr_data.get("yilin_vitrini", "Koç")
         yonetici_ev = sr_data.get("yonetici_ev", 1)
@@ -10737,6 +12056,19 @@ class FBST_Engine:
                 "Oğlak": "<b>Yapı ve Sorumluluk Yılı:</b> Çocuğun kendi sınırlarını, kurallarını ve sorumluluklarını öğrenmesi için ideal bir dönem. Net ve tutarlı sınırlar çizmek, çocuğun disiplin ihtiyacını pedagojik bir şekilde karşılar.",
                 "Kova": "<b>Özgürlük ve Bireysellik Yılı:</b> Çocuğun bireysel alanına saygı duymanın, onun özgürlüğüne değer vermenin ve bağımsız bir birey olarak gelişmesine destek olmanın ön planda olduğu bir dönem.",
                 "Balık": "<b>Sezgi ve Şefkat Yılı:</b> Çocuğun sezgilerinin güçlendiği, empati ihtiyacının arttığı ve duygusal hassasiyetinin yoğunlaştığı bir dönem. Mantıktan ziyade kalbi dinlemek, çocuğun duygusal gelişimini destekler."
+            } if not _EN and not _ES else {
+                "Koç": "<b>Year of Discovery and Independence:</b> A period when the child begins to discover their own identity and the desire to make independent decisions strengthens. As a parent, patience and support are your most critical tools. Setting boundaries without breaking the child's courage is this year's most important pedagogical lesson.",
+                "Boğa": "<b>Year of Trust and Stability:</b> A period when the child's physical and emotional security takes precedence. Routines, order and repeated habits nourish the child's inner peace. A patient and firm parenting approach lays the foundation of the child's self-confidence.",
+                "İkizler": "<b>Year of Communication and Curiosity:</b> The child's need to ask questions, explore and communicate peaks. Using a patient and explanatory language supports the child's mental development. Reading books and chatting together is this year's most valuable pedagogical activity.",
+                "Yengeç": "<b>Year of Emotional Bonding:</b> A period when the emotional bond between parent and child deepens and the sense of belonging and trust strengthens. Approaching the child's emotional needs with sensitivity lays the foundation of long-term trust.",
+                "Aslan": "<b>Year of Creativity and Appreciation:</b> A period when the child's creative potential shines and the need for recognition and praise increases. Noticing and appreciating the child's efforts is the most powerful engine of self-esteem development.",
+                "Başak": "<b>Year of Order and Habits:</b> An ideal period for the child to acquire orderly life habits and develop a sense of responsibility. Sharing small tasks together pedagogically builds the child's sense of responsibility.",
+                "Terazi": "<b>Year of Balance and Harmony:</b> A period when finding balance in the parent-child relationship, learning mutual respect and establishing harmonious communication take precedence. Maintaining a sense of justice and equality in discussions is critical.",
+                "Akrep": "<b>Year of Deepening and Confrontation:</b> A period when the child's deep feelings, fears and needs from their inner world surface. The parent's patient and understanding approach is the key to turning this process into healing.",
+                "Yay": "<b>Year of Expansion and Discovery:</b> A period when the child's need to broaden their horizons, experience new things and develop a philosophy about life increases. Traveling together, getting to know new cultures and having philosophical conversations nourish spiritual growth.",
+                "Oğlak": "<b>Year of Structure and Responsibility:</b> An ideal period for the child to learn their own limits, rules and responsibilities. Drawing clear and consistent boundaries pedagogically satisfies the child's need for discipline.",
+                "Kova": "<b>Year of Freedom and Individuality:</b> A period when respecting the child's personal space, valuing their freedom and supporting them to develop as an independent individual take precedence.",
+                "Balık": "<b>Year of Intuition and Compassion:</b> A period when the child's intuition strengthens, the need for empathy increases and emotional sensitivity intensifies. Listening to the heart rather than logic supports the child's emotional development."
             }
         else:
             vitrin_sozlugu = {
@@ -10752,8 +12084,21 @@ class FBST_Engine:
                 "Oğlak": "<b>İmparatorluk İnşası Yılı:</b> Aşkın en ciddi ve statü odaklı hali. Sorumlulukların arttığı, ilişkinin dış dünyada kalıcı bir kaleye dönüştürüleceği o ağırbaşlı yıl. İlişkinizin resmiyet kazanması, toplum önünde 'saygın bir çift' olarak kabul görmeniz veya ortak bir şirket kurmanız an meselesi. Sorumluluklardan kaçmak yerine omuz omuza verip çalışırsanız, bu yıl ilişkinizin betonlarını atacaksınız.",
                 "Kova": "<b>Özgürleşme ve Devrim Yılı:</b> Eski rutinlerin yıkıldığı, birbirinizin bireysel alanına saygı duyarak 'biz' olduğunuz ve ilişkinin sıra dışı bir boyuta evrildiği dönem. Beklenmedik sürprizler, aniden alınan kararlar veya farklı bir şehre taşınma fikri gündeme gelebilir. Bu yıl geleneksel kalıplara (klasik karı-koca rolleri) sığmayacaksınız; birbirinizin en iyi arkadaşı ve vizyoner yoldaşı olmayı başarmanız gerekiyor.",
                 "Balık": "<b>İlahi Teslimiyet Yılı:</b> Mantığın sustuğu, rüyaların konuştuğu yıl. Sınırların eridiği ve birbirinizin ruhunda kaybolup şifa bulacağınız o fedakarlık dönemi. Bu yıl dünyevi hırsları bir kenara bırakıp spiritüel konulara yönelebilir, birlikte meditasyon yapabilir veya doğa ile iç içe kamplara katılabilirsiniz. Birbirinizi yargılamadan, sadece koşulsuz sevgiyle kabul ettiğinizde aranızdaki tüm geçmiş karmik düğümler çözülecektir."
+            } if not _EN and not _ES else {
+                "Koç": "<b>Year of War and Conquest:</b> You will have to make new decisions, step forward courageously and accelerate the tempo of the relationship. You may suddenly make that big decision you postponed (moving, marriage or a joint business). Inaction will tire your relationship; starting sports together, taking up a new hobby or locking onto a shared goal increases the relationship's driving force.",
+                "Boğa": "<b>Year of Grounding and Building:</b> Passion gives way to the search for peace, financial security and unshakably consolidating the relationship's roots. This year you will take concrete financial steps such as buying a home, saving money or opening a joint bank account. Going to luxury restaurants together, renewing the home decor and increasing physical touch (hugs, massage) will nourish your soul.",
+                "İkizler": "<b>Year of Mental Synchronization:</b> A fast period of abundant communication, constantly changing plans and your ideological harmony turning into passion. Short weekend getaways, learning a new language or a course together are this year's standout themes. Hours-long deep conversations are your greatest key to unraveling the knots in your relationship.",
+                "Yengeç": "<b>Year of Belonging and Shelter:</b> An inner year when you escape the noise of the outside world, take refuge only in each other's emotional shield and heal the home. Concrete steps that cement the sense of belonging — meeting families, getting engaged or moving in together — are on this year's agenda. Cooking together at home, looking at old albums and withdrawing into a cocoon that belongs only to the two of you will do you a world of good.",
+                "Aslan": "<b>Year of Stage and Creation:</b> A radiant period when your relationship receives applause from the outside, pride and generosity take the foreground and love turns into a celebration. This year you may experience weddings, celebrations or magnificent moments in which you announce your relationship to everyone. The idea of having a baby or a creative project you will bring to life together (art, business) will be your relationship's shining star this year.",
+                "Başak": "<b>Year of Service and Repair:</b> Rather than big romantic words, it is time to make each other's lives easier, repair what is missing and set the relationship into a flawless system. Going through health check-ups, starting a joint diet or a healthy living routine are this year's concrete events. Instead of saying 'I love you', having your partner's broken car repaired or making them a warm soup when they are tired will be your greatest act of love.",
+                "Terazi": "<b>Year of Diplomacy and Mirror:</b> The year you completely abandon the you-me battle, focus on absolute harmony and polish the relationship's showcase before the outside world. The most ideal period for signing serious contracts (marriage certificate, partnership agreement). Instead of raising your voice in arguments, you should act like a fair mediator and keep the aesthetic and romantic side of your relationship (gift-giving, surprises) alive.",
+                "Akrep": "<b>Year of Alchemy and Transformation:</b> An intense karmic bend where secrets come to light and crises either destroy you entirely or birth you from your ashes with a bond far more unshakable than before. No problem swept under the carpet can stay hidden this year. Joint loans, inheritance or debt restructuring may come onto the agenda. Instead of superficial talk, you will live a magnificent year of psychological therapy in which you heal each other's deepest fears in the soul.",
+                "Yay": "<b>Year of Transcending Horizons:</b> A period of expanding the relationship's boundaries, developing new beliefs together, traveling the world or growing wise in a shared vision. That distant foreign holiday you have long dreamed of may come true this year. Legal processes being resolved smoothly or jointly achieving an academic success is possible. You will add a new philosophy and freedom to your relationship.",
+                "Oğlak": "<b>Year of Empire Building:</b> The most serious and status-oriented face of love. That solemn year when responsibilities increase and the relationship is turned into a lasting fortress in the outside world. Your relationship becoming official, being recognized in public as a 'respectable couple' or founding a joint company is only a matter of time. If you work shoulder to shoulder instead of fleeing responsibilities, this year you will lay your relationship's concrete foundations.",
+                "Kova": "<b>Year of Liberation and Revolution:</b> A period when old routines are torn down, you become 'we' while respecting each other's individual space, and the relationship evolves to an extraordinary dimension. Unexpected surprises, suddenly-made decisions or the idea of moving to a different city may come up. This year you will not fit into traditional molds (classic husband-wife roles); you must succeed in becoming each other's best friend and visionary companion.",
+                "Balık": "<b>Year of Divine Surrender:</b> The year when logic falls silent and dreams speak. That sacrificial period when boundaries dissolve and you lose yourselves in each other's souls to find healing. You may set worldly ambitions aside, turn to spiritual subjects, meditate together or join nature-focused camps. When you accept each other without judgment and only with unconditional love, all past karmic knots between you will be untied."
             }
-        vitrin_yorum = vitrin_sozlugu.get(asc, f"<b>Kadersel Yenilenme Yılı:</b> İlişkiniz bu yıl yeni bir forma bürünüyor.")
+        vitrin_yorum = vitrin_sozlugu.get(asc, f"{(f'<b>Karmic Renewal Year:</b> Your relationship takes on a new form this year.') if _EN else ((f'<b>Año de Renovación Kármica:</b> Su relación adopta una nueva forma este año.') if _ES else f'<b>Kadersel Yenilenme Yılı:</b> İlişkiniz bu yıl yeni bir forma bürünüyor.')}")
 
         if self.mod == "ebeveyn_cocuk":
             yonetici_sozlugu = {
@@ -10769,6 +12114,19 @@ class FBST_Engine:
                 10: "Ebeveynlikte ciddiyet ve yapı ön planda. Çocuğunuz için kalıcı temeller atma, kurallar ve sorumluluklar oluşturma yılı.",
                 11: "Çocuğunuzun sosyal çevre ihtiyaçları, arkadaşlıkları ve geleceğe dair umutları bu yılın odak noktası. Birlikte gelecek planları yapmak kritik.",
                 12: "Bu yıl içe çekilme, ruhsal derinleşme ve sezgisel bağın güçlendirilmesi ön planda. Çocuğunuzla sessiz ve derin bir bağ kurmak için ideal bir dönem."
+            } if not _EN and not _ES else {
+                1: "This year, as a parent, you carry an instinctive guiding energy from within yourself. Rather than waiting for outside advice, you will steer your relationship with your child through your own intuition.",
+                2: "All your motivation is directed toward discovering and nurturing your child's values, talents and self-confidence. Taking concrete steps is this year's key.",
+                3: "Your communication traffic with your child increases. The need for learning, talking, sharing and discovering new things together takes the foreground.",
+                4: "You withdraw from the outside world and focus on creating a safe haven within the family. Spending one-on-one time with your child is this year's most valuable investment.",
+                5: "The year of discovering your child's creative potential and bringing them onto the stage. Artistic activities, games and creative projects together are at this year's heart.",
+                6: "Routine, order and service take the foreground in parenting. Meeting your child's daily needs and focusing on health and care matters is this year's focus.",
+                7: "A year when you seek balance and harmony in your parent-child relationship. Mutual respect, justice and shared decision-making processes come to the fore.",
+                8: "The year of building a deep emotional bond with your child, exploring their inner world and witnessing their transformation process. Crises can turn into healing.",
+                9: "The need to broaden your child's vision, discover new horizons and develop a philosophy about life takes the foreground. A period of learning together.",
+                10: "Seriousness and structure take the foreground in parenting. The year of laying lasting foundations and establishing rules and responsibilities for your child.",
+                11: "Your child's social needs, friendships and hopes for the future are this year's focus point. Making future plans together is critical.",
+                12: "This year withdrawal, spiritual deepening and the strengthening of the intuitive bond take the foreground. An ideal period for building a quiet, deep bond with your child."
             }
         else:
             yonetici_sozlugu = {
@@ -10784,8 +12142,21 @@ class FBST_Engine:
                 10: "İlişkinin dış dünyada statü kazanmak, kariyer yapmak ve 'imparatorluk' olarak görünmek istediği zirve yılı.",
                 11: "Sosyal çevrenizin, ortak arkadaşlarınızın ve geleceğe dair büyük umutlarınızın ilişkinin lokomotifi olduğu bir dönem.",
                 12: "Gözlerden uzak kalmak istediğiniz, ruhsal inziva, iyileşme ve gizli korkuları birlikte şifalandırma yılı."
+            } if not _EN and not _ES else {
+                1: "This year, instead of expecting outside support, you manage the relationship with your own inner structures, entirely with your own hands.",
+                2: "The entire fundamental energy and direction of the relationship flows through shared finances, creating value and multiplying material wealth.",
+                3: "All motivation has shifted toward mental projects, signatures, education and an intense traffic of communication.",
+                4: "You need to withdraw from the outside world and root yourself in belonging, home, property or family matters.",
+                5: "This year's heart beats with creativity, the stage, flirtatious passion and perhaps a child (or a new excitement).",
+                6: "Romance gives way to service. A year when you will work a lot together and balance routine and working life.",
+                7: "A karmic year focused on contracts and clear partnerships, in which you make your decisions entirely with the consciousness of being 'we'.",
+                8: "An intense alchemy year of psychological deepening, overcoming crises and transformation through joint debts, inheritance or finances.",
+                9: "The relationship's direction turns toward faraway places, new philosophies, plans abroad or belief-driven, visionary growth.",
+                10: "The peak year in which the relationship wants to gain status in the outside world, build a career and appear as an 'empire'.",
+                11: "A period when your social circle, shared friends and great hopes for the future are the locomotive of the relationship.",
+                12: "The year of wanting to stay out of sight — spiritual retreat, healing and jointly healing hidden fears together."
             }
-        yonetici_yorum = yonetici_sozlugu.get(yonetici_ev, "Motivasyonunuz kadersel bir hedefe kilitlenmiş durumda.")
+        yonetici_yorum = yonetici_sozlugu.get(yonetici_ev, f"{(f'Your motivation is locked onto a karmic goal.') if _EN else f'Motivasyonunuz kadersel bir hedefe kilitlenmiş durumda.'}")
 
         if self.mod == "ebeveyn_cocuk":
             odak_sozlugu = {
@@ -10801,6 +12172,19 @@ class FBST_Engine:
                 10: "<b>Yapı ve Sorumluluk Eğitimi:</b><br/><i>• Somut Etki:</i> Kurallar, sınırlar, sorumluluklar ve disiplin uygulamaları bu yılın somut olayları.<br/><i>• Soyut Etki:</i> Ebeveynin otoritesini sevgiyle harmanladığı, çocuğun yapı ve düzen ihtiyacını pedagojik bir şekilde karşıladığı yıl.",
                 11: "<b>Sosyal Çevre ve Gelecek Planları:</b><br/><i>• Somut Etki:</i> Çocuğun arkadaşlık ilişkileri, sosyal etkinlikler ve geleceğe dair planlar bu yılın odak noktası.<br/><i>• Soyut Etki:</i> Ebeveynin çocuğunun geleceğine dair umutlarını ve vizyonunu birlikte şekillendirdiği, ortak hayaller kurduğu dönem.",
                 12: "<b>Ruhsal Derinleşme ve Şifa:</b><br/><i>• Somut Etki:</i> Sessizlik, meditasyon, doğa yürüyüşleri ve içe çekilme faaliyetleri bu yılın somut olayları.<br/><i>• Soyut Etki:</i> Ebeveyn ve çocuğun bilinçaltındaki korkuları ve endişeleri birlikte şifalandırdığı, ruhsal olarak derinleştiği kutsal bir dönem."
+            } if not _EN and not _ES else {
+                1: "<b>Child's Identity Discovery:</b><br/><i>• Concrete Impact:</i> A year when the child expresses their own self, makes independent decisions and feels safe.<br/><i>• Abstract Impact:</i> A pedagogical mirror year in which the parent also rediscovers their own identity and finds themselves in the child's reflection.",
+                2: "<b>Building Value and Self-Confidence:</b><br/><i>• Concrete Impact:</i> Concrete steps for the child to become aware of their abilities, discover their values and grow in self-confidence.<br/><i>• Abstract Impact:</i> A sacred year in which the parent's faith in and appreciation of the child nourish the child's inner world.",
+                3: "<b>Bridge of Learning and Communication:</b><br/><i>• Concrete Impact:</i> Plenty of reading, writing, speaking and learning together. Ideal for discovering a new skill or field of knowledge.<br/><i>• Abstract Impact:</i> A period when a mental synchronization forms between parent and child and they deeply understand each other.",
+                4: "<b>Safe Haven and Roots:</b><br/><i>• Concrete Impact:</i> Home order, family routines and creating a safe environment are this year's concrete events.<br/><i>• Abstract Impact:</i> The process in which the child's spiritual roots deepen and the safe haven the parent offers turns into a lasting memory.",
+                5: "<b>Source of Creativity and Joy:</b><br/><i>• Concrete Impact:</i> Artistic activities, games, creative projects and opportunities for the child to showcase their talents.<br/><i>• Abstract Impact:</i> A sacred moment of union in which parent and child experience joy, play and creativity together.",
+                6: "<b>Routine, Health and Service:</b><br/><i>• Concrete Impact:</i> Health check-ups, regular nutrition, cleanliness and daily care routines are this year's concrete events.<br/><i>• Abstract Impact:</i> The year in which the service and sacrifice the parent offers the child is love's most concrete expression.",
+                7: "<b>Lesson of Balance and Harmony:</b><br/><i>• Concrete Impact:</i> Practices of mutually deciding, compromising in discussions and establishing a fair balance between parent and child.<br/><i>• Abstract Impact:</i> A sacred period when the relationship moves from 'you' and 'I' to the consciousness of 'we', and mutual respect deepens.",
+                8: "<b>Deepening and Transformation:</b><br/><i>• Concrete Impact:</i> The period in which the fears and worries in the child's inner world surface and, through the parent's patient approaches, turn into healing.<br/><i>• Abstract Impact:</i> The alchemy year in which an emotional sharing of a depth never experienced before takes place between parent and child.",
+                9: "<b>Vision and Horizon Expansion:</b><br/><i>• Concrete Impact:</i> Traveling together, getting to know new cultures, reading books or having philosophical conversations are this year's concrete activities.<br/><i>• Abstract Impact:</i> An expansion period in which the parent guides the child to develop a philosophy about life and also reshapes their own vision.",
+                10: "<b>Education in Structure and Responsibility:</b><br/><i>• Concrete Impact:</i> Rules, boundaries, responsibilities and discipline practices are this year's concrete events.<br/><i>• Abstract Impact:</i> The year when the parent blends their authority with love and pedagogically meets the child's need for structure and order.",
+                11: "<b>Social Circle and Future Plans:</b><br/><i>• Concrete Impact:</i> The child's friendship relations, social activities and plans for the future are this year's focus point.<br/><i>• Abstract Impact:</i> The period when the parent and the child together shape hopes and a vision for the child's future and dream together.",
+                12: "<b>Spiritual Deepening and Healing:</b><br/><i>• Concrete Impact:</i> Silence, meditation, nature walks and withdrawal activities are this year's concrete events.<br/><i>• Abstract Impact:</i> A sacred period in which parent and child jointly heal the fears and worries lurking in the subconscious and grow spiritually."
             }
         else:
             odak_sozlugu = {
@@ -10816,8 +12200,21 @@ class FBST_Engine:
                 10: "<b>Statü, Tepe Noktası ve İtibar:</b><br/><i>• Somut Etki:</i> İlişkinin resmiyet kazanıp toplum önüne çıkması, ortak bir kariyer başarısı veya prestijli bir sıçrama.<br/><i>• Soyut Etki:</i> Emeklerinizin meyvesini verdiği, ilişkinizin dışarıya karşı yıkılmaz bir 'imparatorluk' olarak göründüğü zirve yılı.",
                 11: "<b>Gelecek, Umutlar ve Dostluk:</b><br/><i>• Somut Etki:</i> Ortak arkadaş gruplarında parlama, kalabalık etkinlikler ve geleceğe dair büyük bir hayalin tohumunu atma.<br/><i>• Soyut Etki:</i> Aşık olmanın ötesine geçip, birbirinizin 'en iyi vizyoner dostu' olduğunuz o özgür ve umut dolu yıl.",
                 12: "<b>İnziva, Karmik Şifa ve Rüyalar:</b><br/><i>• Somut Etki:</i> Gözlerden uzak doğa tatilleri, spiritüel çalışmalar veya kalabalıklardan kopup tamamen baş başa kalma ihtiyacı.<br/><i>• Soyut Etki:</i> Geçmiş karmaların, bilinçaltı korkularının çözüldüğü; mantığın sustuğu ve koşulsuz bir ruhsal teslimiyetin başladığı süreç."
+            } if not _EN and not _ES else {
+                1: "<b>Rebirth of the Relationship:</b><br/><i>• Concrete Impact:</i> Changing your image together, starting a new life or taking physical steps that refresh the relationship.<br/><i>• Abstract Impact:</i> A high-energy starting point where identities dissolve and a universal 'we' consciousness is reborn.",
+                2: "<b>Building Finance and Self-Worth:</b><br/><i>• Concrete Impact:</i> Growing the shared budget, making large expenditures, acquiring property or focusing on investments.<br/><i>• Abstract Impact:</i> The year in which the value you give each other and your spiritual security are the most powerful center of production.",
+                3: "<b>Mind and Communication Traffic:</b><br/><i>• Concrete Impact:</i> Short trips, important signatures, contracts and intense exchanges of ideas.<br/><i>• Abstract Impact:</i> The year love is lived not in the heart but in the mind — of achieving complete ideological synchronization.",
+                4: "<b>Healing of Home and Roots:</b><br/><i>• Concrete Impact:</i> Moving in together, relocating, redecorating the home or resolving family and root matters.<br/><i>• Abstract Impact:</i> The process of closing the doors to the outside world and finding absolute spiritual belonging and a safe haven in each other.",
+                5: "<b>Stage, Creativity and Love:</b><br/><i>• Concrete Impact:</i> Flirtatious holidays, shared hobbies, stage projects or the agenda of a baby (or a grand project).<br/><i>• Abstract Impact:</i> The center where the child within you awakens and the relationship leaves routine behind to produce pure joy and passion.",
+                6: "<b>Routine, Service and Order:</b><br/><i>• Concrete Impact:</i> Starting a joint diet or sport, adopting a pet or having work rhythms steer the relationship.<br/><i>• Abstract Impact:</i> The repair year in which love is proven not with words but with the 'service' and sacrifices you offer each other.",
+                7: "<b>Absolute Partnership and Balance:</b><br/><i>• Concrete Impact:</i> Engagement, marriage, a serious official contract or a radical signature period in which the relationship levels up.<br/><i>• Abstract Impact:</i> The sacred year when the 'you' vs 'I' battle ends completely and absolute mirroring and the spiritual balance of the scales are established.",
+                8: "<b>Crisis, Alchemy and Depth:</b><br/><i>• Concrete Impact:</i> Joint loans, inheritance or debt solutions, or an intense physical passion born from rising attraction.<br/><i>• Abstract Impact:</i> The alchemy year in which you dive into the relationship's dark waters, break taboos and emerge from crisis with an unshakable bond.",
+                9: "<b>Vision and Distant Horizons:</b><br/><i>• Concrete Impact:</i> Travel abroad, international decisions, academic or legal steps being resolved smoothly.<br/><i>• Abstract Impact:</i> The expansion period in which your love leaps to a philosophical dimension and your shared beliefs enlarge the relationship's vision.",
+                10: "<b>Status, Summit and Reputation:</b><br/><i>• Concrete Impact:</i> The relationship becoming official and appearing in public, a joint career success or a prestigious leap.<br/><i>• Abstract Impact:</i> The summit year in which your efforts bear fruit and your relationship appears to the outside as an unbreakable 'empire'.",
+                11: "<b>Future, Hopes and Friendship:</b><br/><i>• Concrete Impact:</i> Shining in shared friendship circles, grand events and planting the seed of a big dream for the future.<br/><i>• Abstract Impact:</i> That free, hopeful year when you go beyond being in love and become each other's 'best visionary friend'.",
+                12: "<b>Retreat, Karmic Healing and Dreams:</b><br/><i>• Concrete Impact:</i> Nature holidays away from prying eyes, spiritual studies or the need to break away from crowds and be completely alone together.<br/><i>• Abstract Impact:</i> The process in which past karmas and subconscious fears dissolve; logic falls silent and an unconditional spiritual surrender begins."
             }
-        odak_yorum = odak_sozlugu.get(gunes_ev, "Odak noktanız bu yıl evrenin gizli çekmecelerinde şekilleniyor.")
+        odak_yorum = odak_sozlugu.get(gunes_ev, f"{(f'Your focus point this year takes shape in the hidden drawers of the universe.') if _EN else f'Odak noktanız bu yıl evrenin gizli çekmecelerinde şekilleniyor.'}")
 
         if self.mod == "ebeveyn_cocuk":
             sinav_sozlugu = {
@@ -10833,6 +12230,19 @@ class FBST_Engine:
                 10: "<b>Yapı ve Otorite Sınavı:</b> Kurallar koyma ve otorite ile sevgiyi dengeleme arasındaki hassas denge test ediliyor.",
                 11: "<b>Sosyal Çevre Sınavı:</b> Çocuğunuzun sosyal çevre ihtiyaçlarını karşılarken kendi sosyal yaşamınızı da koruma sınavı.",
                 12: "<b>Ruhsal Yüzleşme Sınavı:</b> Kendi ebeveynlik korkularınız ve yetersizlik duygularınızla yüzleşmeniz gereken derin bir sınav."
+            } if not _EN and not _ES else {
+                1: "<b>Test of Identity and Independence:</b> A delicate balance test in which you must preserve your own parental identity while getting to know your child's individual self.",
+                2: "<b>Test of Value and Self-Confidence:</b> An exam period in which you will question your own parental authority while building your child's self-confidence.",
+                3: "<b>Test of Communication and Understanding:</b> Communicating correctly with your child, listening to them and being understood is this year's most difficult yet most valuable test.",
+                4: "<b>Test of a Safe Environment:</b> How safe and protective an environment you can create for your child is being tested.",
+                5: "<b>Test of Creativity and Joy:</b> The struggle to preserve joy and creativity together with your child amid life's seriousness.",
+                6: "<b>Test of Routine and Service:</b> There is a risk of exhaustion as a parent in daily care, health and order matters. Don't forget to care for yourself as well.",
+                7: "<b>Test of Balance and Harmony:</b> Maintaining the balance between parent and child and meeting both sides' needs is this year's test.",
+                8: "<b>Test of Emotional Depth:</b> Confronting the deep feelings in your child's inner world and supporting them requires patience.",
+                9: "<b>Test of Vision and Horizon:</b> Giving the right guidance for your child's future and broadening your own vision is this year's test.",
+                10: "<b>Test of Structure and Authority:</b> The delicate balance between setting rules and blending authority with love is being tested.",
+                11: "<b>Test of Social Circle:</b> The test of protecting your own social life while meeting your child's social needs.",
+                12: "<b>Test of Spiritual Confrontation:</b> A deep test in which you must confront your own parental fears and feelings of inadequacy."
             }
         else:
             sinav_sozlugu = {
@@ -10848,118 +12258,132 @@ class FBST_Engine:
                 10: "<b>Statü Sınavı:</b> Dış dünyanın, ailenin veya kariyerin ilişkiniz üzerindeki baskısı. Aşkınızı dış engellere karşı bir kale gibi savunmalısınız.",
                 11: "<b>Sosyal Sınav:</b> Çevrenizin ilişkiyi yıpratma potansiyeli. Gelecek planlarında ortaya çıkan tıkanıklıkları, sadece birbirinize yaslanarak aşabilirsiniz.",
                 12: "<b>Karmik Yüzleşme Sınavı:</b> Bilinçaltında yatan en derin kaybetme veya yetersizlik korkularının tetiklendiği, kaçışın değil spiritüel yüzleşmenin gerektiği sınav."
+            } if not _EN and not _ES else {
+                1: "<b>Identity Test:</b> You must learn not to lose your own individuality while carrying your partner's burden. The weight on your shoulders may increase.",
+                2: "<b>Finance Test:</b> Crises to come through material wealth or self-worth. How you manage money will become the relationship's trust test.",
+                3: "<b>Communication Test:</b> Misunderstandings and mental walls. You must learn to use words not as a sharp sword but as a constructive brick.",
+                4: "<b>Belonging Test:</b> Home, family and 'roots' will be tested. Independent of the outside, how safe a refuge can you be for each other?",
+                5: "<b>Joy Test:</b> Fun gives way to responsibility. The struggle to protect the child within you and the love despite life's weight.",
+                6: "<b>Routine Test:</b> Work stress or daily worries may come between you. If you don't divide the tasks, the relationship risks exhaustion.",
+                7: "<b>Partnership Test:</b> The absolute confrontation bottleneck where marriage or the relationship's very existence is tested and you cannot sweep problems under the carpet.",
+                8: "<b>Trust and Crisis Test:</b> Jealousies, hidden fears or joint debts surface. Time to drop manipulation and become transparent.",
+                9: "<b>Faith Test:</b> Philosophical or visionary differences may come between you. Distances (physical or ideological) must be crossed and a shared belief held onto.",
+                10: "<b>Status Test:</b> The pressure of the outside world, family or career on your relationship. You must defend your love like a fortress against external obstacles.",
+                11: "<b>Social Test:</b> Your circle's potential to wear down the relationship. You can overcome the blockages arising in future plans only by leaning on each other.",
+                12: "<b>Karmic Confrontation Test:</b> The test in which the deepest fears of loss or inadequacy lurking in the subconscious are triggered and which demands spiritual confrontation, not escape."
             }
-        sinav_yorum = sinav_sozlugu.get(saturn_ev, "Yılın sınavı görünmez kolonların dayanıklılığında gizli.")
+        sinav_yorum = sinav_sozlugu.get(saturn_ev, "This year's test lies hidden in the resilience of invisible columns." if _EN else "Yılın sınavı görünmez kolonların dayanıklılığında gizli.")
 
         aci_metinleri = []
         if not acilar:
             if self.mod == "ebeveyn_cocuk":
-                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok; ebeveyn-çocuk ilişkinizin akışı tamamen sizin kendi pedagojik kararlarınızda.")
+                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok; ebeveyn-çocuk ilişkinizin akışı tamamen sizin kendi pedagojik kararlarınızda." if not _EN and not _ES else "• There is no karmic intervention from outside; the flow of your parent-child relationship lies entirely in your own pedagogical decisions.")
             else:
-                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok, ilişkinin dümeni tamamen sizin kendi saf iradenizde.")
+                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok, ilişkinin dümeni tamamen sizin kendi saf iradenizde." if not _EN and not _ES else "• There is no karmic intervention from outside; the helm of the relationship lies entirely in your own pure will.")
         else:
             for aci in acilar:
                 gez = aci["gezegen"]
                 tip = aci["aci"]
+                _sert = tip in (["Square", "Opposition"] if _EN else (["Cuadratura", "Oposición"] if _core_get_lang() == "es" else ["Kare", "Karşıt"]))
                 
                 if self.mod == "ebeveyn_cocuk":
                     if gez == "Ay":
-                        if tip == "Kavuşum": aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Duygusal Senkronizasyon! Ebeveyn ve çocuk arasındaki duygusal bağın en güçlü hissedildiği, sezgisel iletişimin dorukta olduğu bir dönem.")
-                        elif tip == "Karşıt": aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Duygusal Çekişme! Ebeveynin beklentileri ile çocuğun duygusal ihtiyaçları arasında bir denge arayışı söz konusu. Sabır ve anlayış kritik.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var.")
+                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Duygusal Senkronizasyon! Ebeveyn ve çocuk arasındaki duygusal bağın en güçlü hissedildiği, sezgisel iletişimin dorukta olduğu bir dönem." if not (_EN or _ES) else "• <b>Sun-Moon (Conjunction):</b> Emotional Synchronization! A period when the emotional bond between parent and child is felt most strongly and intuitive communication is at its peak.")
+                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Duygusal Çekişme! Ebeveynin beklentileri ile çocuğun duygusal ihtiyaçları arasında bir denge arayışı söz konusu. Sabır ve anlayış kritik." if not (_EN or _ES) else "• <b>Sun-Moon (Opposition):</b> Emotional Tension! There is a search for balance between the parent's expectations and the child's emotional needs. Patience and understanding are critical.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var." if not (_EN or _ES) else f"• <b>Sun-Moon ({tip}):</b> There is a supportive flow between emotional needs and shared goals.")
                     elif gez == "Merkür":
-                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> İletişim Köprüsü! Çocuğunuzla zihinsel uyumun arttığı, birbirinizi derinlemesine anladığınız pedagojik bir dönem.")
+                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> İletişim Köprüsü! Çocuğunuzla zihinsel uyumun arttığı, birbirinizi derinlemesine anladığınız pedagojik bir dönem." if not (_EN or _ES) else f"• <b>Sun-Mercury:</b> Bridge of Communication! A pedagogical period when mental harmony with your child increases and you understand each other deeply.")
                     elif gez == "Venüs":
-                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Sevgi Dili! Bu yıl ebeveyn-çocuk arasındaki sevgi ve şefkat dili en yüksek oktavda çalışıyor. Takdir ve minnet ön planda.")
+                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Sevgi Dili! Bu yıl ebeveyn-çocuk arasındaki sevgi ve şefkat dili en yüksek oktavda çalışıyor. Takdir ve minnet ön planda." if not (_EN or _ES) else f"• <b>Sun-Venus:</b> Language of Love! This year the language of love and compassion between parent and child works at its highest octave. Appreciation and gratitude take the foreground.")
                     elif gez == "Mars":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Enerji Çatışması! Çocuğun bağımsızlık ihtiyacı ile ebeveynin sınırları arasındaki gerilim artabilir. Yapıcı yönlendirme kritik.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Eylem Gücü! Birlikte enerjik ve verimli bir dönem. Çocuğun cesaretlendirilmesi ve desteklenmesi ön planda.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Enerji Çatışması! Çocuğun bağımsızlık ihtiyacı ile ebeveynin sınırları arasındaki gerilim artabilir. Yapıcı yönlendirme kritik." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> Energy Conflict! Tension between the child's need for independence and the parent's boundaries may increase. Constructive guidance is critical.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Eylem Gücü! Birlikte enerjik ve verimli bir dönem. Çocuğun cesaretlendirilmesi ve desteklenmesi ön planda." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> Power of Action! An energetic and productive period together. Encouraging and supporting the child takes the foreground.")
                     elif gez == "Satürn":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Sınavı! Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı bir yaklaşımla bu sınavı aşabilirsiniz.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Mührü! Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Sınavı! Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı bir yaklaşımla bu sınavı aşabilirsiniz." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Structure Test! Rules and boundaries are being tested. You can overcome this test with a patient and consistent approach.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Mührü! Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Seal of Structure! Lasting foundations are being laid in the parent-child relationship. The building of responsibility and trust strengthens.")
                     elif gez == "Jüpiter":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı İyimserlik! Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun; abartılar hayal kırıklığına dönüşebilir.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Genişleme ve Bolluk! Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu kadersel bir dönem.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı İyimserlik! Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun; abartılar hayal kırıklığına dönüşebilir." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Over-Optimism! Keep your expectations about your child realistic; exaggerations can turn into disappointment.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Genişleme ve Bolluk! Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu kadersel bir dönem." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Expansion and Abundance! A karmic period rich in opportunities to learn, discover and grow together.")
                     elif gez == "KAD":
-                        if tip == "Kavuşum": aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Öğrenme! Ebeveyn-çocuk arasındaki kadersel derslerin en yoğun hissedildiği, birlikte tekamül edildiği uyanış yılı.")
-                        elif tip == "Karşıt": aci_metinleri.append("• <b>GAD Teması:</b> Geçmiş Kalıpları Terk Etme! Eski ebeveynlik kalıplarından ve korkularından kurtulma zamanı.")
-                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile pedagojik vizyonunuz arasında taşların yerine oturduğu senkronizasyon dönemi.")
+                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Öğrenme! Ebeveyn-çocuk arasındaki kadersel derslerin en yoğun hissedildiği, birlikte tekamül edildiği uyanış yılı." if not (_EN or _ES) else "• <b>Node Theme:</b> Karmic Learning! The awakening year when the karmic lessons between parent and child are felt most intensely and you evolve together.")
+                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>GAD Teması:</b> Geçmiş Kalıpları Terk Etme! Eski ebeveynlik kalıplarından ve korkularından kurtulma zamanı." if not (_EN or _ES) else "• <b>South Node Theme:</b> Abandoning Past Patterns! Time to break free from old parenting patterns and fears.")
+                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile pedagojik vizyonunuz arasında taşların yerine oturduğu senkronizasyon dönemi." if not (_EN or _ES) else f"• <b>Node Theme ({tip}):</b> A synchronization period in which the pieces fall into place between your karmic route and your pedagogical vision.")
                     elif gez == "Uranüs":
-                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Beklenmedik Değişim! Çocuğunuzun gelişiminde ani sıçramalar veya sürpriz gelişmeler yaşanabilir. Esneklik kritik.")
+                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Beklenmedik Değişim! Çocuğunuzun gelişiminde ani sıçramalar veya sürpriz gelişmeler yaşanabilir. Esneklik kritik." if not (_EN or _ES) else f"• <b>Sun-Uranus ({tip}):</b> Unexpected Change! Sudden leaps or surprise developments may occur in your child's development. Flexibility is critical.")
                     elif gez == "Neptün":
-                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> Sezgisel Bağ! Çocuğunuzla aranızdaki sezgisel bağın güçlendiği, birbirinizi sözlerin ötesinde anladığınız bir dönem.")
+                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> Sezgisel Bağ! Çocuğunuzla aranızdaki sezgisel bağın güçlendiği, birbirinizi sözlerin ötesinde anladığınız bir dönem." if not (_EN or _ES) else f"• <b>Sun-Neptune ({tip}):</b> Intuitive Bond! A period when the intuitive bond between you and your child strengthens and you understand each other beyond words.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Derin Dönüşüm! Ebeveyn-çocuk ilişkisinde köklü bir dönüşüm yaşanabilir. Krizler şifaya dönüşme potansiyeli taşıyor.")
+                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Derin Dönüşüm! Ebeveyn-çocuk ilişkisinde köklü bir dönüşüm yaşanabilir. Krizler şifaya dönüşme potansiyeli taşıyor." if not (_EN or _ES) else f"• <b>Sun-Pluto ({tip}):</b> Deep Transformation! A radical transformation can occur in the parent-child relationship. Crises carry the potential to turn into healing.")
                 else:
                     if gez == "Ay":
-                        if tip == "Kavuşum": aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Muazzam bir Yeniay yılı! Mantık ve duygu kusursuz senkronize; yepyeni bir duygu tohumu atıyorsunuz.")
-                        elif tip == "Karşıt": aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Dolunay yılı! İlişkide bir dönemin meyvesini alıyorsunuz ancak beklentilerde ufak bir çekişme yaşanabilir.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var.")
+                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Muazzam bir Yeniay yılı! Mantık ve duygu kusursuz senkronize; yepyeni bir duygu tohumu atıyorsunuz." if not (_EN or _ES) else "• <b>Sun-Moon (Conjunction):</b> A magnificent New Moon year! Logic and feeling are in perfect sync; you are planting a brand-new seed of emotion.")
+                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Dolunay yılı! İlişkide bir dönemin meyvesini alıyorsunuz ancak beklentilerde ufak bir çekişme yaşanabilir." if not (_EN or _ES) else "• <b>Sun-Moon (Opposition):</b> A Full Moon year! You are reaping the fruit of an era in the relationship, though a small tug-of-war may arise over expectations.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var." if not (_EN or _ES) else f"• <b>Sun-Moon ({tip}):</b> There is a supportive flow between emotional needs and shared goals.")
                     elif gez == "Merkür":
-                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> Telepatik Uyum! Zihinlerin birleştiği, imzaların, sözleşmelerin ve iletişimin yılın kaderini belirlediği rasyonel dönem.")
+                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> Telepatik Uyum! Zihinlerin birleştiği, imzaların, sözleşmelerin ve iletişimin yılın kaderini belirlediği rasyonel dönem." if not (_EN or _ES) else f"• <b>Sun-Mercury:</b> Telepathic Harmony! The rational period when minds unite and signatures, contracts and communication decide the year's destiny.")
                     elif gez == "Venüs":
-                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Aşkın Mührü! Bu yıl tutku, romantizm ve finansal bereket doğrudan ilişkinin merkezine akıyor. Sevgi diliniz en yüksek oktavda.")
+                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Aşkın Mührü! Bu yıl tutku, romantizm ve finansal bereket doğrudan ilişkinin merkezine akıyor. Sevgi diliniz en yüksek oktavda." if not (_EN or _ES) else f"• <b>Sun-Venus:</b> Seal of Love! This year passion, romance and financial abundance flow directly into the center of the relationship. Your love language is at its highest octave.")
                     elif gez == "Mars":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> BUYUK SINAV! Agresyon ve tartışma riski. Bu gergin enerjiyi kavgaya değil, ortak bir projeye harcayın.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> İnanılmaz bir motor gücü. Birlikte cesaretle ilerlemek ve engelleri aşmak için harika bir eylem yılı.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> BUYUK SINAV! Agresyon ve tartışma riski. Bu gergin enerjiyi kavgaya değil, ortak bir projeye harcayın." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> THE BIG TEST! Risk of aggression and arguments. Spend this tense energy not on fighting but on a shared project.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> İnanılmaz bir motor gücü. Birlikte cesaretle ilerlemek ve engelleri aşmak için harika bir eylem yılı." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> An incredible motor power. A wonderful year of action for moving forward courageously together and overcoming obstacles.")
                     elif gez == "Satürn":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> DARBOĞAZ! Kurallar ve engeller ilişkinin neşesini bastırabilir. Bu bir testtir, inşaya ve sabra odaklanın.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Çelik Mühür! İlişkinin temelleri beton dökülmüşcesine sağlamlaşıyor. Uzun vadeli kararlar için koruyucu etki.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> DARBOĞAZ! Kurallar ve engeller ilişkinin neşesini bastırabilir. Bu bir testtir, inşaya ve sabra odaklanın." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> BOTTLENECK! Rules and obstacles can stifle the relationship's joy. This is a test; focus on construction and patience.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Çelik Mühür! İlişkinin temelleri beton dökülmüşcesine sağlamlaşıyor. Uzun vadeli kararlar için koruyucu etki." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Steel Seal! The relationship's foundations solidify as if concrete has been poured. A protective effect for long-term decisions.")
                     elif gez == "Jüpiter":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı iyimserlik, lüzumsuz para harcama veya tutulamayacak büyük sözler verme riskine dikkat edin.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> İlahi Genişleme! Şansın, bolluğun ve vizyonun ilişkinize nehir gibi aktığı kadersel şans yılı.")
+                        if _sert: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı iyimserlik, lüzumsuz para harcama veya tutulamayacak büyük sözler verme riskine dikkat edin." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Beware the risk of over-optimism, unnecessary spending or making grand promises that cannot be kept.")
+                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> İlahi Genişleme! Şansın, bolluğun ve vizyonun ilişkinize nehir gibi aktığı kadersel şans yılı." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Divine Expansion! The karmic luck year in which fortune, abundance and vision flow into your relationship like a river.")
                     elif gez == "KAD":
-                        if tip == "Kavuşum": aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Sıçrama! İlişkinin tamamen evrenin sizden beklediği ortak tekamül hedefine kilitlendiği uyanış yılı.")
-                        elif tip == "Karşıt": aci_metinleri.append("• <b>GAD Teması:</b> Geçmişin Ayak Bağı! İlişkinin ilerleyebilmesi için eski toksik alışkanlıkları ve geçmiş karmaları tamamen terk etme zamanı.")
-                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile iradeniz arasında taşların yerine oturduğu senkronizasyon dönemi.")
+                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Sıçrama! İlişkinin tamamen evrenin sizden beklediği ortak tekamül hedefine kilitlendiği uyanış yılı." if not (_EN or _ES) else "• <b>Node Theme:</b> Karmic Leap! The awakening year when the relationship locks entirely onto the shared evolution goal the universe expects of you.")
+                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>GAD Teması:</b> Geçmişin Ayak Bağı! İlişkinin ilerleyebilmesi için eski toksik alışkanlıkları ve geçmiş karmaları tamamen terk etme zamanı." if not (_EN or _ES) else "• <b>South Node Theme:</b> The Anchor of the Past! Time to completely abandon toxic old habits and past karmas so the relationship can move forward.")
+                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile iradeniz arasında taşların yerine oturduğu senkronizasyon dönemi." if not (_EN or _ES) else f"• <b>Node Theme ({tip}):</b> A synchronization period in which the pieces fall into place between your karmic route and your will.")
                     elif gez == "Uranüs":
-                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Devrim! Ani sürprizlerin veya rutin kırıcı yeniliklerin yılı. Esnek olan ve yeniliğe açık olan kazanır.")
+                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Devrim! Ani sürprizlerin veya rutin kırıcı yeniliklerin yılı. Esnek olan ve yeniliğe açık olan kazanır." if not (_EN or _ES) else f"• <b>Sun-Uranus ({tip}):</b> Revolution! The year of sudden surprises or routine-breaking innovations. The flexible and the open-minded win.")
                     elif gez == "Neptün":
-                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> İlahi Çekim. Birlikte hayal kurduğunuz, sınırların eridiği bir şifa yılı. Kurban/kurtarıcı tuzağına düşmeyin.")
+                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> İlahi Çekim. Birlikte hayal kurduğunuz, sınırların eridiği bir şifa yılı. Kurban/kurtarıcı tuzağına düşmeyin." if not (_EN or _ES) else f"• <b>Sun-Neptune ({tip}):</b> Divine Attraction. A healing year when you dream together and boundaries dissolve. Don't fall into the victim/savior trap.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Yeraltı Simyası. İlişkinin saklı gölgelerinin yüzeye çıktığı, yıkıcı ama bir o kadar da baştan yaratıcı kriz yılı.")
+                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Yeraltı Simyası. İlişkinin saklı gölgelerinin yüzeye çıktığı, yıkıcı ama bir o kadar da baştan yaratıcı kriz yılı." if not (_EN or _ES) else f"• <b>Sun-Pluto ({tip}):</b> Underground Alchemy. A crisis year when the relationship's hidden shadows surface — destructive yet equally creative.")
 
         aci_rapor = "<br/>".join(aci_metinleri)
 
         if self.mod == "ebeveyn_cocuk":
             metin = f"""
             <font color="#1A1A2E">
-            <b>📅 {yil} YILI - EBEVEYN-ÇOCUK PEDAGOJİK YIL HARİTASI</b><br/>
+            <b>📅 {yil} {'YEAR - PARENT-CHILD PEDAGOGICAL YEAR MAP' if _EN else ('AÑO - MAPA PEDAGÓGICO DEL AÑO PADRE-HIJO' if _ES else 'YILI - EBEVEYN-ÇOCUK PEDAGOJİK YIL HARİTASI')}</b><br/>
             <br/>
-            <b>Bu Yılın Pedagojik Vitrini:</b><br/>
+            <b>{'This Year’s Pedagogical Showcase:' if _EN else ('Vitrina Pedagógica de Este Año:' if _ES else 'Bu Yılın Pedagojik Vitrini:')}</b><br/>
             {vitrin_yorum}<br/>
             <br/>
-            <b>Ebeveynlik Rotası:</b><br/>
+            <b>{'Parenting Route:' if _EN else ('Ruta de la Paternidad:' if _ES else 'Ebeveynlik Rotası:')}</b><br/>
             {yonetici_yorum}<br/>
             <br/>
-            <b>Yılın Odak Noktası ve Gelişim Alanı (Güneş):</b><br/>
+            <b>{'Year’s Focus and Development Area (Sun):' if _EN else ('Área de Enfoque y Desarrollo del Año (Sol):' if _ES else 'Yılın Odak Noktası ve Gelişim Alanı (Güneş):')}</b><br/>
             {odak_yorum}<br/>
             <br/>
-            <b>Yılın Sınavı ve Öğrenme Alanı (Satürn):</b><br/>
+            <b>{'Year’s Test and Learning Area (Saturn):' if _EN else ('Área de Prueba y Aprendizaje del Año (Saturno):' if _ES else 'Yılın Sınavı ve Öğrenme Alanı (Satürn):')}</b><br/>
             {sinav_yorum}<br/>
             <br/>
-            <b>YILIN PEDAGOJİK TETİKLEYİCİLERİ:</b><br/>
+            <b>{'YEAR’S PEDAGOGICAL TRIGGERS:' if _EN else ('DISPARADORES PEDAGÓGICOS DEL AÑO:' if _ES else 'YILIN PEDAGOJİK TETİKLEYİCİLERİ:')}</b><br/>
             {aci_rapor}
             </font>
             """
         else:
             metin = f"""
             <font color="#1A1A2E">
-            <b>📅 {yil} YILI KADERSEL KONTRATI</b><br/>
+            <b>📅 {yil} {'YEAR - KARMIC CONTRACT' if _EN else ('AÑO - CONTRATO KÁRMICO' if _ES else 'YILI KADERSEL KONTRATI')}</b><br/>
             <br/>
-            <b>İlişkinin Bu Yılki Vitrini:</b><br/>
+            <b>{'This Year’s Showcase of the Relationship:' if _EN else ('Vitrina de la Relación Este Año:' if _ES else 'İlişkinin Bu Yılki Vitrini:')}</b><br/>
             {vitrin_yorum}<br/>
             <br/>
-            <b>Yükselen Yöneticisinin Rotası:</b><br/>
+            <b>{'Route of the Ascendant Ruler:' if _EN else ('Ruta del Regente del Ascendente:' if _ES else 'Yükselen Yöneticisinin Rotası:')}</b><br/>
             {yonetici_yorum}<br/>
             <br/>
-            <b>Yılın Kutsal Amacı ve Üretim Merkezi (Güneş):</b><br/>
+            <b>{'Year’s Sacred Purpose and Production Center (Sun):' if _EN else ('Propósito Sagrado y Centro de Producción del Año (Sol):' if _ES else 'Yılın Kutsal Amacı ve Üretim Merkezi (Güneş):')}</b><br/>
             {odak_yorum}<br/>
             <br/>
-            <b>Yılın Büyük Sınavı ve Darboğazı (Satürn):</b><br/>
+            <b>{'Year’s Great Test and Bottleneck (Saturn):' if _EN else ('Gran Prueba y Cuello de Botella del Año (Saturno):' if _ES else 'Yılın Büyük Sınavı ve Darboğazı (Satürn):')}</b><br/>
             {sinav_yorum}<br/>
             <br/>
-            <b>YILIN İLAVE KADERSEL TETİKLEYİCİLERİ:</b><br/>
+            <b>{'YEAR’S ADDITIONAL KARMIC TRIGGERS:' if _EN else ('DISPARADORES KÁRMICOS ADICIONALES DEL AÑO:' if _ES else 'YILIN İLAVE KADERSEL TETİKLEYİCİLERİ:')}</b><br/>
             {aci_rapor}
             </font>
             """
@@ -10971,12 +12395,14 @@ class FBST_Engine:
         Ay'ın, Bağıl Haritadaki (Kök Ruh) doğum derecesine tam döndüğü saniyeyi hesaplar.
         """
         import swisseph as swe
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
         
         # 1. Kök Ruh'un Ay derecesi
         try:
             natal_ay = swe.calc_ut(j_referans, swe.MOON)[0][0]
         except Exception:
-            return f"<b>{hedef_ay}/{hedef_yil} AYLIK İKLİM:</b> Ay verisine ulaşılamadı."
+            return f"<b>{hedef_ay}/{hedef_yil} {'ANNUAL RETURN' if _EN else 'AYLIK İKLİM'}:</b> {'Moon data unavailable.' if _EN else 'Ay verisine ulaşılamadı.'}"
 
         # 2. O ayın 15'ini (ortasını) tahmini başlangıç noktası alıyoruz
         tahmini_j_gun = swe.julday(hedef_yil, hedef_ay, 15, 12.0)
@@ -11019,10 +12445,10 @@ class FBST_Engine:
                 if aci_farki > 180: aci_farki = 360 - aci_farki
                 gez_evi = self.ev_konumu_bul(j_return, gez_id)
                 
-                if abs(aci_farki - 0) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": "Kavuşum", "ev": gez_evi})
-                elif abs(aci_farki - 90) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": "Kare", "ev": gez_evi})
-                elif abs(aci_farki - 120) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": "Üçgen", "ev": gez_evi})
-                elif abs(aci_farki - 180) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": "Karşıt", "ev": gez_evi})
+                if abs(aci_farki - 0) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": ("Conjunction" if _EN else ("Conjunción" if _ES else "Kavuşum")), "ev": gez_evi})
+                elif abs(aci_farki - 90) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": ("Square" if _EN else ("Cuadratura" if _ES else "Kare")), "ev": gez_evi})
+                elif abs(aci_farki - 120) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": ("Trine" if _EN else ("Trígono" if _ES else "Üçgen")), "ev": gez_evi})
+                elif abs(aci_farki - 180) <= 8: ay_acilar.append({"gezegen": gez_isim, "aci": ("Opposition" if _EN else ("Oposición" if _ES else "Karşıt")), "ev": gez_evi})
             except Exception:
                 pass
 
@@ -11037,7 +12463,9 @@ class FBST_Engine:
         return self.lunar_return_metni_yaz(lr_data)
 
     def lunar_return_metni_yaz(self, lr_data):
-        ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
+        ay_isimleri = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] if (_EN or _ES) else ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
         yil = lr_data["yil"]
         ay_no = lr_data["ay"]
         ay_isim = ay_isimleri[ay_no]
@@ -11060,6 +12488,19 @@ class FBST_Engine:
                 "Oglak": f"Bu ayki duygusal refleksleriniz <b>Oğlak</b> burcu temasında çalışacak. Yapı, sorumluluk ve ciddiyet bu ayın duygusal tonu. Kurallar ve sınırlar konusunda net ve tutarlı olmak bu ayın önemli bir sınavı.",
                 "Kova": f"Bu ayki duygusal refleksleriniz <b>Kova</b> burcu temasında çalışacak. Bireysel alan ve özgürlük bu ay kritik. Çocuğunuzun bireysel alanına saygı göstermek ve bağımsızlığını desteklemek bu ayın önemli bir dersi.",
                 "Balik": f"Bu ayki duygusal refleksleriniz <b>Balık</b> burcu temasında çalışacak. Sezgiler, şefkat ve duygusal hassasiyet bu ayın ana temaları. Mantıktan ziyade kalbi dinlemek, çocuğunuzla sezgisel bir bağ kurmak bu ayın şifası."
+            } if not _EN and not _ES else {
+                "Koc": f"Your emotional reflexes this month will work under the theme of <b>Aries</b>. Your child's need for independence and exploratory energy is high this month. A patient and supportive parenting approach nurtures your child's courage.",
+                "Boga": f"Your emotional reflexes this month will work under the theme of <b>Taurus</b>. Security, stability and physical comfort are this month's focus. Spending peaceful, calm time with your child will nourish your soul.",
+                "Ikizler": f"Your emotional reflexes this month will work under the theme of <b>Gemini</b>. Plenty of communication, curiosity and the need to learn come to the fore this month. Talking, reading books and discovering new things together with your child is this month's key.",
+                "Yengec": f"Your emotional reflexes this month will work under the theme of <b>Cancer</b>. Family, home and emotional bonding come before everything this month. Spending time at home with your child and deepening your emotional bond will do you a world of good.",
+                "Aslan": f"Your emotional reflexes this month will work under the theme of <b>Leo</b>. Recognition, appreciation and creativity are this month's key. Appreciating your child's efforts and encouraging them will be this month's most valuable pedagogical investment.",
+                "Basak": f"Your emotional reflexes this month will work under the theme of <b>Virgo</b>. Order, health and practical matters are in the foreground. Building regular habits together with your child and focusing on healthy topics will be beneficial.",
+                "Terazi": f"Your emotional reflexes this month will work under the theme of <b>Libra</b>. Harmony, balance and justice are this month's priorities. Maintaining balance in the parent-child relationship and strengthening mutual respect is critical.",
+                "Akrep": f"Your emotional reflexes this month will work under the theme of <b>Scorpio</b>. Intense emotions and deepening are this month's signature. Exploring your child's inner world and witnessing their emotional deepening is this month's important experience.",
+                "Yay": f"Your emotional reflexes this month will work under the theme of <b>Sagittarius</b>. The need for discovery, expansion and learning is high this month. Sharing new experiences with your child and broadening your horizons will nourish your soul.",
+                "Oglak": f"Your emotional reflexes this month will work under the theme of <b>Capricorn</b>. Structure, responsibility and seriousness set this month's emotional tone. Being clear and consistent about rules and boundaries is this month's important test.",
+                "Kova": f"Your emotional reflexes this month will work under the theme of <b>Aquarius</b>. Personal space and freedom are critical this month. Respecting your child's personal space and supporting their independence is this month's important lesson.",
+                "Balik": f"Your emotional reflexes this month will work under the theme of <b>Pisces</b>. Intuition, compassion and emotional sensitivity are this month's core themes. Listening to the heart rather than logic, and building an intuitive bond with your child, is this month's healing."
             }
         else:
             vitrin_sozlugu_lr = {
@@ -11075,8 +12516,21 @@ class FBST_Engine:
                 "Oglak": f"Bu ayki duygusal refleksleriniz <b>Oğlak</b> burcu temasında çalışacak. Ciddiyet ve sorumluluk bu ayın duygusal tonu. Duygularınızı kelimelerle değil, somut adımlar ve güvenilir davranışlarla gösterin.",
                 "Kova": f"Bu ayki duygusal refleksleriniz <b>Kova</b> burcu temasında çalışacak. Bireysel alan ve özgürlük bu ay kritik. Birbirinize nefes alma alanı tanıyın; bağımsızlığa saygı göstermek bu ay ilişkinizi güçlendirecek.",
                 "Balik": f"Bu ayki duygusal refleksleriniz <b>Balık</b> burcu temasında çalışacak. Sezgiler, rüyalar ve koşulsuz şefkat bu ayın ana temaları. Mantık yerine kalbi dinleyin; birbirinize karşı nazik ve anlayışlı olmak her şeyi çözecek."
+            } if not _EN and not _ES else {
+                "Koc": f"Your emotional reflexes this month will work under the theme of <b>Aries</b>. Sudden decisions, heated arguments and quick reconciliations set this month's emotional rhythm. Direct your energy not into quarrels but into starting something new together.",
+                "Boga": f"Your emotional reflexes this month will work under the theme of <b>Taurus</b>. Physical touch, good food and a peaceful home environment will nourish your soul. Avoid hasty decisions this month; calmness and stability are your priority.",
+                "Ikizler": f"Your emotional reflexes this month will work under the theme of <b>Gemini</b>. You will talk a lot, message a lot, and your plans will change often. Mental harmony is this month's key to emotional closeness.",
+                "Yengec": f"Your emotional reflexes this month will work under the theme of <b>Cancer</b>. Home, family and the sense of belonging take precedence this month. Taking refuge in each other and shutting the doors to the outside will do you good.",
+                "Aslan": f"Your emotional reflexes this month will work under the theme of <b>Leo</b>. Being appreciated, being generous and celebrating your relationship are this month's core needs. Praise each other abundantly and make romantic surprises.",
+                "Basak": f"Your emotional reflexes this month will work under the theme of <b>Virgo</b>. Practical help and order are your love language this month. Making each other's lives easier is your greatest way of bonding emotionally.",
+                "Terazi": f"Your emotional reflexes this month will work under the theme of <b>Libra</b>. Harmony, justice and aesthetics are this month's priorities. Seek consensus instead of arguments; creating a beautiful environment together will refresh your soul.",
+                "Akrep": f"Your emotional reflexes this month will work under the theme of <b>Scorpio</b>. Intense emotions, deep conversations and strong physical attraction are this month's signature. Sharing your hidden feelings will deepen your relationship.",
+                "Yay": f"Your emotional reflexes this month will work under the theme of <b>Sagittarius</b>. Freedom, adventure and new experiences feed your soul this month. Discovering something new together or having a horizon-broadening conversation will satisfy your emotional hunger.",
+                "Oglak": f"Your emotional reflexes this month will work under the theme of <b>Capricorn</b>. Seriousness and responsibility set this month's emotional tone. Show your feelings not with words but with concrete steps and trustworthy behavior.",
+                "Kova": f"Your emotional reflexes this month will work under the theme of <b>Aquarius</b>. Personal space and freedom are critical this month. Give each other breathing room; respecting independence will strengthen your relationship this month.",
+                "Balik": f"Your emotional reflexes this month will work under the theme of <b>Pisces</b>. Intuition, dreams and unconditional compassion are this month's core themes. Listen to your heart instead of logic; being kind and understanding toward each other will solve everything."
             }
-        vitrin_yorum = vitrin_sozlugu_lr.get(asc, f"Bu ayki duygusal refleksleriniz <b>{asc}</b> burcu temasında çalışacak.")
+        vitrin_yorum = vitrin_sozlugu_lr.get(asc, f"{(f'Your emotional reflexes this month will work under the theme of <b>{pdf_label(asc)}</b>.') if _EN else f'Bu ayki duygusal refleksleriniz <b>{asc}</b> burcu temasında çalışacak.'}")
 
         if self.mod == "ebeveyn_cocuk":
             ay_ev_sozlugu = {
@@ -11092,6 +12546,19 @@ class FBST_Engine:
                 10: "Bu ay yapı, sorumluluk ve ciddiyet ön planda. Çocuğunuz için kalıcı temeller atmak, kurallar ve sınırlar koymak bu ayın önemli bir görevi. Ebeveyn olarak kararlı ve tutarlı olmak bu ayın en büyük desteği.",
                 11: "Bu ay sosyal çevre ve gelecek planları öne çıkıyor. Çocuğunuzun arkadaşlık ilişkilerine ve sosyal ihtiyaçlarına destek olmak bu ayın önemli bir parçası. Birlikte gelecek hakkında konuşmak ve ortak hedefler belirlemek değerli bir deneyim.",
                 12: "Bu ay içe çekilme ve ruhsal derinleşme zamanı. Çocuğunuzla sessiz ve derin bir bağ kurmak, sezgisel iletişimi güçlendirmek bu ayın en değerli deneyimi. Doğada vakit geçirmek, meditasyon yapmak veya sadece sessizce birlikte olmak ruhunuzu besleyecek."
+            } if not _EN and not _ES else {
+                1: "This month your child's individual identity and need for independence come to the fore. Supporting their process of making their own decisions is this month's most important pedagogical opportunity. Discovering a new hobby or activity together will strengthen your bond.",
+                2: "This month your child's self-confidence and awareness of their abilities increase. Use your language of appreciation and gratitude abundantly this month. Working on a concrete project together or learning a new skill will be this month's valuable experience.",
+                3: "This month the need for communication and learning is very high. Chatting with your child often, patiently answering their questions and reading books together is the most valuable pedagogical activity of the month. A short outing or a nature walk will also nourish your soul.",
+                4: "This month home and family matters come to the fore. Creating a safe and peaceful environment at home with your child will deepen your emotional bond. Cooking, watching a film or beautifying the home together are this month's healing activities.",
+                5: "This month creativity and joy are very high. Playing, doing artistic activities or simply having fun with your child is this month's most important need. Discovering and sharing the child within you is this month's gift.",
+                6: "This month order, health and practical matters are in the foreground. Adopting healthy habits and building a regular routine together with your child is this month's concrete gain. Even cleaning together or spending time in the kitchen can be a valuable experience.",
+                7: "This month the parent-child balance and harmony are very important. Understanding your child's needs and trying to see from their perspective is this month's most valuable lesson. Making joint decisions and reaching compromises together is this month's teaching.",
+                8: "This month is a time of emotional deepening and confrontation. Discovering the deep feelings in your child's inner world and understanding their fears and worries is an important experience this month. Being patient and understanding is this month's healing.",
+                9: "This month the energy of broadening horizons and exploration is very high. Discovering new places, learning new things or having philosophical conversations together with your child are this month's valuable experiences. Enjoy growing and learning together.",
+                10: "This month structure, responsibility and seriousness are in the foreground. Laying lasting foundations, setting rules and boundaries for your child is an important task this month. Being firm and consistent as a parent is this month's greatest support.",
+                11: "This month social circles and future plans come to the fore. Supporting your child's friendships and social needs is an important part of this month. Talking about the future and setting shared goals together is a valuable experience.",
+                12: "This month is a time of withdrawal and spiritual deepening. Building a quiet, deep bond with your child and strengthening intuitive communication is this month's most valuable experience. Spending time in nature, meditating or simply being together in silence will nourish your soul."
             }
         else:
             ay_ev_sozlugu = {
@@ -11107,86 +12574,100 @@ class FBST_Engine:
                 10: "Duygularınızı ulu orta göstermek yerine, ilişkinizin ciddiyetine ve toplum önündeki duruşunuza odaklanıyorsunuz. Aile büyükleri gündemde olabilir. Partnerinizin kariyerindeki bir başarıyı kutlamak, aile yemeklerine katılmak veya ilişkinizin statüsünü (nişan, söz vb.) ciddileştirecek kararlar almak bu ayın ana teması.",
                 11: "Bu ay romantik aşıklar olmak yerine 'en iyi iki dost' olmak size iyi gelecek. Sosyalleşmek ve ortak arkadaşlarla vakit geçirmek duyguları şifalandırır. Evinize kalabalık misafirler davet etmek, ortak arkadaşlarınızla oyun geceleri düzenlemek veya bir sosyal sorumluluk projesine birlikte destek vermek ilişkinizi tazeleyecektir.",
                 12: "Kozadan çıkmak istemediğiniz, alıngan, mistik ve sezgisel bir ay. Duygusal yorgunlukları sessiz kalarak ve birbirinizin ruhuna dokunarak atabilirsiniz. Kalabalıklardan uzaklaşıp doğada sessiz bir yürüyüş yapmak, birlikte meditasyon yapmak veya birbirinizin rüyalarını yorumlamak bu içsel ayın en büyük ruhsal ilacıdır."
+            } if not _EN and not _ES else {
+                1: "This month the sense of 'I' in your relationship is very high. Sensitivity may increase and you will both feel the need to protect your own emotional boundaries. Do not hesitate to express your personal needs; going to the hairdresser, buying new clothes or refreshing your image will add fresh air to your relationship this month.",
+                2: "This month your emotional security depends entirely on 'financial and physical values'. Spending money, exchanging gifts or enjoying a luxury meal will do your soul good. Making a joint budget plan or ordering that special item you have long wanted to buy will satisfy this month's emotional hunger.",
+                3: "This month you want only to talk, be understood and message each other. A period where mental harmony, words and quick little getaways will heal. Driving to a nearby lakeside or a neighboring city on the weekend and chatting at length along the way is your greatest karmic healing this month.",
+                4: "This month is your month of watching films on the same sofa instead of going out, taking refuge in each other and spending time alone at home. Belonging is being tested. Buying a new plant, entering the kitchen together to try a new recipe or changing the bedroom decor will bind you to each other spiritually.",
+                5: "A month where you feel emotionally flirtatious, playful and childlike. The need for romance and passion peaks. This month is a wonderful time to set aside the responsibilities of the relationship and go to the cinema, have fun at an amusement park or simply spoil each other with passionate surprises.",
+                6: "This month is less about romance and more 'How much do you help me?'. Dieting, cleaning or organizing together binds you to each other. Cleaning the house from top to bottom, getting a check-up together or massaging away each other's office stress are this month's tangible acts of love.",
+                7: "A period when you focus entirely on your partner and seek the emotional security of being 'We'. Your need for approval is high. When making decisions you should frequently ask 'How do you think we should do it?' and realign your balance by going out for a nice dinner just the two of you.",
+                8: "The intense alchemy month of jealousy, deep passion and 'Open your soul to me'. Your bond strengthens by resolving crises or through bedroom secrets. Rather than superficial topics, midnight conversations where you listen to each other's deepest hidden fears and a powerful sexual attraction will recreate your relationship this month.",
+                9: "This month you tire of the relationship routine and want to discuss new philosophies, make plans abroad or travel far away. Starting a new documentary series, dining at a restaurant of a foreign culture or planning next year's holiday route will give your soul a sense of expansion.",
+                10: "Instead of openly displaying your feelings, you focus on the seriousness of your relationship and your stance in public. Family elders may be on the agenda. Celebrating a success in your partner's career, attending family dinners or making decisions that formalize your relationship's status (engagement, commitment) is this month's core theme.",
+                11: "This month being 'two best friends' rather than romantic lovers will do you good. Socializing and spending time with mutual friends heals feelings. Inviting a crowd to your home, hosting game nights with your mutual friends or supporting a social responsibility project together will refresh your relationship.",
+                12: "A touchy, mystical and intuitive month in which you do not want to leave the cocoon. You can release emotional fatigue by staying quiet and touching each other's souls. Stepping away from crowds for a quiet walk in nature, meditating together or interpreting each other's dreams is the greatest spiritual medicine of this inner month."
             }
         odak_yorum = ay_ev_sozlugu.get(ay_ev, f"Bu ay duygusal odak noktanız {ay_ev}. evde.")
 
         aci_metinleri = []
         if not acilar:
             if self.mod == "ebeveyn_cocuk":
-                aci_metinleri.append("Bu ay ebeveyn-çocuk duygusal akışınız son derece sakin ve dış etkenlerden bağımsız.")
+                aci_metinleri.append("Bu ay ebeveyn-çocuk duygusal akışınız son derece sakin ve dış etkenlerden bağımsız." if not _EN and not _ES else "This month your parent-child emotional flow is extremely calm and independent of external influences.")
             else:
-                aci_metinleri.append("Bu ay duygusal akışınız son derece sakin ve dış etkenlerden bağımsız (Gezegen açısı yok).")
+                aci_metinleri.append("Bu ay duygusal akışınız son derece sakin ve dış etkenlerden bağımsız (Gezegen açısı yok)." if not _EN and not _ES else "This month your emotional flow is extremely calm and independent of external influences (no planetary aspect).")
         else:
             for aci in acilar:
                 gez = aci["gezegen"]
                 tip = aci["aci"]
+                _sert = tip in (["Square", "Opposition"] if _EN else (["Cuadratura", "Oposición"] if _core_get_lang() == "es" else ["Kare", "Karşıt"]))
                 
                 if self.mod == "ebeveyn_cocuk":
                     if gez == "Güneş":
-                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Ebeveyn-çocuk arasındaki duygusal dengenin güçlendiği, sezgisel iletişimin arttığı bir dönem.")
+                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Ebeveyn-çocuk arasındaki duygusal dengenin güçlendiği, sezgisel iletişimin arttığı bir dönem." if not _EN and not _ES else f"<b>Moon-Sun Theme ({tip}):</b> A period when the emotional balance between parent and child strengthens and intuitive communication increases.")
                     elif gez == "Mars":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Duygusal patlamalar ve alınganlık riski. Çocuğunuzun bağımsızlık ihtiyacı ile sınırlarınız arasındaki gerilim artabilir. Sabırlı ve yapıcı olun.")
-                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Enerjik ve verimli bir ay. Çocuğunuzla birlikte aktif ve yaratıcı faaliyetler için mükemmel bir dönem.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Duygusal patlamalar ve alınganlık riski. Çocuğunuzun bağımsızlık ihtiyacı ile sınırlarınız arasındaki gerilim artabilir. Sabırlı ve yapıcı olun." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> Risk of emotional outbursts and touchiness. Tension may rise between your child's need for independence and your boundaries. Be patient and constructive.")
+                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Enerjik ve verimli bir ay. Çocuğunuzla birlikte aktif ve yaratıcı faaliyetler için mükemmel bir dönem." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> An energetic and productive month. A perfect time for active and creative activities with your child.")
                     elif gez == "Satürn":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve disiplin sınavı. Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı olmak bu ayın en büyük dersi.")
-                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve güvence ayı. Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve disiplin sınavı. Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı olmak bu ayın en büyük dersi." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A test of structure and discipline. Rules and boundaries are being tested. Being patient and consistent is this month's greatest lesson.")
+                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve güvence ayı. Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A month of structure and assurance. Lasting foundations are being laid in the parent-child relationship. The building of responsibility and trust strengthens.")
                     elif gez == "Venüs":
-                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Sevgi ve şefkat ayı. Ebeveyn-çocuk arasındaki sevgi ve şefkat dili bu ay çok güçlü. Takdir ve minnet ön planda.")
+                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Sevgi ve şefkat ayı. Ebeveyn-çocuk arasındaki sevgi ve şefkat dili bu ay çok güçlü. Takdir ve minnet ön planda." if not _EN and not _ES else f"<b>Moon-Venus {tip}:</b> A month of love and compassion. The language of love and compassion between parent and child is very strong this month. Appreciation and gratitude take the forefront.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Duygusal derinleşme ve dönüşüm. Çocuğunuzun iç dünyasındaki derin duygular yüzeye çıkabilir. Sabırlı ve anlayışlı olmak kritik.")
+                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Duygusal derinleşme ve dönüşüm. Çocuğunuzun iç dünyasındaki derin duygular yüzeye çıkabilir. Sabırlı ve anlayışlı olmak kritik." if not _EN and not _ES else f"<b>Moon-Pluto {tip}:</b> Emotional deepening and transformation. Deep feelings in your child's inner world may surface. Being patient and understanding is critical.")
                     elif gez == "Merkür":
-                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> İletişim ve anlama ayı. Çocuğunuzla aranızdaki iletişim bu ay çok güçlü. Birbirinizi derinlemesine anlama dönemi.")
+                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> İletişim ve anlama ayı. Çocuğunuzla aranızdaki iletişim bu ay çok güçlü. Birbirinizi derinlemesine anlama dönemi." if not _EN and not _ES else f"<b>Moon-Mercury {tip}:</b> A month of communication and understanding. Communication between you and your child is very strong this month. A period of deeply understanding each other.")
                     elif gez == "Jüpiter":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı. Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun.")
-                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve neşe ayı. Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu bir dönem.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı. Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A warning about emotional exaggeration. Keep your expectations about your child realistic.")
+                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve neşe ayı. Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu bir dönem." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A month of abundance and joy. A period full of opportunities to learn, discover and grow together.")
                     elif gez == "Uranüs":
-                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Beklenmedik gelişmeler ve sürprizler. Çocuğunuzun gelişiminde ani sıçramalar olabilir. Esnek olun.")
+                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Beklenmedik gelişmeler ve sürprizler. Çocuğunuzun gelişiminde ani sıçramalar olabilir. Esnek olun." if not _EN and not _ES else f"<b>Moon-Uranus {tip}:</b> Unexpected developments and surprises. Sudden leaps in your child's development are possible. Be flexible.")
                     elif gez == "Neptün":
-                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> Sezgisel bağın güçlendiği bir ay. Çocuğunuzla aranızdaki sezgisel iletişim çok güçlü. Birlikte sanatsal faaliyetler yapmak ruhunuzu besleyecek.")
+                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> Sezgisel bağın güçlendiği bir ay. Çocuğunuzla aranızdaki sezgisel iletişim çok güçlü. Birlikte sanatsal faaliyetler yapmak ruhunuzu besleyecek." if not _EN and not _ES else f"<b>Moon-Neptune {tip}:</b> A month when the intuitive bond strengthens. Intuitive communication between you and your child is very strong. Doing artistic activities together will nourish your soul.")
                 else:
                     if gez == "Güneş":
-                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Duygularınızla ortak mantığınız arasında kesişim. Bu ay ilişkinizin kalbiyle ruhu eşzamanlı atıyor.")
+                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Duygularınızla ortak mantığınız arasında kesişim. Bu ay ilişkinizin kalbiyle ruhu eşzamanlı atıyor." if not _EN and not _ES else f"<b>Moon-Sun Theme ({tip}):</b> An intersection between your feelings and your shared logic. This month your relationship's heart and soul beat in unison.")
                     elif gez == "Mars":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> DIKKAT SINAVI! Duygusal patlamalar, ani sinir harpleri veya gereksiz alınganlıklardan kaynaklı kavga riski yüksek. Tutkuyu kavgaya değil, yapıcı bir fiziksel enerjiye dönüştürün.")
-                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Bu ay inanılmaz bir eylem ve fiziksel tutku enerjisi var. İsteklerinizi hızlıca hayata geçirebilirsiniz.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> DIKKAT SINAVI! Duygusal patlamalar, ani sinir harpleri veya gereksiz alınganlıklardan kaynaklı kavga riski yüksek. Tutkuyu kavgaya değil, yapıcı bir fiziksel enerjiye dönüştürün." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> ATTENTION TEST! High risk of quarrels from emotional outbursts, sudden temper flares or needless sensitivity. Turn passion not into fighting but into constructive physical energy.")
+                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Bu ay inanılmaz bir eylem ve fiziksel tutku enerjisi var. İsteklerinizi hızlıca hayata geçirebilirsiniz." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> There is an incredible energy of action and physical passion this month. You can swiftly bring your desires into reality.")
                     elif gez == "Satürn":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> DARBOĞAZ! Duygusal mesafe, soğukluk veya 'yetersiz sevgi' hissi yaşanabilir. Duvar örmek yerine bu ayki sınavın 'sabır ve olgunluk' olduğunu hatırlayın.")
-                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Duyguların çok ayakları yere bastığı, taahhütlerin ve sadakatin perçinlendiği ağırbaşlı ve güven verici bir ay.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> DARBOĞAZ! Duygusal mesafe, soğukluk veya 'yetersiz sevgi' hissi yaşanabilir. Duvar örmek yerine bu ayki sınavın 'sabır ve olgunluk' olduğunu hatırlayın." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> BOTTLENECK! Emotional distance, coldness or a feeling of 'insufficient love' may arise. Instead of building walls, remember that this month's test is 'patience and maturity'.")
+                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Duyguların çok ayakları yere bastığı, taahhütlerin ve sadakatin perçinlendiği ağırbaşlı ve güven verici bir ay." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A dignified, reassuring month when feelings stay firmly grounded and commitments and loyalty are cemented.")
                     elif gez == "Venüs":
-                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Şefkat Mührü! Bu ay ilişkinizde romantizm, dişil enerji ve tatlı dil ön planda. Kusursuz bir barışma ve aşk ayı.")
+                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Şefkat Mührü! Bu ay ilişkinizde romantizm, dişil enerji ve tatlı dil ön planda. Kusursuz bir barışma ve aşk ayı." if not _EN and not _ES else f"<b>Moon-Venus {tip}:</b> Seal of Compassion! Romance, feminine energy and sweet words take the forefront in your relationship this month. A perfect month for reconciliation and love.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Derin psikolojik okumalar, takıntılar veya tutkulu bir sahiplenme. Zehirli kıskançlıklara dikkat edildiği sürece bağınızı çelikleştirir.")
+                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Derin psikolojik okumalar, takıntılar veya tutkulu bir sahiplenme. Zehirli kıskançlıklara dikkat edildiği sürece bağınızı çelikleştirir." if not _EN and not _ES else f"<b>Moon-Pluto {tip}:</b> Deep psychological readings, obsessions or passionate possessiveness. As long as poisonous jealousy is kept in check, it steel-plates your bond.")
                     elif gez == "Merkür":
-                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> Zihinsel Uyum Ayı! Duygularınızı kelimelerle ifade etme ihtiyacı had safhada. Uzun sohbetler, mesajlaşmak ve birbirinizi dinlemek bu ayın en büyük şifa aracı.")
+                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> Zihinsel Uyum Ayı! Duygularınızı kelimelerle ifade etme ihtiyacı had safhada. Uzun sohbetler, mesajlaşmak ve birbirinizi dinlemek bu ayın en büyük şifa aracı." if not _EN and not _ES else f"<b>Moon-Mercury {tip}:</b> Mental Harmony Month! The need to express your feelings in words is at its peak. Long conversations, messaging and listening to each other are this month's greatest healing tool.")
                     elif gez == "Jüpiter":
-                        if tip in ["Kare", "Karşıt"]: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı! Beklentilerinizi ve vaatlerinizi gerçekçi tutun; aşırı iyimserlik hayal kırıklığına dönüşebilir.")
-                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve Neşe Ayı! Duygusal açıdan son derece cömert ve pozitif bir dönem. Birlikte kutlamalar yapmak, seyahat etmek veya büyük bir hediye almak için mükemmel zaman.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı! Beklentilerinizi ve vaatlerinizi gerçekçi tutun; aşırı iyimserlik hayal kırıklığına dönüşebilir." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A warning about emotional exaggeration! Keep your expectations and promises realistic; excessive optimism can turn into disappointment.")
+                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve Neşe Ayı! Duygusal açıdan son derece cömert ve pozitif bir dönem. Birlikte kutlamalar yapmak, seyahat etmek veya büyük bir hediye almak için mükemmel zaman." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> Month of Abundance and Joy! An extremely generous and positive period emotionally. A perfect time to celebrate together, travel or buy a grand gift.")
                     elif gez == "Uranüs":
-                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Duygusal Sürpriz! Bu ay beklenmedik bir gelişme veya ani bir karar ilişkinin seyrini değiştirebilir. Esnekliğinizi koruyun ve değişime direnmek yerine ona uyum sağlayın.")
+                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Duygusal Sürpriz! Bu ay beklenmedik bir gelişme veya ani bir karar ilişkinin seyrini değiştirebilir. Esnekliğinizi koruyun ve değişime direnmek yerine ona uyum sağlayın." if not _EN and not _ES else f"<b>Moon-Uranus {tip}:</b> Emotional Surprise! An unexpected development or sudden decision may change the course of your relationship this month. Stay flexible and adapt to change rather than resisting it.")
                     elif gez == "Neptün":
-                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> İlahi Duygu Dalgası! Bu ay sezgileriniz ve empati kapasiteniz zirveye çıkıyor. Birlikte müzik dinlemek, film izlemek veya sanatsal bir şey üretmek ruhunuzu besler. Hayal kırıklığına karşı gerçekçi kalın.")
+                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> İlahi Duygu Dalgası! Bu ay sezgileriniz ve empati kapasiteniz zirveye çıkıyor. Birlikte müzik dinlemek, film izlemek veya sanatsal bir şey üretmek ruhunuzu besler. Hayal kırıklığına karşı gerçekçi kalın." if not _EN and not _ES else f"<b>Moon-Neptune {tip}:</b> Divine Emotional Wave! This month your intuition and empathy reach their peak. Listening to music, watching films or creating something artistic together feeds your soul. Stay realistic against disappointment.")
 
         aci_rapor = "<br/>".join(aci_metinleri)
 
         if self.mod == "ebeveyn_cocuk":
             metin = f"""
-            <b>📅 {ay_isim} {yil} - AYLIK EBEVEYN-ÇOCUK PEDAGOJİK İKLİMİ</b><br/>
-            <b>Bu Ayın Duygusal Üniforması:</b> {vitrin_yorum}<br/>
+            <b>📅 {ay_isim} {yil} - {'MONTHLY PARENT-CHILD PEDAGOGICAL CLIMATE' if _EN else ('CLIMA PEDAGÓGICO MENSUAL PADRE-HIJO' if _ES else 'AYLIK EBEVEYN-ÇOCUK PEDAGOJİK İKLİMİ')}</b><br/>
+            <b>{'This Month’s Emotional Uniform:' if _EN else ('El Uniforme Emocional de Este Mes:' if _ES else 'Bu Ayın Duygusal Üniforması:')}</b> {vitrin_yorum}<br/>
             <br/>
-            <b>Ayın Pedagojik Odak Noktası:</b> {odak_yorum}<br/>
+            <b>{'Month’s Pedagogical Focus:' if _EN else ('El Enfoque Pedagógico del Mes:' if _ES else 'Ayın Pedagojik Odak Noktası:')}</b> {odak_yorum}<br/>
             <br/>
-            <b>AYIN PEDAGOJİK TETİKLEYİCİLERİ:</b><br/>
+            <b>{'MONTH’S PEDAGOGICAL TRIGGERS:' if _EN else ('DETONANTES PEDAGÓGICOS DEL MES:' if _ES else 'AYIN PEDAGOJİK TETİKLEYİCİLERİ:')}</b><br/>
             {aci_rapor}<br/>
             <hr/>
             """
         else:
             metin = f"""
-            <b>📅 {ay_isim} {yil} - AYLIK DUYGUSAL İKLİM (LUNAR RETURN)</b><br/>
-            <b>Bu Ayın Duygusal Üniforması:</b> {vitrin_yorum}<br/>
+            <b>📅 {ay_isim} {yil} - {'MONTHLY EMOTIONAL CLIMATE (LUNAR RETURN)' if _EN else ('CLIMA EMOCIONAL MENSUAL (RETORNO LUNAR)' if _ES else 'AYLIK DUYGUSAL İKLİM (LUNAR RETURN)')}</b><br/>
+            <b>{'This Month’s Emotional Uniform:' if _EN else ('El Uniforme Emocional de Este Mes:' if _ES else 'Bu Ayın Duygusal Üniforması:')}</b> {vitrin_yorum}<br/>
             <br/>
-            <b>Ayın Temel İhtiyacı:</b> {odak_yorum}<br/>
+            <b>{'Month’s Fundamental Need:' if _EN else ('La Necesidad Fundamental del Mes:' if _ES else 'Ayın Temel İhtiyacı:')}</b> {odak_yorum}<br/>
             <br/>
-            <b>AYIN PSİKOLOJİK TETİKLEYİCİLERİ:</b><br/>
+            <b>{'MONTH’S PSYCHOLOGICAL TRIGGERS:' if _EN else ('DETONANTES PSICOLÓGICOS DEL MES:' if _ES else 'AYIN PSİKOLOJİK TETİKLEYİCİLERİ:')}</b><br/>
             {aci_rapor}<br/>
             <hr/>
             """

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,15 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../services/api_service.dart';
 import '../widgets/score_display.dart';
-import '../widgets/situa_chart.dart';
-import '../widgets/frekans_chart.dart';
-import '../widgets/aci_gridi.dart';
-import '../widgets/composite_chart.dart';
-import '../widgets/acg_map.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
 
@@ -40,19 +35,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.request.modLabel), actions: const [LanguageSwitcher()]),
+      appBar: AppBar(title: Text(widget.request.modLabel(l10n)), actions: const [LanguageSwitcher()]),
       body: Consumer<AnalysisProvider>(
         builder: (context, provider, _) {
           switch (provider.status) {
             case AnalysisStatus.loading:
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text('Yıldız bağı analiz ediliyor...'),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 20),
+                    Text(l10n.loadingSky),
                   ],
                 ),
               );
@@ -65,13 +61,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     children: [
                       const Icon(Icons.error_outline, size: 64, color: Colors.red),
                       const SizedBox(height: 16),
-                      Text('Hata', style: Theme.of(context).textTheme.titleLarge),
+                      Text(l10n.errorTitle, style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 8),
-                      Text(provider.error ?? 'Bilinmeyen hata', textAlign: TextAlign.center),
+                      Text(provider.error ?? l10n.unknownError, textAlign: TextAlign.center),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () => provider.analizYap(widget.request),
-                        child: const Text('Tekrar Dene'),
+                        child: Text(l10n.retryButton),
                       ),
                     ],
                   ),
@@ -88,13 +84,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildResults(BuildContext context, AnalysisProvider provider) {
+    final l10n = AppLocalizations.of(context);
     final r = provider.detayliResult ?? provider.result!;
     final sessionId = provider.sessionId ?? '';
     final mod = widget.request.mod;
-    final isNatal = mod == 'bireysel_natal';
-    final isPotansiyel = mod == 'potansiyel_yetenek';
-    final isCift = mod == 'es_sevgili';
-    final isEb = mod == 'ebeveyn_cocuk';
 
     final uyum = r['uyum_orani']?.toString() ?? '';
     final tork = r['tork']?.toString() ?? '';
@@ -109,9 +102,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
           Row(
             children: [
               if (uyum.isNotEmpty)
-                ScoreCard(label: 'Uyum Oranı', value: uyum.length > 40 ? '${uyum.substring(0, 40)}...' : uyum, color: FastTheme.rose),
-              if (tork.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: 'İlişki Canlılığı (Tork)', value: tork, color: FastTheme.secondary)],
-              if (fraktal.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: 'Doğal Akış (Fraktal)', value: fraktal, color: FastTheme.accent)],
+                ScoreCard(label: l10n.scoreCompatibility, value: uyum.length > 40 ? '${uyum.substring(0, 40)}...' : uyum, color: FastTheme.rose),
+              if (tork.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreVitalityTork, value: tork, color: FastTheme.secondary)],
+              if (fraktal.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreFlowFraktal, value: fraktal, color: FastTheme.accent)],
             ],
           ),
           if (uyum.isNotEmpty) ...[
@@ -141,7 +134,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           // Bagil Iklim
           if (r['bagil_iklim'] != null && (r['bagil_iklim'] as String).isNotEmpty)
             SectionCard(
-              title: 'Bağıl İklim',
+              title: l10n.analyzerSectionRelativeClimate,
               icon: Icons.cloud,
               child: HtmlRender(r['bagil_iklim'] as String),
             ),
@@ -188,11 +181,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
           // Solar Return
           if (r['solar_return'] != null)
-            _buildHtmlSection('Solar Return (Yıllık)', r['solar_return']),
+            _buildHtmlSection(l10n.analyzerSectionSolarReturn, r['solar_return']),
 
           // Lunar Return
           if (r['lunar_return'] != null)
-            _buildHtmlSection('Lunar Return (Aylık)', r['lunar_return']),
+            _buildHtmlSection(l10n.analyzerSectionLunarReturn, r['lunar_return']),
 
           // Minor Progress
           if (r['minor_progress'] is List && (r['minor_progress'] as List).isNotEmpty)
@@ -200,7 +193,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
           // Chart Yorumu
           if (r['chart_yorumu'] != null)
-            _buildHtmlSection('Doğum Haritası Yorumu', r['chart_yorumu']),
+            _buildHtmlSection(l10n.analyzerSectionChartComment, r['chart_yorumu']),
 
           // Sifa Receteleri
           if (r['sifa_receteleri'] != null)
@@ -226,10 +219,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _chartSection(String sessionId, String mod, Map<String, dynamic> r) {
+    final l10n = AppLocalizations.of(context);
     final chartTypes = <String, String>{};
     if (sessionId.isNotEmpty) {
-      chartTypes['situa_a'] = 'Harita A';
-      chartTypes['situa_b'] = 'Harita B';
+      chartTypes['situa_a'] = l10n.analyzerPersonA;
+      chartTypes['situa_b'] = l10n.analyzerPersonB;
     }
     if (r['chartlar'] is List) {
       for (final c in r['chartlar'] as List) {
@@ -270,6 +264,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildKarmikEv(Map data) {
+    final l10n = AppLocalizations.of(context);
     final items = <Widget>[];
     if (data['rapor_a'] is List) {
       for (final item in data['rapor_a'] as List) {
@@ -284,13 +279,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
       }
     }
     if (items.isEmpty) return const SizedBox.shrink();
-    return SectionCard(title: 'Karmik Ev Aktarımları', icon: Icons.home_work, child: Column(children: items));
+    return SectionCard(title: l10n.analyzerSectionKarmikHouse, icon: Icons.home_work, child: Column(children: items));
   }
 
   Widget _buildProgression(dynamic data) {
+    final l10n = AppLocalizations.of(context);
     if (data is! List) return const SizedBox.shrink();
     return SectionCard(
-      title: 'Secondary Progression',
+      title: l10n.progressionTitle,
       icon: Icons.timeline,
       child: Column(
         children: data.map((item) {
@@ -303,8 +299,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   if (item['kisi'] != null || item['baslik'] != null)
                     Text('${item['kisi'] ?? item['baslik'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
                   if ((item['ilerleme_yili'] ?? 0) > 0)
-                    Text('📅 İlerleme Yılı: ${(item['ilerleme_yili'] as num).toStringAsFixed(1)}'),
-                  if (item['ay_burcu'] != null) Text('🌙 Ay: ${item['ay_burcu']} | ☀️ Güneş: ${item['gunes_burcu'] ?? ''}'),
+                    Text(l10n.analyzerProgressionYear((item['ilerleme_yili'] as num).toStringAsFixed(1))),
+                  if (item['ay_burcu'] != null) Text(l10n.analyzerMoonSun(item['ay_burcu'], item['gunes_burcu'] ?? '')),
                   if (item['genel_yorum'] != null) HtmlRender(item['genel_yorum']),
                   if (item['ay_aci_yorumlari'] is List)
                     ...((item['ay_aci_yorumlari'] as List).map((aci) => Padding(
@@ -320,7 +316,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       ),
                     ))),
                   if ((item['toplam_aci'] ?? 0) > 0)
-                    Text('Toplam ${item['toplam_aci']} ilerletilmiş açı tespit edildi.',
+                    Text(l10n.analyzerTotalAspects(item['toplam_aci']),
                       style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                 ],
               ),
@@ -333,9 +329,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildWeather(dynamic data) {
+    final l10n = AppLocalizations.of(context);
     if (data is! List) return const SizedBox.shrink();
     return SectionCard(
-      title: 'Gökyüzü Akışı (3 Gün)',
+      title: l10n.weatherTitle,
       icon: Icons.wb_sunny,
       child: Column(
         children: data.map((item) {
@@ -348,7 +345,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   Text('🗓️ ${item['tarih'] ?? ''} (${item['gun_ad'] ?? ''})',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                   if (item['ay_burc'] != null)
-                    Text('🌙 Ay ${item['ay_burc']} — ${item['ay_ev']}. Ev (${item['ay_derece']}°)',
+                    Text(l10n.analyzerMoonTransitLine(item['ay_derece'] ?? '', item['ay_ev'] ?? '', item['ay_burc']),
                       style: const TextStyle(fontSize: 11, color: FastTheme.accent)),
                   if (item['ortam'] != null)
                     Text(item['ortam'].toString(),
@@ -367,9 +364,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildTimeMachine(dynamic data) {
+    final l10n = AppLocalizations.of(context);
     if (data is! List) return const SizedBox.shrink();
     return SectionCard(
-      title: 'Göksel Zaman Akışı (21 Yıl)',
+      title: l10n.timeMachineTitle,
       icon: Icons.access_time,
       child: Column(
         children: data.map((item) {
@@ -379,7 +377,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (item['yil'] != null) Text('Yıl: ${item['yil']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (item['yil'] != null) Text(l10n.analyzerYearLine(item['yil']), style: const TextStyle(fontWeight: FontWeight.bold)),
                   if (item['yorum'] != null) HtmlRender(item['yorum']),
                 ],
               ),
@@ -392,8 +390,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildYildizMuhurleri(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Yıldız Mühürleri',
+      title: l10n.analyzerSectionSeals,
       icon: Icons.stars,
       child: Column(
         children: data.map((item) {
@@ -423,8 +422,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildAsteroitler(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Asteroit Etkileşimleri',
+      title: l10n.analyzerSectionAsteroids,
       icon: Icons.star,
       child: Column(
         children: data.take(12).map((item) {
@@ -460,8 +460,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildPotansiyelAlanlar(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Potansiyel ve Yetenek Alanları',
+      title: l10n.analyzerSectionPotential(''),
       icon: Icons.auto_awesome,
       child: Column(
         children: data.map((p) {
@@ -474,7 +475,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 children: [
                   Text('✨ ${p['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                   if (p['aci'] != null || p['aci_turu'] != null)
-                    Text('${p['aci'] ?? ''} — ${p['aci_turu'] ?? ''}° Açısı (Orb: ${p['orb'] ?? ''})',
+                    Text(l10n.analyzerAspectOrb(p['aci'] ?? '', p['orb'] ?? '', p['aci_turu'] ?? ''),
                       style: const TextStyle(fontSize: 11, color: FastTheme.textLight)),
                   if (p['metin'] != null)
                     Padding(padding: const EdgeInsets.only(top: 4), child: Text(p['metin'].toString(), style: const TextStyle(fontSize: 12, height: 1.4))),
@@ -489,8 +490,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildMeslekOnerileri(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Meslek Yönlendirme Önerileri',
+      title: l10n.analyzerSectionProfession,
       icon: Icons.work,
       child: Column(
         children: data.map((m) {
@@ -502,7 +504,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('${data.indexOf(m) + 1}. ${m['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                  Text('${m['puan'] is num ? (m['puan'] as num).toStringAsFixed(1) : m['puan']} puan (%${m['yuzde'] ?? ''})',
+                  Text(l10n.analyzerScorePoints(m['yuzde'] ?? '', m['puan'] is num ? (m['puan'] as num).toStringAsFixed(1) : m['puan']),
                     style: const TextStyle(fontSize: 11, color: FastTheme.accent)),
                   if (m['meslekler'] is List)
                     ...((m['meslekler'] as List).map((j) => Padding(
@@ -521,8 +523,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildArapNoktalari(Map data, dynamic arapSinastri) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Arap Noktaları',
+      title: l10n.analyzerSectionArabic,
       icon: Icons.gps_fixed,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -567,7 +570,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           }),
           if (arapSinastri is List && arapSinastri.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text('🔗 Arap Noktası Sinastri Bağları', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
+            Text('🔗 ${l10n.analyzerSectionArabicBonds}', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
             const SizedBox(height: 4),
             ...arapSinastri.take(6).map((b) => Container(
               padding: const EdgeInsets.all(6),
@@ -598,8 +601,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildSabianlar(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Sabian Sembolleri',
+      title: l10n.analyzerSectionSabian,
       icon: Icons.auto_stories,
       child: Column(
         children: data.map((item) {
@@ -630,8 +634,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildHayatAlanlari(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Hayat Alanları Analizi',
+      title: l10n.analyzerSectionLifeAreas,
       icon: Icons.widgets,
       child: Column(
         children: data.map((item) {
@@ -671,8 +676,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildMinorProgress(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Minor Progress — 3 Günlük Akış',
+      title: l10n.analyzerSectionMinorProgress,
       icon: Icons.trending_up,
       child: Column(
         children: data.map((p) {
@@ -684,10 +690,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 İlerleme Yılı: ${p['yil'] ?? ''}',
+                  Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 ${l10n.analyzerProgressionYear(p['yil'] ?? '')}',
                     style: const TextStyle(color: FastTheme.accent, fontWeight: FontWeight.w600)),
                   if (p['ay_burc'] != null)
-                    Text('🌙 Ay: ${p['ay_burc']} (${p['ay_ev'] ?? ''}. Ev) | ☀️ Güneş: ${p['gunes_burc'] ?? ''}',
+                    Text(l10n.analyzerMoonSunHouse(p['ay_ev'] ?? '', p['ay_burc'], p['gunes_burc'] ?? ''),
                       style: const TextStyle(fontSize: 11, color: FastTheme.textLight)),
                   if (p['ortam'] != null)
                     Text(p['ortam'].toString(), style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
@@ -712,17 +718,19 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildSifaReceteleri(dynamic data) {
+    final l10n = AppLocalizations.of(context);
     if (data == null) return const SizedBox.shrink();
     return SectionCard(
-      title: 'Şifa Reçeteleri',
+      title: l10n.analyzerSectionHealing,
       icon: Icons.spa,
       child: HtmlRender(data.toString()),
     );
   }
 
   Widget _buildSifaReceteleriDetay(List data) {
+    final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: 'Detaylı Şifa Reçeteleri',
+      title: l10n.analyzerSectionHealingDetail,
       icon: Icons.local_florist,
       child: Column(
         children: data.map((rct) => Container(
@@ -736,20 +744,21 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildAstrocartography(Map data, AnalysisProvider provider, String sessionId, Map r) {
+    final l10n = AppLocalizations.of(context);
     final skor = data['skor'] is Map ? data['skor'] as Map : data;
     return SectionCard(
-      title: 'Astrokartografi',
+      title: l10n.astrokartografiTitle,
       icon: Icons.public,
       child: Column(
         children: [
-          ..._buildAstroBars(skor),
+          ..._buildAstroBars(skor, l10n),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () => provider.loadAcgMap(),
               icon: const Icon(Icons.map, size: 18),
-              label: const Text('🌍 Dünya Haritasını Yükle'),
+              label: Text('🌍 ${l10n.analyzerLoadWorldMap}'),
             ),
           ),
           if (provider.acgMapUrl != null) ...[
@@ -761,17 +770,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
           ],
           if (provider.astroData != null) ...[
             const SizedBox(height: 12),
-            Text('Alternatif Evren Puanları', style: const TextStyle(fontWeight: FontWeight.bold)),
-            ..._buildAstroBars(provider.astroData!['skor'] is Map ? provider.astroData!['skor'] as Map : provider.astroData!),
+            Text(l10n.alternateUniverseScores, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ..._buildAstroBars(provider.astroData!['skor'] is Map ? provider.astroData!['skor'] as Map : provider.astroData!, l10n),
           ],
         ],
       ),
     );
   }
 
-  List<Widget> _buildAstroBars(Map data) {
+  List<Widget> _buildAstroBars(Map data, AppLocalizations l10n) {
     final categories = ['para', 'huzur', 'tutku', 'kriz'];
-    final labels = {'para': '💰 Para & Kariyer', 'huzur': '🧘 Huzur & Sakinlik', 'tutku': '🔥 Tutku & Aşk', 'kriz': '⚠️ Kriz & Zorluk'};
+    final labels = {
+      'para': l10n.astroBarMoney, 'huzur': l10n.astroBarPeace,
+      'tutku': l10n.astroBarPassion, 'kriz': l10n.astroBarCrisis,
+    };
     final colors = {'para': Colors.green, 'huzur': Colors.blue, 'tutku': Colors.red, 'kriz': Colors.orange};
     final effects = data['etkiler'] is List ? data['etkiler'] as List : <dynamic>[];
     return categories.map((cat) {
@@ -800,15 +812,19 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildSimulation(AnalysisProvider provider, String sessionId) {
+    final l10n = AppLocalizations.of(context);
     final data = provider.simData;
     if (data == null) return const SizedBox.shrink();
     final topSehirler = data['top_sehirler'] as Map? ?? {};
     final kategoriler = ['para', 'huzur', 'tutku', 'kriz'];
-    final katEtiket = {'para': '💰 Para', 'huzur': '🧘 Huzur', 'tutku': '🔥 Tutku', 'kriz': '⚠️ Kriz'};
+    final katEtiket = {
+      'para': l10n.astroScoreMoney, 'huzur': l10n.astroScorePeace,
+      'tutku': l10n.astroScorePassion, 'kriz': l10n.astroScoreCrisis,
+    };
     final katRenk = {'para': Colors.green, 'huzur': Colors.blue, 'tutku': Colors.red, 'kriz': Colors.orange};
 
     return SectionCard(
-      title: '🌍 Şehir Pusulası',
+      title: l10n.cityCompassTitle,
       icon: Icons.explore,
       child: Column(
         children: kategoriler.map((kat) {
@@ -864,23 +880,24 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Widget _buildPdfSection(AnalysisProvider provider, String sessionId) {
+    final l10n = AppLocalizations.of(context);
     if (sessionId.isEmpty) return const SizedBox.shrink();
     return SectionCard(
-      title: '📄 PDF Raporu',
+      title: '📄 ${l10n.analyzerReportTitle}',
       icon: Icons.picture_as_pdf,
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton.icon(
-          onPressed: () => _downloadPdf(provider, sessionId, widget.request.mod),
+          onPressed: () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
           icon: const Icon(Icons.download, size: 18),
-          label: Text('📥 PDF İndir (${widget.request.modLabel})'),
+          label: Text(l10n.downloadPdfButton(widget.request.modLabel(l10n))),
           style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accent),
         ),
       ),
     );
   }
 
-  Future<void> _downloadPdf(AnalysisProvider provider, String sessionId, String mod) async {
+  Future<void> _downloadPdf(AnalysisProvider provider, String sessionId, String mod, AppLocalizations l10n) async {
     final tip = switch (mod) {
       'potansiyel_yetenek' => 'potansiyel',
       'bireysel_natal' => 'natal',
@@ -891,17 +908,17 @@ class _ResultsScreenState extends State<ResultsScreen> {
     try {
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
       if (resp.statusCode != 200) {
-        throw Exception('PDF bulunamadı (${resp.statusCode})');
+        throw Exception(l10n.analyzerPdfNotFound('${resp.statusCode}'));
       }
       final dir = await getApplicationDocumentsDirectory();
       final dosya = File('${dir.path}/${sessionId}_$tip.pdf');
       await dosya.writeAsBytes(resp.bodyBytes, flush: true);
       await OpenFile.open(dosya.path);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF indirildi: ${dosya.path}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfDownloaded(dosya.path))));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF indirme hatası: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
   }
 }

@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocaleProvider extends ChangeNotifier {
   static const _prefKey = 'app_language';
-  static const supportedLocales = [Locale('tr'), Locale('en')];
+  static const supportedLocales = [Locale('tr'), Locale('en'), Locale('es')];
+  static const supportedCodes = ['tr', 'en', 'es'];
 
   Locale _locale = const Locale('tr');
   bool _ready = false;
@@ -21,7 +22,7 @@ class LocaleProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _hasChoice = prefs.containsKey(_prefKey);
       final code = prefs.getString(_prefKey) ?? 'tr';
-      _locale = Locale(code == 'en' ? 'en' : 'tr');
+      _locale = _localeFor(code);
       _ready = true;
       notifyListeners();
     } catch (_) {
@@ -41,6 +42,11 @@ class LocaleProvider extends ChangeNotifier {
   }
 
   Future<void> setLanguage(String code) async {
-    await setLocale(Locale(code == 'en' ? 'en' : 'tr'));
+    await setLocale(_localeFor(code));
+  }
+
+  Locale _localeFor(String code) {
+    if (supportedCodes.contains(code)) return Locale(code);
+    return const Locale('tr');
   }
 }

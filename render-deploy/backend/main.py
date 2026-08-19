@@ -336,6 +336,234 @@ NATAL_AY_ACISI_YORUMLARI = {
     ],
 }  # 45 keys × 3 = 135 interpretations
 
+NATAL_AY_ACISI_YORUMLARI_EN = {
+    ("Ay","Güneş","Kavuşum"): [
+        "Your emotions and your sense of self are in perfect harmony today. Your inner voice and your logic are saying the same thing. Your self-confidence is growing, and this energy radiates to those around you.",
+        "There is a rare unity between your heart and your mind. You see clearly what you want and move forward with certainty in your feelings. Today, feel the power of simply being yourself to the fullest.",
+        "A day of inner wholeness: your feelings and your thoughts are vibrating on the same frequency. Thanks to this harmony, you can make even difficult decisions with ease and project a natural authority onto your surroundings."
+    ],
+    ("Ay","Güneş","Karşıt"): [
+        "There is a search for balance within your inner world. Your logic says one thing while your heart pulls in another direction. This tension exists precisely to show you which path to take.",
+        "You may feel a conflict between your emotional needs and your ego goals. Today, listen to both voices. The resolution lies not between them but in embracing both.",
+        "A day when opposites bring awareness. You may be experiencing inner tension, but it will show you sides of yourself you have not yet discovered. Try to understand both sides to find your balance."
+    ],
+    ("Ay","Güneş","Kare"): [
+        "You may feel caught between your emotions and your goals. Not knowing which way to go is natural. This uncertainty opens space for you to find a new direction.",
+        "You are under inner pressure. This tension between your heart and your mind is a sign that you need to make a decision. Do not postpone it; even a small step will relieve you.",
+        "Today is a day of confronting yourself. Your inner conflicts offer you an opportunity to grow. Do not resist uncomfortable emotions; try to understand them, they are here to teach you something."
+    ],
+    ("Ay","Güneş","Trigon"): [
+        "There is a natural harmony between your emotional world and your identity. Accepting yourself as you are becomes easier today. Your inner peace reflects onto the outside world.",
+        "A day when you are in the flow. There is a smooth connection between your feelings and your actions. Your creativity is high and your intuition strong. Make the most of this energy.",
+        "A time when you feel at peace with yourself. Thanks to your inner harmony, you spread tranquility to those around you. Today, make time for the things you enjoy."
+    ],
+    ("Ay","Güneş","Sekstil"): [
+        "A beautiful opportunity to express your feelings is at your door. A situation you encounter today will help you reveal your true inner feelings.",
+        "A productive bridge is being built between your inner and outer world. A new hobby, a creative project or a space to express yourself will do you good.",
+        "A day when your emotional intelligence rises. Understanding people around you and connecting with them becomes easier. Use this opportunity for an honest, heartfelt conversation."
+    ],
+    ("Ay","Venüs","Kavuşum"): [
+        "Your love energy is very high today. The warmth in your heart reflects onto those around you. Turning to artistic and aesthetic matters and surrounding yourself with beautiful things will do you good.",
+        "You feel compassionate and affectionate. You instinctively seek beauty and harmony. Today, do a small favor for yourself; you deserve it.",
+        "The balance between giving and receiving is established naturally today. Do not hesitate to express your love. You may draw inspiration for work that requires creativity."
+    ],
+    ("Ay","Venüs","Karşıt"): [
+        "You may need to choose between your emotional needs and the things you enjoy. Ask yourself in which area you want to invest more.",
+        "You may feel a sense of inner dissatisfaction. What you want and what you need may not be the same. Today, spend a little time alone and listen to your inner self.",
+        "Time to strike a balance between love and money. If there is a mismatch between what you value and where you spend your energy, you can recognize and correct it today."
+    ],
+    ("Ay","Venüs","Kare"): [
+        "You may feel caught between the things you enjoy and your responsibilities. If you struggle to make time for yourself, even a short break makes a big difference.",
+        "Your desire to spend may conflict with your need to save. In today's decisions, listen to your logic rather than your heart. Do not let a passing whim mislead you.",
+        "You may experience a balance issue in relationships — giving too much and taking too little, or the reverse. Today, review your boundaries and protect yourself."
+    ],
+    ("Ay","Venüs","Trigon"): [
+        "Love and beauty are finding a natural flow in your life. Your inner peace reflects onto the outside world. Artistic activities, music or a nature walk will do you good.",
+        "There is a natural harmony between you and your social circle. Today, spending time with loved ones, cooking a nice meal or being in an aesthetic environment will energize you.",
+        "A day to pamper yourself. This harmonious aspect between Venus and the Moon offers you the chance to see the beautiful sides of life. Enjoy the small pleasures."
+    ],
+    ("Ay","Venüs","Sekstil"): [
+        "A new discovery of beauty may await you — perhaps a new café, an exhibition or a melody. Your aesthetic sensitivity is high today; pay attention to your surroundings.",
+        "A wonderful opportunity to socialize. You may meet new people or come together with old friends. Your communication will be fluent and warm.",
+        "You may find a new way to express yourself. An inspiring day to take up a hobby or start a creative project."
+    ],
+    ("Ay","Mars","Kavuşum"): [
+        "Your energy and your emotions are moving at the same time. There is a strong urge to act within you. Channeling this energy into sports or a physical activity will do you good.",
+        "Your emotional reactions may be more intense than usual. Recognize your anger but know how to control it. When channeled correctly, this energy is a great driving force.",
+        "A day of courage and passion. A perfect time to start something you have been postponing for a long time. Trust your instincts and take action."
+    ],
+    ("Ay","Mars","Karşıt"): [
+        "You may find yourself between your inner desires and the demands of the outside world. You may need to make an effort to balance your wants and your obligations.",
+        "You may feel emotionally tense, and your reactions may be harsher than usual. Before entering a conflict, take a deep breath and think.",
+        "Other people's energy can affect you. Protect your own boundaries and do not take on others' problems. Physical exercise will help you release this tension."
+    ],
+    ("Ay","Mars","Kare"): [
+        "A volcano may be waiting inside you. A small spark could turn into a big explosion. Today, make a conscious effort to stay calm.",
+        "You are stuck between your emotional anger and your logic. You want to break things but also know you must stop. Physical activity can reduce this pressure.",
+        "You may feel impatience and restlessness. Everything may seem to bother you. This is a temporary phase; give yourself time and do not force it."
+    ],
+    ("Ay","Mars","Trigon"): [
+        "Your energy and your emotions are in perfect harmony. You have high potential to succeed at anything you want to do. Ideal for sports, creative projects or new beginnings.",
+        "Your courage and determination are at their peak. Even a difficult task may seem easy today. You are instinctively making the right moves and surrendering to the flow.",
+        "A day when you feel physically and emotionally strong. You trust yourself and do not waste any time before taking action. Use this energy productively."
+    ],
+    ("Ay","Mars","Sekstil"): [
+        "A wonderful opportunity to start a new physical activity. Dance, yoga, running or a team sport may do you well. Your body and soul want to work together.",
+        "Your emotional courage is growing. An opportunity you meet today may awaken the warrior within you. Face your fears.",
+        "You may discover a new area to channel your energy. A hobby, a project or a sport will provide you with both physical and emotional satisfaction."
+    ],
+    ("Ay","Jüpiter","Kavuşum"): [
+        "Your optimism and joy are peaking today. You look at life from a broader perspective and approach the future with hope. Be open to new experiences.",
+        "You feel emotional expansion and liberation. There is a sense of inner abundance and prosperity. Sharing this energy with your loved ones will do you good.",
+        "Your desire for adventure and discovery is growing. Seeing a new place, experiencing a different culture, or simply walking down a street you have never seen can do you good."
+    ],
+    ("Ay","Jüpiter","Karşıt"): [
+        "You may find yourself between your desire for inner growth and the limitations of the outside world. You want more, but circumstances may be restricting you. Be patient.",
+        "You have a tendency to exaggerate. You may struggle to control your emotions or your spending. Today, try to be moderate.",
+        "You may need to balance others' expectations with your own wishes. Listen to your inner voice to find your own path."
+    ],
+    ("Ay","Jüpiter","Kare"): [
+        "Excessive optimism can overshadow your realism. Dreaming big is beautiful, but today your feet should stay on the ground. Step back and evaluate the situation objectively.",
+        "You tend to exaggerate emotionally. There may be an imbalance between what you feel and what you do. Today, make an effort to stay measured.",
+        "You may feel the need to prove yourself. But do not force yourself to impress others. Being accepted as you are is the greatest freedom."
+    ],
+    ("Ay","Jüpiter","Trigon"): [
+        "Your inner sense of abundance and prosperity is in a natural flow. Life may offer you beautiful surprises. A feeling of gratitude will warm your heart today.",
+        "Your desire to learn and explore is growing. A great day to read a book, watch a documentary or learn a new skill. Your mind and heart work together.",
+        "Your optimism also affects the people around you. Today, share your positive thoughts and inspire your loved ones. Ideal for socializing."
+    ],
+    ("Ay","Jüpiter","Sekstil"): [
+        "A new learning opportunity may be at your door. An educational program, seminar or workshop might catch your interest. A good time to invest in your personal growth.",
+        "A cultural event or a travel plan may do you good. Seeing different perspectives will broaden your horizons. Today, try something new.",
+        "Trust your inner wisdom. If you know something to be true, do not hesitate to share it. You can inspire the people around you."
+    ],
+    ("Ay","Satürn","Kavuşum"): [
+        "You may feel more serious and distant emotionally. There is a questioning within your inner world. This is part of your emotional maturation process. Be honest with yourself.",
+        "You feel the weight of your responsibilities. Your emotional burden may have increased. Today, show yourself compassion and remember that you are not alone.",
+        "A day of discovering your inner boundaries. You are questioning where to stand and where to move forward. This discipline will give you emotional security in the long run."
+    ],
+    ("Ay","Satürn","Karşıt"): [
+        "You are experiencing a conflict between your emotional needs and your responsibilities. Your inner voice says one thing while the outside world expects another. Finding the balance is up to you.",
+        "A feeling of loneliness may prevail. You may think others do not understand you. This is a temporary feeling; instead of isolating yourself, reach out to a friend.",
+        "An emotional burden from the past may surface today. Forgiving and letting go will lighten this weight. Give yourself time."
+    ],
+    ("Ay","Satürn","Kare"): [
+        "You feel under emotional pressure. You may feel inadequate or unprepared in a matter. See this feeling as a learning opportunity.",
+        "Your tendency to criticize yourself is growing. Perfectionism may give you a hard time today. Remember that not everything has to be perfect.",
+        "You may encounter an emotional obstacle. Your plans may go wrong or you may experience disappointment in something. This is a test that will strengthen you."
+    ],
+    ("Ay","Satürn","Trigon"): [
+        "Thanks to your emotional discipline and maturity, you overcome difficulties easily. Being aware of your inner strength gives you confidence.",
+        "You adopt a structured emotional approach. Instead of suppressing your feelings, you are learning to manage them. This is a sign of growth.",
+        "A good day to focus on your long-term goals. Thanks to your emotional stability, you can take solid steps and look to the future with confidence."
+    ],
+    ("Ay","Satürn","Sekstil"): [
+        "An opportunity is before you to become more organized and planned emotionally. A good time to build a habit or establish a routine.",
+        "A lesson from the past may prove useful today. On a matter that was difficult for you before, you now feel more mature and ready.",
+        "Advice from a mentor or guide will do you good. An experienced person's perspective can guide you on an emotional matter."
+    ],
+    ("Ay","Merkür","Kavuşum"): [
+        "Your power to express your emotions is growing. Putting what is inside you into words becomes easier. A great day for writing, speaking or telling someone your troubles.",
+        "Your intuition and your logic work at the same time. You grasp a subject with both your heart and your mind. If there is a contradiction between the two, it will become clear today.",
+        "There is a strong connection between your mind and your heart. Your emotional intelligence is high, and your ability to understand people and empathize with them is increasing."
+    ],
+    ("Ay","Merkür","Karşıt"): [
+        "You are experiencing a contradiction between your feelings and your thoughts. Your logic says one thing while your heart feels another. Listen to both.",
+        "There may be misunderstandings in communication with others. If there is a gap between what you say and what you feel, try to close it today.",
+        "You may overthink an emotional subject and confuse yourself. Sometimes you need to feel rather than analyze. Silence your mind and listen to your heart."
+    ],
+    ("Ay","Merkür","Kare"): [
+        "You may be mentally scattered and find it hard to focus. Your emotions may be clouding your thoughts. Today, avoid making important decisions.",
+        "There may be a difference between what you want to say and what you say. If you struggle to express yourself, writing may help you.",
+        "You may fall into obsessive thoughts about an emotional subject. To break this cycle, direct your mind toward something else."
+    ],
+    ("Ay","Merkür","Trigon"): [
+        "A perfect day to express your feelings. Your inner voice is clear and your words flow. Telling someone how you feel or writing a letter will do you good.",
+        "Your intuition and logic are in harmony. You both feel and understand a subject. Thanks to this holistic perspective, you can make the right decisions.",
+        "Your learning and communication abilities are growing. An ideal day to learn a new language, read a book or research a topic."
+    ],
+    ("Ay","Merkür","Sekstil"): [
+        "A new communication opportunity is at your door. You may hear from an old friend or have a meaningful conversation with someone new.",
+        "You may encounter a situation where you can use your emotional intelligence. Giving someone advice or understanding them will do you good.",
+        "You may feel inspired to write or create something. Keeping a journal, writing poetry or posting on a blog will help you express your emotions."
+    ],
+    ("Ay","Uranüs","Kavuşum"): [
+        "You may feel a sudden need for emotional liberation. Routines are suffocating you, and you want to do something new and different. Trust your instincts.",
+        "You may experience an unexpected emotional insight. Suddenly, you may see a matter very clearly. Make the most of this moment of illumination.",
+        "A day when you are attached to your freedom. You want to live by your own rules, not by others' expectations. Use this energy creatively."
+    ],
+    ("Ay","Uranüs","Karşıt"): [
+        "You may be caught between your desire for stability and your need for change. On one hand you want to be safe, on the other you want to push your limits. This dilemma offers you a chance to grow.",
+        "There is tension between others' expectations and your own need for freedom. You may need to be brave to find your own path.",
+        "You may react suddenly and then regret it. Think once more before you say or do something."
+    ],
+    ("Ay","Uranüs","Kare"): [
+        "You may experience an unexpected emotional outburst. A feeling you have been suppressing for a long time may suddenly surface today. Do not be surprised; this is natural.",
+        "A disruption of your routine may bother you. Being forced out of your plans, though annoying at first, may open a new door.",
+        "You may experience emotional fluctuations. One moment happy, another moment sad. This is a temporary phase; let yourself go with the flow."
+    ],
+    ("Ay","Uranüs","Trigon"): [
+        "A day when you discover your inner freedom. You enjoy living by your own rules. Your creativity and originality influence those around you.",
+        "You may experience a sudden burst of inspiration. A perfect idea for a creative project may come to mind. Do not miss it; write it down immediately.",
+        "Change and novelty do you good. A different environment, new people or an unusual experience can reveal your inner potential."
+    ],
+    ("Ay","Uranüs","Sekstil"): [
+        "An opportunity for a new and unusual experience is at your door. Trying something you have never done before can energize you.",
+        "You may gain a different perspective on a matter. An unconventional thought may help you find a creative solution to a problem.",
+        "Getting involved with technology or an innovative field may do you well. A good day to discover a new app or start a digital project."
+    ],
+    ("Ay","Neptün","Kavuşum"): [
+        "Your intuition is very strong today. You sense people and events beyond words. Meditation, music or art will bring you deep peace.",
+        "You may feel your boundaries dissolving emotionally and see that you are connected to everything. This sense of unity heals you.",
+        "Your imagination and emotions are intertwined. Your dreams may be more vivid and your intuition clearer. Today, listen to your inner voice."
+    ],
+    ("Ay","Neptün","Karşıt"): [
+        "You may drift between reality and your dream world. You may be seeing things differently than they are. Today, avoid making important decisions.",
+        "You may experience emotional confusion and struggle to see a matter clearly. Step back for a while and let the situation become clear.",
+        "Other people's energy can easily affect you. Your emotional boundaries may be weakened. Create a space where you can be alone to protect yourself."
+    ],
+    ("Ay","Neptün","Kare"): [
+        "You may feel lost in an emotional fog. Distinguishing what is real from what is imagined may become difficult. Today, be honest with yourself.",
+        "Your tendency to escape may increase. You may turn to dreams, alcohol or another addiction to get away from reality. Be aware and find healthy alternatives.",
+        "Your chances of being deceived or disappointed are high. Do not trust a person or situation too much. Be realistic."
+    ],
+    ("Ay","Neptün","Trigon"): [
+        "There is a natural flow between your intuition and imagination. A perfect day for an artistic project, creative work or a spiritual practice.",
+        "You feel inner peace and serenity. Spending time in nature, listening to music or meditating will bring you deep satisfaction.",
+        "Your empathy is very high. You have a natural gift for understanding and helping people. Today, use this power."
+    ],
+    ("Ay","Neptün","Sekstil"): [
+        "An opportunity to nourish your creativity is before you. An art workshop, a photography trip or a music event may do you good.",
+        "You may have a spiritual experience. A book, a conversation or a memory of nature may bring you deep understanding.",
+        "Your intuition will guide you today. If you have a feeling about something, take it seriously. Even if your logic cannot explain it, your heart knows the truth."
+    ],
+    ("Ay","Plüton","Kavuşum"): [
+        "You are in the middle of an emotional transformation. Suppressed feelings may surface today. Though it looks frightening, this confrontation will set you free.",
+        "A day when you become aware of your inner power. Letting go of what you cannot control is actually your greatest form of empowerment. Be open to transformation.",
+        "You are undergoing a deep emotional purification. Old wounds and past traumas may show themselves today. This is an opportunity to heal them."
+    ],
+    ("Ay","Plüton","Karşıt"): [
+        "You are waging a war between controlling and letting go. The more you try to hold onto a situation, the more you seem to lose. Letting go is the greatest victory.",
+        "Others' shadow may affect you. Do not take on the emotions someone projects onto you. Remember your own power.",
+        "Time for an emotional reckoning. An event from your past may come up again today. You do not have to react the same way this time."
+    ],
+    ("Ay","Plüton","Kare"): [
+        "Your emotional intensity is at its peak. A small event can turn into a big reaction. Today, take extra care of yourself and recognize your triggers.",
+        "You are experiencing an inner power struggle. You may feel caught between your old habits and your new self. Transformation can be painful, but it is necessary.",
+        "Obsessive thoughts and feelings may take over. If you struggle to let go of a subject, seeking professional support may be a good idea."
+    ],
+    ("Ay","Plüton","Trigon"): [
+        "Your power of emotional transformation works in a natural flow. You can easily resolve a difficult issue and act with deep understanding.",
+        "Your inner healing and recovery energy is high. You are in a powerful period for mending past wounds and breaking old patterns.",
+        "Your ability to heal and transform others is growing. Supporting and guiding someone will do you good. In this process, you are healing as well."
+    ],
+    ("Ay","Plüton","Sekstil"): [
+        "You may gain a deep psychological insight. A dream, a therapy session or a deep conversation can teach you something new about yourself.",
+        "Researching a matter from the past or exploring your family history may do you good. Understanding your roots can explain your present behavior.",
+        "You may learn a hidden truth about a matter. Although shocking at first, in the long run this knowledge will bring you freedom."
+    ],
+}  # EN mirror
+
 # ── Natal Moon Sign & House descriptors ──
 AY_BURC_TANIMLARI = {
     "Koç": "Ay'ınız Koç burcunda — duygularınız ateşli, ani ve doğrudan. İçgüdüsel tepkileriniz güçlü, cesur ve atılgan.",
@@ -367,23 +595,291 @@ AY_EV_TANIMLARI = {
     12: "Ay 12. evde — duygularınız bilinçaltı düzeyde akar. Yalnızlık, meditasyon ve içsel çalışma size iyi gelir.",
 }
 
+AY_BURC_TANIMLARI_ES = {
+    "Koç": "Tu Luna está en Aries — tus emociones son ardientes, repentinas y directas. Tus reacciones instintivas son fuertes, valientes y emprendedoras.",
+    "Boğa": "Tu Luna está en Tauro — buscas estabilidad emocional y seguridad. La comodidad y el bienestar son importantes para ti.",
+    "İkizler": "Tu Luna está en Géminis — sientes la necesidad de poner tus emociones en palabras. Tienes una estructura emocional curiosa y orientada a la comunicación.",
+    "Yengeç": "Tu Luna está en Cáncer — la Luna en su propia casa, tus emociones son sumamente profundas y protectoras. La familia y el hogar son muy poderosos en tu interior.",
+    "Aslan": "Tu Luna está en Leo — tu expresión emocional es cálida, generosa y brillante. Actúas guiado por el corazón; el honor y el orgullo son importantes para ti.",
+    "Başak": "Tu Luna está en Virgo — analizas tus emociones e intentas encajarlas en un marco lógico. El orden y la limpieza te dan paz.",
+    "Terazi": "Tu Luna está en Libra — buscas equilibrio y armonía emocional. La estética, la elegancia y la justicia alimentan tus sentimientos.",
+    "Akrep": "Tu Luna está en Escorpio — tus emociones son intensas, apasionadas y transformadoras. Tus sentimientos ocultos en lo profundo son poderosos.",
+    "Yay": "Tu Luna está en Sagitario — la libertad emocional y la exploración te nutren. Tienes una naturaleza emocional optimista, aventurera e independiente.",
+    "Oğlak": "Tu Luna está en Capricornio — tus emociones son controladas, disciplinadas y responsables. Tu seguridad emocional se vincula con el éxito y el estatus.",
+    "Kova": "Tu Luna está en Acuario — emocionalmente libre, independiente y poco convencional. Valorizas tu originalidad y mantienes tu distancia emocional.",
+    "Balık": "Tu Luna está en Piscis — tus emociones son fluidas, intuitivas y sin límites. Tu capacidad de empatía es alta y tu veta artística y espiritual es fuerte.",
+}
+
+AY_EV_TANIMLARI_ES = {
+    1: "La Luna en casa 1 — tu expresión emocional es fuerte; tus sentimientos se leen en tu rostro. Tus propias necesidades están en primer plano.",
+    2: "La Luna en casa 2 — tu seguridad emocional se conecta con la estabilidad material. Desarrollas vínculos afectivos con lo que posees.",
+    3: "La Luna en casa 3 — expresas tus emociones a través de la comunicación. Tu círculo cercano y tus hermanos ocupan un lugar importante en tu mundo emocional.",
+    4: "La Luna en casa 4 — la familia y el hogar son tu centro emocional. Tu conexión con tu pasado, tus raíces y tu madre es fuerte.",
+    5: "La Luna en casa 5 — expresas tus emociones a través de la creatividad y el juego. El romance y los asuntos de los niños están en primer plano.",
+    6: "La Luna en casa 6 — tu salud emocional se relaciona con tu rutina diaria y tu vida laboral. Servir y ayudar te sienta bien.",
+    7: "La Luna en casa 7 — tus necesidades emocionales se moldean a través de las relaciones cercanas y las alianzas. Buscas equilibrio y armonía.",
+    8: "La Luna en casa 8 — la profundidad emocional, la transformación y los recursos compartidos están en primer plano. La intimidad y la confianza son temas sensibles.",
+    9: "La Luna en casa 9 — tu alimento emocional llega a través de los viajes, la filosofía y el aprendizaje superior. La exploración y la búsqueda de sentido son tus necesidades emocionales.",
+    10: "La Luna en casa 10 — tu expresión emocional se hace visible a través de tu carrera y tu estatus social. La seguridad emocional se vincula con el logro.",
+    11: "La Luna en casa 11 — las amistades y los grupos sociales son importantes en tu mundo emocional. Las metas idealistas te nutren.",
+    12: "La Luna en casa 12 — tus emociones fluyen a nivel subconsciente. La soledad, la meditación y el trabajo interior te sientan bien.",
+}
+
+NATAL_AY_ACISI_YORUMLARI_ES = {
+    ("Ay","Güneş","Kavuşum"): [
+        "Tus emociones y tu esencia están hoy en plena sintonía. Tu voz interior y tu lógica dicen lo mismo. Tu confianza aumenta y esa energía se irradia a tu entorno.",
+        "Hay una unidad poco frecuente entre tu corazón y tu mente. Ves con claridad lo que quieres y avanzas con pasos seguros, guiado por tus sentimientos. Hoy siente hasta el final el poder de ser tú mismo.",
+        "Día de integridad interior: tus sentimientos y tus pensamientos vibran en la misma frecuencia. Gracias a esa armonía puedes tomar incluso decisiones difíciles y proyectar una autoridad natural."
+    ],
+    ("Ay","Güneş","Karşıt"): [
+        "Hay una búsqueda de equilibrio en tu mundo interior. Mientras tu lógica dice una cosa, tu corazón te arrastra hacia otra dirección. Esa tensión existe para mostrarte qué camino seguir.",
+        "Puedes sentir un conflicto entre tus necesidades emocionales y tus metas del ego. Hoy escucha las dos voces. La reconciliación no está entre ambas, sino en abrazarlas a las dos.",
+        "Un día en que los contrarios traen conciencia. Puede que vivas una tensión interna, pero te mostrará facetas tuyas que aún no has descubierto. Para encontrar tu equilibrio, intenta comprender ambos lados."
+    ],
+    ("Ay","Güneş","Kare"): [
+        "Puedes sentirte atrapado entre tus emociones y tus metas. No saber hacia dónde ir es natural. Esta incertidumbre te abre espacio para encontrar una nueva dirección.",
+        "Estás bajo una presión interna. Esta tensión entre tu corazón y tu mente es señal de que debes tomar una decisión. No la postergues; incluso un pequeño paso te aliviará.",
+        "Hoy es un día de encuentro contigo mismo. Tus conflictos internos te ofrecen una oportunidad de crecer. No te resistas a las emociones incómodas; intenta comprenderlas: están aquí para enseñarte algo."
+    ],
+    ("Ay","Güneş","Trigon"): [
+        "Hay una armonía natural entre tu mundo emocional y tu identidad. Hoy te resulta más fácil aceptarte tal como eres. Tu paz interior se refleja en el exterior.",
+        "Un día de fluidez. Hay una conexión tersa entre tus sentimientos y tus acciones. Tu creatividad es alta y tus intuiciones están fuertes. Aprovecha esta energía.",
+        "Un período en el que te sientes en paz contigo mismo. Gracias a tu armonía interna irradias serenidad a quienes te rodean. Hoy dedica tiempo a lo que disfrutas."
+    ],
+    ("Ay","Güneş","Sekstil"): [
+        "Tienes a la puerta una hermosa oportunidad de expresar tus emociones. Una situación que aparezca hoy te ayudará a sacar a la luz tus sentimientos verdaderos.",
+        "Se tiende un puente productivo entre tu mundo interior y el exterior. Un pasatiempo nuevo, un proyecto creativo o un espacio donde expresarte te sentará bien.",
+        "Un día en que tu inteligencia emocional se eleva. Comprender a quienes te rodean y conectar con ellos se vuelve más fácil. Aprovecha esta oportunidad para una charla sincera."
+    ],
+    ("Ay","Venüs","Kavuşum"): [
+        "Tu energía amorosa está hoy muy elevada. El calor de tu corazón se refleja en tu entorno. Volcarte hacia lo artístico y estético, rodearte de cosas bellas, te sentará bien.",
+        "Te sientes emocionalmente lleno de ternura. Buscas instintivamente la belleza y la armonía. Hoy hazte un pequeño gesto; lo mereces.",
+        "El equilibrio entre dar y recibir se establece hoy de forma natural. No dudes en expresar tu amor. Puedes inspirarte para trabajos que requieran creatividad."
+    ],
+    ("Ay","Venüs","Karşıt"): [
+        "Puede que tengas que elegir entre tus necesidades emocionales y aquello que disfrutas. Pregúntate en qué ámbito quieres invertir más de ti mismo.",
+        "Puedes sentir una insatisfacción interna. Lo que quieres y lo que necesitas puede no ser lo mismo. Hoy quédate un rato a solas y escúchate.",
+        "Es momento de equilibrar el amor y el dinero. Si hay una desarmonía entre lo que valoras y la energía que gastas, hoy puedes notarla y corregirla."
+    ],
+    ("Ay","Venüs","Kare"): [
+        "Puedes sentirte atrapado entre lo que disfrutas y tus responsabilidades. Si te cuesta dedicarte tiempo, incluso un pequeño descanso hará una gran diferencia.",
+        "Tu deseo de gastar y la necesidad de ahorrar pueden chocar. Hoy, en tus decisiones, escucha tu lógica y no tu impulso. Que un capricho pasajero no te engañe.",
+        "Puedes vivir un desequilibrio en las relaciones: dar demasiado y recibir poco, o al revés. Hoy revisa tus límites y protégete."
+    ],
+    ("Ay","Venüs","Trigon"): [
+        "El amor y la belleza fluyen con naturalidad en tu vida. Tu paz interior se refleja en el exterior. Las actividades artísticas, la música o caminar en la naturaleza te sentarán bien.",
+        "Hay una armonía natural con tu círculo social. Hoy pasar tiempo con tus seres queridos, cocinar algo rico o estar en un entorno estético te dará energía.",
+        "Día para consentirte. Este aspecto armonioso entre Venus y la Luna te ofrece la oportunidad de ver el lado bello de la vida. Disfruta de los pequeños placeres."
+    ],
+    ("Ay","Venüs","Sekstil"): [
+        "Puede que te espere un nuevo descubrimiento estético. Quizá un café nuevo, una exposición o una melodía. Hoy tu sensibilidad estética está alta; fíjate en lo que te rodea.",
+        "Una linda oportunidad para socializar. Puedes conocer gente nueva o reencontrarte con viejos amigos. Tu comunicación será fluida y cálida.",
+        "Puedes hallar una nueva manera de expresarte. Un día inspirador para tomar un pasatiempo o empezar un proyecto creativo."
+    ],
+    ("Ay","Mars","Kavuşum"): [
+        "Tu energía y tus emociones se ponen en marcha al mismo tiempo. En tu interior hay un fuerte impulso de hacer. Canalizar esta energía hacia el deporte o una actividad física te sentará bien.",
+        "Tus reacciones emocionales pueden ser más intensas de lo normal. Reconoce tu ira, pero aprende también a controlarla. Esta energía, bien canalizada, es un gran motor.",
+        "Día de coraje y pasión. Un momento perfecto para empezar algo que has estado postergando. Confía en tus instintos y actúa."
+    ],
+    ("Ay","Mars","Karşıt"): [
+        "Puedes verte entre tus deseos internos y las exigencias del mundo exterior. Puede que tengas que esforzarte por equilibrar tus anhelos y tus obligaciones.",
+        "Puedes sentirte tenso emocionalmente y reaccionar con más dureza de lo usual. Antes de entrar en un conflicto, respira hondo y piensa.",
+        "La energía de los demás puede afectarte. Protege tus propios límites y no cargues con los problemas ajenos. El ejercicio físico te ayudará a liberar esa tensión."
+    ],
+    ("Ay","Mars","Kare"): [
+        "Dentro de ti puede estar a punto un volcán. Una pequeña chispa puede convertirse en una gran explosión. Hoy haz un esfuerzo consciente por mantener la calma.",
+        "Estás atrapado entre tu ira emocional y tu lógica. Quieres romper algo, pero sabes que debes detenerte. Una actividad física puede aliviar esa presión.",
+        "Puedes sentir impaciencia e inquietud. Como si todo te molestara. Es un período pasajero; date tiempo y no te exijas de más."
+    ],
+    ("Ay","Mars","Trigon"): [
+        "Tu energía y tus emociones están en perfecta sintonía. Tienes un alto potencial de éxito en todo lo que quieras hacer. Ideal para el deporte, proyectos creativos o nuevos comienzos.",
+        "Tu coraje y tu determinación están en la cima. Incluso una tarea que parece difícil hoy te resultará fácil. Haces instintivamente los movimientos correctos y te entregas al flujo.",
+        "Un día en que te sientes fuerte, tanto física como emocionalmente. Confías en ti y no pierdes tiempo en ponerte en marcha. Aprovecha esta energía de forma productiva."
+    ],
+    ("Ay","Mars","Sekstil"): [
+        "Una buena oportunidad para empezar una nueva actividad física. La danza, el yoga, correr o un deporte de equipo te pueden sentar bien. Tu cuerpo y tu alma quieren trabajar juntos.",
+        "Tu valentía emocional aumenta. Una oportunidad que aparezca hoy puede despertar al guerrero que llevas dentro. Enfréntate a tus miedos.",
+        "Puedes descubrir un nuevo ámbito donde dirigir tu energía. Un pasatiempo, un proyecto o un deporte te dará satisfacción tanto física como emocional."
+    ],
+    ("Ay","Jüpiter","Kavuşum"): [
+        "Tus sentimientos de optimismo y alegría están hoy por las nubes. Ves la vida desde una perspectiva más amplia y te acercas al futuro con esperanza. Permanece abierto a nuevas experiencias.",
+        "Sientes una expansión y liberación emocional. Hay una sensación interior de abundancia y plenitud. Compartir esta energía con tus seres queridos te sentará bien.",
+        "Aumenta tu deseo de aventura y descubrimiento. Ver un sitio nuevo, conocer una cultura distinta o simplemente caminar por una calle desconocida puede sentarte de maravilla."
+    ],
+    ("Ay","Jüpiter","Karşıt"): [
+        "Puedes quedar entre tu deseo de crecimiento interior y las limitaciones del mundo exterior. Quieres más, pero las condiciones actuales pueden frenarte. Ten paciencia.",
+        "Tienes tendencia a exagerar. Puede costarte controlar tus emociones o tus gastos. Hoy intenta ser moderado.",
+        "Puede que necesites equilibrar las expectativas ajenas con tus propios deseos. Escucha tu voz interior para encontrar tu propio camino."
+    ],
+    ("Ay","Jüpiter","Kare"): [
+        "El optimismo excesivo puede ensombrecer tu realismo. Soñar en grande es hermoso, pero hoy debes mantener los pies en la tierra. Da un paso atrás y evalúa la situación objetivamente.",
+        "Tiendes a exagerar emocionalmente. Puede haber un desequilibrio entre lo que sientes y lo que haces. Hoy procura ser mesurado.",
+        "Puede que sientas la necesidad de demostrar tu valía. Pero no te fuerces para impresionar a los demás. Ser aceptado tal como eres es la mayor libertad."
+    ],
+    ("Ay","Jüpiter","Trigon"): [
+        "Tu sensación interna de abundancia fluye con naturalidad. La vida puede ofrecerte hermosas sorpresas. La gratitud calentará hoy tu corazón.",
+        "Aumenta tu deseo de aprender y explorar. Un gran día para leer un libro, ver un documental o aprender una nueva habilidad. Tu mente y tu corazón trabajan juntos.",
+        "Tu energía optimista contagia a quienes te rodean. Hoy comparte tus pensamientos positivos e inspira a tus seres queridos. Ideal para socializar."
+    ],
+    ("Ay","Jüpiter","Sekstil"): [
+        "Puede haber a la puerta una nueva oportunidad de aprendizaje. Un programa de formación, un seminario o un taller pueden interesarte. Es un buen momento para invertir en tu crecimiento personal.",
+        "Un evento cultural o un plan de viaje puede sentarte bien. Ver perspectivas distintas ampliará tus horizontes. Hoy prueba algo nuevo.",
+        "Confía en tu sabiduría interior. Si hay algo que sabes con certeza, no dudes en compartirlo. Puedes inspirar a quienes te rodean."
+    ],
+    ("Ay","Satürn","Kavuşum"): [
+        "Puedes sentirte emocionalmente más serio y distante. Hay un cuestionamiento en tu mundo interior. Es parte de tu proceso de maduración emocional. Sé honesto contigo mismo.",
+        "Sientes el peso de tus responsabilidades. Tu carga emocional puede haber aumentado. Hoy muéstrate compasivo contigo y recuerda que no estás solo.",
+        "Día de descubrir tus límites internos. Cuestionas dónde detenerte y dónde avanzar. Esta disciplina te dará, a largo plazo, seguridad emocional."
+    ],
+    ("Ay","Satürn","Karşıt"): [
+        "Vives un conflicto entre tus necesidades emocionales y tus responsabilidades. Tu voz interior te dice una cosa, mientras el mundo exterior espera otra. Encontrar el equilibrio está en tus manos.",
+        "Puede pesar la sensación de soledad. Puedes creer que los demás no te comprenden. Es un sentimiento pasajero; en lugar de aislarte, acércate a un amigo.",
+        "Una carga emocional del pasado puede aflorar hoy. Perdonar y soltar aliviará ese peso. Date tiempo."
+    ],
+    ("Ay","Satürn","Kare"): [
+        "Te sientes bajo presión emocional. Puede que en algún ámbito te consideres insuficiente o poco preparado. Ve esta sensación como una oportunidad de aprendizaje.",
+        "Aumenta tu tendencia a autocríticarte. El perfeccionismo puede darte hoy malos momentos. Recuerda que no todo tiene que ser perfecto.",
+        "Puedes encontrarte con un obstáculo emocional. Tus planes pueden retrasarse o vivirá una decepción. Es una prueba que te hará más fuerte."
+    ],
+    ("Ay","Satürn","Trigon"): [
+        "Gracias a tu disciplina y madurez emocional superas las dificultades con facilidad. Ser consciente de tu fuerza interior te da confianza.",
+        "Adoptas un enfoque emocional estructurado. Aprendes a gestionar tus emociones en lugar de reprimirlas. Es señal de crecimiento.",
+        "Un buen día para centrarte en tus metas de largo plazo. Gracias a tu estabilidad emocional puedes dar pasos firmes y mirar el futuro con seguridad."
+    ],
+    ("Ay","Satürn","Sekstil"): [
+        "Se presenta una oportunidad para ser más organizado y planificado emocionalmente. Un buen momento para adquirir un hábito o crear una rutina.",
+        "Una lección del pasado puede resultarte útil hoy. En un tema que antes te costaba, ahora te sientes más maduro y preparado.",
+        "Un consejo de un mentor o guía te hará bien. La perspectiva de alguien con experiencia puede orientarte en un asunto emocional."
+    ],
+    ("Ay","Merkür","Kavuşum"): [
+        "Aumenta tu capacidad de expresar tus emociones. Poner en palabras lo que llevas dentro se vuelve más fácil. Un gran día para escribir, hablar o contarle a alguien lo que te pasa.",
+        "Tus intuiciones y tu lógica trabajan a la vez. Comprendes un tema tanto con el corazón como con la mente. Si hay una contradicción entre ambos, hoy se aclarará.",
+        "Hay una conexión fuerte entre tu mente y tu corazón. Tu inteligencia emocional está alta y crece tu capacidad de entender a las personas y empatizar con ellas."
+    ],
+    ("Ay","Merkür","Karşıt"): [
+        "Vives una contradicción entre tus emociones y tus pensamientos. Tu lógica dice una cosa y tu corazón siente otra. Escucha a ambos.",
+        "Puede haber malentendidos en la comunicación con los demás. Si hay una diferencia entre lo que dices y lo que sientes, intenta cerrarla hoy.",
+        "Puedes darle demasiadas vueltas a un tema emocional y confundirte. A veces hay que sentir en lugar de analizar. Calla tu mente y escucha a tu corazón."
+    ],
+    ("Ay","Merkür","Kare"): [
+        "Puedes sentirte mentalmente disperso y con dificultad para concentrarte. Tus emociones pueden estar nublando tus pensamientos. Hoy evita tomar decisiones importantes.",
+        "Puede haber una diferencia entre lo que quieres decir y lo que dices. Si te cuesta expresarte, escribir puede ayudarte.",
+        "Puedes caer en pensamientos obsesivos sobre un tema emocional. Para salir de ese bucle, dirige tu mente hacia otra cosa."
+    ],
+    ("Ay","Merkür","Trigon"): [
+        "Un día perfecto para expresar tus emociones. Tu voz interior es clara y tus palabras fluyen. Contarle a alguien lo que sientes o escribir una carta te hará bien.",
+        "Tus intuiciones y tu lógica están en armonía. Sientes y comprendes un tema al mismo tiempo. Gracias a esa visión integral puedes tomar decisiones acertadas.",
+        "Aumentan tu capacidad de aprendizaje y comunicación. Un día ideal para aprender un idioma nuevo, leer un libro o investigar un tema."
+    ],
+    ("Ay","Merkür","Sekstil"): [
+        "Tienes a la puerta una nueva oportunidad de comunicación. Puedes recibir noticias de un viejo amigo o mantener una conversación profunda con alguien nuevo.",
+        "Puedes encontrarte en una situación donde usar tu inteligencia emocional. Dar un consejo a alguien o comprenderlo te hará bien.",
+        "Puedes inspirarte para escribir o crear algo. Llevar un diario, escribir poesía o publicar un blog te ayudará a expresar tus emociones."
+    ],
+    ("Ay","Uranüs","Kavuşum"): [
+        "Puedes sentir una necesidad repentina de liberación emocional. Las rutinas te asfixian y quieres hacer algo nuevo y distinto. Confía en tus instintos.",
+        "Puedes vivir una toma de conciencia emocional inesperada. De pronto empiezas a ver un tema con gran claridad. Aprovecha ese momento de iluminación.",
+        "Un día en que valoras tu libertad. Quieres vivir según tus propias reglas y no según las expectativas ajenas. Usa esta energía de manera creativa."
+    ],
+    ("Ay","Uranüs","Karşıt"): [
+        "Puedes quedar entre tu deseo de estabilidad y tu necesidad de cambio. Por un lado quieres estar seguro y por otro superar tus límites. Esta disyuntiva te ofrece una oportunidad de crecer.",
+        "Hay tensión entre las expectativas ajenas y tu necesidad de libertad. Para encontrar tu propio camino puede que debas ser valiente.",
+        "Puedes reaccionar emocionalmente de forma impulsiva y luego arrepentirte. Antes de decir o hacer algo, piénsalo una vez más."
+    ],
+    ("Ay","Uranüs","Kare"): [
+        "Puedes vivir una explosión emocional inesperada. Una emoción que has reprimido durante mucho tiempo puede aflorar de repente. No te sorprendas; es natural.",
+        "La ruptura de tu rutina puede incomodarte. Tener que salirte de tus planes, aunque al principio sea irritante, puede abrir una nueva puerta.",
+        "Puedes vivir altibajos emocionales. Sentirte feliz un momento y triste al siguiente. Es un período pasajero; déjate llevar por el flujo."
+    ],
+    ("Ay","Uranüs","Trigon"): [
+        "Un día en que descubres tu libertad interior. Disfrutas de vivir según tus propias reglas. Tu creatividad y originalidad impactan a tu entorno.",
+        "Puedes vivir un estallido de inspiración repentino. Puede venirte a la mente una idea perfecta para un proyecto creativo. No la dejes escapar; anótala de inmediato.",
+        "El cambio y la novedad te sientan bien. Un entorno distinto, gente nueva o una experiencia poco habitual pueden sacar a la luz tu potencial interior."
+    ],
+    ("Ay","Uranüs","Sekstil"): [
+        "Tienes a la puerta la oportunidad de vivir una experiencia nueva y poco habitual. Probar algo que nunca has hecho puede darte energía.",
+        "Puedes adquirir una perspectiva distinta sobre un tema. Un pensamiento fuera de lo común puede ayudarte a encontrar una solución creativa a un problema.",
+        "Interesarte por la tecnología o un campo innovador puede sentarte bien. Un buen día para descubrir una aplicación nueva o empezar un proyecto digital."
+    ],
+    ("Ay","Neptün","Kavuşum"): [
+        "Tus intuiciones están hoy muy fuertes. Sientes a las personas y los acontecimientos más allá de las palabras. La meditación, la música o el arte te darán una paz profunda.",
+        "Puedes sentir que tus límites emocionales se disuelven, que estás conectado con todo. Esa sensación de fusión te está sanando.",
+        "Tu imaginación y tus emociones se entrelazan. Tus sueños pueden ser más vívidos y tus intuiciones más claras. Hoy presta atención a tu voz interior."
+    ],
+    ("Ay","Neptün","Karşıt"): [
+        "Puedes oscilar entre la realidad y tu mundo imaginario. Puede que veas las cosas distinto de como son. Hoy evita tomar decisiones importantes.",
+        "Puedes vivir una confusión emocional y tener dificultad para ver con claridad un tema. Retírate un momento y aclara la situación.",
+        "La energía de los demás puede afectarte con facilidad. Tus límites emocionales pueden estar debilitados. Crea un espacio donde puedas estar a solas para protegerte."
+    ],
+    ("Ay","Neptün","Kare"): [
+        "Puedes sentirte perdido en una niebla emocional. Distinguir lo real de lo imaginario puede volverse difícil. Hoy sé honesto contigo mismo.",
+        "Puede aumentar tu tendencia a la evasión. Para alejarte de la realidad puedes recurrir a los sueños, al alcohol o a otro tipo de dependencia. Sé consciente y busca alternativas sanas.",
+        "Es alta la probabilidad de una decepción o un engaño. No confíes de más en alguien o en una situación. Sé realista."
+    ],
+    ("Ay","Neptün","Trigon"): [
+        "Hay un flujo natural entre tus intuiciones y tu imaginación. Un día perfecto para un proyecto artístico, un trabajo creativo o una práctica espiritual.",
+        "Sientes paz interior y serenidad. Pasar tiempo en la naturaleza, escuchar música o meditar te dará una profunda satisfacción.",
+        "Tu capacidad de empatía es muy alta. Tienes un talento natural para comprender a las personas y ayudarlas. Hoy usa ese poder."
+    ],
+    ("Ay","Neptün","Sekstil"): [
+        "Se presenta una oportunidad que alimentará tu creatividad. Un taller de arte, una salida fotográfica o un evento musical pueden sentarte bien.",
+        "Puedes vivir una experiencia espiritual. Un libro, una conversación o un recuerdo de la naturaleza puede darte una comprensión profunda.",
+        "Tus intuiciones te guiarán hoy. Si sientes algo sobre un tema, tómalo en serio. Aunque tu lógica no lo explique, tu corazón sabe qué es lo correcto."
+    ],
+    ("Ay","Plüton","Kavuşum"): [
+        "Estás justo en medio de una transformación emocional. Las emociones reprimidas pueden aflorar hoy. Aunque parezca aterrador, ese enfrentamiento te liberará.",
+        "Un día en que tomas conciencia de tu fuerza interior. Soltar lo que no puedes controlar es, en realidad, tu mayor forma de empoderamiento. Permanece abierto a la transformación.",
+        "Vives una profunda purificación emocional. Heridas antiguas y traumas pasados pueden mostrarse hoy. Es una oportunidad para sanarlos."
+    ],
+    ("Ay","Plüton","Karşıt"): [
+        "Libras una batalla entre controlar y soltar. Cuanto más intentas retener una situación, más sientes que la pierdes. Soltar es la mayor victoria.",
+        "La sombra de los demás puede influir en ti. No cargues con las emociones que otra persona proyecta sobre ti. Recuerda tu propio poder.",
+        "Es momento de un ajuste de cuentas emocional. Un acontecimiento del pasado puede volver a hoy. Pero esta vez no tienes que reaccionar del mismo modo."
+    ],
+    ("Ay","Plüton","Kare"): [
+        "Tu intensidad emocional está en su punto máximo. Un pequeño acontecimiento puede convertirse en una gran reacción. Hoy cuídate de más y reconoce tus desencadenantes.",
+        "Vives una lucha de poder interna. Puedes sentirte atrapado entre tus viejos hábitos y tu nuevo yo. La transformación puede ser dolorosa, pero es necesaria.",
+        "Los pensamientos y emociones obsesivos pueden apoderarse de ti. Si te cuesta soltar un tema, buscar apoyo profesional puede ser una buena idea."
+    ],
+    ("Ay","Plüton","Trigon"): [
+        "Tu poder de transformación emocional fluye con naturalidad. Puedes resolver con facilidad un tema difícil y actuar con comprensión profunda.",
+        "Tu energía de sanación interior está alta. Estás en un período poderoso para cerrar viejas heridas y romper patrones antiguos.",
+        "Aumenta tu capacidad de sanar y transformar a los demás. Apoyar a alguien, guiarlo, te hará bien. En ese proceso también te sanas a ti."
+    ],
+    ("Ay","Plüton","Sekstil"): [
+        "Puedes ganar una profunda visión psicológica. Un sueño, una sesión de terapia o una conversación profunda pueden enseñarte algo nuevo sobre ti.",
+        "Investigarte un tema del pasado o explorar tu historia familiar puede sentarte bien. Comprender tus raíces puede explicar tu comportamiento actual.",
+        "Puedes conocer una verdad oculta sobre un tema. Aunque al principio sea conmovedor, a largo plazo ese conocimiento te traerá libertad."
+    ],
+}
+
 def _ay_ortami_yorumu(ay_burc, ay_ev):
     """Ay'ın bulunduğu burç ve eve göre ortam tanımı döndürür."""
-    _EN = _i18n_get_lang() == "en"
-    burc_tanim = AY_BURC_TANIMLARI.get(ay_burc, ("Your Moon is shaping your emotional world." if _EN else "Ay duygusal dünyanızı şekillendiriyor."))
-    ev_tanim = AY_EV_TANIMLARI.get(ay_ev, "")
+    _ES = _i18n_get_lang() == "es"
+    if _ES:
+        burc_tanim = AY_BURC_TANIMLARI_ES.get(ay_burc, "Tu Luna está dando forma a tu mundo emocional.")
+        ev_tanim = AY_EV_TANIMLARI_ES.get(ay_ev, "")
+    else:
+        _EN = _i18n_get_lang() == "en"
+        burc_tanim = AY_BURC_TANIMLARI.get(ay_burc, ("Your Moon is shaping your emotional world." if _EN else "Ay duygusal dünyanızı şekillendiriyor."))
+        ev_tanim = AY_EV_TANIMLARI.get(ay_ev, "")
     return f"{burc_tanim} {ev_tanim}"
 
 def _aspekt_yorumu_sec(gezegen1, gezegen2, aci_turu, index=0):
     """NATAL_AY_ACISI_YORUMLARI'ndan bir yorum seçer."""
-    _EN = _i18n_get_lang() == "en"
+    _ES = _i18n_get_lang() == "es"
+    if _ES:
+        sozluk = NATAL_AY_ACISI_YORUMLARI_ES
+    else:
+        _EN = _i18n_get_lang() == "en"
+        sozluk = NATAL_AY_ACISI_YORUMLARI_EN if _EN else NATAL_AY_ACISI_YORUMLARI
     key = (gezegen1, gezegen2, aci_turu)
-    if key in NATAL_AY_ACISI_YORUMLARI:
-        return NATAL_AY_ACISI_YORUMLARI[key][index % 3]
+    if key in sozluk:
+        return sozluk[key][index % 3]
     # Try reverse order
     rev_key = (gezegen2, gezegen1, aci_turu)
-    if rev_key in NATAL_AY_ACISI_YORUMLARI:
-        return NATAL_AY_ACISI_YORUMLARI[rev_key][index % 3]
+    if rev_key in sozluk:
+        return sozluk[rev_key][index % 3]
     # Fallback by aspect type
     FALLBACK = {
         "Kavuşum": "Bu birleşme enerjisi duygusal dünyanızı güçlendiriyor.",
@@ -399,6 +895,15 @@ def _aspekt_yorumu_sec(gezegen1, gezegen2, aci_turu, index=0):
         "Trigon": "This harmonious aspect supports your emotional flow.",
         "Sekstil": "This opportunity aspect opens a door for emotional development.",
     }
+    FALLBACK_ES = {
+        "Kavuşum": "Esta energía de conjunción está fortaleciendo tu mundo emocional.",
+        "Karşıt": "Esta oposición pone a prueba tu equilibrio emocional y trae conciencia.",
+        "Kare": "Este aspecto desafiante ofrece una prueba para tu crecimiento emocional.",
+        "Trigon": "Este aspecto armonioso favorece tu flujo emocional.",
+        "Sekstil": "Este aspecto de oportunidad abre una puerta para tu desarrollo emocional.",
+    }
+    if _ES:
+        return FALLBACK_ES.get(aci_turu, "Este aspecto está afectando tu mundo emocional.")
     if _EN:
         return FALLBACK_EN.get(aci_turu, "This aspect is affecting your emotional world.")
     return FALLBACK.get(aci_turu, "Bu açı duygusal dünyanızı etkiliyor.")
@@ -457,7 +962,10 @@ def _natal_gunluk_hava_durumu(motor):
                 if aci_turu and fark >= 1:
                     index = (gun_kaydir + len(aciklamalar)) % 3
                     yorum = _aspekt_yorumu_sec("Ay", gez, aci_turu, index)
-                    aciklamalar.append(f"{aci_turu} ∟ {gez} (orb {orb:.1f}°): {yorum}")
+                    if _i18n_get_lang() == "en":
+                        aciklamalar.append(f"{pdf_label(aci_turu)} ∟ {pdf_label(gez)} (orb {orb:.1f}°): {yorum}")
+                    else:
+                        aciklamalar.append(f"{aci_turu} ∟ {gez} (orb {orb:.1f}°): {yorum}")
             if not aciklamalar:
                 aciklamalar.append(f"Sakin bir geçiş — Ay bugün belirgin bir açı yapmıyor.")
             # Pick 2-3 aspect highlights
@@ -543,7 +1051,10 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
                 if aci_turu and fark >= 1:
                     index = (kaydir + len(aspekt_yorumlari)) % 3
                     yorum = _aspekt_yorumu_sec("Ay", hedef, aci_turu, index)
-                    aspekt_yorumlari.append(f"{hedef} {aci_turu}: {yorum}")
+                    if _i18n_get_lang() != "tr":
+                        aspekt_yorumlari.append(f"{pdf_label(hedef)} {pdf_label(aci_turu)}: {yorum}")
+                    else:
+                        aspekt_yorumlari.append(f"{hedef} {aci_turu}: {yorum}")
             
             if not aspekt_yorumlari:
                 aspekt_yorumlari.append(("No prominent Moon aspect was found for this period." if _EN else "Bu dönem için belirgin bir Ay açısı bulunamadı."))
@@ -853,10 +1364,11 @@ def _etki_temizle(etki):
     """Clean a raw city-effect line for the PDF."""
     e = str(etki).replace("[K]", "").replace("[S]", "").replace("⚠️", "").strip()
     if _i18n_get_lang() == "en":
-        e = e.replace("↑ Yükselen", "↑ Ascendant").replace("↓ Alçalan", "↓ Descendant")
+        e = e.replace("↑ Yükselen", "↑ Ascendant").replace("↓ Alçalan", "↓ Descendant").replace("⌃ MC", "MC Axis").replace("⌄ IC", "IC Axis")
+    elif _i18n_get_lang() == "es":
+        e = e.replace("↑ Ascendente", "eje Ascendente").replace("↑ Yükselen", "eje Ascendente").replace("↓ Descendente", "eje Descendente").replace("↓ Alçalan", "eje Descendente").replace("⌃ MC", "eje MC").replace("⌄ IC", "eje IC")
     else:
-        e = e.replace("↑ Yükselen", "Yükselen ekseni").replace("↓ Alçalan", "Alçalan ekseni")
-    e = e.replace("⌃ MC", "MC ekseni").replace("⌄ IC", "IC ekseni")
+        e = e.replace("↑ Yükselen", "Yükselen ekseni").replace("↓ Alçalan", "Alçalan ekseni").replace("⌃ MC", "MC ekseni").replace("⌄ IC", "IC ekseni")
     if "→" in e:
         oncesi, sonrasi = e.split("→", 1)
         e = oncesi.strip() + (f": {sonrasi.strip()}" if sonrasi.strip() else "")
@@ -872,6 +1384,7 @@ def _generate_natal_pdf(motor):
     except Exception:
         pass
     _EN = _i18n_get_lang() == "en"
+    _ES = _i18n_get_lang() == "es"
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.colors import HexColor
     from reportlab.pdfgen import canvas
@@ -1083,7 +1596,7 @@ def _generate_natal_pdf(motor):
     c.drawCentredString(w / 2, 152, motor.p1_isim or pdf_label("Kişisel Analiz"))
     c.setFont("DejaVu", 9)
     c.setFillColor(HexColor('#999999'))
-    c.drawCentredString(w / 2, 130, "FAST — Synastry Technique  |  v4.0" if _EN else "FAST — Sinastri Tekniği  |  v4.0")
+    c.drawCentredString(w / 2, 130, "FAST — Synastry Technique  |  v4.0" if _EN else ("FAST — Técnica de Sinastría  |  v4.0" if _ES else "FAST — Sinastri Tekniği  |  v4.0"))
     try:
         dogum_bilgi = f"{pdf_label('Doğum:')} {motor.p1_str or ''}  |  {getattr(motor, 'event_time_str', '')}"
         yer_bilgi = f"{pdf_label('Konum:')} {getattr(motor, 'sehir', '')}, {getattr(motor, 'ulke', '')} ({motor.enlem:.2f}°, {motor.boylam:.2f}°)" if hasattr(motor, 'enlem') else ""
@@ -1194,7 +1707,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_yorum")
-        y = sayfa_basligi("Natal Chart Interpretation" if _EN else "Doğum Haritası Yorumu", numara=str(bolum_no[0]))
+        y = sayfa_basligi("Natal Chart Interpretation" if _EN else ("Interpretación de la Carta Natal" if _ES else "Doğum Haritası Yorumu"), numara=str(bolum_no[0]))
         gez_parag_metin = " ".join(b.get("metin", "") for b in gez_bolumler if b.get("metin"))
         aci_parag_metin = " ".join(b.get("metin", "") for b in aci_bolumler if b.get("metin"))
         paragraflar = chart_yorum.split("\n\n")
@@ -1234,10 +1747,11 @@ def _generate_natal_pdf(motor):
                     aci_adi = ''
                     if '(' in baslik_metni and ')' in baslik_metni:
                         aci_adi = baslik_metni.split('(')[1].split(')')[0].strip()
-                    c.drawString(SOL + 6, y - 2, f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1} – {GEZEGEN_GLIF.get(g2, '')} {g2}")
+                    g1d, g2d = pdf_label(g1), pdf_label(g2)
+                    c.drawString(SOL + 6, y - 2, f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1d} – {GEZEGEN_GLIF.get(g2, '')} {g2d}")
                     if aci_adi:
                         c.setFillColor(altin)
-                        c.drawString(SOL + 8 + c.stringWidth(f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1} – {GEZEGEN_GLIF.get(g2, '')} {g2}", "DejaVu-Bold", 9.5), y - 2, f"{ACI_GLIF.get(aci_adi, '')} {aci_adi}")
+                        c.drawString(SOL + 8 + c.stringWidth(f"✦ {GEZEGEN_GLIF.get(g1, '')} {g1d} – {GEZEGEN_GLIF.get(g2, '')} {g2d}", "DejaVu-Bold", 9.5), y - 2, f"{ACI_GLIF.get(aci_adi, '')} {pdf_label(aci_adi)}")
                     c.setStrokeColor(sari_cizgi)
                     c.setLineWidth(0.4)
                     c.line(SOL + 6, y - 7, SAG - 6, y - 7)
@@ -1274,7 +1788,7 @@ def _generate_natal_pdf(motor):
             derece = _bilgi.get("derece", 0)
             burc_yorum = _bilgi.get("burc_yorum", "") or ""
             ev_yorumu = _bilgi.get("ev_yorumu", "") or ""
-            ust_bilgi = (f"{pdf_label(burc)}, House {ev_no} ({derece}°)" if _i18n_get_lang() == "en" else f"{burc} burcu, {ev_no}. Ev ({derece}°)") if burc else (f"House {ev_no} ({derece}°)" if _i18n_get_lang() == "en" else f"{ev_no}. Ev ({derece}°)")
+            ust_bilgi = (f"{pdf_label(burc)}, House {ev_no} ({derece}°)" if _EN else (f"{pdf_label(burc)}, Casa {ev_no} ({derece}°)" if _ES else f"{burc} burcu, {ev_no}. Ev ({derece}°)")) if burc else (f"House {ev_no} ({derece}°)" if _EN else (f"Casa {ev_no} ({derece}°)" if _ES else f"{ev_no}. Ev ({derece}°)"))
             parag = " ".join(p for p in [burc_yorum, ev_yorumu] if p)
             nokta_h = 16 + 12 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
             if y - nokta_h < SAYFA_ALT:
@@ -1286,7 +1800,7 @@ def _generate_natal_pdf(motor):
             c.roundRect(SOL, y - nokta_h, SAG - SOL, nokta_h, 5, fill=0, stroke=1)
             c.setFont("DejaVu-Bold", 9.5)
             c.setFillColor(bordo)
-            c.drawString(SOL + 12, y - 16, f"✦ {_nokta_adi}")
+            c.drawString(SOL + 12, y - 16, f"✦ {pdf_label(_nokta_adi)}")
             c.setFont("DejaVu", 7.5)
             c.setFillColor(acik)
             c.drawString(SAG - 130, y - 16, ust_bilgi[:52])
@@ -1321,8 +1835,8 @@ def _generate_natal_pdf(motor):
                 yorum = _ab.get("yorum", "") or ""
                 parag = " ".join(p for p in [yorum, etki] if p)
                 if not parag:
-                    parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda.")
-                baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)")
+                    parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else (f"{asto_ad} está en conjunción con tu energía de {gez_ad}." if _ES else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."))
+                baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunción)" if _ES else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)"))
                 ast_h = 16 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
                 if y - ast_h < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
@@ -1350,7 +1864,8 @@ def _generate_natal_pdf(motor):
                 ak_burc = _ak.get("burc", "")
                 ak_deg = _ak.get("derece", 0)
                 ak_etki = _ak.get("etki", "") or ""
-                ak_line = f"✦ {ak_ad} — {ak_burc} ({ak_deg}°)  ·  {ak_etki}" if ak_etki else f"✦ {ak_ad} — {ak_burc} ({ak_deg}°)"
+                ak_burc_ad = pdf_label(ak_burc)
+                ak_line = f"✦ {ak_ad} — {ak_burc_ad} ({ak_deg}°)  ·  {ak_etki}" if ak_etki else f"✦ {ak_ad} — {ak_burc_ad} ({ak_deg}°)"
                 if y - 14 < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
                 y = metin_yaz(SOL + 6, y, ak_line, "DejaVu", 8, koyu, 92)
@@ -1490,7 +2005,7 @@ def _generate_natal_pdf(motor):
             sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*(?:Sabian Şifresi|Sabian Cipher) \(\d+°\):\s*', '', sembol)
             sembol = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3\u200D]', '', sembol)
             muhur = ""
-            _muhur_etiketi = "Seal:" if _EN else "Mühür:"
+            _muhur_etiketi = "Seal:" if _EN else ("Sello:" if _ES else "Mühür:")
             if "Mühür:" in sembol or "Seal:" in sembol:
                 _ayrac = "Mühür:" if "Mühür:" in sembol else "Seal:"
                 sembol, muhur = sembol.split(_ayrac, 1)
@@ -1512,10 +2027,10 @@ def _generate_natal_pdf(motor):
             c.rect(SOL + 2, y - sembol_h + 6, 3, sembol_h - 12, fill=1, stroke=0)
             c.setFont("DejaVu-Bold", 9.5)
             c.setFillColor(bordo)
-            c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {pdf_label(gez_isim)}  —  {s.get('derece_str','') or str(s.get('derece',''))+'°'}")
+            c.drawString(SOL + 14, y - 17, f"✦ {GEZEGEN_GLIF.get(gez_isim, '')} {pdf_label(gez_isim)}  —  {re.sub(r'(?<=\d°)\s*\S+$', lambda m: ' ' + pdf_label(m.group(0).strip()), (s.get('derece_str','') or str(s.get('derece',''))+'°'))}")
             c.setFillColor(altin)
             c.setFont("DejaVu-Bold", 7)
-            c.drawRightString(SAG - 14, y - 16, "✦ Sabian Cipher" if _EN else "✦ Sabian Şifresi")
+            c.drawRightString(SAG - 14, y - 16, "✦ Sabian Cipher" if _EN else ("✦ Símbolo Sabiano" if _ES else "✦ Sabian Şifresi"))
             c.setStrokeColor(sari_cizgi)
             c.setLineWidth(0.4)
             c.line(SOL + 14, y - 23, SAG - 14, y - 23)
@@ -1578,8 +2093,8 @@ def _generate_natal_pdf(motor):
         y -= 16
 
         import datetime as _dt_mod
-        AY_ADLARI_TR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"] if _i18n_get_lang() != "en" else ["January","February","March","April","May","June","July","August","September","October","November","December"]
-        HAFTALAR = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"] if _i18n_get_lang() != "en" else ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+        AY_ADLARI = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"] if _ES else (["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"] if not _EN else ["January","February","March","April","May","June","July","August","September","October","November","December"])
+        HAFTALAR = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"] if _ES else (["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"] if not _EN else ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])
         HUCRE_W = (SAG - SOL - 14) / 7.0
         HUCRE_H = 24.0
 
@@ -1623,7 +2138,7 @@ def _generate_natal_pdf(motor):
                 c.roundRect(SOL, y - grid_h, SAG - SOL, grid_h, 5, fill=0, stroke=1)
                 c.setFillColor(altin)
                 c.setFont("DejaVu-Bold", 11)
-                c.drawString(SOL + 12, y - 17, f"{AY_ADLARI_TR[mm-1]} {yy}")
+                c.drawString(SOL + 12, y - 17, f"{AY_ADLARI[mm-1]} {yy}")
                 c.setStrokeColor(sari_cizgi)
                 c.setLineWidth(0.4)
                 c.line(SOL + 12, y - 23, SAG - 12, y - 23)
@@ -1668,14 +2183,14 @@ def _generate_natal_pdf(motor):
                     ly = y - 46 - satir_sayisi * HUCRE_H - 2
                     c.setFillColor(bordo)
                     c.setFont("DejaVu-Bold", 8)
-                    c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(onemli)})" if _i18n_get_lang() == "en" else f"✦ Bu Ayın Öne Çıkan Günleri ({len(onemli)})")
+                    c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(onemli)})")
                     for gd in onemli[:4]:
                         ly -= 13
                         p_entry = gun_verileri[gd]
                         ilk_yorum = (p_entry.get("yorumlar") or [pdf_label("Açı bulunamadı")])[0]
                         c.setFillColor(koyu)
                         c.setFont("DejaVu-Bold", 7.5)
-                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI_TR[mm-1]} · {p_entry.get('ay_burc','')} {pdf_label('Ay')}")
+                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}")
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 7)
                         c.drawString(SOL + 118, ly, ilk_yorum[:135])
@@ -1692,18 +2207,24 @@ def _generate_natal_pdf(motor):
         y = sayfa_basligi(pdf_label("Global Kader Pusulası"), numara=str(bolum_no[0]))
         c.setFont("DejaVu", 8)
         c.setFillColor(acik)
-        c.drawString(SOL, y, pdf_label("Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır."))
+        c.drawString(SOL, y, (("The cities on Earth where your planets exert their strongest influence — 15,000+ locations scanned.") if _EN else
+                              (("Las ciudades de la Tierra donde tus planetas ejercen su influencia más potente — se han analizado más de 15.000 ubicaciones.") if _ES else pdf_label("Gezegenlerinizin dünya üzerinde en güçlü etki gösterdiği şehirler — 15.000+ konum taranmıştır."))))
         y -= 22
         # ── Calculation technique explanation ──
         teknik = ((("Calculation Method: Your planets' natal positions are compared against the coordinates of "
-                    "more than 15,000 cities worldwide. ") if _EN else pdf_label("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. ")) +
+                    "more than 15,000 cities worldwide. ") if _EN else (("Método de cálculo: Las posiciones natales de tus planetas se comparan con las coordenadas de "
+                    "más de 15.000 ciudades de todo el mundo. ") if _ES else pdf_label("Hesaplama Tekniği: Doğum haritanızdaki gezegen konumları, dünya üzerindeki 15.000'den fazla şehir koordinatıyla karşılaştırılır. "))) +
                   (("For each city, the day's sky axes — the Ascendant (AC), Midheaven (MC), Descendant (DC) and "
-                    "Imum Coeli (IC) — are computed; ") if _EN else pdf_label("Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; ")) +
+                    "Imum Coeli (IC) — are computed; ") if _EN else (("Para cada ciudad se calculan los ejes celestes del momento — el Ascendente (AC), el Medio Cielo (MC), el Descendente (DC) y el "
+                    "Imum Coeli (IC); ") if _ES else pdf_label("Her şehir için o günkü gökyüzünde Yükselen (AC), Zirve (MC), Alçalan (DC) ve Taban (IC) eksenleri hesaplanır; "))) +
                   (("Your planets' closeness (orb) to these axes up to 5° is scored together with the planet's nature — "
-                    "the sharper the angle, the stronger the influence. ") if _EN else pdf_label("gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. ")) +
+                    "the sharper the angle, the stronger the influence. ") if _EN else (("La cercanía (orb) de tus planetas a estos ejes, hasta 5°, se puntúa junto con la naturaleza del planeta — "
+                    "cuanto más agudo es el ángulo, más fuerte es la influencia. ") if _ES else pdf_label("gezegenlerinizin bu eksenlere 5°'ye kadar olan yakınlığı (orb) ile gezegenin doğası puanlanır — açı ne kadar keskinse etki o kadar güçlüdür. "))) +
                   (("Each city is assessed with 4 core scores: Wealth & Abundance, Peace & Inner Calm, "
-                    "Passion & Adventure, Crisis & Transformation. ") if _EN else pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. ")) +
-                  pdf_label("Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder."))
+                    "Passion & Adventure, Crisis & Transformation. ") if _EN else (("Cada ciudad se evalúa con 4 puntuaciones esenciales: Riqueza y Abundancia, Paz y Calma Interior, "
+                    "Pasión y Aventura, Crisis y Transformación. ") if _ES else pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. "))) +
+                  (("The top 10 cities in each category by score represent the points where your energies resonate most powerfully on Earth." if _EN else
+                    ("Las 10 ciudades con mayor puntuación en cada categoría representan los puntos donde tus energías resuenan con mayor fuerza sobre la Tierra." if _ES else "Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder."))))
         teknik_h = 24 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 12
         kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, pdf_label("Hesaplama Tekniği"), "🔮")
         metin_yaz(SOL + 14, y - teknik_h + 22, teknik, "DejaVu", 7.5, acik, 90)
@@ -1727,7 +2248,7 @@ def _generate_natal_pdf(motor):
             kat_h = 28 + len(cities) * 26 + 8
             if y - kat_h < SAYFA_ALT:
                 yeni_sayfa()
-                y = sayfa_basligi(pdf_label("Global Kader Pusulası") + " (devam)" if _i18n_get_lang() != "en" else "Global Destiny Compass (continued)")
+                y = sayfa_basligi(pdf_label("Global Kader Pusulası") + (" (devam)" if not _EN and not _ES else (" (continuación)" if _ES else " (continued)")), numara=str(bolum_no[0]))
             kart_ciz(SOL, y - kat_h, SAG - SOL, kat_h, label, icon)
             # Category color stripe on the left edge
             c.setFillColor(KAT_RENK.get(kat_key, altin))
@@ -1752,7 +2273,16 @@ def _generate_natal_pdf(motor):
                 inner_y -= 13
                 etkiler = city.get("etkiler") or []
                 if etkiler:
-                    etki_list = "; ".join(_etki_temizle(e) for e in etkiler[:2])
+                    _etkiler_list = [_etki_temizle(e) for e in etkiler[:2]]
+                    if _EN or _ES:
+                        import re as _re_mod
+                        if _ES:
+                            _pname_map = {"Güneş":"Sol","Ay":"Luna","Merkür":"Mercurio","Venüs":"Venus","Mars":"Marte","Jüpiter":"Júpiter","Satürn":"Saturno","Uranüs":"Urano","Neptün":"Neptuno","Plüton":"Plutón","Chiron":"Quirón"}
+                        else:
+                            _pname_map = {"Güneş":"Sun","Ay":"Moon","Merkür":"Mercury","Venüs":"Venus","Mars":"Mars","Jüpiter":"Jupiter","Satürn":"Saturn","Uranüs":"Uranus","Neptün":"Neptune","Plüton":"Pluto","Chiron":"Chiron"}
+                        _pname_pat = _re_mod.compile("|".join(_pname_map.keys()))
+                        _etkiler_list = [_pname_pat.sub(lambda m: _pname_map[m.group(0)], e) for e in _etkiler_list]
+                    etki_list = "; ".join(_etkiler_list)
                     acik_yazi = f"{pdf_label('Etkiler:')} {etki_list}."
                 else:
                     acik_yazi = KAT_ACIKLAMA.get(kat_key, "")
@@ -2083,6 +2613,7 @@ def _aspect_interpretasyon_kutuphanesi():
     Her çift için 5 açı tipinde doğrudan yorum + üretici ile eksikleri tamamlama."""
 
     _EN = _i18n_get_lang() == "en"
+    _ES = _i18n_get_lang() == "es"
 
     _EN_OZ = {
         "Güneş": "core self, identity, life purpose, creative power, authority, leadership",
@@ -2107,6 +2638,31 @@ def _aspect_interpretasyon_kutuphanesi():
         "Aşk Noktası": "love potential, romantic attraction, emotional bonding, sexual harmony",
         "Tutku Noktası": "intense passion, desire, ambition, obsession, deep attraction, sexual energy",
         "Para Noktası": "material potential, financial luck, value creation, abundance",
+    }
+
+    _ES_OZ = {
+        "Güneş": "la identidad, el propósito vital, la voluntad y la creatividad",
+        "Ay": "las emociones, el mundo interior, la madre, la nutrición, los hábitos, la intuición, la necesidad de seguridad",
+        "Merkür": "la mente, la comunicación, la lógica, el aprendizaje, el análisis, la escritura, los viajes cortos",
+        "Venüs": "el amor, la belleza, los valores, la armonía, la estética, la atracción, el dinero, el confort",
+        "Mars": "la acción, la pasión, el coraje, la ira, la competencia, la voluntad, la energía de lucha",
+        "Jüpiter": "la abundancia, la suerte, la expansión, la filosofía, la fe, el aprendizaje, el optimismo",
+        "Satürn": "la disciplina, los límites, la responsabilidad, la madurez, la estructura, el miedo, la paciencia, las lecciones",
+        "Uranüs": "la libertad, la revolución, el cambio repentino, la invención, el espíritu rebelde, la independencia, el genio",
+        "Neptün": "los sueños, la inspiración, la intuición, la bruma, la espiritualidad, el idealismo, la confusión",
+        "Plüton": "la transformación, el poder, la muerte y renacimiento, la obsesión, la profundidad, el poder oculto",
+        "Chiron": "la herida, la vulnerabilidad, la curación, la sabiduría, la herida del sanador, la aceptación",
+        "Juno": "el compromiso, el matrimonio, la lealtad, la sociedad, la justicia, los votos de relación",
+        "Ceres": "la nutrición, la maternidad, la pérdida, la aceptación, la compasión, la alimentación, la naturaleza",
+        "Pallas": "la sabiduría, la estrategia, la inteligencia creativa, el talento artístico, el espíritu guerrero, la previsión",
+        "Vesta": "la devoción, el foco, el fuego sagrado, la disciplina interior, el servicio, el Templo",
+        "Eros": "el amor apasionado, el deseo, la sexualidad, la lujuria, la pasión creativa, el gusto por la vida",
+        "Psyche": "el alma, la psicología, el vínculo profundo, la vulnerabilidad, la intuición, el amor espiritual",
+        "Ruh Noktası": "el propósito de vida, la dirección espiritual, el camino profesional, el destino, la fuente de inspiración",
+        "Evlilik Noktası": "el potencial de relación, el tema del matrimonio, la pareja a largo plazo, la búsqueda de armonía",
+        "Aşk Noktası": "el potencial amoroso, la atracción romántica, el vínculo emocional, la armonía sexual",
+        "Tutku Noktası": "la pasión intensa, el deseo, la ambición, la obsesión, la atracción profunda, la energía sexual",
+        "Para Noktası": "el potencial material, la suerte financiera, la creación de valor, la abundancia",
     }
 
     GEZEGENLER = {
@@ -2402,6 +2958,130 @@ def _aspect_interpretasyon_kutuphanesi():
         ("Para Noktası","Plüton"): "the deep transformation between material potential and power",
     }
 
+    CIFT_TEMA_ES = {
+        ("Güneş","Ay"): "el puente entre la esencia propia y el mundo emocional",
+        ("Güneş","Merkür"): "la conexión directa entre la identidad y la mente",
+        ("Güneş","Venüs"): "la armonía entre la esencia propia y el amor y los valores",
+        ("Güneş","Mars"): "el vínculo fuerte entre la identidad y la acción y la pasión",
+        ("Güneş","Jüpiter"): "el apoyo entre la esencia y la abundancia y la expansión",
+        ("Güneş","Satürn"): "el equilibrio entre la esencia y la responsabilidad y los límites",
+        ("Güneş","Uranüs"): "la ruptura entre la identidad y la libertad y la revolución",
+        ("Güneş","Neptün"): "la nebulosidad entre la esencia y los sueños y las intuiciones",
+        ("Güneş","Plüton"): "el vínculo profundo entre la esencia y el poder y la transformación",
+        ("Güneş","Chiron"): "la herida de la esencia y la lucha por la aceptación",
+        ("Ay","Merkür"): "el puente entre la emoción y la mente",
+        ("Ay","Venüs"): "la armonía profunda entre el mundo emocional y el amor",
+        ("Ay","Mars"): "el conflicto y la pasión entre las emociones y la acción",
+        ("Ay","Jüpiter"): "la expansión entre la seguridad emocional y la abundancia",
+        ("Ay","Satürn"): "el equilibrio exigente entre las emociones y los límites",
+        ("Ay","Uranüs"): "las rupturas súbitas entre el mundo interior y la libertad",
+        ("Ay","Neptün"): "la intuición profunda entre las emociones y los sueños",
+        ("Ay","Plüton"): "la transformación intensa entre el mundo emocional y el poder",
+        ("Ay","Chiron"): "la herida emocional y la necesidad de nutrición",
+        ("Ay","KAD"): "el vínculo entre las raíces familiares y los hábitos emocionales",
+        ("Ay","Lilith"): "el secretismo emocional y el deseo reprimido",
+        ("Merkür","Venüs"): "la armonía entre la mente y el atractivo",
+        ("Merkür","Mars"): "la rapidez entre el pensamiento y la acción",
+        ("Merkür","Jüpiter"): "la abundancia entre la mente y la expansión",
+        ("Merkür","Satürn"): "la seriedad entre el pensamiento y los límites",
+        ("Merkür","Uranüs"): "el genio entre la mente y la revolución",
+        ("Merkür","Neptün"): "la inteligencia nebulosa entre el pensamiento y el sueño",
+        ("Merkür","Plüton"): "el análisis profundo entre la mente y el poder",
+        ("Merkür","Chiron"): "la herida de la comunicación y la dificultad de expresión",
+        ("Merkür","KAD"): "los patrones de comunicación en las raíces familiares",
+        ("Merkür","Lilith"): "el secretismo mental y el pensamiento reprimido",
+        ("Venüs","Mars"): "la fuerte atracción entre el atractivo y la pasión",
+        ("Venüs","Jüpiter"): "la expansión entre el amor y la abundancia",
+        ("Venüs","Satürn"): "la maduración entre el amor y los límites",
+        ("Venüs","Uranüs"): "el cambio súbito entre los valores y la revolución",
+        ("Venüs","Neptün"): "el idealismo entre el amor y el sueño",
+        ("Venüs","Plüton"): "la transformación intensa entre el amor y el poder",
+        ("Venüs","Chiron"): "la herida del amor y la búsqueda de aceptación",
+        ("Venüs","KAD"): "los patrones de amor y valores en las raíces familiares",
+        ("Venüs","Lilith"): "el secretismo en el amor y el deseo reprimido",
+        ("Mars","Jüpiter"): "la expansión entre la pasión y la abundancia",
+        ("Mars","Satürn"): "la disciplina entre la acción y los límites",
+        ("Mars","Uranüs"): "las explosiones súbitas entre la pasión y la revolución",
+        ("Mars","Neptün"): "la lucha nebulosa entre la acción y el sueño",
+        ("Mars","Plüton"): "la guerra intensa entre la pasión y el poder",
+        ("Mars","Chiron"): "la herida de la guerra y el coraje frágil",
+        ("Mars","KAD"): "la guerra y la protección en las raíces familiares",
+        ("Mars","Lilith"): "el secretismo apasionado y la ira reprimida",
+        ("Jüpiter","Satürn"): "el equilibrio entre la abundancia y los límites",
+        ("Jüpiter","Uranüs"): "la suerte súbita entre la expansión y la revolución",
+        ("Jüpiter","Neptün"): "la expansión espiritual entre la fe y el sueño",
+        ("Jüpiter","Plüton"): "la expansión profunda entre la abundancia y el poder",
+        ("Jüpiter","Chiron"): "la herida de la fe y la curación espiritual",
+        ("Jüpiter","KAD"): "la abundancia y la fe en las raíces familiares",
+        ("Jüpiter","Lilith"): "el secretismo y la expansión en la fe",
+        ("Satürn","Uranüs"): "el equilibrio exigente entre el límite y la revolución",
+        ("Satürn","Neptün"): "la estructura nebulosa entre la disciplina y el sueño",
+        ("Satürn","Plüton"): "la estructura intensa entre el límite y el poder",
+        ("Satürn","Chiron"): "la herida del miedo y la maduración",
+        ("Satürn","KAD"): "la responsabilidad y los límites en las raíces familiares",
+        ("Satürn","Lilith"): "el secretismo en el límite y el miedo reprimido",
+        ("Uranüs","Neptün"): "el cambio espiritual entre la revolución y el sueño",
+        ("Uranüs","Plüton"): "la revolución profunda entre la libertad y el poder",
+        ("Uranüs","Chiron"): "la herida de la libertad y la aceptación",
+        ("Uranüs","KAD"): "la revolución y el cambio súbito en las raíces familiares",
+        ("Uranüs","Lilith"): "el secretismo en la libertad y el espíritu rebelde",
+        ("Neptün","Plüton"): "la transformación espiritual entre el sueño y el poder",
+        ("Neptün","Chiron"): "la herida del sueño y la curación espiritual",
+        ("Neptün","KAD"): "los sueños y la nebulosidad en las raíces familiares",
+        ("Neptün","Lilith"): "el secretismo en el sueño y la intuición reprimida",
+        ("Plüton","Chiron"): "la herida de la transformación y la curación profunda",
+        ("Plüton","KAD"): "el poder y la transformación profunda en las raíces familiares",
+        ("Plüton","Lilith"): "el secretismo del poder y la pasión reprimida",
+        ("Juno","Güneş"): "el vínculo fuerte entre el compromiso y la identidad",
+        ("Juno","Ay"): "la armonía profunda entre el compromiso y las emociones",
+        ("Juno","Venüs"): "el tema matrimonial entre el compromiso y el atractivo",
+        ("Juno","Mars"): "el equilibrio exigente entre el compromiso y la pasión",
+        ("Ceres","Güneş"): "la energía materna entre el cuidado y la identidad",
+        ("Ceres","Ay"): "la compasión profunda entre el cuidado y las emociones",
+        ("Ceres","Venüs"): "el amor incondicional entre el cuidado y el atractivo",
+        ("Ceres","Merkür"): "el cuidado comunicativo entre el cuidado y la mente",
+        ("Pallas","Güneş"): "la sabiduría entre la estrategia y la identidad",
+        ("Pallas","Merkür"): "el poder analítico entre la estrategia y la mente",
+        ("Pallas","Satürn"): "la sabiduría estructural entre la estrategia y los límites",
+        ("Pallas","Plüton"): "la previsión profunda entre la estrategia y el poder",
+        ("Vesta","Güneş"): "el fuego sagrado entre la devoción y la identidad",
+        ("Vesta","Ay"): "la disciplina interna entre la devoción y las emociones",
+        ("Vesta","Venüs"): "el amor sagrado entre la devoción y el atractivo",
+        ("Vesta","Plüton"): "el enfoque profundo entre la devoción y el poder",
+        ("Eros","Venüs"): "el amor sensual entre la pasión y el atractivo",
+        ("Eros","Mars"): "el deseo intenso entre la pasión y la acción",
+        ("Eros","Plüton"): "la transformación profunda entre la pasión y el poder",
+        ("Eros","Güneş"): "el entusiasmo vital entre la pasión y la identidad",
+        ("Psyche","Ay"): "el vínculo profundo entre el alma y las emociones",
+        ("Psyche","Venüs"): "el amor espiritual entre el alma y el atractivo",
+        ("Psyche","Plüton"): "la transformación psicológica entre el alma y el poder",
+        ("Psyche","Neptün"): "la intuición espiritual entre el alma y el sueño",
+        ("Ruh Noktası","Güneş"): "el vínculo profundo entre el propósito de vida y la identidad",
+        ("Ruh Noktası","Ay"): "la dirección intuitiva entre el propósito de vida y las emociones",
+        ("Ruh Noktası","Venüs"): "la dirección estética entre el propósito de vida y el atractivo",
+        ("Ruh Noktası","Mars"): "la dirección orientada a la acción entre el propósito de vida y la pasión",
+        ("Evlilik Noktası","Venüs"): "la fuerte armonía entre el potencial de relación y el atractivo",
+        ("Evlilik Noktası","Jüpiter"): "la expansión entre el potencial de relación y la abundancia",
+        ("Evlilik Noktası","Satürn"): "el compromiso serio entre el potencial de relación y los límites",
+        ("Evlilik Noktası","Neptün"): "la relación idealista entre el potencial de relación y el sueño",
+        ("Aşk Noktası","Venüs"): "el fuerte romanticismo entre el potencial de amor y el atractivo",
+        ("Aşk Noktası","Mars"): "el amor apasionado entre el potencial de amor y la pasión",
+        ("Aşk Noktası","Plüton"): "la transformación intensa entre el potencial de amor y el poder",
+        ("Aşk Noktası","Güneş"): "el amor propio entre el potencial de amor y la identidad",
+        ("Tutku Noktası","Mars"): "la ambición fuerte entre la pasión intensa y la acción",
+        ("Tutku Noktası","Plüton"): "la obsesión profunda entre la pasión intensa y el poder",
+        ("Tutku Noktası","Venüs"): "la energía sensual entre la pasión intensa y el atractivo",
+        ("Tutku Noktası","Ay"): "el deseo profundo entre la pasión intensa y las emociones",
+        ("Para Noktası","Jüpiter"): "la fuerte suerte entre el potencial material y la abundancia",
+        ("Para Noktası","Satürn"): "la estructura entre el potencial material y los límites",
+        ("Para Noktası","Venüs"): "el valor estético entre el potencial material y el atractivo",
+        ("Para Noktası","Plüton"): "la transformación profunda entre el potencial material y el poder",
+    }
+
+
+
+
+
     OZEL_YORUMLAR = {
         ("Güneş","Ay","Kavuşum"): "Güneş ve Ay'ınız aynı burçta birleşmiş. Öz benliğiniz ile duygusal dünyanız tam uyum içinde — ne istediğiniz ve neye ihtiyacınız olduğu konusunda doğal bir berraklığınız var. Bu kavuşum, hayatınızda güçlü bir iç tutarlılık sağlar.",
         ("Güneş","Ay","Karşıt"): "Güneş ve Ay'ınız zıt burçlarda. Öz benliğiniz ile duygusal ihtiyaçlarınız sürekli denge arayışında — ne istediğiniz ile neye ihtiyacınız olduğu arasında gidip gelirsiniz. Bu karşıtlık, her iki tarafı da tam olarak anlamanızı gerektirir.",
@@ -2658,27 +3338,48 @@ def _aspect_interpretasyon_kutuphanesi():
         ("Neptün","Plüton","Sekstil"): "Your Neptune and Pluto are in a sextile. There is a supportive bond between dream and power. You can bring your spiritual transformations to life constructively.",
     }
 
+    OZEL_YORUMLAR_ES = {}
+
     tum = list(GEZEGENLER.keys()) + list(ASTEROITLER.keys()) + list(ARAP_NOKTALARI.keys())
 
-    def _urun(p1, p2, aci, en=False):
+    def _urun(p1, p2, aci, en=False, es=False):
         key = (p1, p2, aci)
         key_t = (p2, p1, aci)
         if en:
             if key in OZEL_YORUMLAR_EN: return OZEL_YORUMLAR_EN[key]
             if key_t in OZEL_YORUMLAR_EN: return OZEL_YORUMLAR_EN[key_t]
+            p1n = pdf_label(p1); p2n = pdf_label(p2)
             pair = (p1, p2) if (p1, p2) in CIFT_TEMA_EN else ((p2, p1) if (p2, p1) in CIFT_TEMA_EN else None)
-            tema = CIFT_TEMA_EN.get(pair, f"the connection between the energies of {p1} and {p2}") if pair else f"the connection between the energies of {p1} and {p2}"
-            p1o = _EN_OZ.get(p1) or f"{p1} energy"; p2o = _EN_OZ.get(p2) or f"{p2} energy"
+            tema = CIFT_TEMA_EN.get(pair, f"the connection between the energies of {p1n} and {p2n}") if pair else f"the connection between the energies of {p1n} and {p2n}"
+            p1o = _EN_OZ.get(p1) or f"{p1n} energy"; p2o = _EN_OZ.get(p2) or f"{p2n} energy"
             if aci == "Kavuşum":
-                return f"{p1} and {p2} energies merge at the same point. {tema}. The {p1o} of {p1} and the {p2o} of {p2} form a unified whole. This conjunction allows you to experience both energies with great intensity."
+                return f"{p1n} and {p2n} energies merge at the same point. {tema}. The {p1o} of {p1n} and the {p2o} of {p2n} form a unified whole. This conjunction allows you to experience both energies with great intensity."
             elif aci == "Karşıt":
-                return f"{p1} and {p2} stand at opposite poles. {tema}. There is constant search for balance between the {p1o} of {p1} and the {p2o} of {p2}. This opposition requires you to fully understand both sides."
+                return f"{p1n} and {p2n} stand at opposite poles. {tema}. There is constant search for balance between the {p1o} of {p1n} and the {p2o} of {p2n}. This opposition requires you to fully understand both sides."
             elif aci == "Kare":
-                return f"The square between {p1} and {p2} creates tension around {tema}. This demanding energy pushes you beyond your comfort zone and forces growth. The struggle between the {p1o} of {p1} and the {p2o} of {p2} is one of your most powerful transformation opportunities."
+                return f"The square between {p1n} and {p2n} creates tension around {tema}. This demanding energy pushes you beyond your comfort zone and forces growth. The struggle between the {p1o} of {p1n} and the {p2o} of {p2n} is one of your most powerful transformation opportunities."
             elif aci == "Trigon":
-                return f"The trine between {p1} and {p2} creates a natural harmony around {tema}. Used consciously, this energy can create flow in your life. The {p1o} of {p1} and the {p2o} of {p2} naturally build a bridge."
+                return f"The trine between {p1n} and {p2n} creates a natural harmony around {tema}. Used consciously, this energy can create flow in your life. The {p1o} of {p1n} and the {p2o} of {p2n} naturally build a bridge."
             elif aci == "Sekstil":
-                return f"The sextile between {p1} and {p2} offers opportunities around {tema}. To activate this energy, you need to take a conscious step. There is a supportive bond between the {p1o} of {p1} and the {p2o} of {p2}."
+                return f"The sextile between {p1n} and {p2n} offers opportunities around {tema}. To activate this energy, you need to take a conscious step. There is a supportive bond between the {p1o} of {p1n} and the {p2o} of {p2n}."
+            return ""
+        if es:
+            if key in OZEL_YORUMLAR_ES: return OZEL_YORUMLAR_ES[key]
+            if key_t in OZEL_YORUMLAR_ES: return OZEL_YORUMLAR_ES[key_t]
+            p1n = pdf_label(p1); p2n = pdf_label(p2)
+            pair = (p1, p2) if (p1, p2) in CIFT_TEMA_ES else ((p2, p1) if (p2, p1) in CIFT_TEMA_ES else None)
+            tema = CIFT_TEMA_ES.get(pair, f"la conexión entre las energías de {p1n} y {p2n}") if pair else f"la conexión entre las energías de {p1n} y {p2n}"
+            p1o = _ES_OZ.get(p1) or f"la energía de {p1n}"; p2o = _ES_OZ.get(p2) or f"la energía de {p2n}"
+            if aci == "Kavuşum":
+                return f"Las energías de {p1n} y {p2n} se unen en el mismo punto. {tema}. La {p1o} de {p1n} y la {p2o} de {p2n} forman un todo unificado. Esta conjunción te permite experimentar ambas energías con gran intensidad."
+            elif aci == "Karşıt":
+                return f"{p1n} y {p2n} se sitúan en polos opuestos. {tema}. Hay una búsqueda constante de equilibrio entre la {p1o} de {p1n} y la {p2o} de {p2n}. Esta oposición te exige comprender por completo ambos lados."
+            elif aci == "Kare":
+                return f"El cuadrado entre {p1n} y {p2n} genera tensión alrededor de {tema}. Esta energía exigente te empuja fuera de tu zona de confort y obliga al crecimiento. La lucha entre la {p1o} de {p1n} y la {p2o} de {p2n} es una de tus oportunidades de transformación más poderosas."
+            elif aci == "Trigon":
+                return f"El trígono entre {p1n} y {p2n} crea una armonía natural alrededor de {tema}. Usada con conscencia, esta energía puede fluir en tu vida. La {p1o} de {p1n} y la {p2o} de {p2n} construyen naturalmente un puente."
+            elif aci == "Sekstil":
+                return f"La sextil entre {p1n} y {p2n} ofrece oportunidades alrededor de {tema}. Para activar esta energía, debes dar un paso consciente. Existe un vínculo de apoyo entre la {p1o} de {p1n} y la {p2o} de {p2n}."
             return ""
         if key in OZEL_YORUMLAR: return OZEL_YORUMLAR[key]
         if key_t in OZEL_YORUMLAR: return OZEL_YORUMLAR[key_t]
@@ -2701,6 +3402,7 @@ def _aspect_interpretasyon_kutuphanesi():
 
     _sozluk_tr = {}
     _sozluk_en = None
+    _sozluk_es = None
     islenen = set()
     for p1 in tum:
         for p2 in tum:
@@ -2712,12 +3414,19 @@ def _aspect_interpretasyon_kutuphanesi():
             if _EN:
                 if _sozluk_en is None: _sozluk_en = {}
                 _sozluk_en[f"{pk[0]}-{pk[1]}"] = {}
+            if _ES:
+                if _sozluk_es is None: _sozluk_es = {}
+                _sozluk_es[f"{pk[0]}-{pk[1]}"] = {}
             for aci in ["Kavuşum","Karşıt","Kare","Trigon","Sekstil"]:
-                _sozluk_tr[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, en=False)
+                _sozluk_tr[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, es=_ES)
                 if _sozluk_en is not None:
                     _sozluk_en[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, en=True)
+                if _sozluk_es is not None:
+                    _sozluk_es[f"{pk[0]}-{pk[1]}"][aci] = _urun(pk[0], pk[1], aci, es=True)
     if _sozluk_en is not None:
         return _sozluk_en
+    if _sozluk_es is not None:
+        return _sozluk_es
     return _sozluk_tr
 
 def _collect_solar_lunar_data(motor):
@@ -2767,9 +3476,16 @@ def _natal_hayat_alani_analizi(motor):
     """Bireysel natal için kapsamlı hayat alanı analizi.
     Her alan için: skor, doğal dil yorum, spor/sanat/beslenme/hastalık/öneri."""
     try:
+        _EN = _i18n_get_lang() == "en"
+        _ES = _i18n_get_lang() == "es"
         jd = motor.get_natal_julian_day("p1")
 
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
+        BURCLAR_EN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]
+        BURCLAR_ES = ["Aries","Tauro","Géminis","Cáncer","Leo","Virgo","Libra","Escorpio","Sagitario","Capricornio","Acuario","Piscis"]
+
+        def _hburc(burc_no):
+            return BURCLAR_EN[burc_no % 12] if _EN else (BURCLAR_ES[burc_no % 12] if _ES else BURCLAR[burc_no % 12])
 
         gez_poz = {}
         for g_ad, g_id in list(GEZEGENLER.items())[:14]:
@@ -3116,32 +3832,588 @@ def _natal_hayat_alani_analizi(motor):
             "Balık": "bağışıklık, ayak ve lenf sistemi; ilaç/alergi duyarlılığı",
         }
 
+        # ── EN variants (selected when _EN) ──
+        if _EN:
+            BURC_SPOR = {
+                "Koç": "running, boxing, martial arts, cross-country, mountain climbing, sprint",
+                "Boğa": "walking, pilates, weight training, gardening sports, horse riding",
+                "İkizler": "cycling, badminton, table tennis, trying multiple sports, archery",
+                "Yengeç": "swimming, water sports, tai-chi, evening walks, rhythmic movement",
+                "Aslan": "tennis, bodybuilding, gymnastics, fitness, show sports",
+                "Başak": "yoga, pilates, regular walking, fresh-air exercise, stretching",
+                "Terazi": "dance, pilates, ice skating, rhythmic gymnastics, partner sports",
+                "Akrep": "boxing, martial arts, crossfit, swimming, diving, high-intensity interval training",
+                "Yay": "horse riding, outdoor sports, camping, archery, adventure sports",
+                "Oğlak": "long-distance running, cycling, mountain climbing, disciplined training, weights",
+                "Kova": "extreme sports, skateboarding, snowboarding, free diving, innovative workouts",
+                "Balık": "swimming, diving, yoga, tai-chi, meditative movement, water sports",
+            }
+            SPOR_MAP = {
+                ("Mars",1): "Running, boxing, martial arts and solo combat sports",
+                ("Mars",6): "CrossFit, interval training, high-tempo workouts",
+                ("Mars",5): "Competitive sports, tennis, squash, sports competitions",
+                ("Venüs",1): "Dance, pilates, swimming, aesthetic and fluid sports",
+                ("Venüs",6): "Yoga, stretching exercises, nature walking",
+                ("Venüs",5): "Dance, ice skating, rhythmic gymnastics",
+                ("Jüpiter",1): "Outdoor sports, team games, nature sports",
+                ("Jüpiter",6): "Long walks, trekking, nature camping",
+                ("Jüpiter",9): "Horse riding, archery, outdoor adventure sports",
+                ("Satürn",1): "Long-distance running, cycling, endurance sports",
+                ("Satürn",6): "Regular walking, disciplined training, weight training",
+                ("Satürn",10): "Marathons, triathlons, long-term endurance goals",
+                ("Ay",1): "Swimming, tai-chi, evening walks, rhythmic movement",
+                ("Ay",6): "Yoga, meditative exercises, light-tempo sports",
+                ("Ay",4): "Garden walks, home workouts, family sports activities",
+                ("Uranüs",1): "Extreme sports, skateboarding, snowboarding, innovative workouts",
+                ("Uranüs",11): "Group extreme sports, parkour, free diving",
+                ("Neptün",1): "Yoga, swimming, dance, water sports, tai-chi",
+                ("Neptün",12): "Meditative movements, qigong, spiritual body exercises",
+                ("Güneş",1): "Tennis, athletics, sports requiring leadership",
+                ("Güneş",5): "Show sports, gymnastics, artistic performance",
+                ("Plüton",8): "Transformative fitness, deep bodywork, detox sports",
+                ("Plüton",6): "Healing yoga, meditation, body-spirit cleansing",
+                ("Merkür",3): "Brisk walking, cycling, multi-station gym exercises",
+                ("Merkür",6): "Coordination work, mind-body exercises",
+            }
+            BURC_SANAT = {
+                "Koç": "sculpture, performance art, bold experimental works, street art",
+                "Boğa": "ceramics, art with natural materials, photography, playing an instrument",
+                "İkizler": "writing, literature, theater, podcasts, linguistic art, journalism",
+                "Yengeç": "culinary art, crafts, photography, emotional music, storytelling",
+                "Aslan": "stage arts, theater, dance, showmanship, costume design, artistic performance",
+                "Başak": "detailed crafts, digital design, the art of organization, fine workmanship",
+                "Terazi": "fashion design, interior architecture, aesthetic arts, jewelry design, photography",
+                "Akrep": "photography, cinema, transformative art, sculpture, deeply themed works",
+                "Yay": "travel photography, documentaries, murals, street art, cross-cultural art",
+                "Oğlak": "architecture, sculpture, structural arts, restoration, traditional techniques",
+                "Kova": "digital art, installation, video art, technology-art, graphic design",
+                "Balık": "watercolor, music, dance, meditative art, cinema, spiritual symbolism",
+            }
+            SANAT_MAP = {
+                ("Venüs",5): "Painting, sculpture, ceramics, visual arts",
+                ("Venüs",3): "Poetry, literature, creative writing, writing song lyrics",
+                ("Venüs",10): "Fashion design, interior architecture, aesthetic consulting",
+                ("Neptün",5): "Music, dance, photography, cinema and stage arts",
+                ("Neptün",12): "Meditative art, mandala, spiritual painting, poetry",
+                ("Neptün",3): "Playing an instrument, singing, composing",
+                ("Merkür",3): "Writing, journalism, blogging, theater acting",
+                ("Merkür",5): "Theater, screenwriting, creative writing workshops",
+                ("Ay",4): "Handicrafts, knitting, embroidery, ceramics, culinary art",
+                ("Ay",5): "Writing children's books, toy design, storytelling",
+                ("Güneş",5): "Stage arts, theater acting, performance",
+                ("Uranüs",5): "Digital art, graphic design, installation, experimental art",
+                ("Jüpiter",5): "Performance arts, show business, stage management",
+                ("Satürn",5): "Architecture, sculpture, structural arts, restoration",
+                ("Plüton",5): "Photography, transformative art, deeply themed works",
+            }
+            BURC_HOBI = {
+                "Koç": "adventure sports, travel, exploration, motor sports, camping",
+                "Boğa": "gardening, collecting, cooking, antique research, nature walks",
+                "İkizler": "chess, software, reading, podcasts, learning languages, solving puzzles",
+                "Yengeç": "kitchen hobbies, photography, keeping a journal, family conversations",
+                "Aslan": "theater, stage arts, volunteering with children, show hobbies",
+                "Başak": "organizing, detail-oriented crafts, coding, data analysis",
+                "Terazi": "music, art collecting, social events, decoration, fashion",
+                "Akrep": "mystery novels, detective games, diving, research, psychology",
+                "Yay": "travel planning, philosophy, archery, nature exploration, cross-cultural interaction",
+                "Oğlak": "woodworking, strategy games, hiking, planning, traditional crafts",
+                "Kova": "technology, science fiction, robotics, space research, digital projects",
+                "Balık": "music, photography, nature observation, meditation, imagination activities",
+            }
+            BURC_SAGLIK = {
+                "Koç": "mind head-region health; dynamic exercise but avoid head injuries",
+                "Boğa": "throat and thyroid health; regular eating and metabolism control",
+                "İkizler": "nervous system and respiratory health; breathing exercises are important",
+                "Yengeç": "stomach and digestive system; regular sleep and emotional balance",
+                "Aslan": "heart and spine health; cardio exercises and posture correction",
+                "Başak": "gut health and food sensitivity; clean eating is a priority",
+                "Terazi": "kidney and skin health; water intake and hormonal balance matter",
+                "Akrep": "reproductive system and immunity; detox and cleansing nutrition",
+                "Yay": "liver and hip health; active living and regular exercise",
+                "Oğlak": "joint, bone and skin health; mineral supplementation and moisturizing",
+                "Kova": "circulatory system and ankles; blood-circulation exercises",
+                "Balık": "immune system and sleep routine; meditation and a steady rhythm",
+            }
+            BURC_BESLENME = {
+                "Koç": "spicy, energizing foods; iron- and protein-heavy, red meat and leafy greens",
+                "Boğa": "quality, tasty, filling meals; natural and additive-free eating, dairy products",
+                "İkizler": "light, varied and colorful foods; nuts, fruit, rich snacks",
+                "Yengeç": "homemade, natural, organic foods; dairy, soups and warm dishes",
+                "Aslan": "heart-friendly foods, antioxidant-rich foods, red berries, fish",
+                "Başak": "pure, clean, organic eating; fibrous foods, whole grains, detox teas",
+                "Terazi": "balanced, light, colorful eating; salads, social meals, chocolate",
+                "Akrep": "intensely flavorful foods, detox foods, probiotics, garlic and ginger",
+                "Yay": "exploring different cuisines; spicy and exotic flavors, protein-heavy",
+                "Oğlak": "mineral-rich, regular and measured eating; bone-friendly calcium foods",
+                "Kova": "innovative and different foods; smoothie bowls, superfoods, vegetarian alternatives",
+                "Balık": "seafood, omega-3 sources; light and liquid-heavy, herbal teas",
+            }
+            BESLENME_MAP = {
+                "Ay_Yengeç": "Homemade, natural, organic foods; dairy products and home cooking serve you well",
+                "Ay_Boğa": "Quality, tasty, filling meals; natural and additive-free eating",
+                "Ay_Balık": "Seafood, omega-3 sources; light and liquid-heavy eating",
+                "Ay_Oğlak": "Regular, disciplined, scheduled eating; mineral- and calcium-heavy",
+                "Ay_Başak": "Pure, clean, organic eating; watch food sensitivities",
+                "Venüs_Boğa": "Flavor-focused, quality foods; deli items and natural tastes",
+                "Venüs_Terazi": "Balanced, light, colorful and varied eating; social meals",
+                "Jüpiter_Yay": "Exploring different cuisines; spicy and exotic flavors",
+                "Jüpiter_Balık": "Seafood, plant-heavy, plenty of fluids",
+                "Mars_Koç": "Spicy, energizing, iron- and protein-heavy eating",
+                "Mars_Aslan": "Heart-friendly foods, magnesium, antioxidant-rich foods",
+                "Satürn_Oğlak": "Mineral-rich, bone-friendly calcium eating",
+                "Neptün_Balık": "Vegetable-heavy, light, liquid and plant-based eating",
+            }
+            BURC_ASK = {
+                "Koç": "a passionate and enthusiastic bond; strong physical attraction, bold romantic gestures",
+                "Boğa": "loyalty, trust and long-term commitment; sensual pleasures and comfort come first",
+                "İkizler": "intellectual harmony and social sharing; communication, humor and a mental bond matter",
+                "Yengeç": "a deep emotional bond and a sense of home; affection, protection and family values are fundamental",
+                "Aslan": "dazzling romance; attention, appreciation and lavish expressions of love",
+                "Başak": "service and practical love; small regular gestures, thoughtfulness and loyalty",
+                "Terazi": "an elegant and balanced union; aesthetic sharing, art and a sense of justice",
+                "Akrep": "passion, mystery and deep transformation; a powerful spiritual and sexual bond",
+                "Yay": "free and adventurous love; shared discovery, philosophy and broad horizons",
+                "Oğlak": "serious, long-term and goal-oriented union; discipline and respect",
+                "Kova": "an original and independent bond; intellectual harmony, innovation and social idealism",
+                "Balık": "spiritual and unconditional love; empathy, sacrifice and imagination-filled romance",
+            }
+            BURC_KARIYER = {
+                "Koç": "entrepreneurship, leadership, emergency management, sports, military, start-ups",
+                "Boğa": "banking, real estate, food, music, design, art, value management",
+                "İkizler": "communication, media, software, marketing, sales, journalism, teaching",
+                "Yengeç": "education, consulting, tourism, gastronomy, real estate, family business",
+                "Aslan": "stage arts, management, education, entertainment, PR, luxury brand management",
+                "Başak": "accounting, health services, editing, quality control, analysis, IT",
+                "Terazi": "law, diplomacy, art, fashion, interior architecture, mediation, consulting",
+                "Akrep": "research, psychology, finance, detective work, transformation consulting, medicine",
+                "Yay": "academia, international relations, travel, publishing, philosophy",
+                "Oğlak": "management, architecture, engineering, public service, long-term projects",
+                "Kova": "technology, science, social movements, aviation, innovative start-ups",
+                "Balık": "art, psychology, health, consulting, spiritual guidance, charitable organizations",
+            }
+            BURC_AILE = {
+                "Koç": "a leader and protector role in the family; passes on courage and independence values",
+                "Boğa": "a trustworthy bond that keeps family traditions; comfort and stability focused",
+                "İkizler": "intellectual sharing and open communication with family; versatile interaction",
+                "Yengeç": "family ties woven with emotional depth and affection; protective and nurturing",
+                "Aslan": "creativity and generosity in the family; being a source of inspiration to children",
+                "Başak": "order and service in the family; practical support and attentive care",
+                "Terazi": "balance and harmony in the family; artistic sharing and aesthetic values",
+                "Akrep": "deep transformation and loyalty in the family; strong emotional bonds and protection",
+                "Yay": "adventure and the passing of wisdom in the family; open-minded and broad perspective",
+                "Oğlak": "discipline and responsibility in the family; traditional values and long-term structure",
+                "Kova": "innovation and independence in the family; respect for individuality and celebrating difference",
+                "Balık": "compassion and a spiritual bond in the family; intuitive understanding and unconditional acceptance",
+            }
+            BURC_MADDI = {
+                "Koç": "entrepreneurial investments and high risk-taking potential; hasty decisions",
+                "Boğa": "savings and long-term investments; a preference for real estate and precious metals",
+                "İkizler": "diverse income sources; communication and media investments, short-term",
+                "Yengeç": "real estate and family investments; seeking a safe harbor, controlling emotional spending",
+                "Aslan": "showy investments and art; luxury brands and the entertainment sector",
+                "Başak": "detailed budget planning; small savings and practical thrift",
+                "Terazi": "joint financial decisions with a partner; aesthetic investments and a search for balance",
+                "Akrep": "transformative investments; shared resources, inheritance and tax planning",
+                "Yay": "income sources from different cultures; international investments and education",
+                "Oğlak": "long-term and disciplined investments; retirement planning and real estate",
+                "Kova": "technology and innovative investments; crypto, start-ups and social projects",
+                "Balık": "investments with artistic and spiritual value; philanthropy and creative projects",
+            }
+            BURC_SOSYAL = {
+                "Koç": "a natural leader and source of inspiration in your circle; bold and open",
+                "Boğa": "a loyal and trustworthy friend; solid and lasting bonds around you",
+                "İkizler": "a wide circle and intellectual conversations; communication-focused sociability",
+                "Yengeç": "sincere and emotional bonds; a small but deep circle of friends",
+                "Aslan": "the star of the social circle; generosity and inspiring leadership",
+                "Başak": "service-oriented sociability; volunteering and practical help circles",
+                "Terazi": "elegant and balanced social relationships; artistic sharing and an aesthetic circle",
+                "Akrep": "deep and selective social bonds; strong alliances built on trust",
+                "Yay": "a wide and diverse social circle; friendships from different cultures",
+                "Oğlak": "professional and purposeful social circles; career-focused networking",
+                "Kova": "original and innovative circles; social groups and digital communities",
+                "Balık": "empathetic and spiritual circles; aid associations and spiritual communities",
+            }
+            BURC_EGITIM = {
+                "Koç": "you take quick interest in new topics and dive in boldly; practical and applied learning",
+                "Boğa": "in-depth study and gaining practical skills; patient and methodical",
+                "İkizler": "you are inclined toward abstract concepts and theoretical knowledge; using multiple sources",
+                "Yengeç": "intuitive learning and interest in family/emotional topics; the storytelling method",
+                "Aslan": "visual and performance-focused learning; creative projects and presentations",
+                "Başak": "systematic and detail-oriented study; research, analysis and practical application",
+                "Terazi": "balanced and multi-perspective learning; negotiation and aesthetic studies",
+                "Akrep": "research and diving deep; psychology, mystery and transformation topics",
+                "Yay": "philosophical and broad-perspective learning; international education and travel",
+                "Oğlak": "disciplined and goal-oriented study; certification and career focused",
+                "Kova": "innovative and technological learning; online education, digital resources",
+                "Balık": "intuitive and creative learning; through art, music and meditation",
+            }
+            BURC_MANEVİ = {
+                "Koç": "active meditation and spiritual connection in nature; bold inner exploration",
+                "Boğa": "connection with the earth, nature rituals and physical spiritual practices",
+                "İkizler": "philosophical inquiry and mental awareness; writing and meditation",
+                "Yengeç": "rituals tied to lunar cycles, family-roots meditation, water meditation",
+                "Aslan": "heart-centered meditation, creative visualization, inspiring rituals",
+                "Başak": "daily spiritual practices, service meditation, a regular spiritual routine",
+                "Terazi": "balance-and-harmony meditation, spiritual expression through art, uniting opposites",
+                "Akrep": "transformative meditation, shadow work, deep inner cleansing",
+                "Yay": "philosophical meditation, exploring different spiritual traditions, mountain meditation",
+                "Oğlak": "disciplined meditation practice, the guru-student relationship, structured spirituality",
+                "Kova": "technology-supported meditation, group meditation, innovative spiritual practices",
+                "Balık": "deep meditation, spiritual guidance, sea meditation, ego dissolution",
+            }
+            BURC_SEYAHAT = {
+                "Koç": "adventure-filled discoveries, adrenaline-packed routes, solo travel",
+                "Boğa": "natural beauty, luxury accommodation, gastronomy tours, slow travel",
+                "İkizler": "city-by-city trips, museum and culture tours, short trips",
+                "Yengeç": "the lands where you were born and raised, historic sites, comfortable and peaceful holidays",
+                "Aslan": "luxury resorts, performing-arts festivals, lavish destinations",
+                "Başak": "health tours, wellness centers, clean nature walks, detox camps",
+                "Terazi": "cultural capitals, art galleries, romantic getaways, aesthetic destinations",
+                "Akrep": "mysterious and historic sites, archaeological sites, deep cultural experiences",
+                "Yay": "different continents, far-off cultures, philosophical and historic routes, open-air camps",
+                "Oğlak": "mountaineering tours, historic castles, traditional and structural architecture discoveries",
+                "Kova": "innovative destinations, science museums, diverse communities, space centers",
+                "Balık": "coastal towns, mystical temples, meditation camps, spiritual journeys",
+            }
+            HASTALIK_MAP = {
+                ("Mars",6,"Koç"): "Headaches, migraines, sinusitis, face and head-region ailments",
+                ("Mars",6,"Boğa"): "Throat infections, vocal-cord issues, thyroid imbalance",
+                ("Mars",6,"Aslan"): "Palpitations, back pain, spine issues",
+                ("Mars",6,"Akrep"): "Inflammation, reproductive health, intestinal inflammation",
+                ("Mars",6,"Yay"): "Liver, hip region, sciatic nerve",
+                ("Satürn",6,"Oğlak"): "Arthritis, joint pain, knee problems, osteoporosis",
+                ("Satürn",6,"Kova"): "Circulatory issues, varicose veins, ankle injuries",
+                ("Satürn",6,"Balık"): "Foot health, lymphatic system, a tendency to retain water",
+                ("Ay",6,"Yengeç"): "Stomach sensitivity, digestive problems, chest health",
+                ("Ay",6,"Balık"): "Psychological sensitivity, addictive tendencies, sleep routine",
+                ("Ay",6,"Boğa"): "Throat sensitivity, eating disorders, metabolism",
+                ("Venüs",6,"Boğa"): "Throat and tonsil issues, skin allergies, kidney balance",
+                ("Venüs",6,"Terazi"): "Kidney function, skin sensitivity, hormonal balance",
+                ("Neptün",6,"Balık"): "Weakened immunity, chronic fatigue, sleep apnea",
+                ("Neptün",6,"Yay"): "Liver sensitivity, allergic reactions",
+                ("Güneş",6,"Aslan"): "Heart health, vitality decline, blood-pressure fluctuations",
+                ("Plüton",6,"Akrep"): "Immune system, cellular issues, a need for detox",
+            }
+            BURC_SAGLIK_UYARISI = {
+                "Koç": "head region, migraines and injury risk; watch hot conflicts",
+                "Boğa": "throat, thyroid and neck muscle tension; a slow-metabolism tendency",
+                "İkizler": "nervous system, respiratory tract and communication-related tension",
+                "Yengeç": "stomach, digestion, chest region; emotional eating and water retention",
+                "Aslan": "heart, back and spine; tension from overexertion",
+                "Başak": "intestines, skin and nervous system; stress from being overly meticulous",
+                "Terazi": "kidneys, skin and hormonal balance; indecision stress",
+                "Akrep": "reproductive system, immunity and intense emotional stress",
+                "Yay": "liver, hips and sciatica; overdoing it and pushing limits",
+                "Oğlak": "joints, bones, skin and joints; chronic stress and dystonia",
+                "Kova": "circulation, ankles and nervous system; unexpected accidents",
+                "Balık": "immunity, feet and lymphatic system; medication/allergy sensitivity",
+            }
+
+        elif _ES:
+            HASTALIK_MAP = {
+                ("Mars",6,"Koç"): "Dolores de cabeza, migrañas, sinusitis, afecciones de rostro y cabeza",
+                ("Mars",6,"Boğa"): "Infecciones de garganta, cuerdas vocales, desequilibrio tiroideo",
+                ("Mars",6,"Aslan"): "Palpitaciones, dolor de espalda, problemas de columna",
+                ("Mars",6,"Akrep"): "Inflamación, salud reproductiva, inflamación intestinal",
+                ("Mars",6,"Yay"): "Hígado, zona de la cadera, nervio ciático",
+                ("Satürn",6,"Oğlak"): "Artrosis, dolor articular, problemas de rodilla, osteoporosis",
+                ("Satürn",6,"Kova"): "Problemas circulatorios, varices, torceduras de tobillo",
+                ("Satürn",6,"Balık"): "Salud de los pies, sistema linfático, tendencia a retener líquidos",
+                ("Ay",6,"Yengeç"): "Sensibilidad estomacal, problemas digestivos, salud torácica",
+                ("Ay",6,"Balık"): "Sensibilidad psicológica, tendencias adictivas, rutina de sueño",
+                ("Ay",6,"Boğa"): "Sensibilidad de garganta, trastornos alimentarios, metabolismo",
+                ("Venüs",6,"Boğa"): "Problemas de garganta y amígdalas, alergias cutáneas, equilibrio renal",
+                ("Venüs",6,"Terazi"): "Función renal, sensibilidad cutánea, equilibrio hormonal",
+                ("Neptün",6,"Balık"): "Inmunidad debilitada, fatiga crónica, apnea del sueño",
+                ("Neptün",6,"Yay"): "Sensibilidad hepática, reacciones alérgicas",
+                ("Güneş",6,"Aslan"): "Salud del corazón, caída de vitalidad, fluctuaciones de tensión",
+                ("Plüton",6,"Akrep"): "Sistema inmunitario, problemas celulares, necesidad de depuración",
+            }
+            BURC_SAGLIK_UYARISI = {
+                "Koç": "zona de la cabeza, migrañas y riesgo de lesiones; cuidado con los conflictos",
+                "Boğa": "garganta, tiroides y tensión muscular en el cuello; tendencia al metabolismo lento",
+                "İkizler": "sistema nervioso, vías respiratorias y tensión ligada a la comunicación",
+                "Yengeç": "estómago, digestión, zona torácica; alimentación emocional y retención de líquidos",
+                "Aslan": "corazón, espalda y columna; tensión por sobreesfuerzo",
+                "Başak": "intestinos, piel y sistema nervioso; estrés por exceso de perfeccionismo",
+                "Terazi": "riñones, piel y equilibrio hormonal; estrés por indecisión",
+                "Akrep": "sistema reproductivo, inmunidad y estrés emocional intenso",
+                "Yay": "hígado, caderas y ciática; excesos y sobrepasar límites",
+                "Oğlak": "articulaciones, huesos y piel; estrés crónico y distonía",
+                "Kova": "circulación, tobillos y sistema nervioso; accidentes inesperados",
+                "Balık": "inmunidad, pies y sistema linfático; sensibilidad a medicamentos/alergias",
+            }
+            BURC_SPOR = {
+                "Koç": "correr, boxeo, deportes de combate, campo a través, escalada, sprint",
+                "Boğa": "caminata, pilates, entrenamiento de fuerza, deportes de jardín, equitación",
+                "İkizler": "ciclismo, bádminton, tenis de mesa, probar varios deportes, tiro con arco",
+                "Yengeç": "natación, deportes acuáticos, tai-chi, paseos al atardecer, movimiento rítmico",
+                "Aslan": "tenis, culturismo, gimnasia, fitness, deportes de exhibición",
+                "Başak": "yoga, pilates, caminata regular, ejercicio al aire libre, estiramientos",
+                "Terazi": "baile, pilates, patinaje sobre hielo, gimnasia rítmica, deportes en pareja",
+                "Akrep": "boxeo, artes marciales, crossfit, natación, buceo, intervalos de alta intensidad",
+                "Yay": "equitación, deportes al aire libre, campamento, tiro con arco, deportes de aventura",
+                "Oğlak": "carreras de fondo, ciclismo, escalada, entrenamiento disciplinado, pesas",
+                "Kova": "deportes extremos, skate, snowboard, buceo libre, rutinas innovadoras",
+                "Balık": "natación, buceo, yoga, tai-chi, movimientos meditativos, deportes acuáticos",
+            }
+            SPOR_MAP = {
+                ("Mars",1): "Correr, boxeo, artes marciales y deportes de combate individual",
+                ("Mars",6): "CrossFit, entrenamiento por intervalos, ejercicios de alta intensidad",
+                ("Mars",5): "Deportes competitivos, tenis, squash, competiciones deportivas",
+                ("Venüs",1): "Baile, pilates, natación, deportes estéticos y fluidos",
+                ("Venüs",6): "Yoga, ejercicios de estiramiento, caminatas por la naturaleza",
+                ("Venüs",5): "Baile, patinaje sobre hielo, gimnasia rítmica",
+                ("Jüpiter",1): "Deportes al aire libre, juegos de equipo, deportes de naturaleza",
+                ("Jüpiter",6): "Caminatas largas, trekking, campamentos en la naturaleza",
+                ("Jüpiter",9): "Equitación, tiro con arco, deportes de aventura al aire libre",
+                ("Satürn",1): "Carreras de fondo, ciclismo, deportes de resistencia",
+                ("Satürn",6): "Caminata regular, entrenamiento disciplinado, trabajo con pesas",
+                ("Satürn",10): "Maratones, triatlones, objetivos de resistencia a largo plazo",
+                ("Ay",1): "Natación, tai-chi, paseos al atardecer, movimiento rítmico",
+                ("Ay",6): "Yoga, ejercicios meditativos, deportes de ritmo suave",
+                ("Ay",4): "Paseos por el jardín, ejercicio en casa, actividades deportivas en familia",
+                ("Uranüs",1): "Deportes extremos, skate, snowboard, rutinas innovadoras",
+                ("Uranüs",11): "Deportes extremos en grupo, parkour, buceo libre",
+                ("Neptün",1): "Yoga, natación, baile, deportes acuáticos, tai-chi",
+                ("Neptün",12): "Movimientos meditativos, qigong, ejercicios corporales espirituales",
+                ("Güneş",1): "Tenis, atletismo, deportes que requieren liderazgo",
+                ("Güneş",5): "Deportes de exhibición, gimnasia, actuación artística",
+                ("Plüton",8): "Fitness transformador, trabajo corporal profundo, deportes de depuración",
+                ("Plüton",6): "Yoga terapéutico, meditación, limpieza cuerpo-mente",
+                ("Merkür",3): "Marcha rápida, ciclismo, ejercicios multipuesto en el gimnasio",
+                ("Merkür",6): "Trabajo de coordinación, ejercicios mente-cuerpo",
+            }
+            BURC_SANAT = {
+                "Koç": "escultura, arte de performance, obras experimentales atrevidas, arte callejero",
+                "Boğa": "cerámica, arte con materiales naturales, fotografía, tocar un instrumento",
+                "İkizler": "escritura, literatura, teatro, pódcast, arte lingüístico, periodismo",
+                "Yengeç": "arte culinario, artesanía, fotografía, música emotiva, narración de historias",
+                "Aslan": "artes escénicas, teatro, danza, espectáculo, diseño de vestuario, actuación artística",
+                "Başak": "artesanía detallada, diseño digital, el arte de la organización, trabajo fino",
+                "Terazi": "diseño de moda, decoración de interiores, artes estéticas, diseño de joyas, fotografía",
+                "Akrep": "fotografía, cine, arte transformador, escultura, obras de temática profunda",
+                "Yay": "fotografía de viajes, documental, mural, arte callejero, arte intercultural",
+                "Oğlak": "arquitectura, escultura, artes estructurales, restauración, técnicas tradicionales",
+                "Kova": "arte digital, instalación, videoarte, tecnología-arte, diseño gráfico",
+                "Balık": "acuarela, música, danza, arte meditativo, cine, simbolismo espiritual",
+            }
+            SANAT_MAP = {
+                ("Venüs",5): "Pintura, escultura, cerámica, artes visuales",
+                ("Venüs",3): "Poesía, literatura, escritura creativa, escribir letras de canciones",
+                ("Venüs",10): "Diseño de moda, decoración de interiores, asesoría estética",
+                ("Neptün",5): "Música, danza, fotografía, cine y artes escénicas",
+                ("Neptün",12): "Arte meditativo, mandala, pintura espiritual, poesía",
+                ("Neptün",3): "Tocar un instrumento, cantar, componer",
+                ("Merkür",3): "Escritura, periodismo, blog, actuación teatral",
+                ("Merkür",5): "Teatro, guion cinematográfico, talleres de escritura creativa",
+                ("Ay",4): "Artesanías, tejido, bordado, cerámica, arte culinario",
+                ("Ay",5): "Escribir libros infantiles, diseño de juguetes, narración de historias",
+                ("Güneş",5): "Artes escénicas, actuación teatral, performance",
+                ("Uranüs",5): "Arte digital, diseño gráfico, instalación, arte experimental",
+                ("Jüpiter",5): "Artes de performance, mundo del espectáculo, dirección de escena",
+                ("Satürn",5): "Arquitectura, escultura, artes estructurales, restauración",
+                ("Plüton",5): "Fotografía, arte transformador, obras de temática profunda",
+            }
+            BURC_HOBI = {
+                "Koç": "deportes de aventura, viajes, exploración, deportes de motor, campamento",
+                "Boğa": "jardinería, coleccionismo, cocina, investigación de antigüedades, caminatas por la naturaleza",
+                "İkizler": "ajedrez, programación, lectura, escuchar pódcast, aprender idiomas, resolver acertijos",
+                "Yengeç": "pasatiempos de cocina, fotografía, llevar un diario, conversaciones familiares",
+                "Aslan": "teatro, artes escénicas, voluntariado con niños, pasatiempos de espectáculo",
+                "Başak": "organizar, artesanía detallada, programación, análisis de datos",
+                "Terazi": "música, coleccionismo de arte, eventos sociales, decoración, moda",
+                "Akrep": "novelas de misterio, juegos de detectives, buceo, investigación, psicología",
+                "Yay": "planificar viajes, filosofía, tiro con arco, exploración de la naturaleza, interacción intercultural",
+                "Oğlak": "carpintería, juegos de estrategia, senderismo, planificación, artesanía tradicional",
+                "Kova": "tecnología, ciencia ficción, robótica, exploración espacial, proyectos digitales",
+                "Balık": "música, fotografía, observación de la naturaleza, meditación, actividades de imaginación",
+            }
+            BURC_SAGLIK = {
+                "Koç": "cuidado de la zona de la cabeza; ejercicio dinámico, pero evita los traumatismos craneales",
+                "Boğa": "salud de la garganta y la tiroides; alimentación regular y control del metabolismo",
+                "İkizler": "sistema nervioso y vías respiratorias; los ejercicios de respiración son importantes",
+                "Yengeç": "estómago y sistema digestivo; sueño regular y equilibrio emocional",
+                "Aslan": "salud del corazón y la columna; ejercicios cardiovasculares y corrección de la postura",
+                "Başak": "salud intestinal y sensibilidad alimentaria; la alimentación limpia es prioridad",
+                "Terazi": "salud de los riñones y la piel; consumo de agua y equilibrio hormonal",
+                "Akrep": "sistema reproductivo e inmunidad; depuración y alimentación limpiadora",
+                "Yay": "salud del hígado y las caderas; vida activa y ejercicio regular",
+                "Oğlak": "salud de articulaciones, huesos y piel; suplementación mineral e hidratación",
+                "Kova": "sistema circulatorio y tobillos; ejercicios de circulación sanguínea",
+                "Balık": "sistema inmunitario y rutina de sueño; meditación y ritmo regular",
+            }
+            BURC_BESLENME = {
+                "Koç": "alimentos picantes y energéticos; ricos en hierro y proteína, carne roja y verduras de hoja verde",
+                "Boğa": "comidas de calidad, sabrosas y saciantes; alimentación natural sin aditivos, lácteos",
+                "İkizler": "alimentos ligeros, variados y coloridos; frutos secos, fruta, tentempiés nutritivos",
+                "Yengeç": "comidas caseras, naturales y orgánicas; lácteos, sopas y platos calientes",
+                "Aslan": "alimentos cardioprotectores, ricos en antioxidantes, frutos rojos, pescado",
+                "Başak": "alimentación pura, limpia y orgánica; alimentos ricos en fibra, cereales integrales, tés depurativos",
+                "Terazi": "alimentación equilibrada, ligera y colorida; ensaladas, comidas sociales, chocolate",
+                "Akrep": "alimentos de sabor intenso, alimentos depurativos, probióticos, ajo y jengibre",
+                "Yay": "descubrir distintas cocinas; sabores picantes y exóticos, rica en proteínas",
+                "Oğlak": "alimentación rica en minerales, regular y medida; alimentos con calcio para los huesos",
+                "Kova": "alimentos innovadores y diferentes; bowls de batido, superalimentos, alternativas vegetarianas",
+                "Balık": "mariscos, fuentes de omega-3; alimentos ligeros y ricos en líquidos, infusiones",
+            }
+            BESLENME_MAP = {
+                "Ay_Yengeç": "Comidas caseras, naturales y orgánicas; los lácteos y la comida casera te sientan bien",
+                "Ay_Boğa": "Comidas de calidad, sabrosas y saciantes; alimentación natural sin aditivos",
+                "Ay_Balık": "Mariscos, fuentes de omega-3; alimentación ligera y rica en líquidos",
+                "Ay_Oğlak": "Alimentación regular, disciplinada y a horas; rica en minerales y calcio",
+                "Ay_Başak": "Alimentación pura, limpia y orgánica; cuidado con las sensibilidades alimentarias",
+                "Venüs_Boğa": "Alimentos de calidad orientados al sabor; embutidos y sabores naturales",
+                "Venüs_Terazi": "Alimentación equilibrada, ligera, colorida y variada; comidas sociales",
+                "Jüpiter_Yay": "Descubrir distintas cocinas; sabores picantes y exóticos",
+                "Jüpiter_Balık": "Mariscos, alimentos de origen vegetal y abundante líquido",
+                "Mars_Koç": "Alimentación picante, energética, rica en hierro y proteínas",
+                "Mars_Aslan": "Alimentos cardioprotectores, magnesio, alimentos ricos en antioxidantes",
+                "Satürn_Oğlak": "Alimentación rica en minerales, con calcio para los huesos",
+                "Neptün_Balık": "Alimentación rica en verduras, ligera, líquida y de origen vegetal",
+            }
+            BURC_ASK = {
+                "Koç": "un vínculo apasionado y entusiasta; fuerte atracción física, gestos románticos valientes",
+                "Boğa": "lealtad, confianza y compromiso a largo plazo; los placeres sensoriales y la comodidad importan",
+                "İkizler": "armonía intelectual y compartir social; la comunicación, el humor y el vínculo mental importan",
+                "Yengeç": "un vínculo emocional profundo y sensación de hogar; el afecto, la protección y los valores familiares son fundamentales",
+                "Aslan": "romance deslumbrante; atención, aprecio y muestras de amor exuberantes",
+                "Başak": "servicio y amor práctico; pequeños gestos regulares, consideración y lealtad",
+                "Terazi": "una unión elegante y equilibrada; compartir estético, arte y sentido de la justicia",
+                "Akrep": "pasión, misterio y transformación profunda; un vínculo espiritual y sexual intenso",
+                "Yay": "amor libre y aventurero; descubrimiento compartido, filosofía y horizontes amplios",
+                "Oğlak": "una unión seria, a largo plazo y orientada a objetivos; disciplina y respeto",
+                "Kova": "un vínculo original e independiente; armonía intelectual, innovación e idealismo social",
+                "Balık": "amor espiritual e incondicional; empatía, entrega y un romance lleno de imaginación",
+            }
+            BURC_KARIYER = {
+                "Koç": "emprendimiento, liderazgo, gestión de emergencias, deportes, carrera militar, empresas emergentes",
+                "Boğa": "banca, inmobiliario, alimentación, música, diseño, arte, gestión de valores",
+                "İkizler": "comunicación, medios, software, marketing, ventas, periodismo, docencia",
+                "Yengeç": "educación, consultoría, turismo, gastronomía, inmobiliario, empresa familiar",
+                "Aslan": "artes escénicas, gestión, educación, entretenimiento, relaciones públicas, gestión de marcas de lujo",
+                "Başak": "contabilidad, servicios de salud, edición, control de calidad, análisis, TI",
+                "Terazi": "derecho, diplomacia, arte, moda, decoración de interiores, mediación, consultoría",
+                "Akrep": "investigación, psicología, finanzas, detective, consultoría de transformación, medicina",
+                "Yay": "mundo académico, relaciones internacionales, viajes, edición, filosofía",
+                "Oğlak": "gestión, arquitectura, ingeniería, servicio público, proyectos a largo plazo",
+                "Kova": "tecnología, ciencia, movimientos sociales, aviación, empresas emergentes innovadoras",
+                "Balık": "arte, psicología, salud, consultoría, guía espiritual, organizaciones benéficas",
+            }
+            BURC_AILE = {
+                "Koç": "un papel de líder y protector en la familia; transmite valores de valentía e independencia",
+                "Boğa": "un vínculo confiable que mantiene las tradiciones familiares; centrado en la comodidad y la estabilidad",
+                "İkizler": "compartir intelectual y comunicación abierta con la familia; interacción versátil",
+                "Yengeç": "lazos familiares tejidos con profundidad emocional y afecto; protector y nutriente",
+                "Aslan": "creatividad y generosidad en la familia; ser una inspiración para los hijos",
+                "Başak": "orden y servicio en la familia; apoyo práctico y cuidado atento",
+                "Terazi": "equilibrio y armonía en la familia; compartir artístico y valores estéticos",
+                "Akrep": "transformación profunda y lealtad en la familia; vínculos emocionales fuertes y protección",
+                "Yay": "aventura y transmisión de sabiduría en la familia; mente abierta y perspectiva amplia",
+                "Oğlak": "disciplina y responsabilidad en la familia; valores tradicionales y estructura a largo plazo",
+                "Kova": "innovación e independencia en la familia; respeto por la individualidad y celebración de las diferencias",
+                "Balık": "compasión y vínculo espiritual en la familia; comprensión intuitiva y aceptación incondicional",
+            }
+            BURC_MADDI = {
+                "Koç": "inversiones emprendedoras y alto potencial de asumir riesgos; decisiones impulsivas",
+                "Boğa": "ahorro e inversiones a largo plazo; preferencia por inmuebles y metales preciosos",
+                "İkizler": "distintas fuentes de ingresos; inversiones en comunicación y medios, a corto plazo",
+                "Yengeç": "inversiones inmobiliarias y familiares; búsqueda de puerto seguro y control del gasto emocional",
+                "Aslan": "inversiones llamativas y arte; marcas de lujo y sector del entretenimiento",
+                "Başak": "planificación presupuestaria detallada; pequeños ahorros y ahorro práctico",
+                "Terazi": "decisiones financieras compartidas con la pareja; inversiones estéticas y búsqueda de equilibrio",
+                "Akrep": "inversiones transformadoras; recursos compartidos, herencia y planificación fiscal",
+                "Yay": "fuentes de ingresos de distintas culturas; inversiones internacionales y educación",
+                "Oğlak": "inversiones a largo plazo y disciplinadas; planificación de jubilación e inmuebles",
+                "Kova": "inversiones tecnológicas e innovadoras; criptomonedas, empresas emergentes y proyectos sociales",
+                "Balık": "inversiones con valor artístico y espiritual; filantropía y proyectos creativos",
+            }
+            BURC_SOSYAL = {
+                "Koç": "un líder natural y fuente de inspiración en tu círculo; valiente y abierto",
+                "Boğa": "un amigo leal y confiable; vínculos sólidos y duraderos a tu alrededor",
+                "İkizler": "un círculo amplio y conversaciones intelectuales; sociabilidad centrada en la comunicación",
+                "Yengeç": "vínculos sinceros y emocionales; un círculo de amigos pequeño pero profundo",
+                "Aslan": "la estrella del círculo social; generosidad y liderazgo inspirador",
+                "Başak": "sociabilidad orientada al servicio; voluntariado y círculos de ayuda práctica",
+                "Terazi": "relaciones sociales elegantes y equilibradas; compartir artístico y un círculo estético",
+                "Akrep": "vínculos sociales profundos y selectos; fuertes alianzas basadas en la confianza",
+                "Yay": "un círculo social amplio y diverso; amistades de distintas culturas",
+                "Oğlak": "círculos sociales profesionales y con propósito; networking orientado a la carrera",
+                "Kova": "círculos originales e innovadores; grupos sociales y comunidades digitales",
+                "Balık": "círculos empáticos y espirituales; asociaciones solidarias y comunidades espirituales",
+            }
+            BURC_EGITIM = {
+                "Koç": "te interesas rápidamente por temas nuevos y te sumerges con valentía; aprendizaje práctico y aplicado",
+                "Boğa": "estudio en profundidad y adquisición de habilidades prácticas; paciente y metódico",
+                "İkizler": "te inclinas por conceptos abstractos y conocimiento teórico; uso de múltiples fuentes",
+                "Yengeç": "aprendizaje intuitivo e interés por temas familiares y emocionales; el método de la narración",
+                "Aslan": "aprendizaje visual y centrado en la actuación; proyectos creativos y presentaciones",
+                "Başak": "estudio sistemático y detallista; investigación, análisis y aplicación práctica",
+                "Terazi": "aprendizaje equilibrado y con múltiples perspectivas; negociación y estudios estéticos",
+                "Akrep": "investigación y profundización; psicología, misterio y temas de transformación",
+                "Yay": "aprendizaje filosófico y de perspectiva amplia; educación internacional y viajes",
+                "Oğlak": "estudio disciplinado y orientado a objetivos; certificaciones y enfoque profesional",
+                "Kova": "aprendizaje innovador y tecnológico; educación online, recursos digitales",
+                "Balık": "aprendizaje intuitivo y creativo; a través del arte, la música y la meditación",
+            }
+            BURC_MANEVİ = {
+                "Koç": "meditación activa y conexión espiritual en la naturaleza; exploración interior valiente",
+                "Boğa": "conexión con la tierra, rituales de la naturaleza y prácticas espirituales físicas",
+                "İkizler": "indagación filosófica y conciencia mental; escritura y meditación",
+                "Yengeç": "rituales ligados a los ciclos lunares, meditación de raíces familiares, meditación del agua",
+                "Aslan": "meditación centrada en el corazón, visualización creativa, rituales inspiradores",
+                "Başak": "prácticas espirituales diarias, meditación de servicio, rutina espiritual regular",
+                "Terazi": "meditación de equilibrio y armonía, expresión espiritual a través del arte, unión de opuestos",
+                "Akrep": "meditación transformadora, trabajo con la sombra, limpieza interior profunda",
+                "Yay": "meditación filosófica, exploración de distintas tradiciones espirituales, meditación de montaña",
+                "Oğlak": "práctica disciplinada de meditación, relación gurú-discípulo, espiritualidad estructurada",
+                "Kova": "meditación asistida por tecnología, meditación en grupo, prácticas espirituales innovadoras",
+                "Balık": "meditación profunda, guía espiritual, meditación marina, disolución del ego",
+            }
+            BURC_SEYAHAT = {
+                "Koç": "descubrimientos llenos de aventura, rutas cargadas de adrenalina, viajes en solitario",
+                "Boğa": "bellezas naturales, alojamiento de lujo, tours gastronómicos, viaje lento",
+                "İkizler": "recorridos ciudad por ciudad, tours de museos y cultura, viajes cortos",
+                "Yengeç": "las tierras donde naciste y creciste, sitios históricos, vacaciones cómodas y tranquilas",
+                "Aslan": "complejos turísticos de lujo, festivales de artes escénicas, destinos ostentosos",
+                "Başak": "tours de salud, centros de bienestar, caminatas por naturaleza limpia, campamentos de depuración",
+                "Terazi": "capitales culturales, galerías de arte, escapadas románticas, destinos estéticos",
+                "Akrep": "lugares misteriosos e históricos, sitios arqueológicos, experiencias culturales profundas",
+                "Yay": "distintos continentes, culturas lejanas, rutas filosóficas e históricas, campamentos al aire libre",
+                "Oğlak": "tours de montañismo, castillos históricos, descubrimientos de arquitectura tradicional y estructural",
+                "Kova": "destinos innovadores, museos de ciencia, comunidades diversas, centros espaciales",
+                "Balık": "pueblos costeros, templos místicos, campamentos de meditación, viajes espirituales",
+            }
+
         # ── Yardımcı fonksiyonlar ──
+        def _gad(g_ad):
+            return pdf_label(g_ad)
+
         def _spor_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             key = (g_ad, ev_no)
             if key in SPOR_MAP:
-                return f"{g_ad} • {burc}: {SPOR_MAP[key]}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {SPOR_MAP[key]}"
             burc_spor = BURC_SPOR.get(burc)
             if burc_spor:
-                return f"{g_ad} • {burc}: {burc_spor}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_spor}"
             return None
 
         def _sanat_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             key = (g_ad, ev_no)
             if key in SANAT_MAP:
-                return f"{g_ad} • {burc}: {SANAT_MAP[key]}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {SANAT_MAP[key]}"
             burc_sanat = BURC_SANAT.get(burc)
             if burc_sanat:
-                return f"{g_ad} • {burc}: {burc_sanat}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_sanat}"
             return None
 
         def _hobi_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_hobi = BURC_HOBI.get(burc)
             if burc_hobi:
-                return f"{g_ad} • {burc}: {burc_hobi}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_hobi}"
             return None
 
         def _hastalik_uyarisi(g_ad, ev_no, burc_no):
@@ -3153,80 +4425,82 @@ def _natal_hayat_alani_analizi(motor):
                 if g == g_ad and e == ev_no: return v
             uyari = BURC_SAGLIK_UYARISI.get(burc)
             if uyari:
-                return f"{g_ad} etkisiyle {burc}: {uyari}"
+                if _ES:
+                    return f"Influencia de {_gad(g_ad)} en {_hburc(burc_no)}: {uyari}"
+                return f"{_gad(g_ad)} influence on {_hburc(burc_no)}: {uyari}"
             return None
 
         def _saglik_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             saglik = BURC_SAGLIK.get(burc)
             if saglik:
-                return f"{g_ad} • {burc}: {saglik}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {saglik}"
             return None
 
         def _beslenme_onerisi(g_ad, burc_no):
             burc = BURCLAR[burc_no % 12]
             key = f"{g_ad}_{burc}"
             if key in BESLENME_MAP:
-                return f"{g_ad} • {burc}: {BESLENME_MAP[key]}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {BESLENME_MAP[key]}"
             burc_besl = BURC_BESLENME.get(burc)
             if burc_besl:
-                return f"{g_ad} • {burc}: {burc_besl}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_besl}"
             return None
 
         def _ask_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_ask = BURC_ASK.get(burc)
             if burc_ask:
-                return f"{g_ad} • {burc}: {burc_ask}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_ask}"
             return None
 
         def _kariyer_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_kar = BURC_KARIYER.get(burc)
             if burc_kar:
-                return f"{g_ad} • {burc}: {burc_kar}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_kar}"
             return None
 
         def _aile_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_ail = BURC_AILE.get(burc)
             if burc_ail:
-                return f"{g_ad} • {burc}: {burc_ail}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_ail}"
             return None
 
         def _maddi_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_mad = BURC_MADDI.get(burc)
             if burc_mad:
-                return f"{g_ad} • {burc}: {burc_mad}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_mad}"
             return None
 
         def _sosyal_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_sos = BURC_SOSYAL.get(burc)
             if burc_sos:
-                return f"{g_ad} • {burc}: {burc_sos}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_sos}"
             return None
 
         def _egitim_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_egi = BURC_EGITIM.get(burc)
             if burc_egi:
-                return f"{g_ad} • {burc}: {burc_egi}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_egi}"
             return None
 
         def _manevi_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_man = BURC_MANEVİ.get(burc)
             if burc_man:
-                return f"{g_ad} • {burc}: {burc_man}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_man}"
             return None
 
         def _seyahat_onerisi(g_ad, ev_no, burc_no):
             burc = BURCLAR[burc_no % 12]
             burc_sey = BURC_SEYAHAT.get(burc)
             if burc_sey:
-                return f"{g_ad} • {burc}: {burc_sey}"
+                return f"{_gad(g_ad)} • {_hburc(burc_no)}: {burc_sey}"
             return None
 
         # ── Kategori tanımları ──
@@ -3284,6 +4558,83 @@ def _natal_hayat_alani_analizi(motor):
              "giris":"Keşfetme arzunuz, yeni ufuklara duyduğunuz özlemin bir yansımasıdır.",
              "kapanis":"Her yolculuk kendinizi keşfetme fırsatıdır."},
         ]
+
+        if _EN:
+            ALAN_EN = {
+                "spor": {"etiket":"Sports & Fitness","giris":"Physical activity holds an important place in your life; your body carries a natural call to move.","kapanis":"Movement is life — listen to your body."},
+                "sanat": {"etiket":"Art & Creativity","giris":"Creativity and aesthetic sensitivity form the colorful side of life for you.","kapanis":"Art is the food of the soul — nourish the creativity within you."},
+                "hobi": {"etiket":"Hobbies & Interests","giris":"How you spend your free time is directly linked to the variety of your interests.","kapanis":"Every moment of joy is a gift that feeds your soul."},
+                "saglik": {"etiket":"Health & Vitality","giris":"The balance between body and mind is a reflection of your daily habits.","kapanis":"A healthy life is built through the big effect of small habits."},
+                "beslenme": {"etiket":"Nutrition & Diet","giris":"What you eat affects not only your body but also your emotional world directly.","kapanis":"What you eat feeds not only your body but also your soul."},
+                "ask": {"etiket":"Love & Romance","giris":"Your love life is shaped by the emotional codes hidden deep within your heart.","kapanis":"True love begins with the love you hold for yourself."},
+                "kariyer": {"etiket":"Career & Work Life","giris":"Your career journey takes shape where discipline and vision meet.","kapanis":"Success comes through bold steps taken at the right time."},
+                "aile": {"etiket":"Family & Roots","giris":"Your family bonds and roots are the key to understanding who you are.","kapanis":"Your family bonds are your greatest spiritual inheritance."},
+                "maddi": {"etiket":"Financial Situation","giris":"When your financial flow aligns with your values, abundance arrives naturally.","kapanis":"Financial balance begins by clarifying your values."},
+                "sosyal": {"etiket":"Social Life","giris":"Your social circle, communication style and interaction enrich your life.","kapanis":"Your circle is your greatest mirror and teacher."},
+                "egitim": {"etiket":"Education & Mind","giris":"Your desire to learn and your mental curiosity continually push you toward growth.","kapanis":"Learning is a journey that never ends."},
+                "manevi": {"etiket":"Spirituality & Inner Journey","giris":"Your inner journey reaches into the depths of unseen connections and intuitive awareness.","kapanis":"Inner peace is the essence of everything you seek in the outer world."},
+                "seyahat": {"etiket":"Travel & Discovery","giris":"Your urge to explore is a reflection of your longing for new horizons.","kapanis":"Every journey is an opportunity to discover yourself."},
+            }
+            for _a in ALANLAR:
+                _en_info = ALAN_EN.get(_a["anahtar"])
+                if _en_info:
+                    _a["etiket"] = _en_info["etiket"]
+                    _a["giris"] = _en_info["giris"]
+                    _a["kapanis"] = _en_info["kapanis"]
+
+        elif _ES:
+            ALAN_ES_ETIKET = {
+                "spor": "Deporte y Forma Física",
+                "sanat": "Arte y Creatividad",
+                "hobi": "Pasatiempos e Intereses",
+                "saglik": "Salud y Vitalidad",
+                "beslenme": "Nutrición y Dieta",
+                "ask": "Amor y Romance",
+                "kariyer": "Carrera y Vida Laboral",
+                "aile": "Familia y Raíces",
+                "maddi": "Situación Financiera",
+                "sosyal": "Vida Social",
+                "egitim": "Educación y Mente",
+                "manevi": "Espiritualidad y Viaje Interior",
+                "seyahat": "Viajes y Descubrimiento",
+            }
+            ALAN_ES_GIRIS = {
+                "spor": "La actividad física ocupa un lugar importante en tu vida; tu cuerpo lleva una llamada natural a moverse.",
+                "sanat": "La creatividad y la sensibilidad estética forman el lado colorido de la vida para ti.",
+                "hobi": "La forma en que empleas tu tiempo libre está directamente ligada a la variedad de tus intereses.",
+                "saglik": "El equilibrio entre cuerpo y mente es un reflejo de tus hábitos diarios.",
+                "beslenme": "Lo que comes afecta no solo a tu cuerpo, sino también directamente a tu mundo emocional.",
+                "ask": "Tu vida amorosa se moldea con los códigos emocionales ocultos en lo profundo de tu corazón.",
+                "kariyer": "Tu camino profesional se forma donde se unen la disciplina y la visión.",
+                "aile": "Tus lazos familiares y tus raíces son la clave para entender quién eres.",
+                "maddi": "Cuando tu flujo económico está en sintonía con tus valores, la abundancia llega de forma natural.",
+                "sosyal": "Tu círculo social, tu forma de comunicarte y tu interacción enriquecen tu vida.",
+                "egitim": "Tu deseo de aprender y tu curiosidad mental te impulsan constantemente a crecer.",
+                "manevi": "Tu viaje interior llega a las profundidades de conexiones invisibles y de tu conciencia intuitiva.",
+                "seyahat": "Tu ansia de explorar es un reflejo de tu anhelo por nuevos horizontes.",
+            }
+            ALAN_ES_KAPANIS = {
+                "spor": "El movimiento es vida; escucha a tu cuerpo.",
+                "sanat": "El arte es el alimento del alma; nutre la creatividad que llevas dentro.",
+                "hobi": "Cada momento de disfrute es un regalo que alimenta tu alma.",
+                "saglik": "Una vida sana se construye con el gran efecto de los pequeños hábitos.",
+                "beslenme": "Lo que comes alimenta no solo tu cuerpo, sino también tu alma.",
+                "ask": "El amor verdadero empieza por el amor que te tienes a ti mismo.",
+                "kariyer": "El éxito llega con pasos valientes dados en el momento adecuado.",
+                "aile": "Tus lazos familiares son tu mayor herencia espiritual.",
+                "maddi": "El equilibrio material comienza por aclarar tus valores.",
+                "sosyal": "Tu entorno es tu mejor espejo y maestro.",
+                "egitim": "Aprender es un viaje que nunca termina.",
+                "manevi": "La paz interior es la esencia de todo lo que buscas fuera.",
+                "seyahat": "Cada viaje es una oportunidad de descubrirte a ti mismo.",
+            }
+            for _a in ALANLAR:
+                if _a["anahtar"] in ALAN_ES_ETIKET:
+                    _a["etiket"] = ALAN_ES_ETIKET[_a["anahtar"]]
+                if _a["anahtar"] in ALAN_ES_GIRIS:
+                    _a["giris"] = ALAN_ES_GIRIS[_a["anahtar"]]
+                if _a["anahtar"] in ALAN_ES_KAPANIS:
+                    _a["kapanis"] = ALAN_ES_KAPANIS[_a["anahtar"]]
 
         import random
         sonuclar = []
@@ -3360,6 +4711,10 @@ def _natal_hayat_alani_analizi(motor):
                     if sey: oneriler.append({"tur":"seyahat","metin":sey})
 
             dominan = sorted(element_sayac.items(), key=lambda x: -x[1])[0][0] if max(element_sayac.values()) > 0 else "Ateş"
+            ELEMENT_AD_EN = {"Ateş":"Fire","Toprak":"Earth","Hava":"Air","Su":"Water"}
+            dominan_en = ELEMENT_AD_EN.get(dominan, dominan)
+            ELEMENT_AD_ES = {"Ateş":"Fuego","Toprak":"Tierra","Hava":"Aire","Su":"Agua"}
+            dominan_es = ELEMENT_AD_ES.get(dominan, dominan)
 
             # ── Natural language yorum generation (no planet names) ──
             havuz = [alan["giris"]]
@@ -3370,58 +4725,168 @@ def _natal_hayat_alani_analizi(motor):
                 "Hava": "zihinsel berraklığınız ve iletişim kurma yeteneğiniz",
                 "Su": "derin duygusal sezgileriniz ve empatik anlayışınız",
             }
+            ELEMENT_ACIKLAMA_EN = {
+                "Ateş": "your dynamic and passionate energy, your courage to take action",
+                "Toprak": "your steady and reliable nature, your ability to build solid foundations",
+                "Hava": "your mental clarity and your ability to communicate",
+                "Su": "your deep emotional intuition and empathic understanding",
+            }
+            ELEMENT_ACIKLAMA_ES = {
+                "Ateş": "tu energía dinámica y apasionada, tu valentía para actuar",
+                "Toprak": "tu naturaleza firme y confiable, tu capacidad para construir bases sólidas",
+                "Hava": "tu claridad mental y tu capacidad de comunicación",
+                "Su": "tus intuiciones emocionales profundas y tu comprensión empática",
+            }
             eac = element_acik = ELEMENT_ACIKLAMA.get(dominan, "enerjiniz")
             eac_baslik = eac[0].upper() + eac[1:] if eac else eac
+            if _EN:
+                eac = element_acik = ELEMENT_ACIKLAMA_EN.get(dominan, "your energy")
+                eac_baslik = eac[0].upper() + eac[1:] if eac else eac
+            if _ES:
+                eac = element_acik = ELEMENT_ACIKLAMA_ES.get(dominan, "tu energía")
+                eac_baslik = eac[0].upper() + eac[1:] if eac else eac
 
-            ALAN_DOMINAN = {
-                "spor": f"Özellikle {dominan} elementinin ön planda olduğu bir vücut yapısına sahipsiniz. Bedeninizi zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
-                "sanat": f"Sanatsal ifadenizde {dominan} elementinin izleri belirgin — {eac} yaratıcılığınızı besleyen ana kaynak.",
-                "hobi": f"Boş zamanlarınızda {dominan} elementinin yönlendirdiği aktiviteler size daha çok hitap ediyor. {eac_baslik}, ilgi alanlarınızın temelini oluşturuyor.",
-                "saglik": f"Sağlığınız {dominan} elementinin dengesine duyarlı — {eac} beden sinyallerinizi doğru okumanızı sağlıyor.",
-                "beslenme": f"Beslenme alışkanlıklarınızda {dominan} elementinin etkisi görülüyor. {eac_baslik}, hangi besinlerin size iyi geldiğini belirlemede önemli rol oynuyor.",
-                "ask": f"Aşk hayatınızda {dominan} elementinin enerjisi öne çıkıyor. {eac_baslik}, duygusal bağ kurma biçiminizi derinden etkiliyor.",
-                "kariyer": f"Kariyer yolculuğunuzda {dominan} elementinin özellikleri belirleyici. {eac_baslik}, iş hayatınızdaki en büyük gücünüz.",
-                "aile": f"Aile bağlarınız {dominan} elementinin dokusuyla örülü. {eac_baslik}, köklerinizle kurduğunuz bağın kalitesini belirliyor.",
-                "maddi": f"Maddi konularda {dominan} elementinin yaklaşımı size rehberlik ediyor. {eac_baslik}, finansal kararlarınızı şekillendiriyor.",
-                "sosyal": f"Sosyal çevrenizde {dominan} elementinin enerjisiyle hareket ediyorsunuz. {eac_baslik}, çevrenizle kurduğunuz bağları güçlendiriyor.",
-                "egitim": f"Öğrenme tarzınız {dominan} elementinin doğasına uygun. {eac_baslik}, bilgiyi içselleştirme biçiminizi belirliyor.",
-                "manevi": f"Manevi yolculuğunuz {dominan} elementinin rehberliğinde ilerliyor. {eac_baslik}, ruhsal arayışınızın temel dinamiği.",
-                "seyahat": f"Keşfetme arzunuz {dominan} elementinin enerjisiyle besleniyor. {eac_baslik}, size yeni ufuklara açılma cesareti veriyor.",
-            }
-
-            # Element-based specific suggestions for each area
-            ELEMENT_ONERI = {
-                "spor": {"Ateş":"yüksek tempolu kardiyo, dövüş sporları ve takım oyunları","Toprak":"ağırlık çalışmaları, pilates ve doğa yürüyüşleri","Hava":"dans, esneme ve grup fitness dersleri","Su":"yüzme, yoga ve su egzersizleri"},
-                "sanat": {"Ateş":"heykel, performans sanatı ve deneysel çalışmalar","Toprak":"seramik, dokuma ve doğal malzemelerle sanat","Hava":"dijital sanat, edebiyat ve fotoğrafçılık","Su":"suluboya, müzik ve duygusal ifade sanatları"},
-                "hobi": {"Ateş":"macera sporları, seyahat ve keşif","Toprak":"bahçecilik, koleksiyon ve el işleri","Hava":"satranç, yazılım ve okuma","Su":"müzik, fotoğrafçılık ve doğa gözlemi"},
-                "saglik": {"Ateş":"dinamik egzersiz ve yüksek enerjili aktiviteler","Toprak":"düzenli uyku, sağlam bir günlük rutin ve doğal beslenme","Hava":"nefes çalışmaları ve zihin-beden bağlantısı","Su":"meditasyon, su terapisi ve duygusal denge"},
-                "beslenme": {"Ateş":"hafif, taze ve canlandırıcı besinler; baharatlı yemeklere dikkat","Toprak":"düzenli öğünler, köklü sebzeler ve doğal tahıllar","Hava":"çeşitli ve renkli besinler; sosyal yemek keyfi","Su":"sulu gıdalar, deniz ürünleri ve bitki çayları"},
-                "ask": {"Ateş":"tutkulu ve coşkulu bir bağ arayışı, fiziksel çekim güçlü","Toprak":"sadakat, güven ve uzun vadeli bağlılık ön planda","Hava":"entelektüel uyum ve sosyal paylaşım önemli","Su":"derin duygusal bağ ve ruhsal uyum arıyorsunuz"},
-                "kariyer": {"Ateş":"öncü ve girişimci roller, liderlik pozisyonları","Toprak":"yapıcı ve yönetici pozisyonlar, finansal istikrar","Hava":"iletişim, yazılım, medya ve danışmanlık","Su":"sanat, psikoloji, sağlık ve danışmanlık alanları"},
-                "aile": {"Ateş":"aile içinde lider ve koruyucu rol üstleniyorsunuz","Toprak":"aile geleneklerini sürdüren güvenilir bir bağ kuruyorsunuz","Hava":"aile ile entelektüel paylaşım ve açık iletişim","Su":"aile bağlarınız duygusal derinlik ve şefkatle örülü"},
-                "maddi": {"Ateş":"girişimci yatırımlar ve risk alma potansiyeliniz yüksek","Toprak":"birikim ve uzun vadeli yatırımlar size uygun","Hava":"entelektüel sermaye ve network ile kazanç","Su":"sanat ve duygusal değeri olan yatırımlar size uygun"},
-                "sosyal": {"Ateş":"sosyal çevrenizde doğal bir lider ve ilham kaynağısınız","Toprak":"sadık ve güvenilir bir dost, çevrenizde sağlam bağlar","Hava":"geniş bir çevre ve entelektüel sohbetler sizi besliyor","Su":"derin dostluklar ve empatik bağlar kuruyorsunuz"},
-                "egitim": {"Ateş":"yeni konulara hızlı ilgi duyar ve cesurca dalarsınız","Toprak":"derinlemesine çalışma ve pratik beceriler kazanma","Hava":"soyut kavramlar ve teorik bilgiye yatkınsınız","Su":"sezgisel öğrenme ve psikolojik konular ilginizi çeker"},
-                "manevi": {"Ateş":"aktif meditasyon ve doğada ruhsal bağlantı","Toprak":"ritüeller ve günlük manevi pratikler","Hava":"felsefi sorgulama ve zihinsel farkındalık","Su":"derin meditasyon, yoga ve ruhsal rehberlik"},
-                "seyahat": {"Ateş":"macera dolu keşifler ve adrenalin yüklü rotalar","Toprak":"doğal güzellikler ve kültürel turlar","Hava":"entelektüel seyahatler ve yeni kültürler öğrenme","Su":"deniz kenarı, mistik ve ruhsal yolculuklar"},
-            }
-            oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "doğal yapınıza uygun aktiviteler")
-
-            ALAN_OZEL_CUMLER = {
-                "spor": f"Sizin için en uygun sporlar {oneri_metni} gibi aktivitelerdir. Vücudunuzu zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
-                "sanat": f"Yaratıcı yönünüz en çok {dominan} elementinin etkisi altında şekilleniyor. {oneri_metni} gibi sanatsal ifade biçimleri size doğal geliyor. Sezgilerinizin rehberliğine izin verdiğinizde ortaya gerçekten özgün işler çıkıyor.",
-                "hobi": f"İlgi alanlarınız {dominan} elementinin özelliklerini yansıtıyor. {oneri_metni} gibi hobiler size daha çok hitap ediyor. Bu alandaki merakınız sizi sürekli yeni şeyler denemeye itiyor.",
-                "saglik": f"Sağlık konusunda {dominan} elementinin ihtiyaçlarını anlamak size büyük avantaj sağlıyor. Size en iyi gelen aktiviteler {oneri_metni} şeklinde sıralanabilir. Vücudunuzun sinyallerine kulak verdiğinizde doğru seçimleri yapıyorsunuz.",
-                "beslenme": f"Beslenme alışkanlıklarınızı {dominan} elementinin dengesine göre düzenlemek size iyi gelecek. {oneri_metni} gibi besinler vücudunuzu hem fiziksel hem de ruhsal olarak besliyor.",
-                "ask": f"İlişkilerinizde {oneri_metni}. Duygusal dünyanızda derinlik ve samimiyet arayışınız, sizi yüzeysel bağlardan uzaklaştırıyor. Kalbinizin sesini dinlediğinizde doğru yolu buluyorsunuz.",
-                "kariyer": f"Profesyonel hayatınızda {dominan} elementinin güçlü yönlerini kullanıyorsunuz. {oneri_metni} kariyerinizde başarıya ulaşmanızda size yardımcı oluyor. Disiplinli adımlar atmak size istikrar getiriyor.",
-                "aile": f"Aile bağlarınız {dominan} elementinin doğasına uygun bir şekilde şekilleniyor. {oneri_metni}. Köklerinizden aldığınız gücü fark ettiğinizde, hem geçmişinizle barışıyor hem de geleceğe sağlam adımlarla ilerliyorsunuz.",
-                "maddi": f"Parasal konularda {oneri_metni}. Değerlerinizi netleştirdiğinizde ve akışa güvendiğinizde, maddi kaynaklarınızı daha bilinçli yönetiyorsunuz.",
-                "sosyal": f"Sosyal çevrenizde {oneri_metni}. İnsanlarla kurduğunuz bağlarda içtenlik ve derinlik aramanız, size anlamlı dostluklar kazandırıyor.",
-                "egitim": f"Öğrenme süreciniz {dominan} elementinin özelliklerini taşıyor. {oneri_metni}. Merak ettiğiniz konuların derinliklerine indikçe, bilginin size kattığı gücü daha çok hissediyorsunuz.",
-                "manevi": f"İçsel yolculuğunuzda {oneri_metni} size rehberlik ediyor. Ruhsal arayışınızda sessizliğe ve iç gözleme zaman ayırdığınızda, kendinizle ilgili yeni farkındalıklar kazanıyorsunuz.",
-                "seyahat": f"Keşif ruhunuz {dominan} elementinin enerjisiyle canlanıyor. {oneri_metni} size sadece keyif değil, aynı zamanda derin bir perspektif kazandırıyor.",
-            }
+            if _EN:
+                ALAN_DOMINAN = {
+                    "spor": f"You have a body constitution in which the {dominan_en} element especially comes to the fore. Rather than forcing your body, you get the most efficient results when you align with its natural rhythm.",
+                    "sanat": f"The traces of the {dominan_en} element are clear in your artistic expression — {eac} is the main source feeding your creativity.",
+                    "hobi": f"Activities guided by the {dominan_en} element appeal to you more in your free time. {eac_baslik} forms the foundation of your interests.",
+                    "saglik": f"Your health is sensitive to the balance of the {dominan_en} element — {eac} helps you read your body's signals correctly.",
+                    "beslenme": f"The influence of the {dominan_en} element is visible in your eating habits. {eac_baslik} plays an important role in determining which foods suit you.",
+                    "ask": f"The energy of the {dominan_en} element stands out in your love life. {eac_baslik} deeply affects how you form emotional bonds.",
+                    "kariyer": f"The qualities of the {dominan_en} element are decisive in your career journey. {eac_baslik} is your greatest strength in your work life.",
+                    "aile": f"Your family bonds are woven with the texture of the {dominan_en} element. {eac_baslik} determines the quality of the bond you build with your roots.",
+                    "maddi": f"The approach of the {dominan_en} element guides you in financial matters. {eac_baslik} shapes your financial decisions.",
+                    "sosyal": f"You move with the energy of the {dominan_en} element in your social circle. {eac_baslik} strengthens the bonds you build with your surroundings.",
+                    "egitim": f"Your learning style suits the nature of the {dominan_en} element. {eac_baslik} determines how you internalize knowledge.",
+                    "manevi": f"Your spiritual journey advances under the guidance of the {dominan_en} element. {eac_baslik} is the core dynamic of your spiritual search.",
+                    "seyahat": f"Your urge to explore is nourished by the energy of the {dominan_en} element. {eac_baslik} gives you the courage to open up to new horizons.",
+                }
+                ELEMENT_ONERI = {
+                    "spor": {"Ateş":"high-tempo cardio, combat sports and team games","Toprak":"weight training, pilates and nature walks","Hava":"dance, stretching and group fitness classes","Su":"swimming, yoga and water exercises"},
+                    "sanat": {"Ateş":"sculpture, performance art and experimental works","Toprak":"ceramics, weaving and art with natural materials","Hava":"digital art, literature and photography","Su":"watercolor, music and emotionally expressive arts"},
+                    "hobi": {"Ateş":"adventure sports, travel and exploration","Toprak":"gardening, collecting and crafts","Hava":"chess, software and reading","Su":"music, photography and nature observation"},
+                    "saglik": {"Ateş":"dynamic exercise and high-energy activities","Toprak":"regular sleep, a solid daily routine and natural eating","Hava":"breathing practices and the mind-body connection","Su":"meditation, water therapy and emotional balance"},
+                    "beslenme": {"Ateş":"light, fresh and revitalizing foods; be careful with spicy meals","Toprak":"regular meals, root vegetables and natural grains","Hava":"varied and colorful foods; the joy of social meals","Su":"water-rich foods, seafood and herbal teas"},
+                    "ask": {"Ateş":"a search for a passionate and enthusiastic bond, strong physical attraction","Toprak":"loyalty, trust and long-term commitment come first","Hava":"intellectual harmony and social sharing matter","Su":"you seek a deep emotional bond and spiritual harmony"},
+                    "kariyer": {"Ateş":"pioneering and entrepreneurial roles, leadership positions","Toprak":"constructive and managerial positions, financial stability","Hava":"communication, software, media and consulting","Su":"art, psychology, health and consulting fields"},
+                    "aile": {"Ateş":"you take on a leader and protector role in the family","Toprak":"you build a trustworthy bond that keeps family traditions","Hava":"intellectual sharing and open communication with family","Su":"family bonds woven with emotional depth and affection"},
+                    "maddi": {"Ateş":"high entrepreneurial investment and risk-taking potential","Toprak":"savings and long-term investments suit you","Hava":"gain through intellectual capital and networking","Su":"investments with artistic and emotional value suit you"},
+                    "sosyal": {"Ateş":"you are a natural leader and source of inspiration in your circle","Toprak":"a loyal and trustworthy friend, solid bonds around you","Hava":"a wide circle and intellectual conversations nourish you","Su":"you build deep friendships and empathic bonds"},
+                    "egitim": {"Ateş":"you take quick interest in new topics and dive in boldly","Toprak":"in-depth study and gaining practical skills","Hava":"you are inclined toward abstract concepts and theoretical knowledge","Su":"intuitive learning and psychological topics draw your interest"},
+                    "manevi": {"Ateş":"active meditation and spiritual connection in nature","Toprak":"rituals and daily spiritual practices","Hava":"philosophical inquiry and mental awareness","Su":"deep meditation, yoga and spiritual guidance"},
+                    "seyahat": {"Ateş":"adventure-filled discoveries and adrenaline-packed routes","Toprak":"natural beauty and cultural tours","Hava":"intellectual travel and learning new cultures","Su":"seaside, mystical and spiritual journeys"},
+                }
+                oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "activities suited to your natural constitution")
+                ALAN_OZEL_CUMLER = {
+                    "spor": f"The most suitable sports for you are activities like {oneri_metni}. Rather than forcing your body, you get the most efficient results when you align with its natural rhythm.",
+                    "sanat": f"Your creative side is shaped most under the influence of the {dominan_en} element. Artistic expression forms like {oneri_metni} come naturally to you. When you allow your intuition to guide you, truly original work emerges.",
+                    "hobi": f"Your interests reflect the qualities of the {dominan_en} element. Hobbies like {oneri_metni} appeal to you more. Your curiosity in this area constantly pushes you to try new things.",
+                    "saglik": f"Understanding the needs of the {dominan_en} element in health gives you a big advantage. The activities that suit you best can be listed as {oneri_metni}. When you heed your body's signals, you make the right choices.",
+                    "beslenme": f"Arranging your eating habits according to the balance of the {dominan_en} element will serve you well. Foods like {oneri_metni} nourish your body both physically and spiritually.",
+                    "ask": f"In your relationships, {oneri_metni}. Your search for depth and sincerity in your emotional world keeps you away from superficial bonds. When you listen to your heart, you find the right path.",
+                    "kariyer": f"You use the strong qualities of the {dominan_en} element in your professional life. {oneri_metni} help you reach success in your career. Taking disciplined steps brings you stability.",
+                    "aile": f"Your family bonds take shape in keeping with the nature of the {dominan_en} element. {oneri_metni}. When you recognize the strength you draw from your roots, you make peace with your past and move toward the future with firm steps.",
+                    "maddi": f"In financial matters, {oneri_metni}. When you clarify your values and trust the flow, you manage your resources more consciously.",
+                    "sosyal": f"In your social circle, {oneri_metni}. Your search for sincerity and depth in the bonds you build earns you meaningful friendships.",
+                    "egitim": f"Your learning process carries the qualities of the {dominan_en} element. {oneri_metni}. The deeper you go into the subjects you are curious about, the more you feel the power knowledge gives you.",
+                    "manevi": f"{oneri_metni} guides you on your inner journey. When you set aside time for silence and introspection in your spiritual search, you gain new awareness about yourself.",
+                    "seyahat": f"Your spirit of discovery comes alive with the energy of the {dominan_en} element. {oneri_metni} give you not only pleasure but also a deep perspective.",
+                }
+            elif _ES:
+                ALAN_DOMINAN = {
+                    "spor": f"Tienes una constitución física en la que destaca especialmente el elemento {dominan_es}. En lugar de forzar tu cuerpo, obtienes los resultados más eficientes cuando te alineas con su ritmo natural.",
+                    "sanat": f"Las huellas del elemento {dominan_es} son evidentes en tu expresión artística — {eac} es la fuente principal que alimenta tu creatividad.",
+                    "hobi": f"En tu tiempo libre te atraen más las actividades guiadas por el elemento {dominan_es}. {eac_baslik} forma la base de tus intereses.",
+                    "saglik": f"Tu salud es sensible al equilibrio del elemento {dominan_es} — {eac} te ayuda a leer correctamente las señales de tu cuerpo.",
+                    "beslenme": f"La influencia del elemento {dominan_es} se aprecia en tus hábitos alimentarios. {eac_baslik} juega un papel importante a la hora de determinar qué alimentos te sientan bien.",
+                    "ask": f"En tu vida amorosa destaca la energía del elemento {dominan_es}. {eac_baslik} afecta profundamente a cómo formas vínculos emocionales.",
+                    "kariyer": f"Las cualidades del elemento {dominan_es} son decisivas en tu camino profesional. {eac_baslik} es tu mayor fortaleza en tu vida laboral.",
+                    "aile": f"Tus lazos familiares están tejidos con la textura del elemento {dominan_es}. {eac_baslik} determina la calidad del vínculo que estableces con tus raíces.",
+                    "maddi": f"En asuntos económicos te guía el enfoque del elemento {dominan_es}. {eac_baslik} da forma a tus decisiones financieras.",
+                    "sosyal": f"Te mueves con la energía del elemento {dominan_es} en tu círculo social. {eac_baslik} fortalece los lazos que construyes con tu entorno.",
+                    "egitim": f"Tu estilo de aprendizaje se adapta a la naturaleza del elemento {dominan_es}. {eac_baslik} determina cómo interiorizas el conocimiento.",
+                    "manevi": f"Tu viaje espiritual avanza guiado por el elemento {dominan_es}. {eac_baslik} es la dinámica central de tu búsqueda espiritual.",
+                    "seyahat": f"Tu ansia de explorar se nutre de la energía del elemento {dominan_es}. {eac_baslik} te da el coraje para abrirte a nuevos horizontes.",
+                }
+                ELEMENT_ONERI = {
+                    "spor": {"Ateş":"cardio de alto ritmo, deportes de combate y juegos de equipo","Toprak":"entrenamiento de fuerza, pilates y caminatas por la naturaleza","Hava":"baile, estiramientos y clases de fitness en grupo","Su":"natación, yoga y ejercicios acuáticos"},
+                    "sanat": {"Ateş":"escultura, arte de performance y obras experimentales","Toprak":"cerámica, tejido y arte con materiales naturales","Hava":"arte digital, literatura y fotografía","Su":"acuarela, música y artes de expresión emocional"},
+                    "hobi": {"Ateş":"deportes de aventura, viajes y exploración","Toprak":"jardinería, coleccionismo y artesanías","Hava":"ajedrez, programación y lectura","Su":"música, fotografía y observación de la naturaleza"},
+                    "saglik": {"Ateş":"ejercicio dinámico y actividades de alta energía","Toprak":"sueño regular, una rutina diaria sólida y alimentación natural","Hava":"prácticas de respiración y la conexión mente-cuerpo","Su":"meditación, hidroterapia y equilibrio emocional"},
+                    "beslenme": {"Ateş":"alimentos ligeros, frescos y revitalizantes; cuidado con las comidas picantes","Toprak":"comidas regulares, vegetales de raíz y cereales naturales","Hava":"alimentos variados y coloridos; el placer de las comidas sociales","Su":"alimentos ricos en agua, mariscos e infusiones"},
+                    "ask": {"Ateş":"la búsqueda de un vínculo apasionado y entusiasta, una fuerte atracción física","Toprak":"la lealtad, la confianza y el compromiso a largo plazo importan primero","Hava":"importan la armonía intelectual y el compartir social","Su":"buscas un vínculo emocional profundo y armonía espiritual"},
+                    "kariyer": {"Ateş":"roles pioneros y emprendedores, posiciones de liderazgo","Toprak":"posiciones constructivas y de gestión, estabilidad financiera","Hava":"comunicación, software, medios y consultoría","Su":"ámbitos del arte, la psicología, la salud y la consultoría"},
+                    "aile": {"Ateş":"asumes un papel de líder y protector en la familia","Toprak":"construyes un vínculo confiable que mantiene las tradiciones familiares","Hava":"compartir intelectual y comunicación abierta con la familia","Su":"lazos familiares tejidos con profundidad emocional y afecto"},
+                    "maddi": {"Ateş":"un alto potencial de inversión emprendedora y de asumir riesgos","Toprak":"te convienen el ahorro y las inversiones a largo plazo","Hava":"ganancias mediante el capital intelectual y las redes de contactos","Su":"te convienen las inversiones con valor artístico y emocional"},
+                    "sosyal": {"Ateş":"eres un líder natural y fuente de inspiración en tu círculo","Toprak":"un amigo leal y confiable, vínculos sólidos a tu alrededor","Hava":"un círculo amplio y conversaciones intelectuales te nutren","Su":"construyes amistades profundas y vínculos empáticos"},
+                    "egitim": {"Ateş":"te interesas rápidamente por temas nuevos y te sumerges con valentía","Toprak":"estudio en profundidad y adquisición de habilidades prácticas","Hava":"te inclinas por conceptos abstractos y conocimiento teórico","Su":"el aprendizaje intuitivo y los temas psicológicos despiertan tu interés"},
+                    "manevi": {"Ateş":"meditación activa y conexión espiritual en la naturaleza","Toprak":"rituales y prácticas espirituales diarias","Hava":"indagación filosófica y conciencia mental","Su":"meditación profunda, yoga y guía espiritual"},
+                    "seyahat": {"Ateş":"descubrimientos llenos de aventura y rutas cargadas de adrenalina","Toprak":"bellezas naturales y tours culturales","Hava":"viajes intelectuales y aprendizaje de nuevas culturas","Su":"viajes junto al mar, místicos y espirituales"},
+                }
+                oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "actividades acordes con tu constitución natural")
+                ALAN_OZEL_CUMLER = {
+                    "spor": f"Los deportes más adecuados para ti son actividades como {oneri_metni}. En lugar de forzar tu cuerpo, obtienes los resultados más eficientes cuando te alineas con su ritmo natural.",
+                    "sanat": f"Tu lado creativo se forma sobre todo bajo la influencia del elemento {dominan_es}. Formas de expresión artística como {oneri_metni} te resultan naturales. Cuando permites que tu intuición te guíe, surge un trabajo realmente original.",
+                    "hobi": f"Tus intereses reflejan las cualidades del elemento {dominan_es}. Los pasatiempos como {oneri_metni} te atraen más. Tu curiosidad en este campo te empuja constantemente a probar cosas nuevas.",
+                    "saglik": f"Entender las necesidades del elemento {dominan_es} en la salud te da una gran ventaja. Las actividades que mejor te sientan pueden enumerarse como {oneri_metni}. Cuando atiendes las señales de tu cuerpo, tomas las decisiones correctas.",
+                    "beslenme": f"Organizar tus hábitos alimentarios según el equilibrio del elemento {dominan_es} te vendrá bien. Alimentos como {oneri_metni} nutren tu cuerpo tanto física como espiritualmente.",
+                    "ask": f"En tus relaciones, {oneri_metni}. Tu búsqueda de profundidad y sinceridad en tu mundo emocional te aleja de los vínculos superficiales. Cuando escuchas a tu corazón, encuentras el camino correcto.",
+                    "kariyer": f"Utilizas las fuertes cualidades del elemento {dominan_es} en tu vida profesional. {oneri_metni} te ayudan a alcanzar el éxito en tu carrera. Dar pasos disciplinados te aporta estabilidad.",
+                    "aile": f"Tus lazos familiares se forman en sintonía con la naturaleza del elemento {dominan_es}. {oneri_metni}. Cuando reconoces la fuerza que recibes de tus raíces, haces las paces con tu pasado y avanzas con paso firme hacia el futuro.",
+                    "maddi": f"En asuntos económicos, {oneri_metni}. Cuando aclaras tus valores y confías en el flujo, gestionas tus recursos de forma más consciente.",
+                    "sosyal": f"En tu círculo social, {oneri_metni}. Tu búsqueda de sinceridad y profundidad en los vínculos que construyes te granjea amistades significativas.",
+                    "egitim": f"Tu proceso de aprendizaje lleva las cualidades del elemento {dominan_es}. {oneri_metni}. Cuanto más profundizas en los temas que te interesan, más sientes el poder que te da el conocimiento.",
+                    "manevi": f"{oneri_metni} te guían en tu viaje interior. Cuando reservas tiempo para el silencio y la introspección en tu búsqueda espiritual, adquieres nuevas conciencias sobre ti mismo.",
+                    "seyahat": f"Tu espíritu de descubrimiento cobra vida con la energía del elemento {dominan_es}. {oneri_metni} te aportan no solo placer, sino también una perspectiva profunda.",
+                }
+            else:
+                ALAN_DOMINAN = {
+                    "spor": f"Özellikle {dominan} elementinin ön planda olduğu bir vücut yapısına sahipsiniz. Bedeninizi zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
+                    "sanat": f"Sanatsal ifadenizde {dominan} elementinin izleri belirgin — {eac} yaratıcılığınızı besleyen ana kaynak.",
+                    "hobi": f"Boş zamanlarınızda {dominan} elementinin yönlendirdiği aktiviteler size daha çok hitap ediyor. {eac_baslik}, ilgi alanlarınızın temelini oluşturuyor.",
+                    "saglik": f"Sağlığınız {dominan} elementinin dengesine duyarlı — {eac} beden sinyallerinizi doğru okumanızı sağlıyor.",
+                    "beslenme": f"Beslenme alışkanlıklarınızda {dominan} elementinin etkisi görülüyor. {eac_baslik}, hangi besinlerin size iyi geldiğini belirlemede önemli rol oynuyor.",
+                    "ask": f"Aşk hayatınızda {dominan} elementinin enerjisi öne çıkıyor. {eac_baslik}, duygusal bağ kurma biçiminizi derinden etkiliyor.",
+                    "kariyer": f"Kariyer yolculuğunuzda {dominan} elementinin özellikleri belirleyici. {eac_baslik}, iş hayatınızdaki en büyük gücünüz.",
+                    "aile": f"Aile bağlarınız {dominan} elementinin dokusuyla örülü. {eac_baslik}, köklerinizle kurduğunuz bağın kalitesini belirliyor.",
+                    "maddi": f"Maddi konularda {dominan} elementinin yaklaşımı size rehberlik ediyor. {eac_baslik}, finansal kararlarınızı şekillendiriyor.",
+                    "sosyal": f"Sosyal çevrenizde {dominan} elementinin enerjisiyle hareket ediyorsunuz. {eac_baslik}, çevrenizle kurduğunuz bağları güçlendiriyor.",
+                    "egitim": f"Öğrenme tarzınız {dominan} elementinin doğasına uygun. {eac_baslik}, bilgiyi içselleştirme biçiminizi belirliyor.",
+                    "manevi": f"Manevi yolculuğunuz {dominan} elementinin rehberliğinde ilerliyor. {eac_baslik}, ruhsal arayışınızın temel dinamiği.",
+                    "seyahat": f"Keşfetme arzunuz {dominan} elementinin enerjisiyle besleniyor. {eac_baslik}, size yeni ufuklara açılma cesareti veriyor.",
+                }
+                ELEMENT_ONERI = {
+                    "spor": {"Ateş":"yüksek tempolu kardiyo, dövüş sporları ve takım oyunları","Toprak":"ağırlık çalışmaları, pilates ve doğa yürüyüşleri","Hava":"dans, esneme ve grup fitness dersleri","Su":"yüzme, yoga ve su egzersizleri"},
+                    "sanat": {"Ateş":"heykel, performans sanatı ve deneysel çalışmalar","Toprak":"seramik, dokuma ve doğal malzemelerle sanat","Hava":"dijital sanat, edebiyat ve fotoğrafçılık","Su":"suluboya, müzik ve duygusal ifade sanatları"},
+                    "hobi": {"Ateş":"macera sporları, seyahat ve keşif","Toprak":"bahçecilik, koleksiyon ve el işleri","Hava":"satranç, yazılım ve okuma","Su":"müzik, fotoğrafçılık ve doğa gözlemi"},
+                    "saglik": {"Ateş":"dinamik egzersiz ve yüksek enerjili aktiviteler","Toprak":"düzenli uyku, sağlam bir günlük rutin ve doğal beslenme","Hava":"nefes çalışmaları ve zihin-beden bağlantısı","Su":"meditasyon, su terapisi ve duygusal denge"},
+                    "beslenme": {"Ateş":"hafif, taze ve canlandırıcı besinler; baharatlı yemeklere dikkat","Toprak":"düzenli öğünler, köklü sebzeler ve doğal tahıllar","Hava":"çeşitli ve renkli besinler; sosyal yemek keyfi","Su":"sulu gıdalar, deniz ürünleri ve bitki çayları"},
+                    "ask": {"Ateş":"tutkulu ve coşkulu bir bağ arayışı, fiziksel çekim güçlü","Toprak":"sadakat, güven ve uzun vadeli bağlılık ön planda","Hava":"entelektüel uyum ve sosyal paylaşım önemli","Su":"derin duygusal bağ ve ruhsal uyum arıyorsunuz"},
+                    "kariyer": {"Ateş":"öncü ve girişimci roller, liderlik pozisyonları","Toprak":"yapıcı ve yönetici pozisyonlar, finansal istikrar","Hava":"iletişim, yazılım, medya ve danışmanlık","Su":"sanat, psikoloji, sağlık ve danışmanlık alanları"},
+                    "aile": {"Ateş":"aile içinde lider ve koruyucu rol üstleniyorsunuz","Toprak":"aile geleneklerini sürdüren güvenilir bir bağ kuruyorsunuz","Hava":"aile ile entelektüel paylaşım ve açık iletişim","Su":"aile bağlarınız duygusal derinlik ve şefkatle örülü"},
+                    "maddi": {"Ateş":"girişimci yatırımlar ve risk alma potansiyeliniz yüksek","Toprak":"birikim ve uzun vadeli yatırımlar size uygun","Hava":"entelektüel sermaye ve network ile kazanç","Su":"sanat ve duygusal değeri olan yatırımlar size uygun"},
+                    "sosyal": {"Ateş":"sosyal çevrenizde doğal bir lider ve ilham kaynağısınız","Toprak":"sadık ve güvenilir bir dost, çevrenizde sağlam bağlar","Hava":"geniş bir çevre ve entelektüel sohbetler sizi besliyor","Su":"derin dostluklar ve empatik bağlar kuruyorsunuz"},
+                    "egitim": {"Ateş":"yeni konulara hızlı ilgi duyar ve cesurca dalarsınız","Toprak":"derinlemesine çalışma ve pratik beceriler kazanma","Hava":"soyut kavramlar ve teorik bilgiye yatkınsınız","Su":"sezgisel öğrenme ve psikolojik konular ilginizi çeker"},
+                    "manevi": {"Ateş":"aktif meditasyon ve doğada ruhsal bağlantı","Toprak":"ritüeller ve günlük manevi pratikler","Hava":"felsefi sorgulama ve zihinsel farkındalık","Su":"derin meditasyon, yoga ve ruhsal rehberlik"},
+                    "seyahat": {"Ateş":"macera dolu keşifler ve adrenalin yüklü rotalar","Toprak":"doğal güzellikler ve kültürel turlar","Hava":"entelektüel seyahatler ve yeni kültürler öğrenme","Su":"deniz kenarı, mistik ve ruhsal yolculuklar"},
+                }
+                oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "doğal yapınıza uygun aktiviteler")
+                ALAN_OZEL_CUMLER = {
+                    "spor": f"Sizin için en uygun sporlar {oneri_metni} gibi aktivitelerdir. Vücudunuzu zorlamaktan çok, onun doğal ritmine uyum sağladığınızda en verimli sonuçları alıyorsunuz.",
+                    "sanat": f"Yaratıcı yönünüz en çok {dominan} elementinin etkisi altında şekilleniyor. {oneri_metni} gibi sanatsal ifade biçimleri size doğal geliyor. Sezgilerinizin rehberliğine izin verdiğinizde ortaya gerçekten özgün işler çıkıyor.",
+                    "hobi": f"İlgi alanlarınız {dominan} elementinin özelliklerini yansıtıyor. {oneri_metni} gibi hobiler size daha çok hitap ediyor. Bu alandaki merakınız sizi sürekli yeni şeyler denemeye itiyor.",
+                    "saglik": f"Sağlık konusunda {dominan} elementinin ihtiyaçlarını anlamak size büyük avantaj sağlıyor. Size en iyi gelen aktiviteler {oneri_metni} şeklinde sıralanabilir. Vücudunuzun sinyallerine kulak verdiğinizde doğru seçimleri yapıyorsunuz.",
+                    "beslenme": f"Beslenme alışkanlıklarınızı {dominan} elementinin dengesine göre düzenlemek size iyi gelecek. {oneri_metni} gibi besinler vücudunuzu hem fiziksel hem de ruhsal olarak besliyor.",
+                    "ask": f"İlişkilerinizde {oneri_metni}. Duygusal dünyanızda derinlik ve samimiyet arayışınız, sizi yüzeysel bağlardan uzaklaştırıyor. Kalbinizin sesini dinlediğinizde doğru yolu buluyorsunuz.",
+                    "kariyer": f"Profesyonel hayatınızda {dominan} elementinin güçlü yönlerini kullanıyorsunuz. {oneri_metni} kariyerinizde başarıya ulaşmanızda size yardımcı oluyor. Disiplinli adımlar atmak size istikrar getiriyor.",
+                    "aile": f"Aile bağlarınız {dominan} elementinin doğasına uygun bir şekilde şekilleniyor. {oneri_metni}. Köklerinizden aldığınız gücü fark ettiğinizde, hem geçmişinizle barışıyor hem de geleceğe sağlam adımlarla ilerliyorsunuz.",
+                    "maddi": f"Parasal konularda {oneri_metni}. Değerlerinizi netleştirdiğinizde ve akışa güvendiğinizde, maddi kaynaklarınızı daha bilinçli yönetiyorsunuz.",
+                    "sosyal": f"Sosyal çevrenizde {oneri_metni}. İnsanlarla kurduğunuz bağlarda içtenlik ve derinlik aramanız, size anlamlı dostluklar kazandırıyor.",
+                    "egitim": f"Öğrenme süreciniz {dominan} elementinin özelliklerini taşıyor. {oneri_metni}. Merak ettiğiniz konuların derinliklerine indikçe, bilginin size kattığı gücü daha çok hissediyorsunuz.",
+                    "manevi": f"İçsel yolculuğunuzda {oneri_metni} size rehberlik ediyor. Ruhsal arayışınızda sessizliğe ve iç gözleme zaman ayırdığınızda, kendinizle ilgili yeni farkındalıklar kazanıyorsunuz.",
+                    "seyahat": f"Keşif ruhunuz {dominan} elementinin enerjisiyle canlanıyor. {oneri_metni} size sadece keyif değil, aynı zamanda derin bir perspektif kazandırıyor.",
+                }
 
             yorum_parcalari = [alan["giris"]]
             yorum_parcalari.append(ALAN_DOMINAN[anahtar])
@@ -3430,43 +4895,95 @@ def _natal_hayat_alani_analizi(motor):
 
             # Kategoriye özel genel öneriler (element-bilinçli)
             ELEMENT_SPOR_IPUCU = {
-                "Ateş": "Haftada en az 3 gün yüksek tempolu egzersiz; dinamik ve rekabetçi sporlar enerjinizi besler.",
-                "Toprak": "Düzenli ve sabit bir antrenman programı; doğa yürüyüşleri ve ağırlık çalışmaları ideal.",
-                "Hava": "Grup dersleri ve dans temelli egzersizler; zihinsel bağlantı kuran sporlar sizi besler.",
-                "Su": "Ritmik ve akıcı sporlar; yüzme, yoga, tai-chi gibi su ve meditasyon odaklı aktiviteler."
+                "Ateş": "Haftada en az 3 gün yüksek tempolu egzersiz; dinamik ve rekabetçi sporlar enerjinizi besler." if not _EN else "At least 3 days a week of high-tempo exercise; dynamic and competitive sports feed your energy.",
+                "Toprak": "Düzenli ve sabit bir antrenman programı; doğa yürüyüşleri ve ağırlık çalışmaları ideal." if not _EN else "A regular and steady training program; nature walks and weight training are ideal.",
+                "Hava": "Grup dersleri ve dans temelli egzersizler; zihinsel bağlantı kuran sporlar sizi besler." if not _EN else "Group classes and dance-based workouts; sports that create a mental connection feed you.",
+                "Su": "Ritmik ve akıcı sporlar; yüzme, yoga, tai-chi gibi su ve meditasyon odaklı aktiviteler." if not _EN else "Rhythmic and fluid sports; water- and meditation-focused activities like swimming, yoga and tai-chi."
             }
             ELEMENT_SANAT_IPUCU = {
-                "Ateş": "Cesur ve deneysel sanat dallarına dalın; performans ve sahne sanatları size enerji katar.",
-                "Toprak": "Somut ve elle yapılan sanatlara odaklanın; seramik, ahşap, dokuma gibi doğal malzemeler.",
-                "Hava": "Yazı, edebiyat ve dijital sanatlar zihinsel yaratıcılığınızı besler; iletişim temelli sanatlar.",
-                "Su": "Müzik, suluboya ve duygusal ifade sanatları; sezgilerinizin rehberliğine bırakın kendinizi."
+                "Ateş": "Cesur ve deneysel sanat dallarına dalın; performans ve sahne sanatları size enerji katar." if not _EN else "Dive into bold and experimental art forms; performance and stage arts add energy to you.",
+                "Toprak": "Somut ve elle yapılan sanatlara odaklanın; seramik, ahşap, dokuma gibi doğal malzemeler." if not _EN else "Focus on tangible, handmade arts; natural materials like ceramics, wood and weaving.",
+                "Hava": "Yazı, edebiyat ve dijital sanatlar zihinsel yaratıcılığınızı besler; iletişim temelli sanatlar." if not _EN else "Writing, literature and digital arts feed your mental creativity; communication-based arts.",
+                "Su": "Müzik, suluboya ve duygusal ifade sanatları; sezgilerinizin rehberliğine bırakın kendinizi." if not _EN else "Music, watercolor and emotionally expressive arts; let yourself be guided by your intuition."
             }
             ELEMENT_BESLENME_IPUCU = {
-                "Ateş": "Enerji veren ve baharatlı besinler; yeşil yapraklılar ve protein ağırlıklı beslenme.",
-                "Toprak": "Toprak ürünleri ve köklü sebzeler; düzenli öğünler ve doğal gıdalar.",
-                "Hava": "Çeşitli ve renkli besinler; hafif atıştırmalıklar ve sosyal yemek deneyimleri.",
-                "Su": "Sıvı tüketimi ve deniz ürünleri; çorbalar, çaylar ve bitki bazlı beslenme."
+                "Ateş": "Enerji veren ve baharatlı besinler; yeşil yapraklılar ve protein ağırlıklı beslenme." if not _EN else "Energizing and spicy foods; leafy greens and protein-heavy eating.",
+                "Toprak": "Toprak ürünleri ve köklü sebzeler; düzenli öğünler ve doğal gıdalar." if not _EN else "Root crops and root vegetables; regular meals and natural foods.",
+                "Hava": "Çeşitli ve renkli besinler; hafif atıştırmalıklar ve sosyal yemek deneyimleri." if not _EN else "Varied and colorful foods; light snacks and social dining experiences.",
+                "Su": "Sıvı tüketimi ve deniz ürünleri; çorbalar, çaylar ve bitki bazlı beslenme." if not _EN else "Fluid intake and seafood; soups, teas and plant-based eating."
             }
             ELEMENT_GENEL_IPUCU = {
                 "spor": ELEMENT_SPOR_IPUCU,
                 "sanat": ELEMENT_SANAT_IPUCU,
                 "beslenme": ELEMENT_BESLENME_IPUCU,
             }
-            kat_oneriler = {
-                "spor": [ELEMENT_SPOR_IPUCU.get(dominan, "Düzenli egzersiz ve elementinize uygun sporlar ideal.")],
-                "sanat": [ELEMENT_SANAT_IPUCU.get(dominan, "Sanatsal ifadenizi keşfetmek için farklı dalları deneyin.")],
-                "hobi": ["Çocukluğunuzda keyif aldığınız aktivitelere geri dönmeyi deneyin; merak her zaman iyi bir rehberdir."],
-                "saglik": ["Yılda bir kez kapsamlı sağlık kontrolünden geçmeyi ihmal etmeyin; düzenli uyku ve doğal beslenme önceliğiniz."],
-                "beslenme": [ELEMENT_BESLENME_IPUCU.get(dominan, "Mevsimsel ve doğal beslenme sindirim sisteminizi dengeler.")],
-                "ask": ["Partnerinizle derin ve dürüst iletişim; duygusal ihtiyaçlarınızı açıkça paylaşın."],
-                "kariyer": ["Kariyer hedeflerinizi yazılı hale getirmek ve düzenli gözden geçirmek başarı şansınızı artırır."],
-                "aile": ["Aile bireyleriyle düzenli zaman geçirmek ve geçmiş hikayelerini paylaşmak bağları güçlendirir."],
-                "maddi": ["Bütçe planlaması ve düzenli tasarruf alışkanlığı size finansal özgürlük getirir."],
-                "sosyal": ["Derin ve anlamlı ilişkiler için aktif dinleme ve empati pratiği yapın."],
-                "egitim": ["Yeni bir konuyu 21 gün düzenli çalışarak alışkanlık haline getirebilirsiniz."],
-                "manevi": ["Günlük 10 dakikalık sessiz meditasyon bile uzun vadede büyük farklar yaratır."],
-                "seyahat": ["Seyahatlerinizi önceden planlamak ama esnek kalmak; en güzel anlar çoğu zaman plansız gelir."],
-            }
+            if _ES:
+                ELEMENT_SPOR_IPUCU = {
+                    "Ateş": "Ejercicio de alto ritmo al menos 3 días a la semana; los deportes dinámicos y competitivos alimentan tu energía.",
+                    "Toprak": "Un programa de entrenamiento regular y constante; son ideales las caminatas por la naturaleza y el trabajo con pesas.",
+                    "Hava": "Clases en grupo y ejercicios basados en el baile; los deportes que crean una conexión mental te nutren.",
+                    "Su": "Deportes rítmicos y fluidos; actividades centradas en el agua y la meditación, como natación, yoga y tai-chi."
+                }
+                ELEMENT_SANAT_IPUCU = {
+                    "Ateş": "Sumérgete en disciplinas artísticas atrevidas y experimentales; el performance y las artes escénicas te aportan energía.",
+                    "Toprak": "Céntrate en artes concretas y hechas a mano; materiales naturales como la cerámica, la madera y el tejido.",
+                    "Hava": "La escritura, la literatura y las artes digitales alimentan tu creatividad mental; artes basadas en la comunicación.",
+                    "Su": "La música, la acuarela y las artes de expresión emocional; déjate guiar por tu intuición."
+                }
+                ELEMENT_BESLENME_IPUCU = {
+                    "Ateş": "Alimentos energéticos y picantes; verduras de hoja verde y una dieta rica en proteínas.",
+                    "Toprak": "Cultivos de la tierra y vegetales de raíz; comidas regulares y alimentos naturales.",
+                    "Hava": "Alimentos variados y coloridos; tentempiés ligeros y experiencias de comida social.",
+                    "Su": "Consumo de líquidos y mariscos; sopas, infusiones y una alimentación de origen vegetal."
+                }
+            if _EN:
+                kat_oneriler = {
+                    "spor": [ELEMENT_SPOR_IPUCU.get(dominan, "Regular exercise and sports suited to your element are ideal.")],
+                    "sanat": [ELEMENT_SANAT_IPUCU.get(dominan, "Try different art forms to discover your artistic expression.")],
+                    "hobi": ["Try returning to the activities you enjoyed in childhood; curiosity is always a good guide."],
+                    "saglik": ["Do not skip a comprehensive health check-up once a year; regular sleep and natural eating are your priorities."],
+                    "beslenme": [ELEMENT_BESLENME_IPUCU.get(dominan, "Seasonal and natural eating balances your digestive system.")],
+                    "ask": ["Deep and honest communication with your partner; openly share your emotional needs."],
+                    "kariyer": ["Writing down your career goals and reviewing them regularly increases your chances of success."],
+                    "aile": ["Spending regular time with family members and sharing past stories strengthens bonds."],
+                    "maddi": ["Budget planning and a habit of regular saving bring you financial freedom."],
+                    "sosyal": ["Practice active listening and empathy for deep, meaningful relationships."],
+                    "egitim": ["You can turn a new subject into a habit by studying it regularly for 21 days."],
+                    "manevi": ["Even 10 minutes of silent meditation daily creates big differences in the long run."],
+                    "seyahat": ["Plan your travels in advance but stay flexible; the best moments often come unplanned."],
+                }
+            elif _ES:
+                kat_oneriler = {
+                    "spor": [ELEMENT_SPOR_IPUCU.get(dominan, "Son ideales el ejercicio regular y los deportes acordes con tu elemento.")],
+                    "sanat": [ELEMENT_SANAT_IPUCU.get(dominan, "Prueba distintas disciplinas para descubrir tu expresión artística.")],
+                    "hobi": ["Intenta volver a las actividades que disfrutabas en la infancia; la curiosidad siempre es una buena guía."],
+                    "saglik": ["No descuides un chequeo de salud integral una vez al año; el sueño regular y la alimentación natural son tu prioridad."],
+                    "beslenme": [ELEMENT_BESLENME_IPUCU.get(dominan, "La alimentación de temporada y natural equilibra tu sistema digestivo.")],
+                    "ask": ["Comunicación profunda y honesta con tu pareja; comparte abiertamente tus necesidades emocionales."],
+                    "kariyer": ["Escribir tus metas profesionales y revisarlas con regularidad aumenta tus probabilidades de éxito."],
+                    "aile": ["Pasar tiempo regular con los miembros de tu familia y compartir historias del pasado fortalece los vínculos."],
+                    "maddi": ["La planificación presupuestaria y el hábito del ahorro regular te aportan libertad financiera."],
+                    "sosyal": ["Practica la escucha activa y la empatía para relaciones profundas y significativas."],
+                    "egitim": ["Puedes convertir un tema nuevo en hábito estudiándolo 21 días de forma regular."],
+                    "manevi": ["Incluso 10 minutos diarios de meditación en silencio generan grandes diferencias a largo plazo."],
+                    "seyahat": ["Planifica tus viajes con antelación pero mantente flexible; los mejores momentos suelen llegar sin planearlos."],
+                }
+            else:
+                kat_oneriler = {
+                    "spor": [ELEMENT_SPOR_IPUCU.get(dominan, "Düzenli egzersiz ve elementinize uygun sporlar ideal.")],
+                    "sanat": [ELEMENT_SANAT_IPUCU.get(dominan, "Sanatsal ifadenizi keşfetmek için farklı dalları deneyin.")],
+                    "hobi": ["Çocukluğunuzda keyif aldığınız aktivitelere geri dönmeyi deneyin; merak her zaman iyi bir rehberdir."],
+                    "saglik": ["Yılda bir kez kapsamlı sağlık kontrolünden geçmeyi ihmal etmeyin; düzenli uyku ve doğal beslenme önceliğiniz."],
+                    "beslenme": [ELEMENT_BESLENME_IPUCU.get(dominan, "Mevsimsel ve doğal beslenme sindirim sisteminizi dengeler.")],
+                    "ask": ["Partnerinizle derin ve dürüst iletişim; duygusal ihtiyaçlarınızı açıkça paylaşın."],
+                    "kariyer": ["Kariyer hedeflerinizi yazılı hale getirmek ve düzenli gözden geçirmek başarı şansınızı artırır."],
+                    "aile": ["Aile bireyleriyle düzenli zaman geçirmek ve geçmiş hikayelerini paylaşmak bağları güçlendirir."],
+                    "maddi": ["Bütçe planlaması ve düzenli tasarruf alışkanlığı size finansal özgürlük getirir."],
+                    "sosyal": ["Derin ve anlamlı ilişkiler için aktif dinleme ve empati pratiği yapın."],
+                    "egitim": ["Yeni bir konuyu 21 gün düzenli çalışarak alışkanlık haline getirebilirsiniz."],
+                    "manevi": ["Günlük 10 dakikalık sessiz meditasyon bile uzun vadede büyük farklar yaratır."],
+                    "seyahat": ["Seyahatlerinizi önceden planlamak ama esnek kalmak; en güzel anlar çoğu zaman plansız gelir."],
+                }
             for o in kat_oneriler.get(anahtar, []):
                 oneriler.append({"tur":"genel","metin":o})
 
@@ -3495,8 +5012,11 @@ def _natal_chart_yorumu(motor):
     """Natal chart interpretation as flowing narrative — like a human astrologer."""
     try:
         _EN = _i18n_get_lang() == "en"
+        _ES = _i18n_get_lang() == "es"
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
         EN_EV = {1:"1st",2:"2nd",3:"3rd",4:"4th",5:"5th",6:"6th",7:"7th",8:"8th",9:"9th",10:"10th",11:"11th",12:"12th"}
+        ES_EV = {1:"1ª",2:"2ª",3:"3ª",4:"4ª",5:"5ª",6:"6ª",7:"7ª",8:"8ª",9:"9ª",10:"10ª",11:"11ª",12:"12ª"}
+        BURCLAR_ES = ["Aries","Tauro","Géminis","Cáncer","Leo","Virgo","Libra","Escorpio","Sagitario","Capricornio","Acuario","Piscis"]
 
         jd = motor.get_natal_julian_day("p1")
         cusps, ascmc = swe.houses(jd, motor.enlem, motor.boylam, b'P')
@@ -3514,6 +5034,12 @@ def _natal_chart_yorumu(motor):
             4:"roots and family", 5:"creativity and love", 6:"health and daily routine",
             7:"relationships and partnerships", 8:"transformation and shared resources", 9:"beliefs and higher learning",
             10:"career and social standing", 11:"social circle and ideals", 12:"the subconscious and the spiritual journey"
+        }
+        EV_ANLAM_ES = {
+            1:"personalidad y apariencia exterior", 2:"valores y seguridad material", 3:"comunicación y entorno cercano",
+            4:"raíces y familia", 5:"creatividad y amor", 6:"salud y rutina diaria",
+            7:"relaciones y alianzas", 8:"transformación y recursos compartidos", 9:"creencias y educación superior",
+            10:"carrera y estatus social", 11:"círculo social e ideales", 12:"el subconsciente y el viaje espiritual"
         }
 
         gez_poz = {}
@@ -3571,17 +5097,28 @@ def _natal_chart_yorumu(motor):
             "Hava": "The Air element prevails — your mind is constantly active, generating ideas and building connections. Communication and your social circle stand at the center of your life.",
             "Su": "The Water element prevails — you possess deep intuitive intelligence and empathy. Your emotional world shapes your decisions and relationships.",
         }
+        element_acik_es = {
+            "Ateş": "El elemento Fuego prevalece — eres un pionero natural y una fuente de inspiración. Das pasos valientes en la vida y proyectas tu pasión interior hacia el exterior.",
+            "Toprak": "El elemento Tierra prevalece — tienes una naturaleza sólida, confiable y productiva, construida sobre cimientos firmes. Conviertes tus sueños en realidad mediante pasos concretos.",
+            "Hava": "El elemento Aire prevalece — tu mente está en constante actividad, generando ideas y tejiendo conexiones. La comunicación y tu círculo social ocupan el centro de tu vida.",
+            "Su": "El elemento Agua prevalece — posees una profunda inteligencia intuitiva y una gran empatía. Tu mundo emocional moldea tus decisiones y tus relaciones.",
+        }
         eksik_element = [e for e, s in eleman_say.items() if s == 0]
         eksik_not = ""
         if eksik_element:
-            if _EN:
+            if _ES:
+                _eks = {"Ateş":"Fuego","Toprak":"Tierra","Hava":"Aire","Su":"Agua"}
+                eksik_not = f" Asimismo, tu carta no contiene planetas en el elemento { ' y '.join(_eks.get(e, e) for e in eksik_element) }; quizá te aguarde un camino de crecimiento consciente para equilibrar estas áreas."
+            elif _EN:
                 _eks = {"Ateş":"Fire","Toprak":"Earth","Hava":"Air","Su":"Water"}
                 eksik_not = f" Meanwhile, your chart holds no planets in the { ' and '.join(_eks.get(e, e) for e in eksik_element) } element; a conscious journey of growth may await you to bring these areas into balance."
             else:
                 eksik_not = f" Öte yandan haritanızda { ' ve '.join(eksik_element) } elementinde gezegen bulunmuyor; bu alanları dengelemek için bilinçli bir gelişim yolculuğu sizi bekliyor olabilir."
 
         if _EN:
-            par1 = f"With your Ascendant in {asc_burc} and your MC in {mc_burc}, your approach to life and your social goals take shape. {element_acik_en.get(bask_element, 'Your elemental distribution is balanced and harmonious.')}{eksik_not}"
+            par1 = f"With your Ascendant in {pdf_label(asc_burc)} and your MC in {pdf_label(mc_burc)}, your approach to life and your social goals take shape. {element_acik_en.get(bask_element, 'Your elemental distribution is balanced and harmonious.')}{eksik_not}"
+        elif _ES:
+            par1 = f"Con tu Ascendente en {pdf_label(asc_burc)} y tu MC en {pdf_label(mc_burc)}, tu manera de llegar a la vida y tus metas sociales van tomando forma. {element_acik_es.get(bask_element, 'Tu distribución elemental es equilibrada y armoniosa.')}{eksik_not}"
         else:
             par1 = f"Yükselen burcunuz {asc_burc} ve MC'niz {mc_burc} ile hayata geliş tarzınız ve toplumsal hedefleriniz şekilleniyor. {element_acik.get(bask_element, 'Element dağılımınız dengeli ve uyumlu.')}{eksik_not}"
 
@@ -3593,8 +5130,11 @@ def _natal_chart_yorumu(motor):
             if g not in gez_poz: continue
             p = gez_poz[g]
             burc = p["burc"]; ev = p["ev"]
+            g_ad = pdf_label(g)
+            burc_ad = pdf_label(burc)
             e_anlam = EV_ANLAM.get(ev, "hayat")
             e_anlam_en = EV_ANLAM_EN.get(ev, "life")
+            e_anlam_es = EV_ANLAM_ES.get(ev, "vida")
             DUSUK_ZARAR = {
                 "Güneş": ("Terazi","Kova"), "Ay": ("Akrep","Oğlak"), "Merkür": ("Balık","Yay"),
                 "Venüs": ("Başak","Akrep"), "Mars": ("Boğa","Terazi"), "Jüpiter": ("Oğlak","Başak"),
@@ -3603,41 +5143,43 @@ def _natal_chart_yorumu(motor):
             }
             dusuk, zarar = DUSUK_ZARAR.get(g, ("",""))
             notu = ""
-            if burc == zarar: notu = (" Here its energy is challenged — an area that requires conscious effort." if _EN else " Burada enerjisi sınanıyor — bilinçli çaba gerektiren bir alan.")
-            elif burc == dusuk: notu = (" Here its expression is weakened but can be restored — it can be strengthened with awareness." if _EN else " Burada ifadesi zayıflıyor ama telafisi mümkün — farkındalıkla güçlenebilir.")
+            if burc == zarar:
+                notu = (" Here its energy is challenged — an area that requires conscious effort." if _EN else (" Aquí su energía se ve desafiada — un área que exige esfuerzo consciente." if _ES else " Burada enerjisi sınanıyor — bilinçli çaba gerektiren bir alan."))
+            elif burc == dusuk:
+                notu = (" Here its expression is weakened but can be restored — it can be strengthened with awareness." if _EN else (" Aquí su expresión se debilita, aunque puede recuperarse — puede fortalecerse con conciencia." if _ES else " Burada ifadesi zayıflıyor ama telafisi mümkün — farkındalıkla güçlenebilir."))
 
             giris = {
-                "Güneş": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) konumlanmış. Öz benliğiniz ve hayattaki temel amacınız bu kesişimde şekilleniyor.",
-                "Ay": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) yer alıyor. Duygusal dünyanız ve içgüdüsel tepkileriniz bu konumdan besleniyor.",
-                "Merkür": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Zihinsel yapınız ve iletişim tarzınız bu yerleşimden güç alıyor.",
-                "Venüs": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sevgi diliniz, estetik anlayışınız ve değer verdikleriniz bu konumun izlerini taşıyor.",
-                "Mars": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). İradeniz, tutkularınız ve mücadele enerjiniz buradan yönetiliyor.",
-                "Jüpiter": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Şans, bolluk ve kişisel genişleme alanınız bu konumda kendini gösteriyor.",
-                "Satürn": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sorumluluklarınız, sınırlarınız ve en önemli hayat dersleriniz bu yerleşimde gizli.",
-                "Uranüs": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Özgünlüğünüz, ani değişimleriniz ve isyan ettiğiniz alanlar bu konumla bağlantılı.",
-                "Neptün": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Hayalleriniz, sezgileriniz ve manevi bağlantılarınız buradan ilham alıyor.",
-                "Plüton": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Derin dönüşüm, güç dinamikleri ve yeniden doğuş potansiyeliniz bu konumda saklı.",
-                "Chiron": f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). En derin yaranız ve aynı zamanda en büyük iyileşme gücünüz burada.",
+                "Güneş": (f"{g_ad} is in {burc_ad}, in the {EN_EV.get(ev, str(ev))} House ({e_anlam_en}), shaping your core identity and life purpose." if _EN else (f"{g_ad} está en {burc_ad}, en la Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}), dando forma a tu identidad central y propósito de vida." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) konumlanmış. Öz benliğiniz ve hayattaki temel amacınız bu kesişimde şekilleniyor.")),
+                "Ay": (f"{g_ad} is in {burc_ad}, in the {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your emotional world and instincts are fed from here." if _EN else (f"{g_ad} está en {burc_ad}, en la Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu mundo emocional y tus instintos se nutren de aquí." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}) yer alıyor. Duygusal dünyanız ve içgüdüsel tepkileriniz bu konumdan besleniyor.")),
+                "Merkür": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your mind and communication style draw strength from this placement." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu mente y tu estilo de comunicación se ven reforzados por esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Zihinsel yapınız ve iletişim tarzınız bu yerleşimden güç alıyor.")),
+                "Venüs": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your love language, aesthetics and values carry the mark of this placement." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu lenguaje del amor, tu estética y tus valores llevan la huella de esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sevgi diliniz, estetik anlayışınız ve değer verdikleriniz bu konumun izlerini taşıyor.")),
+                "Mars": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your will, passions and fighting energy are managed from here." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu voluntad, tus pasiones y tu energía de lucha se gestionan desde aquí." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). İradeniz, tutkularınız ve mücadele enerjiniz buradan yönetiliyor.")),
+                "Jüpiter": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your luck, abundance and personal expansion show themselves in this position." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu suerte, tu abundancia y tu expansión personal se manifiestan en esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Şans, bolluk ve kişisel genişleme alanınız bu konumda kendini gösteriyor.")),
+                "Satürn": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your responsibilities, boundaries and most important life lessons are hidden in this placement." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tus responsabilidades, límites y las lecciones de vida más importantes se esconden en esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Sorumluluklarınız, sınırlarınız ve en önemli hayat dersleriniz bu yerleşimde gizli.")),
+                "Uranüs": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your originality, sudden changes and the areas you rebel against are linked to this position." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu originalidad, los cambios repentinos y las áreas contra las que te rebelas están ligados a esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Özgünlüğünüz, ani değişimleriniz ve isyan ettiğiniz alanlar bu konumla bağlantılı.")),
+                "Neptün": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your dreams, intuition and spiritual connections draw inspiration from here." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tus sueños, tu intuición y tus conexiones espirituales se inspiran desde aquí." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Hayalleriniz, sezgileriniz ve manevi bağlantılarınız buradan ilham alıyor.")),
+                "Plüton": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your deep transformation, power dynamics and rebirth potential are stored in this position." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu transformación profunda, tus dinámicas de poder y tu potencial de renacimiento residen en esta posición." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). Derin dönüşüm, güç dinamikleri ve yeniden doğuş potansiyeliniz bu konumda saklı.")),
+                "Chiron": (f"{g_ad} in {burc_ad}, {EN_EV.get(ev, str(ev))} House ({e_anlam_en}); your deepest wound and, at the same time, your greatest healing power lie here." if _EN else (f"{g_ad} en {burc_ad}, Casa {ES_EV.get(ev, str(ev))} ({e_anlam_es}); tu herida más profunda y, a la vez, tu mayor poder de sanación residen aquí." if _ES else f"{g} {burc} burcunda, {ev}. evde ({e_anlam}). En derin yaranız ve aynı zamanda en büyük iyileşme gücünüz burada.")),
             }.get(g, "")
             giris_en = {
-                "Güneş": f"{g} is placed in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your core self and your life's fundamental purpose take shape at this intersection.",
-                "Ay": f"{g} sits in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your emotional world and instinctive reactions are nourished by this placement.",
-                "Merkür": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your mental structure and communication style draw strength from this placement.",
-                "Venüs": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your love language, aesthetic sense and what you value bear the imprint of this position.",
-                "Mars": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your will, passions and fighting energy are governed from here.",
-                "Jüpiter": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your domain of luck, abundance and personal expansion reveals itself in this position.",
-                "Satürn": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your responsibilities, limits and most important life lessons lie hidden in this placement.",
-                "Uranüs": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your originality, sudden changes and the areas you rebel against are linked to this position.",
-                "Neptün": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your dreams, intuitions and spiritual connections draw inspiration from here.",
-                "Plüton": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Deep transformation, power dynamics and your potential for rebirth are stored in this position.",
-                "Chiron": f"{g} in {burc}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your deepest wound and, at the same time, your greatest healing power reside here.",
+                "Güneş": f"{g_ad} is placed in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your core self and your life's fundamental purpose take shape at this intersection.",
+                "Ay": f"{g_ad} sits in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your emotional world and instinctive reactions are nourished by this placement.",
+                "Merkür": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your mental structure and communication style draw strength from this placement.",
+                "Venüs": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your love language, aesthetic sense and what you value bear the imprint of this position.",
+                "Mars": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your will, passions and fighting energy are governed from here.",
+                "Jüpiter": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your domain of luck, abundance and personal expansion reveals itself in this position.",
+                "Satürn": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your responsibilities, limits and most important life lessons lie hidden in this placement.",
+                "Uranüs": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your originality, sudden changes and the areas you rebel against are linked to this position.",
+                "Neptün": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your dreams, intuitions and spiritual connections draw inspiration from here.",
+                "Plüton": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Deep transformation, power dynamics and your potential for rebirth are stored in this position.",
+                "Chiron": f"{g_ad} in {burc_ad}, in the {EN_EV.get(ev, str(ev))} house ({e_anlam_en}). Your deepest wound and, at the same time, your greatest healing power reside here.",
             }.get(g, "")
             if giris:
                 tam_metin = f"{giris}{notu}"
                 if _EN:
                     tam_metin = f"{giris_en}{notu}"
                 gez_parcalar.append(tam_metin)
-                gez_bolumler.append({"gezegen": g, "baslik": (f"{g} — {burc}, {EN_EV.get(ev, str(ev))} House" if _EN else f"{g} — {burc}, {ev}. Ev"), "metin": tam_metin})
+                gez_bolumler.append({"gezegen": g, "baslik": (f"{g_ad} — {burc_ad}, {EN_EV.get(ev, str(ev))} House" if _EN else (f"{g_ad} — {burc_ad}, Casa {ES_EV.get(ev, str(ev))}" if _ES else f"{g} — {burc}, {ev}. Ev")), "metin": tam_metin})
 
         # Connect first 3-4 planets with transitions, rest as separate sentences
         if len(gez_parcalar) <= 4:
@@ -3664,7 +5206,10 @@ def _natal_chart_yorumu(motor):
                 sifa = _olumsuz_aci_sifasi(a["g1"], a["g2"], aci) if aci in ("Kare","Karşıt") else ""
                 if _EN:
                     etiket = {"Kavuşum":"a union and strengthening","Trigon":"natural flow and harmony","Sekstil":"opportunity and support","Kare":"a challenge","Karşıt":"a call for balance"}
-                    yorum = f"The {aci} aspect between {a['g1']} and {a['g2']} brings you {etiket.get(aci, 'some tension')}."
+                    yorum = f"{pdf_label(aci)} aspect between {pdf_label(a['g1'])} and {pdf_label(a['g2'])} brings you {etiket.get(aci, 'some tension')}."
+                elif _ES:
+                    etiket = {"Kavuşum":"una unión y fortalecimiento","Trigon":"flujo natural y armonía","Sekstil":"oportunidad y apoyo","Kare":"un desafío","Karşıt":"una llamada al equilibrio"}
+                    yorum = f"El aspecto de {pdf_label(aci)} entre {pdf_label(a['g1'])} y {pdf_label(a['g2'])} te trae {etiket.get(aci, 'alguna tensión')}."
                 else:
                     etiket = {"Kavuşum":"birleşme ve güçlenme","Trigon":"doğal akış ve uyum","Sekstil":"fırsat ve destek","Kare":"meydan okuyor","Karşıt":"denge çağrısı yapıyor"}
                     yorum = f"{a['g1']} ve {a['g2']} arasındaki {aci} açısı size {etiket.get(aci,'bir gerilim getiriyor')}."
@@ -3680,7 +5225,9 @@ def _natal_chart_yorumu(motor):
             mp = motor.meslek_arap_noktasi_hesapla()
             if mp and mp.get("ruh_burc"):
                 if _EN:
-                    diger_not += f"Your Part of Spirit is in {mp['ruh_burc']} (the {EN_EV.get(mp['ruh_ev'], str(mp['ruh_ev']))} house) — it serves as a compass on your career and life-purpose journey. "
+                    diger_not += f"Your Part of Spirit is in {pdf_label(mp['ruh_burc'])} (the {EN_EV.get(mp['ruh_ev'], str(mp['ruh_ev']))} house) — it serves as a compass on your career and life-purpose journey. "
+                elif _ES:
+                    diger_not += f"Tu Parte del Espíritu está en {pdf_label(mp['ruh_burc'])} (la casa {ES_EV.get(mp['ruh_ev'], str(mp['ruh_ev']))}) — te sirve de brújula en tu camino de carrera y propósito vital. "
                 else:
                     diger_not += f"Ruh noktanız {mp['ruh_burc']} burcunda ({mp['ruh_ev']}. ev) — kariyer ve yaşam amacı yolculuğunuzda size pusula görevi görüyor. "
         except: pass
@@ -3694,23 +5241,25 @@ def _natal_chart_yorumu(motor):
                     for nokta_ad, nokta_data in ap_list:
                         if isinstance(nokta_data, dict) and nokta_data.get("burc"):
                             if _EN:
-                                eklenen.append(f"{nokta_ad} in {nokta_data['burc']} (the {EN_EV.get(nokta_data.get('ev'), str(nokta_data.get('ev','?')))} house)")
+                                eklenen.append(f"{pdf_label(nokta_ad)} in {pdf_label(nokta_data['burc'])} (the {EN_EV.get(nokta_data.get('ev'), str(nokta_data.get('ev','?')))} house)")
+                            elif _ES:
+                                eklenen.append(f"{pdf_label(nokta_ad)} en {pdf_label(nokta_data['burc'])} (la casa {ES_EV.get(nokta_data.get('ev'), str(nokta_data.get('ev','?')))})")
                             else:
                                 eklenen.append(f"{nokta_ad} {nokta_data['burc']} burcunda ({nokta_data.get('ev','?')}. ev)")
                     if eklenen:
-                        diger_not += (f"Among the Arabic parts, {', '.join(eklenen)} stand out. " if _EN else f"Arap noktalarından {', '.join(eklenen)} öne çıkıyor. ")
+                        diger_not += (f"Among the Arabic parts, {', '.join(eklenen)} stand out. " if _EN else (f"Entre las partes arábigas, destacan {', '.join(eklenen)}. " if _ES else f"Arap noktalarından {', '.join(eklenen)} öne çıkıyor. "))
         except: pass
         try:
-            ast_anahtar = {"Juno":"commitment","Ceres":"nurturing","Pallas":"wisdom","Vesta":"devotion","Eros":"passion","Psyche":"spiritual bond"} if _EN else {"Juno":"bağlılık","Ceres":"beslenme","Pallas":"bilgelik","Vesta":"adanma","Eros":"tutku","Psyche":"ruhsal bağ"}
+            ast_anahtar = {"Juno":"commitment","Ceres":"nurturing","Pallas":"wisdom","Vesta":"devotion","Eros":"passion","Psyche":"spiritual bond"} if _EN else ({"Juno":"compromiso","Ceres":"nutrición","Pallas":"sabiduría","Vesta":"devoción","Eros":"pasión","Psyche":"vínculo espiritual"} if _ES else {"Juno":"bağlılık","Ceres":"beslenme","Pallas":"bilgelik","Vesta":"adanma","Eros":"tutku","Psyche":"ruhsal bağ"})
             ast_list = []
             for ast_isim, ast_tema in ast_anahtar.items():
                 ast_id = GEZEGENLER.get(ast_isim)
                 if ast_id:
                     deg = swe.calc_ut(jd, ast_id)[0][0]
                     ast_burc = BURCLAR[int(deg // 30)]
-                    ast_list.append(f"{ast_isim} ({ast_burc} — {ast_tema})")
+                    ast_list.append(f"{ast_isim} ({pdf_label(ast_burc)} — {ast_tema})")
             if ast_list:
-                diger_not += (f"Among the asteroids, {', '.join(ast_list[:4])} carry prominent themes in your chart." if _EN else f"Asteroitlerden {', '.join(ast_list[:4])} haritanızda belirgin temalar taşıyor.")
+                diger_not += (f"Among the asteroids, {', '.join(ast_list[:4])} carry prominent themes in your chart." if _EN else (f"Entre los asteroides, {', '.join(ast_list[:4])} portan temas destacados en tu carta." if _ES else f"Asteroitlerden {', '.join(ast_list[:4])} haritanızda belirgin temalar taşıyor."))
         except: pass
 
         # ── Assemble ──
@@ -3731,6 +5280,7 @@ def _natal_chart_yorumu(motor):
 def _olumsuz_aci_sifasi(g1, g2, aci_turu):
     """Returns a healing suggestion for a challenging aspect — natural, varied, specific."""
     _EN = _i18n_get_lang() == "en"
+    _ES = _i18n_get_lang() == "es"
     SIFA_DICT = {
         # ── Güneş ──
         ("Güneş","Satürn"): "Özgüveninizle sorumluluklarınız arasında sıkışmış hissediyorsunuz. Kendinize 'yeterli olmadığınızı' söyleyen iç sesi fark edin ve ona meydan okuyun. Küçük başarılarınızı kutlamak bu gerilimi azaltacak.",
@@ -3888,9 +5438,88 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
         ("Mars","Jüpiter"): "You love taking risks, but sometimes you go overboard. Your 'all or nothing' approach can burn you. Seeing the big picture is good, but moving step by step brings more lasting results.",
         ("Güneş","Ay"): "Your identity and emotional world conflict. One wants one thing while the other wants another. You must reconcile these two parts for inner wholeness. Listen to both; do not favor one.",
     }
+
+    SIFA_DICT_ES = {
+        ("Güneş","Satürn"): "Te sientes atrapado entre tu autoconfianza y tus responsabilidades. Detecta la voz interior que te dice que 'no eres suficiente' y desafíala. Celebrar tus pequeños logros aliviará esta tensión.",
+        ("Güneş","Plüton"): "Las luchas de poder y las dinámicas de control están en tu agenda. En lugar de intentar cambiar a los demás, enfréntate a tus propias sombras. Cuando descubras tu propio poder, las disputas externas perderán su sentido.",
+        ("Güneş","Neptün"): "Una niebla se disipa en torno a tu identidad. Deja de moldear tu vida según las expectativas ajenas. La meditación y el tiempo a solas te recordarán tu verdadero ser.",
+        ("Güneş","Uranüs"): "Tu necesidad de libertad choca con tus responsabilidades. En lugar de rebelarte por rebelarte, cuestiona qué patrones realmente te quedan estrechos. Encontrar tu propio camino no exige rechazar a los demás.",
+        ("Güneş","Merkür"): "Hay una desarmonía entre tus pensamientos y tu yo esencial. Lo que dices y lo que sientes puede no coincidir. Sé honesto contigo mismo y no compartas ideas que no hayas hecho plenamente tuyas.",
+        ("Güneş","Venüs"): "Tu manera de expresarte y tu lenguaje del amor pueden contradecirse. Para complacer a los demás, dejas de lado tus propios deseos. Primero, reconoce tus propias necesidades.",
+        ("Güneş","Mars"): "Estás atrapado entre la voluntad y el deseo. Puede que quieras algo con intensidad y, sin embargo, temas actuar. Da el primer paso; el resto vendrá solo.",
+        ("Güneş","Jüpiter"): "Tu necesidad de demostrar tu valía puede llevarte al extremo. En lugar de intentar probar algo a todos, permítete simplemente existir. Ya eres suficiente; no hace falta nada más.",
+        ("Güneş","KAD"): "Los patrones familiares del pasado y los hábitos heredados de tus ancestros dificultan que construyas tu propia identidad. Para trazar tu camino, aprende a liberarte de los lazos familiares sin rechazarlos. Hacer las paces con tus raíces te fortalecerá.",
+        ("Güneş","Lilith"): "Te cuesta aceptar tu ira y tus lados reprimidos. Reivindicar las partes de ti que la sociedad considera 'inapropiadas' te liberará. Enfrentar tu sombra es el único camino para encontrar tu luz.",
+        ("Ay","Satürn"): "Emocionalmente te sientes limitado. Puede que tu niño interior haya sido silenciado. Permítete: llorar, abrazar, beber algo caliente. Baja tus muros protectores, poco a poco.",
+        ("Ay","Plüton"): "Tus emociones son profundas como un océano y a veces asfixiantes. Observa tus tendencias posesivas y celosas. Recuérdate que puedes sentirte seguro sin depender de alguien.",
+        ("Ay","Neptün"): "Absorbes la energía ajena como una esponja y no distingues dónde terminas tú y dónde comienzan los demás. Diez minutos de silencio cada día te ayudarán a trazar límites emocionales.",
+        ("Ay","Uranüs"): "Tus vaivenes emocionales pueden ser impredecibles: feliz un instante, inquieto al siguiente. Esta volatilidad es la fuente de tu creatividad, pero también puede generar inestabilidad. Las rutinas diarias serán tu ancla.",
+        ("Ay","Mars"): "Tus reacciones son repentinas e intensas. Tu ira y tu sensibilidad están entrelazadas. Cuando algo te moleste, respira hondo antes de responder. Mover tu cuerpo transformará esta energía.",
+        ("Ay","Venüs"): "Hay una contradicción entre tus necesidades emocionales y lo que te complace. Puede que te esfuerces por ser amado y aprobado. Muéstrate amor incondicional en primer lugar.",
+        ("Ay","Merkür"): "Te cuesta poner en palabras tus sentimientos. Algo se agita en tu interior, pero no puedes expresarlo. Llevar un diario y la escritura creativa te ayudarán a romper ese bloqueo.",
+        ("Ay","Jüpiter"): "Tus emociones tienden a exagerarse. Puedes magnificar un pequeño acontecimiento o arrastrar la tristeza de un instante durante días. Consulta a alguien de confianza para ganar perspectiva realista.",
+        ("Ay","KAD"): "Llevas el peso emocional de tu historia familiar. Tu madre o tus mayores te legaron hábitos emocionales. Es hora de detectar esos patrones y tomar decisiones conscientes. No dejes que el pasado te defina.",
+        ("Ay","Lilith"): "Hay tensión entre tu feminidad, tu sensibilidad y los lados tuyos que no se aceptan. Tus respuestas emocionales reprimidas pueden aflorar en los momentos más inesperados. Crea espacios seguros donde expresarte sin miedo al juicio.",
+        ("Merkür","Neptün"): "Tu mente habita en una nube de niebla. Distinguir el sueño de la realidad se vuelve difícil. Plasmar tus pensamientos en el papel —escribir y dibujar— te dará claridad. Confía en tu intuición, pero no sueltes la comprobación de la realidad.",
+        ("Merkür","Plüton"): "Tu mente es profunda e investigadora, pero también puede caer en bucles de pensamiento obsesivos. Te cuesta soltar un tema y repites la misma idea. Prueba la meditación y la actividad física para vaciar la mente.",
+        ("Merkür","Uranüs"): "Tus ideas son poco convencionales y pioneras, pero puedes dejar atrás a los demás al expresarlas. Tus arrebatos repentinos y comentarios inesperados pueden tensar las relaciones. Haz una pausa de un segundo antes de compartir tus pensamientos.",
+        ("Merkür","Satürn"): "Tu mente es crítica y disciplinada, pero puede volverse excesivamente pesimista. Cuestionas incluso tus propios pensamientos y te cuesta decidir. Compartir una idea imperfecta es mejor que quedarse inmóvil.",
+        ("Merkür","Mars"): "Tus pensamientos pueden ser rápidos y agresivos. En una discusión, las palabras pueden volverse armas. Defender tu punto de vista no significa rebajar a otra persona. Puedes comunicarte sin pelear.",
+        ("Merkür","KAD"): "Viejos patrones mentales —sistemas de creencias heredados de tu familia— moldean tu mente. Es hora de preguntarte qué creencias no son realmente tuyas. Declara tu libertad mental.",
+        ("Merkür","Lilith"): "Las palabras no dichas, las ideas reprimidas y los temas tabú ocupan tu mente. Encuentra el valor de decir lo que no se dice. Apropia de los pensamientos que creías prohibidos.",
+        ("Venüs","Satürn"): "Te sientes distante e inseguro en las relaciones. El miedo a 'no ser amado lo suficiente' te detiene. Empieza a expresar tu amor con pequeños gestos e intenta aprender el lenguaje del otro.",
+        ("Venüs","Plüton"): "Tus relaciones son intensas y apasionadas, pero pueden arrastrar posesividad y control. El miedo a perder a alguien te hace aferrarte con demasiada fuerza. Aprender a confiar es tu mayor lección.",
+        ("Venüs","Neptün"): "Tus límites en el amor son difusos. Los sueños románticos pueden imponerse a la realidad. En lugar de ver a alguien tal como es, lo idealizas. Abre los ojos: el amor verdadero también incluye la decepción.",
+        ("Venüs","Uranüs"): "Oscilas entre la libertad y el apego. Cuanto más te acercas a alguien, más sientes la necesidad de alejarte. Acepta que necesitas espacio en tus relaciones — y aprende a decirlo.",
+        ("Venüs","Mars"): "Buscas un equilibrio entre el amor y la pasión. Uno llama a tu corazón, el otro a tu cuerpo. Una salida creativa —la danza, la pintura, la música— puede armonizar estas dos energías.",
+        ("Venüs","KAD"): "Los hábitos de amor de tus raíces familiares afectan tus relaciones adultas. El lenguaje del amor que aprendiste en la infancia puede que ya no satisfaga tus necesidades. Nunca es tarde para aprender uno nuevo.",
+        ("Venüs","Lilith"): "Vives un conflicto interno en torno a la sexualidad, la atracción y el deseo prohibido. Puede que te sientas atrapado entre los guiones sociales sobre la mujer y el sexo y tu propia verdad. Reivindicar tu cuerpo y tus deseos te liberará.",
+        ("Mars","Satürn"): "Te cuesta expresar la ira, o sufres arrebatos descontrolados — dos caras del mismo problema: un ciclo de represión y explosión. El ejercicio físico regular canaliza esta energía de forma sana.",
+        ("Mars","Plüton"): "Tu ira es volcánica: silenciosa durante mucho tiempo, y luego una erupción destructiva. Te ves arrastrado a luchas de poder y puedes tratar todo como un campo de batalla. Recuerda que el verdadero poder no está en controlar, sino en soltar.",
+        ("Mars","Neptün"): "Tu energía está dispersa; te cuesta encontrar motivación. Sientes que no sabes hacia dónde vas. Fija metas pequeñas y claras. Avanzar paso a paso es más eficaz que intentar lograrlo todo de una vez.",
+        ("Mars","Uranüs"): "Los arrebatos de ira repentinos y las acciones impulsivas son el rasgo más destacado de este aspecto. Actuar sin pensar puede traer arrepentimiento. Reconoce tus detonantes y cuenta hasta tres antes de reaccionar.",
+        ("Mars","Jüpiter"): "El optimismo excesivo y los movimientos exagerados pueden llevarte a asumir riesgos. Lo quieres todo a la vez y luego te agotas. Reduce la velocidad, concéntrate en una sola meta y no la sueltes hasta alcanzarla.",
+        ("Mars","KAD"): "Las raíces de tu ira pueden estar en tu historia familiar. Existe un patrón de ira heredado de tu padre o tus mayores. No tienes que repetir las batallas de tus ancestros en tu propia vida. Reconocer este ciclo ya es sanador.",
+        ("Mars","Lilith"): "La ira reprimida y los deseos prohibidos se acumulan en tu cuerpo. Encontrar formas sanas de expresar la ira importa tanto para tu salud física como emocional. Las artes marciales, el ejercicio intenso y la terapia de voz pueden ayudar.",
+        ("Jüpiter","Satürn"): "Oscilas entre la expansión y la restricción. Construyes grandes sueños y luego te detienes. No esperes el momento perfecto; empieza con lo que tienes. Los sueños que se alzan sobre cimientos sólidos se cumplen.",
+        ("Jüpiter","Plüton"): "El poder, la abundancia y el control están entrelazados. El deseo de tener más puede consumirte. La abundancia verdadera viene de apreciar lo que tienes. Recuerda que lo que compartes se multiplica.",
+        ("Jüpiter","Neptün"): "El optimismo sin límites puede alejarte de ser realista. Crees tan firmemente que todo irá bien que pasas por alto las señales de peligro. Equilibrio: busca un punto medio entre soñar y ser realista.",
+        ("Jüpiter","Uranüs"): "Tu deseo de libertad y aventura es tan fuerte que puedes ignorar por completo la estabilidad. Las decisiones repentinas y los movimientos sin plan pueden traer arrepentimiento. Libertad no es irresponsabilidad; no las confundas.",
+        ("Jüpiter","KAD"): "Puede que te sientas atrapado entre los sistemas de creencias heredados de tu familia y tus propios sueños. Cuestiona los patrones de 'así se hacen las cosas'. Los límites de tus ancestros no son tus límites.",
+        ("Jüpiter","Lilith"): "El conocimiento prohibido, los temas tabú y las verdades reprimidas te atraen. Te sientes atraído por lo que la sociedad considera 'excesivo' o 'inapropiado'. Canaliza esa curiosidad hacia campos creativos y constructivos.",
+        ("Satürn","Uranüs"): "Estás atrapado entre la tradición y la revolución. Por un lado quieres seguridad y por el otro libertad. Antes de un cambio radical, prueba pequeñas innovaciones. Transforma los viejos patrones en lugar de derribarlos de golpe.",
+        ("Satürn","Neptün"): "Hay un conflicto entre tus responsabilidades y tus sueños. Cuanto más te acercas a uno, más se aleja el otro. Encuentra un modo de perseguir tus sueños sin descuidar tus deberes.",
+        ("Satürn","Plüton"): "Enfrentas las lecciones más pesadas de la vida: pérdida, control, poder. Este aspecto te enseña resistencia, pero también puede endurecerte. Ablandarse no es debilidad; es señal de madurez.",
+        ("Satürn","KAD"): "Cargas la responsabilidad de tu historia familiar. Los asuntos no resueltos de tus ancestros pueden pesar sobre tus hombros. Soltar esta carga puede sentirse como una traición, pero la verdadera traición es no vivir tu propia vida.",
+        ("Satürn","Lilith"): "Las emociones reprimidas y los lados tuyos considerados prohibidos quedan atrapados tras tus muros de responsabilidad. Como no puedes mostrarte por completo, te sientes constreñido por dentro. Abrazar tu sombra te liberará.",
+        ("Chiron","Satürn"): "Tu herida más profunda está ligada a la responsabilidad y a la sensación de insuficiencia. La creencia de 'nunca soy suficiente' bloquea tu sanación. Acepta que tus imperfecciones son lo que te hace humano. No tienes que ser perfecto.",
+        ("Chiron","Plüton"): "Estás sobre un puente entre el trauma pasado y la transformación. El lugar que más duele guarda tu mayor potencial de sanación. No tienes que hacerlo solo — busca apoyo profesional.",
+        ("Chiron","Neptün"): "Anhelas sanar pero no sabes cómo. Buscas rutas de escape y puedes volcarte hacia dependencias. La sanación real viene de enfrentar tu dolor, no de huir de él.",
+        ("Chiron","KAD"): "Puede que una herida no sanada haya sido heredada de tu historia familiar. Puede que la sientas como propia, aunque provenga de tus ancestros. Romper este ciclo está en tus manos; es parte de tu viaje de destino.",
+        ("Chiron","Lilith"): "El miedo al rechazo, a la exclusión y a no ser aceptado es tu punto más sensible. Sientes que 'sobras'. Sin embargo, lo que te hace distinto es precisamente tu poder sanador. Allí donde te sientas excluido, puedes ser fuente de sanación para otros.",
+        ("KAD","Lilith"): "Cuando la sombra del pasado se une a los lados reprimidos del presente, emerge un poderoso peso kármico. Hay historias silenciadas heredadas de tus ancestros. Romper ese silencio liberará tanto a ti como a tu linaje.",
+        ("KAD","Plüton"): "En tu historia familiar puede haber luchas de poder, disputas hereditarias o pérdidas traumáticas. Esta energía intensa circula en tu subconsciente. Sacar a la luz los secretos familiares puede dar miedo, pero es la clave de tu liberación.",
+        ("KAD","Neptün"): "En tu historia familiar puede haber una historia no resuelta de victimismo, sacrificio o decepción. Tu tendencia a sacrificarte por los demás proviene de aquí. El sacrificio no es amor. Cuídate a ti mismo primero.",
+        ("KAD","Uranüs"): "Librabas una batalla entre los patrones familiares y tu independencia. Rechazas los roles tradicionales que te imponen, pero no logras desprenderte del todo. Liberarse no es rechazar; es hacer tu propia elección.",
+        ("Lilith","Plüton"): "La sexualidad reprimida, los deseos prohibidos y los impulsos sombríos piden una transformación profunda. Los lados tuyos que más te avergüenzan guardan tu mayor poder. Hacer las paces con tu lado oscuro te hará completo.",
+        ("Lilith","Neptün"): "Puedes estar perdido en un ciclo de víctima-redentora. Mientras intentas salvar a otros, te pierdes a ti — o esperas a un salvador. Reconoce que la salvación verdadera no está en otra persona, sino dentro de ti.",
+        ("Uranüs","Lilith"): "La rebeldía y los deseos reprimidos están entrelazados. Quebrantar las reglas no te libera; solo te constriñe más. La libertad real está en fijar tus propios límites. En lugar de combatir la autoridad externa, cuestiona la autoridad interna.",
+        ("Uranüs","KAD"): "Te sientes apretado entre el impulso de desprenderte de tu pasado familiar y la necesidad de pertenecer. En lugar de cortar tus lazos con las raíces, redefínelos según tus propias necesidades. Pertenecer no es rendirse.",
+        ("Lilith","Mars"): "Hay un vínculo entre tu ira y tus lados reprimidos. Temes actuar en un ámbito donde crees que la autoexpresión está 'prohibida'. Mover tu cuerpo y alzar la voz romperá esas cadenas.",
+        ("Venüs","Jüpiter"): "El exceso de indulgencia y las expectativas exageradas pueden crear desequilibrio en tus relaciones. Intentas llegar a todos y complacer a todos. Aprender a decir no equilibrará esta energía.",
+        ("Merkür","Venüs"): "Hay una desarmonía entre lo que dices y lo que sientes. Puedes ser poco sincero al halagar o demasiado duro al criticar. Alinea lo que hay en tu corazón con lo que sale de tu boca.",
+        ("Ay","Jüpiter"): "Tus reacciones emocionales son grandes y arrolladoras. Una alegría pequeña te entusiasma, mientras que una pequeña decepción puede derribarte. Prueba ejercicios de respiración y técnicas de conexión a tierra para equilibrar tus altibajos.",
+        ("Mars","Jüpiter"): "Te encanta asumir riesgos, pero a veces te pasas de la raya. Tu enfoque de 'todo o nada' puede quemarte. Ver el panorama general es bueno, pero avanzar paso a paso trae resultados más duraderos.",
+        ("Güneş","Ay"): "Tu identidad y tu mundo emocional chocan. Uno quiere una cosa mientras el otro quiere otra. Debes reconciliar estas dos partes para lograr tu plenitud interior. Escucha a ambas; no favorezcas a una.",
+    }
     key = (g1, g2)
     rev_key = (g2, g1)
-    sifa_dict = SIFA_DICT_EN if _EN else SIFA_DICT
+    if _EN:
+        sifa_dict = SIFA_DICT_EN
+    elif _ES:
+        sifa_dict = SIFA_DICT_ES
+    else:
+        sifa_dict = SIFA_DICT
     if key in sifa_dict: return sifa_dict[key]
     if rev_key in sifa_dict: return sifa_dict[rev_key]
     # Varied generic fallbacks
@@ -3910,21 +5539,39 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
         f"{g1} ile {g2} arasında bir çekim-itiş dinamiği var. Yaklaştıkça uzaklaşıyor, uzaklaştıkça özlüyorsunuz. Bu döngüyü kırmak için her iki enerjiyi de kucaklayacak bir orta yol bulun.",
         f"{g1} ve {g2} arasındaki karşıtlık, bir ilişkide veya durumda denge arayışınızı simgeliyor. Siyah-beyaz düşünmek yerine gri alanları keşfedin. Gerçek çözüm, ikisinin de ötesinde.",
     ]
+    g1n = pdf_label(g1); g2n = pdf_label(g2)
     generic_kare_en = [
-        f"The square between {g1} and {g2} creates tension between the two. Instead of suppressing this energy, listen to what each is telling you. One does not have to destroy the other.",
-        f"This demanding aspect between {g1} and {g2} asks you to question a habit. Where the two conflict actually lies your growth opportunity. Look closely at what disturbs you.",
-        f"This square is a test for harmonizing the energies of {g1} and {g2}. You do not have to choose one; you can embrace both. What matters is finding the balance between them.",
-        f"The tension between {g1} and {g2} says something inside you must change. Listen to this discomfort. It may be time to release old habits.",
-        f"The square between {g1} and {g2} pushes you beyond your comfort zone. This is a demanding yet deeply instructive cycle. Try channeling this tension into a creative project.",
+        f"The square between {g1n} and {g2n} creates tension between the two. Instead of suppressing this energy, listen to what each is telling you. One does not have to destroy the other.",
+        f"This demanding aspect between {g1n} and {g2n} asks you to question a habit. Where the two conflict actually lies your growth opportunity. Look closely at what disturbs you.",
+        f"This square is a test for harmonizing the energies of {g1n} and {g2n}. You do not have to choose one; you can embrace both. What matters is finding the balance between them.",
+        f"The tension between {g1n} and {g2n} says something inside you must change. Listen to this discomfort. It may be time to release old habits.",
+        f"The square between {g1n} and {g2n} pushes you beyond your comfort zone. This is a demanding yet deeply instructive cycle. Try channeling this tension into a creative project.",
     ]
     generic_karsit_en = [
-        f"The opposition between {g1} and {g2} makes you swing between two separate poles. To find a point of balance, learn to stand at equal distance from both sides.",
-        f"This opposition between {g1} and {g2} points to a mechanism of projection. What you see in front of you may be a part of yourself you do not accept.",
-        f"This opposing aspect can make you feel forced to choose a side in the realms of {g1} and {g2}. Yet the real matter is finding a way to keep both areas in your life.",
-        f"There is an attraction-repulsion dynamic between {g1} and {g2}. The closer you get, the further you drift; the further you drift, the more you long. To break this cycle, find a middle path that embraces both energies.",
-        f"The opposition between {g1} and {g2} symbolizes your search for balance in a relationship or situation. Instead of black-and-white thinking, explore the gray areas. The real solution lies beyond both.",
+        f"The opposition between {g1n} and {g2n} makes you swing between two separate poles. To find a point of balance, learn to stand at equal distance from both sides.",
+        f"This opposition between {g1n} and {g2n} points to a mechanism of projection. What you see in front of you may be a part of yourself you do not accept.",
+        f"This opposing aspect can make you feel forced to choose a side in the realms of {g1n} and {g2n}. Yet the real matter is finding a way to keep both areas in your life.",
+        f"There is an attraction-repulsion dynamic between {g1n} and {g2n}. The closer you get, the further you drift; the further you drift, the more you long. To break this cycle, find a middle path that embraces both energies.",
+        f"The opposition between {g1n} and {g2n} symbolizes your search for balance in a relationship or situation. Instead of black-and-white thinking, explore the gray areas. The real solution lies beyond both.",
     ]
-    if _EN:
+    generic_kare_es = [
+        f"La cuadratura entre {g1n} y {g2n} genera tensión entre ambos. En lugar de reprimir esta energía, escucha lo que cada uno te dice. Ninguno tiene que destruir al otro.",
+        f"Este aspecto exigente entre {g1n} y {g2n} te pide que cuestiones un hábito. En el punto donde ambos chocan se encuentra tu oportunidad de crecimiento. Mira de cerca lo que te inquieta.",
+        f"Esta cuadratura es una prueba para armonizar las energías de {g1n} y {g2n}. No tienes que elegir uno; puedes abrazar los dos. Lo importante es encontrar el equilibrio entre ellos.",
+        f"La tensión entre {g1n} y {g2n} te dice que algo en tu interior debe cambiar. Presta atención a esa incomodidad. Puede que haya llegado el momento de soltar viejos hábitos.",
+        f"La cuadratura entre {g1n} y {g2n} te empuja fuera de tu zona de confort. Es un ciclo exigente pero profundamente instructivo. Intenta canalizar esa tensión hacia un proyecto creativo.",
+    ]
+    generic_karsit_es = [
+        f"La oposición entre {g1n} y {g2n} te hace oscilar entre dos polos distintos. Para hallar un punto de equilibrio, aprende a mantener la misma distancia de ambos lados.",
+        f"Esta oposición entre {g1n} y {g2n} señala un mecanismo de proyección. Lo que ves frente a ti puede ser una parte tuya que no aceptas.",
+        f"Este aspecto de oposición puede hacerte sentir obligado a elegir un bando en los ámbitos de {g1n} y {g2n}. Sin embargo, la verdadera cuestión es encontrar un modo de mantener ambas áreas en tu vida.",
+        f"Hay una dinámica de atracción y rechazo entre {g1n} y {g2n}. Cuanto más te acercas, más te alejas; cuanto más te alejas, más lo extrañas. Para romper este ciclo, busca un camino intermedio que abrace ambas energías.",
+        f"La oposición entre {g1n} y {g2n} simboliza tu búsqueda de equilibrio en una relación o situación. En lugar de pensar en blanco y negro, explora las zonas grises. La solución real está más allá de ambos.",
+    ]
+    if _ES:
+        generic_kare = generic_kare_es
+        generic_karsit = generic_karsit_es
+    elif _EN:
         generic_kare = generic_kare_en
         generic_karsit = generic_karsit_en
     if aci_turu == "Kare":
@@ -3936,6 +5583,7 @@ def _olumsuz_aci_sifasi(g1, g2, aci_turu):
 def _natal_sifa_receteleri(motor):
     """Expanded healing prescriptions for negative aspects + fallen/detriment planets."""
     _EN = _i18n_get_lang() == "en"
+    _ES = _i18n_get_lang() == "es"
     try:
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
         BURCLAR_EN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]
@@ -3982,7 +5630,18 @@ def _natal_sifa_receteleri(motor):
             "Neptün": {"Başak": "Ground your spirituality in a practical foundation. Add meditation to your daily routine. Crystals (amethyst, lapis lazuli) and incense help you focus.", "Kova": "Find a community to realize your dreams. Turning your idealistic energy into practical projects will ground you."},
             "Plüton": {"Başak": "Letting go of your need for control will be your greatest transformation. Instead of getting stuck on details, focus on the big picture. Deep breathing exercises ease transformation.", "Boğa": "Notice your possessive and controlling impulses. Face your fear of letting go and losing. Forgiveness and gratitude practices accelerate transformation."},
         }
-
+        SAGALTIM_TEKNIKLERI_ES = {
+            "Güneş": {"Terazi": "Aprende a valorarte a ti mismo. Observa tu necesidad de aprobación y deja que tu luz interior brille sin esperar validación externa. Saludos al sol (Surya Namaskar) y afirmaciones de autoconfianza.", "Kova": "Abdica tu singularidad, pero no te cortes completamente de la comunidad. Encuentra formas de compartir tus dones únicos con los demás. Meditación y trabajo comunitario."},
+            "Ay": {"Akrep": "Dirige tu intensidad emocional a campos creativos. Escribir un diario, plasmar tus sentimientos y expresarte por el arte te harán bien. Pasas tiempo junto al agua.", "Oğlak": "Te cuesta expresar tus emociones. Reserva diez minutos al día para volverte hacia adentro y muéstrate compasión. Los tés herbales y los baños calientes son reconfortantes."},
+            "Merkür": {"Balık": "Tu mente puede sentirse dispersa. La escritura diaria y los mapas mentales te ayudarán a concentrarte. Intenta trabajar en un entorno tranquilo.", "Yay": " investiga más antes de compartir tus ideas. Prestar atención a los detalles y escuchar con paciencia te hará un comunicador más eficaz."},
+            "Venüs": {"Başak": "Deja de buscar el amor perfecto. Aceptar pequeñas imperfecciones y desarrollar expectativas realistas mejorará tus relaciones. Regálate una flor o crea un entorno hermoso.", "Akrep": "Detecta tus tendencias posesivas y celosas en las relaciones. Realiza ejercicios de confianza y da espacio a tu pareja. Bailar disuelve bloqueos emocionales."},
+            "Mars": {"Boğa": "En lugar de reprimir tu ira, exprésala de forma sana a través de la actividad física. Ejercicios de conexión a tierra y caminatas por la naturaleza equilibrarán tu energía.", "Terazi": "Evita comportamientos pasivo-agresivos. Aprende a expresar tus necesidades de forma clara y amable. El yoga y el trabajo respiratorio te ayudan a gestionar la ira."},
+            "Jüpiter": {"Oğlak": "Crea un plan disciplinado para materializar tus grandes sueños. Haz afirmaciones de abundancia y lleva un diario de gratitud.", "Başak": "No dejes que el perfeccionismo te oculte la visión general. Aprende a tolerar riesgos y celebra cada pequeño éxito."},
+            "Satürn": {"Yengeç": "Tu necesidad de seguridad emocional puede chocar con tus responsabilidades. Enfrenta tu historia familiar y fortalecécete emocionalmente te dará libertad.", "Koç": "La paciencia es tu mayor lección. En lugar de exigir resultados rápidos, confía en el proceso. El caldo de huesos, suplementos de calcio y rutinas regulares te harán bien."},
+            "Uranüs": {"Boğa": "En lugar de resistirte al cambio, abrígate a la innovación en pequeños pasos. Hacer pequeños cambios en tu rutina abrirá la puerta a grandes transformaciones.", "Aslan": "No temas expresar tu singularidad. Sigue la inspiración repentina en proyectos creativos. El azul eléctrico y el púrpura elevan tu vibración."},
+            "Neptün": {"Başak": "Arrela tu espiritualidad en una base práctica. Añade meditación a tu rutina diaria. Cruces (ametista, lapislázuli) y incienso te ayudan a concentrarte.", "Kova": "Busca una comunidad para materializar tus sueños. Convertir tu energía idealista en proyectos prácticos te arraigará."},
+            "Plüton": {"Başak": "Dejar ir tu necesidad de control será tu mayor transformación. En lugar de quedarte en los detalles, enfócate en la visión general. La respiración profunda facilita la transformación.", "Boğa": "Detecta tus impulsos posesivos y dominantes. Enfrenta tu miedo a soltar y perder. La práctica del perdón y la gratitud acelera la transformación."},
+        }
         receteler = []
         # Hard aspects
         gez_list = list(gez_poz.keys())[:12]
@@ -3998,14 +5657,38 @@ def _natal_sifa_receteleri(motor):
                         if sifa:
                             if _EN:
                                 aci_label = "Opposition" if aci_ad == "Karşıt" else "Square"
+                            elif _ES:
+                                aci_label = "Oposición" if aci_ad == "Karşıt" else "Cuadratura"
                             else:
                                 aci_label = aci_ad
-                            receteler.append(f"🔴 {g1} {aci_label} {g2}: {sifa}")
+                            if _EN:
+                                _pname_map = {"Güneş":"Sun","Ay":"Moon","Merkür":"Mercury","Venüs":"Venus","Mars":"Mars","Jüpiter":"Jupiter","Satürn":"Saturn","Uranüs":"Uranus","Neptün":"Neptune","Plüton":"Pluto","Chiron":"Chiron"}
+                                for _tk, _tv in _pname_map.items():
+                                    sifa = sifa.replace(_tk, _tv)
+                                receteler.append(f"🔴 {_pname_map.get(g1, g1)} {aci_label} {_pname_map.get(g2, g2)}: {sifa}")
+                            elif _ES:
+                                _pname_map = {"Güneş":"Sol","Ay":"Luna","Merkür":"Mercurio","Venüs":"Venus","Mars":"Marte","Jüpiter":"Júpiter","Satürn":"Saturno","Uranüs":"Urano","Neptün":"Neptuno","Plüton":"Plutón","Chiron":"Chirón"}
+                                for _tk, _tv in _pname_map.items():
+                                    sifa = sifa.replace(_tk, _tv)
+                                receteler.append(f"🔴 {_pname_map.get(g1, g1)} {aci_label} {_pname_map.get(g2, g2)}: {sifa}")
+                            else:
+                                receteler.append(f"🔴 {g1} {aci_label} {g2}: {sifa}")
                         break
 
         # Fall / detriment remedies
-        diki = SAGALTIM_TEKNIKLERI_EN if _EN else SAGALTIM_TEKNIKLERI
-        fark_tr = "Awareness and conscious work are needed." if _EN else "Farkındalık ve bilinçli çalışma gerekiyor."
+        if _ES:
+            diki = SAGALTIM_TEKNIKLERI_ES
+        elif _EN:
+            diki = SAGALTIM_TEKNIKLERI_EN
+        else:
+            diki = SAGALTIM_TEKNIKLERI
+        if _ES:
+            fark_tr = "Se necesita conciencia y trabajo consciente."
+        elif _EN:
+            fark_tr = "Awareness and conscious work are needed."
+        else:
+            fark_tr = "Farkındalık ve bilinçli çalışma gerekiyor."
+        BURCLAR_ES = ["Aries","Tauro","Géminis","Cáncer","Leo","Virgo","Libra","Escorpio","Sagitario","Capricornio","Acuario","Piscis"]
         for gez, burc in gez_poz.items():
             if gez in DUSUK_ZARAR:
                 dusuk, zarar = DUSUK_ZARAR[gez]
@@ -4013,14 +5696,20 @@ def _natal_sifa_receteleri(motor):
                     teknik = diki.get(gez, {}).get(zarar, fark_tr)
                     if _EN:
                         zarar_label = BURCLAR_EN[BURCLAR.index(zarar)]
-                        receteler.append(f"🟠 {gez} Detriment ({zarar_label}): {teknik}")
+                        receteler.append(f"🟠 {pdf_label(gez)} Detriment ({zarar_label}): {teknik}")
+                    elif _ES:
+                        zarar_label = BURCLAR_ES[BURCLAR.index(zarar)]
+                        receteler.append(f"🟠 {pdf_label(gez)} en disminución ({zarar_label}): {teknik}")
                     else:
                         receteler.append(f"🟠 {gez} Zarar ({zarar}): {teknik}")
                 elif burc["burc"] == dusuk:
                     teknik = diki.get(gez, {}).get(dusuk, fark_tr)
                     if _EN:
                         dusuk_label = BURCLAR_EN[BURCLAR.index(dusuk)]
-                        receteler.append(f"🟡 {gez} Fall ({dusuk_label}): {teknik}")
+                        receteler.append(f"🟡 {pdf_label(gez)} Fall ({dusuk_label}): {teknik}")
+                    elif _ES:
+                        dusuk_label = BURCLAR_ES[BURCLAR.index(dusuk)]
+                        receteler.append(f"🟡 {pdf_label(gez)} Debilidad ({dusuk_label}): {teknik}")
                     else:
                         receteler.append(f"🟡 {gez} Düşük ({dusuk}): {teknik}")
 
@@ -4636,13 +6325,17 @@ def _composite_sehir_skor(comp, jd_event, lat, lon):
         tutku += deger.get("tutku", 0) * carpan
         huzur += deger.get("huzur", 0) * carpan
         kriz -= deger.get("huzur", 0) * carpan * 0.5
-        aci_simge = {"AC": "↑ Yükselen", "DC": "↓ Alçalan", "MC": "⌃ MC", "IC": "⌄ IC"}
+        aci_simge = {"AC": "↑ Ascendant", "DC": "↓ Descendant", "MC": "⌃ MC", "IC": "⌄ IC"}
+        if _i18n_get_lang() == "tr":
+            aci_simge = {"AC": "↑ Yükselen", "DC": "↓ Alçalan", "MC": "⌃ MC", "IC": "⌄ IC"}
+        elif _i18n_get_lang() == "es":
+            aci_simge = {"AC": "↑ Ascendente", "DC": "↓ Descendente", "MC": "⌃ MC", "IC": "⌄ IC"}
         etkiler.append(f"[K] {gezegen_adi} {aci_simge.get(aci, aci)} ({fark:.1f}°) → {deger.get('parlaklik', '')}")
     if "Satürn" in comp and "Plüton" in comp:
         sp_f = aci_farki_safe(comp["Satürn"], comp["Plüton"])
         if sp_f < 10:
             kriz += 20 * (1 - sp_f / 10)
-            etkiler.append(f"⚠️ [K] Satürn-Plüto kavuşumu ({sp_f:.1f}°)")
+            etkiler.append(f"⚠️ [K] Satürn-Plüto kavuşumu ({sp_f:.1f}°)" if _i18n_get_lang() == "tr" else (f"⚠️ [K] Saturn-Pluto conjunction ({sp_f:.1f}°)" if _i18n_get_lang() == "en" else f"⚠️ [K] Conjunción Saturno-Plutón ({sp_f:.1f}°)"))
     huzur = min(99, max(5, huzur))
     para = min(99, max(5, para))
     tutku = min(99, max(5, tutku))
@@ -4719,6 +6412,14 @@ def _result_kategorize(radar):
     """Sort radar results into 4 categories, one per country, exclude 3rd world."""
     EXCLUDED = {"Afghanistan","Afganistan","Pakistan","Bangladesh","Sri Lanka","Myanmar","Cambodia","Laos","Nepal","Bhutan","Maldives","Maldivler","Yemen","Syria","Suriye","Iraq","Irak","Libya","Sudan","Somali","Somalia","Ethiopia","Eritre","Chad","Nijer","Niger","Mali","Burkina Faso","Moritanya","Mauritania","Orta Afrika Cumhuriyeti","Central African Republic","Kongo","Demokratik Kongo Cumhuriyeti","DRC","Zimbabwe","Mozambik","Mozambique","Madagaskar","Madagascar","Haiti","Kuzey Kore","North Korea","Küba","Cuba"}
     excluded_any = {e.lower() for e in EXCLUDED}
+    _ULKE_EN = {"Türkiye":"Turkey","İngiltere":"United Kingdom","İrlanda":"Ireland","İsviçre":"Switzerland","Çin":"China","Kamboçya":"Cambodia","Çad":"Chad","Norveç":"Norway","Rusya":"Russia","Yunanistan":"Greece","Almanya":"Germany","Fransa":"France","İtalya":"Italy","İspanya":"Spain","Portekiz":"Portugal","Avusturya":"Austria","Hollanda":"Netherlands","Belçika":"Belgium","İsveç":"Sweden","Danimarka":"Denmark","Finlandiya":"Finland","İzlanda":"Iceland","Polonya":"Poland","Ukrayna":"Ukraine","Romanya":"Romania","Bulgaristan":"Bulgaria","Sırbistan":"Serbia","Hırvatistan":"Croatia","Arnavutluk":"Albania","Makedonya":"North Macedonia","Bosna-Hersek":"Bosnia and Herzegovina","Karadağ":"Montenegro","Kosova":"Kosovo","Gürcistan":"Georgia","Ermenistan":"Armenia","Azerbaycan":"Azerbaijan","Kazakistan":"Kazakhstan","Özbekistan":"Uzbekistan","Kırgızistan":"Kyrgyzstan","Türkmenistan":"Turkmenistan","Tacikistan":"Tajikistan","Afganistan":"Afghanistan","İran":"Iran","Irak":"Iraq","Suriye":"Syria","Lübnan":"Lebanon","İsrail":"Israel","Ürdün":"Jordan","Suudi Arabistan":"Saudi Arabia","Birleşik Arap Emirlikleri":"United Arab Emirates","Katar":"Qatar","Kuveyt":"Kuwait","Umman":"Oman","Yemen":"Yemen","Bahreyn":"Bahrain","Mısır":"Egypt","Libya":"Libya","Tunus":"Tunisia","Cezayir":"Algeria","Fas":"Morocco","ABD":"United States","ABD, Kaliforniya":"United States","Kanada":"Canada","Meksika":"Mexico","Brezilya":"Brazil","Arjantin":"Argentina","Şili":"Chile","Kolombiya":"Colombia","Peru":"Peru","Venezuela":"Venezuela","Ekvador":"Ecuador","Bolivya":"Bolivia","Paraguay":"Paraguay","Uruguay":"Uruguay","Küba":"Cuba","Japonya":"Japan","Güney Kore":"South Korea","Kuzey Kore":"North Korea","Hindistan":"India","Endonezya":"Indonesia","Malezya":"Malaysia","Singapur":"Singapore","Tayland":"Thailand","Vietnam":"Vietnam","Filipinler":"Philippines","Avustralya":"Australia","Yeni Zelanda":"New Zealand","Güney Afrika":"South Africa","Nijerya":"Nigeria","Kenya":"Kenya","Etiyopya":"Ethiopia","Tanzanya":"Tanzania","Cezayir":"Algeria","Fildişi Sahili":"Ivory Coast","Gana":"Ghana","Senegal":"Senegal","Kamerun":"Cameroon","Uganda":"Uganda","Moritanya":"Mauritania","Mali":"Mali","Nijer":"Niger","Çek Cumhuriyeti":"Czech Republic","Çekya":"Czechia","Slovakya":"Slovakia","Macaristan":"Hungary","Slovenya":"Slovenia","Estonya":"Estonia","Letonya":"Latvia","Litvanya":"Lithuania","Belarus":"Belarus","Moldova":"Moldova","Lüksemburg":"Luxembourg","Monako":"Monaco","Vatikan":"Vatican City","San Marino":"San Marino","Malta":"Malta","Kıbrıs":"Cyprus","Andorra":"Andorra","Lihtenştayn":"Liechtenstein","Grönland":"Greenland","Yeni Kaledonya":"New Caledonia","Fransız Polinezyası":"French Polynesia","Madagaskar":"Madagascar","Mozambik":"Mozambique","Zimbabve":"Zimbabwe","Zambiya":"Zambia","Angola":"Angola","Namibya":"Namibia","Botsvana":"Botswana","Svaziland":"Eswatini","Lesotho":"Lesotho","Malavi":"Malawi","Kongo Cumhuriyeti":"Republic of the Congo","Gine":"Guinea","Gine-Bissau":"Guinea-Bissau","Sierra Leone":"Sierra Leone","Liberya":"Liberia","Togo":"Togo","Benin":"Benin","Burkina Faso":"Burkina Faso","Orta Afrika Cumhuriyeti":"Central African Republic","Güney Sudan":"South Sudan","Eritre":"Eritrea","Cibuti":"Djibouti","Somali":"Somalia","Surinam":"Suriname","Guyana":"Guyana","Panama":"Panama","Kosta Rika":"Costa Rica","Nikaragua":"Nicaragua","Honduras":"Honduras","Guatemala":"Guatemala","El Salvador":"El Salvador","Belize":"Belize","Jamaika":"Jamaica","Dominik Cumhuriyeti":"Dominican Republic","Haiti":"Haiti","Porto Riko":"Puerto Rico","Trinidad ve Tobago":"Trinidad and Tobago","Bahamalar":"Bahamas","Barbados":"Barbados","Kırgızistan":"Kyrgyzstan","Moğolistan":"Mongolia","Nepal":"Nepal","Bhutan":"Bhutan","Bangladeş":"Bangladesh","Myanmar":"Myanmar","Sri Lanka":"Sri Lanka","Maldivler":"Maldives","Brunei":"Brunei","Doğu Timor":"East Timor","Papua Yeni Gine":"Papua New Guinea","Fiji":"Fiji","Samoa":"Samoa","Tonga":"Tonga","Vanuatu":"Vanuatu","Solomon Adaları":"Solomon Islands","Marshall Adaları":"Marshall Islands","Mikronezya":"Micronesia","Palau":"Palau","Kiribati":"Kiribati","Nauru":"Nauru","Tuvalu":"Tuvalu"}
+    _ULKE_ES = {"Türkiye":"Turquía","İngiltere":"Reino Unido","İrlanda":"Irlanda","İsviçre":"Suiza","Çin":"China","Kamboçya":"Camboya","Çad":"Chad","Norveç":"Noruega","Rusya":"Rusia","Yunanistan":"Grecia","Almanya":"Alemania","Fransa":"Francia","İtalya":"Italia","İspanya":"España","Portekiz":"Portugal","Avusturya":"Austria","Hollanda":"Países Bajos","Belçika":"Bélgica","İsveç":"Suecia","Danimarka":"Dinamarca","Finlandiya":"Finlandia","İzlanda":"Islandia","Polonya":"Polonia","Ukrayna":"Ucrania","Romanya":"Rumania","Bulgaristan":"Bulgaria","Sırbistan":"Serbia","Hırvatistan":"Croacia","Arnavutluk":"Albania","Makedonya":"Macedonia del Norte","Bosna-Hersek":"Bosnia y Herzegovina","Karadağ":"Montenegro","Kosova":"Kosovo","Gürcistan":"Georgia","Ermenistan":"Armenia","Azerbaycan":"Azerbaiyán","Kazakistan":"Kazajistán","Özbekistan":"Uzbekistán","Kırgızistan":"Kirguistán","Türkmenistan":"Turkmenistán","Tacikistan":"Tayikistán","Afganistan":"Afganistán","İran":"Irán","Irak":"Irak","Suriye":"Siria","Lübnan":"Líbano","İsrail":"Israel","Ürdün":"Jordania","Suudi Arabistan":"Arabia Saudita","Birleşik Arap Emirlikleri":"Emiratos Árabes Unidos","Katar":"Catar","Kuveyt":"Kuwait","Umman":"Omán","Yemen":"Yemen","Bahreyn":"Baréin","Mısır":"Egipto","Libya":"Libia","Tunus":"Túnez","Cezayir":"Argelia","Fas":"Marruecos","ABD":"Estados Unidos","ABD, Kaliforniya":"Estados Unidos","Kanada":"Canadá","Meksika":"México","Brezilya":"Brasil","Arjantin":"Argentina","Şili":"Chile","Kolombiya":"Colombia","Perú":"Perú","Venezuela":"Venezuela","Ekvador":"Ecuador","Bolivya":"Bolivia","Paraguay":"Paraguay","Uruguay":"Uruguay","Küba":"Cuba","Japonya":"Japón","Güney Kore":"Corea del Sur","Kuzey Kore":"Corea del Norte","Hindistan":"India","Endonezya":"Indonesia","Malezya":"Malasia","Singapur":"Singapur","Tayland":"Tailandia","Vietnam":"Vietnam","Filipinler":"Filipinas","Avustralya":"Australia","Yeni Zelanda":"Nueva Zelanda","Güney Afrika":"Sudáfrica","Nijerya":"Nigeria","Kenya":"Kenia","Etiyopya":"Etiopía","Tanzanya":"Tanzania","Fildişi Sahili":"Costa de Marfil","Gana":"Ghana","Senegal":"Senegal","Kamerun":"Camerún","Uganda":"Uganda","Moritanya":"Mauritania","Mali":"Malí","Nijer":"Níger","Çek Cumhuriyeti":"República Checa","Çekya":"Chequia","Slovakya":"Eslovaquia","Macaristan":"Hungría","Slovenya":"Eslovenia","Estonya":"Estonia","Letonya":"Letonia","Litvanya":"Lituania","Belarus":"Bielorrusia","Moldova":"Moldavia","Lüksemburg":"Luxemburgo","Monako":"Mónaco","Vatikan":"Ciudad del Vaticano","San Marino":"San Marino","Malta":"Malta","Kıbrıs":"Chipre","Andorra":"Andorra","Lihtenştayn":"Liechtenstein","Grönland":"Groenlandia","Yeni Kaledonya":"Nueva Caledonia","Fransız Polinezyası":"Polinesia Francesa","Madagaskar":"Madagascar","Mozambik":"Mozambique","Zimbabve":"Zimbabue","Zambiya":"Zambia","Angola":"Angola","Namibya":"Namibia","Botsvana":"Botsuana","Svaziland":"Suazilandia","Lesotho":"Lesoto","Malavi":"Malaui","Kongo Cumhuriyeti":"República del Congo","Gine":"Guinea","Gine-Bissau":"Guinea-Bisáu","Sierra Leone":"Sierra Leona","Liberya":"Liberia","Togo":"Togo","Benin":"Benín","Burkina Faso":"Burkina Faso","Orta Afrika Cumhuriyeti":"República Centroafricana","Güney Sudan":"Sudán del Sur","Eritre":"Eritrea","Cibuti":"Yibuti","Somali":"Somalia","Surinam":"Surinam","Guyana":"Guyana","Panama":"Panamá","Kosta Rika":"Costa Rica","Nikaragua":"Nicaragua","Honduras":"Honduras","Guatemala":"Guatemala","El Salvador":"El Salvador","Belize":"Belice","Jamaika":"Jamaica","Dominik Cumhuriyeti":"República Dominicana","Haiti":"Haití","Porto Riko":"Puerto Rico","Trinidad ve Tobago":"Trinidad y Tobago","Bahamalar":"Bahamas","Barbados":"Barbados","Moğolistan":"Mongolia","Nepal":"Nepal","Bhutan":"Bután","Bangladeş":"Bangladés","Myanmar":"Birmania","Sri Lanka":"Sri Lanka","Maldivler":"Maldivas","Brunei":"Brunéi","Doğu Timor":"Timor Oriental","Papua Yeni Gine":"Papúa Nueva Guinea","Fiji":"Fiyi","Samoa":"Samoa","Tonga":"Tonga","Vanuatu":"Vanuatu","Solomon Adaları":"Islas Salomón","Marshall Adaları":"Islas Marshall","Mikronezya":"Micronesia","Palau":"Palaos","Kiribati":"Kiribati","Nauru":"Nauru","Tuvalu":"Tuvalu"}
+    if _i18n_get_lang() == "en":
+        for _k, _v in _ULKE_EN.items():
+            if _k in EXCLUDED or _v in EXCLUDED:
+                continue
+            EXCLUDED.discard(_k); EXCLUDED.discard(_v)
+        excluded_any = {e.lower() for e in EXCLUDED}
     sirali = {"para": [], "huzur": [], "tutku": [], "kriz": []}
     for c in radar:
         raw = c["sehir"]
@@ -4733,6 +6434,10 @@ def _result_kategorize(radar):
         for sehir_ad, ulke, skor, lat, lon, etkiler in sirali[kat]:
             if ulke not in gorulen:
                 gorulen.add(ulke)
+                if _i18n_get_lang() == "en":
+                    ulke = _ULKE_EN.get(ulke, ulke)
+                elif _i18n_get_lang() == "es":
+                    ulke = _ULKE_ES.get(ulke, ulke)
                 tekil.append({"sehir": f"{sehir_ad}, {ulke}", "skor": round(skor, 2), "lat": lat, "lon": lon, "etkiler": list(etkiler or [])[:2]})
                 if len(tekil) == 10: break
         sirali[kat] = tekil
@@ -4775,6 +6480,7 @@ def simulasyon_alternatif(input: AlternatifInput):
         lat=input.enlem, lon=input.boylam,
         p1_isim=motor.p1_isim, p2_isim=motor.p2_isim,
         mod=motor.mod, utc_offset=input.utc_offset,
+        lang=motor._lang,
     )
     motor2.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor2)

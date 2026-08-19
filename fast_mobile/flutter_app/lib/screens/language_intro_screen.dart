@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
 
 class LanguageIntroScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class LanguageIntroScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lp = context.read<LocaleProvider>();
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: FastTheme.bg,
       body: Center(
@@ -31,12 +33,14 @@ class LanguageIntroScreen extends StatelessWidget {
               const SizedBox(height: 16),
               const Text('FAST', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
               const SizedBox(height: 40),
-              const Text('Dilinizi seçin', style: TextStyle(color: FastTheme.text, fontSize: 18)),
-              const Text('Choose your language', style: TextStyle(color: FastTheme.textMuted, fontSize: 14)),
+              Text(l10n.chooseLanguage, style: const TextStyle(color: FastTheme.text, fontSize: 18)),
+              Text(l10n.chooseLanguageSub, style: const TextStyle(color: FastTheme.textMuted, fontSize: 14)),
               const SizedBox(height: 24),
               _langBtn(lp, 'tr', 'Türkçe'),
               const SizedBox(height: 12),
               _langBtn(lp, 'en', 'English'),
+              const SizedBox(height: 12),
+              _langBtn(lp, 'es', 'Español'),
             ],
           ),
         ),

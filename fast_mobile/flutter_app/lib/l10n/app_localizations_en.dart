@@ -467,6 +467,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get spanish => 'Spanish';
+
+  @override
   String get homeTitle => 'Fatih Asartepe\nSynastry Technique';
 
   @override
@@ -890,4 +893,216 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyzerStarScan => 'Star Compass Scan';
+
+  @override
+  String get errorTitle => 'Error';
+
+  @override
+  String get unknownError => 'Unknown error';
+
+  @override
+  String get retryButton => 'Try Again';
+
+  @override
+  String get imageLoadError => 'Image could not be loaded';
+
+  @override
+  String get chooseLanguage => 'Choose your language';
+
+  @override
+  String get chooseLanguageSub => 'Dilinizi seçin';
+
+  @override
+  String get analyzerParentRole => 'Parent Role';
+
+  @override
+  String get analyzerParentNameRequired => 'Enter the parent\'s name';
+
+  @override
+  String get analyzerLocationLoading => 'Fetching location...';
+
+  @override
+  String get analyzerPersonA => 'Chart A';
+
+  @override
+  String get analyzerPersonB => 'Chart B';
+
+  @override
+  String get scoreVitalityTork => 'Relationship Vitality (Torque)';
+
+  @override
+  String get scoreFlowFraktal => 'Natural Flow (Fractal)';
+
+  @override
+  String get progressionTitle => 'Secondary Progression';
+
+  @override
+  String get weatherTitle => 'Sky Flow (3 Days)';
+
+  @override
+  String get timeMachineTitle => 'Celestial Time Flow (21 Years)';
+
+  @override
+  String get astrokartografiTitle => 'Astrocartography';
+
+  @override
+  String get alternateUniverseScores => 'Alternate Universe Scores';
+
+  @override
+  String get cityCompassTitle => '🌍 City Compass';
+
+  @override
+  String downloadPdfButton(Object mod) {
+    return '📥 Download PDF ($mod)';
+  }
+
+  @override
+  String analyzerYearLine(Object year) {
+    return 'Year: $year';
+  }
+
+  @override
+  String analyzerMoonSun(Object moon, Object sun) {
+    return '🌙 Moon: $moon | ☀️ Sun: $sun';
+  }
+
+  @override
+  String analyzerMoonSunHouse(Object house, Object moon, Object sun) {
+    return '🌙 Moon: $moon ($house. House) | ☀️ Sun: $sun';
+  }
+
+  @override
+  String analyzerMoonTransitLine(Object degree, Object house, Object sign) {
+    return '🌙 Moon $sign — $house. House ($degree°)';
+  }
+
+  @override
+  String analyzerAspectOrb(Object aspect, Object orb, Object type) {
+    return '$aspect — $type° Aspect (Orb: $orb)';
+  }
+
+  @override
+  String analyzerScorePoints(Object percent, Object points) {
+    return '$points points ($percent%)';
+  }
+
+  @override
+  String get analyzerPotentialChildDesc =>
+      'Natural talent, potential areas and career directions detected from the planetary aspects in the child\'s chart.';
+
+  @override
+  String get analyzerPotentialSelfDesc =>
+      'Natural talent, potential areas and career directions detected from the planetary aspects in your chart.';
+
+  @override
+  String get analyzerPotentialTop5Hint =>
+      '💡 Only the first 5 talent areas are shown in the browser. All areas are in the PDF report.';
+
+  @override
+  String get analyzerPotentialAllPdf =>
+      'All potential and talent areas are detailed in your PDF report.';
+
+  @override
+  String get analyzerProfessionChildDesc =>
+      'Career fields the child is inclined toward, determined by the synthesis of their potential and talent areas.';
+
+  @override
+  String get analyzerProfessionSelfDesc =>
+      'Career fields you are inclined toward, determined by the synthesis of your potential and talent areas.';
+
+  @override
+  String get analyzerProfessionFullRanking =>
+      '💡 The full ranking is in the PDF report.';
+
+  @override
+  String get analyzerProfessionScoringNote =>
+      'Scoring: Calculated using planet-sign matches, aspect type, orb proximity, legend boost, MC bonus and asteroid support.';
+
+  @override
+  String get analyzerProfessionPdfHint =>
+      'Check your PDF report for a detailed explanation.';
+
+  @override
+  String get analyzerArabicIntro =>
+      'Arabic Points represent cosmic points in astrology. The relationship-focused point positions of both people.';
+
+  @override
+  String get analyzerArabicPdfHint =>
+      '💡 Detailed sign and house interpretations are in your PDF report.';
+
+  @override
+  String get analyzerLifeAreasIntro =>
+      'Comprehensive category cards for your entire chart — personal analysis and recommendations for each area.';
+
+  @override
+  String get analyzerSabianIntro =>
+      'Sabian symbols and interpretations based on the degrees your planets occupy.';
+
+  @override
+  String get analyzerMinorProgress6Month =>
+      '📄 A comprehensive 6-month Minor Progress report is presented in the PDF.';
+
+  @override
+  String get analyzerChartCommentIntro =>
+      'A holistic chart analysis covering planetary positions, aspect patterns, Arabic points and asteroid themes.';
+
+  @override
+  String get analyzerHealingIntro =>
+      'Personal healing and balance recommendations based on the planetary positions in your birth chart.';
+
+  @override
+  String get analyzerHealingDetailIntro =>
+      'Special remediation techniques and recommendations for challenging aspects and planets in detriment/fall.';
+
+  @override
+  String get analyzerAsteroidsIntro =>
+      'Cross-aspect themes of the Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho and Amor asteroids.';
+
+  @override
+  String get analyzerAsteroidsOrbHint =>
+      '💡 Contacts within the 0-5° orb range are shown.';
+
+  @override
+  String get analyzerAsteroidsAllPdf =>
+      'All asteroid interactions are detailed in your PDF report.';
+
+  @override
+  String get analyzerAcgGlobalIntro =>
+      'An interactive map showing where your birth chart planets peak on Earth and a star compatibility scan across 15,000+ cities.';
+
+  @override
+  String get simCatWealth => 'Money & Career';
+
+  @override
+  String get simCatPeace => 'Peace & Serenity';
+
+  @override
+  String get simCatPassion => 'Passion & Love';
+
+  @override
+  String get simCatCrisis => 'Crisis & Challenge';
+
+  @override
+  String get astroScoreMoney => '💰 Money';
+
+  @override
+  String get astroScorePeace => '☮️ Peace';
+
+  @override
+  String get astroScorePassion => '🔥 Passion';
+
+  @override
+  String get astroScoreCrisis => '⚡ Crisis';
+
+  @override
+  String get astroBarMoney => '💰 Money & Career';
+
+  @override
+  String get astroBarPeace => '🧘 Peace & Serenity';
+
+  @override
+  String get astroBarPassion => '🔥 Passion & Love';
+
+  @override
+  String get astroBarCrisis => '⚠️ Crisis & Challenge';
 }

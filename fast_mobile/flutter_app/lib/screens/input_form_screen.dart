@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
@@ -38,7 +38,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
   String _seciliSehir = 'İstanbul';
   final _latCtrl = TextEditingController(text: '41.0082');
   final _lonCtrl = TextEditingController(text: '28.9784');
-  String _geoHint = 'Şehir yazıp ara butonuna basın';
+  String? _geoHint;
 
   // Ebeveyn
   String _ebeveynRolu = 'anne';
@@ -48,12 +48,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
   bool _dbLoading = true;
   bool _geoLoading = false;
 
-  String get _modKey {
-    if (widget.mod.startsWith('Eş')) return 'es_sevgili';
-    if (widget.mod.startsWith('Ebeveyn')) return 'ebeveyn_cocuk';
-    if (widget.mod.startsWith('Potansiyel')) return 'potansiyel_yetenek';
-    return 'bireysel_natal';
-  }
+  String get _modKey => widget.mod;
 
   bool get _ikinciKisiGerekli => _modKey == 'es_sevgili' || _modKey == 'ebeveyn_cocuk';
   bool get _eventGerekli => _modKey == 'es_sevgili';
@@ -129,26 +124,27 @@ class _InputFormScreenState extends State<InputFormScreen> {
         _geoHint = '${r['city']}, ${r['country'] ?? '—'} (${r['lat'].toStringAsFixed(4)}, ${r['lon'].toStringAsFixed(4)})';
       });
     } catch (_) {
-      setState(() => _geoHint = 'Şehir bulunamadı, manuel girin');
+      setState(() => _geoHint = AppLocalizations.of(context).analyzerCityNotFound);
     }
     setState(() => _geoLoading = false);
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     if (_p1TarihCtrl.text.isEmpty) {
-      _snack('Doğum tarihini girin');
+      _snack(l10n.analyzerDateRequired);
       return;
     }
     if (_ikinciKisiGerekli && _p2TarihCtrl.text.isEmpty) {
-      _snack('2. kişinin doğum tarihini girin');
+      _snack(l10n.analyzerDate2Required);
       return;
     }
     if (_tekKisiMod && _p1IsimCtrl.text.trim().isEmpty) {
-      _snack('İsim girin');
+      _snack(l10n.analyzerNameRequired);
       return;
     }
     if (_ebeveynMod && _p1IsimCtrl.text.trim().isEmpty) {
-      _snack('Ebeveyn ismi girin');
+      _snack(l10n.analyzerParentNameRequired);
       return;
     }
 
@@ -182,6 +178,16 @@ class _InputFormScreenState extends State<InputFormScreen> {
   List<String>? get _ulkeler => (_lokasyonDB?['ulkeler'] as List?)?.cast<String>();
   List<String>? get _sehirler => (_lokasyonDB?['sehirler']?[_seciliUlke] as List?)?.cast<String>();
 
+  String _modeTitle(AppLocalizations l10n) {
+    switch (widget.mod) {
+      case 'es_sevgili': return l10n.modeEsTitle;
+      case 'ebeveyn_cocuk': return l10n.modeEbTitle;
+      case 'potansiyel_yetenek': return l10n.modePyTitle;
+      case 'bireysel_natal': return l10n.modeNatalTitle;
+      default: return widget.mod;
+    }
+  }
+
   @override
   void dispose() {
     _p1IsimCtrl.dispose();
@@ -199,74 +205,76 @@ class _InputFormScreenState extends State<InputFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.mod), actions: const [LanguageSwitcher()]),
+      appBar: AppBar(title: Text(_modeTitle(l10n)), actions: const [LanguageSwitcher()]),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ---- PERSON 1 ----
-            if (_ebeveynMod) _sectionBaslik('Ebeveyn', Icons.family_restroom, FastTheme.secondary)
-            else if (_tekKisiMod) _sectionBaslik('Kişisel Bilgiler', Icons.person, FastTheme.primary)
-            else _sectionBaslik('1. Kişi', Icons.person, FastTheme.rose),
+            if (_ebeveynMod) _sectionBaslik(l10n.analyzerParent, Icons.family_restroom, FastTheme.secondary)
+            else if (_tekKisiMod) _sectionBaslik(l10n.analyzerPersonalInfo, Icons.person, FastTheme.primary)
+            else _sectionBaslik(l10n.analyzerPerson1, Icons.person, FastTheme.rose),
 
             if (_ebeveynMod) ...[
-              _dropdownField('Ebeveyn Rolü', ['anne', 'baba'], _ebeveynRolu, (v) => _ebeveynRolu = v!),
+              _dropdownField(l10n.analyzerParentRole, ['anne', 'baba'], _ebeveynRolu, (v) => _ebeveynRolu = v!,
+                labels: {'anne': l10n.analyzerMother, 'baba': l10n.analyzerFather}),
               const SizedBox(height: 12),
             ],
             if (_tekKisiMod || _ebeveynMod || _modKey == 'es_sevgili')
-              _textField('İsim', _p1IsimCtrl, icon: Icons.person),
+              _textField(l10n.analyzerName, _p1IsimCtrl, icon: Icons.person),
             if (_tekKisiMod || _ebeveynMod || _modKey == 'es_sevgili')
               const SizedBox(height: 12),
-            _dateField('Doğum Tarihi', _p1TarihCtrl),
+            _dateField(l10n.analyzerBirthDate, _p1TarihCtrl, l10n),
             const SizedBox(height: 12),
             if (!_ebeveynMod)
-              _timeField('Doğum Saati', _p1SaatCtrl),
+              _timeField(l10n.analyzerBirthTime, _p1SaatCtrl),
 
             const SizedBox(height: 24),
 
             // ---- PERSON 2 (es/eb only) ----
             if (_ikinciKisiGerekli) ...[
-              if (_ebeveynMod) _sectionBaslik('Çocuk', Icons.child_care, FastTheme.secondary)
-              else _sectionBaslik('2. Kişi', Icons.person_outline, FastTheme.rose),
+              if (_ebeveynMod) _sectionBaslik(l10n.analyzerChild, Icons.child_care, FastTheme.secondary)
+              else _sectionBaslik(l10n.analyzerPerson2, Icons.person_outline, FastTheme.rose),
               if (!_ebeveynMod) ...[
-                _textField('İsim', _p2IsimCtrl, icon: Icons.person_outline),
+                _textField(l10n.analyzerName, _p2IsimCtrl, icon: Icons.person_outline),
                 const SizedBox(height: 12),
               ],
-              _dateField('Doğum Tarihi', _p2TarihCtrl),
+              _dateField(l10n.analyzerBirthDate, _p2TarihCtrl, l10n),
               const SizedBox(height: 12),
               if (_ebeveynMod)
-                _timeField('Doğum Saati', _p2SaatCtrl),
+                _timeField(l10n.analyzerBirthTime, _p2SaatCtrl),
               const SizedBox(height: 24),
             ],
 
             // ---- EVENT (es only) ----
             if (_eventGerekli) ...[
-              _sectionBaslik('Tanışma / Evlilik', Icons.favorite, FastTheme.rose),
-              _dateField('Tarih', _eventTarihCtrl, zorunlu: false),
+              _sectionBaslik(l10n.analyzerMeetingMarriage, Icons.favorite, FastTheme.rose),
+              _dateField(l10n.analyzerDate, _eventTarihCtrl, l10n, zorunlu: false),
               const SizedBox(height: 12),
-              _timeField('Saat', _eventSaatCtrl),
+              _timeField(l10n.analyzerTime, _eventSaatCtrl),
               const SizedBox(height: 24),
             ],
 
             // ---- LOCATION ----
-            _sectionBaslik('Konum', Icons.location_on, FastTheme.accent),
+            _sectionBaslik(l10n.analyzerLocation, Icons.location_on, FastTheme.accent),
             const SizedBox(height: 12),
 
             if (_dbLoading)
               const LinearProgressIndicator()
             else ...[
-              _dropdownField('Ülke', _ulkeler ?? [], _seciliUlke, (v) {
+              _dropdownField(l10n.analyzerCountry, _ulkeler ?? [], _seciliUlke, (v) {
                 setState(() {
                   _seciliUlke = v!;
                   _seciliSehir = '';
-                  _geoHint = 'Şehir seçin';
+                  _geoHint = l10n.analyzerSelectCity;
                 });
               }),
               const SizedBox(height: 12),
               if (_sehirler != null)
-                _dropdownField('Şehir', _sehirler!, _seciliSehir, (v) {
+                _dropdownField(l10n.analyzerCity, _sehirler!, _seciliSehir, (v) {
                   setState(() => _seciliSehir = v!);
                   _geoCode(v!);
                 }),
@@ -275,23 +283,23 @@ class _InputFormScreenState extends State<InputFormScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: _textField('Enlem', _latCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
+                Expanded(child: _textField(l10n.analyzerLatitude, _latCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
                 const SizedBox(width: 12),
-                Expanded(child: _textField('Boylam', _lonCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
+                Expanded(child: _textField(l10n.analyzerLongitude, _lonCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
               ],
             ),
             const SizedBox(height: 8),
             if (_geoLoading)
-              const Row(children: [SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 8), Text('Konum alınıyor...')])
+              Row(children: [const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), const SizedBox(width: 8), Text(l10n.analyzerLocationLoading)])
             else
-              Text(_geoHint, style: TextStyle(fontSize: 12, color: FastTheme.textLight)),
+              Text(_geoHint ?? l10n.analyzerSearchHint, style: TextStyle(fontSize: 12, color: FastTheme.textLight)),
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () => _geoCode(_seciliSehir),
                 icon: const Icon(Icons.search, size: 18),
-                label: const Text('Konumu Ara'),
+                label: Text(l10n.analyzerSearchLocation),
               ),
             ),
 
@@ -305,7 +313,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
                   backgroundColor: FastTheme.primary,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('🔮 Analizi Başlat'),
+                child: Text(l10n.analyzerStart),
               ),
             ),
             const SizedBox(height: 20),
@@ -343,14 +351,14 @@ class _InputFormScreenState extends State<InputFormScreen> {
     );
   }
 
-  Widget _dateField(String label, TextEditingController ctrl, {bool zorunlu = true}) {
+  Widget _dateField(String label, TextEditingController ctrl, AppLocalizations l10n, {bool zorunlu = true}) {
     return TextField(
       controller: ctrl,
       readOnly: false,
       keyboardType: TextInputType.number,
       style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
-        labelText: zorunlu ? label : '$label (opsiyonel)',
+        labelText: zorunlu ? label : '$label (${l10n.analyzerOptional})',
         hintText: '08.10.1986',
         prefixIcon: const Icon(Icons.calendar_today, size: 20),
         suffixIcon: IconButton(
@@ -397,11 +405,11 @@ class _InputFormScreenState extends State<InputFormScreen> {
     );
   }
 
-  Widget _dropdownField(String label, List<String> items, String value, ValueChanged<String?> onChanged) {
+  Widget _dropdownField(String label, List<String> items, String value, ValueChanged<String?> onChanged, {Map<String, String>? labels}) {
     return DropdownButtonFormField<String>(
       value: items.contains(value) ? value : (items.isNotEmpty ? items.first : null),
       decoration: InputDecoration(labelText: label),
-      items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+      items: items.map((e) => DropdownMenuItem(value: e, child: Text(labels?[e] ?? e))).toList(),
       onChanged: onChanged,
     );
   }

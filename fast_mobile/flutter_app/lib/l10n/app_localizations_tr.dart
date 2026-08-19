@@ -467,6 +467,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get english => 'İngilizce';
 
   @override
+  String get spanish => 'İspanyolca';
+
+  @override
   String get homeTitle => 'Fatih Asartepe\nSinastri Tekniği';
 
   @override
@@ -886,4 +889,216 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get analyzerStarScan => 'Yıldız Pusulası Taraması';
+
+  @override
+  String get errorTitle => 'Hata';
+
+  @override
+  String get unknownError => 'Bilinmeyen hata';
+
+  @override
+  String get retryButton => 'Tekrar Dene';
+
+  @override
+  String get imageLoadError => 'Görsel yüklenemedi';
+
+  @override
+  String get chooseLanguage => 'Dilinizi seçin';
+
+  @override
+  String get chooseLanguageSub => 'Choose your language';
+
+  @override
+  String get analyzerParentRole => 'Ebeveyn Rolü';
+
+  @override
+  String get analyzerParentNameRequired => 'Ebeveyn ismi girin';
+
+  @override
+  String get analyzerLocationLoading => 'Konum alınıyor...';
+
+  @override
+  String get analyzerPersonA => 'Harita A';
+
+  @override
+  String get analyzerPersonB => 'Harita B';
+
+  @override
+  String get scoreVitalityTork => 'İlişki Canlılığı (Tork)';
+
+  @override
+  String get scoreFlowFraktal => 'Doğal Akış (Fraktal)';
+
+  @override
+  String get progressionTitle => 'Secondary Progression';
+
+  @override
+  String get weatherTitle => 'Gökyüzü Akışı (3 Gün)';
+
+  @override
+  String get timeMachineTitle => 'Göksel Zaman Akışı (21 Yıl)';
+
+  @override
+  String get astrokartografiTitle => 'Astrokartografi';
+
+  @override
+  String get alternateUniverseScores => 'Alternatif Evren Puanları';
+
+  @override
+  String get cityCompassTitle => '🌍 Şehir Pusulası';
+
+  @override
+  String downloadPdfButton(Object mod) {
+    return '📥 PDF İndir ($mod)';
+  }
+
+  @override
+  String analyzerYearLine(Object year) {
+    return 'Yıl: $year';
+  }
+
+  @override
+  String analyzerMoonSun(Object moon, Object sun) {
+    return '🌙 Ay: $moon | ☀️ Güneş: $sun';
+  }
+
+  @override
+  String analyzerMoonSunHouse(Object house, Object moon, Object sun) {
+    return '🌙 Ay: $moon ($house. Ev) | ☀️ Güneş: $sun';
+  }
+
+  @override
+  String analyzerMoonTransitLine(Object degree, Object house, Object sign) {
+    return '🌙 Ay $sign — $house. Ev ($degree°)';
+  }
+
+  @override
+  String analyzerAspectOrb(Object aspect, Object orb, Object type) {
+    return '$aspect — $type° Açısı (Orb: $orb)';
+  }
+
+  @override
+  String analyzerScorePoints(Object percent, Object points) {
+    return '$points puan (%$percent)';
+  }
+
+  @override
+  String get analyzerPotentialChildDesc =>
+      'Çocuğun haritasındaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.';
+
+  @override
+  String get analyzerPotentialSelfDesc =>
+      'Haritanızdaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.';
+
+  @override
+  String get analyzerPotentialTop5Hint =>
+      '💡 Tarayıcıda sadece ilk 5 yetenek alanı gösterilmektedir. Tüm alanlar PDF raporundadır.';
+
+  @override
+  String get analyzerPotentialAllPdf =>
+      'Tüm potansiyel ve yetenek alanları PDF raporunuzda detaylı şekilde yer almaktadır.';
+
+  @override
+  String get analyzerProfessionChildDesc =>
+      'Çocuğun potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğu meslek dalları.';
+
+  @override
+  String get analyzerProfessionSelfDesc =>
+      'Potansiyel ve yetenek alanlarınızın senteziyle belirlenen, yatkın olduğunuz meslek dalları.';
+
+  @override
+  String get analyzerProfessionFullRanking =>
+      '💡 Tam sıralama PDF raporundadır.';
+
+  @override
+  String get analyzerProfessionScoringNote =>
+      'Puanlama: Gezegen-burç eşleşmesi, açı türü, orb yakınlığı, efsane boost, MC bonusu ve asteroid desteği ile hesaplanmıştır.';
+
+  @override
+  String get analyzerProfessionPdfHint =>
+      'Detaylı açıklama için PDF raporunuzu inceleyin.';
+
+  @override
+  String get analyzerArabicIntro =>
+      'Arap Noktaları, astrolojide kozmik noktaları temsil eder. Her iki kişinin ilişki odaklı nokta pozisyonları.';
+
+  @override
+  String get analyzerArabicPdfHint =>
+      '💡 Detaylı burç ve ev yorumları PDF raporunuzdadır.';
+
+  @override
+  String get analyzerLifeAreasIntro =>
+      'Tüm haritanız için kapsamlı kategori kartları — her alan için kişisel analiz ve öneriler.';
+
+  @override
+  String get analyzerSabianIntro =>
+      'Gezegenlerinizin bulunduğu derecelere göre Sabian sembolleri ve yorumları.';
+
+  @override
+  String get analyzerMinorProgress6Month =>
+      '📄 6 aylık kapsamlı Minor Progress raporu PDF\'te sunulmuştur.';
+
+  @override
+  String get analyzerChartCommentIntro =>
+      'Gezegen konumları, açı kalıpları, Arap noktaları ve asteroit temalarını kapsayan bütünsel harita analizi.';
+
+  @override
+  String get analyzerHealingIntro =>
+      'Doğum haritanızdaki gezegen konumlarına göre kişisel şifa ve denge önerileri.';
+
+  @override
+  String get analyzerHealingDetailIntro =>
+      'Zorlu açılar ve zarar/düşük pozisyonundaki gezegenler için özel sağaltım teknikleri ve öneriler.';
+
+  @override
+  String get analyzerAsteroidsIntro =>
+      'Juno, Ceres, Pallas, Vesta, Eros, Psyche, Sappho, Amor asteroidlerinin çapraz açısal temaları.';
+
+  @override
+  String get analyzerAsteroidsOrbHint =>
+      '💡 0-5° orb aralığındaki temaslar gösterilmiştir.';
+
+  @override
+  String get analyzerAsteroidsAllPdf =>
+      'Tüm asteroit etkileşimleri PDF raporunuzda detaylandırılmıştır.';
+
+  @override
+  String get analyzerAcgGlobalIntro =>
+      'Doğum haritanızdaki gezegenlerin dünya üzerinde nerede doruk noktaya ulaştığını gösteren interaktif harita ve 15.000+ şehirdeki yıldız uyumu taraması.';
+
+  @override
+  String get simCatWealth => 'Para & Kariyer';
+
+  @override
+  String get simCatPeace => 'Huzur & Sakinlik';
+
+  @override
+  String get simCatPassion => 'Tutku & Aşk';
+
+  @override
+  String get simCatCrisis => 'Kriz & Zorluk';
+
+  @override
+  String get astroScoreMoney => '💰 Para';
+
+  @override
+  String get astroScorePeace => '☮️ Huzur';
+
+  @override
+  String get astroScorePassion => '🔥 Tutku';
+
+  @override
+  String get astroScoreCrisis => '⚡ Kriz';
+
+  @override
+  String get astroBarMoney => '💰 Para & Kariyer';
+
+  @override
+  String get astroBarPeace => '🧘 Huzur & Sakinlik';
+
+  @override
+  String get astroBarPassion => '🔥 Tutku & Aşk';
+
+  @override
+  String get astroBarCrisis => '⚠️ Kriz & Zorluk';
 }
