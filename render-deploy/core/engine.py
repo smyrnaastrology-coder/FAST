@@ -7240,7 +7240,16 @@ class FBST_Engine:
                         "🌋 <b>Destructive Creative Power:</b> Suppressed anger may suddenly explode; the urge to burn every bridge may peak. This energy is poison; bring the antidote (compassion) into play today."
                     ]
                 }
-            bsp_sozlugu = bsp_sozlugu_en
+            if _ES:
+                try:
+                    _bsp_es_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'core', 'fast_bsp_es.json')
+                    with open(_bsp_es_path, encoding="utf-8") as _f:
+                        _bsp_es = json.load(_f)
+                    bsp_sozlugu = _bsp_es.get(aktif_mod, {})
+                except Exception:
+                    bsp_sozlugu = bsp_sozlugu_en
+            else:
+                bsp_sozlugu = bsp_sozlugu_en
         
         minor_oran = 27.32166 / 365.2422 
         alarmlar = []
