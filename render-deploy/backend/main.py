@@ -996,7 +996,8 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
     from datetime import timedelta
     try:
         _EN = _i18n_get_lang() == "en"
-        GUN_AD = (["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] if _EN else ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"])
+        _ES = _i18n_get_lang() == "es"
+        GUN_AD = (["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] if _EN else (["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"] if _ES else ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"]))
         BURCLAR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
 
         jd_natal = motor.get_natal_julian_day("p1")
@@ -1057,7 +1058,7 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
                         aspekt_yorumlari.append(f"{hedef} {aci_turu}: {yorum}")
             
             if not aspekt_yorumlari:
-                aspekt_yorumlari.append(("No prominent Moon aspect was found for this period." if _EN else "Bu dönem için belirgin bir Ay açısı bulunamadı."))
+                aspekt_yorumlari.append(("No prominent Moon aspect was found for this period." if _EN else ("No se encontró ningún aspecto prominente de la Luna para este período." if _ES else "Bu dönem için belirgin bir Ay açısı bulunamadı.")))
             
             # Pick 2-3 aspects max
             if len(aspekt_yorumlari) > 3:
@@ -1328,6 +1329,12 @@ def _es_localize(data):
             y["baslik"] = _es_cv_text(y["baslik"])
         if y.get("icerik"):
             y["icerik"] = _es_cv_text(y["icerik"])
+    # karmik_ev raporlari
+    _ke = data.get("karmik_ev")
+    if isinstance(_ke, dict):
+        for _rk in ("rapor_a", "rapor_b"):
+            if isinstance(_ke.get(_rk), list):
+                _ke[_rk] = [_es_cv_text(x) if isinstance(x, str) else x for x in _ke[_rk]]
     return data
 
 def _analiz_hash(tag, girdi):
