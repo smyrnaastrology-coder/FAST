@@ -5015,6 +5015,9 @@ class FBST_Engine:
             arap_nokta_listesi_en = ["Father Point", "Mother Point", "Child Soul",
                                      "Protection Point", "Education Point", "Boundary Point",
                                      "Attachment Point", "Responsibility"]
+            arap_nokta_listesi_es = ["Punto del Padre", "Punto de la Madre", "Alma Infantil",
+                                     "Punto de Protección", "Punto de Educación", "Punto de Límite",
+                                     "Punto de Acentramiento", "Responsabilidad"]
         else:
             arap_nokta_listesi = ["Evlilik Noktası", "Aşk Noktası", "Tutku Noktası",
                                   "Ortaklık Noktası", "Sadakat Noktası", "Cinsellik Noktası",
@@ -5022,6 +5025,9 @@ class FBST_Engine:
             arap_nokta_listesi_en = ["Marriage Point", "Love Point", "Passion Point",
                                      "Partnership Point", "Loyalty Point", "Sexuality Point",
                                      "Marital Happiness", "Divorce Point"]
+            arap_nokta_listesi_es = ["Punto de Matrimonio", "Punto de Amor", "Punto de Pasión",
+                                     "Punto de Asociación", "Punto de Lealtad", "Punto de Sexualidad",
+                                     "Felicidad Matrimonial", "Punto de Divorcio"]
 
         for nokta in arap_nokta_listesi:
             p1_val = arap.get(p1_isim, {}).get(nokta, {})
@@ -5035,6 +5041,8 @@ class FBST_Engine:
 
             if _EN:
                 nokta_etiketi = arap_nokta_listesi_en[arap_nokta_listesi.index(nokta)].replace(" Point", "")
+            elif _ES:
+                nokta_etiketi = arap_nokta_listesi_es[arap_nokta_listesi.index(nokta)].replace(" Punto", "")
             else:
                 nokta_etiketi = nokta.replace(" Noktası", "")
             nokta_turleri.append(nokta_etiketi)
@@ -12474,7 +12482,12 @@ class FBST_Engine:
     def lunar_return_metni_yaz(self, lr_data):
         _EN = _core_get_lang() == "en"
         _ES = _core_get_lang() == "es"
-        ay_isimleri = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] if (_EN or _ES) else ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+        if _EN:
+            ay_isimleri = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        elif _ES:
+            ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"]
+        else:
+            ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"]
         yil = lr_data["yil"]
         ay_no = lr_data["ay"]
         ay_isim = ay_isimleri[ay_no]
