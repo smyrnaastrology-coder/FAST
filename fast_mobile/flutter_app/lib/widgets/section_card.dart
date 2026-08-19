@@ -35,7 +35,7 @@ class _SectionCardState extends State<SectionCard> {
                     const SizedBox(width: 10),
                   ],
                   Expanded(
-                    child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.textDark)),
+                    child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.text)),
                   ),
                   Icon(_open ? Icons.expand_less : Icons.expand_more, color: FastTheme.textLight),
                 ],
@@ -69,7 +69,7 @@ class HtmlRender extends StatelessWidget {
         .replaceAll('&gt;', '>')
         .trim();
     if (text.isEmpty) return const SizedBox.shrink();
-    return Text(text, style: const TextStyle(fontSize: 14, height: 1.5, color: FastTheme.textDark));
+    return Text(text, style: const TextStyle(fontSize: 14, height: 1.5, color: FastTheme.text));
   }
 }
 

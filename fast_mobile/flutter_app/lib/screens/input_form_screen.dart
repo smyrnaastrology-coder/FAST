@@ -335,7 +335,7 @@ class _InputFormScreenState extends State<InputFormScreen> {
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(width: 10),
-          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.textDark)),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.text)),
         ],
       ),
     );

@@ -88,7 +88,7 @@ class _SituaPainter extends CustomPainter {
       final midAngle = startAngle + sweep / 2;
       final labelR = (outerR + innerR) / 2;
       final labelPos = Offset(center.dx + labelR * cos(midAngle), center.dy + labelR * sin(midAngle));
-      _drawText(canvas, _burcSembol(i), labelPos, 13, FastTheme.textDark);
+      _drawText(canvas, _burcSembol(i), labelPos, 13, FastTheme.text);
     }
   }
 

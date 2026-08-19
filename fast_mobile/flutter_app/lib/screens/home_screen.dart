@@ -96,7 +96,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(title, style: GoogleFonts.cormorantGaramond(
-                    fontSize: 20, fontWeight: FontWeight.w600, color: FastTheme.textDark,
+                    fontSize: 20, fontWeight: FontWeight.w600, color: FastTheme.text,
                   )),
                 ),
                 Icon(Icons.arrow_forward_ios, color: FastTheme.textLight, size: 16),

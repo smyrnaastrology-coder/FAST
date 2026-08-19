@@ -895,6 +895,7 @@ def _aktif_sozluk_yok():
 
 def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=None):
     _EN = _uEN()
+    _ES = _uget_lang() == "es"
     bulunan_muhurler = []
     _aktif_mod = mod
 
@@ -906,7 +907,11 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
         _aktif_sozluk = fbst_sabit_yildizlar
 
     for yildiz_adi, veriler in _aktif_sozluk.items():
-        if _EN and getattr(_aktif_sozluk, "_en", None):
+        if _ES and getattr(_aktif_sozluk, "_es", None):
+            _ev = _aktif_sozluk._es.get(yildiz_adi)
+            if isinstance(_ev, dict):
+                veriler = _ev
+        elif _EN and getattr(_aktif_sozluk, "_en", None):
             _ev = _aktif_sozluk._en.get(yildiz_adi)
             if isinstance(_ev, dict):
                 veriler = _ev
@@ -915,7 +920,9 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
 
         if fark <= orb_siniri:
             # Raporlama şablonu
-            if _EN:
+            if _ES:
+                rapor_metni = f"* Vínculo Estelar: {yildiz_adi} (conjunción con {_updf_label(gezegen_adi)} | Dif: {fark:.2f}°)\n"
+            elif _EN:
                 rapor_metni = f"* Star Link: {yildiz_adi} (conjunct {_updf_label(gezegen_adi)} | Diff: {fark:.2f}°)\n"
             else:
                 rapor_metni = f"* Yıldız Bağlantısı: {yildiz_adi} ({gezegen_adi} ile | Fark: {fark:.2f}°)\n"
@@ -923,7 +930,9 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
 
             # Yıldızın genel yorumu
             if "yargi" in veriler:
-                if _EN:
+                if _ES:
+                    rapor_metni += f"   💫 Significado de la estrella: {veriler['yargi']}\n"
+                elif _EN:
                     rapor_metni += f"   💫 Star's meaning: {veriler['yargi']}\n"
                 else:
                     rapor_metni += f"   💫 Yıldızın anlamı: {veriler['yargi']}\n"
@@ -931,7 +940,9 @@ def kadersel_yildiz_taramasi(gezegen_adi, gezegen_derecesi, orb_siniri=2.0, mod=
 
             # Klasik etkileri tara
             for kategori, gezegen_etkileri in veriler["etkiler"].items():
-                if _EN:
+                if _ES:
+                    _kategori_ad = _KATEGORI_DUZ_AD_ES.get(kategori, kategori.replace("_", " ").title())
+                elif _EN:
                     _kategori_ad = _KATEGORI_DUZ_AD_EN.get(kategori, kategori.replace("_", " ").title())
                 else:
                     _kategori_ad = _KATEGORI_DUZ_AD.get(kategori, kategori.replace("_", " ").title())
@@ -1061,6 +1072,32 @@ _KATEGORI_DUZ_AD_EN = {
     "egitim_ve_ogrenme": "Education and Learning",
     "ebeveynlik": "Parenting",
     "karmik_bag": "Fated Bond",
+}
+
+# Yıldız etkisi kategorilerinin düz İspanyolca başlıkları (ES modda kullanılır)
+_KATEGORI_DUZ_AD_ES = {
+    "ask": "Vida Amorosa",
+    "evlilik": "Matrimonio",
+    "cinsellik": "Sexualidad e Intimidad",
+    "cekim": "Atracción y Carisma",
+    "karmik_ask": "Amor Kármico",
+    "zihinsel": "Mente y Pensamiento",
+    "saglik": "Salud",
+    "kaza": "Riesgo y Pruebas",
+    "gizlilikler": "Misterio e Intuición",
+    "is_hayati": "Vida Profesional",
+    "arkadaslar": "Amistades",
+    "maddi": "Dinero y Asuntos Materiales",
+    "sorumluluk_ogrenme": "Responsabilidad y Aprendizaje",
+    "sinav_ve_donusum": "Prueba y Transformación",
+    "duygusal_saglik": "Salud Emocional",
+    "sosyal_cevre": "Círculo Social",
+    "cocuk_gelisimi": "Desarrollo del Hijo",
+    "bedensel_saglik": "Salud Física",
+    "zihinsel_gelisim": "Desarrollo Mental",
+    "egitim_ve_ogrenme": "Educación y Aprendizaje",
+    "ebeveynlik": "Crianza",
+    "karmik_bag": "Vínculo Kármico",
 }
 
 

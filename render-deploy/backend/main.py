@@ -1247,10 +1247,14 @@ def _es_localize(data):
         for _k in ("nokta_a", "nokta_b", "kaynak", "hedef", "nokta", "gezegen"):
             if b.get(_k):
                 b[_k] = _es_cv_text(b[_k])
-    # arap_noktalari (nokta adı anahtarları)
+    # arap_noktalari (nokta adı anahtarları - hem dış hem iç anahtarlar)
     arap_noktalari = data.get("arap_noktalari")
     if isinstance(arap_noktalari, dict):
-        data["arap_noktalari"] = {_es_cv_text(k): v for k, v in arap_noktalari.items()}
+        def _arap_nokta_cevir(d):
+            if not isinstance(d, dict):
+                return d
+            return {_es_cv_text(k): _arap_nokta_cevir(v) if isinstance(v, dict) else v for k, v in d.items()}
+        data["arap_noktalari"] = _arap_nokta_cevir(arap_noktalari)
     # asteroit_konumlar
     for a in data.get("asteroit_konumlar") or []:
         if isinstance(a, dict):

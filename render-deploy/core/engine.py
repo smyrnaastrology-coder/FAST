@@ -32,6 +32,12 @@ from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET)
 from core.sifa_receteler_en import FBST_RECETELER_EN, FBST_RECETELER_EBEVEYN_EN
 from core.sifa_receteler_es import FBST_RECETELER_ES, FBST_RECETELER_EBEVEYN_ES
+try:
+    from core._lr_es_sozlukleri import (lr_ebeveyn_vitrin_es, lr_bireysel_vitrin_es,
+        lr_ebeveyn_ayev_es, lr_bireysel_ayev_es)
+    from core._lr_aci_es import lr_aci_metinleri_es
+except Exception:
+    lr_ebeveyn_vitrin_es = lr_bireysel_vitrin_es = lr_ebeveyn_ayev_es = lr_bireysel_ayev_es = lr_aci_metinleri_es = None
 from core.i18n import set_lang as _core_set_lang, get_lang as _core_get_lang, pdf_label as pdf_label
 from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocator,
     sehir_bul, _turkiye_utc_offset_hesapla, _nci_pazar_gunu,
@@ -12293,72 +12299,87 @@ class FBST_Engine:
 
         aci_metinleri = []
         if not acilar:
-            if self.mod == "ebeveyn_cocuk":
-                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok; ebeveyn-çocuk ilişkinizin akışı tamamen sizin kendi pedagojik kararlarınızda." if not _EN and not _ES else "• There is no karmic intervention from outside; the flow of your parent-child relationship lies entirely in your own pedagogical decisions.")
+            if _ES and lr_aci_metinleri_es:
+                if self.mod == "ebeveyn_cocuk":
+                    aci_metinleri.append(lr_aci_metinleri_es["eb_sakin"])
+                else:
+                    aci_metinleri.append(lr_aci_metinleri_es["bi_sakin"])
+            elif self.mod == "ebeveyn_cocuk":
+                aci_metinleri.append("Bu ay ebeveyn-çocuk duygusal akışınız son derece sakin ve dış etkenlerden bağımsız." if not _EN and not _ES else "This month your parent-child emotional flow is extremely calm and independent of external influences.")
             else:
-                aci_metinleri.append("• Dışarıdan kadersel bir müdahale yok, ilişkinin dümeni tamamen sizin kendi saf iradenizde." if not _EN and not _ES else "• There is no karmic intervention from outside; the helm of the relationship lies entirely in your own pure will.")
+                aci_metinleri.append("Bu ay duygusal akışınız son derece sakin ve dış etkenlerden bağımsız (Gezegen açısı yok)." if not _EN and not _ES else "This month your emotional flow is extremely calm and independent of external influences (no planetary aspect).")
         else:
+            _ACI_ES_MAP = {
+                "ebeveyn_cocuk": {
+                    "Güneş": "eb_gunes", "Mars": "eb_mars", "Satürn": "eb_saturn",
+                    "Venüs": "eb_venus", "Plüton": "eb_pluto", "Merkür": "eb_merkür",
+                    "Jüpiter": "eb_jup", "Uranüs": "eb_uranus", "Neptün": "eb_neptun",
+                },
+                "bireysel": {
+                    "Güneş": "bi_gunes", "Mars": "bi_mars", "Satürn": "bi_saturn",
+                    "Venüs": "bi_venus", "Plüton": "bi_pluto", "Merkür": "bi_merkür",
+                    "Jüpiter": "bi_jup", "Uranüs": "bi_uranus", "Neptün": "bi_neptun",
+                },
+            }
             for aci in acilar:
                 gez = aci["gezegen"]
                 tip = aci["aci"]
                 _sert = tip in (["Square", "Opposition"] if _EN else (["Cuadratura", "Oposición"] if _core_get_lang() == "es" else ["Kare", "Karşıt"]))
-                
+
                 if self.mod == "ebeveyn_cocuk":
-                    if gez == "Ay":
-                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Duygusal Senkronizasyon! Ebeveyn ve çocuk arasındaki duygusal bağın en güçlü hissedildiği, sezgisel iletişimin dorukta olduğu bir dönem." if not (_EN or _ES) else "• <b>Sun-Moon (Conjunction):</b> Emotional Synchronization! A period when the emotional bond between parent and child is felt most strongly and intuitive communication is at its peak.")
-                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Duygusal Çekişme! Ebeveynin beklentileri ile çocuğun duygusal ihtiyaçları arasında bir denge arayışı söz konusu. Sabır ve anlayış kritik." if not (_EN or _ES) else "• <b>Sun-Moon (Opposition):</b> Emotional Tension! There is a search for balance between the parent's expectations and the child's emotional needs. Patience and understanding are critical.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var." if not (_EN or _ES) else f"• <b>Sun-Moon ({tip}):</b> There is a supportive flow between emotional needs and shared goals.")
-                    elif gez == "Merkür":
-                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> İletişim Köprüsü! Çocuğunuzla zihinsel uyumun arttığı, birbirinizi derinlemesine anladığınız pedagojik bir dönem." if not (_EN or _ES) else f"• <b>Sun-Mercury:</b> Bridge of Communication! A pedagogical period when mental harmony with your child increases and you understand each other deeply.")
-                    elif gez == "Venüs":
-                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Sevgi Dili! Bu yıl ebeveyn-çocuk arasındaki sevgi ve şefkat dili en yüksek oktavda çalışıyor. Takdir ve minnet ön planda." if not (_EN or _ES) else f"• <b>Sun-Venus:</b> Language of Love! This year the language of love and compassion between parent and child works at its highest octave. Appreciation and gratitude take the foreground.")
+                    if _ES and lr_aci_metinleri_es:
+                        _base = _ACI_ES_MAP["ebeveyn_cocuk"].get(gez)
+                        if _base:
+                            _anahtar = (_base + "_sert" if _sert and _base in ("eb_mars", "eb_saturn", "eb_jup") else (_base + "_uyum" if not _sert and _base in ("eb_mars", "eb_saturn", "eb_jup") else _base))
+                            aci_metinleri.append("<b>" + lr_aci_metinleri_es.get(_anahtar, lr_aci_metinleri_es.get(_base, "")).replace("{tip}", str(tip)))
+                    elif gez == "Güneş":
+                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Ebeveyn-çocuk arasındaki duygusal dengenin güçlendiği, sezgisel iletişimin arttığı bir dönem." if not _EN and not _ES else f"<b>Moon-Sun Theme ({tip}):</b> A period when the emotional balance between parent and child strengthens and intuitive communication increases.")
                     elif gez == "Mars":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Enerji Çatışması! Çocuğun bağımsızlık ihtiyacı ile ebeveynin sınırları arasındaki gerilim artabilir. Yapıcı yönlendirme kritik." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> Energy Conflict! Tension between the child's need for independence and the parent's boundaries may increase. Constructive guidance is critical.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> Eylem Gücü! Birlikte enerjik ve verimli bir dönem. Çocuğun cesaretlendirilmesi ve desteklenmesi ön planda." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> Power of Action! An energetic and productive period together. Encouraging and supporting the child takes the foreground.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Duygusal patlamalar ve alınganlık riski. Çocuğunuzun bağımsızlık ihtiyacı ile sınırlarınız arasındaki gerilim artabilir. Sabırlı ve yapıcı olun." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> Risk of emotional outbursts and touchiness. Tension may rise between your child's need for independence and your boundaries. Be patient and constructive.")
+                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Enerjik ve verimli bir ay. Çocuğunuzla birlikte aktif ve yaratıcı faaliyetler için mükemmel bir dönem." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> An energetic and productive month. A perfect time for active and creative activities with your child.")
                     elif gez == "Satürn":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Sınavı! Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı bir yaklaşımla bu sınavı aşabilirsiniz." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Structure Test! Rules and boundaries are being tested. You can overcome this test with a patient and consistent approach.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Yapı Mührü! Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Seal of Structure! Lasting foundations are being laid in the parent-child relationship. The building of responsibility and trust strengthens.")
-                    elif gez == "Jüpiter":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı İyimserlik! Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun; abartılar hayal kırıklığına dönüşebilir." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Over-Optimism! Keep your expectations about your child realistic; exaggerations can turn into disappointment.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Genişleme ve Bolluk! Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu kadersel bir dönem." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Expansion and Abundance! A karmic period rich in opportunities to learn, discover and grow together.")
-                    elif gez == "KAD":
-                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Öğrenme! Ebeveyn-çocuk arasındaki kadersel derslerin en yoğun hissedildiği, birlikte tekamül edildiği uyanış yılı." if not (_EN or _ES) else "• <b>Node Theme:</b> Karmic Learning! The awakening year when the karmic lessons between parent and child are felt most intensely and you evolve together.")
-                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>GAD Teması:</b> Geçmiş Kalıpları Terk Etme! Eski ebeveynlik kalıplarından ve korkularından kurtulma zamanı." if not (_EN or _ES) else "• <b>South Node Theme:</b> Abandoning Past Patterns! Time to break free from old parenting patterns and fears.")
-                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile pedagojik vizyonunuz arasında taşların yerine oturduğu senkronizasyon dönemi." if not (_EN or _ES) else f"• <b>Node Theme ({tip}):</b> A synchronization period in which the pieces fall into place between your karmic route and your pedagogical vision.")
-                    elif gez == "Uranüs":
-                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Beklenmedik Değişim! Çocuğunuzun gelişiminde ani sıçramalar veya sürpriz gelişmeler yaşanabilir. Esneklik kritik." if not (_EN or _ES) else f"• <b>Sun-Uranus ({tip}):</b> Unexpected Change! Sudden leaps or surprise developments may occur in your child's development. Flexibility is critical.")
-                    elif gez == "Neptün":
-                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> Sezgisel Bağ! Çocuğunuzla aranızdaki sezgisel bağın güçlendiği, birbirinizi sözlerin ötesinde anladığınız bir dönem." if not (_EN or _ES) else f"• <b>Sun-Neptune ({tip}):</b> Intuitive Bond! A period when the intuitive bond between you and your child strengthens and you understand each other beyond words.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve disiplin sınavı. Kurallar ve sınırlar test ediliyor. Sabırlı ve tutarlı olmak bu ayın en büyük dersi." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A test of structure and discipline. Rules and boundaries are being tested. Being patient and consistent is this month's greatest lesson.")
+                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Yapı ve güvence ayı. Ebeveyn-çocuk ilişkisinde kalıcı temeller atılıyor. Sorumluluk ve güven inşası güçleniyor." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A month of structure and assurance. Lasting foundations are being laid in the parent-child relationship. The building of responsibility and trust strengthens.")
+                    elif gez == "Venüs":
+                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Sevgi ve şefkat ayı. Ebeveyn-çocuk arasındaki sevgi ve şefkat dili bu ay çok güçlü. Takdir ve minnet ön planda." if not _EN and not _ES else f"<b>Moon-Venus {tip}:</b> A month of love and compassion. The language of love and compassion between parent and child is very strong this month. Appreciation and gratitude take the forefront.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Derin Dönüşüm! Ebeveyn-çocuk ilişkisinde köklü bir dönüşüm yaşanabilir. Krizler şifaya dönüşme potansiyeli taşıyor." if not (_EN or _ES) else f"• <b>Sun-Pluto ({tip}):</b> Deep Transformation! A radical transformation can occur in the parent-child relationship. Crises carry the potential to turn into healing.")
+                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Duygusal derinleşme ve dönüşüm. Çocuğunuzun iç dünyasındaki derin duygular yüzeye çıkabilir. Sabırlı ve anlayışlı olmak kritik." if not _EN and not _ES else f"<b>Moon-Pluto {tip}:</b> Emotional deepening and transformation. Deep feelings in your child's inner world may surface. Being patient and understanding is critical.")
+                    elif gez == "Merkür":
+                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> İletişim ve anlama ayı. Çocuğunuzla aranızdaki iletişim bu ay çok güçlü. Birbirinizi derinlemesine anlama dönemi." if not _EN and not _ES else f"<b>Moon-Mercury {tip}:</b> A month of communication and understanding. Communication between you and your child is very strong this month. A period of deeply understanding each other.")
+                    elif gez == "Jüpiter":
+                        if _sert: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı. Çocuğunuzla ilgili beklentilerinizi gerçekçi tutun." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A warning about emotional exaggeration. Keep your expectations about your child realistic.")
+                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve neşe ayı. Birlikte öğrenme, keşfetme ve büyüme fırsatlarının bol olduğu bir dönem." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A month of abundance and joy. A period full of opportunities to learn, discover and grow together.")
+                    elif gez == "Uranüs":
+                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Beklenmedik gelişmeler ve sürprizler. Çocuğunuzun gelişiminde ani sıçramalar olabilir. Esnek olun." if not _EN and not _ES else f"<b>Moon-Uranus {tip}:</b> Unexpected developments and surprises. Sudden leaps in your child's development are possible. Be flexible.")
+                    elif gez == "Neptün":
+                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> Sezgisel bağın güçlendiği bir ay. Çocuğunuzla aranızdaki sezgisel iletişim çok güçlü. Birlikte sanatsal faaliyetler yapmak ruhunuzu besleyecek." if not _EN and not _ES else f"<b>Moon-Neptune {tip}:</b> A month when the intuitive bond strengthens. Intuitive communication between you and your child is very strong. Doing artistic activities together will nourish your soul.")
                 else:
-                    if gez == "Ay":
-                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>Güneş-Ay (Kavuşum):</b> Muazzam bir Yeniay yılı! Mantık ve duygu kusursuz senkronize; yepyeni bir duygu tohumu atıyorsunuz." if not (_EN or _ES) else "• <b>Sun-Moon (Conjunction):</b> A magnificent New Moon year! Logic and feeling are in perfect sync; you are planting a brand-new seed of emotion.")
-                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>Güneş-Ay (Karşıt):</b> Dolunay yılı! İlişkide bir dönemin meyvesini alıyorsunuz ancak beklentilerde ufak bir çekişme yaşanabilir." if not (_EN or _ES) else "• <b>Sun-Moon (Opposition):</b> A Full Moon year! You are reaping the fruit of an era in the relationship, though a small tug-of-war may arise over expectations.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Ay ({tip}):</b> Duygusal ihtiyaçlar ile ortak hedefler arasında destekleyici bir akış var." if not (_EN or _ES) else f"• <b>Sun-Moon ({tip}):</b> There is a supportive flow between emotional needs and shared goals.")
-                    elif gez == "Merkür":
-                        aci_metinleri.append(f"• <b>Güneş-Merkür:</b> Telepatik Uyum! Zihinlerin birleştiği, imzaların, sözleşmelerin ve iletişimin yılın kaderini belirlediği rasyonel dönem." if not (_EN or _ES) else f"• <b>Sun-Mercury:</b> Telepathic Harmony! The rational period when minds unite and signatures, contracts and communication decide the year's destiny.")
-                    elif gez == "Venüs":
-                        aci_metinleri.append(f"• <b>Güneş-Venüs:</b> Aşkın Mührü! Bu yıl tutku, romantizm ve finansal bereket doğrudan ilişkinin merkezine akıyor. Sevgi diliniz en yüksek oktavda." if not (_EN or _ES) else f"• <b>Sun-Venus:</b> Seal of Love! This year passion, romance and financial abundance flow directly into the center of the relationship. Your love language is at its highest octave.")
+                    if _ES and lr_aci_metinleri_es:
+                        _base = _ACI_ES_MAP["bireysel"].get(gez)
+                        if _base:
+                            _anahtar = (_base + "_sert" if _sert and _base in ("bi_mars", "bi_saturn", "bi_jup") else (_base + "_uyum" if not _sert and _base in ("bi_mars", "bi_saturn", "bi_jup") else _base))
+                            aci_metinleri.append("<b>" + lr_aci_metinleri_es.get(_anahtar, lr_aci_metinleri_es.get(_base, "")).replace("{tip}", str(tip)))
+                    elif gez == "Güneş":
+                        aci_metinleri.append(f"<b>Ay-Güneş Teması ({tip}):</b> Duygularınızla ortak mantığınız arasında kesişim. Bu ay ilişkinizin kalbiyle ruhu eşzamanlı atıyor." if not _EN and not _ES else f"<b>Moon-Sun Theme ({tip}):</b> An intersection between your feelings and your shared logic. This month your relationship's heart and soul beat in unison.")
                     elif gez == "Mars":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> BUYUK SINAV! Agresyon ve tartışma riski. Bu gergin enerjiyi kavgaya değil, ortak bir projeye harcayın." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> THE BIG TEST! Risk of aggression and arguments. Spend this tense energy not on fighting but on a shared project.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Mars ({tip}):</b> İnanılmaz bir motor gücü. Birlikte cesaretle ilerlemek ve engelleri aşmak için harika bir eylem yılı." if not (_EN or _ES) else f"• <b>Sun-Mars ({tip}):</b> An incredible motor power. A wonderful year of action for moving forward courageously together and overcoming obstacles.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> DIKKAT SINAVI! Duygusal patlamalar, ani sinir harpleri veya gereksiz alınganlıklardan kaynaklı kavga riski yüksek. Tutkuyu kavgaya değil, yapıcı bir fiziksel enerjiye dönüştürün." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> ATTENTION TEST! High risk of quarrels from emotional outbursts, sudden temper flares or needless sensitivity. Turn passion not into fighting but into constructive physical energy.")
+                        else: aci_metinleri.append(f"<b>Ay-Mars {tip}:</b> Bu ay inanılmaz bir eylem ve fiziksel tutku enerjisi var. İsteklerinizi hızlıca hayata geçirebilirsiniz." if not _EN and not _ES else f"<b>Moon-Mars {tip}:</b> There is an incredible energy of action and physical passion this month. You can swiftly bring your desires into reality.")
                     elif gez == "Satürn":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> DARBOĞAZ! Kurallar ve engeller ilişkinin neşesini bastırabilir. Bu bir testtir, inşaya ve sabra odaklanın." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> BOTTLENECK! Rules and obstacles can stifle the relationship's joy. This is a test; focus on construction and patience.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Satürn ({tip}):</b> Çelik Mühür! İlişkinin temelleri beton dökülmüşcesine sağlamlaşıyor. Uzun vadeli kararlar için koruyucu etki." if not (_EN or _ES) else f"• <b>Sun-Saturn ({tip}):</b> Steel Seal! The relationship's foundations solidify as if concrete has been poured. A protective effect for long-term decisions.")
-                    elif gez == "Jüpiter":
-                        if _sert: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> Aşırı iyimserlik, lüzumsuz para harcama veya tutulamayacak büyük sözler verme riskine dikkat edin." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Beware the risk of over-optimism, unnecessary spending or making grand promises that cannot be kept.")
-                        else: aci_metinleri.append(f"• <b>Güneş-Jüpiter ({tip}):</b> İlahi Genişleme! Şansın, bolluğun ve vizyonun ilişkinize nehir gibi aktığı kadersel şans yılı." if not (_EN or _ES) else f"• <b>Sun-Jupiter ({tip}):</b> Divine Expansion! The karmic luck year in which fortune, abundance and vision flow into your relationship like a river.")
-                    elif gez == "KAD":
-                        if tip == ("Conjunction" if _EN else "Kavuşum"): aci_metinleri.append("• <b>KAD Teması:</b> Kadersel Sıçrama! İlişkinin tamamen evrenin sizden beklediği ortak tekamül hedefine kilitlendiği uyanış yılı." if not (_EN or _ES) else "• <b>Node Theme:</b> Karmic Leap! The awakening year when the relationship locks entirely onto the shared evolution goal the universe expects of you.")
-                        elif tip == ("Opposition" if _EN else "Karşıt"): aci_metinleri.append("• <b>GAD Teması:</b> Geçmişin Ayak Bağı! İlişkinin ilerleyebilmesi için eski toksik alışkanlıkları ve geçmiş karmaları tamamen terk etme zamanı." if not (_EN or _ES) else "• <b>South Node Theme:</b> The Anchor of the Past! Time to completely abandon toxic old habits and past karmas so the relationship can move forward.")
-                        else: aci_metinleri.append(f"• <b>Düğüm Teması ({tip}):</b> Kadersel rotanız ile iradeniz arasında taşların yerine oturduğu senkronizasyon dönemi." if not (_EN or _ES) else f"• <b>Node Theme ({tip}):</b> A synchronization period in which the pieces fall into place between your karmic route and your will.")
-                    elif gez == "Uranüs":
-                        aci_metinleri.append(f"• <b>Güneş-Uranüs ({tip}):</b> Devrim! Ani sürprizlerin veya rutin kırıcı yeniliklerin yılı. Esnek olan ve yeniliğe açık olan kazanır." if not (_EN or _ES) else f"• <b>Sun-Uranus ({tip}):</b> Revolution! The year of sudden surprises or routine-breaking innovations. The flexible and the open-minded win.")
-                    elif gez == "Neptün":
-                        aci_metinleri.append(f"• <b>Güneş-Neptün ({tip}):</b> İlahi Çekim. Birlikte hayal kurduğunuz, sınırların eridiği bir şifa yılı. Kurban/kurtarıcı tuzağına düşmeyin." if not (_EN or _ES) else f"• <b>Sun-Neptune ({tip}):</b> Divine Attraction. A healing year when you dream together and boundaries dissolve. Don't fall into the victim/savior trap.")
+                        if _sert: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> DARBOĞAZ! Duygusal mesafe, soğukluk veya 'yetersiz sevgi' hissi yaşanabilir. Duvar örmek yerine bu ayki sınavın 'sabır ve olgunluk' olduğunu hatırlayın." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> BOTTLENECK! Emotional distance, coldness or a feeling of 'insufficient love' may arise. Instead of building walls, remember that this month's test is 'patience and maturity'.")
+                        else: aci_metinleri.append(f"<b>Ay-Satürn {tip}:</b> Duyguların çok ayakları yere bastığı, taahhütlerin ve sadakatin perçinlendiği ağırbaşlı ve güven verici bir ay." if not _EN and not _ES else f"<b>Moon-Saturn {tip}:</b> A dignified, reassuring month when feelings stay firmly grounded and commitments and loyalty are cemented.")
+                    elif gez == "Venüs":
+                        aci_metinleri.append(f"<b>Ay-Venüs {tip}:</b> Şefkat Mührü! Bu ay ilişkinizde romantizm, dişil enerji ve tatlı dil ön planda. Kusursuz bir barışma ve aşk ayı." if not _EN and not _ES else f"<b>Moon-Venus {tip}:</b> Seal of Compassion! Romance, feminine energy and sweet words take the forefront in your relationship this month. A perfect month for reconciliation and love.")
                     elif gez == "Plüton":
-                        aci_metinleri.append(f"• <b>Güneş-Plüton ({tip}):</b> Yeraltı Simyası. İlişkinin saklı gölgelerinin yüzeye çıktığı, yıkıcı ama bir o kadar da baştan yaratıcı kriz yılı." if not (_EN or _ES) else f"• <b>Sun-Pluto ({tip}):</b> Underground Alchemy. A crisis year when the relationship's hidden shadows surface — destructive yet equally creative.")
+                        aci_metinleri.append(f"<b>Ay-Plüton {tip}:</b> Derin psikolojik okumalar, takıntılar veya tutkulu bir sahiplenme. Zehirli kıskançlıklara dikkat edildiği sürece bağınızı çelikleştirir." if not _EN and not _ES else f"<b>Moon-Pluto {tip}:</b> Deep psychological readings, obsessions or passionate possessiveness. As long as poisonous jealousy is kept in check, it steel-plates your bond.")
+                    elif gez == "Merkür":
+                        aci_metinleri.append(f"<b>Ay-Merkür {tip}:</b> Zihinsel Uyum Ayı! Duygularınızı kelimelerle ifade etme ihtiyacı had safhada. Uzun sohbetler, mesajlaşmak ve birbirinizi dinlemek bu ayın en büyük şifa aracı." if not _EN and not _ES else f"<b>Moon-Mercury {tip}:</b> Mental Harmony Month! The need to express your feelings in words is at its peak. Long conversations, messaging and listening to each other are this month's greatest healing tool.")
+                    elif gez == "Jüpiter":
+                        if _sert: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Duygusal abartı uyarısı! Beklentilerinizi ve vaatlerinizi gerçekçi tutun; aşırı iyimserlik hayal kırıklığına dönüşebilir." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> A warning about emotional exaggeration! Keep your expectations and promises realistic; excessive optimism can turn into disappointment.")
+                        else: aci_metinleri.append(f"<b>Ay-Jüpiter {tip}:</b> Bereket ve Neşe Ayı! Duygusal açıdan son derece cömert ve pozitif bir dönem. Birlikte kutlamalar yapmak, seyahat etmek veya büyük bir hediye almak için mükemmel zaman." if not _EN and not _ES else f"<b>Moon-Jupiter {tip}:</b> Month of Abundance and Joy! An extremely generous and positive period emotionally. A perfect time to celebrate together, travel or buy a grand gift.")
+                    elif gez == "Uranüs":
+                        aci_metinleri.append(f"<b>Ay-Uranüs {tip}:</b> Duygusal Sürpriz! Bu ay beklenmedik bir gelişme veya ani bir karar ilişkinin seyrini değiştirebilir. Esnekliğinizi koruyun ve değişime direnmek yerine ona uyum sağlayın." if not _EN and not _ES else f"<b>Moon-Uranus {tip}:</b> Emotional Surprise! An unexpected development or sudden decision may change the course of your relationship this month. Stay flexible and adapt to change rather than resisting it.")
+                    elif gez == "Neptün":
+                        aci_metinleri.append(f"<b>Ay-Neptün {tip}:</b> İlahi Duygu Dalgası! Bu ay sezgileriniz ve empati kapasiteniz zirveye çıkıyor. Birlikte müzik dinlemek, film izlemek veya sanatsal bir şey üretmek ruhunuzu besler. Hayal kırıklığına karşı gerçekçi kalın." if not _EN and not _ES else f"<b>Moon-Neptune {tip}:</b> Divine Emotional Wave! This month your intuition and empathy reach their peak. Listening to music, watching films or creating something artistic together feeds your soul. Stay realistic against disappointment.")
 
         aci_rapor = "<br/>".join(aci_metinleri)
 
@@ -12485,7 +12506,7 @@ class FBST_Engine:
         if _EN:
             ay_isimleri = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         elif _ES:
-            ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"]
+            ay_isimleri = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
         else:
             ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"]
         yil = lr_data["yil"]
@@ -12552,7 +12573,9 @@ class FBST_Engine:
                 "Kova": f"Your emotional reflexes this month will work under the theme of <b>Aquarius</b>. Personal space and freedom are critical this month. Give each other breathing room; respecting independence will strengthen your relationship this month.",
                 "Balik": f"Your emotional reflexes this month will work under the theme of <b>Pisces</b>. Intuition, dreams and unconditional compassion are this month's core themes. Listen to your heart instead of logic; being kind and understanding toward each other will solve everything."
             }
-        vitrin_yorum = vitrin_sozlugu_lr.get(asc, f"{(f'Your emotional reflexes this month will work under the theme of <b>{pdf_label(asc)}</b>.') if _EN else f'Bu ayki duygusal refleksleriniz <b>{asc}</b> burcu temasında çalışacak.'}")
+        if _ES and (lr_ebeveyn_vitrin_es if self.mod == "ebeveyn_cocuk" else lr_bireysel_vitrin_es):
+            vitrin_sozlugu_lr = (lr_ebeveyn_vitrin_es if self.mod == "ebeveyn_cocuk" else lr_bireysel_vitrin_es)
+        vitrin_yorum = vitrin_sozlugu_lr.get(asc, f"{(f'Your emotional reflexes this month will work under the theme of <b>{pdf_label(asc)}</b>.') if _EN else (f'Tus reflejos emocionales de este mes funcionarán bajo el tema de <b>{pdf_label(asc)}</b>.' if _ES else f'Bu ayki duygusal refleksleriniz <b>{asc}</b> burcu temasında çalışacak.')}")
 
         if self.mod == "ebeveyn_cocuk":
             ay_ev_sozlugu = {
@@ -12610,7 +12633,9 @@ class FBST_Engine:
                 11: "This month being 'two best friends' rather than romantic lovers will do you good. Socializing and spending time with mutual friends heals feelings. Inviting a crowd to your home, hosting game nights with your mutual friends or supporting a social responsibility project together will refresh your relationship.",
                 12: "A touchy, mystical and intuitive month in which you do not want to leave the cocoon. You can release emotional fatigue by staying quiet and touching each other's souls. Stepping away from crowds for a quiet walk in nature, meditating together or interpreting each other's dreams is the greatest spiritual medicine of this inner month."
             }
-        odak_yorum = ay_ev_sozlugu.get(ay_ev, f"Bu ay duygusal odak noktanız {ay_ev}. evde.")
+        if _ES and (lr_ebeveyn_ayev_es if self.mod == "ebeveyn_cocuk" else lr_bireysel_ayev_es):
+            ay_ev_sozlugu = (lr_ebeveyn_ayev_es if self.mod == "ebeveyn_cocuk" else lr_bireysel_ayev_es)
+        odak_yorum = ay_ev_sozlugu.get(ay_ev, f"{(f'Your emotional focus this month is in house {ay_ev}.') if _EN else (f'Tu foco emocional este mes está en la casa {ay_ev}.' if _ES else f'Bu ay duygusal odak noktanız {ay_ev}. evde.')}")
 
         aci_metinleri = []
         if not acilar:
