@@ -17,8 +17,8 @@ if (kpHasKey) {
 android {
     namespace = "com.fastastrology.fast"
     compileSdk = 36
-    buildToolsVersion = "34.0.0"
-    ndkVersion = "27.1.12297006"
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
