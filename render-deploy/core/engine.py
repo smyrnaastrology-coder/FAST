@@ -54,6 +54,24 @@ from core.utils import (GEZEGENLER, _plt, sehir_veritabani_yukle, _get_geolocato
     kadersel_radar_analizi, _son_pazar_gunu,
     METIN_SIYAH, DERIN_MAVI, KADIM_LACIVERT, ALTIN_AMBER, KART_ARKA_PLAN, CERCEVE_GRI,
     varsayilan_sabian_vizyonu, varsayilan_sabian_yorumu)
+_AYLAR_ES = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+_AYLAR_EN = ["", "January", "February", "March", "April", "May", "June",
+             "July", "August", "September", "October", "November", "December"]
+_AYLAR_TR = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+             "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+
+
+def _fmt_tarih(dt_obj, lang=None):
+    """Tarihi aktif dile gore '20 August 2026' biciminde bicimler."""
+    lang = lang or _core_get_lang()
+    if lang == "es":
+        return "%02d %s %d" % (dt_obj.day, _AYLAR_ES[dt_obj.month], dt_obj.year)
+    if lang == "en":
+        return "%02d %s %d" % (dt_obj.day, _AYLAR_EN[dt_obj.month], dt_obj.year)
+    return "%02d %s %d" % (dt_obj.day, _AYLAR_TR[dt_obj.month], dt_obj.year)
+
+
 class FBST_Engine:
 
     
@@ -5419,14 +5437,14 @@ class FBST_Engine:
 
                 if pdf_icin:
                     metin = (f"<font name='DejaVuSans-Bold'>{baslik_yazi}</font><br/>"
-                             f"<font name='DejaVuSans-Bold'>📅 {hedef_tarih.strftime('%d %B %Y')} ({kriz_yili:.1f}{' Yr' if _EN else ('. año' if _ES else '. Yıl')}):</font> "
+                             f"<font name='DejaVuSans-Bold'>📅 {_fmt_tarih(hedef_tarih)} ({kriz_yili:.1f}{' Yr' if _EN else ('. año' if _ES else '. Yıl')}):</font> "
                              f"{uygun_kutup['pdf_yorum']}")
                 else:
                     donem_adi = f"Ebeveyn-Çocuk Bağı ({kriz_yili:.1f}. Yıl)" if self.mod == "ebeveyn_cocuk" else (f"Relationship's Year {kriz_yili:.1f}" if _EN else (f"Año de la Relación {kriz_yili:.1f}" if _ES else f"İlişkinin {kriz_yili:.1f}. Yılı"))
                     metin = (
                         f"<div style='background-color:#0d0d1a; color:#e8e8f0; padding:14px; border-left:4px solid #7b2ff7; margin-bottom:12px; border-radius:6px;'>"
                         f"<div style='font-size:17px; color:#c084fc; margin-bottom:4px;'>{baslik_yazi}</div>"
-                        f"<div style='font-size:12px; color:#9ca3af; margin-bottom:6px;'>{tema_yazi} | {hedef_tarih.strftime('%d %B %Y')} ({donem_adi})</div>"
+                        f"<div style='font-size:12px; color:#9ca3af; margin-bottom:6px;'>{tema_yazi} | {_fmt_tarih(hedef_tarih)} ({donem_adi})</div>"
                         f"<div style='font-size:13px; color:#d1d5db; line-height:1.6;'>{uygun_kutup['html_yorum']}</div>"
                         f"</div>"
                     )
@@ -5516,6 +5534,43 @@ class FBST_Engine:
                     "yorum": "That rare, eternal bond that has moved beyond time, crises, and earthly cares! You are no longer merely a parent and a child but karmic companions who have successfully passed a universal examination. Having overcome all those Saturn cycles, boundary tests, and life's wearying storms, you have completed your spiritual seal. This bond has now attained a noble mastery that no wind from the outside world can easily bring down. Your child has now charted their own path, yet the ocean of trust between you continues, unshakable and eternal."
                 }
             ]
+            donemecler_es = [
+                {
+                    "yil": 1.375,
+                    "ad": "1. Despertar de la Proporción Áurea: Descubrimiento y Vínculo (Año 1.375)",
+                    "yorum": "Esta es la encantadora fase de 'descubrimiento' al comienzo mismo de su vínculo de padre-hijo: un proceso de conocerse y construir confianza. En estos primeros meses, la neblina hormonal se disipa lentamente y usted comienza a reconocer no solo las cualidades entrañables de su hijo, sino también sus verdaderas necesidades y límites. Es precisamente aquí donde entra en juego la protección universal de la 'Proporción Áurea'. Su preocupación ansiosa de 'cómo debería aparecer' da paso al sentimiento de 'estoy aquí para él'. Se encuentra en ese primer umbral mágico donde trazan los límites reales de la relación que construyen juntos, yendo más allá de la novedad y comenzando a sostenerse mutuamente con un vínculo kármico difícil de romper."
+                },
+                {
+                    "yil": 2.225,
+                    "ad": "Enraizamiento Fractal: Construcción de Memoria Compartida (Año 2.225)",
+                    "yorum": "Como padre e hijo, están en la fase de entrelazarse invisiblemente y formar una 'memoria kármica compartida'. En este umbral, el sistema comienza a repararse a sí mismo. Tanto es así que cuando su hijo se inquieta sin razón aparente, usted lo siente; o cuando usted tropieza en su vida laboral, el apoyo puro de su hijo entra en acción al instante para cerrar esa brecha. Los planes que antes consideraban por separado ahora comienzan a fusionarse orgánicamente en un solo crisol. Este es el período en que el vínculo padre-hijo desarrolla su propio sistema inmunológico y adquiere una estructura autosuficiente e inquebrantable, resistente a las interferencias externas."
+                },
+                {
+                    "yil": 2.4,
+                    "ad": "La Gran Atracción Cósmica y la Prueba de Límites (Año 2.4)",
+                    "yorum": "¡Atención! Esta parada es la primera gran prueba de resistencia del universo a su vínculo de padre-hijo. El flujo fluido de los primeros días puede dar paso a luchas por los límites, presiones de 'mi espacio — tu espacio', o estrés de fuentes externas (escuela, grupos de amigos, mudanzas) que se refleja en su relación. Los conflictos vividos en este período no son prueba de que su vínculo se deteriora; todo lo contrario, son prueba de que se está poniendo a prueba su poder para escalar juntos las colinas empinadas de la vida. La única manera de pasar esta prueba es soltar la terquedad y proteger el equipo preguntando: '¿Cómo podemos resolver este problema hombro con hombro?'"
+                },
+                {
+                    "yil": 4.0,
+                    "ad": "Serenidad Elemental y Flujo Compartido (Año 4)",
+                    "yorum": "Están en un período de paz y productividad en el que las primeras crisis, las luchas de poder y los dolores de crecimiento quedaron atrás, y el fuego, el agua, la tierra y el aire se equilibran perfectamente entre ustedes. El vínculo ya no es un esfuerzo agotador, sino que se ha instalado en un flujo natural, incansable y profundamente dulce dentro de la vida diaria. Este año — cuando despertarse juntos, compartir responsabilidades sin que se las pidan y disfrutar del silencio del otro alcanza su punto máximo — es esa parada de respiración bien merecida donde el universo dice: 'Descansen, echen raíces y comiencen a saborear los frutos del hermoso vínculo que han construido.'"
+                },
+                {
+                    "yil": 7.0,
+                    "ad": "1er Sello de Saturno: La Prueba de la Construcción Estructural (Año 7)",
+                    "yorum": "¡Han llegado al umbral kármico de los 7 años, el más famoso de la astrología! El universo se presenta ante ustedes con toda seriedad y pregunta: '¿Están listos para asumir la responsabilidad de sostener este vínculo de por vida?' Todas las expectativas y límites pospuestos hasta ahora y evitados en la conversación quedan claramente sobre la mesa. Este es un año de 'todo o nada'. Mientras los cimientos débiles tiemblan, los cimientos construidos sobre la honestidad, la paciencia y el compromiso hombro con hombro salen de esta curva con un sello estructural mucho más duradero. Encontrar el equilibrio entre la necesidad de independencia de su hijo y su papel de guía es la mayor tarea de este período."
+                },
+                {
+                    "yil": 14.0,
+                    "ad": "2ª Prueba de Saturno: Maduración y Redefinición (Año 14)",
+                    "yorum": "Este es el 'despertar de la mediana edad' del vínculo padre-hijo en términos espirituales. Toda la acumulación emocional de los primeros 14 años se reevalúa a medida que su hijo crece. La pregunta '¿Quiénes somos y cómo queremos vivir nuestro vínculo de ahora en adelante?' es el principal tema de agenda. Su hijo, ahora adolescente, está buscando su propia identidad; en este proceso natural, su papel parental se está redefiniendo. Esta parada es esa fase de profunda transformación en la que su vínculo o tomará una forma completamente nueva, visionaria y emocionante, o saltará a un nivel espiritual mucho más alto y filosófico y ganará sabiduría."
+                },
+                {
+                    "yil": 21.0,
+                    "ad": "Maestría Kármica y la Cosecha Final (Año 21)",
+                    "yorum": "¡Ese raro vínculo eterno que ha trascendido el tiempo, las crisis y las preocupaciones terrenales! Ya no son meramente un padre y un hijo, sino compañeros kármicos que han superado con éxito un examen universal. Habiendo superado todos esos ciclos de Saturno, pruebas de límites y tormentas agotadoras de la vida, han completado su sello espiritual. Este vínculo ha alcanzado ahora una noble maestría que ningún viento del mundo exterior puede derribar fácilmente. Su hijo ya ha trazado su propio camino, pero el océano de confianza entre ustedes continúa, inquebrantable y eterno."
+                }
+            ]
         else:
             donemecler = [
             {
@@ -5591,19 +5646,58 @@ class FBST_Engine:
                 "yorum": "That rare, eternal contract that has moved beyond time, crises, and earthly cares! You are no longer merely a couple but karmic companions who have successfully passed a universal examination. Having overcome all those harsh Saturn cycles, cosmic pull tests, and life's wearying storms, you have completed your spiritual seal. This bond has now attained a noble mastery that no wind from the outside world — no money, illness, or gossip — can easily bring down. The restless love of youth has given way to an unshakable and eternal ocean of trust, where two souls read each other like a book, needing no words."
             }
         ]
+            donemecler_es = [
+            {
+                "yil": 1.375,
+                "ad": "1. Despertar de la Proporción Áurea (Año 1.375)",
+                "yorum": "Esto representa la encantadora fase de 'emoción cegadora' al comienzo mismo de su relación: un período brumoso en el que la dopamina se eleva y usted ve a su pareja como un 'ideal'. Sin embargo, en este primer umbral, la neblina hormonal se disipa gradualmente; usted comienza a descubrir no solo los rasgos más amados de su pareja, sino también la realidad que a veces puede ser desafiante dentro de la vida diaria. Y es precisamente aquí donde entra en juego la protección universal de la 'Proporción Áurea'. Su ansiedad de 'debo impresionarlo' da paso al sentimiento de 'me siento seguro en su presencia'. Se encuentra en ese primer umbral mágico donde trazan los límites reales de la vida que construyen juntos, van más allá del enamoramiento y comienzan a sostenerse mutuamente con 'pertenencia' — un vínculo kármico difícil de romper."
+            },
+            {
+                "yil": 2.225,
+                "ad": "Enraizamiento Fractal (Año 2.225)",
+                "yorum": "Están en la fase donde dos vidas diferentes e independientes se entrelazan invisiblemente y forman una 'memoria kármica compartida'. En este umbral, el sistema comienza a repararse a sí mismo. Tanto es así que cuando uno de ustedes se inquieta sin razón aparente, el otro lo siente; o cuando uno de ustedes tropieza en su carrera, el otro entra en acción al instante como amortiguador psicológico, cerrando esa brecha. Los planes financieros o sociales para el futuro que antes consideraban por separado ahora comienzan a fusionarse orgánicamente en un solo crisol. Este es el período en que su relación desarrolla su propio sistema inmunológico y adquiere una estructura autosuficiente e inquebrantable, resistente a las interferencias externas."
+            },
+            {
+                "yil": 2.4,
+                "ad": "La Gran Atracción Cósmica y la Prueba de Crisis (Año 2.4)",
+                "yorum": "¡Atención! Esta parada es la primera gran prueba de resistencia y de 'ego' del universo a su relación. El flujo fluido de los primeros días puede dar paso a diferencias de opinión, luchas de 'mi espacio — tu espacio', o estrés de fuentes externas (trabajo, familia, mudanzas) que se refleja en la relación. Los conflictos vividos en este período no son prueba de que su relación se deteriora; todo lo contrario, son prueba de que su poder para escalar juntos las colinas empinadas de la vida — es decir, la 'Fuerza de Atracción Cósmica' (Poder Generativo) entre ustedes — está siendo puesta a prueba por el universo. La única manera de pasar esta prueba es abandonar la terquedad y la necesidad de tener la razón, y proteger el equipo preguntando: '¿Cómo podemos resolver este problema hombro con hombro?'"
+            },
+            {
+                "yil": 4.0,
+                "ad": "Serenidad Elemental y Flujo Compartido (Año 4)",
+                "yorum": "Están en un período de paz y productividad en el que las primeras crisis, las luchas de poder y los dolores de adaptación quedaron atrás, y el fuego, el agua, la tierra y el aire se equilibran perfectamente entre ustedes. La relación ya no es un esfuerzo agotador, sino que se ha instalado en un flujo natural, incansable y profundamente dulce dentro de la vida diaria. Este año — cuando despertarse juntos, compartir responsabilidades comunes sin que se las pidan y disfrutar del silencio del otro alcanza su punto máximo — es esa parada de respiración bien merecida y pacífica donde el universo dice: 'Descansen, echen raíces y comiencen a saborear los frutos de este hermoso amor que han construido.'"
+            },
+            {
+                "yil": 7.0,
+                "ad": "1er Sello de Saturno: La Prueba de la Construcción Estructural (Año 7)",
+                "yorum": "¡Han llegado al umbral kármico de los 7 años, el más famoso de la astrología! El universo se presenta ante ustedes con toda seriedad y pregunta: '¿Están listos para asumir la responsabilidad mundana y espiritual de transformar esta relación en un imperio?' Todos los problemas y expectativas barridos bajo la alfombra hasta ahora y evitados en la conversación quedan claramente sobre la mesa. Este es un año de 'todo o nada'. Mientras los cimientos débiles e inseguros tiemblan, los cimientos construidos sobre la honestidad, la lealtad y el compromiso hombro con hombro salen de esta curva con un sello estructural mucho más duradero — como el matrimonio, una inversión conjunta, tener hijos o un voto inquebrantable de lealtad espiritual."
+            },
+            {
+                "yil": 14.0,
+                "ad": "2ª Prueba de Saturno: El Despertar de las Raíces y la Visión (Año 14)",
+                "yorum": "Este es el 'despertar de la mediana edad' de la relación en términos espirituales. Toda la acumulación emocional y financiera de los primeros 14 años, y los años pasados con los hijos o dentro de las rutinas de la vida, se reevalúan. La pregunta '¿Quiénes somos y cómo queremos vivir el resto de nuestras vidas?' es el principal tema de agenda. Se encuentran en esa curva kármica crítica donde la rutina, los hábitos y el riesgo de deslizarse hacia la 'cohabitación de compañeros de piso' deben romperse — de lo contrario, el aburrimiento puede comenzar. Esta parada es esa fase de profunda transformación en la que su relación o tomará una forma completamente nueva, visionaria y emocionante (una segunda primavera), o saltará a un nivel espiritual mucho más alto y filosófico y ganará sabiduría."
+            },
+            {
+                "yil": 21.0,
+                "ad": "Maestría Kármica y la Cosecha Final (Año 21)",
+                "yorum": "¡Ese raro contrato eterno que ha trascendido el tiempo, las crisis y las preocupaciones terrenales! Ya no son meramente una pareja, sino compañeros kármicos que han superado con éxito un examen universal. Habiendo superado todos esos duros ciclos de Saturno, pruebas de atracción cósmica y tormentas agotadoras de la vida, han completado su sello espiritual. Este vínculo ha alcanzado ahora una noble maestría que ningún viento del mundo exterior — ni el dinero, ni la enfermedad, ni los chismes — puede derribar fácilmente. El amor inquieto de la juventud ha dado paso a un océano de confianza inquebrantable y eterno, donde dos almas se leen mutuamente como un libro, sin necesidad de palabras."
+            }
+            ]
         
-        if _EN or _ES:
+        if _ES:
+            donemecler = donemecler_es
+        elif _EN:
             donemecler = donemecler_en
         
         rapor = []
         for dnm in donemecler:
             hedef = milat_tarihi + timedelta(days=int(dnm["yil"] * 365.25))
             if pdf_icin:
-                metin = f"<font name='DejaVuSans-Bold'>[*] {dnm['ad']} ({hedef.strftime('%d %B %Y')}):</font> {dnm['yorum']}"
+                metin = f"<font name='DejaVuSans-Bold'>[*] {dnm['ad']} ({_fmt_tarih(hedef)}):</font> {dnm['yorum']}"
             else:
                 renk_sol = "#B8A9C9" if aktif_mod == "ebeveyn_cocuk" else "#C9A96E"
                 tarih_etiket = "Key Date:" if _EN else ("Fecha Clave:" if _ES else "Kilit Tarihi:")
-                metin = f"<div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid {renk_sol}; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'><b style='font-size:18px; color:#4A3F5C;'>{dnm['ad']}</b><br><span style='color:#6B5B7B; font-size:14px;'>{tarih_etiket} {hedef.strftime('%d %B %Y')}</span><p style='margin-top:5px; color:#4A4A4A;'>{dnm['yorum']}</p></div>"
+                metin = f"<div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid {renk_sol}; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'><b style='font-size:18px; color:#4A3F5C;'>{dnm['ad']}</b><br><span style='color:#6B5B7B; font-size:14px;'>{tarih_etiket} {_fmt_tarih(hedef)}</span><p style='margin-top:5px; color:#4A4A4A;'>{dnm['yorum']}</p></div>"
             rapor.append(metin)
         return rapor
 
@@ -6356,7 +6450,72 @@ class FBST_Engine:
             ("Güneş", "Satürn", "Trigon"): "Maturity and deepening suit your relationship wonderfully this period — you trust each other and support one another. Nurture this trust: the step you take now will be built on a very solid foundation years later.",
         }
 
-        yorum_sozlugu_es = {}  # ES için şimdilik EN fallback; ileride çeviri eklenebilir
+        yorum_sozlugu_es = {
+            # --- ASPECTOS DE LA LUNA: el pulso de la dinámica emocional en la relación ---
+            ("Ay", "Güneş", "Kavuşum"): "Sus sentimientos están perfectamente sincronizados en este período — usted ve con claridad lo que siente y lo refleja a su pareja con la misma nitidez. Son esos raros momentos en los que 'te entiendo' se siente de verdad. Su corazón y su ser están muy cerca el uno del otro ahora, abriendo la puerta a la intimidad más profunda de su relación.",
+            ("Ay", "Güneş", "Karşıt"): "Sea lo que su pareja necesite ahora, usted ve exactamente lo contrario en ella — esto no es un conflicto, sino un espejo. Quizá precisamente a través de este contraste tomará conciencia de su propio mundo emocional. La tensión no los separará; al contrario, lo obliga a preguntarse '¿qué quiero realmente?'. La respuesta a esa pregunta puede profundizar su relación.",
+            ("Ay", "Güneş", "Kare"): "Puede sentirse emocionalmente un poco atascado este período — sin saber bien qué hacer, pero a la vez con ganas de arreglar las cosas. Escuche ese impulso: quizá ahora sea precisamente el momento de tener esa conversación que ha estado posponiendo. La paciencia es la clave de este período.",
+            ("Ay", "Güneş", "Trigon"): "Todo encaja en su lugar en este período — sus sentimientos son claros, su cercanía con su pareja es natural y su comunicación fluye. Aprecie esos momentos: a veces incluso 'no hacer nada' es el acto más grande. Simplemente sentarse juntos en silencio con una taza de té puede traer una profunda satisfacción ahora.",
+            ("Ay", "Güneş", "Sekstil"): "Una oportunidad pequeña pero significativa se presenta ante usted en este período: quizá abrir un tema que no ha hablado durante mucho tiempo, o hacer una pequeña sorpresa a su pareja. Ese pequeño paso podría abrir una puerta inesperada en su relación. Aproveche la oportunidad — no se arrepentirá.",
+
+            ("Ay", "Venüs", "Kavuşum"): "El amor está en su punto máximo en este período — lo que da y lo que recibe están equilibrados y son hermosos. Cuando abraza a su pareja, el resto del mundo desaparece de repente. Abrace ese sentimiento, porque esos momentos dejan recuerdos que sumarán años a su relación.",
+            ("Ay", "Venüs", "Karşıt"): "Su lenguaje del amor funciona en otra frecuencia en este período: donde usted dice 'te quiero', su pareja puede estar escuchando otra cosa. Esto no es un desajuste, sino una oportunidad para aprender. Quizá sea el momento de preguntar cómo percibe el amor su pareja. La respuesta puede sorprenderlo.",
+            ("Ay", "Venüs", "Kare"): "Puede tropezar un poco en el amor este período — quizá no recibe la atención que espera de su pareja, o quizá no logra llegar a ella. Pero recuerde: los puentes más fuertes se construyen sobre las aguas más difíciles. Un pequeño paso que dé ahora se convierte en la semilla de una gran transformación mañana.",
+            ("Ay", "Venüs", "Trigon"): "El amor fluye de forma tan natural y libre este período — como un río, sin esfuerzo. No necesita hacer un esfuerzo especial para mostrar su amor a su pareja; se nota en todo lo que hace. Saboree esta paz.",
+            ("Ay", "Venüs", "Sekstil"): "Siente un dulce impulso de hacer algo bonito por su pareja este período — quizá flores, un mensaje hermoso o simplemente una sonrisa. No subestime el poder de esos pequeños gestos: una relación se construye con pequeñas piedras.",
+
+            ("Ay", "Mars", "Kavuşum"): "La energía y la pasión están en su punto máximo en este período — todo lo que hagan juntos tiene un chispa extra de vitalidad. Pero tenga cuidado: la misma energía puede convertirse en discusión. Canalizar este poder hacia una actividad deportiva o un proyecto compartido sacará a relucir el lado más brillante de su relación.",
+            ("Ay", "Mars", "Karşıt"): "Es un período en el que debe permanecer alerta — incluso una pequeña palabra puede encender la ira mutua. Pero detrás de esta presión hay una gran verdad: quizá algo largamente no dicho saldrá a la superficie este período. Mantenga la calma, pero tampoco ignore la verdad.",
+            ("Ay", "Mars", "Kare"): "Las discusiones pueden estallar fácilmente en este período — ambos están un poco más impacientes y un poco más al límite. Pero esto es una prueba: ¿puede convertir su ira en poder constructivo? El deporte, caminar o sudar juntos podrían ser la mejor medicina en este período.",
+            ("Ay", "Mars", "Trigon"): "Se sienten muy enérgicos y vivos juntos en este período — la aventura, el movimiento y la emoción están de su lado. Aproveche bien esta energía: quizá por fin pueda llevar a la vida un plan pospuesto durante mucho tiempo. Correr, reír y respirar juntos son las actividades más hermosas de este período.",
+            ("Ay", "Mars", "Sekstil"): "Una pequeña emoción le espera este período — quizá una llamada inesperada, quizá un viejo recuerdo que encuentra en la calle, o una pequeña sorpresa de su pareja. Atrape esta energía y creen juntos un momento alegre.",
+
+            ("Ay", "Jüpiter", "Kavuşum"): "La expansión y la abundancia son muy fuertes en este período — está en una fase en la que las cosas hermosas se acumulan en su vida. Es un momento perfecto para hacer grandes planes para el futuro y soñar junto a su pareja. Alimente esta energía: cosecha lo que siembras.",
+            ("Ay", "Jüpiter", "Karşıt"): "Cuidado con los excesos este período — gastar de más, comer de más, prometer de más... todo se ve bien pero crea desequilibrio. Las demandas de 'más' pueden chocar entre usted y su pareja. Encontrar el equilibrio podría ser su mayor logro en este período.",
+            ("Ay", "Jüpiter", "Kare"): "Las grandes expectativas pueden convertirse en decepción este período — quizá espera demasiado de su pareja, o quizá se está presionando a sí mismo. Concéntrese en las cosas pequeñas: a veces una taza de té o una sonrisa son una gran fuente de felicidad.",
+            ("Ay", "Jüpiter", "Trigon"): "La suerte está de su lado en este período — pero véala no solo como 'ganar', sino como una oportunidad para crecer juntos. Es un momento maravilloso para aprender algo nuevo con su pareja y compartir una nueva experiencia. No pierda esta oportunidad.",
+            ("Ay", "Jüpiter", "Sekstil"): "Una oportunidad pequeña pero valiosa puede llamar a su puerta este período — quizá una invitación inesperada, o un evento encantador al que puedan asistir juntos. Aprovéchela al máximo: una relación se nutre de pequeñas experiencias.",
+
+            ("Ay", "Satürn", "Kavuşum"): "La seriedad y la estructura toman el centro del escenario en este período — un momento ideal para hacer planes a largo plazo en su relación y aclarar responsabilidades. Las conversaciones que tenga ahora pueden dar frutos años después. Sea paciente y constante; sus esfuerzos serán recompensados.",
+            ("Ay", "Satürn", "Karşıt"): "Puede sentir un poco de distancia este período — quizá su pareja se ha vuelto silenciosa, o quizá usted se ha retirado emocionalmente. Pero esto no es una ruptura, es un momento de descanso. Como toda relación, la suya también necesita una pausa. Aproveche esta pausa con sabiduría, pero no corte la comunicación.",
+            ("Ay", "Satürn", "Kare"): "Las responsabilidades pueden sentirse un poco abrumadoras este período — el trabajo, la familia y la relación ejercen presión a la vez. Pero esta presión lo fortalece: pone a prueba su resiliencia y le enseña el valor de poner límites. Incluso decir 'no' es un logro en este período.",
+            ("Ay", "Satürn", "Trigon"): "La madurez sienta maravillosamente a su relación este período — se tienen confianza y se apoyan mutuamente. Construir esa confianza tomó años, y ahora están cosechando los frutos. Las decisiones que tome ahora sentarán cimientos muy sólidos para el largo plazo.",
+            ("Ay", "Satürn", "Sekstil"): "Es momento de dar un paso pequeño pero significativo — quizá una solicitud oficial, un compromiso a largo plazo, o simplemente decir 'caminaremos juntos'. El paso es pequeño, pero su significado es grande. Reúna su valor.",
+
+            ("Ay", "Uranüs", "Kavuşum"): "Las sorpresas pueden llamar a su puerta este período — quizá una decisión repentina, un desarrollo inesperado, o algo muy sorprendente que le dice su pareja. No se resista al cambio: Urano le está abriendo una nueva ventana. Sea flexible y abrace la vida.",
+            ("Ay", "Uranüs", "Karşıt"): "La necesidad de libertad puede crear algo de tensión este período — quizá usted quiere comprometerse más, o quizá su pareja busca algo de espacio. Este contraste es natural: cada persona tiene su propio ritmo. Darse espacio mutuamente, en realidad, los acercará aún más.",
+            ("Ay", "Uranüs", "Kare"): "Discusiones repentinas o eventos inesperados pueden causar estrés este período. Pero esta tensión es temporal, y debajo de ella yace una gran semilla de cambio. Una conversación que tengan ahora puede ser la ocasión para que una verdad pospuesta durante años salga por fin a la superficie.",
+            ("Ay", "Uranüs", "Trigon"): "Un período innovador y creativo le espera — prueben algo nuevo juntos, salgan de la rutina. Quizá visiten un restaurante diferente, o tracen una ruta distinta. Esta pequeña aventura traerá aire fresco a su relación.",
+            ("Ay", "Uranüs", "Sekstil"): "Una pequeña sorpresa o un desarrollo inesperado puede dar color a su relación este período. Sea flexible y de mente abierta: todo lo inesperado está trabajando a su favor ahora.",
+
+            ("Ay", "Neptün", "Kavuşum"): "La profundización espiritual es muy fuerte en este período — mediten juntos, dedíquense al arte, o simplemente cierren los ojos y siéntanse el uno al otro. Momentos como estos son los tesoros más hermosos de una relación. Sus almas se están hablando ahora.",
+            ("Ay", "Neptün", "Karşıt"): "Las ilusiones pueden ser un poco confusas este período — quizá entendió algo que su pareja dijo de otra manera, o quizá su propia imaginación nubló la realidad. La comunicación clara es muy importante ahora: no dude en preguntar 'esto es lo que entendí, ¿es correcto?'.",
+            ("Ay", "Neptün", "Kare"): "La nebulosidad emocional puede dominar este período — no sabe bien qué siente, y quizá no está seguro de las intenciones de su pareja. Pero esta nebulosidad es temporal: mantenga la calma, sea paciente, y cuando el agua se asiente todo se verá mucho más claro.",
+            ("Ay", "Neptün", "Trigon"): "Es un período muy romántico y espiritual — su vínculo con el otro es profundo y fuerte. Abrace este sentimiento: quizá escuchen una canción juntos, miren las estrellas, o simplemente se abracen en silencio. Estos momentos nutren su alma.",
+            ("Ay", "Neptün", "Sekstil"): "Una experiencia pequeña pero profunda le espera este período — quizá mientras miran una obra de arte juntos compartirán la misma emoción, o durante una escena de película se mirarán y dirán 'estamos pensando lo mismo'. Esa sincronización es muy valiosa.",
+
+            ("Ay", "Plüton", "Kavuşum"): "La transformación es muy poderosa este período — un cambio profundo está ocurriendo en su relación. Quizá una emoción que ha reprimido durante mucho tiempo está saliendo a la superficie. Esta confrontación puede dar miedo, pero también cura profundamente: está derribando lo viejo para construir lo nuevo.",
+            ("Ay", "Plüton", "Karşıt"): "Las luchas de poder pueden volverse algo prominentes este período — los temas de control, confianza y dependencia pueden salir a la luz. Pero esta confrontación es una oportunidad: pregúntese '¿dónde estoy perdiendo el control?'. La respuesta le espera en las profundidades de su relación.",
+            ("Ay", "Plüton", "Kare"): "Pueden ocurrir experiencias emocionales intensas este período — viejas heridas, miedos e inseguridades pueden aflorar. Pero esta confrontación es el momento en que comienza la sanación: poder mirar el dolor y transformarlo requiere gran valentía. Demuestre esa valentía.",
+            ("Ay", "Plüton", "Trigon"): "Una transformación profunda está remodelando su relación este período — los patrones antiguos se rompen y se establece un orden nuevo y más saludable. Abrace este proceso: el cambio puede dar miedo, pero el resultado será una unión mucho más fuerte.",
+            ("Ay", "Plüton", "Sekstil"): "Un cambio pequeño pero profundo está ocurriendo este período — quizá ha comenzado a confiar más en su pareja, o se ha reconciliado más con sus propios sentimientos. Este pequeño progreso es el heraldo de una gran transformación. Sea paciente; cosechará sus frutos.",
+
+            # --- ASPECTOS DEL SOL: interacción de identidad y ego ---
+            ("Güneş", "Venüs", "Kavuşum"): "Se siente muy encantador y atractivo este período — y su pareja lo nota. Convierta esta energía en una actividad hermosa juntos: quizá una cena romántica, o simplemente reír juntos. El amor fluye muy naturalmente este período.",
+            ("Güneş", "Venüs", "Karşıt"): "La búsqueda de equilibrio entre sus propias necesidades y las de su pareja es muy prominente este período: quizá usted da mucho mientras su pareja recibe mucho — o al revés. Hablar sobre esta diferencia hará que su relación sea mucho más equilibrada.",
+            ("Güneş", "Venüs", "Kare"): "Pueden surgir pequeñas diferencias en valores y gustos este período — quizá estilos de música diferentes, o planes de vacaciones distintos. Pero recuerde: las diferencias enriquecen una relación. Esté abierto al compromiso; podría descubrir un nuevo placer compartido.",
+            ("Güneş", "Venüs", "Trigon"): "Hay una armonía natural este período — hablan el mismo idioma y se ríen de las mismas cosas con su pareja. Disfrute de esta armonía: una relación se nutre de momentos como estos. Quizá lean un libro juntos, den un paseo, o simplemente se sienten en silencio.",
+
+            ("Güneş", "Mars", "Kavuşum"): "La energía y el coraje son muy altos este período — un momento maravilloso para embarcarse en una nueva aventura juntos y dar pasos audaces. Use esta energía de forma constructiva: concentrarse en una meta compartida, hacer ejercicio o compartir su pasión será muy agradable ahora.",
+            ("Güneş", "Mars", "Karşıt"): "El ego y la ira pueden estar un poco al límite este período — ambos pueden insistir en salirse con la suya. Pero este conflicto es una oportunidad: preguntar '¿cómo te sientes?' en lugar de decir 'yo tengo razón' podría profundizar enormemente su relación.",
+            ("Güneş", "Mars", "Kare"): "Pueden surgir fricciones y tensiones este período — quizá sus planes no coinciden, o sus energías chocan. Pero esta fricción lo fortalece: pone a prueba su resiliencia y le enseña a comprometerse. Sea paciente.",
+            ("Güneş", "Mars", "Trigon"): "Se sienten muy fuertes y enérgicos juntos este período — un momento perfecto para unirse por metas comunes y lograr cosas juntos. Aproveche bien esta energía: un paso que den juntos puede producir resultados muy brillantes durante mucho tiempo.",
+
+            ("Güneş", "Satürn", "Kavuşum"): "La seriedad y la estructura toman la delantera este período — puede ser el momento de dar un paso importante en su relación. Quizá una decisión oficial, un plan a largo plazo, o simplemente decir 'caminaremos juntos'. El paso es pequeño, pero sienta una base muy sólida.",
+            ("Güneş", "Satürn", "Karşıt"): "Puede sentir un poco de presión y distancia este período — quizá no recibe el apoyo que espera de su pareja, o sus propias responsabilidades lo abruman. Pero esto es temporal: sea paciente, este período pasará y dejará detrás una relación mucho más fuerte.",
+            ("Güneş", "Satürn", "Kare"): "Una prueba desafiante llama a su puerta este período — un tiempo que exige paciencia, determinación y flexibilidad. Pero esta prueba lo madura: pone a prueba su resiliencia y le enseña el valor de 'superar juntos los momentos difíciles'.",
+            ("Güneş", "Satürn", "Trigon"): "La madurez y la profundización sientan maravillosamente a su relación este período — se tienen confianza y se apoyan mutuamente. Alimente esta confianza: el paso que dé ahora estará construido sobre una base muy sólida años después.",
+        }
 
         if _ES:
             yorum_sozlugu = yorum_sozlugu_es if yorum_sozlugu_es else yorum_sozlugu_en
@@ -6467,12 +6626,27 @@ class FBST_Engine:
             k2 = yorumlar[1]
 
             # Ay burçları uyumu
-            burc_gruplari = {
-                "ateş": ["Koç", "Aslan", "Yay"],
-                "toprak": ["Boğa", "Başak", "Oğlak"],
-                "hava": ["İkizler", "Terazi", "Kova"],
-                "su": ["Yengeç", "Akrep", "Balık"]
-            }
+            if _ES:
+                burc_gruplari = {
+                    "ateş": ["Aries", "Leo", "Sagitario"],
+                    "toprak": ["Tauro", "Virgo", "Capricornio"],
+                    "hava": ["Géminis", "Libra", "Acuario"],
+                    "su": ["Cáncer", "Escorpio", "Piscis"]
+                }
+            elif _EN:
+                burc_gruplari = {
+                    "ateş": ["Koç", "Aslan", "Yay"],
+                    "toprak": ["Boğa", "Başak", "Oğlak"],
+                    "hava": ["İkizler", "Terazi", "Kova"],
+                    "su": ["Yengeç", "Akrep", "Balık"]
+                }
+            else:
+                burc_gruplari = {
+                    "ateş": ["Koç", "Aslan", "Yay"],
+                    "toprak": ["Boğa", "Başak", "Oğlak"],
+                    "hava": ["İkizler", "Terazi", "Kova"],
+                    "su": ["Yengeç", "Akrep", "Balık"]
+                }
 
             k1_grup = next((g for g, b in burc_gruplari.items() if k1["ay_burcu"] in b), "")
             k2_grup = next((g for g, b in burc_gruplari.items() if k2["ay_burcu"] in b), "")
@@ -6495,6 +6669,24 @@ class FBST_Engine:
                 ("hava", "su"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — hava ve su zorlu ama zenginleştirici: siz mantığa, o duyguya önem veriyorsunuz. Bu denge çok değerli: birbirinize farklı pencerelerden bakmayı öğretirsiniz.",
                 ("su", "hava"): f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — su ve hava zorlu ama zenginleştirici: duygusal derinliğiniz zihinsel berraklıkla buluşuyor. Birlikte hem hissedebilir hem de anlayabilirsiniz.",
             }
+            uyum_mesajlari_es = {
+                ("ateş", "ateş"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — están en el mismo grupo de elementos: su pasión, su coraje y su energía se alimentan naturalmente entre sí. Están hechos para disfrutar la vida juntos. Pero cuidado: dos fuegos juntos a veces pueden crear un incendio — sean pacientes.",
+                ("toprak", "toprak"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — la solidez de la tierra está en ustedes: la estabilidad, la confianza y los pasos concretos son la base de esta relación. Juntos pueden construir una estructura muy fuerte. Pero no suelten la flexibilidad: a veces hay que elevarse un poco de la tierra y mezclarse con el viento.",
+                ("hava", "hava"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — están mentalmente muy en sintonía: sus conversaciones nunca terminan y sus ideas se alimentan mutuamente. Forman un equipo maravilloso para explorar el mundo juntos. Pero no se conformen solo con la mente: compartan también sus sentimientos.",
+                ("su", "su"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — su profundidad emocional es muy fuerte: se entienden profundamente e incluso pueden hablar a través de la intuición. Este vínculo espiritual es muy especial. Pero no olviden apoyarse mutuamente en los altibajos emocionales.",
+                ("ateş", "hava"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el fuego y el aire son altamente compatibles: ustedes aportan pasión y energía, ellos aportan visión e intelecto. Juntos pueden producir ideas brillantes y soñar en grande. Esta combinación es altamente creativa.",
+                ("hava", "ateş"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el aire y el fuego son altamente compatibles: su intelecto mental se encuentra con su pasión. Juntos pueden hablar y también actuar. Este equilibrio es muy valioso.",
+                ("toprak", "su"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — la tierra y el agua son profundamente nutritivas: ustedes forman una base concreta, ellos añaden profundidad emocional. Juntos pueden construir un hogar que sea a la vez seguro y lleno de sentimiento.",
+                ("su", "toprak"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el agua y la tierra son profundamente nutritivas: su riqueza emocional se encuentra con pasos concretos. Juntos pueden soñar y convertir esos sueños en realidad.",
+                ("ateş", "toprak"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el fuego y la tierra son una combinación desafiante pero valiosa: ustedes quieren velocidad, ellos son pacientes. Este contraste los fortalece: los protege de la prisa y les enseña paciencia.",
+                ("toprak", "ateş"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — la tierra y el fuego son desafiantes pero valiosos: su paciencia y constancia equilibran el fuego de su pareja. Juntos pueden construir una relación a la vez sólida y apasionada.",
+                ("ateş", "su"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el fuego y el agua son desafiantes pero fascinantes: ustedes son extrovertidos, ellos son introvertidos. Este contraste se complementa, pero a veces puede crear vapor. Sean pacientes y comprensivos.",
+                ("su", "ateş"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el agua y el fuego son desafiantes pero fascinantes: su profundidad emocional se encuentra con la energía de su pareja. Juntos pueden experimentar algo a la vez apasionado y emocional.",
+                ("hava", "toprak"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el aire y la tierra son diferentes pero complementarios: ustedes aportan visión, ellos aportan ejecución. Juntos pueden dar vida a grandes proyectos.",
+                ("toprak", "hava"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — la tierra y el aire son diferentes pero complementarios: sus pasos concretos se encuentran con su intelecto mental. Juntos pueden soñar y construir esos sueños.",
+                ("hava", "su"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el aire y el agua son desafiantes pero enriquecedores: ustedes valoran la lógica, ellos valoran el sentimiento. Este equilibrio es muy valioso: se enseñan mutuamente a mirar a través de ventanas diferentes.",
+                ("su", "hava"): f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — el agua y el aire son desafiantes pero enriquecedores: su profundidad emocional se encuentra con la claridad mental. Juntos pueden sentir y también comprender.",
+            }
             uyum_mesajlari_en = {
                 ("ateş", "ateş"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — you are in the same element group: your passion, courage, and energy naturally feed each other. You were made to enjoy life together. But beware: two fires together can sometimes create a blaze — be patient.",
                 ("toprak", "toprak"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — the solidity of the earth is in you: stability, trust, and concrete steps are the foundation of this relationship. Together you can build a very strong structure. But do not let go of flexibility: sometimes you need to rise slightly from the earth and blend with the wind.",
@@ -6513,9 +6705,11 @@ class FBST_Engine:
                 ("hava", "su"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — air and water are challenging but enriching: you value logic, they value feeling. This balance is very valuable: you teach each other to look through different windows.",
                 ("su", "hava"): f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — water and air are challenging but enriching: your emotional depth meets mental clarity. Together you can both feel and understand.",
             }
-            uyum_mesajlari = uyum_mesajlari_en if (_EN or _ES) else uyum_mesajlari_tr
+            uyum_mesajlari = uyum_mesajlari_es if _ES else (uyum_mesajlari_en if _EN else uyum_mesajlari_tr)
             uyum_key = (k1_grup, k2_grup)
-            if _EN or _ES:
+            if _ES:
+                uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{pdf_label(k1['ay_burcu'])} y {pdf_label(k2['ay_burcu'])} — venir de diferentes elementos añadirá riqueza. Sus diferencias se convertirán en su mayor fortaleza.")
+            elif _EN:
                 uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{pdf_label(k1['ay_burcu'])} and {pdf_label(k2['ay_burcu'])} — coming from different elements will add richness. Your differences will become your greatest strength.")
             else:
                 uyum_mesaji = uyum_mesajlari.get(uyum_key, f"{pdf_label(k1['ay_burcu'])} ve {pdf_label(k2['ay_burcu'])} — farklı elementlerden gelmeniz zenginlik katacak. Farklılıklarınız en büyük gücünüz olacak.")
@@ -7367,7 +7561,7 @@ class FBST_Engine:
             gunun_olaylari.extend(haritayi_tara(ay_derece_B, ana_harita_B, self.p2_isim, "#D4878F")) 
             
             if gunun_olaylari:
-                tarih_str = hedef_tarih.strftime("%d %B %Y")
+                tarih_str = _fmt_tarih(hedef_tarih)
                 alarmlar.append({"tarih": tarih_str, "mesajlar": gunun_olaylari})
                 
         return alarmlar
