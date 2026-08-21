@@ -1138,6 +1138,22 @@ try:
 except Exception:
     pass
 
+# ─── IP ülke gate (TR hariç global) ───
+# Aktif etmek için env: GLOBAL_EXCLUDE_TR=1 (Render dashboard'da ayarla)
+# Cloudflare CF-IPCountry veya X-Forwarded-For tabanlı basit kontrol
+_TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc", "/api/debug_ephe"}
+
+@app_fast.middleware("http")
+async def _tr_ip_gate(request: Request, call_next):
+    if os.getenv("GLOBAL_EXCLUDE_TR") == "1" and request.url.path not in _TR_BLOCK_PATHS:
+        country = (request.headers.get("CF-IPCountry") or request.headers.get("cf-ipcountry") or "").upper()
+        # Fallback: X-Country custom header (test için)
+        if not country:
+            country = (request.headers.get("X-Country") or "").upper()
+        if country == "TR":
+            return JSONResponse(status_code=403, content={"error": "TR region excluded — please use the TR app", "code": "TR_BLOCKED"})
+    return await call_next(request)
+
 # ─── In-memory engine cache ───
 _ENGINE_CACHE = {}
 _ENGINE_CACHE_MAX = 12
