@@ -71,7 +71,7 @@ def _resize_and_encode(filename, max_width=400):
 
 _cift_b64 = _resize_and_encode('cift.png')
 _eb_b64 = _resize_and_encode('ebeveyn_cocuk.png')
-_py_b64 = _resize_and_encode('potansıyel_yetenek.png')
+_py_b64 = _resize_and_encode('potansiyel_yetenek.png')
 
 @st.cache_data
 def sehir_veritabani_yukle():

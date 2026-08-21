@@ -4206,7 +4206,7 @@ class FBST_Engine:
                 ax.text(t_orta, (r_ic + r_dis) / 2, BURC_SEMBOLLERI[i],
                         ha='center', va='center', fontsize=13, color=renk, alpha=0.8, zorder=3)
                 t_isim = np.deg2rad(dondur(i * 30 + 15))
-                ax.text(t_isim, r_dis + 0.035, BURC_ISIMLERI[i],
+                ax.text(t_isim, r_dis + 0.035, pdf_label(BURC_ISIMLERI[i]),
                         ha='center', va='center', fontsize=5.5, color='#6B5B7B', alpha=0.7, zorder=3)
 
             # ── 2) DIŞ ÇEMBER ──
@@ -4218,8 +4218,17 @@ class FBST_Engine:
             ev_renkleri = ['#C9A96E', '#8A7F96', '#8FB8CA', '#D4878F', '#B8A9C9',
                            '#C47A82', '#6B5B7B', '#7A6B8A', '#8FB8CA', '#C9A96E',
                            '#D4878F', '#B8A9C9']
-            burclar_kisa = ["Koc", "Boga", "Iki", "Yen", "Asl", "Bas",
-                            "Ter", "Akr", "Yay", "Ogl", "Kov", "Bal"]
+            _is_es_kisa = _core_get_lang() == "es"
+            _is_en_kisa = _core_get_lang() == "en"
+            if _is_es_kisa:
+                burclar_kisa = ["Ari", "Tau", "Gem", "Can", "Leo", "Vir",
+                                 "Lib", "Esc", "Sag", "Cap", "Acu", "Pis"]
+            elif _is_en_kisa:
+                burclar_kisa = ["Ari", "Tau", "Gem", "Can", "Leo", "Vir",
+                                 "Lib", "Sco", "Sag", "Cap", "Aqu", "Pis"]
+            else:
+                burclar_kisa = ["Koc", "Boga", "Iki", "Yen", "Asl", "Bas",
+                                 "Ter", "Akr", "Yay", "Ogl", "Kov", "Bal"]
             if len(cusps) >= 12:
                 for idx in range(12):
                     cusp_derece = cusps[idx]
@@ -4295,7 +4304,7 @@ class FBST_Engine:
                 yazilar.append(txt1)
 
                 burc_idx = int(derece / 30) % 12
-                txt2 = ax.text(radyan, r_name, gezegen, color='#6B5B7B', fontsize=5.5,
+                txt2 = ax.text(radyan, r_name, pdf_label(gezegen), color='#6B5B7B', fontsize=5.5,
                                ha='center', va='center', zorder=6)
                 yazilar.append(txt2)
 
@@ -4324,11 +4333,26 @@ class FBST_Engine:
             plt.savefig(dosya_adi, facecolor=fig.get_facecolor(), dpi=200)
             plt.close(fig)
             
-        ciz(j_ileri, f"{self._session_id}_Situa_A.png", f"{self.p1_isim} Haritası")
-        if self.mod == "potansiyel_yetenek":
-            ciz(j_geri, f"{self._session_id}_Situa_B.png", f"{self.p2_isim} Natal Haritası")
+        _is_es_h = _core_get_lang() == "es"
+        _is_en_h = _core_get_lang() == "en"
+        if _is_es_h:
+            ciz(j_ileri, f"{self._session_id}_Situa_A.png", f"Carta de {self.p1_isim}")
+            if self.mod == "potansiyel_yetenek":
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"Carta Natal de {self.p2_isim}")
+            else:
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"SITUA B: Carta Vectorial de {self.p2_isim}")
+        elif _is_en_h:
+            ciz(j_ileri, f"{self._session_id}_Situa_A.png", f"Chart of {self.p1_isim}")
+            if self.mod == "potansiyel_yetenek":
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"Natal Chart of {self.p2_isim}")
+            else:
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"SITUA B: Vector Chart of {self.p2_isim}")
         else:
-            ciz(j_geri, f"{self._session_id}_Situa_B.png", f"SİTUA B: {self.p2_isim} Vektör Haritası")
+            ciz(j_ileri, f"{self._session_id}_Situa_A.png", f"{self.p1_isim} Haritası")
+            if self.mod == "potansiyel_yetenek":
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"{self.p2_isim} Natal Haritası")
+            else:
+                ciz(j_geri, f"{self._session_id}_Situa_B.png", f"SİTUA B: {self.p2_isim} Vektör Haritası")
 
     def ciz_titresim_grafigi(self, dosya_adi=None):
         if dosya_adi is None:
@@ -4346,32 +4370,74 @@ class FBST_Engine:
         fig.patch.set_facecolor('#FFFFFF')
         ax.set_facecolor('#FBF7F4')
         
-        ax.plot(t, y_akis, color='#8FB8CA', linewidth=1, linestyle='--', alpha=0.5, label="Ruhsal Akış (Sinüs)")
-        ax.plot(t, y_kriz, color='#D4878F', linewidth=1, linestyle='--', alpha=0.5, label="Kriz ve Blokaj (Kosinüs)")
-        ax.plot(t, y_toplam, color='#B8A9C9', linewidth=2.0, label="Ana Kadersel Vektör")
+        _is_es_t = _core_get_lang() == "es"
+        _is_en_t = _core_get_lang() == "en"
+        if _is_es_t:
+            ax.plot(t, y_akis, color='#8FB8CA', linewidth=1, linestyle='--', alpha=0.5, label="Flujo Espiritual (Seno)")
+            ax.plot(t, y_kriz, color='#D4878F', linewidth=1, linestyle='--', alpha=0.5, label="Crisis y Bloqueo (Coseno)")
+            ax.plot(t, y_toplam, color='#B8A9C9', linewidth=2.0, label="Vector Kármico Principal")
+        elif _is_en_t:
+            ax.plot(t, y_akis, color='#8FB8CA', linewidth=1, linestyle='--', alpha=0.5, label="Spiritual Flow (Sine)")
+            ax.plot(t, y_kriz, color='#D4878F', linewidth=1, linestyle='--', alpha=0.5, label="Crisis & Blockage (Cosine)")
+            ax.plot(t, y_toplam, color='#B8A9C9', linewidth=2.0, label="Main Karmic Vector")
+        else:
+            ax.plot(t, y_akis, color='#8FB8CA', linewidth=1, linestyle='--', alpha=0.5, label="Ruhsal Akış (Sinüs)")
+            ax.plot(t, y_kriz, color='#D4878F', linewidth=1, linestyle='--', alpha=0.5, label="Kriz ve Blokaj (Kosinüs)")
+            ax.plot(t, y_toplam, color='#B8A9C9', linewidth=2.0, label="Ana Kadersel Vektör")
         
         ax.fill_between(t, y_toplam, 0, where=(y_toplam > 0), color='#B8A9C9', alpha=0.12)
         ax.fill_between(t, y_toplam, 0, where=(y_toplam < 0), color='#D4878F', alpha=0.12)
         
-        donemecler = {
-            1.375: ("Uyanış", "#C9A96E"), 
-            2.225: ("Fraktal", "#C9A96E"), 
-            2.4: ("İlişki Krizi", "#D4878F"), 
-            4.0: ("Uyum", "#8FB8CA"), 
-            7.0: ("1. Satürn", "#C47A82"),
-            14.0: ("2. Satürn", "#C47A82"),
-            21.0: ("Büyük Hasat", "#8FB8CA")
-        }
+        if _is_es_t:
+            donemecler = {
+                1.375: ("Despertar", "#C9A96E"),
+                2.225: ("Fractal", "#C9A96E"),
+                2.4: ("Crisis de Relación", "#D4878F"),
+                4.0: ("Armonía", "#8FB8CA"),
+                7.0: ("1er Saturno", "#C47A82"),
+                14.0: ("2º Saturno", "#C47A82"),
+                21.0: ("Gran Cosecha", "#8FB8CA")
+            }
+        elif _is_en_t:
+            donemecler = {
+                1.375: ("Awakening", "#C9A96E"),
+                2.225: ("Fractal", "#C9A96E"),
+                2.4: ("Relationship Crisis", "#D4878F"),
+                4.0: ("Harmony", "#8FB8CA"),
+                7.0: ("1st Saturn", "#C47A82"),
+                14.0: ("2nd Saturn", "#C47A82"),
+                21.0: ("Great Harvest", "#8FB8CA")
+            }
+        else:
+            donemecler = {
+                1.375: ("Uyanış", "#C9A96E"), 
+                2.225: ("Fraktal", "#C9A96E"), 
+                2.4: ("İlişki Krizi", "#D4878F"), 
+                4.0: ("Uyum", "#8FB8CA"), 
+                7.0: ("1. Satürn", "#C47A82"),
+                14.0: ("2. Satürn", "#C47A82"),
+                21.0: ("Büyük Hasat", "#8FB8CA")
+            }
         
         for yil, (isim, renk) in donemecler.items():
             y_val = np.sin(1.5 * yil + faz) - np.cos(2.5 * yil + faz/2)
             ax.plot(yil, y_val, marker='o', markersize=7, color=renk, markeredgecolor='#FFFFFF', markeredgewidth=1.5, zorder=5)
-            ax.annotate(f"{yil} Y.\n{isim}", (yil, y_val), textcoords="offset points", xytext=(0,15), ha='center', fontsize=7.5, color='#4A4A4A', weight='bold')
+            _lbl_yil = "a." if _is_es_t else ("yr" if _is_en_t else "Y.")
+            ax.annotate(f"{yil} {_lbl_yil}\n{isim}", (yil, y_val), textcoords="offset points", xytext=(0,15), ha='center', fontsize=7.5, color='#4A4A4A', weight='bold')
 
         ax.axhline(0, color='#C9A96E', linewidth=0.8, linestyle='-', alpha=0.5)
-        ax.set_title("FAST Uzun Vadeli Frekans ve 21 Yıllık Ritim", color='#3D2E50', fontsize=13, pad=20, weight='bold')
-        ax.set_xlabel("İlişkinin Yaşı (Yıl)", color='#6B5B7B', fontsize=10)
-        ax.set_ylabel("Ödül (Zirve) / Kriz (Dip)", color='#6B5B7B', fontsize=10)
+        if _is_es_t:
+            ax.set_title("Frecuencia a Largo Plazo FAST y Ritmo de 21 Años", color='#3D2E50', fontsize=13, pad=20, weight='bold')
+            ax.set_xlabel("Edad de la Relación (Años)", color='#6B5B7B', fontsize=10)
+            ax.set_ylabel("Recompensa (Cima) / Crisis (Valle)", color='#6B5B7B', fontsize=10)
+        elif _is_en_t:
+            ax.set_title("FAST Long-Term Frequency and 21-Year Rhythm", color='#3D2E50', fontsize=13, pad=20, weight='bold')
+            ax.set_xlabel("Relationship Age (Years)", color='#6B5B7B', fontsize=10)
+            ax.set_ylabel("Reward (Peak) / Crisis (Trough)", color='#6B5B7B', fontsize=10)
+        else:
+            ax.set_title("FAST Uzun Vadeli Frekans ve 21 Yıllık Ritim", color='#3D2E50', fontsize=13, pad=20, weight='bold')
+            ax.set_xlabel("İlişkinin Yaşı (Yıl)", color='#6B5B7B', fontsize=10)
+            ax.set_ylabel("Ödül (Zirve) / Kriz (Dip)", color='#6B5B7B', fontsize=10)
         
         ax.set_xticks(np.arange(0, 22, 3))
         ax.tick_params(colors='#6B5B7B')
