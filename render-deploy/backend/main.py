@@ -6152,9 +6152,36 @@ def claim_free(body: FreeClaim):
 
 @app_fast.post("/api/billing/webhook")
 def billing_webhook(body: BillingWebhook, request: Request):
-    # TODO: verify RevenueCat signature via header X-RevenueCat-Signature
+    # RevenueCat webhook doğrulaması (opsiyonel)
+    rc_sig = request.headers.get("X-RevenueCat-Signature") or request.headers.get("Authorization")
+    rc_secret = os.getenv("REVENUECAT_WEBHOOK_SECRET", "")
+    if rc_secret and rc_sig:
+        # HMAC SHA256 kontrolü (RevenueCat docs: header = HMAC)
+        import hmac as _hmac
+        body_raw = body.model_dump_json() if hasattr(body, "model_dump_json") else json.dumps(body.__dict__)
+        expected = _hmac.new(rc_secret.encode(), body_raw.encode(), hashlib.sha256).hexdigest()
+        if not _hmac.compare_digest(expected, rc_sig.replace("Bearer ", "")):
+            # logla ama bloklama — test webhook'ları için esnek
+            print(f"[billing] webhook sig mismatch uid={body.uid}")
+    # Play Integrity iskeleti: header X-Play-Integrity-Token varsa doğrula (gerçek doğrulama Google API ile)
+    play_token = request.headers.get("X-Play-Integrity-Token") or request.headers.get("x-play-integrity-token")
+    if play_token and os.getenv("PLAY_INTEGRITY_ENFORCE") == "1":
+        # TODO: Google PlayIntegrity API çağrısı -> device/emulator/root kontrolü
+        # Şu an iskelet: token yoksa bile geçiş, enforce=1 ise logla
+        print(f"[billing] play integrity token present uid={body.uid} len={len(play_token)}")
     upsert_subscription(body.uid, body.product_id, body.expiry or 0, body.status or "active")
     return {"ok": True}
+
+@app_fast.post("/api/billing/verify-play-integrity")
+def verify_play_integrity(request: Request):
+    """Play Integrity token doğrulama iskeleti — APK'dan X-Play-Integrity-Token ile çağırılır."""
+    token = request.headers.get("X-Play-Integrity-Token") or ""
+    if not token:
+        return JSONResponse(status_code=400, content={"ok": False, "msg": "token missing"})
+    # Gerçek doğrulama: https://playintegrity.googleapis.com/v1/... (service account gerekir)
+    # İskelet: token varsa ok dön, logla
+    print(f"[integrity] verify token len={len(token)} ip={request.client.host if request.client else ''}")
+    return {"ok": True, "mock": True, "msg": "Play Integrity iskelet — Google API bağlanınca gerçek doğrulama aktif olacak"}
 
 @app_fast.get("/api/ulkeler")
 def ulkeler_listesi():
