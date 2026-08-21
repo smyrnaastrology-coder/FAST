@@ -37,7 +37,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(widget.request.modLabel(l10n)), actions: const [LanguageSwitcher()]),
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).maybePop()),
+        title: Text(widget.request.modLabel(l10n)), actions: const [LanguageSwitcher()]),
       body: Consumer<AnalysisProvider>(
         builder: (context, provider, _) {
           switch (provider.status) {
@@ -89,6 +91,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final sessionId = provider.sessionId ?? '';
     final mod = widget.request.mod;
 
+    final isSingle = mod == 'bireysel_natal' || mod == 'potansiyel_yetenek';
     final uyum = r['uyum_orani']?.toString() ?? '';
     final tork = r['tork']?.toString() ?? '';
     final fraktal = r['fraktal']?.toString() ?? '';
@@ -98,21 +101,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Score cards
-          Row(
-            children: [
-              if (uyum.isNotEmpty)
-                ScoreCard(label: l10n.scoreCompatibility, value: uyum.length > 40 ? '${uyum.substring(0, 40)}...' : uyum, color: FastTheme.rose),
-              if (tork.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreVitalityTork, value: tork, color: FastTheme.secondary)],
-              if (fraktal.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreFlowFraktal, value: fraktal, color: FastTheme.accent)],
+          // Score cards - gizle bireysel/potansiyel modda
+          if (!isSingle) ...[
+            Row(
+              children: [
+                if (uyum.isNotEmpty)
+                  ScoreCard(label: l10n.scoreCompatibility, value: uyum.length > 40 ? '${uyum.substring(0, 40)}...' : uyum, color: FastTheme.rose),
+                if (tork.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreVitalityTork, value: tork, color: FastTheme.secondary)],
+                if (fraktal.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreFlowFraktal, value: fraktal, color: FastTheme.accent)],
+              ],
+            ),
+            if (uyum.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(uyum, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
             ],
-          ),
-          if (uyum.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(uyum, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+            const SizedBox(height: 16),
           ],
-
-          const SizedBox(height: 16),
 
           // Chart tabs
           _chartSection(sessionId, mod, r),
@@ -882,16 +886,32 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget _buildPdfSection(AnalysisProvider provider, String sessionId) {
     final l10n = AppLocalizations.of(context);
     if (sessionId.isEmpty) return const SizedBox.shrink();
-    return SectionCard(
-      title: '📄 ${l10n.analyzerReportTitle}',
-      icon: Icons.picture_as_pdf,
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
-          icon: const Icon(Icons.download, size: 18),
-          label: Text(l10n.downloadPdfButton(widget.request.modLabel(l10n))),
-          style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accent),
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 32),
+      child: SectionCard(
+        title: '📄 ${l10n.analyzerReportTitle}',
+        icon: Icons.picture_as_pdf,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 360),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
+                icon: const Icon(Icons.download, size: 20),
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(l10n.downloadPdfButton(widget.request.modLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FastTheme.accent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 4,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

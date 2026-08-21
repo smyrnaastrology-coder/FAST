@@ -945,7 +945,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   Widget _scoreCards(Map<String, dynamic> r, AppLocalizations l10n) {
+    final hideFlow = _tekKisiMod;
     final isPy = _mode == 'potansiyel_yetenek';
+    if (hideFlow) {
+      // bireysel/potansiyel modda uyum kartlarını tamamen gizle
+      return const SizedBox.shrink();
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         final cardWidth = (constraints.maxWidth - 12) / (isPy ? 2 : 3);
@@ -1920,26 +1925,42 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // ========== PDF SECTION ==========
   Widget _pdfSection(AnalysisProvider provider, Map<String, dynamic> r, String sessionId, AppLocalizations l10n) {
     if (sessionId.isEmpty) return const SizedBox.shrink();
-    return Column(
-      children: [
-        const SizedBox(height: 24),
-        Text('📄 ${l10n.analyzerReportTitle}', style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          children: _pdfLinks(sessionId, l10n).map((link) => ElevatedButton.icon(
-            onPressed: () => _downloadPdf(sessionId, link['tip'], l10n),
-            icon: const Icon(Icons.download, size: 16),
-            label: Text('📥 ${link['label']}'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: FastTheme.accentGold,
-              foregroundColor: FastTheme.bg,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          Text('📄 ${l10n.analyzerReportTitle}', style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          const SizedBox(height: 16),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 360),
+              child: Wrap(
+                spacing: 12, runSpacing: 12, alignment: WrapAlignment.center,
+                children: _pdfLinks(sessionId, l10n).map((link) => SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _downloadPdf(sessionId, link['tip'], l10n),
+                    icon: const Icon(Icons.download, size: 20),
+                    label: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text('📥 ${link['label']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FastTheme.accentGold,
+                      foregroundColor: FastTheme.bg,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 4,
+                    ),
+                  ),
+                )).toList(),
+              ),
             ),
-          )).toList(),
-        ),
-      ],
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
     );
   }
 

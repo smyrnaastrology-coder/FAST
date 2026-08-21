@@ -208,7 +208,9 @@ class _InputFormScreenState extends State<InputFormScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(_modeTitle(l10n)), actions: const [LanguageSwitcher()]),
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.of(context).maybePop()),
+        title: Text(_modeTitle(l10n)), actions: const [LanguageSwitcher()]),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
