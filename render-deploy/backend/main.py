@@ -1138,10 +1138,38 @@ try:
 except Exception:
     pass
 
+_TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc", "/api/debug_ephe"}
+
+# ─── Rate limit (basit, in-memory) ───
+import time as _rl_time
+_RL_BUCKET = {}
+_RL_LIMIT = int(os.getenv("RL_LIMIT", "30"))  # 30 req / 60s / IP
+_RL_WINDOW = 60
+
+@app_fast.middleware("http")
+async def _rate_limit(request: Request, call_next):
+    if request.url.path.startswith("/api/") and request.url.path not in _TR_BLOCK_PATHS:
+        ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.client.host if request.client else "unknown"
+        now = _rl_time.time()
+        bucket = _RL_BUCKET.get(ip)
+        if bucket:
+            count, start = bucket
+            if now - start > _RL_WINDOW:
+                _RL_BUCKET[ip] = [1, now]
+            else:
+                if count >= _RL_LIMIT:
+                    return JSONResponse(status_code=429, content={"error": "Rate limit, try later"})
+                bucket[0] += 1
+        else:
+            _RL_BUCKET[ip] = [1, now]
+        # temizlik (1000+ IP birikmesin)
+        if len(_RL_BUCKET) > 2000:
+            for k in list(_RL_BUCKET.keys())[:1000]:
+                del _RL_BUCKET[k]
+    return await call_next(request)
+
 # ─── IP ülke gate (TR hariç global) ───
 # Aktif etmek için env: GLOBAL_EXCLUDE_TR=1 (Render dashboard'da ayarla)
-# Cloudflare CF-IPCountry veya X-Forwarded-For tabanlı basit kontrol
-_TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc", "/api/debug_ephe"}
 
 @app_fast.middleware("http")
 async def _tr_ip_gate(request: Request, call_next):
@@ -6095,6 +6123,39 @@ def debug_ephe():
         sonuc["sefstars_yildiz_sayisi"] = f"HATA: {e}"
     return sonuc
 
+# ─── Billing & Entitlement ───
+try:
+    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status
+except Exception:
+    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status
+
+class FreeClaim(BaseModel):
+    uid: str
+    device_token: Optional[str] = None
+
+class BillingWebhook(BaseModel):
+    uid: str
+    product_id: str
+    expiry: Optional[float] = None
+    status: Optional[str] = "active"
+
+@app_fast.get("/api/billing/status")
+def billing_status(uid: str = "", device_token: str = ""):
+    return get_status(uid) | {"device_has_free": has_free_used("", device_token) if device_token else False}
+
+@app_fast.post("/api/billing/claim-free")
+def claim_free(body: FreeClaim):
+    if has_free_used(body.uid, body.device_token or ""):
+        raise HTTPException(status_code=402, detail={"code": "FREE_ALREADY_USED", "msg": "Free PDF already claimed"})
+    mark_free_used(body.uid, body.device_token or "")
+    return {"ok": True, "msg": "Free PDF claimed"}
+
+@app_fast.post("/api/billing/webhook")
+def billing_webhook(body: BillingWebhook, request: Request):
+    # TODO: verify RevenueCat signature via header X-RevenueCat-Signature
+    upsert_subscription(body.uid, body.product_id, body.expiry or 0, body.status or "active")
+    return {"ok": True}
+
 @app_fast.get("/api/ulkeler")
 def ulkeler_listesi():
     """Tüm ülkeler ve her ülkenin şehir listesi (cities_db.json'dan, 223 ülke)."""
@@ -6122,8 +6183,21 @@ def sehir_ara_endpoint(q: str = "", limit: int = 15):
     return {"sonuc": sonuc}
 
 @app_fast.post("/api/astrokartografi")
-def astrokartografi_analiz(input: AstroInput):
-    """Verilen koordinat için composite chart'a göre astrokartografi skoru hesaplar."""
+def astrokartografi_analiz(input: AstroInput, request: Request):
+    """Verilen koordinat için composite chart'a göre astrokartografi skoru hesaplar. Tarayıcı interaktif harita -> sadece aboneler."""
+    # Browser interactive gate: sadece abone olan kullanabilir (PDF alan PDF'te görür)
+    uid = request.headers.get("X-UID") or request.headers.get("x-uid") or getattr(input, "uid", "") or ""
+    # uid yoksa da deneyip preview dön — frontend blur gösterecek
+    try:
+        from backend.billing import is_subscribed as _is_sub
+    except Exception:
+        try:
+            from billing import is_subscribed as _is_sub
+        except Exception:
+            _is_sub = lambda x: True  # fallback açık
+    if uid and not _is_sub(uid):
+        # limitli preview: sadece ilk skor, detay yok
+        raise HTTPException(status_code=402, detail={"code": "SUB_REQUIRED", "msg": "Astrokartografi için abonelik gerekli", "locked": True})
     try:
         motor = _get_engine(input.session_id)
         if not motor:
