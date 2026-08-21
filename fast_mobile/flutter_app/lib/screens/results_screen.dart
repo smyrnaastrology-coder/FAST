@@ -9,6 +9,7 @@ import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../services/api_service.dart';
+import '../services/billing_service.dart';
 import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
@@ -749,36 +750,72 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   Widget _buildAstrocartography(Map data, AnalysisProvider provider, String sessionId, Map r) {
     final l10n = AppLocalizations.of(context);
-    final skor = data['skor'] is Map ? data['skor'] as Map : data;
-    return SectionCard(
-      title: l10n.astrokartografiTitle,
-      icon: Icons.public,
-      child: Column(
-        children: [
-          ..._buildAstroBars(skor, l10n),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => provider.loadAcgMap(),
-              icon: const Icon(Icons.map, size: 18),
-              label: Text('🌍 ${l10n.analyzerLoadWorldMap}'),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: BillingService.getStatus(),
+      builder: (ctx, snap) {
+        final isSub = snap.data?['is_subscribed'] == true;
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()));
+        }
+        if (!isSub) {
+          return SectionCard(
+            title: l10n.astrokartografiTitle,
+            icon: Icons.public,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: FastTheme.bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: FastTheme.border)),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.lock, size: 36, color: FastTheme.accentGold),
+                      const SizedBox(height: 8),
+                      Text(l10n.analyzerSectionChartComment, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Text('🔒 ${l10n.analyzerLoadWorldMap} — abonelik gerekli', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                      const SizedBox(height: 12),
+                      SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.star, size: 16), label: Text('Abone Ol — \$7.99/ay'), style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold), onPressed: () {})),
+                      const SizedBox(height: 8),
+                      Text('PDF alanlar PDF\'te görür, tarayıcıda görmek için abone olun', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          );
+        }
+        final skor = data['skor'] is Map ? data['skor'] as Map : data;
+        return SectionCard(
+          title: l10n.astrokartografiTitle,
+          icon: Icons.public,
+          child: Column(
+            children: [
+              ..._buildAstroBars(skor, l10n),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => provider.loadAcgMap(),
+                  icon: const Icon(Icons.map, size: 18),
+                  label: Text('🌍 ${l10n.analyzerLoadWorldMap}'),
+                ),
+              ),
+              if (provider.acgMapUrl != null) ...[
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(provider.acgMapUrl!, fit: BoxFit.contain, height: 250),
+                ),
+              ],
+              if (provider.astroData != null) ...[
+                const SizedBox(height: 12),
+                Text(l10n.alternateUniverseScores, style: const TextStyle(fontWeight: FontWeight.bold)),
+                ..._buildAstroBars(provider.astroData!['skor'] is Map ? provider.astroData!['skor'] as Map : provider.astroData!, l10n),
+              ],
+            ],
           ),
-          if (provider.acgMapUrl != null) ...[
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(provider.acgMapUrl!, fit: BoxFit.contain, height: 250),
-            ),
-          ],
-          if (provider.astroData != null) ...[
-            const SizedBox(height: 12),
-            Text(l10n.alternateUniverseScores, style: const TextStyle(fontWeight: FontWeight.bold)),
-            ..._buildAstroBars(provider.astroData!['skor'] is Map ? provider.astroData!['skor'] as Map : provider.astroData!, l10n),
-          ],
-        ],
-      ),
+        );
+      },
     );
   }
 
