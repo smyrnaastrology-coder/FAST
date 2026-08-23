@@ -12,15 +12,27 @@ class HoraryApi {
     required double lat,
     required double lon,
     String lang = 'tr',
+    List<Map<String, dynamic>>? history,
   }) async {
     final uri = Uri.parse('$baseUrl/api/horary/cast');
-    final res = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'question': question, 'lat': lat, 'lon': lon, 'lang': lang}),
-    ).timeout(const Duration(seconds: 20));
-    if (res.statusCode != 200) throw Exception('API ${res.statusCode}: ${res.body}');
-    return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+    // OpenAI + Render cold-start için 90sn + 1 retry (20sn çok kısaydı)
+    http.Response? res;
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        res = await http.post(
+          uri,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'question': question, 'lat': lat, 'lon': lon, 'lang': lang, if(history!=null) 'history': history}),
+        ).timeout(const Duration(seconds: 90));
+        break;
+      } catch (e) {
+        if (attempt == 1) rethrow;
+        await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+    final r = res!;
+    if (r.statusCode != 200) throw Exception('API ${r.statusCode}: ${r.body}');
+    return jsonDecode(utf8.decode(r.bodyBytes)) as Map<String, dynamic>;
   }
 
   static Future<Map<String, dynamic>> health() async {
