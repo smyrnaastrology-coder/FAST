@@ -45,6 +45,9 @@ A: Nerede: Venüs 16° Terazi 7. evde (onun türetilmiş 1. evi) domicile — ke
 Q: beşiktaş maçı kazanır mı ?
 A: Göstergeler: ASC 10° Koç → Beşiktaş Mars, DSC 10° Terazi → rakip Venüs. Mars 16°17' Yengeç düşüşte (fall) — enerji düşük, sahada yansıtamama. Venüs 16°12' Terazi domicile 7. ev köşede — rakip motivasyon/güç/yerleşim sağlam. 1. evde Satürn 14°22' Koç Rx retro malefik — Beşiktaş'ın işi zor, engel/mağlubiyet. Ay 10°09' Yay → Venüs 16° Terazi applying sekstil 60° — gidişat rakip lehine. Sonuç: Beşiktaş kazanması çok zor, rakip galibiyet veya puan kaybı.
 
+Q: aklımdaki kişiyle evlenecek miyim ?
+A: Göstergeler: ASC 10° Koç → sen Mars 8° Yengeç, 7. ev 10° Terazi → kişi Venüs 16° Terazi 7. ev domicile çok güçlü → ilişki/partnerlik belirgin. Mars-Venüs applying kare — yönelme var ama ciddi engel/gerilim, kendiliğinden ilerlemez. Ay 10° Oğlak Mars/Venüs eksenine sert bağlantı — bekleme, şartların oluşması, sorumluluk/mesafe/zamanlama problemi. Sonuç: evet ihtimali var ama kolay/doğrudan değil, ilişki potansiyeli var, evliliğe giden yolda sınav aşılmalı. Not: görsel transits ise horary için soru haritası gerekir.
+
 Engine JSON:
 {json}
 """
