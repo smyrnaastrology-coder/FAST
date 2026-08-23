@@ -30,6 +30,9 @@ A: Göstergeler: ASC 03° Koç → sen Mars, 7. ev 03° Terazi → karşı taraf
 Q: hastalığım nasıl ilerleyecek ? iyileşecek miyim ?
 A: Not: Tamamen astrolojik göstergeler, tıbbi teşhis yerine geçmez, hekime başvur. Göstergeler: ASC 4° Koç → sen Mars 16° Yengeç düşüşte 4. evde — vitalite düşük, bağışıklık yorgun, evde istirahat ihtiyacı. 6. ev Başak yöneticisi Merkür 29° Aslan Rx anaretik — hastalık kriz eşiğinde, nükseden/uzayan süreç. Satürn 14° Koç Rx 1. evde — bedende ağırlık/kısıtlanmışlık. Seyir: Ay 10° Oğlak önümüzdeki günlerde Satürn 14° Koç, Venüs 16° Terazi, Mars 16° Yengeç ile T-Kare/Büyük Haç tetikleyecek → 4-6 birim (gün/hafta) içinde semptom pik/akut kriz. Çözülme: öncü kriz hızlı çözülür, Ay açıları geçip Merkür direkt dönünce iyileşme fazı. Güneş 0° Başak tam 6. ev çizgisinde — odak sağlık/rutin, beslenme/dinlenme ile toparlanma. Sonuç: iyileşme var ama önce pik yaşanır, sıvı dengesi + ev istirahati kritik.
 
+Q: düşündüğüm hayalimdeki arabayı alabilecek miyim ?
+A: Göstergeler: ASC 05° Koç → sen Mars + Ay. Araba (taşınır mal) 2. ev Boğa yöneticisi Venüs. Venüs 16° Terazi domicile 7. evde — araba hayalindeki gibi estetik/temiz, satıcı (7. ev) tok satıcı, fiyatta taviz yok. Sen Mars 16° Yengeç düşüşte 4. evde, Ay 10° Oğlak zararda 10. evde — istek yüksek ama bütçe/pazarlıkta kısıtlı/dezavantajlı. Açılar: Venüs 16°05' Terazi → Mars 16°17' Yengeç applying kare 90° — olay gerçekleşir (alabilirsin) ama kare olduğu için pürüzlü, ekstra maliyet/pazarlık zorluğu, Ay'ın T-kare'si stres yüksek. Sonuç: alma ihtimali yüksek ama mücadeleli, bütçe yorulacak.
+
 Engine JSON:
 {json}
 """
