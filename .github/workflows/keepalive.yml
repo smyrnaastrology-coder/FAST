@@ -1,0 +1,12 @@
+name: keepalive horary-oracle-api
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # her 5 dk
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -fsS https://horary-oracle-api.onrender.com/api/health || echo "ping failed"
+          curl -fsS https://fbst-api.onrender.com/api/health || true
