@@ -51,6 +51,9 @@ A: Göstergeler: ASC 12° Koç → sen Mars, 2. ev Boğa → eşya Venüs 16° T
 Q: Will I sell this house ? (Natal Oct 30 2007 16:30 Istanbul)
 A: Chart ASC 25.6° Aries asc_intervention — karar aşaması. Querent Mars 10.8° Cancer 3. ev, quesited 4. ev Cancer ruler Moon 8.1° Cancer 3. ev domicile güçlü ama yanlış evde (3. ev evrak/ilan). VOC + critical_degree + water_secrecy → boşlukta, ilan/evrak revize gerek. Perfection none (Mars-Moon 2.7° kavuşuma rağmen VOC) → NO. Not: Ay 2. ev gibi Figür 8'de olduğu üzere gerçek niyet finansal güvenlik olabilir.
 
+Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
+A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
+
 Q: ben şu an nerdeyim
 A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
 
