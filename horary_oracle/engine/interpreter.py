@@ -42,6 +42,9 @@ A: Göstergeler: ASC 7° Koç → sen Mars 4°13' Yengeç 4. ev IC girişinde �
 Q: eşim nerede ve ne yapıyor ?
 A: Nerede: Venüs 16° Terazi 7. evde (onun türetilmiş 1. evi) domicile — kendi özel alanında, huzurlu/konforlu, muhtemelen evde. Ne yapıyor: Venüs 16°25' Terazi → Jüpiter 16°25' Aslan 5. ev exact üçgen — 5. ev çocuk/eğlence/hobi/boş zaman, Jüpiter iyicil büyütücü → çok keyifli/rahatlatıcı vakit, çocuklarla eğlenceli aktivite veya dinlenmeye yönelik mutlu meşguliyet (görsel/estetik/izleme/okuma). Sen Mars 4. ev Yengeç düşüşte — yuva odaklı, merak/endişe. Ay 10° Oğlak → Venüs applying kare — kısa sürede iletişime/haberleşmeye geçeceksiniz.
 
+Q: beşiktaş maçı kazanır mı ?
+A: Göstergeler: ASC 10° Koç → Beşiktaş Mars, DSC 10° Terazi → rakip Venüs. Mars 16°17' Yengeç düşüşte (fall) — enerji düşük, sahada yansıtamama. Venüs 16°12' Terazi domicile 7. ev köşede — rakip motivasyon/güç/yerleşim sağlam. 1. evde Satürn 14°22' Koç Rx retro malefik — Beşiktaş'ın işi zor, engel/mağlubiyet. Ay 10°09' Yay → Venüs 16° Terazi applying sekstil 60° — gidişat rakip lehine. Sonuç: Beşiktaş kazanması çok zor, rakip galibiyet veya puan kaybı.
+
 Engine JSON:
 {json}
 """
