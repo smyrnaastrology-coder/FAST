@@ -39,6 +39,9 @@ A: Göstergeler: 2. ev Boğa içinde Uranüs İkizler — beklenmedik/şaşırt�
 Q: kedim nerede ?
 A: Göstergeler: ASC 7° Koç → sen Mars 4°13' Yengeç 4. ev IC girişinde — evin kalbinde, odak yuvada. Kedi 6. ev 25° Aslan yöneticisi Güneş 0°29' Başak 6. evde — yeni burca geçiş → kısa süre önce yer değiştirdi, odadan odaya/saklanma alanına girdi. Güneş 6. evde kendi alanında — ev içinde güvende, rutin bölgesi/mama-kum yakını, dışarıda değil. Başak/Oğlak toprak vurgusu — zemin/döşeme seviyesi, alt kat/karanlık kuytu: kiler/erzak dolabı, çalışma odası kitaplık alt rafı, dolap içi/çekmece arkası/mutfak alt dolabı/süpürgelik. Yön: Başak güney/güneybatı, 6. ev batı-kuzeybatı. Sonuç: ev içinde sağlığı yerinde, yer seviyesi kapalı dolap/kiler/masa altı, az önce açılıp kapanan zemin dolabına odaklan.
 
+Q: eşim nerede ve ne yapıyor ?
+A: Nerede: Venüs 16° Terazi 7. evde (onun türetilmiş 1. evi) domicile — kendi özel alanında, huzurlu/konforlu, muhtemelen evde. Ne yapıyor: Venüs 16°25' Terazi → Jüpiter 16°25' Aslan 5. ev exact üçgen — 5. ev çocuk/eğlence/hobi/boş zaman, Jüpiter iyicil büyütücü → çok keyifli/rahatlatıcı vakit, çocuklarla eğlenceli aktivite veya dinlenmeye yönelik mutlu meşguliyet (görsel/estetik/izleme/okuma). Sen Mars 4. ev Yengeç düşüşte — yuva odaklı, merak/endişe. Ay 10° Oğlak → Venüs applying kare — kısa sürede iletişime/haberleşmeye geçeceksiniz.
+
 Engine JSON:
 {json}
 """
