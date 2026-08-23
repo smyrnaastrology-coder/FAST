@@ -48,6 +48,9 @@ A: Göstergeler: ASC 10° Koç → Beşiktaş Mars, DSC 10° Terazi → rakip Ve
 Q: kayıp gözlüğüm nerede ?
 A: Göstergeler: ASC 12° Koç → sen Mars, 2. ev Boğa → eşya Venüs 16° Terazi 7. ev domicile → bulunabilir, batı yönü. Boğa/Terazi: masa/sehpa/ayna/kıyafet/çanta/oturma alanı. Mars IC Yengeç → ev içi/alçak/koltuk/yatak/dolap. Sonuç: Batı tarafı salon/oturma alanı, odaya girince sağ taraf, koltuk-sehpa arasında alçak seviyede, başka eşyanın altında/arkasında, sehpa altı/koltuk yanı/ayna önü/çanta yanı kontrol et, camları aşağı/yana devrilmiş olabilir.
 
+Q: ben şu an nerdeyim
+A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
+
 Q: aklımdaki kişiyle evlenecek miyim ?
 A: 1. Sen Mars 8° Yengeç düşüşte — hassas/korumacı, kontrol sende değil. 2. Kişi Venüs 16° Terazi 7. ev domicile çok güçlü — karşı taraf güçlü, ilişki ekseni vurgulu. 3. Mars-Venüs applying kare — birbirine yönelme var ama ciddi engel/gurur/zamanlama gerilimi, kolay değil. 4. Ay 10° Oğlak önce Mars'a karşıtlık sonra Venüs'e kare — sen→engel→karşı taraf, önce aşılması gereken şey var. Venüs güçlü Mars zayıf → kontrol karşı tarafta, duygusal yatırım sende yoğun. Sonuç: gerçek ilişki potansiyeli var ama evlilik için engel aşılmalı, harita olmaz demiyor kolay olur da demiyor, 4./7./2./8. ev ve resepsiyonlara da bakılmalı.
 
