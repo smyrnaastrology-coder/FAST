@@ -24,6 +24,9 @@ A: Harita, mevcut evlilik yapısının sürdürülebilirliğini yitirdiğini ve 
 Q: işe girecek miyim ?
 A: Harita Parametreleri - 23 Ağustos 2026 21:07:58 İzmir ASC 01°58' Koç MC 01°05' Oğlak. 1. ev yöneticisi Mars 06°44' Yengeç 4. evde düşüşte. 10. ev yöneticisi Satürn 14°06' Koç Rx 1. evde düşüşte/retro. Ay 10°09' Oğlak 10. evde zararlı. Değerlendirme: 10. yöneticisi 1. evde — iş/fırsat ayağınıza gelecek, gündeminize oturacak. Karşılıklı asaletsizlik (Mars ve Satürn düşüşte) — teklif olsa bile şartlar tatmin etmeyebilir, revizyon yaşanır. Ay 10° Oğlak → Satürn 14° Koç yaklaşan kare 90° — mücadeleli/pürüzlü pazarlıkla tamamlanma. Sonuç: işe giriş/teklif olasılığı mevcut ama gecikmeli/revizyonlu. Zamanlama: Ay-Satürn 4° fark + öncü burç → 4 birim (4 gün - 4 hafta) içinde net gelişme/karar.
 
+Q: beni seviyor mu ? sevgili olacak mıyız ?
+A: Göstergeler: ASC 03° Koç → sen Mars, 7. ev 03° Terazi → karşı taraf Venüs. Venüs 16° Terazi domicile — kendi alanında güçlü, keyfi yerinde, sana değil kendine odaklı. Terazi Mars'ın detriment'i — Venüs Mars'ı ağırlamıyor/dışlıyor → romantik ilgisizlik, uyumsuzluk, itici/yorucu bulma. Mars 08° Yengeç düşüşte — sen zayıf/güvensiz, reaktif. Açılar: Mars 08° Yengeç - Venüs 16° Terazi kare ama separating (Venüs hızlı, geçmişte kaldı) → geleceğe eylem yok. Ay 10° Oğlak → Venüs 16° Terazi applying kare ama Ay zararda ve ağırlama yok → engel. Sonuç: karşı taraf sevgi hissetmiyor, sevgili olma yok. Soru: iletişim tamamen koptu mu, zorunlu diyalog mu devam ediyor?
+
 Engine JSON:
 {json}
 """
