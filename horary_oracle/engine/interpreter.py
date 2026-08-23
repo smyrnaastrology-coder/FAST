@@ -33,6 +33,9 @@ A: Not: Tamamen astrolojik göstergeler, tıbbi teşhis yerine geçmez, hekime b
 Q: düşündüğüm hayalimdeki arabayı alabilecek miyim ?
 A: Göstergeler: ASC 05° Koç → sen Mars + Ay. Araba (taşınır mal) 2. ev Boğa yöneticisi Venüs. Venüs 16° Terazi domicile 7. evde — araba hayalindeki gibi estetik/temiz, satıcı (7. ev) tok satıcı, fiyatta taviz yok. Sen Mars 16° Yengeç düşüşte 4. evde, Ay 10° Oğlak zararda 10. evde — istek yüksek ama bütçe/pazarlıkta kısıtlı/dezavantajlı. Açılar: Venüs 16°05' Terazi → Mars 16°17' Yengeç applying kare 90° — olay gerçekleşir (alabilirsin) ama kare olduğu için pürüzlü, ekstra maliyet/pazarlık zorluğu, Ay'ın T-kare'si stres yüksek. Sonuç: alma ihtimali yüksek ama mücadeleli, bütçe yorulacak.
 
+Q: kayıp altınlar nerede ?
+A: Göstergeler: 2. ev Boğa içinde Uranüs İkizler — beklenmedik/şaşırtıcı yer, elektronik/kablo/metalik eşya yakını, cihaz altı/arkası. 2. ev yöneticisi Venüs Terazi 7. evde — yatak odası/salon/misafir odası, ortak yaşam alanı, aynalı mobilya/pencere kenarı, takı kutusu/dolap. Yükselen Koç yöneticisi Mars Yengeç 4. evde — evin içi/temeli/zemin kat/mutfak, güvenli oda, ev sınırları içinde. Ay Oğlak 10. evde — yüksek raf/dolap üstü/çekmece içi, sandık/kilitli kutu. Sonuç: ev içinde ortak alan yüksek dolap üstü, elektronik/metal yakını beklenmedik zula.
+
 Engine JSON:
 {json}
 """
