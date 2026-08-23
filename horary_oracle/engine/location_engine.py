@@ -81,12 +81,12 @@ BURC_YER_DETAY = {
     "Yengeç": "Ev Dışı: akarsulu bereketli ıslak çayır | Dolaşılan: çocuk bahçesi/lokanta | En çok: yuva/gıda market/manav | En az: kolleksiyoncu | Oda: yatak/mutfak",
     "Aslan": "Ev Dışı: sıcak kurak güneşli | Dolaşılan: idari bina/tiyatro/gazino | En çok: çocuk parkı/sinema | En az: kumarhane/saray | Oda: oyun/çocuk",
     "Başak": "Ev Dışı: araştırma için ve diğer tarım | Dolaşılan: kütüphane/borsa | En çok: eczane/klinik/laboratuvar | En az: sauna | Oda: çalışma/hizmetçi",
-    "Terazi": "park/çiçek bahçesi, güzellik salonu, sanat galerisi, misafir/oturma odası",
-    "Akrep": "yeraltı mağarası, atık alanı, banyo/tuvalet, sauna, gizli depo",
-    "Yay": "geniş orman, borsa, kilise/cami/mahkeme, kütüphane, hol",
-    "Oğlak": "taşlı sivri mezarlık, klinik, ofis/çalışma odası, kiler, bodrum",
-    "Kova": "tuhaf/alışılmamış, uçuş pisti, elektrikçi, rasathane, teknoloji odası",
-    "Balık": "bataklık/plaj/sisli gölet, rıhtım, şarap mahzeni, maden, gizli su yeri",
+    "Terazi": "Ev Dışı: park çiçek bahçesi | Dolaşılan: güzellik salonu | En çok: kuaför/hediyelik eşya satıcısı | En az: sanat galerisi/antika/dans okulu | Oda: misafir",
+    "Akrep": "Ev Dışı: yeraltı mağarası/atık alanı | Dolaşılan: genelev | En çok: kasap | En az: ispirtizma derneği | Oda: banyo/tuvalet",
+    "Yay": "Ev Dışı: geniş orman | Dolaşılan: kilise/cami/mahkeme | En çok: turizm şirketi | En az: tapınak | Oda: ibadet",
+    "Oğlak": "Ev Dışı: taşlı sivri bitkili buzlu yüksek | Dolaşılan: mezarlık | En çok: ofis/maden | En az: mağara | Oda: iş",
+    "Kova": "Ev Dışı: tuhaf alışılmamış gayzerli | Dolaşılan: hava alanı/uçuş pisti | En çok: elektrikçi/elektronikçi | En az: rasathane | Oda: bilim araştırma",
+    "Balık": "Ev Dışı: bataklık sisli gölet sel almış | Dolaşılan: plaj/rıhtım | En çok: balıkçı/ayakkabıcı | En az: tarikat | Oda: şarap mahzeni",
 }
 def burc_yer_detay(sign): return BURC_YER_DETAY.get(sign,"")
 # İki burç arası ise iki şey arasında/arkasında/sıkışmış/eşikte
