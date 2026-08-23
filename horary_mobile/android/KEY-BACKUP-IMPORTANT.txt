@@ -1,0 +1,10 @@
+FAST UYGULAMASI PLAY STORE IMZALAMA ANAHTARI - BU DOSYAYI MUTLAKA YEDEKLEYIN!
+
+Anahtar dosyasi : android/app/fbst-release.jks
+Alias           : fbst
+Store sifresi   : aCCXX9pvHuM43oHBuDsjrpoo
+Key sifresi     : aCCXX9pvHuM43oHBuDsjrpoo
+
+Bu anahtar kaybolursa uygulamanin Play Store'daki tum guncellemeleri imkansiz hale gelir.
+Anahtarin yedegini en az 2 farkli yerde (USB bellek, bulut depolama, kagit) saklayin.
+Gizli tutun - sifreleri kimseyle paylasmayin.

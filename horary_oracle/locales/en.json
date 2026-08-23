@@ -1,0 +1,17 @@
+{
+  "app_title": "Horary Oracle - Question Chart Astrology",
+  "ask_placeholder": "Write your question in one clear sentence (e.g. Will my ex return?)",
+  "strictures": {
+    "asc_early": "Unjudgeable: ASC {deg}° - Question premature.",
+    "asc_late": "Unjudgeable: ASC {deg}° - Matter already decided.",
+    "via_combusta": "Moon in Via Combusta ({lon}°) - Hidden corruption.",
+    "voc": "Moon void of course - No perfection."
+  },
+  "perfection": {
+    "yes": "Perfection by {type} - YES, {q} meets {qs}.",
+    "no": "No perfection - NO",
+    "translation": "Translation of light via {mediator} - YES.",
+    "prohibition": "Prohibition by {blocker} - YES blocked.",
+    "frustration": "Frustration: significator hits {blocker} first."
+  }
+}

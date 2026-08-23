@@ -1,0 +1,969 @@
+{
+  "meta": {
+    "name": "Horary Oracle v0.10 - Lilly + Usta 1-7 + 791 Teknik",
+    "source": "Christian Astrology (1647) + 1.txt + 2.txt + 3.txt + 4.txt + 5.txt + 5_2.txt + 6.txt + 7.txt",
+    "version": "0.12",
+    "note": "v0.6 uzerine motor fix v0.7"
+  },
+  "strictures": {
+    "asc_degrees": {
+      "0_2_59_immature": {
+        "range": [
+          0,
+          3
+        ],
+        "verdict": "Olgunlasmamis - kavramlar hazir degil, cevap yok. 6 ay sonra tekrar.",
+        "severity": "block"
+      },
+      "3_25_ideal": {
+        "range": [
+          3,
+          25
+        ],
+        "verdict": "Ideal",
+        "severity": "ok"
+      },
+      "25_26_intervention": {
+        "range": [
+          25,
+          26
+        ],
+        "verdict": "Mudahale sansi, karar asamasi",
+        "severity": "info"
+      },
+      "27_29_critical": {
+        "range": [
+          27,
+          30
+        ],
+        "verdict": "Is isten gecmis / gizli problem / cogunlukla olumsuz",
+        "severity": "critical"
+      }
+    },
+    "significator_degrees": {
+      "27_29_warning": {
+        "enabled": true,
+        "severity": "critical"
+      }
+    },
+    "via_combusta": {
+      "enabled": true,
+      "from": "15 Libra",
+      "to": "15 Scorpio",
+      "applies_to": [
+        "Moon",
+        "ASC"
+      ],
+      "only_moon_asc": true,
+      "exception_degrees": [
+        22,
+        23,
+        24
+      ],
+      "exception_stars": [
+        "Foramen",
+        "Spica",
+        "Arcturus"
+      ],
+      "exception_verdict": "22-24 Foramen/Spica/Arcturus ise devam et, olumsuz degil",
+      "default_verdict": "15 Terazi-15 Akrep Ay veya ASC duserse olumsuz"
+    },
+    "combustion": {
+      "enabled": true,
+      "cazimi_like_0_2": {
+        "range": [
+          0,
+          2
+        ],
+        "verdict": "0-2 destek var ama manipulasyon var, olumlu sayilir",
+        "severity": "info"
+      },
+      "combust_2_8_5": {
+        "range": [
+          2,
+          8.5
+        ],
+        "verdict": "Agir manipulasyon - birileri engelliyor/manipule ediyor",
+        "severity": "critical",
+        "house_meaning": "3./9.evde ise amca/dayi/yenge manipule ediyor ornegi"
+      },
+      "approaching_vs_separating": "Yaklasan daha guclu/olumsuz, uzaklasan kontrol edilebilir",
+      "new_moon": {
+        "conjunction_moon_sun": "Cok feci manipulasyon, kargasa, bilincli kotuluk - cevap verilir ama durum kotu"
+      },
+      "weakening_8_5_17": {
+        "range": [
+          8.5,
+          17
+        ],
+        "verdict": "Hafifliyor, 17-18 hafif hastalik gibi",
+        "max_orb": 18
+      },
+      "max_orb": 18
+    },
+    "moon_void_of_course": {
+      "enabled": true,
+      "definition": "Ay 27-29 dereceden cikana kadar ana gezegen acisi almiyorsa (90,180,60,120,45,150) - seyir disi, kader belirlenmemis, 6 ay sonra bak",
+      "aspects_considered": [
+        45,
+        60,
+        90,
+        120,
+        150,
+        180
+      ],
+      "exception": "Yalnizca 29 Regulus kraliyet yildizi istisna - devam et, zor da olsa yanit gorulebilir",
+      "royal_stars_warning": "Fomalhaut/Aldebaran/Antares/Regulus gorulurse kader ust boyuttan, temkinli ve kazik yanti"
+    },
+    "moon_barren_degrees": {
+      "barren_signs": [
+        "Gemini",
+        "Scorpio",
+        "Capricorn"
+      ],
+      "27_29_uncertain": "Ay 27-29 ve verimsiz burcta ise belirsizlik, cok insan var, cozum zor",
+      "gemini_28_betelgeuse_exception": "Ay 28 Ikizler Betelgeuse tam derecede ise kadin yardimi/ilahi yardim ile cozulur (27 ve 29 degil, sadece 28)",
+      "moon_in_scorpio_capricorn_negative": true
+    },
+    "moon_water_secrecy": {
+      "water_signs": [
+        "Cancer",
+        "Scorpio",
+        "Pisces"
+      ],
+      "verdict": "Ay veya ASC su grubunda ise danisan gizli bilgi sakliyor, manipulasyon/sir olabilir, ozellikle Akrep kesin"
+    },
+    "saturn_asc_conjunction": {
+      "enabled": true,
+      "orb": 5,
+      "retro_extra_negative": "Saturn ASC ile kavusum veya retro ise cevap cogunlukla olumsuz"
+    },
+    "saturn_in_1_or_7": {
+      "enabled": true,
+      "orb": 5,
+      "severity": "warning",
+      "meaning_7th": "Astrolog yetersiz, soru agir"
+    },
+    "mars_in_7th": {
+      "enabled": true,
+      "severity": "danger",
+      "meaning": "Dayak riski"
+    },
+    "pluto_in_7th": {
+      "enabled": true,
+      "severity": "caution",
+      "meaning": "Dikkat - Pluto 7.ev"
+    },
+    "self_question": "Kendi kendine soruyorsan sen ASC'sin, 7.ev kurali gecersiz",
+    "fortune_nodes": {
+      "parts_of_fortune": true,
+      "KAD_GAD": true
+    },
+    "hour_ruler_quality": "Kalde saati kalitesi cok onemli",
+    "asc_jupiter_faithful": {
+      "orb": 5,
+      "verdict": "ASC-Jupiter 0-5 kavusum tek basina EVET sadik (3.txt:22)"
+    }
+  },
+  "houses": {
+    "system": "Regiomontanus",
+    "quesited_map": {
+      "relationship": 7,
+      "marriage": 7,
+      "ex_return": 7,
+      "money": 2,
+      "job": 10,
+      "lost_object": 2,
+      "house_property": 4,
+      "travel": 9,
+      "education": 9,
+      "lawsuit": 7,
+      "child": 5,
+      "health": 6,
+      "pet": 6,
+      "missing_person": 7,
+      "missing_child": 5,
+      "general": 7
+    },
+    "significators": {
+      "querent": "ASC ruler + Moon",
+      "quesited": "Soru evinin yoneticisi (klasik)",
+      "fallback_venus_libra": "7.ev bos ve yonetici acisiz ise Venus + Terazi'ye dusen gezegenler kullanilir",
+      "relationship_detail": "Seks yoksa 11.ev, cinsellik varsa 5.ev, evlilik ise 7.ev. 5+7 cinsellik+evlilik, 11 flort",
+      "retro_querent": "Querent yoneticisi retro ise korkulari var, Ay'a da bak"
+    },
+    "derivations": {
+      "enabled": true,
+      "examples": {
+        "baba": 10,
+        "babanin_annesi_babaanne": "10'dan 4 => 1.ev",
+        "babanin_babasi": "1'in 7'si",
+        "babanin_kardesi_amca_hala": "10'dan 3 => 12.ev",
+        "komsunun_annesi": "3'ten 4 => 6.ev",
+        "komsunun_cocugu": "3'ten 5 => 7.ev",
+        "asigin_cocugu": "5'ten 5 => 9.ev"
+      },
+      "all_houses_meaning": "1 danisan, 2 finansci, 3 komsu, 4 aile, 5 asik, 6 hizmetci/kole/evcil/doktor, 7 es/ortak/acik dusman, 8 medyum/bankaci/buyu, 9 ogretmen/din adami, 10 CEO/yonetici, 11 dost/sosyal grup, 12 dusman/hirsizlik/buyucu, 7 astrolog meslegi, 5 ilk cocuk 7 ikinci cocuk"
+    },
+    "family_synastry": "Horary'yi dogum haritasi yaninda 4. ev anne, 5. ev cocuk vb. icin kullan - horary iyi ise dogum tarihine gerek kalmaz"
+  },
+  "planets": {
+    "primary_7": [
+      "Sun",
+      "Moon",
+      "Mercury",
+      "Venus",
+      "Mars",
+      "Jupiter",
+      "Saturn"
+    ],
+    "detail_collectives": [
+      "Uranus",
+      "Neptune",
+      "Pluto"
+    ],
+    "collectives_meaning": "Uranus ezber bozar/yeni sartlar (seytani/zararli cogunlukla), Neptun aldatici/belirsiz/hayal kirikligi, Pluto geri donulmez donusum/yikim/red",
+    "hierarchy_power": [
+      "Pluto",
+      "Neptune",
+      "Uranus",
+      "Saturn",
+      "Jupiter",
+      "Mars",
+      "Venus",
+      "Mercury",
+      "Moon",
+      "Sun"
+    ],
+    "spices": [
+      "Juno",
+      "Vesta",
+      "Pallas",
+      "Ceres"
+    ],
+    "spices_usage": "Baharat - evet/hayir vermez",
+    "juno_second_spouse": "Juno ikinci/eski esleri gosterir (13 ay+ iliski evlilik sayilir)",
+    "lilith": "Karanlik/manipulasyon/problem",
+    "chiron": "Ekstra nokta - cevap verebilir",
+    "meanings": {
+      "Moon": "Reaksiyon/uyum, durtu evi - evlilikte 8.evde ise cinsel/maddi karanlik arzu",
+      "Sun": "Farkindalik/algı",
+      "Mercury": "Iletisim",
+      "Venus": "Maddi/manevi deger/guzellik/iliskiler",
+      "Mars": "Mucadele/rekabet ama tehlikeli",
+      "Jupiter": "Genisleme/bolluk/firsat (her yere bolluk)",
+      "Saturn": "Disiplin/sinirlama/daraltma"
+    },
+    "rulership": "Klasik: Kova Saturn, Balik Jupiter, Akrep Mars. Uranus/Neptun/Pluto ekstra detay"
+  },
+  "almuten": {
+    "enabled": true,
+    "note": "Almuten o anin almüteni - evet/hayira sebebiyet veren ana kisi (kizin babasi/hakim/abi). Olumlu ise destekleyici, olumsuz ise engelleyici - cok yonlu dusun"
+  },
+  "angularity": {
+    "strong_angular": [
+      1,
+      4,
+      7,
+      10
+    ],
+    "note_strong": "Gezegen 10/1/7/4 ise konu cok onemli - arizi gereklilik",
+    "weak_cadent": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "note_weak": "Belirleyici zayif, sonuc olumsuz cikabilir ama kesin degil",
+    "succedent": [
+      2,
+      5,
+      8,
+      11
+    ],
+    "note_succedent": "Guclu evler"
+  },
+  "peregrine": {
+    "definition": "Sahipsiz - etkisi az, 5 derece kurali + peregrin evde ise",
+    "examples": "Venus Ikizler peregrin, Mars Ikizler peregrin, Venus 3.ev peregrin; Jupiter Oglak/Ikizler zararli, Basak dusuk, Boga/Akrep/Aslan/Kova peregrin (ornek: Jupiter 8.ev peregrin, kopek calinmadi basibos dolasiyor)",
+    "with_lilith_vesta": "Peregrin + Lilith = yakininda tehlikeli kadin, + Vesta = bir yere siginmis"
+  },
+  "fixed_stars": {
+    "enabled": true,
+    "orb_planets_lights": 2,
+    "orb_angles_cusps": 5,
+    "note_orb": "Gezegen/isik 0-2 max 3 degil, ASC/MC/IC/DSC/ev girisi 0-5 onemli",
+    "antiscia": "Thuban paralel/kontraparalel - paralel iyi, kontraparalel kotu",
+    "catalog": {
+      "Algol": "0-1 ASC/MC/DSC/IC fiziki tehlike/kayip/bas belada",
+      "Alcyone_0_Gemini": "27-28 Taurus/Pleiades gozyasi, 0 Gemini Alcyone uzuntuyle bitecek",
+      "Windemiatrix": "Dul kalacaksin - 8.evde ameliyat belirsiz",
+      "Zuben_El_Genubi_15": "15 en kotu korku/seri katil, 19 kotunun iyisi, 15-19 arasi felaket/olum/manipulasyon",
+      "Zuben_El_Shemali_19": "Zehirlenme/ilac olumu, Genubi'de oluyu bulamazsin Semali'de bulursun",
+      "Unukalhai_21": "Cinsel tutkudan buyuk kotuluk",
+      "Scheat": "Intihar/bogularak olum/hapis/iskence",
+      "Asellus_Borealis_7_Leo": "Goz sorunu, 7-8 Aslan para/altin yatirimi yanlis",
+      "Asellus_Australis_8_Leo": "Ayni",
+      "Antares": "Silahli yaralanma, ani hizli karar buyuk sorun",
+      "Sirius": "Ay acilari iyi ise git, kotu ise bas belada",
+      "Regulus_29_Leo": "Basari/statü",
+      "Spica": "Hersey iyi/keyifli",
+      "Arcturus": "Iyi ama zaman var",
+      "Foramen": "Iyi ama sorunlar cozulmeli",
+      "Vega_15_Cap": "Sans/beceri/otoriteden destek",
+      "Betelgeuse_28_Gemini": "Kadindan yardim (sadece 28)",
+      "Rigel": "Ogretmen yardimi",
+      "Alnitak_Alnilam_Mintaka": "Seyahat/yolculuk",
+      "Bellatrix": "Iyi yuzlu sinsi cift karakterli guzel fizikli tilki kadin - cikarci/cadi/politik",
+      "Saiph_26_Gemini": "Sapik/cinsel sapkinlik/sado-mazo/manipulasyon/ortak olup bitirme",
+      "Aldebaran": "Sari/kirmizi hanim hanimcik tutarli",
+      "Fomalhaut": "Mor",
+      "Thuban": "Hazine/altin - ASC'de yap",
+      "Deneb_Kaitos_2_52": "Bataklik/metan/kurbaga hastaligi/sigil - 2.52",
+      "Peacok": "Tavus - tak takistir"
+    },
+    "colors": "Rigel mavi, Betelgeuse kirmizi, Regulus sari/altin, Antares kirmizi, Zuben siyah, Aldebaran sarimsi, Mars kirmizi, Jupiter papagan bros, Boga gozluk, Fomalhaut mor, Saturn formal/soguk",
+    "behenian_detail": "16 Behenian + tum alpha (1.txt:15)",
+    "colors_detail": " + Boga gozluk"
+  },
+  "critical_degrees": {
+    "enabled": true,
+    "cardinal_0_13_26": [
+      0,
+      13,
+      26
+    ],
+    "fixed_9_21": [
+      9,
+      21
+    ],
+    "mutable_4_17": [
+      4,
+      17
+    ],
+    "applies_to": [
+      "cardinal: Aries Libra Capricorn Cancer",
+      "fixed: Taurus Scorpio Leo Aquarius",
+      "mutable: Gemini Sagittarius Virgo Pisces"
+    ],
+    "orb": 0,
+    "applies_to_points": [
+      "planet",
+      "Moon",
+      "ASC",
+      "MC",
+      "DSC",
+      "IC"
+    ],
+    "meaning": "Buyuk kriz hizla geliyor ama cogunlukla cozulur (oncu hizli, sabit uzun, degisken orta)",
+    "note": "Regulus olumlu, 29 kritik sabit yildiz dereceleri onemli"
+  },
+  "aspects": {
+    "major": {
+      "conjunction": {
+        "angle": 0,
+        "orb": 10
+      },
+      "opposition": {
+        "angle": 180,
+        "orb": 10
+      },
+      "trine": {
+        "angle": 120,
+        "orb": 8
+      },
+      "square": {
+        "angle": 90,
+        "orb": 8
+      },
+      "sextile": {
+        "angle": 60,
+        "orb": 6
+      }
+    },
+    "minor_considered": [
+      45,
+      150
+    ],
+    "ignore": [
+      72,
+      144
+    ],
+    "special_108": "108 tam ise olumlu, gelismeler sonlandi baska sekil almaz",
+    "60_120_orb": {
+      "sharp_0_5": "keskin iyi gelisme",
+      "future_6_8": "ilerde bir sans daha var (kiz simdi hayir ama ileride kabul edebilir)"
+    },
+    "approaching_vs_separating": "Yaklasan 3 ay icinde yeniden dene, giden 6 ay sonra - ustune gitme",
+    "quincunx_150": {
+      "orb": 3,
+      "verdict": "Cogunlukla olumsuz, 120 var ama Ay-Venus 150 varsa anne/kadin engeli son dakika, Jupitersiz %100 olumsuz, Jupiterli %10-15 surpriz olumlu"
+    },
+    "all_squares_oppositions": "olumsuz",
+    "orb_rules": {
+      "malefic_malefic": 8,
+      "malefic_Sun_Moon": 8,
+      "benefic_benefic": 5,
+      "first_5_sharp": "0-5 cok keskin",
+      "distant_6_8": "6-8 uzaktan engel (amca/yurt disi patron)"
+    },
+    "moon_aspects": "Ay acilari cok onemli, benefik+malefik karisikta guc hiyerarsisi (Pluto>Neptune>Uranus>Saturn>Jupiter) belirler",
+    "allow_out_of_sign": false,
+    "rules_inflexible": "Horary egilmez (1.txt:22)"
+  },
+  "bonatus": {
+    "enabled": true,
+    "rule": "Onceki dolunay burc yoneticisi sorunun ana planeti ise ve kose evde (1,4,7,10) ise kotu acilara ragmen sonuc iyi - kotu acida %50, iyi acida %100",
+    "example": "Dolunay Boga => Venus 1.evde ise olumlu"
+  },
+  "vergilius": {
+    "enabled": true,
+    "rule": "Sonraki dolunay Ay burc yoneticisi sorunun belirleyicisi ile ayni/turevi kose evde ve olumlu aci aliyorsa olumlu - gelecekte olumluya donecek"
+  },
+  "retro": {
+    "general": "Rx = ret/hayir/engel/problem (ozellikle Merkur Venus Mars belirleyici ise direkt ret)",
+    "Rx_trine": "Eskiden iyiydi simdi bitiyor",
+    "stationary_S": "Cozumsuz, uzun suren iliski/firma",
+    "frenleme_refrain": "Iyi gezegen retro gezegene iyi aci => frenleme, olay durur cogunlukla olumsuza doner, Ay 1/4/7/10 iyi ise geri donus sansi",
+    "tukenme_frustration": "Venus-Ay 120 yaparken 7 derece sonra Ay Saturn ile kavusacak => 7 ay olumlu sonra tukenme/benzin bitmesi (progres gibi)",
+    "kusatilma_besiegement": "Belirleyici Mars/Saturn/Pluto/Uranus arasinda 7 derece orb ile kalmis => hareket kisitli, en yakin en buyuk sikinti, karsit kusatilma daha tehlikeli (esir/iskence), Jup/Nept kusatmaz cikis gosterir, iki iyi kusatmasi farkli (kadin+para)"
+  },
+  "timing": {
+    "same_question_cooldown": {
+      "months": 6,
+      "max_per_year": 2
+    },
+    "between_questions": {
+      "hours_min": 6,
+      "hours_ideal": 8
+    },
+    "question_moment": "Astrologun anladigi an, konum astrologun yeri",
+    "moon_to_significator_degree": "Ay ile belirleyici arasi derece = sure. Ay burc/evine gore: Oncu kose gun / ikincil hafta / ucuncul ay; Degisken kose hafta / ikincil ay / ucuncul yil; Sabit kose ay / ikincil yil / ucuncul belirsiz (1 hafta icinde tekrar sor, 1 kez). Cogunlukla gun/hafta calisir. Belirleyici Ay ise Ay-Gunes arasi.",
+    "houses_speed": "Oncu hizli, sabit uzun, degisken kisa",
+    "ritual": "lavanta/mum/muzik/kedi sakin"
+  },
+  "perfection": {
+    "types": [
+      "conjunction",
+      "aspect",
+      "translation_of_light",
+      "collection_of_light"
+    ],
+    "translation": {
+      "max_orb": 10,
+      "faster_mediator_required": true
+    },
+    "collection": {
+      "max_orb": 10
+    },
+    "prohibition": {
+      "enabled": true
+    },
+    "frustration": {
+      "enabled": true
+    },
+    "refranation": {
+      "enabled": true
+    }
+  },
+  "reception": {
+    "weights": {
+      "domicile": 5,
+      "exaltation": 4,
+      "triplicity": 3,
+      "term": 2,
+      "face": 1,
+      "detriment": -5,
+      "fall": -5
+    },
+    "mutual_reception_bonus": 2
+  },
+  "scoring": {
+    "perfection_yes": 10,
+    "perfection_translation": 7,
+    "perfection_collection": 6,
+    "reception_positive": 5,
+    "moon_aspect_querent_quesited": 3,
+    "prohibition_penalty": -8,
+    "frustration_penalty": -6,
+    "refranation_penalty": -7,
+    "combust_penalty": -5,
+    "threshold_yes": 8,
+    "threshold_no": -5
+  },
+  "location_finding": {
+    "star_deneb_kaitos": "2.52 Deneb Kaitos/Difta - bataklik vurgusu",
+    "best_practice": "Laptop+Solar Fire+Google Earth + mobil internet ile olay yerinde yap - danisanin bulundugu yer en iyi, cinayet mahalline git - ustalasinca daha cok ucret",
+    "border_house_rule": {
+      "angular_1_4_7_10": "sana cok yakin",
+      "succedent_2_5_8_11": "uzakta, zor yerde",
+      "cadent_3_6_9_12": "cok uzaklarda, 12 indiregandi - baskalari bulur, 5 derece kurali ile 2.eve yakinsa istisna"
+    },
+    "house_location_examples": "1 sende, 4 annende, 7 esinle oldugun yerde, 10 is yerinde",
+    "distance_angular_separation": "ASC yoneticisi ile kayip belirleyicisi arasi uzaklik: 0-30 cok yakin, 30-70 kasabada, 70+ baya uzak",
+    "lost_significator_by_object": {
+      "bicak": "Mars",
+      "yuzuk": "Venus",
+      "saat_degerli": "Saturn/Venus",
+      "evrak_ders": "Mercury",
+      "araba": "3.ev yoneticisi",
+      "ayakkabi_kiyafet_cuzdan": "1.ev yoneticisi",
+      "genel": "En yakin gezegen (0-70, ozellikle 0-30) kayip seyi tanimlar - Vesta/Pallas/Juno/Ceres ikincil"
+    },
+    "distance_calc_fixed": "Enlem * derece * faktor : kuzey 41N ornek 41*4*0.2=32.8m ; faktor: angular 1,4,7,10 =>0.2 kuzey /1.6 guney ; succedent 2,5,8,11=>1.6 ; cadent 3,6,9,12=>5 ; 12.ev km, digerleri metre ; 12.ev 200km alani",
+    "distance_calc_live_creature": "Oncu 3.2km, Degisken 0.8km, Sabit 0.4km ; 1,4,7,10 carpsiz direk bu deger ; degilse ASC yoneticisi ile belirleyici ilk major aci derecesi * usteki katsayi (20*3.2=64km)",
+    "distance_calc_house_cusp": "Ev kesiti ile gezegen arasi derece (or: 6.ev 12 Terazi, Venus 14 Ikizler =>122°) = km dairesi ; sonra Ay ilk major aci derecesi (22°) => 122/22*? => 0.5km hareket alani - hareketli cisimler icin",
+    "death_sign": "Pluto acisi veya 29 derece => olmus",
+    "theft_timing": "Araba calindi 36 saat icinde 4 kez sorulabilir (hareketli)",
+    "directions_house": {
+      "1": "DOGU",
+      "7": "BATI",
+      "4": "KUZEY",
+      "10": "GUNEY",
+      "1-4": "KUZEYDOGU",
+      "4-7": "KUZEYBATI",
+      "7-10": "GUNEYBATI",
+      "10-1": "GUNEYDOGU"
+    },
+    "directions_note": "Kayip belirleyicisi nerdeyse o yone git; Ay ikincil - Ay bulundugu yer gitmek istedigi yon; Ay gidecegi major aci gezegeni onemli - Pluto ise 6 saatte basina is gelecek; Ay Saturn/Mars arasinda mahkum",
+    "fire_sign_direction": "Koc dogu, Aslan kuzeydogu, Yay guneydogu - hazine icin; Hava: Terazi bati, Kova kuzeybati, Ikizler guneybati; Su: Yengec kuzey, Akrep kuzeydogu, Balik kuzeybati; Toprak: Oglak guney, Boga dogu-guney, Basak bati-guney",
+    "height_element": {
+      "air": "cok yuksek",
+      "fire": "yuksek",
+      "water": "alcak",
+      "earth": "cok alcak"
+    },
+    "height_terrain": {
+      "land_air": "tepe",
+      "land_fire": "yuksek/tepeli/volkanik/col",
+      "land_water": "bataklik/deniz/gol/nehir",
+      "land_earth": "duz/ekili tarla/magara/buzullar"
+    },
+    "height_garden": {
+      "fire": "ocak/barbeku/duvar dibi",
+      "air": "cicekli veranda/ruzgarli buyuk yaprakli agac/teras",
+      "water": "kuyu/cesme/havuz/benzin deposu/yosunlu duvar",
+      "earth": "giris kapisi/merdiven/kopru/iskele/mezar"
+    },
+    "height_house": {
+      "fire": "cocuk odasi/orta odalar/oyun odasi",
+      "air": "calisma/salon/yemek kucuk odalar",
+      "water": "banyo/tuvalet/yatak/zemin odalar",
+      "earth": "bodrum/garaj/kalorifer"
+    },
+    "height_room": {
+      "fire": "somine/baca/isitici/ocak/firin",
+      "air": "pencere/balkon/teras/klima/havalandirma",
+      "water": "lavabo/kuvet/buzdolabi/zeytinyagi/sarap",
+      "earth": "depo/atolye/garaj"
+    },
+    "modality_place": "Oncu tepe/cati dikkat cekici (Palladium Tower), Sabit gizli/kapali/saglam, Degisken silik/hendekli/mezar/mustemilat",
+    "modality_terrain_element": "Ates sicak/kuru, Hava havadar/ferah/ruzgarli, Su sulu/nemli, Toprak soguk/tozlu - mezar yeri icin kullan"
+  },
+  "terrain_elements": {
+    "base": {
+      "fire": "daglik sivri tepeler volkanik col",
+      "air": "engebeli yuvarlak tepeli firtinali yayla",
+      "water": "aluvyon duz deniz gol nehir",
+      "earth": "verimli ekili tarlalar magara buzullar"
+    },
+    "saturn": {
+      "fire": "kayalik volkanik",
+      "air": "taslik orta boy taslar",
+      "water": "az bitkili",
+      "earth": "buzlu"
+    },
+    "jupiter": {
+      "fire": "sivri yaprakli kisa bitki",
+      "air": "gürgen/cam/selvi ormani (Terazi/Ikizler/Kova)",
+      "water": "zengin verimli meyve/mese ormanlari",
+      "earth": "verimli zeytin/kayisi/elma ormanlari"
+    },
+    "mars": {
+      "fire": "volkanik sert",
+      "air": "yanmis tedavi olan bolge (yeni yangin)",
+      "water": "vahsi sert bataklik kotu kokulu - Akrep lagim, Yengec daha az, Balik tuzlu golcuk",
+      "earth": "ekili dikili tarla"
+    },
+    "sun": {
+      "fire": "sicak",
+      "air": "gunesli ilik acik",
+      "water": "sisli",
+      "earth": "corak"
+    },
+    "venus": {
+      "fire": "yesil alan sit parki/cocuk parki",
+      "air": "hayvan otlagi",
+      "water": "cayir irmakli bereketli (Akrep/Balik/Yengec)",
+      "earth": "duzenli ekili bereketli tarla su akabilir"
+    },
+    "mercury": {
+      "fire": "yuksek esintili yola yakin tali yol",
+      "air": "universite/TUBITAK/meteoroloji bahcesi - onunde iyi yol gecer",
+      "water": "liman/iskele/gol buyuk nehir su ulasimi",
+      "earth": "buyuk otoyol/E5 yani kose arsa"
+    },
+    "moon_terrain": {
+      "fire_aries": "askeri tesis yakini bulutlu kapali",
+      "fire_sag": "dinsel merkez/uni/cami/kilise",
+      "fire_leo": "cocuk/okul/tiyatro",
+      "water_scorpio": "lagim/tuvalet/mezarlik/mezbaha/idam",
+      "water_pisces": "morg/yogun bakim/genelev/zehir/akir hastanasi/turbe/meditasyon",
+      "water_cancer": "restorant/asevi/anaokulu/mezarlik/semtpazari/antika/kadin dogum",
+      "earth_capricorn": "devlet kurumu/holding/banka SGK",
+      "earth_taurus": "finans/factoring/borsa/insaat ozel bankalar",
+      "earth_virgo": "kole pazari/veteriner/petshop/holding kokorecci",
+      "air_gemini": "uydu anteni/havaalani/enerji hatti"
+    }
+  },
+  "house_location": {
+    "1": "danisanin en cok kullandigi yer/esya - ustundeki elbise/canta gozu",
+    "2": "para mucevher kasasi/cuzdan",
+    "3": "calisma odasi tv/radyo/telefon/cep/araba anahtari/kitap/kirtasiye veya arabada",
+    "4": "yasli odasi mutfak/depo/kiler/birikim en eski bolge sandik/vitrin/cati",
+    "5": "dinlenme/oyun/cocuk/kumar/sanat - spor oyuncak taki makyaj/tavla muzik/piyango",
+    "6": "hizmetci/hasta/kopek mamasi/ecza dolabi/temizlik/ilac",
+    "7": "evlilik cuzdani esin koltugu tv kumandasi",
+    "8": "banyo/tuvalet/copluk / yeni evli yatak / bono/banka kasasi/zehir ilac/silah/tapu/fantezi/prezervatif/kredi karti fatura",
+    "9": "meditasyon/ders/Kuran/din kitabi/pasaport/bavul/hukuki/ucak bileti",
+    "10": "is resmi evrak kimlik/vatandaslik bilgisayar/printer home office",
+    "11": "misafir odasi salon bilgisayar/teknolojik/muzik seti/teras/teleskop",
+    "12": "yatak odasi/icinde uyku/icki dolabi/izole yoga/spa yastik yorgan tutsu"
+  },
+  "practical": {
+    "job_travel": "Danisan gezegeni 10.evde ise ise girer, Ay 9.evde ise yurtdisi evet - 5 derece kurali 8 sonu/9 basi/MC solu da evet; Ay belirleyici degilse bile istek/motivasyon gosterir",
+    "family_roles": "Basbakan 10, esi 4; iki kardes ayni anda sorarsa ilk gecerli (Evren aptal degil)",
+    "relationship": "1-5 majör yaklasan evet bir araya gelir, ayrilan ayrilir; 6+ uzaklasan ayriliyor, 6+ yaklasan birlesiyor, 0-2 yaklasan/kavusum birlikteler; kare olumsuz ama 6 ay icinde belki sans, karsit ayrildi bitti; araya Mars/Saturn engel, Venus destek, kusatma kontrol",
+    "childbearing": "1-5 yonetici iyi aci +5 yonetici iyi => hamilelik tamam; 5-8 kare yasam dusuk, 5-12 150 ani dusuk, Rx problem, 5te baska gezegen (Ay/Venus/Gunes) veya 1-5 cift burcta + Ay/Venus/Jupiter Balik/Yay/Ikizler => ikiz sansi (Basak dusuk), Rx/yanma/8-12 agir => kotu ama kurtarici aci kurtarir",
+    "child_gender": "Erkek burc Koc/Ikizler/Aslan/Terazi/Yay/Kova, disi Boga/Yengec/Basak/Akrep/Oglak/Balik; disi gezegen Ay/Venus/Neptun (horary), erkek Gunes/Mars/Jupiter/Saturn/Pluto, Merkur/Uranus notr; Balik cifte kismet",
+    "property_buy_sell": "Mars satmak/borclanmak 8, Venus almak 2; 4 ev 8 kredi 2 nakit; Gunes asaleti ev kalitesi (Vega guzel ev, Boga 2 pahali, Neptun deniz, Akrep tesisat, Kova kalabalik), 7.ev satici/emlakci Pluto manipulasyon Jupiter Terazi durust; Gunes 10 yuksek fiyat, 4 dusuk, 11/Kova sacma/ucuz, 12den 11e 10-10:30 luks alim zamani, 3-5 (Akrep) gagalanma saati",
+    "voice_colors": "Koc do, Boga do# , Ikizler re, Yengec re#, Aslan mi, Basak fa, Terazi fa#, Akrep sol, Yay sol#, Oglak la, Kova la#, Balik si - Mark Sender/Gulhac",
+    "animals": "Terazi/Ikizler/Kova insan, Koc koyun, Boga okuz, Yengec kabuklu/kucuk su, Aslan kedi, Basak evcil, Akrep yilan/ciyan 0-10 zehirsiz bogan 10-20 zehirli 15-18 cok zehirli 21-29 kobra faydali, Yay at, Oglak keci, Kova kus/gocmen, Balik su hayvani, Yengec karides/midye, Sirius kopek, Venüs istiridye, Kartal Kova/Altair, Dheneb kugu, Yilan Zuben hatti",
+    "burc_colors": "Koc kirmizi, Boga yesil, Ikizler gri/kursuni, Yengec gumus, Aslan gunes sarisi, Basak hardal, Terazi pirlanata beyaz/pembe/tanzanit mavi, Akrep siyah/mor, Yay turuncu, Oglak kahve/kakao, Kova gokyuzu elektrik mavi, Balik lacivert/okyanus",
+    "burc_speed": "Koc hizli, Akrep yavas ketum, Ikizler/Basak/Kova yavas duragan, Boga/Terazi/Oglak daha yavas duragan, Ates hizli, Su yavas, Oncu baslatir, Sabit istikrar, Degisken tekrarlar (Venüs Ikizler iki evlilik)",
+    "finance_dow": "Para yoneticisi-Ay arasi derece aci degeri dip/tepe gosterir %10 hipotez, Jüpiter+Kad/Gad tahtravalli, merkez karari sonrasi 1 hafta icinde sorulan horaryde gecerli",
+    "nodes": "Gad kayip/problem zarar asagi ceken, Kad manipülatif ama cozer toparlar olumlu; Gad ustu zarar veren kisi, Kad ustu iyi aci yardim eden",
+    "twelve_degree_rule": "12 icinde kimle kavusum - 12 ana 17ye kadar (5.txt:152)",
+    "voice_detail": "Ses: Koc cirtlak Aslan bariton Yay kahkaha, Su yumusak Akrep suh Yengec anne, Hava elektronik Terazi otoriter, Toprak cool (5_2.txt:188)",
+    "cobra_detail": "Kobra 21-29 faydali, yilan yiyen (5_2.txt:228)"
+  },
+  "theft": {
+    "hunter_house": "12 Neptun dolandirici/hirsiz, 7 acik dusman (aile/bakici/sekreter/gelin - karsi) - once 12 ve yoneticisi +7 bak",
+    "lost_vs_theft": "12 yoneticisi kotu aci hirsizlik, iyi aci kayip; Jup-Neptun kare kayip+baskasi aldi",
+    "remedy": "12de hirsizlik gorursen dusuk degerli cakmak/ruj caldirarak sagalt",
+    "loss_recovery_lilly": "Ay ASC yoneticisi/dispozitorune yaklasan aci veya 1/2.evde ise bulunacak; Ay 6/8/12 yoneticisine 60 yaklasan veya Jup/Venus iyi aci => geri doner; Ay 2/8 kesit/yonetici sert + Mars/Saturn zararli => donmez",
+    "kidnapped": "12 tutsak, yasiyor mu 8 yoneticisi-Ay acisi; Ay/dispozitor 8 yoneticisine zararli => olmus, kapanan kavusum yakinda olecek; kardes 3/12, es 7/12, cocuk 5/12; annenin cantasi 4un 12si =>3.ev; kayip ikisinde de bak; Ay yonu ile git"
+  },
+  "health": {
+    "houses": "1-6-8-12 (4 genetik, 12 yatarak, 6 ayakta, 8 kanser), 1 beden",
+    "diagnosis": "6 ve 12 yoneticisi ASC yoneticisi ile kare/karsit => hastasin; once 6 yoneticisi",
+    "death_warning": "Olum bilgisi verilmez; 8 olum",
+    "retro": "Retro olumsuz, ileride ayni dereceye Jup/Ay olumlu => iyilesme; Mars kronik birakir",
+    "planets": "Mars enfeksiyon/kanama/iltihap, Pluto kanser, Neptun belirsiz, Merkur ciger, Venus bobrek/bel, Jup karaciger, Saturn kemik/deri, Gunes kalp, Ay rahim/gogus, Uranus sinir",
+    "fixed_star_health": "Scheat-Mars/Saturn, Algol-Mars/Ay olumcul; Venus-Algol kotu ama sans, Jup-Algol iyi gorunen sonu kotu"
+  },
+  "timing_planet_years": {
+    "Moon": "0-4 yil (ilk 4 saat) - evlilik/isevin ilk 4 yili",
+    "Mercury": "4-14 yil (10y) - 10 saat",
+    "Venus": "14-22 (8y) - 8 saat - 8 yilda 5 retro yuzunden spiral geride kalir",
+    "Sun": "22-40 (18.5-19y) - 19 saat",
+    "Mars": "41-56 (15y) -15 saat",
+    "Jupiter": "56-68 (12y) -12 saat",
+    "Saturn": "68+ (14-28y) -28 saat (1 gun+) - 14 olumsuz 28 olumlu"
+  },
+  "lot_of_fortune": {
+    "horary": "Sans demek - yardim gelecek yer; para degil; 8de ameliyat sansli, 12de yatacak sansli, 5te dogum kolay; yoneticisi yardim eden kisi; ASC yoneticisi-POF arasi iyi => sansli, kare karsit yardim gelmez, 72 tam yetenekle sansi yonet; Gunes/Ay iyi aci iyi; Venus-POF 60/120 askta keseyi ac",
+    "fixed_star_pof": "Regulus/Spica/Arcturus cillop olumlu, Algol/El Genubi ise bitti"
+  },
+  "burc_gender_fertility": {
+    "most_fertile": "Yengec Akrep Balik (disi verimli)",
+    "sterile": "Ikizler Basak en verimsiz, Aslan/Kova takip, Basak yari verimli",
+    "field": "4.ev Ikizler verimsiz, Basak yari; gezegen konumuna da bak; Venus Balik verimsiz bolgede Venuse bakma Ikizlere bak",
+    "child_question": "5.ev kesiti su ise verimli, 5 yoneticisi iyi bile olsa orta; yari verimli az cocuk",
+    "child_number_moon": "Ay cocuk sayisini arttirir"
+  },
+  "rx_degrees": {
+    "26_28_retro": "26-28 Rx eskiden beri tekrar eden konu, sureklilik; 28de olumlu gelme sansi daha fazla",
+    "29_retro": "29daki tum Rx olumsuz (Regulus haric)",
+    "26_27_review": "26-27 yeniden gozden gecir"
+  },
+  "decision_two_options": {
+    "note": "iki ev/dolar-altin ikilemi - sabit tasinmaz uzun vadeli => Ay ve Saturn onemli; Ay hangi belirtec ile olumlu aci yapiyorsa onu al (Venus vs Mars ornegi); adres tanimlama tecrube ister",
+    "example": "Ayse mi Fatma mi evleneyim - iki belirtec tanimlama zor"
+  },
+  "almuten_moon": {
+    "note": "Almuten gezegen -Ay iyi aci => hizli olumlu, kotu aci => olumlu ama ugras gerektirir; Almuten hiz gosterir, Almuten Ay ise hizli"
+  },
+  "horary_minerva": {
+    "karmic_minerva": "D harita Jup/Pluto/Juno 120/60",
+    "horary_minerva": "Jup-Ay-Mars 60/120 (Jup-Pluto-Ay da cok olumlu) => en olumsuz olayda bile buyuk iyilik; ayrilmissiz Juno katilmaz"
+  },
+  "uranian_points": {
+    "note": "Koc noktasi 0 Koc dunya girisi karsilasma; retro daha onceden tanidik",
+    "Hades": "Hirszlik/tuvalet patlamasi/kanalizasyon/petrol/mezar define cop - kayip donusturmez cinsellik yok; Hades kirli su, Poseidon temiz su; Hades adi suc",
+    "Vulcanus": "Soba yangin/Mars tetik tahrik saldirganlik, yuksek Mars, turbo guc kaportaci/kaynakci/somine/kivilcim",
+    "Cupido": "Dekor/ev esyasi koltuk Venüs pahali, aile oykusu/evlilik (Terazi iyi evlilik alt Akrep bosa), parfum/makyaj/guzel koku/seker/cicek/Paris/luks yesil turuncu - ev ve yasadigin mekan cok onemli",
+    "Admetos": "Dis gicirdatma/tik/gecikme ilkellesmis Saturn fibromiyalji baski cekiç civi tırnak/kereste/kumas; kucuk alan kutu/tabut 22 derece kutsal gecmis hayat",
+    "Zeus": "Dini kibir itfaiye/mese/kartal/boga silah patlama yangin kalkan; kotu ise kılıktan gire aldatma",
+    "Kronos": "Otorite/zirve super Saturn - karsi Anti Kronos alcak/diz alti/bilinçaltı; guc zalimlik",
+    "Poseidon": "Ilkel Neptun ruh medyum sanat ayna isik ruh uyanisi - sadece aydin degilsen zararsiz, at/yunus, haberci ruya temiz",
+    "Apollon": "Medyumik kehanet Delphi sifa genislemis bilgelik koruyucu melek net mekan - volk patlama",
+    "other": "Koç noktasi transPluto vb. kavusum kullanilir",
+    "Hades_detail": "Hades kirli su/kanalizasyon/mezar, kayip donusturmez cinsellik yok, Poseidon temiz su",
+    "Vulcanus_detail": "Vulcanus soba yangin turbo tahrik Mars",
+    "Cupido_detail": "Cupido dekor/aile/evlilik (Terazi alt Akrep) parfum/seker/Paris luks yesil turuncu",
+    "Admetos_detail": "Admetos fibromiyalji/dis gicirdatma/kutu/tabut 22 kutsal",
+    "TransPluto_detail": "TransPluto (6.txt: TransPluto) - dönüşüm"
+  },
+  "asteroids_6": {
+    "Hygea": "Hastalik oncesi onleme salgin mikrobik mucadele fiziksel tedavi sanitasyon - kefaret/odeme",
+    "Karma": "Karmik etki-tepki eylem gucu, bulundugu yerde guc, retro benzeri tekrar",
+    "Hanuman": "Saturn kotuluge karsi en buyuk koruyucu bonus - vezirin korudugu yer fiziksel siddetten korur (amca/kuzen), gizli goksel koruma",
+    "Hygea_detail": "Hygea hastalik onleme/salgin/fiziksel tedavi/sanitasyon/kefaret",
+    "Karma_detail": "Karma etki-tepki eylem gucu retro tekrar",
+    "Hanuman_detail": "Hanuman Satun kotuluge karsi koruyucu fiziksel siddet/amca gizli goksel"
+  },
+  "philosophy": {
+    "definition": "Evren ile sembolleri okuma sanati",
+    "need_vs_curiosity": "Soru ihtiyac halinde, kalpten gecen, hayati etkileyen olmali; merak/bosluktan degil",
+    "free_will": "Lilly: kisi iradesiyle hukum disi cikabilir; yildizlar ozgur irade olmadan yetersiz",
+    "question_form": "Basit, acik, spesifik, karsinin anlayacagi; tekrar degistirilmemeli, yondirilmemeli",
+    "repetition": "Ilk harita calisir, gundem olmadan tekrar sorulmaz (1-1.5 ay esnek, gercek kural gundem olunca)",
+    "collective": "Kolektif olaylar (Malezya ucagi) horary degil an haritasi",
+    "manasizlik": "Manasizlik prensibi: merak/bosluktan, inandigini duymak isteyen (7.txt:74-82)"
+  },
+  "radicality": {
+    "asc_ruler_hour_ruler_same": "Yukselendirici + saat yoneticisi ayni veya uclu yoneticisi ayni ise radikal",
+    "natal_synastry": "Natal harita ile soru ani uyumlu ise radikal (Aslan 7.ev ornegi)",
+    "story_telling": "Gezegenler hikayeyi veriyorsa radikal (ayni burc/derece, Gunes/Ay ilgili evlerde)"
+  },
+  "unsafe_4_rules": {
+    "1_asc_0_3_or_27_30": "Ilk/son 3 derece - erken sartlar gelismemis / gec kalinmis, kisi cevabi biliyor, Koc enerjisi hizli; okunur ama guvensiz",
+    "2_moon_via_combusta": "Ay yanan yolda (15 Terazi-15 Akrep) - kisi sikintida, soru hayirli degil; hayir yapmaz",
+    "3_moon_voc": "Ay boslukta (temel aci yok) - iyi/kotu hicbir sey olmayacak, belirsiz; jenerasyon acisi bos sayilir; Lilly: burc degisir degismez onde aci varsa VOC degil",
+    "4_saturn_7th": "Saturn 7.evde astrolog zorlanir, kose evler de ayni; temkinli oku",
+    "moon_voc_detail": "Jenerasyon acisi bos, Lilly burc degisir degismez onde aci varsa VOC degil, 29 Oglak Ay-Saturn ornegi"
+  },
+  "moon_3_roles": {
+    "1_emotion": "duygu durumu",
+    "2_intent": "soruyu hangi amacla sordugu (8.evde para beklentisi)",
+    "3_trend": "gidisat - son aci gecmis, yaklasan gelecek; ilk aci Saturn kare ise hayirsiz"
+  },
+  "approaching_separating": {
+    "order": "Kalde: Ay Merkur Venus Gunes Mars Jupiter Saturn - hizli yavasya gider; aciyi baslatan eylemi yapan",
+    "moon_last_next": "Ay son acisi gecmis olay, yaklasan gelecek; guclu Ay istenir (Yengec Boga Balik Yay iyi, Akrep Oglak kotu)"
+  },
+  "generations": "Jenerasyonlar (Uranus Neptun Pluto) sadece ev girisinde veya Ay/gostergeyle tam major acida dikkate alinir; ay dugumleri kavusumda (Gad malefik Kad benefik)",
+  "arabic_parts": "Sans noktasi kariyer, meslek, evlilik, bosanma, hastalik - soruya gore acilir",
+  "moiety": {
+    "Sun": 15,
+    "Moon": 12,
+    "Saturn": 9,
+    "Jupiter": 9,
+    "Mars": 8,
+    "Venus": 7,
+    "Mercury": 7,
+    "note": "Orb disi kavusum gundem sayilmaz, sadece tarih notu"
+  },
+  "essential_dignity": {
+    "ruler": "kral tahtinda guclu",
+    "exaltation": "saraya davetli mutlu",
+    "triplicity": "gece/gunduz sektine gore orta",
+    "term": "5 parca guc",
+    "decan": "10 derece normal",
+    "detriment_fall_peregrine": "mutusuz/uzgun, karsiya tabi"
+  },
+  "accidental": {
+    "angular_100": "kose %100",
+    "succedent_50": "%50",
+    "cadent_25": "%25",
+    "bonus": "Saturn 12, Jupiter 11, Mars 6, Venus 5, Merkur 1, Ay 3, Gunes 9 sever; yanik/retro/cadent zayif"
+  },
+  "house_meaning_derived": "1-7 aks: karsi taraf pisman olmasi icin 1 yoneticisi yuceldigi/yonettigi burcta olmali; asalet ic psikoloji",
+  "relationship_specific": {
+    "flirt": "5 degil 7 (muhatap), sadece asansorde gordugun 5 olabilir",
+    "helper": "Venus kadin Gunes erkek, kotu 3.sahis Saturn",
+    "venus_sun_conjunction_7th": "7/kosede yanik degil kavusacak",
+    "love_vs_action": "Sevgi degil eylem sor (gelir mi, yazar mi)"
+  },
+  "real_estate": {
+    "note": "4-10 aksi: 1/7 alan-satan, 2/8 para, 4 nitelik (su nemli ates sicak toprak duz hava ruzgarli, Saturn4 bocek), 10 fiyat (malefik dusuk benefic fazla), 1-7 aci kim kimin evinde avantaj, 1-4 mutlu, 4un2si=5 yatirim",
+    "houses": "4 calisan 1/7, 10 fiyat, Gunes hizli retro degil"
+  },
+  "career": {
+    "note": "10 kariyer Gunes yardimci, 1-10 agirlanma/antisya/isik, sabit degisim yok, GAD birakma, balzamik sonlanma, 11/2 kazanc, 1 yaniyorsa teklif kotu degil"
+  },
+  "children": {
+    "note": "5 cocuk/para, Ay Venus Jupiter verir, 5 giris kisir/dogurgan, 1/5/Ay aci, cinsiyet Asc/5/Ay/saat, ikiz Basak/Ikizler/Balik"
+  },
+  "magic": {
+    "note": "6-12 gizli dusman buyu: 12/6/8 yoneticileri birbirinin evinde veya 1de, 1-12 ayni Oglak/Kova Satun, Asc yanik, Pluto Neptun"
+  },
+  "health_detail": {
+    "note": "ASC guc 6/8/12/4 malefik kare karsit yanik Gad kritik, Venüs-Gunes yanik istisna, 7 doktor 10 tedavi 8 ameliyat/olum 4 son, Mars kesik, organlar: Gunes kalp Ay mide Merkur ciger Venus bobrek Jup karaciger Saturn kemik"
+  },
+  "horary_791": {
+    "tarih": "Mezopotamya->Iran/Hint/Yunan, Prasna Tantra, Dorotheus Pentateuch, Ebu Maser, Mashaallah, Lilly 1602-1647",
+    "soru_nedir": "Zihin+kalp uyumlu anda belirir, enerji kristalize, net/spesifik, evet/hayir, kayip/is/mahkeme/hamilelik gibi net",
+    "soru_degildir": "Genel soru degil (evlenecek miyim degil X ile evlenecek miyim), tek soru tek cevap",
+    "soru_alinir": "Randevu/ucret arasinda soru bilgisi varsa o an haritasi, yoksa gorusmede tek soru sec, tekrar degistirilmez, yondirilmez",
+    "harita": "Tropical Regiomontanus 1 derece onemli, term/dekan sec, dugumler+sans noktasi her zaman, konum astrolog sehri (farkli sehirse astrolog sehri)",
+    "astrolog_hazirlik": "Sakin/dingin, mum/tutsu/gul yagi, aclik/susuzluk/ruhsal hal onemli, 6 saat O.Ceyhan 8 saat ara, olum disi her sey soylenebilir",
+    "temsilci": "ASC klasik yoneticisi soran, 7 astrolog, ay ikinci temsilci, dis gezegen atanmaz, 1 ve 7 ayni ise Ay soran, 7de gezegen varsa onemli yoksa Terazi/Venus, 2/5/6/7 ev secimi (1 yildan uzun 7 kisa 5)",
+    "gecersiz_5": "1) ASC 0-3 erken 27-30 gec (28 Ikizler Betelgeuse 29 Aslan Regulus istisna, 28-29 Balik Scheat vazgec), 25-26 mudahale; 2) Satun 7/1 evde astrolog hata; 3) Ay boslukta; 4) Ay/temsilci Via Combusta 15 Terazi-15 Akrep (23-24 Terazi ayri); 5) temsilci 2.59 ilk derece belirsiz",
+    "gecerlilik": "3 ay (bazı 6 ay), 1 yilda ayni soru max 2, sart degisir, progresyon/transit duyarli",
+    "asalet_temel": "1 ev yoneticiligi 2 yucelim 3 uclu (gece/gunduz) 4 terim 5 dekan",
+    "asalet_tesadufi": "Kose %100 ikincil %50 cadent %25; Saturn 12 Jupiter 11 Mars6 Venus5 Merkur1 Ay3 Gunes9 sever; yanik/retro/cadent zayif",
+    "lilly_kotu": "yanik, retro, cadent en kotu",
+    "zayiflik_temel": "zararda, dususte, peregrine (yalniz, asalet yok, tarafsiz)",
+    "zayiflik_tesadufi": "yanik 8.5, gunes isini altinda 17, retro (kayip icin avantaj, bosanma geri adim)",
+    "kalde": "Saturn Jupiter Mars Gunes Venus Merkur Ay - hizli yavasya aci yapar, dugum/sans/ASC açı yapamaz",
+    "ay_791": "2. temsilci, guclu olmali (yonetim/yucelim/kose, kotucullerden acisiz), dusus Akrep peregrin zayif, yanan yol dikkate",
+    "yonetici_tablosu": "Geleneksel: Koc Mars, Boga Venus, Ikizler Merkur, Yengec Ay, Aslan Gunes, Basak Merkur, Terazi Venus, Akrep Mars, Yay Jupiter, Oglak Saturn, Kova Saturn, Balik Jupiter",
+    "orblar": "Biruni: Gunes15 Ay12 Merkur7 Venus7 Mars8 Jupiter9 Saturn9; Lilly: Gunes17 Ay12.5 Merkur7 Venus8 Mars7.5 Jupiter12 Saturn10; Uranus/Neptun/Pluto 8",
+    "gezegen_saatleri": "Gunes kalici/otorite, Venus sosyal/ask, Merkur iletisim/sozlesme, Ay duygusal/kararsiz, Saturn sabir/yavas, Jupiter plan/iyimser, Mars girisim/enerji; soran+saat ayni ise radikal",
+    "kusatilma_791": "Ay son acisı sert + gezegen son acısı sert = kusatilma (Mars/Saturn geleneksel, Uranus/Pluto/Neptune ek)",
+    "stationary": "Duran gezegen esneklik yok, karar degismez",
+    "refranation_791": "Temsilci aci yapmadan burc terk/retro => geri cekilme, fikir degisimi",
+    "reception_791": "Karsilikli agirlanma kavusum sayilir, destekleyici, zayifsa az yardim; kare/karsit agirlamada sorunla cozum",
+    "yanik_791": "8.5 yanik, 17 gunes isini altinda, via combusta 15 Terazi-15 Akrep; gunes/yanik soran ise negatif kaybolur",
+    "döngüler": "Gunes 1y/30g, Ay 28g/2.5g, Merkur 15g/20-24 retro yilda 3-4, Venus 224g/25g 40 retro, Mars 22ay/2ay 80 retro 2yilda1, Jupiter 12y/1y 4ay retro, Saturn 29y/2.5y 5ay retro",
+    "gizli_acilar": "Paralel // kavusum gibi birlestirir, kontra paralel karsit; Antiscia Yengec-Oglak izdusum (30-derece), Contra Terazi-Koc; ornegin 17 Koc antiscia 13 Basak orb 1",
+    "kritik_791": "Oncu 0-13-26 Sabit 9-21 Degisken 4-17 kriz; Ezimene: Ikizler/Basak/Yay/Balik 1, Yay 7-8 19-20, Koc1 Yengec10-16 Oglak27-30 Boga6-10 Aslan19 28-29 Akrep20 29 Kova19-20",
+    "yaklasan_791": "Yaklasan hizli yakalar, uzaklasan ayrılır; Natal A/S gosterir",
+    "evler_791": "1 soran 2 gelir/kayip 3 komsu/kardes/kisa yol 4 baba/yasli/ev/arazi/sonuc 5 cocuk/ask/kumar 6 hayvan/hizmet/hastalik 7 astrolog/partner/calinma/hedef 8 baskasinin parasi/zarar/olum 9 din/yuksek egitim/uzak yol 10 anne/kariyer/hukumet 11 arkadas/kazanc/umut 12 gizli dusman/hapis/hastane/buyuk hayvan",
+    "ev_turetme_791": "Sorgucu 1, baskasi 3. sahis evi ilerletme; anne cocuk 1->5, kadin koca 1->7, koca saglik koca evi ilerlet",
+    "zaman_791": "En hizli temsilci/ay ev+burc tipine gore: Kose Oncu gun/saat Degisken hafta/gun Sabit ay/hafta; Ikincil Oncu hafta/gun Degisken ay/hafta Sabit yil/ay; Ucuncul Oncu ay/hafta Degisken yil/ay Sabit belirsiz yillar; derece farki * birim (14 Yengec - 18 Balik =4 derece -> 4 ay)",
+    "yon_791": "Koc Dogu Aslan DoguKuzey Yay DoguGuney; Yengec Kuzey Akrep KuzeyDogu Balik KuzeyBati; Terazi Bati Kova BatiKuzey Ikizler BatiGuney; Oglak Guney Boga GuneyDogu Basak GuneyBati; Evler 1 Dogu 2 DoguKuzeydogu 3 Kuzeydogu 4 Kuzey 5 KuzeyKuzeybati 6 Kuzeybati 7 BatiKuzeybati 8 Bati 9 BatiGuneybati 10 Guneybati 11 GuneyGuneybati 12 Guney",
+    "aranan_bulma": "Sorgucu-aranan olumlu temas => geri gelir; kose bulur kolay, ardil orta, dusuk zor; sorgucu-esya kavusumda bulunma yuksek",
+    "burc_mesafe": "Koc yeni yol killi, Boga bahce/banka, Ikizler kir/tepe/okul, Yengec su/banyo, Aslan moda/cocuk, Basak tarla/kiler, Terazi veranda/luks, Akrep bataklik/pis su, Yay yuksek/buyuk bina, Oglak tenha/maden/mezar, Kova teknoloji, Balik alcak/su/hastane",
+    "mesafe_mil": "1 mil 1500m; sifir/kuzey/guney enlem + kose 1.5km vs tablosu; Ay burcuna gore x2 (oncu) x0.25 (sabit) x0.5 (degisken)",
+    "dekanlar": "Her burc 10 derece 3 dekan; 1. dekan burc yoneticisi, 2. sonraki ayni grup gunduz yoneticisi, 3. ucuncu (Koc Mars/Gunes/Jupiter tablosu)",
+    "ay_boslukta_791": "Boslukta: vazgecer, gecikir, hasta derinlesmez, kaybolan doner, girisim olumsuz, fikir kalir; Ay 2. temsilci olumlu acida gecikme 1-3 ay; Boga/Yengec/Yay/Balik bosluk daha az; Talih kavusum/60/120/paralel basari",
+    "dugumler_tutulma": "GAD malefik KAD benefik; tutulma gunu soru etkilenir, Mars/Saturn tutulma karanlik, Gunes tutulma trafik/kaza, Yeni Ay 2-5 ev karmasik ufkun arkasi",
+    "sans_noktasi": "Her haritada dugum+sans noktasi; diger arap noktalari ihtiyaca gore; Talih 8/12 + sabit kotu + Balik/Akrep dekan + Mars/Neptun kotu; 29 ve KAD kotu",
+    "bozulma": "Temsilciler ahenkli aciya giderken once 3. gezegen uyumsuz aci => engel 3. kisi",
+    "sabit_yildiz_791": "Kavusum 1 orb + paralel, ayni karakter guclenir; Lilly 50 yildiz",
+    "lilly_aforizmalar": "43 madde: radikal ASC+saat, ilk/son derece guvensiz, Saturn/Mars 10 peregrine GAD, kucuk/abartili soru yok, Ay guclu, Mars/Saturn yavaslik, Jupiter/Venus iyicil, boslukta medet umma, Ay once/sonra, dususte uzuntu, retro kotuluk, kotuculler agir, yavas gezegen sure uzatir, iyicil dusuk evde zayif, peregrine kotuc, iyicil asaletsiz yardim az, vb."
+  },
+  "considerations_791_ch1": {
+    "erect_chart": "Astrologun anladigi an + kendi konumu (even email). Querent cevresini gosteren ikinci chart opsiyonel ama yargida kullanilmaz. Lilly kendi sorularini da yantlar.",
+    "radical_3_methods": [
+      "1) saat yoneticisi == ASC yoneticisi",
+      "2) saat yoneticisi == ASC uclu yoneticilerinden biri",
+      "3) saat yoneticisi ve ASC ayni mizac (choleric hot/dry ornegi Leo+Mars)",
+      "Ek: Ay saat yoneticisiyle yakin aci veya saat yoneticisi ASC derecesiyle yakin aci => radikal"
+    ],
+    "ward_4_alternatives": [
+      "saat yoneticisi kose evde",
+      "saat yoneticisi quesited evinde",
+      "saat yoneticisi dogal/tesadufi lord",
+      "saat yoneticisi ASC yucelimi uclu yoneticisi"
+    ],
+    "author_story_test": "Asc/yakini querenti anlatiyor mu? Burc/ev Ay querent dusuncesi? Natal derece kavusumu (12 Virgo ornegi) radikal",
+    "early_0_3": "Cok erken, sartlar olusmamis, kisa yukselen (Oglak-Kova-Balik-Koc-Boga-Ikizler) daha erken, heyecanli hizli harita disi davranir. Lilly: cok genc ve fizik uyuyorsa istisna. Barclay/Lilly: test/cheat de olabilir.",
+    "late_27_30": "Cok gec, karar verilmis, zaten tamamlaniyor, fikir almak icin soruyor. Lilly: yasi dereceye uyuyorsa veya kesin zaman (kacis) ise yargila. Bonatti son dereceler malefiklere ait. Barclay 27-29 caresizlik, Goldstein 29 kritik/kriz.",
+    "via_combusta_ch1": "15 Terazi-15 Akrep kayip/zorluk; ASC/lord/significator da ayni. Antikte Mars/Saturn yildizlari simdi presesyonla kaydi, modern cogunluk dikkate almaz. Dorotheus: Ay/significator inactive. Louis: Spica 1 icinde ise basari. Coley: ASC via stricture degil. Watters: Ay-Uranus ani degisim savas/kaza. Ward: korku/hapis. Yazar: kritik degil.",
+    "voc_ch1": "Bonatti engel, is iptal utanc. Lilly: ayrilmadan sonraki 6. dakikadan itibaren sonraki gezegene orb icine girene kadar boslukta; burc degistirip orb icine girerse bos degil (29 Kova Ay - 1 Boga Saturn sextile ornegi). Ward moiety ile bos degil. Modern sadece burc ici sinirlar. Lilly: void nadiren guzel ilerler; Yengec/Boga/Yay/Balik iyi (Venus/Jupiter), Ikizler/Akrep/Oglak kotu. Barclay/Goldstein boslukta endise etme. Yazar: diger significator guclu ise gecikmeyle olur, kayip geri gelir.",
+    "moon_late_ch1": "Lilly: Ay son derecelerde ozellikle Ikizler/Akrep/Oglak guvensiz (Yengec 12., malefik yoneticisi). Dorotheus term malefik. Yazar: bir sey bitiyor, yakinda Yengec gibi rahat burca girerse duzelir.",
+    "saturn_7_ch1": "Danisma evi, astroloji zorlanir, Pluto da ayni. Lord 7 afflicted/retro => yanlis harita. Lilly: Satrun 7 yargiyi bozar, ASC Satrun retro nadiren iyi, Satrun/Mars/GAD peregrine 10. evde itibar yok. Lehman: evdeki gezegen kisiyi anlatir (Saturn 7 yasli sahipler). Barclay Satrun 1 retro kotu ama engel degil. Yazar: temkinli ama vazgecme."
+  },
+  "significators_ch2": {
+    "querent": "ASC + lord + intercepted lord + 1.evdeki gezegen (en iyi tanimlayan), biz sorulari 1.ev; Ay co-significator, Yengec yukseliyorsa birincil, Yengec 7 ise quesited",
+    "mashaallah_6": "1) lord ASCye bakiyorsa o; 2) baska gezegene apply edip o ASCye bakiyorsa o; 3) degilse Ay ASCye bakiyorsa Ay; 4) ikisi de boslukta ise son derecelere yakin olani; 5) burc degistirince ilk aci benefic ise gelisim var; 6) digeri co-significator kalir",
+    "lord_asc": "1.ev lord evi querent durumu (Barclay: 6da calisiyor, 5te eglence, 4te evde; baska gezegenle ise baskasiyla), ayrilan gecmis yaklasan gelecek, malefik kare sorun benefic guzel sans",
+    "moon_ch2": "hizli yansitici isik tasiyan, querent arzu/duygu, akil neredeyse Ay orada; Barclay: lord fakta yer, Ay ilgi/umut (9 cusp yurtdisi umudu)",
+    "quaesited": "Ilgili ev + lord + icindeki gezegen (en iyi tanimlayan), victor/almuten guclu ise birincil; Barclay yerlestirme kisiyi/seyin yerini gosterir (angular evde ise evde)",
+    "derived": "3.kisi icin turetilmis ev (es 7, es kardesi 7den 3=9, anne kitabi 10dan 2=11)",
+    "natural": "Gunes/Mars erkek, Ay/Venus kadin; bosanma sorusu 1-7 + Gunes iliskisi"
+  },
+  "houses_ch3": {
+    "1": "hayat/beden/saglik/benlik - horaryde querent",
+    "2": "para/kayip esya/mahkeme yardimcisi - 2 vs 8 guc farki",
+    "3": "kardes/komsu/kisa yol/egitim/haber",
+    "4": "baba/yasli/ev/arazi/sonuc",
+    "5": "cocuk/ask/kumar/eglence",
+    "6": "hayvan/hizmet/hastalik/amca",
+    "7": "partner/acik dusman/hirsiz/astrolog",
+    "8": "olum/miras/baskasinin parasi",
+    "9": "din/yuksek egitim/uzak yol/mahkeme",
+    "10": "anne/kariyer/hukumet",
+    "11": "arkadas/kazanc/umut",
+    "12": "gizli dusman/hapis/hastane/buyuk hayvan"
+  },
+  "signs_ch4": {
+    "yon": "Koc Dogu Yengec Kuzey Terazi Bati Oglak Guney + tali yonler",
+    "tip": "ates dogu hava bati su kuzey toprak guney",
+    "ulke_sehir": "Ptolemy/al-Qabisi/Lilly listeleri (Aries Almanya vb) - mundane icin"
+  },
+  "classification_ch5": {
+    "human": "Ikizler Basak Terazi Kova + Yay ilk yari",
+    "winged": "Ikizler Basak Balik",
+    "bestial": "Koc Boga Aslan Oglak + Yay ilk yari",
+    "fertile": "Yengec Akrep Balik",
+    "unfruitful": "Koc Boga Terazi Yay Oglak Kova",
+    "barren": "Ikizler Aslan Basak",
+    "mute": "Yengec Akrep Balik",
+    "semi_voiced": "Koc Boga Aslan Oglak + Yay son yari",
+    "crooked": "Oglak-Balik-Koc-Boga-Ikizler kisa yukselen"
+  },
+  "practical_ch6": {
+    "1_health": "ASC/lord/Moon yanik/kare/karsit malefik/GAD kotu; 6/8/4 dusuk ev tehlike; guclu kose, direkt hizli, benefik kavusum iyi; zaman icin 5 derece=5 birim; 6da ise hasta",
+    "lost_person": "Iliski yoksa ASC/1 lord/Moon quesited; varsa turetilmis (kardes 3 cocuk 5); 6/8/12 malefik olum riski; 9 uzak 3/1 yakin; retro doner; son derece burc degistirir",
+    "2_money": "2 lord/ Ay / lot 2 lord acisi, reception, antiscia; angular/dignity/direkt hizli olumlu; lot 2 evi kazanc kaynagi (5 cocuk 7 es 11 arkadas); 3/7 lord sert para engeli; GAD 8 kayip",
+    "3_siblings_rumor_journey": "3 lord/Moon uyumlu iyi; malefik 3 desteksiz, benefic destek; rumor 3/Ay/Merkur benefic dogru, VOC/false, malefik 1 yanlis; kisa yol 3 uzun 9, malefik kotu",
+    "4_hidden_buying": "2 lord kose yakinda, 10 ofiste, 7 este, 4 evde; element su mutfak ates ocak toprak zemin hava yuksek; Lilly yon ASC+lord+4+Moon+lot; anlasma 1-7 yaklasan uyumlu, Ay isik tasima; fiyat 10 lord kose pahali cadent ucuz",
+    "5_children": "5 isareti + lord/Moon uyumlu hamile; benefik 5 iyi malefik kotu; zaman hizli/kose cabuk; benefik hizli hamile cabuk; cinsiyet eril/disi sayim, ikiz cift beden",
+    "6_disease": "Ay son/yaklasan aci hastalik seyri; ates iltihap toprak toksik hava sinir su duygusal; kardinal akut sabit kronik degisken tekrar; Saturn kronik Mars akut; son derece bitiyor, retro tekrar",
+    "7_marriage": "1/7 uyumlu olumlu, Ay isik koleksiyon olumlu, karanlik karsit zorluk ama reception ile olur; Gunes erkek Venus kadin kavusum 7/kose yanik degil; lord 7 1de ilgili, zayif gucsuz; 1-7 arasi engel evi gosterir (3 kardes 2 para 8 para)",
+    "8_survival_profit_threat": "8 olum, turetilmis 8 (kardes 3->10); benefic 8 kar malefik zarar; tehdit 7 biliniyorsa 7 bilinmiyorsa 12 malefik 1 zarar; borc 2-8 iliskisi",
+    "9_travel_education": "9 benefic iyi malefik kotu; 1-9 uyumlu iyi; is seyahati 10 da bak; zaman cardinal hizli",
+    "10_career": "10 lord/1 lord Ay kavusum/60/120 terfi; benefik 1/10 iyi malefik kotu; lord 10 1de kolay, 1 lord 10da akil iste; 10 11de umut; son derece degisim",
+    "11_hopes_friends": "11 lord/1 lord/Ay uyumlu dilek olur, 11 guclu kose iyi; arkadas malefik 11 zarar; organizasyon ayni",
+    "12_hidden": "12 gizli dusman, 7 acik; 12 lord 6/8/12den kare kotu; 12deki gezegen kisiyi gosterir (Merkur genc); hapis 12 lord 12/ retro yavas uzun"
+  },
+  "examples_ch7": {
+    "threat": "Ay 12 Saturn 7 <1 derece kavusum yakinda gizli dusman, 6 ay sikinti, sonra Mars/Jupiter/Sun trine cozulur",
+    "school": "Sabit aks degismez ama Gunes 29 Boga->Ikizler degisken 10.ev Venus Ikizler retro gecikme 7 ay",
+    "catering": "Gunes peregrine Yengec 11 Saturn/Merkur, Moon fall Akrep GAD, sabit aks devam ama degisken kariyer zor 1.5 yil",
+    "friend_job": "Mars ASC kotu, Saturn retro 5. ev is gorusmesi kotu, void Ay -> is yok",
+    "missing_son": "Venus 12 Neptun kavusum sonra Saturn karsit umutsuz, 12 kalabalik, Moon waning under rays bitiş"
+  },
+  "appendix": {
+    "dignities": "Domicile/exaltation/triplicity/term/face tablosu (Aries Mars Sun vb)",
+    "glossary": "Accidental benefic/malefic, besieged, burned 8.5, cadent %25, cazimi 17, peregrine, victor/almuten, void, vb 50+ terim"
+  },
+  "houses_ch3_detail": {
+    "1_vs_7_strength": "Lord 1 guclu ise querent ustun, Lord 7 guclu ise quesited ustun",
+    "2_vs_8_money": "Lord 2 guclu ise querent kazanir, Lord 8 guclu ise karsi kazanir / lender guclu ise lender daha iyi",
+    "lost_extra": "2. ev + lot + dogal significator (Venus taki, Sun altin, Mercury evrak, Mars alet) element/burc/ev dikkate",
+    "derived_examples_detail": "3.kisi icin turetilmis ev sart (kardes cocugu 9, anne kitabi 11, vb)"
+  },
+  "person_definitions": {
+    "1_querent": "ASC + lord + intercepted + 1deki gezegen (en iyi tanimlayan) + Ay co-significator",
+    "7_astrolog_or_partner": "7 = astrolog (iliskisi degilse) veya partner/hirsiz/acik dusman; afflicted ise astrolog zorlanir",
+    "derived": "Her kisi icin turetilmis ev sart (es kardesi 7den 3=9 gibi)"
+  },
+  "lost_indicators_detail": "Kayıp 2. ev + lot + dogal: Venus taki, Sun altin, Mercury evrak, Mars alet; element/burc/ev (ates ocak toprak zemin hava yüksek su banyo gibi) hepsi kullanilir",
+  "eve_gore_yer_detay": {
+    "1": "en çok kullandığı yerde - taktığı saat, çanta gözü, en çok kullandığı oda",
+    "2": "para/mücevher kasası/cüzdan odası",
+    "3": "çalışma odası, TV/radyo yanı, telefon/cep/araba anahtarı/kitap/kırtasiye veya arabada",
+    "4": "yaşlıların odası, mutfak/depo/kiler/birikim, en eski bölge, çeyiz sandığı/vitrin/çatı",
+    "5": "dinlenme/oyun/çocuk/kumar/sanat, spor/oyuncak/takı/makyaj/tavla/müzik/piyango",
+    "6": "hizmetçi/hasta/kopek maması/ecza/temizlik/ilaç",
+    "7": "evlilik cüzdanı, eşin koltuğu/TV kumandası",
+    "8": "banyo/tuvalet/çöplük, yeni evli yatak, bono/banka kasası/zehir/silah/tapu/fantezi/kredi kartı",
+    "9": "meditasyon/ders/Kuran/pasaport/bavul/hukuki evrak",
+    "10": "iş, resmi evrak/kimlik/printer/home office",
+    "11": "misafir odası/salon/teknoloji/teleskop/teras",
+    "12": "yatak odası/uyku/icki dolabı/yoga/izole"
+  },
+  "pratik_teknik": {
+    "ise_girecek_miyim": "Querent 10.evdeyse EVET (belirleyici 10da)",
+    "yurtdisi": "Ay 9.evdeyse EVET, 9da 5 derece kurali (8 sonu/9 basi/MC solu da EVET)",
+    "istek": "Belirleyici olmasa da Ay belirleyici bolgedeyse cok istiyor demek (motivasyon Ay)",
+    "aile_ornegi": "Basbakan 10 esi 4, Kraliçe 10 kocasi 4, kardesler ayni anda sorarsa ilk gecerli",
+    "iliski_1_5": "1-5 yaklasan EVET birlikte, ayrilan ayrilir, 6+ uzaklasma ayrilir, 0-2 yaklasan zaten birlikte"
+  }
+}

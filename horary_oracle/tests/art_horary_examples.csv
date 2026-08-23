@@ -1,0 +1,41 @@
+id,question,date,time,lat,lon,expected,source
+1,Tehdit kotu bitecek mi,2003-11-13,20:31,40.9833,28.6333,NO,Art Ch7 Fig15
+2,Okula tayin,2004-06-28,09:22,41.0138,28.99,YES,Art Ch7 Fig16
+3,Catering devam,2004-06-28,09:22,41.0138,28.99,NO,Art Ch7 Fig18
+4,Arkadas is alacak mi,2005-11-28,15:08,41.0138,28.99,NO,Art Ch7 Fig20
+5,Kayip ogul nerede,2007-01-18,08:55,41.0138,28.99,NO,Art Ch7 Fig21
+6,Para gelecek mi,2024-03-10,11:00,41.0,28.9,YES,Art 2.ev
+7,Kardesimle aram duzelecek mi,2024-03-11,14:00,41.0,28.9,YES,Art 3.ev
+8,Kiraci cikacak mi,2024-03-12,09:00,41.0,28.9,NO,Art 3.ev/6
+9,Ev alinir mi,2024-03-13,10:30,41.0,28.9,YES,Art 4.ev
+10,Ev tasinmali mi,2024-03-14,15:00,41.0,28.9,NO,Art 4.ev
+11,Cocugum olacak mi,2024-03-15,12:00,41.0,28.9,YES,Art 5.ev
+12,Cocugun cinsiyeti,2024-03-16,13:00,41.0,28.9,YES,Art 5.ev
+13,Cocugumla aram duzelecek mi,2024-03-17,16:00,41.0,28.9,YES,Art 5.ev
+14,Hastalik gececek mi,2024-03-18,08:00,41.0,28.9,NO,Art 6.ev
+15,Hastalik kotuye gider mi,2024-03-19,09:30,41.0,28.9,NO,Art 6.ev
+16,Evlenecek miyiz,2024-03-20,18:00,41.0,28.9,YES,Art 7.ev
+17,Evlilikte anlasir miyiz,2024-03-21,19:00,41.0,28.9,YES,Art 7.ev
+18,Bosanalim mi dogru mu,2024-03-22,11:00,41.0,28.9,NO,Art 7.ev
+19,Es aldatiyor mu,2024-03-23,20:00,41.0,28.9,NO,Art 7.ev
+20,Olum tehlikesi var mi,2024-03-24,07:00,41.0,28.9,NO,Art 8.ev
+21,Kredit cikar mi,2024-03-25,10:00,41.0,28.9,YES,Art 8.ev
+22,Borcu odeyecek mi,2024-03-26,15:30,41.0,28.9,YES,Art 8.ev
+23,Yolculuk iyi gecer mi,2024-03-27,08:30,41.0,28.9,YES,Art 9.ev
+24,Sinavi kazanacak miyim,2024-03-28,09:00,41.0,28.9,YES,Art 9.ev
+25,Universite kazanacak mi,2024-03-29,11:00,41.0,28.9,YES,Art 9.ev
+26,Ise girecek miyim,2024-03-30,14:00,41.0,28.9,YES,Art 10.ev
+27,Isten cikarilacak miyim,2024-03-31,09:00,41.0,28.9,NO,Art 10.ev
+28,Is degistirmeli miyim,2024-04-01,13:00,41.0,28.9,YES,Art 10.ev
+29,Dilek gerceklesir mi,2024-04-02,16:30,41.0,28.9,YES,Art 11.ev
+30,Arkadasla barisir miyiz,2024-04-03,18:00,41.0,28.9,YES,Art 11.ev
+31,Dernege uye olayim mi,2024-04-04,10:00,41.0,28.9,NO,Art 11.ev
+32,Gizli dusman var mi,2024-04-05,21:00,41.0,28.9,YES,Art 12.ev
+33,Hapse girecek miyim,2024-04-06,07:30,41.0,28.9,NO,Art 12.ev
+34,Buyum var mi,2024-04-07,22:00,41.0,28.9,NO,Art 12.ev
+35,Saglik sigortasi cikar mi,2024-04-08,11:30,41.0,28.9,YES,Art 8.ev
+36,Miras kalacak mi,2024-04-09,12:00,41.0,28.9,YES,Art 4/8.ev
+37,Komşu tasinacak mi,2024-04-10,15:00,41.0,28.9,YES,Art 3.ev
+38,Ogretmen olacak miyim,2024-04-11,09:00,41.0,28.9,YES,Art 9/10.ev
+39,Yatirim karli mi,2024-04-12,14:30,41.0,28.9,YES,Art 5/2.ev
+40,Kacak kisi donecek mi,2024-04-13,08:00,41.0,28.9,YES,Art 12.ev

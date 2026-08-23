@@ -1,0 +1,17 @@
+{
+  "app_title": "Horary Kahini - Soru Anı Astrolojisi",
+  "ask_placeholder": "Sorunu net ve tek cümlede yaz (örn: Eski sevgilim geri dönecek mi?)",
+  "strictures": {
+    "asc_early": "Harita yargılanamaz: ASC {deg}° - Soru erken, henüz olgunlaşmamış.",
+    "asc_late": "Harita yargılanamaz: ASC {deg}° - Soru geç, durum zaten kararlaştırılmış.",
+    "via_combusta": "Ay Via Combusta'da ({lon}°) - Gizli engeller, sorunun kökü çürük.",
+    "voc": "Ay boşlukta - Konu akmıyor, hiçbir açı mükemmelleşmiyor."
+  },
+  "perfection": {
+    "yes": "Mükemmelleşme var: {type} ile EVET - {q} ve {qs} kavuşuyor.",
+    "no": "Mükemmelleşme yok - HAYIR",
+    "translation": "Işık aktarımı ile EVET - Aracı gezegen {mediator} ışığı taşıyor.",
+    "prohibition": "Yasaklama: {blocker} araya giriyor, EVET engelleniyor.",
+    "frustration": "Engelleme (Frustration): Significator önce {blocker}'a çarpıyor."
+  }
+}

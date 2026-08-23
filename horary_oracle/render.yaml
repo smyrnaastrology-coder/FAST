@@ -1,13 +1,5 @@
 services:
   - type: web
-    name: fbst-api
-    runtime: python
-    rootDir: render-deploy
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: bash start.sh
-    healthCheckPath: /api/health
-  - type: web
     name: horary-oracle-api
     runtime: python
     plan: free
