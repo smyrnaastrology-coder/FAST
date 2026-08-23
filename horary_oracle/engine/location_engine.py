@@ -73,14 +73,14 @@ ELEMENT_KALITE = {
     "toprak":"topraklı/soğuk/tozlu - ekili tarla/mağara/bodrum/garaj/kiler/depo",
 }
 
-# Burca göre detay yer (kitap 143-144) - OCR temizlenmiş özet
+# Burca göre detay yer (görsel 143-144 - Ev Dışında tablosu OCR temiz)
 BURC_YER_DETAY = {
-    "Koç": "vahşi/volkanik arazi, spor salonu, yarış alanı, cephanelik, spor odası",
-    "Boğa": "tepeli bereketli çayır/tarla, banka, pazar yeri, mutfak/gıda marketi",
-    "İkizler": "esintili ulaşım ağı, postane, kütüphane, internet cafe, iletişim odası",
-    "Yengeç": "akarsulu/islak çayır, çocuk bahçesi, lokanta, mutfak, banyo, yuva",
-    "Aslan": "sıcak kurak güneşli, idari bina, tiyatro/gazino, kuyumcu, çocuk odası/salon",
-    "Başak": "araştırma/kütüphane/eczane, klinik/laboratuvar, çalışma odası, atölye",
+    "Koç": "Ev Dışı: vahşi/volkanik arazi | Genelde dolaşılan: spor salonu/yarış alanı | En çok gidilen: tesisatçı/yarış pisti | En az gidilen: cephanelik | Ev içi oda: spor",
+    "Boğa": "Ev Dışı: tepeli bereketli çayır/tarla | Dolaşılan: banka | En çok: kuyumcu/çiftlik | En az: banka kasası/müzayede salonu | Oda: yemek",
+    "İkizler": "Ev Dışı: esintili ulaşım ağı yoğun | Dolaşılan: pazar yeri/postane | En çok: kitapçı/gazeteci | En az: internet cafe | Oda: günlük salon",
+    "Yengeç": "Ev Dışı: akarsulu bereketli ıslak çayır | Dolaşılan: çocuk bahçesi/lokanta | En çok: yuva/gıda market/manav | En az: kolleksiyoncu | Oda: yatak/mutfak",
+    "Aslan": "Ev Dışı: sıcak kurak güneşli | Dolaşılan: idari bina/tiyatro/gazino | En çok: çocuk parkı/sinema | En az: kumarhane/saray | Oda: oyun/çocuk",
+    "Başak": "Ev Dışı: araştırma için ve diğer tarım | Dolaşılan: kütüphane/borsa | En çok: eczane/klinik/laboratuvar | En az: sauna | Oda: çalışma/hizmetçi",
     "Terazi": "park/çiçek bahçesi, güzellik salonu, sanat galerisi, misafir/oturma odası",
     "Akrep": "yeraltı mağarası, atık alanı, banyo/tuvalet, sauna, gizli depo",
     "Yay": "geniş orman, borsa, kilise/cami/mahkeme, kütüphane, hol",
