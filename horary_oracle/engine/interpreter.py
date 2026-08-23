@@ -54,6 +54,9 @@ A: Chart ASC 25.6° Aries asc_intervention — karar aşaması. Querent Mars 10.
 Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
 A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
 
+Q: Jun 30 1981 13:33 Istanbul - Oglum istedigi okula girecek mi ?
+A: Kitap: Anne-baba güçlü ilişkilerle olumlu noktaya taşıdı ama belirsizdi. Horary: çocuk Satürn, okul Venüs. Venüs Satürn'e kapanan yarı-üçgen (30°) olumlu açı yapıyor, önce Jüpiter'e sonra Satürn'e olumlu açı → fırsat/açılım işareti. Sonuç olumlu, çocuk istediği bölüme kabul edildi.
+
 Q: ben şu an nerdeyim
 A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
 
