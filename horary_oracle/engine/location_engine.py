@@ -73,6 +73,26 @@ ELEMENT_KALITE = {
     "toprak":"topraklı/soğuk/tozlu - ekili tarla/mağara/bodrum/garaj/kiler/depo",
 }
 
+# Burca göre detay yer (kitap 143-144) - OCR temizlenmiş özet
+BURC_YER_DETAY = {
+    "Koç": "vahşi/volkanik arazi, spor salonu, yarış alanı, cephanelik, spor odası",
+    "Boğa": "tepeli bereketli çayır/tarla, banka, pazar yeri, mutfak/gıda marketi",
+    "İkizler": "esintili ulaşım ağı, postane, kütüphane, internet cafe, iletişim odası",
+    "Yengeç": "akarsulu/islak çayır, çocuk bahçesi, lokanta, mutfak, banyo, yuva",
+    "Aslan": "sıcak kurak güneşli, idari bina, tiyatro/gazino, kuyumcu, çocuk odası/salon",
+    "Başak": "araştırma/kütüphane/eczane, klinik/laboratuvar, çalışma odası, atölye",
+    "Terazi": "park/çiçek bahçesi, güzellik salonu, sanat galerisi, misafir/oturma odası",
+    "Akrep": "yeraltı mağarası, atık alanı, banyo/tuvalet, sauna, gizli depo",
+    "Yay": "geniş orman, borsa, kilise/cami/mahkeme, kütüphane, hol",
+    "Oğlak": "taşlı sivri mezarlık, klinik, ofis/çalışma odası, kiler, bodrum",
+    "Kova": "tuhaf/alışılmamış, uçuş pisti, elektrikçi, rasathane, teknoloji odası",
+    "Balık": "bataklık/plaj/sisli gölet, rıhtım, şarap mahzeni, maden, gizli su yeri",
+}
+def burc_yer_detay(sign): return BURC_YER_DETAY.get(sign,"")
+# İki burç arası ise iki şey arasında/arkasında/sıkışmış/eşikte
+def is_cusp(deg): return deg < 2 or deg > 28
+# Ay insani (İkizler,Başak,Terazi,Kova) vs hayvani (Koç,Boğa,Aslan,Yay,Oğlak) vs diğer
+
 # Eski API uyumu için alias
 def distance_fixed(lat, degree, house, is_north=True):
     base = uzaklik_simmontie(0, house, is_north)
