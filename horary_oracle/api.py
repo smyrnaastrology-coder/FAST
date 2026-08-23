@@ -35,7 +35,7 @@ class CastRequest(BaseModel):
     lon: float = Field(..., ge=-180, le=180, example=27.1428)
     lang: str = Field("tr", pattern="^(tr|en|es|ar|pt|fr|de|ru|it|hi)$")
     # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
-    history: Optional[list] = Field(None, description=" onceki chat [{role,content}]")
+    history: Optional[list] = None
     # opsiyonel: client kendi zamanını gönderirse
     year: Optional[int] = None
     month: Optional[int] = None
