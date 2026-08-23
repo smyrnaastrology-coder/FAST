@@ -34,6 +34,8 @@ class CastRequest(BaseModel):
     lat: float = Field(..., ge=-90, le=90, example=38.4237)
     lon: float = Field(..., ge=-180, le=180, example=27.1428)
     lang: str = Field("tr", pattern="^(tr|en|es|ar|pt|fr|de|ru|it|hi)$")
+    # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
+    history: Optional[list] = Field(None, description=" onceki chat [{role,content}]")
     # opsiyonel: client kendi zamanını gönderirse
     year: Optional[int] = None
     month: Optional[int] = None
@@ -68,6 +70,15 @@ async def health():
 
 @app.post("/api/horary/cast")
 async def cast(req: CastRequest):
+    # --- Sohbet modülü (horary_app.py:118 ile birebir) ---
+    qlow = req.question.strip().lower()
+    if qlow in ["merhaba","selam","selamlar","hey","hi","hello"] or qlow.startswith("merhaba") or qlow.startswith("selam"):
+        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* veya *bu işe girecek miyim?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber"]):
+        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, senin sorularını bekliyorum! Horary için en önemli soruyu sor — kalbinden geçen, uykunu kaçıran soru. Ne sormak istersin?","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    # follow-up: önceki haritayı hatırla (history içinde son assistant charth olabilir, ama basit: client history gönderirse)
+    # history varsa ve soru "açar mısın / neden / nasıl" ise önceki chart'a dair detay dön (horary_app.py:132)
+    # Bu endpoint stateless olduğu için follow-up için history'de son chart'ı client göndermeli; şimdilik passthrough
     t0 = time.perf_counter()
     y, mo, da, utc_dec, off, tzname, local_dec = resolve_time(req)
 
@@ -107,6 +118,34 @@ async def cast(req: CastRequest):
         }
     except: pass
 
+    # --- Gizli visitor modelleri (sistem içinde, dışarıda görünmez) ---
+    qlow2 = req.question.lower()
+    is_visitor_who = any(k in qlow2 for k in ["yanıma gelen","yanimda gelen","yanımdaki kişi","yanimdaki kisi","karşımdaki kişi","karsimdaki kisi","kim bu kişi","nasıl biri","nasil biri"])
+    is_visitor_why = any(k in qlow2 for k in ["neden geldi","neden aradı","neden yazdı","neden aradi","niyeti ne","neden mesaj","neden geldiğini"])
+    if is_visitor_who or is_visitor_why:
+        try:
+            # visitor_who: ASC + ASC yöneticisi burç/ev + sabit yıldız karakteri
+            asc_sign = res['houses']['asc_sign']; asc_deg = res['houses']['asc'] % 30
+            ruler = res['querent']['planet']; ruler_data = res['querent']['data']
+            # sabit yıldız
+            star_note = ""
+            for s in res['strictures']:
+                if s['code'].startswith('fixed_star') and s.get('planet')==ruler:
+                    star_note = f" Sabit yıldızı {s.get('star')} ({s.get('dist')}°) karakterine damga vuruyor."
+                    break
+            elem = {"Koç":"ateş","Boğa":"toprak","İkizler":"hava","Yengeç":"su","Aslan":"ateş","Başak":"toprak","Terazi":"hava","Akrep":"su","Yay":"ateş","Oğlak":"toprak","Kova":"hava","Balık":"su"}
+            if is_visitor_who:
+                res['strictures'].insert(0, {"code":"visitor_who","level":"info","meaning":f"Gizli WHO: ASC {asc_sign} {asc_deg:.1f}° — gelen kişi {elem.get(asc_sign,'')} enerjisinde, yöneticisi {ruler} {ruler_data['sign']} {ruler_data['deg']:.1f}° Ev{ruler_data['house']}{' Rx' if ruler_data['retro'] else ''} → o evin konularıyla tanımlı kişi.{star_note}"})
+            if is_visitor_why:
+                # why: 7.yönetici + Ay evi + 3.ev
+                sev_house = res['quesited']['house']; moon_house = res['planets']['Moon']['house']
+                # 3.ev analizi
+                third_cusp = res['houses']['cusps'][2] % 360
+                from core.ephemeris import sign_from_lon as _sfl
+                third_sign = _sfl(third_cusp)
+                res['strictures'].insert(0, {"code":"visitor_why","level":"info","meaning":f"Gizli WHY: 7.yöneticisi {res['quesited']['planet']} Ev{sev_house} ({res['quesited']['sign']}), Ay Ev{moon_house} ({res['planets']['Moon']['sign']}) niyeti gösteriyor; 3.ev {third_sign} mesaj/arma şekli. 7→1 açısı varsa doğrudan sana yönelik niyet."})
+        except: pass
+
     # LLM sadece tercüman
     engine_json = {
         "verdict": res["verdict"], "score": res["score"],
@@ -115,6 +154,9 @@ async def cast(req: CastRequest):
         "querent": res["querent"]["planet"], "quesited": res["quesited"]["planet"],
         "question": req.question, "location": loc_info
     }
+    # visitor who/why için prompt'a gizli talimat ekle (dışarıda görünmez)
+    if is_visitor_who or is_visitor_why:
+        engine_json["hidden_instruction"] = "Bu soru gizli visitor modeli: WHO ise ASC ve yöneticisinin burç/ev/sabit yıldızına göre karakteri muhabbet gibi anlat; WHY ise 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat. Standart horary kalıbının dışına çık, insani dil kullan."
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000
