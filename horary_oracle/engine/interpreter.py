@@ -57,6 +57,9 @@ A: Kitap: ASC Kova Satürn danışan, DSC Aslan Güneş eş. Satürn-Güneş yan
 Q: Nov 07 1983 13:45 Istanbul - Esim geri donecek mi ? (OR-OVC02)
 A: Kitap: ASC Kova Satürn erkek, DSC Aslan Güneş eş. Güneş Satürn'den hızla ayrılan → eş gitti. 7. ev Venüs-Mars kavuşumunda Venüs Mars'tan uzaklaşan → geri dönmeyecek. Venüs 10. ev Neptün ile kare → aldatma, mesleki hayal için terk; Güneş'ten ayrılan Merkür → eğitim olmayacak. Ay önce Uranüs'e karşıt (ayrılık) sonra Jüpiter'e kavuşum (büyük şans/fırsat) → erkeğe moral.
 
+Q: Jan 13 1994 20:50 Istanbul - Kedim kayboldu nerede ? (OR-OVEO1)
+A: Kitap: Soru horoskopu tutarlı, 2 gün sonra üst kattaki banyoda jakuzide bulundu, küçük servis kapısından girip hapis kaldı.
+
 Q: Mar 13 1984 11:56 - O evi satin alabilecek miyim ? (OR-OVDO1)
 A: Kitap: Alıcı 1. ev, satıcı 7. ev, ev 4. ev, fiyat 10. ev. Ay Merkür'e dekster güçlü üçgen → alacak, <1° kaldı öncü+köşe = 1 gün içinde organizasyon yapıldı. Ay Mars'tan Merkür'e ışık nakli, Mars aracı. 7. ev Jüpiter Oğlak dürüst/güvenilir satıcı → olumlu. 10. ev Güneş aristokrat yüksek fiyat, yöneticisi Neptün Jüpiter kavuşum → aşırı yüksek fiyat.
 
