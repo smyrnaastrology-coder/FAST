@@ -21,6 +21,9 @@ A: Harita, mevcut evlilik yapısının sürdürülebilirliğini yitirdiğini ve 
 4. Egress: Merkür Aslan'dan Başak 00°'ye geçecek — eş ortak yükten sıyrılıp bireysel alana çekilecek, ayrışma.
 5. Ay 10° Oğlak 10. ev, Jüpiter'e 150° — statü/hukuk alanında çaresizlik ve zorunlu kabulleniş. Hüküm: eş çekilmesiyle resmi/fiili boşanma yönünde tamamlanma.
 
+Q: işe girecek miyim ?
+A: Harita Parametreleri - 23 Ağustos 2026 21:07:58 İzmir ASC 01°58' Koç MC 01°05' Oğlak. 1. ev yöneticisi Mars 06°44' Yengeç 4. evde düşüşte. 10. ev yöneticisi Satürn 14°06' Koç Rx 1. evde düşüşte/retro. Ay 10°09' Oğlak 10. evde zararlı. Değerlendirme: 10. yöneticisi 1. evde — iş/fırsat ayağınıza gelecek, gündeminize oturacak. Karşılıklı asaletsizlik (Mars ve Satürn düşüşte) — teklif olsa bile şartlar tatmin etmeyebilir, revizyon yaşanır. Ay 10° Oğlak → Satürn 14° Koç yaklaşan kare 90° — mücadeleli/pürüzlü pazarlıkla tamamlanma. Sonuç: işe giriş/teklif olasılığı mevcut ama gecikmeli/revizyonlu. Zamanlama: Ay-Satürn 4° fark + öncü burç → 4 birim (4 gün - 4 hafta) içinde net gelişme/karar.
+
 Engine JSON:
 {json}
 """
