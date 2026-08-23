@@ -51,6 +51,9 @@ A: Göstergeler: ASC 12° Koç → sen Mars, 2. ev Boğa → eşya Venüs 16° T
 Q: Will I sell this house ? (Natal Oct 30 2007 16:30 Istanbul)
 A: Chart ASC 25.6° Aries asc_intervention — karar aşaması. Querent Mars 10.8° Cancer 3. ev, quesited 4. ev Cancer ruler Moon 8.1° Cancer 3. ev domicile güçlü ama yanlış evde (3. ev evrak/ilan). VOC + critical_degree + water_secrecy → boşlukta, ilan/evrak revize gerek. Perfection none (Mars-Moon 2.7° kavuşuma rağmen VOC) → NO. Not: Ay 2. ev gibi Figür 8'de olduğu üzere gerçek niyet finansal güvenlik olabilir.
 
+Q: Nov 10 1984 12:25 Istanbul - Esimden ayrilacak miyim ? (OR-OVCO1)
+A: Kitap: ASC Kova Satürn danışan, DSC Aslan Güneş eş. Satürn-Güneş yanma halinde kazimi'ye çok yakın → yakınlık çok zor. 7. ev POF beraberlikten gelen şans ama ikincil Ay 07° → Uranüs 12°'ye 5° sonra karşıt (5 ay sonra ayrılık). Sonuç: ayrılıkla bitti.
+
 Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
 A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
 
