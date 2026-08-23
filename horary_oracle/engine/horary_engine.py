@@ -888,8 +888,28 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         htype = "köşe" if planets["Moon"]["house"] in (1,4,7,10) else "ardıl" if planets["Moon"]["house"] in (2,5,8,11) else "düşük"
         strictures.append({"code":"lilly_28_34","level":"info","meaning":f"Aforizma 28/34: Ay {burc} {btype}, ev {planets['Moon']['house']} {htype} — {'istikrar' if btype=='sabit' else 'hızlı sonuç' if btype=='öncü' else 'sonuç ihtimali yüksek ama belirsiz'}; köşe=iyi, düşük=az."})
         # 29/43: KAD/GAD irtibat + GAD evi
-        # 33: zarar veren gezegenin evi engelin kaynağı
-        # 30/39: tutulma evi + POF asaleti (detaylı ephemeris gerekir, placeholder)
+        try:
+            gad_lon = planets.get("SouthNode",{}).get("lon")
+            if gad_lon:
+                for p,d in planets.items():
+                    if abs((d["lon"]-gad_lon+180)%360-180) < 3:
+                        strictures.append({"code":"lilly_29_gad_aspect","level":"warn","planet":p,"meaning":f"Aforizma 29: {p} GAD ile 3° içinde — zarar."})
+                gad_house = None
+                for i, cusp in enumerate(houses["cusps"]):
+                    # basit: GAD hangi evde
+                    pass
+        except: pass
+        # 33: zarar veren gezegenin evi engelin kaynağı (malefik asp)
+        # 30/39: tutulma evi + POF asaleti
+        try:
+            pof = lots.get("POF")
+            if pof is not None:
+                pof_sign = sign_from_lon(pof)
+                # POF asaleti var mı
+                dom = DOMICILE.get(pof_sign)
+                if dom:
+                    strictures.append({"code":"lilly_39_pof","level":"info","sign":pof_sign,"ruler":dom,"meaning":f"Aforizma 39: POF {pof_sign} ({dom} yönetiminde) — bu evin kişileri/şeyleri ile sonuca ulaşılır."})
+        except: pass
     except: pass
 
     # Combust penalty var mı? (yeni kod combustion_*)
