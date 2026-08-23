@@ -57,6 +57,9 @@ A: Kitap: ASC Kova Satürn danışan, DSC Aslan Güneş eş. Satürn-Güneş yan
 Q: Nov 07 1983 13:45 Istanbul - Esim geri donecek mi ? (OR-OVC02)
 A: Kitap: ASC Kova Satürn erkek, DSC Aslan Güneş eş. Güneş Satürn'den hızla ayrılan → eş gitti. 7. ev Venüs-Mars kavuşumunda Venüs Mars'tan uzaklaşan → geri dönmeyecek. Venüs 10. ev Neptün ile kare → aldatma, mesleki hayal için terk; Güneş'ten ayrılan Merkür → eğitim olmayacak. Ay önce Uranüs'e karşıt (ayrılık) sonra Jüpiter'e kavuşum (büyük şans/fırsat) → erkeğe moral.
 
+Q: Aug 28 1987 16:20 Istanbul - Hakan ile evlenecek miyim ? (OR-OVC04)
+A: Kitap: ASC Oğlak başında — olgunlaşmamış, Ay ateş yolunda → horary geçersiz, soru samimi değil, Hakan nişanlı olduğu biliniyor. Neptün ASC kavuşum + Satürn 12. ev → kendini aldatma. Satürn (danışan) ile Ay (Hakan) arası açı yok → olmayacak.
+
 Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
 A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
 
