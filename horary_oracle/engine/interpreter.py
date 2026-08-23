@@ -36,6 +36,9 @@ A: Göstergeler: ASC 05° Koç → sen Mars + Ay. Araba (taşınır mal) 2. ev B
 Q: kayıp altınlar nerede ?
 A: Göstergeler: 2. ev Boğa içinde Uranüs İkizler — beklenmedik/şaşırtıcı yer, elektronik/kablo/metalik eşya yakını, cihaz altı/arkası. 2. ev yöneticisi Venüs Terazi 7. evde — yatak odası/salon/misafir odası, ortak yaşam alanı, aynalı mobilya/pencere kenarı, takı kutusu/dolap. Yükselen Koç yöneticisi Mars Yengeç 4. evde — evin içi/temeli/zemin kat/mutfak, güvenli oda, ev sınırları içinde. Ay Oğlak 10. evde — yüksek raf/dolap üstü/çekmece içi, sandık/kilitli kutu. Sonuç: ev içinde ortak alan yüksek dolap üstü, elektronik/metal yakını beklenmedik zula.
 
+Q: kedim nerede ?
+A: Göstergeler: ASC 7° Koç → sen Mars 4°13' Yengeç 4. ev IC girişinde — evin kalbinde, odak yuvada. Kedi 6. ev 25° Aslan yöneticisi Güneş 0°29' Başak 6. evde — yeni burca geçiş → kısa süre önce yer değiştirdi, odadan odaya/saklanma alanına girdi. Güneş 6. evde kendi alanında — ev içinde güvende, rutin bölgesi/mama-kum yakını, dışarıda değil. Başak/Oğlak toprak vurgusu — zemin/döşeme seviyesi, alt kat/karanlık kuytu: kiler/erzak dolabı, çalışma odası kitaplık alt rafı, dolap içi/çekmece arkası/mutfak alt dolabı/süpürgelik. Yön: Başak güney/güneybatı, 6. ev batı-kuzeybatı. Sonuç: ev içinde sağlığı yerinde, yer seviyesi kapalı dolap/kiler/masa altı, az önce açılıp kapanan zemin dolabına odaklan.
+
 Engine JSON:
 {json}
 """
