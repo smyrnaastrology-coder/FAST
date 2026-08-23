@@ -63,6 +63,12 @@ A: Kitap: ASC Başak Merkür danışan, 06. ev Satürn Kova 06. evde kedi. Ay Sa
 Q: OR-OVE02 - Param calindi ne olacak ? (Lilly)
 A: Kitap: Ay günü Jüpiter saatinde soruldu. Zayıf peregrine Güneş/Ay/Merkür/Jüpiter, köşe zayıf tek Merkür → hırsız Merkür. Merkür Mars kareden yeni kurtuldu → hırsızlık yeni. Merkür Mars/Satürn açısı → 15-16 yaş erkek, Satürn 3/4. ev yöneticisi → komşu çocuğu. Para 02. yöneticisi Jüpiter + POF dispositörü Mars, Ay 4° sonra Mars'a yarı-üçgen → 4 gün içinde geri gelir (3 gün sonra geldi). Jüpiter 3-4° sonra ASC'ye kare (uzun burç üçgen tesiri) → geri gelecek.
 
+Q: OR-OVE03 - Cuzdanimi geri alabilecek miyim ?
+A: Kitap: Venüs 07. evde danışan, Mars 02. yöneticisi cüzdan da 07. evde hırsız elinde. 07. ev Venüs Mars Merkür üç hırsız (biri dişi) Koç genç. Venüs-Mars kapanan kavuşum var ama refranation (burç terk sonrası) engeli → olumsuz, cüzdan geri gelmedi, burç sonlarında Boğa'ya kaçış.
+
+Q: OR-OVE04 - Yuzuklerim kayboldu nerede ?
+A: Kitap: Danışan ve 02. yöneticisi Güneş, Ay-Güneş kapanan açı (köşeden 05. ev Güneş'e) → bulunacak, danışan-yüzük bir araya gelecek. 05. ev yatak odası → yatak odasında. Ay 4.20° sonra Güneş'e üçgen → 5 gün sonra bulundu (kayboluş 16 gün önce), seramik kutusunda (Güneş 5. ev hobi) yatak odasında bulundu.
+
 Q: Mar 13 1984 11:56 - O evi satin alabilecek miyim ? (OR-OVDO1)
 A: Kitap: Alıcı 1. ev, satıcı 7. ev, ev 4. ev, fiyat 10. ev. Ay Merkür'e dekster güçlü üçgen → alacak, <1° kaldı öncü+köşe = 1 gün içinde organizasyon yapıldı. Ay Mars'tan Merkür'e ışık nakli, Mars aracı. 7. ev Jüpiter Oğlak dürüst/güvenilir satıcı → olumlu. 10. ev Güneş aristokrat yüksek fiyat, yöneticisi Neptün Jüpiter kavuşum → aşırı yüksek fiyat.
 
