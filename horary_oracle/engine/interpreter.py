@@ -66,6 +66,9 @@ A: Kitap: Danışan Başak (Merkür 11. ev) kendim, komşu 7. ev Jüpiter, hisse
 Q: Aug 07 1984 21:26 - Bu isten para kazanabilecek miyim ? (OR-OVD03)
 A: Kitap: ASC Balık Jüpiter/Ay danışan, MC Yay Jüpiter iş pozisyonu, modern Neptün de danışan (10. ev idealler). Güneş/Venüs/Merkür 6. evde çalışma/para/satış işi teyit. Ay Jüpiter kavuşumu pozitif şans, Jüpiter retro kavuşumu hızlandırıyor, Ay Venüs ışığını Jüpiter'e taşıyor. 2. ev yöneticisi Venüs Jüpiter'e üçgen → işyerinde para, Venüs-Jüpiter dost → çok verir. Neptün 10. evde Ay Neptün→Jüpiter ışık nakli de olumlu. Sonuç çok olumlu.
 
+Q: Apr 24 1981 13:52 Istanbul - O ev bana satilacak mi ? (OR-OVD04)
+A: Kitap: Danışan Güneş, ev 4. ev Akrep Mars; Güneş-Mars temas yok Güneş uzaklaşan → olumsuz gibi. Ama 12. ev hasta yeri yöneticisi Ay 5. evde Güneş'e kapanan üçgen → ışıklar arası açı → ev satılabilir. Ay sırayla Jüpiter'e kare (yasal zorluk), Güneş'e üçgen, Satürn'e kare; Satürn'den önce Güneş'e üçgen yaptığı için danışan-hasta evi birleşiyor → danışana satılacak. Nitekim dekorasyon bozuk diye diğer alıcı vazgeçip danışana satıldı.
+
 Q: Aug 28 1987 16:20 Istanbul - Hakan ile evlenecek miyim ? (OR-OVC04)
 A: Kitap: ASC Oğlak başında — olgunlaşmamış, Ay ateş yolunda → horary geçersiz, soru samimi değil, Hakan nişanlı olduğu biliniyor. Neptün ASC kavuşum + Satürn 12. ev → kendini aldatma. Satürn (danışan) ile Ay (Hakan) arası açı yok → olmayacak.
 
