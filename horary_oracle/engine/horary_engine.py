@@ -894,11 +894,20 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 for p,d in planets.items():
                     if abs((d["lon"]-gad_lon+180)%360-180) < 3:
                         strictures.append({"code":"lilly_29_gad_aspect","level":"warn","planet":p,"meaning":f"Aforizma 29: {p} GAD ile 3° içinde — zarar."})
-                gad_house = None
-                for i, cusp in enumerate(houses["cusps"]):
-                    # basit: GAD hangi evde
-                    pass
         except: pass
+        # Gebelik a-h (5. ev) Lilly K07 104-107 - sorgu children ise
+        if quesited_type in ("children",):
+            try:
+                fifth_cusp = houses["cusps"][4]
+                fifth_sign = sign_from_lon(fifth_cusp)
+                fifth_ruler = DOMICILE.get(fifth_sign,"Mercury")
+                # a: ASC/Ay ↔5.yönetici/melek açı/karşılıklı alma/ışık nakli (basit: 1/5 veya Ay-5 arası 0/60/120)
+                score_baby=0
+                for ang in (0,60,120):
+                    d = abs(((planets[fifth_ruler]["lon"]-planets["Moon"]["lon"]+180)%360-180) if fifth_ruler in planets and "Moon" in planets else 999)
+                    if abs(d-ang) < 6: score_baby+=1
+                strictures.append({"code":"baby_a_h","level":"info","score":score_baby,"meaning":f"Gebelik a-h: 5.ev {fifth_sign}({fifth_ruler}) Ay/ASC ile {score_baby} olumlu temas — a-h kriteri."})
+            except: pass
         # 33: zarar veren gezegenin evi engelin kaynağı (malefik asp)
         # 30/39: tutulma evi + POF asaleti
         try:
