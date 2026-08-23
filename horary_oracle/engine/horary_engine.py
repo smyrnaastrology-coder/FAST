@@ -132,9 +132,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     for name, data in planets.items():
         data["house"] = house_of_planet(data["lon"], houses["cusps"])
 
-    # Significator atama
+    # Significator atama - Akrep için Pluto öncelikli, Mars ikincil (senin talimatın)
     asc_sign = houses["asc_sign"]
     asc_ruler = DOMICILE.get(asc_sign, "Mars")
+    asc_ruler_trad = None
+    if asc_sign == "Akrep":
+        asc_ruler_trad = "Mars"
+        # Pluto ko-significator olarak not düş
     quesited_house_num = RULES["houses"]["quesited_map"].get(quesited_type, 7)
     # quesited evin burcu: cusp burcu
     quesited_cusp_lon = houses["cusps"][quesited_house_num - 1]
@@ -142,6 +146,9 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     quesited_ruler = DOMICILE.get(quesited_sign, "Venus")
 
     querent = {"planet": asc_ruler, "house": 1, "sign": asc_sign, "data": planets.get(asc_ruler)}
+    if asc_ruler_trad:
+        querent["co_ruler"] = asc_ruler_trad
+        querent["co_data"] = planets.get(asc_ruler_trad)
     quesited = {"planet": quesited_ruler, "house": quesited_house_num, "sign": quesited_sign, "data": planets.get(quesited_ruler)}
     # Aynı gezegen ise -> Ay devralır + Masha'allah 6 kriter notu (lord ASC'ye bakıyor mu, Moon bakıyor mu, VOC ve son derece)
     masha_notes = []

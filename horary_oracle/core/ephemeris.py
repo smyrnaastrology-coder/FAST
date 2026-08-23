@@ -34,8 +34,16 @@ PLANETS = {
 SIGNS_TR = ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık"]
 SIGNS_EN = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]
 
-# Yöneticilik tablosu (Geleneksel - modern yöneticiler yok, Lilly uyumlu)
+# Yöneticilik tablosu (karma: Akrep için Pluto öncelikli, sonra Mars - senin "Pluto sonra Mars" talimatın)
 DOMICILE = {
+    "Koç": "Mars", "Akrep": "Pluto",
+    "Boğa": "Venus", "Terazi": "Venus",
+    "İkizler": "Mercury", "Başak": "Mercury",
+    "Yengeç": "Moon", "Aslan": "Sun",
+    "Yay": "Jupiter", "Balık": "Jupiter",
+    "Oğlak": "Saturn", "Kova": "Saturn",
+}
+DOMICILE_TRADITIONAL = {
     "Koç": "Mars", "Akrep": "Mars",
     "Boğa": "Venus", "Terazi": "Venus",
     "İkizler": "Mercury", "Başak": "Mercury",
