@@ -63,6 +63,9 @@ A: Kitap: Alıcı 1. ev, satıcı 7. ev, ev 4. ev, fiyat 10. ev. Ay Merkür'e de
 Q: Jul 13 1990 10:03 - Parami hisse senedine yatirmali miyim ? (OR-OVD02)
 A: Kitap: Danışan Başak (Merkür 11. ev) kendim, komşu 7. ev Jüpiter, hisse 7'ye göre 8. ev (=2. ev) yöneticisi Venüs Terazi. Venüs ilk açı Jüpiter ile (major olmasa da) → olumlu. Ama Jüpiter Güneş ile yanma + Ay VOC → horary geçersiz, tatmin edici cevap alınamaz.
 
+Q: Aug 07 1984 21:26 - Bu isten para kazanabilecek miyim ? (OR-OVD03)
+A: Kitap: ASC Balık Jüpiter/Ay danışan, MC Yay Jüpiter iş pozisyonu, modern Neptün de danışan (10. ev idealler). Güneş/Venüs/Merkür 6. evde çalışma/para/satış işi teyit. Ay Jüpiter kavuşumu pozitif şans, Jüpiter retro kavuşumu hızlandırıyor, Ay Venüs ışığını Jüpiter'e taşıyor. 2. ev yöneticisi Venüs Jüpiter'e üçgen → işyerinde para, Venüs-Jüpiter dost → çok verir. Neptün 10. evde Ay Neptün→Jüpiter ışık nakli de olumlu. Sonuç çok olumlu.
+
 Q: Aug 28 1987 16:20 Istanbul - Hakan ile evlenecek miyim ? (OR-OVC04)
 A: Kitap: ASC Oğlak başında — olgunlaşmamış, Ay ateş yolunda → horary geçersiz, soru samimi değil, Hakan nişanlı olduğu biliniyor. Neptün ASC kavuşum + Satürn 12. ev → kendini aldatma. Satürn (danışan) ile Ay (Hakan) arası açı yok → olmayacak.
 
