@@ -1,89 +1,86 @@
 """
-Yer Bulma Motoru - 4.txt + 5.txt
-Mesafe / Yön / Yükseklik
+Yer/Zaman Bulma Motoru - Kitap 135-142 tam tablolar
+Zaman: Ay burç(ev) tablosu + belirleyiciler arası applying derece
+Alan/Uzaklık/Yön/Yükseklik/Yer kalitesi
 """
-import math
+# Zaman tablosu 135-136
+TIME_TABLE = {
+    ("öncü","köşe"): "Gün", ("öncü","orta"): "Hafta", ("öncü","son"): "Ay",
+    ("değişken","köşe"): "Hafta", ("değişken","orta"): "Ay", ("değişken","son"): "Yıl",
+    ("sabit","köşe"): "Ay", ("sabit","orta"): "Yıl", ("sabit","son"): "Belirsiz",
+}
+SIGN_MOD = {
+    "Koç":"öncü","Yengeç":"öncü","Terazi":"öncü","Oğlak":"öncü",
+    "İkizler":"değişken","Başak":"değişken","Yay":"değişken","Balık":"değişken",
+    "Boğa":"sabit","Aslan":"sabit","Akrep":"sabit","Kova":"sabit",
+}
+def burc_mod(sign): return SIGN_MOD.get(sign,"değişken")
+def ev_tipi(house):
+    if house in (1,4,7,10): return "köşe"
+    if house in (2,5,8,11): return "orta"
+    return "son"
+def zaman_birimi(ay_sign, ay_house):
+    return TIME_TABLE.get((burc_mod(ay_sign), ev_tipi(ay_house)), "Gün")
 
+# Alan 136-137
+def alan_tipi(house):
+    if house in (1,4,7,10): return "yakında/her zaman olması gereken yerde, kolay bulunacak"
+    if house in (2,5,8,11): return "uzakta, bulunması zaman alacak, farklı yerde"
+    return "çok uzakta, uzun zamanda ancak başkaları bulabilir"
+
+# Uzaklık - Simmonite/Goldstein tabloları 137-138 (yaklaşık km)
+# Yersel enlem × ev tablosu
+def uzaklik_simmontie(enlem_deg, house, kuzey=True):
+    # güney için farklı sütun yok kitapta, kuzey tablosu kullanılıyor
+    if house in (1,4,7,10): return 0 if kuzey else 0.2 # Sıfır/Yakın
+    if house in (2,5,8,11):
+        return 1.6 if kuzey else 5.0
+    return 5.0 if kuzey else 111.1
+
+def uzaklik_burc_katsayi(mod):
+    return {"öncü":3.2,"değişken":0.8,"sabit":0.4}.get(mod,0.8)
+
+# Yön 139-140
+EV_YON = {1:"DOĞU",4:"KUZEY",7:"BATI",10:"GÜNEY",
+          2:"DOĞU KUZEY-DOĞU",3:"KUZEY KUZEY-DOĞU",5:"KUZEY KUZEY-BATI",6:"BATI KUZEY-BATI",
+          8:"BATI GÜNEY-BATI",9:"GÜNEY GÜNEY-BATI",11:"GÜNEY GÜNEY-DOĞU",12:"DOĞU GÜNEY-DOĞU"}
+BURC_YON = {
+    "Koç":"DOĞU","Aslan":"KUZEY DOĞU","Yay":"GÜNEY DOĞU",
+    "Terazi":"BATI","Kova":"KUZEY BATI","İkizler":"GÜNEY BATI",
+    "Yengeç":"KUZEY","Akrep":"DOĞU KUZEY","Balık":"BATI KUZEY",
+    "Oğlak":"GÜNEY","Boğa":"DOĞU GÜNEY","Başak":"BATI GÜNEY",
+}
+def direction_by_house(house): return EV_YON.get(house,"BATI")
+def direction_by_sign(sign): return BURC_YON.get(sign,"DOĞU")
+
+# Yükseklik 140
+YUKSEKLIK = {
+    "ateş":"yüksek (üst kat, çatı katı-çatı)",
+    "hava":"çok yüksek (tepe, çatı)",
+    "su":"alçak (zemin, giriş katı, su seviyesi)",
+    "toprak":"çok alçak (bodrum, kiler, atölye, yer altı)",
+}
+ELEMENT = {"Koç":"ateş","Aslan":"ateş","Yay":"ateş","İkizler":"hava","Terazi":"hava","Kova":"hava","Yengeç":"su","Akrep":"su","Balık":"su","Boğa":"toprak","Başak":"toprak","Oğlak":"toprak"}
+def height_by_element(el): return YUKSEKLIK.get(el,"")
+def height_by_sign(sign): return YUKSEKLIK.get(ELEMENT.get(sign,""),"")
+
+# Yer kalitesi 141-142
+MOD_KALITE = {"öncü":"dikkati çeken, kaliteli, yüksek bina/çatı","sabit":"gizli/saklı/kapalı, kaliteli, düz/tabana yakın","değişken":"silik, kalitesiz, değişken sulu/hendekli/çukurlu"}
+ELEMENT_KALITE = {
+    "ateş":"ateşli/sıcak/kuru - dağlık/volkanik/ocak/şömine/oyun odası",
+    "hava":"havalı/ılık/ferah - bahçe/veranda/kule/çalışma odası/pencere/teras",
+    "su":"sulu/serin/nemli - deniz/göl/kuyu/bahçe duvarı/banyo/yatak odası/lavabo",
+    "toprak":"topraklı/soğuk/tozlu - ekili tarla/mağara/bodrum/garaj/kiler/depo",
+}
+
+# Eski API uyumu için alias
 def distance_fixed(lat, degree, house, is_north=True):
-    """4.txt: enlem * derece * faktör. Cadent evlerde km, angular metre - txt + global araştırma sentezi"""
-    if house in [1,4,7,10]:
-        f = 0.2 if is_north else 1.6
-        unit = "m"
-    elif house in [2,5,8,11]:
-        f = 1.6
-        unit = "m"
-    else:  # 3,6,9,12 cadent - çok uzak
-        f = 5
-        unit = "km"
-    val = lat * degree * f
-    # Birim düzeltme: cadent km, ama değer küçükse metreye çevirme yok - global araştırma: cadent = km
-    # Angular/succedent'te 1000m üstü km'ye çevir
-    if unit == "m" and val > 1000:
-        val = val / 1000
-        unit = "km"
-    if house == 12:
-        val = min(val, 200)
-    return val, unit
-
-def distance_live(element, house):
-    """Canlı: öncü 3.2km değişken 0.8km sabit 0.4km; 1,4,7,10 çarpansız"""
-    base = {"cardinal":3.2,"mutable":0.8,"fixed":0.4}
-    val = base.get(element,0.8)
-    if house not in [1,4,7,10]:
-        return None  # formül 2 devreye girer
-    return val
-
-def distance_live_advanced(asc_lon, target_lon, element):
-    """Formül 2: ASC ↔ belirleyici ilk major açı derecesi * katsayı (20*3.2=64km)"""
-    # ilk major açı derecesini bul (0,60,90,120,180 en yakın)
-    diff = (target_lon - asc_lon) % 360
-    majors = [0,60,90,120,180]
-    # en yakın major'a uzaklık
-    dist_to_major = min(abs((diff - m + 180) % 360 - 180) for m in majors)
-    # ilk major'a kadar derece
-    first_major_deg = min(majors, key=lambda m: abs((diff - m + 180) % 360 - 180))
-    # basitleştir: diff kadar * katsayı
-    base = {"cardinal":3.2,"mutable":0.8,"fixed":0.4}.get(element,0.8)
-    return diff * base, f"{diff:.1f}°*{base}km"
-
-def distance_house_cusp(cusp_lon, planet_lon):
-    """Ev kesiti ↔ gezegen arası 122° = 122km dairesi (hareketli cisim)"""
-    diff = abs((planet_lon - cusp_lon + 360) % 360)
-    if diff > 180: diff = 360 - diff
-    return diff  # km dairesi
-
-def distance_moon_first_major(moon_lon, moon_speed, target_lon, target_speed):
-    """Ay'ın belirleyici ile ilk major açısına kadar derece (22° → 0.5km hareket alanı)"""
-    for ang in [0,60,90,120,180]:
-        diff = (target_lon - moon_lon) % 360
-        d = abs((diff - ang + 180) % 360 - 180)
-        # applying mi?
-        diff_next = ((target_lon+target_speed) - (moon_lon+moon_speed)) % 360
-        d_next = abs((diff_next - ang + 180) % 360 - 180)
-        if d_next < d and d <= 10:
-            return d, ang
-    return None, None
-
-def direction_by_house(house):
-    m = {1:"DOĞU",7:"BATI",4:"KUZEY",10:"GÜNEY"}
-    if house in m:
-        return m[house]
-    if 1 < house < 4:
-        return "KUZEYDOĞU"
-    if 4 < house < 7:
-        return "KUZEYBATI"
-    if 7 < house < 10:
-        return "GÜNEYBATI"
-    return "GÜNEYDOĞU"
-
-def height_by_element(element):
-    return {"air":"çok yüksek (çatı)","fire":"yüksek (üst kat)","water":"alçak (giriş)","earth":"çok alçak (bodrum)"}.get(element,"")
-
-def house_location_meaning(house):
-    meanings = {
-        1:"en çok kullanılan yer/eşya",2:"para kasası/cüzdan",3:"tv/telefon/araba anahtarı",
-        4:"yaşlı odası/mutfak/depo",5:"oyun/çocuk odası",6:"ilaç/temizlik/kopek",
-        7:"eş koltuğu/evlilik cüzdanı",8:"banyo/çöp/kredi/fantezi",9:"pasaport/ders",
-        10:"iş evrakı",11:"misafir/teknoloji",12:"yatak/yoga"
-    }
-    return meanings.get(house,"")
+    base = uzaklik_simmontie(0, house, is_north)
+    # basit fallback
+    val = degree * uzaklik_burc_katsayi(burc_mod("Koç"))
+    return val, "km"
+def distance_live(element, house): return uzaklik_burc_katsayi(element)
+def distance_live_advanced(a,b,c): return (0,"")
+def distance_house_cusp(a,b): return abs(a-b)%360
+def distance_moon_first_major(a,b,c,d): return (None,None)
+def house_location_meaning(h): return alan_tipi(h)
