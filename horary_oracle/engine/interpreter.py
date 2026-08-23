@@ -66,6 +66,12 @@ A: Kitap: Kızı Güneş, burç değiştirmeden açısız seyir dışı ve zayı
 Q: Jan 22 1981 20:40 Istanbul - Ayrilik olacak mi ? (OR-OVC06)
 A: Kitap: ASC 3° sonrası olgunlaşmamış, Ay eziyete derecesi zayıf → olumsuz. Danışan Ay/Merkür, koca Jüpiter/Güneş; Merkür-Jüpiter açı yapmadan burç terk → bir araya gelmeme. Ay-Güneş 150° destekler. Jüpiter Satürn ile beraber 2. evde para olumsuz, Merkür Mars'a kavuşacak → danışan işyerinde erkekle beraberlik. Ay → 5. ev Venüs'e üçgen → kız danışanda kalır. Ay değişken 1. ev Uranüs'e 27° sonra açı → 27 hafta ayrılık yorumu, boşanma 27 ay sonra gerçekleşti.
 
+Q: May 15 1975 11:40 - Gebe kalabilecek miyim ? (OR-OVC07)
+A: Kitap: Danışan Güneş - bebek 5. ev Jüpiter açı yok → olumsuz. Ay Satürn'e kavuşuma gidiyor → sıkıntı/zorluk. Ay Jüpiter'den ayrılan kare + Jüpiter Satürn'e kapanan kare → engel. Sonuç gebe kalamaz, ciddi tıbbi tedbir gerek.
+
+Q: Feb 24 1975 15:42 - Gebe mi kaldim ? (OR-OVCO8)
+A: Kitap: ASC Aslan 5. ev Yay, danışan Güneş-bebek Jüpiter açı yok → olumsuz. Ay Jüpiter'e kapanan kavuşum olumlu gibi ama önce Merkür'e kare engellenme → olumsuz. Doğu ufkuna kavuşum yapan Satürn kesin olumsuzluk. Sonuç gebe değil.
+
 Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
 A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
 
