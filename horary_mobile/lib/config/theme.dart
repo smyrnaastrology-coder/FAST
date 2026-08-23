@@ -28,15 +28,15 @@ class FastTheme {
   static const Color textDark = ltTextDark;
   static const Color textLight = ltTextLight;
 
-  // Light theme (original)
-  static const Color ltPrimary = Color(0xFFB8A9C9);
-  static const Color ltSecondary = Color(0xFF8FB8CA);
+  // Light theme - Asartepe Sinastri Akademisi (altın pusula)
+  static const Color ltPrimary = Color(0xFFC9A96E); // altın
+  static const Color ltSecondary = Color(0xFFB89A4F); // koyu altın
   static const Color ltAccent = Color(0xFFC9A96E);
-  static const Color ltRose = Color(0xFFD4878F);
-  static const Color ltTextDark = Color(0xFF4A4A4A);
-  static const Color ltTextLight = Color(0xFF6B5B7B);
-  static const Color ltBg = Color(0xFFFBF7F4);
-  static const Color ltBorder = Color(0xFFE8E0D8);
+  static const Color ltRose = Color(0xFFD4AF37); // altın gül
+  static const Color ltTextDark = Color(0xFF3D2E14); // koyu kahve
+  static const Color ltTextLight = Color(0xFF8C7A3A);
+  static const Color ltBg = Color(0xFFFFFEFB); // beyaz-altın krem
+  static const Color ltBorder = Color(0xFFE8DCC0); // altın çizgi
 
   static ThemeData get dark {
     final colorScheme = ColorScheme.dark(
