@@ -153,8 +153,11 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             if code in ("voc",): continue
             if code in STRICTURE_TEXT or s.get("meaning"):
                 parts.append(stricture_sentence(s))
-        if timing_txt and timing_txt != "0 BELİRSİZ (1 hafta içinde tekrar sor)":
-            parts.append(f"Zamanlama: {timing_txt} içinde gelişme beklenir.")
+        # Ephemeris gerçek tarih varsa onu tercih et
+        epi_txt = t.get("ephemeris_text") or t.get("ephemeris_unit")
+        use_timing = epi_txt if epi_txt else timing_txt
+        if use_timing and use_timing != "0 BELİRSİZ (1 hafta içinde tekrar sor)":
+            parts.append(f"Zamanlama: {use_timing} içinde gelişme beklenir. (sembolik: {timing_txt})" if epi_txt else f"Zamanlama: {timing_txt} içinde gelişme beklenir.")
         if is_where and loc:
             parts.append(f"Yer: {loc.get('direction','')} yönünde, yaklaşık {loc.get('distance','')} .")
         return " ".join(parts)

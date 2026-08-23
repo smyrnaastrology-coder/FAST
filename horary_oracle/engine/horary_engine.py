@@ -688,6 +688,33 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     if deg_diff > 180:
         deg_diff = 360 - deg_diff
     timing = {"unit":timing_unit,"degrees":round(deg_diff,1),"burc_type":burc_type,"house_type":house_type,"text":f"{round(deg_diff)} {timing_unit}"}
+    # Ephemeris gerçek kavuşum tarihi (sembolik derece yerine)
+    try:
+        # Ay → quesited/Lot için gerçek aspect tarihi ara (0.25 gün adımla 365 gün)
+        best_days = None; best_ang = None
+        for step in [d*0.25 for d in range(1, 1460)]:  # 365 gün
+            jd2 = jd + step
+            mlon = swe.calc_ut(jd2, swe.MOON)[0][0] % 360
+            tlon = swe.calc_ut(jd2, swe.SUN)[0][0] % 360  # placeholder, hedef quesited için swe.calc ile target gezegen
+            # hedef gezegenin swe id'si
+            pid_map = {"Sun":swe.SUN,"Moon":swe.MOON,"Mercury":swe.MERCURY,"Venus":swe.VENUS,"Mars":swe.MARS,"Jupiter":swe.JUPITER,"Saturn":swe.SATURN}
+            pid = pid_map.get(quesited["planet"], swe.VENUS)
+            tlon = swe.calc_ut(jd2, pid)[0][0] % 360
+            diff_a = (tlon - mlon) % 360
+            for ang in (0,60,90,120,180):
+                if abs((diff_a - ang + 180)%360-180) < 1.0:  # exact orb 1°
+                    best_days = step; best_ang = ang; break
+            if best_days is not None: break
+        if best_days is not None:
+            timing["ephemeris_days"] = round(best_days,1)
+            timing["ephemeris_angle"] = best_ang
+            timing["ephemeris_text"] = f"{round(best_days)} gün sonra {best_ang}° (ephemeris)"
+            # Sembolik yerine ephemeris'i de ekle
+            if best_days < 7: timing["ephemeris_unit"] = "GÜN (ephemeris)"
+            elif best_days < 60: timing["ephemeris_unit"] = "HAFTA (ephemeris)"
+            elif best_days < 400: timing["ephemeris_unit"] = "AY (ephemeris)"
+            else: timing["ephemeris_unit"] = "YIL (ephemeris)"
+    except: pass
     # 5_2.txt Zaman gezegen yılları: Ay 0-4 Merkür 4-14 Venüs 14-22 Güneş 22-40 Mars 41-56 Jüpiter 56-68 Satürn 68+ (ve saat karşılıkları)
     try:
         planet_years = RULES.get("timing_planet_years", {})
