@@ -27,6 +27,9 @@ A: Harita Parametreleri - 23 Ağustos 2026 21:07:58 İzmir ASC 01°58' Koç MC 0
 Q: beni seviyor mu ? sevgili olacak mıyız ?
 A: Göstergeler: ASC 03° Koç → sen Mars, 7. ev 03° Terazi → karşı taraf Venüs. Venüs 16° Terazi domicile — kendi alanında güçlü, keyfi yerinde, sana değil kendine odaklı. Terazi Mars'ın detriment'i — Venüs Mars'ı ağırlamıyor/dışlıyor → romantik ilgisizlik, uyumsuzluk, itici/yorucu bulma. Mars 08° Yengeç düşüşte — sen zayıf/güvensiz, reaktif. Açılar: Mars 08° Yengeç - Venüs 16° Terazi kare ama separating (Venüs hızlı, geçmişte kaldı) → geleceğe eylem yok. Ay 10° Oğlak → Venüs 16° Terazi applying kare ama Ay zararda ve ağırlama yok → engel. Sonuç: karşı taraf sevgi hissetmiyor, sevgili olma yok. Soru: iletişim tamamen koptu mu, zorunlu diyalog mu devam ediyor?
 
+Q: hastalığım nasıl ilerleyecek ? iyileşecek miyim ?
+A: Not: Tamamen astrolojik göstergeler, tıbbi teşhis yerine geçmez, hekime başvur. Göstergeler: ASC 4° Koç → sen Mars 16° Yengeç düşüşte 4. evde — vitalite düşük, bağışıklık yorgun, evde istirahat ihtiyacı. 6. ev Başak yöneticisi Merkür 29° Aslan Rx anaretik — hastalık kriz eşiğinde, nükseden/uzayan süreç. Satürn 14° Koç Rx 1. evde — bedende ağırlık/kısıtlanmışlık. Seyir: Ay 10° Oğlak önümüzdeki günlerde Satürn 14° Koç, Venüs 16° Terazi, Mars 16° Yengeç ile T-Kare/Büyük Haç tetikleyecek → 4-6 birim (gün/hafta) içinde semptom pik/akut kriz. Çözülme: öncü kriz hızlı çözülür, Ay açıları geçip Merkür direkt dönünce iyileşme fazı. Güneş 0° Başak tam 6. ev çizgisinde — odak sağlık/rutin, beslenme/dinlenme ile toparlanma. Sonuç: iyileşme var ama önce pik yaşanır, sıvı dengesi + ev istirahati kritik.
+
 Engine JSON:
 {json}
 """
