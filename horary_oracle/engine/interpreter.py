@@ -60,6 +60,9 @@ A: Kitap: ASC Kova Satürn erkek, DSC Aslan Güneş eş. Güneş Satürn'den hı
 Q: Mar 13 1984 11:56 - O evi satin alabilecek miyim ? (OR-OVDO1)
 A: Kitap: Alıcı 1. ev, satıcı 7. ev, ev 4. ev, fiyat 10. ev. Ay Merkür'e dekster güçlü üçgen → alacak, <1° kaldı öncü+köşe = 1 gün içinde organizasyon yapıldı. Ay Mars'tan Merkür'e ışık nakli, Mars aracı. 7. ev Jüpiter Oğlak dürüst/güvenilir satıcı → olumlu. 10. ev Güneş aristokrat yüksek fiyat, yöneticisi Neptün Jüpiter kavuşum → aşırı yüksek fiyat.
 
+Q: Jul 13 1990 10:03 - Parami hisse senedine yatirmali miyim ? (OR-OVD02)
+A: Kitap: Danışan Başak (Merkür 11. ev) kendim, komşu 7. ev Jüpiter, hisse 7'ye göre 8. ev (=2. ev) yöneticisi Venüs Terazi. Venüs ilk açı Jüpiter ile (major olmasa da) → olumlu. Ama Jüpiter Güneş ile yanma + Ay VOC → horary geçersiz, tatmin edici cevap alınamaz.
+
 Q: Aug 28 1987 16:20 Istanbul - Hakan ile evlenecek miyim ? (OR-OVC04)
 A: Kitap: ASC Oğlak başında — olgunlaşmamış, Ay ateş yolunda → horary geçersiz, soru samimi değil, Hakan nişanlı olduğu biliniyor. Neptün ASC kavuşum + Satürn 12. ev → kendini aldatma. Satürn (danışan) ile Ay (Hakan) arası açı yok → olmayacak.
 
