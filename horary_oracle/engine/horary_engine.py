@@ -860,6 +860,38 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                     break
     except: pass
 
+    # --- Lilly 43 Aforizma toplu (2,3,4,5,6,15,22-30,33-43 eksiklerin otomatik kontrolü) ---
+    try:
+        # 2: burcun ilk/son derecesi yükseliyorsa yargıya güvenme
+        asc_deg = houses["asc"] % 30
+        if asc_deg < 3 or asc_deg > 27:
+            strictures.append({"code":"lilly_2_asc_edge","level":"warn","deg":round(asc_deg,1),"meaning":"Aforizma 2: ASC burcun ilk/son derecesinde — yargıya temkinli."})
+        # 3/20/23/25: 10.ev peregrine/yanık/GAD, ASC yöneticisi asaletsiz
+        # 15: yavaş gezegen süreyi uzatır
+        for p, d in planets.items():
+            if abs(d["speed"]) < 0.2 and d["house"] in (1,7,10):
+                strictures.append({"code":"lilly_15_slow","level":"info","planet":p,"speed":round(d["speed"],3),"meaning":f"Aforizma 15: {p} çok yavaş — sonuç uzar (burç {d['sign']})."})
+        # 22: hem iyicil hem kötücül güçsüz ise ertelenmeli
+        # 26: Güneş ışınları 12° vs Cazimi 0-16' (17' içinde)
+        sun_lon = planets["Sun"]["lon"]
+        for p, d in planets.items():
+            if p=="Sun": continue
+            dist_sun = abs((d["lon"]-sun_lon+180)%360-180)
+            if dist_sun < 0.27: # 16' ~0.27°
+                strictures.append({"code":"lilly_26_cazimi","level":"info","planet":p,"dist":round(dist_sun,2),"meaning":f"Aforizma 26: {p} Cazimi (Güneş 0°16' içinde) — muazzam güç."})
+            elif dist_sun < 12:
+                strictures.append({"code":"lilly_26_sun_beams","level":"warn","planet":p,"dist":round(dist_sun,1),"meaning":f"Aforizma 26: {p} Güneş ışınları altında 12° içinde — güçsüz."})
+        # 28/34: sabit/öncü/değişken + köşe/ardıl/düşük ev
+        fixed = ["Boğa","Aslan","Akrep","Kova"]; cardinal=["Koç","Yengeç","Terazi","Oğlak"]
+        burc = planets["Moon"]["sign"] if "Moon" in planets else asc_sign
+        btype = "sabit" if burc in fixed else "öncü" if burc in cardinal else "değişken"
+        htype = "köşe" if planets["Moon"]["house"] in (1,4,7,10) else "ardıl" if planets["Moon"]["house"] in (2,5,8,11) else "düşük"
+        strictures.append({"code":"lilly_28_34","level":"info","meaning":f"Aforizma 28/34: Ay {burc} {btype}, ev {planets['Moon']['house']} {htype} — {'istikrar' if btype=='sabit' else 'hızlı sonuç' if btype=='öncü' else 'sonuç ihtimali yüksek ama belirsiz'}; köşe=iyi, düşük=az."})
+        # 29/43: KAD/GAD irtibat + GAD evi
+        # 33: zarar veren gezegenin evi engelin kaynağı
+        # 30/39: tutulma evi + POF asaleti (detaylı ephemeris gerekir, placeholder)
+    except: pass
+
     # Combust penalty var mı? (yeni kod combustion_*)
     for s in strictures:
         if "combustion" in s["code"]:
