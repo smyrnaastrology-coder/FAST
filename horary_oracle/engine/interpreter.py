@@ -63,6 +63,9 @@ A: Kitap: ASC Oğlak başında — olgunlaşmamış, Ay ateş yolunda → horary
 Q: Feb 18 1982 17:25 Istanbul - Bu ask iliskisinin sonu ne olacak ? (OR-OVCO5)
 A: Kitap: Kızı Güneş, burç değiştirmeden açısız seyir dışı ve zayıf. Sonra Uranüs'le kare → ayrılık. Ay 10° → 5. ev yöneticisi Jüpiter'e yan-üçgen 10°→ 10 ay sonra yeni aşk fırsatı.
 
+Q: Jan 22 1981 20:40 Istanbul - Ayrilik olacak mi ? (OR-OVC06)
+A: Kitap: ASC 3° sonrası olgunlaşmamış, Ay eziyete derecesi zayıf → olumsuz. Danışan Ay/Merkür, koca Jüpiter/Güneş; Merkür-Jüpiter açı yapmadan burç terk → bir araya gelmeme. Ay-Güneş 150° destekler. Jüpiter Satürn ile beraber 2. evde para olumsuz, Merkür Mars'a kavuşacak → danışan işyerinde erkekle beraberlik. Ay → 5. ev Venüs'e üçgen → kız danışanda kalır. Ay değişken 1. ev Uranüs'e 27° sonra açı → 27 hafta ayrılık yorumu, boşanma 27 ay sonra gerçekleşti.
+
 Q: Aug 06 1980 19:08 Istanbul - Basarili ressam olabilir miyim ?
 A: Kitap K07 146: Horary olumsuz. ASC Oğlak yöneticisi Satürn Başak burcunda → danışan resim konumunda değil. 10. ev Akrep Mars yönetiminde, Terazi'deki Mars sanatla ilgili. Satürn-Mars açısı yok → ressam olamaz. MC 19° Akrep Serpentis ile kavuşum lanet işareti. İkincil Ay VOC → sorudan bir şey çıkmaz. Sonuç: 5 yıl sonra halen eğitimiyle ilgili işte, ressamlıktan para kazanmadı.
 
