@@ -113,6 +113,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         "betelgeuse_28": "28 İkizler Betelgeuse — kadın/ilahi yardım ile çözülür.",
         "visitor_who": "Gizli WHO — ASC ve yöneticisinin burç/ev/sabit yıldızına göre gelen kişinin karakteri.",
         "visitor_why": "Gizli WHY — 7. yöneticisi + Ay + 3. ev ile niyet/motive analizi.",
+        "dream_meaning": "Gizli DREAM — 12. ev yöneticisi + Ay + Neptune ile rüya kaynağı ve kehanet analizi.",
         "masha_allah": "Masha'allah querent kriteri — lord/Ay ASC'ye bakıyor mu kontrolü.",
         "saturn_10_peregrine": "Saturn 10. evde peregrine/retro — itibar riski.",
         "mars_10_peregrine": "Mars 10. evde peregrine/retro — itibar riski.",

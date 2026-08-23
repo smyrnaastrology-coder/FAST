@@ -122,7 +122,8 @@ async def cast(req: CastRequest):
     qlow2 = req.question.lower()
     is_visitor_who = any(k in qlow2 for k in ["yanıma gelen","yanimda gelen","yanımdaki kişi","yanimdaki kisi","karşımdaki kişi","karsimdaki kisi","kim bu kişi","nasıl biri","nasil biri"])
     is_visitor_why = any(k in qlow2 for k in ["neden geldi","neden aradı","neden yazdı","neden aradi","niyeti ne","neden mesaj","neden geldiğini"])
-    if is_visitor_who or is_visitor_why:
+    is_dream = any(k in qlow2 for k in ["rüya","ruya","rüyam","ruyam","rüyam ne","ruyam ne","rüyada gördüm","ruyada gordum"])
+    if is_visitor_who or is_visitor_why or is_dream:
         try:
             # visitor_who: ASC + ASC yöneticisi burç/ev + sabit yıldız karakteri
             asc_sign = res['houses']['asc_sign']; asc_deg = res['houses']['asc'] % 30
@@ -137,13 +138,24 @@ async def cast(req: CastRequest):
             if is_visitor_who:
                 res['strictures'].insert(0, {"code":"visitor_who","level":"info","meaning":f"Gizli WHO: ASC {asc_sign} {asc_deg:.1f}° — gelen kişi {elem.get(asc_sign,'')} enerjisinde, yöneticisi {ruler} {ruler_data['sign']} {ruler_data['deg']:.1f}° Ev{ruler_data['house']}{' Rx' if ruler_data['retro'] else ''} → o evin konularıyla tanımlı kişi.{star_note}"})
             if is_visitor_why:
-                # why: 7.yönetici + Ay evi + 3.ev
                 sev_house = res['quesited']['house']; moon_house = res['planets']['Moon']['house']
-                # 3.ev analizi
                 third_cusp = res['houses']['cusps'][2] % 360
                 from core.ephemeris import sign_from_lon as _sfl
                 third_sign = _sfl(third_cusp)
                 res['strictures'].insert(0, {"code":"visitor_why","level":"info","meaning":f"Gizli WHY: 7.yöneticisi {res['quesited']['planet']} Ev{sev_house} ({res['quesited']['sign']}), Ay Ev{moon_house} ({res['planets']['Moon']['sign']}) niyeti gösteriyor; 3.ev {third_sign} mesaj/arma şekli. 7→1 açısı varsa doğrudan sana yönelik niyet."})
+            if is_dream:
+                # dream: 12. ev + 9. ev + Ay + Neptune
+                twelfth_cusp = res['houses']['cusps'][11] % 360
+                from core.ephemeris import sign_from_lon as _sfl2, DOMICILE as _DOM
+                twelfth_sign = _sfl2(twelfth_cusp)
+                twelfth_ruler = _DOM.get(twelfth_sign, "Saturn")
+                tw_data = res['planets'].get(twelfth_ruler, {})
+                moon_sign = res['planets']['Moon']['sign']; moon_house = res['planets']['Moon']['house']
+                neptune = res['planets'].get('Neptune', {})
+                nept_note = f" Neptune Ev{neptune.get('house','?')} {neptune.get('sign','')}" if neptune else ""
+                # 9. ev kehanet kontrol
+                ninth_sign = _sfl2(res['houses']['cusps'][8] % 360)
+                res['strictures'].insert(0, {"code":"dream_meaning","level":"info","meaning":f"Gizli DREAM: 12.ev {twelfth_sign} yöneticisi {twelfth_ruler} {tw_data.get('sign','')} Ev{tw_data.get('house','?')} → rüyanın kaynağı o evin konuları; Ay {moon_sign} Ev{moon_house} rüyanın taşıyıcısı; {nept_note} prophetic/karmaşa ayırt eder; 9.ev {ninth_sign} kehanet potansiyeli."})
         except: pass
 
     # LLM sadece tercüman
@@ -154,9 +166,13 @@ async def cast(req: CastRequest):
         "querent": res["querent"]["planet"], "quesited": res["quesited"]["planet"],
         "question": req.question, "location": loc_info
     }
-    # visitor who/why için prompt'a gizli talimat ekle (dışarıda görünmez)
-    if is_visitor_who or is_visitor_why:
-        engine_json["hidden_instruction"] = "Bu soru gizli visitor modeli: WHO ise ASC ve yöneticisinin burç/ev/sabit yıldızına göre karakteri muhabbet gibi anlat; WHY ise 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat. Standart horary kalıbının dışına çık, insani dil kullan."
+    # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
+    if is_visitor_who or is_visitor_why or is_dream:
+        hidden = []
+        if is_visitor_who: hidden.append("WHO: ASC ve yöneticisinin burç/ev/sabit yıldızına göre karakteri muhabbet gibi anlat")
+        if is_visitor_why: hidden.append("WHY: 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat")
+        if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
+        engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000
