@@ -60,6 +60,9 @@ A: Kitap: ASC Kova Satürn erkek, DSC Aslan Güneş eş. Güneş Satürn'den hı
 Q: Jan 13 1994 20:50 Istanbul - Kedim kayboldu nerede ? (OR-OVEO1) Figür 30
 A: Kitap: ASC Başak Merkür danışan, 06. ev Satürn Kova 06. evde kedi. Ay Satürn'e kavuşacak ilerliyor → bir araya gelecek. Kedi Kova 06. evde, alan biliniyor evde, yavru apartmandan çıkamaz, Ay-Satürn <30° yakınlık teyit. Satürn sabit=gizli/kapalı, hava=yüksek, Kova=teknik alet, iki burç kesitine yakın=iki şey arasına sıkışmış, 06. ev=sağlık/hijyen/hizmet → üst kat banyo jakuzi. Jüpiter ASC'ye iyi açı → düzelecek. 2 gün sonra jakuzi servis kapısından girip hapiste bulundu.
 
+Q: OR-OVE02 - Param calindi ne olacak ? (Lilly)
+A: Kitap: Ay günü Jüpiter saatinde soruldu. Zayıf peregrine Güneş/Ay/Merkür/Jüpiter, köşe zayıf tek Merkür → hırsız Merkür. Merkür Mars kareden yeni kurtuldu → hırsızlık yeni. Merkür Mars/Satürn açısı → 15-16 yaş erkek, Satürn 3/4. ev yöneticisi → komşu çocuğu. Para 02. yöneticisi Jüpiter + POF dispositörü Mars, Ay 4° sonra Mars'a yarı-üçgen → 4 gün içinde geri gelir (3 gün sonra geldi). Jüpiter 3-4° sonra ASC'ye kare (uzun burç üçgen tesiri) → geri gelecek.
+
 Q: Mar 13 1984 11:56 - O evi satin alabilecek miyim ? (OR-OVDO1)
 A: Kitap: Alıcı 1. ev, satıcı 7. ev, ev 4. ev, fiyat 10. ev. Ay Merkür'e dekster güçlü üçgen → alacak, <1° kaldı öncü+köşe = 1 gün içinde organizasyon yapıldı. Ay Mars'tan Merkür'e ışık nakli, Mars aracı. 7. ev Jüpiter Oğlak dürüst/güvenilir satıcı → olumlu. 10. ev Güneş aristokrat yüksek fiyat, yöneticisi Neptün Jüpiter kavuşum → aşırı yüksek fiyat.
 
