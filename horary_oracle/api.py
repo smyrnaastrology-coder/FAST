@@ -42,6 +42,10 @@ class CastRequest(BaseModel):
     day: Optional[int] = None
     hour: Optional[float] = None  # local decimal
 
+class AuthRequest(BaseModel):
+    email: str
+    password: str
+
 class HealthResponse(BaseModel):
     status: str
     version: str
@@ -67,6 +71,31 @@ def resolve_time(req: CastRequest):
 @app.get("/api/health", response_model=HealthResponse)
 async def health():
     return {"status":"ok","version":"1.0.0"}
+
+@app.post("/api/auth/login")
+async def auth_login(req: AuthRequest):
+    from auth import verify
+    ok, info = verify(req.email, req.password)
+    if not ok: raise HTTPException(401, str(info))
+    return {"ok":True, **info}
+
+@app.get("/admin/list")
+async def admin_list(key: str = ""):
+    import os
+    if key != os.getenv("ADMIN_KEY","asartepe2025"):
+        raise HTTPException(403, "forbidden")
+    import json
+    if not os.path.exists("horary_oracle/users.json"): return {}
+    return json.load(open("horary_oracle/users.json",encoding='utf-8'))
+
+@app.post("/admin/create")
+async def admin_create(email: str, key: str = ""):
+    import os
+    if key != os.getenv("ADMIN_KEY","asartepe2025"):
+        raise HTTPException(403, "forbidden")
+    from auth import create_user
+    pwd = create_user(email)
+    return {"email":email, "password":pwd, "expiry": "1 yil"}
 
 @app.post("/api/horary/cast")
 async def cast(req: CastRequest):
