@@ -61,9 +61,15 @@ def resolve_time(req: CastRequest):
     if req.year and req.month and req.day and req.hour is not None:
         y, mo, da, local_dec = req.year, req.month, req.day, req.hour
     else:
-        now = datetime.now()
-        y, mo, da = now.year, now.month, now.day
-        local_dec = now.hour + now.minute/60 + now.second/3600
+        # Render UTC'de çalışıyor -> utcnow al, İzmir'e çevir
+        utc_now = datetime.utcnow()
+        y, mo, da = utc_now.year, utc_now.month, utc_now.day
+        utc_dec = utc_now.hour + utc_now.minute/60 + utc_now.second/3600
+        # İzmir off'u bulmak için önce utc'den local tahmini
+        off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, utc_dec+3)
+        # düzelt: jd için utc kullanıyoruz
+        local_dec = utc_dec + off
+        return y, mo, da, utc_dec, off, tzname, local_dec
     off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, local_dec)
     utc_dec = local_dec - off
     return y, mo, da, utc_dec, off, tzname, local_dec
