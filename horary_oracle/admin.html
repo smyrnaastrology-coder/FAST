@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>Asartepe Admin - Kullanici</title>
+<h2>TR Kapali Devre - Kullanici Ekle</h2>
+<input id="email" placeholder="ogrenci@mail.com" style="width:300px;padding:8px">
+<button onclick="create()">Olustur (1 yil)</button>
+<pre id="out"></pre>
+<script>
+async function create(){
+  const email=document.getElementById('email').value
+  const r=await fetch('/admin/create?email='+encodeURIComponent(email), {method:'POST', headers:{'X-Admin-Key': prompt('Admin Key')}})
+  const j=await r.json()
+  document.getElementById('out').textContent=JSON.stringify(j,null,2)
+}
+</script>
+<p>T-30 listesi: <a href="/admin/list">/admin/list</a></p>
