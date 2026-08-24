@@ -79,6 +79,13 @@ async def auth_login(req: AuthRequest):
     if not ok: raise HTTPException(401, str(info))
     return {"ok":True, **info}
 
+@app.get("/admin")
+async def admin_page():
+    from fastapi.responses import HTMLResponse
+    import pathlib
+    html = pathlib.Path("horary_oracle/admin.html").read_text(encoding="utf-8")
+    return HTMLResponse(html)
+
 @app.get("/admin/list")
 async def admin_list(key: str = ""):
     import os
