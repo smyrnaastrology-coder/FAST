@@ -4866,13 +4866,23 @@ def _natal_hayat_alani_analizi(motor):
                 "manevi": "La paz interior es la esencia de todo lo que buscas fuera.",
                 "seyahat": "Cada viaje es una oportunidad de descubrirte a ti mismo.",
             }
+            # Fix page 10-12 systematic translations
+            def _fix_es_alan(s):
+                if not isinstance(s, str):
+                    return s
+                s = s.replace("Alimentos como alimentos ligeros,", "Alimentos ligeros,")
+                s = s.replace("Alimentos como alimentos ligeros", "Alimentos ligeros")
+                s = s.replace("sabores picantes y exóticos, rica en proteínas", "sabores picantes y exóticos, ricos en proteínas")
+                s = s.replace("En tus relaciones, la búsqueda de un vínculo apasionado y entusiasta, una fuerte atracción física.", "En tus relaciones, buscas un vínculo apasionado y entusiasta, así como una fuerte atracción física.")
+                s = s.replace("directamente a tu mundo emocional", "a tu mundo emocional")
+                return s
             for _a in ALANLAR:
                 if _a["anahtar"] in ALAN_ES_ETIKET:
-                    _a["etiket"] = ALAN_ES_ETIKET[_a["anahtar"]]
+                    _a["etiket"] = _fix_es_alan(ALAN_ES_ETIKET[_a["anahtar"]])
                 if _a["anahtar"] in ALAN_ES_GIRIS:
-                    _a["giris"] = ALAN_ES_GIRIS[_a["anahtar"]]
+                    _a["giris"] = _fix_es_alan(ALAN_ES_GIRIS[_a["anahtar"]])
                 if _a["anahtar"] in ALAN_ES_KAPANIS:
-                    _a["kapanis"] = ALAN_ES_KAPANIS[_a["anahtar"]]
+                    _a["kapanis"] = _fix_es_alan(ALAN_ES_KAPANIS[_a["anahtar"]])
 
         import random
         sonuclar = []
@@ -5053,7 +5063,7 @@ def _natal_hayat_alani_analizi(motor):
                     "hobi": {"Ateş":"deportes de aventura, viajes y exploración","Toprak":"jardinería, coleccionismo y artesanías","Hava":"ajedrez, programación y lectura","Su":"música, fotografía y observación de la naturaleza"},
                     "saglik": {"Ateş":"ejercicio dinámico y actividades de alta energía","Toprak":"sueño regular, una rutina diaria sólida y alimentación natural","Hava":"prácticas de respiración y la conexión mente-cuerpo","Su":"meditación, hidroterapia y equilibrio emocional"},
                     "beslenme": {"Ateş":"alimentos ligeros, frescos y revitalizantes; cuidado con las comidas picantes","Toprak":"comidas regulares, vegetales de raíz y cereales naturales","Hava":"alimentos variados y coloridos; el placer de las comidas sociales","Su":"alimentos ricos en agua, mariscos e infusiones"},
-                    "ask": {"Ateş":"la búsqueda de un vínculo apasionado y entusiasta, una fuerte atracción física","Toprak":"la lealtad, la confianza y el compromiso a largo plazo importan primero","Hava":"importan la armonía intelectual y el compartir social","Su":"buscas un vínculo emocional profundo y armonía espiritual"},
+                    "ask": {"Ateş":"buscas un vínculo apasionado y entusiasta, así como una fuerte atracción física","Toprak":"la lealtad, la confianza y el compromiso a largo plazo importan primero","Hava":"importan la armonía intelectual y el compartir social","Su":"buscas un vínculo emocional profundo y armonía espiritual"},
                     "kariyer": {"Ateş":"roles pioneros y emprendedores, posiciones de liderazgo","Toprak":"posiciones constructivas y de gestión, estabilidad financiera","Hava":"comunicación, software, medios y consultoría","Su":"ámbitos del arte, la psicología, la salud y la consultoría"},
                     "aile": {"Ateş":"asumes un papel de líder y protector en la familia","Toprak":"construyes un vínculo confiable que mantiene las tradiciones familiares","Hava":"compartir intelectual y comunicación abierta con la familia","Su":"lazos familiares tejidos con profundidad emocional y afecto"},
                     "maddi": {"Ateş":"un alto potencial de inversión emprendedora y de asumir riesgos","Toprak":"te convienen el ahorro y las inversiones a largo plazo","Hava":"ganancias mediante el capital intelectual y las redes de contactos","Su":"te convienen las inversiones con valor artístico y emocional"},
