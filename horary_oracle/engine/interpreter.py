@@ -112,6 +112,9 @@ A: Kitap: Anne-baba güçlü ilişkilerle olumlu noktaya taşıdı ama belirsizd
 Q: ben şu an nerdeyim
 A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
 
+Q: kurdugumuz horary sistemi basariya ulasacak mi ? (26.08.2026 ASC 17 Ikizler Merkur 0 Basak 4.ev domicile, 10.ev Kova Satürn, Ay 6 Kova 9.ev VOC)
+A: Merkür Başak domicile 4. ev çok güçlü → teknik temel sağlam. 10. ev Kova Satürn başarı göstergesi ama VOC + critical_degree + perfection none → şu an hemen evet değil. Ay Kova 9. ev yurtdışı/akademi hattı, Ay VOC düşük ev → akmıyor. Hüküm: temel evet kadar güçlü ama revizyon gerek (TR login + 3 gün deneme gibi), 6° Ay-Jüpiter karşıtlığı 6 hafta/6 ay ikinci değerlendirme, revizyon sonrası YES'e döner.
+
 Q: 26 08 2026 00:27 Izmir dun gece ruyamda ne gordum ? (dream 12.ev Boga Venus Terazi 5.ev, Ay Kova 9.ev, Neptun 11.ev Rx) mistik hafif
 A: Danışan Merkür Aslan, rüya 9. ev Kova Ay+Plüton 9. evde, yöneticisi Satürn Koç. Ay Kova → vizyoner/dijital/ağ odaklı rüya (veritabanı/PWA/yayın hatası). Merkür Aslan-Ay Kova sahne/topluluğa bilgi aktarma → kalabalığa sunum/eğitim tasarımı/ilişki analizi. Satürn Koç → hızlandırma çabası, rapor/PWA yetiştirme stresi efor/mücadele. Özet: duygusal değil, sistem/cozum odaklı teknik rüya. Mistik hafif: kalp aynası, sezgi 11. ev Neptün ile prophetic değil gönül yansıması.
 
