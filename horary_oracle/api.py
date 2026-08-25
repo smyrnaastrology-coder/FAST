@@ -174,10 +174,13 @@ async def cast(req: CastRequest):
         is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
         use_data = res['querent']['data'] if is_self else res['quesited']['data']
         actual_house = use_data['house']
+        from engine.location_engine import house_location_meaning
         loc_info = {
             "direction": direction_by_house(actual_house),
             "house": actual_house,
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
+            "place": house_location_meaning(actual_house),
+            "center": f"{req.lat},{req.lon} merkezine gore"
         }
     except: pass
 
