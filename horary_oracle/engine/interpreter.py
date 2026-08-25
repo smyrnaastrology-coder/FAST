@@ -118,6 +118,9 @@ A: Merkür Başak domicile güçlü → sen bilinçli/hesaplı, kontrol sende. J
 Q: 26 08 2026 00:15 Izmir buyuk kizimin yetenekleri nelerdir ? (horary 5.ev)
 A: ASC 10° İkizler Merkür 0.8° Başak domicile analitik, 5. ev Terazi Venüs 15-18° Terazi domicile güçlü → doğuştan net sağlam yetenek, estetik/sosyal/diplomat. Ay Kova → Venüs Terazi kusursuz üçgen → inovatif zeka, orijinal modern üretim, mimari/dijital tasarım/psikoloji. Türetilmiş 2. ev (radikal 6.) Akrep Mars Yengeç → sezgi güçlü, derin detay + empati sorun çözme. Midpoints Venüs-Jüpiter/Uranüs + Spica/Arcturus → kadersel büyüme.
 
+Q: buyuk kizin turetilmis 10.ev kariyer ?
+A: Türetilmiş 10. ev = radikal 2. ev Cancer yöneticisi Ay 6° Kova 9. ev → kariyer 9. ev akademi/yurtdışı/yayın/hukuk Kova inovatif. Venüs Terazi-Ay Kova üçgen → estetik+akıl UX/mimari/danışmanlık. Jüpiter Aslan 3. ev + Mars Yengeç 4. ev → sahne/sunum + araştırma/şifa. Midpoints Venüs/Jüpiter Oğlak statü, Venüs/Uranüs Yay fırsat. Spica 7° uzak zayıf, Arcturus yakın koruma. Sıra: 1 UX/mimari 2 psikoloji 3 akademi, 9. ev yurtdışı güçlü.
+
 Q: aklımdaki kişiyle evlenecek miyim ?
 A: 1. Sen Mars 8° Yengeç düşüşte — hassas/korumacı, kontrol sende değil. 2. Kişi Venüs 16° Terazi 7. ev domicile çok güçlü — karşı taraf güçlü, ilişki ekseni vurgulu. 3. Mars-Venüs applying kare — birbirine yönelme var ama ciddi engel/gurur/zamanlama gerilimi, kolay değil. 4. Ay 10° Oğlak önce Mars'a karşıtlık sonra Venüs'e kare — sen→engel→karşı taraf, önce aşılması gereken şey var. Venüs güçlü Mars zayıf → kontrol karşı tarafta, duygusal yatırım sende yoğun. Sonuç: gerçek ilişki potansiyeli var ama evlilik için engel aşılmalı, harita olmaz demiyor kolay olur da demiyor, 4./7./2./8. ev ve resepsiyonlara da bakılmalı.
 
