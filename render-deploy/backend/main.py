@@ -5068,9 +5068,9 @@ def _natal_hayat_alani_analizi(motor):
                     "aile": {"Ateş":"Asumes un papel de líder y protector en la familia","Toprak":"construyes un vínculo confiable que mantiene las tradiciones familiares","Hava":"compartir intelectual y comunicación abierta con la familia","Su":"lazos familiares tejidos con profundidad emocional y afecto"},
                     "maddi": {"Ateş":"tienes un alto potencial para la inversión emprendedora y para asumir riesgos","Toprak":"te convienen el ahorro y las inversiones a largo plazo","Hava":"ganancias mediante el capital intelectual y las redes de contactos","Su":"te convienen las inversiones con valor artístico y emocional"},
                     "sosyal": {"Ateş":"eres un líder natural y fuente de inspiración en tu círculo","Toprak":"un amigo leal y confiable, vínculos sólidos a tu alrededor","Hava":"un círculo amplio y conversaciones intelectuales te nutren","Su":"construyes amistades profundas y vínculos empáticos"},
-                    "egitim": {"Ateş":"te interesas rápidamente por temas nuevos y te sumerges con valentía","Toprak":"estudio en profundidad y adquisición de habilidades prácticas","Hava":"te inclinas por conceptos abstractos y conocimiento teórico","Su":"el aprendizaje intuitivo y los temas psicológicos despiertan tu interés"},
-                    "manevi": {"Ateş":"meditación activa y conexión espiritual en la naturaleza","Toprak":"rituales y prácticas espirituales diarias","Hava":"indagación filosófica y conciencia mental","Su":"meditación profunda, yoga y guía espiritual"},
-                    "seyahat": {"Ateş":"descubrimientos llenos de aventura y rutas cargadas de adrenalina","Toprak":"bellezas naturales y tours culturales","Hava":"viajes intelectuales y aprendizaje de nuevas culturas","Su":"viajes junto al mar, místicos y espirituales"},
+                    "egitim": {"Ateş":"Te interesas rápidamente por temas nuevos y te sumerges con valentía","Toprak":"estudio en profundidad y adquisición de habilidades prácticas","Hava":"te inclinas por conceptos abstractos y conocimiento teórico","Su":"el aprendizaje intuitivo y los temas psicológicos despiertan tu interés"},
+                    "manevi": {"Ateş":"La meditación activa y la conexión espiritual con la naturaleza","Toprak":"rituales y prácticas espirituales diarias","Hava":"indagación filosófica y conciencia mental","Su":"meditación profunda, yoga y guía espiritual"},
+                    "seyahat": {"Ateş":"Los descubrimientos llenos de aventura y las rutas cargadas de adrenalina","Toprak":"bellezas naturales y tours culturales","Hava":"viajes intelectuales y aprendizaje de nuevas culturas","Su":"viajes junto al mar, místicos y espirituales"},
                 }
                 oneri_metni = ELEMENT_ONERI.get(anahtar, {}).get(dominan, "actividades acordes con tu constitución natural")
                 ALAN_OZEL_CUMLER = {
@@ -5085,7 +5085,7 @@ def _natal_hayat_alani_analizi(motor):
                     "maddi": f"En asuntos económicos, {oneri_metni}. Cuando aclaras tus valores y confías en el flujo, gestionas tus recursos de forma más consciente.",
                     "sosyal": f"En tu círculo social, {oneri_metni}. Tu búsqueda de sinceridad y profundidad en los vínculos que construyes te granjea amistades significativas.",
                     "egitim": f"Tu proceso de aprendizaje lleva las cualidades del elemento {dominan_es}. {oneri_metni}. Cuanto más profundizas en los temas que te interesan, más sientes el poder que te da el conocimiento.",
-                    "manevi": f"{oneri_metni} te guían en tu viaje interior. Cuando reservas tiempo para el silencio y la introspección en tu búsqueda espiritual, adquieres nuevas conciencias sobre ti mismo.",
+                    "manevi": f"{oneri_metni} te guían en tu viaje interior. Cuando reservas tiempo para el silencio y la introspección en tu búsqueda espiritual, adquieres una mayor conciencia de ti mismo.",
                     "seyahat": f"Tu espíritu de descubrimiento cobra vida con la energía del elemento {dominan_es}. {oneri_metni} te aportan no solo placer, sino también una perspectiva profunda.",
                 }
             else:
