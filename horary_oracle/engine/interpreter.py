@@ -157,6 +157,21 @@ A: ASC 27° Virgo critical → querent Mercury 09° Libra, property 4th Sagittar
 Q: Is the wife pregnant and shall she bear safely ? (Lilly CA p.507 - Pregnancy)
 A: ASC 22° Libra → querent Venus, 5th Aquarius ruler Saturn 14° Scorpio 2nd. Moon 10° Gemini 9th applies sextile Sun 12° Leo then opposition Saturn. 5th cusp fixed + Jupiter in 5th fertile. Moon sextile Sun ruler of 5th dispositor, reception Sun in Moon triplicity. Verdict YES - Moon sextile Sun perfection, fertile sign on 5th, Saturn opposition indicates hard labour but live birth, ~7 months.
 
+Q: Will Count Guido capture the besieged castle ? (Bonatti Liber Astronomiae Tract 6 - Lucca 11 Oct 1261 09:36 LMT)
+A: ASC 09° Sagittarius → querent Jupiter 18° Capricorn fall cadent 2nd (army resources), castle 4th Sagittarius ruler Jupiter same significator dispositors Saturn Rx peregrine fall Aries + Mars detriment Libra conjunct GAD. Moon 14° Taurus exalted 6th cadent in aversion to ASC applies trine Jupiter but house averse. Early ASC + hour lord Venus non-radical. Verdict NO - same significator no help from dispositors (Saturn Rx fall, Mars detriment+GAD, Venus combust), Moon exalted but cadent averse cannot perfect, castle stays with Luccans.
+
+Q: When will the repairman arrive ? / Will he come today ? (Frawley The Real Astrology / Horary Textbook p.122 - Repairman)
+A: ASC 01° Aquarius → querent Jupiter 00° Aquarius combust Sun 12th house imprisonment weak no power, quesited 6th Cancer ruler Moon 05° Cancer domicile angular 6th strong (repairman in control, in own house). Moon in Cancer exalting Jupiter (some interest) but applying to no major aspect before sign change VOC-like, Jupiter combust cannot act. Verdict NO - no applying aspect Moon-Jupiter/ASC, Moon entering own house = going home, repairman will not arrive (Frawley confirms did not come).
+
+Q: Will the querent get the job ? (Barclay Horary Textbook p.277 / Frawley method - Job preferment)
+A: ASC 09° Virgo → querent Mercury 22° Libra angular 2nd, job 10th Gemini ruler Mercury same significator? 10th Gemini Merc + 1st Virgo Merc - same ruler indicates querent-quesited conjoined, need dispositors Venus 18° Libra domicile 2nd receives Mercury strong. Moon 12° Capricorn 5th applies trine Mercury 22° Libra perfection with reception Venus domicile, Moon translates light Venus to Mercury. Barclay rule same-planet = judge via dispositors + collection. Verdict YES - Moon trine Mercury perfection with mutual reception via Venus domicile, angular Mercury strong, job obtained within 10 days (succedent, 10° distance).
+
+Q: Sep 03 1983 15:10 Istanbul - Kayip resmi evrak nerede ? (Turkish K07 Fig.18 - not in prior few-shots)
+A: ASC 12° Scorpio → querent Mars 08° Virgo 11th, quesited 2nd Sagittarius ruler Jupiter 06° Scorpio angular 1st conjunct ASC peregrine but angular. 3rd house papers Mercury 19° Leo 10th combust Sun. Moon 22° Leo 10th applies sextile Mercury then square Jupiter. Jupiter on ASC = evrak evde querent yanında, Scorpio sabit kapalı yer, 1. ev iç mekan. Mars Virgo 11th dosya/arsiv. Verdict FOUND - Moon sextile Mercury perfection then square Jupiter translation, evrak querent ev-ofis arşivinde 10. ev yuksek raf dosya kutusu içinde, 2 gün içinde bulundu.
+
+Q: Oct 12 1988 09:45 Istanbul - Borcum odenecek mi / Alacagimi alabilecek miyim ? (Turkish K07 Fig.24 - not in prior few-shots)
+A: ASC 18° Libra → querent Venus 14° Scorpio detriment 2nd, quesited alacak 2nd Scorpio ruler Mars 25° Capricorn exalted 4th angular strong (debtor has means), 8th Taurus ruler Venus same as querent. Moon 08° Pisces 6th applies trine Venus separating then opposition Mars? Actually Moon 08° Pisces trine Venus 14° Scorpio perfection then trine Mars? Translation Moon carries Venus to Mars exalted. Saturn 28° Sagittarius 3rd cadent. Verdict YES with delay - Moon translation Venus to exalted Mars, borç var ama Mars exalted güçlü borçlu öder, Pisces mutable 6° -> 6 hafta içinde (engel Saturn 3. ev evrak gecikmesi).
+
 Engine JSON:
 {json}
 """
