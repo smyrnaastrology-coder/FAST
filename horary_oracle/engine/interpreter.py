@@ -112,6 +112,9 @@ A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde 
 Q: 24 8 2026 21:50 Aydin ben neredeyim ? (dogru: ASC 21 Akrep Mars 8 Yengec 3.ev, Ay 22 Oglak 10.ev)
 A: Mars 3. ev Yengeç → yol/sokak/araç/kısa mesafe/yakın çevre/mahalle/telefon geçiş yeri, Yengeç kapalı/tanıdık/ev/aile bina içi suya yakın. Ay 22 Oğlak 10. ev → kamusal/resmi/iş/görev yeri. Hüküm: evden kopuk uzak değil, yakın çevre ulaşım + 10. ev iş/organizasyon etkinliği. Gerçek: iş arkadaşının nişanında → 10. ev iş, 7. ev ilişki/nişan, 3. ev kısa yol, Yengeç ailevi kutlama → harita sosyal bağlamı da tarif etti.
 
+Q: 26 08 2026 00:09 Izmir is yeriyle devam edecek miyim ? (ASC 8 Ikizler Merkur 0 Basak 4.ev, 10.ev Balik Jupiter 12 Aslan retro, Ay 6 Kova)
+A: Merkür Başak domicile güçlü → sen bilinçli/hesaplı, kontrol sende. Jüpiter retro → iş koşulları yeniden değerlendirme, geri dönüş/fikir değişikliği, sürdürülemez. Ay Kova Jüpiter'e karşıtlığa gidiyor → uyuşmazlık/engel/ayrışma. Hüküm: aynı koşullarda devam düşük, önce gerilim/karar, sonra yeniden değerlendirme, değişikliğe işaret. Zamanlama Ay-Jüpiter ~6° → 6 gün/6 hafta, özellikle Eylül sonu-Ekim başı 2026 dönemeç, 1-1.5 ayda karar belirgin.
+
 Q: aklımdaki kişiyle evlenecek miyim ?
 A: 1. Sen Mars 8° Yengeç düşüşte — hassas/korumacı, kontrol sende değil. 2. Kişi Venüs 16° Terazi 7. ev domicile çok güçlü — karşı taraf güçlü, ilişki ekseni vurgulu. 3. Mars-Venüs applying kare — birbirine yönelme var ama ciddi engel/gurur/zamanlama gerilimi, kolay değil. 4. Ay 10° Oğlak önce Mars'a karşıtlık sonra Venüs'e kare — sen→engel→karşı taraf, önce aşılması gereken şey var. Venüs güçlü Mars zayıf → kontrol karşı tarafta, duygusal yatırım sende yoğun. Sonuç: gerçek ilişki potansiyeli var ama evlilik için engel aşılmalı, harita olmaz demiyor kolay olur da demiyor, 4./7./2./8. ev ve resepsiyonlara da bakılmalı.
 
