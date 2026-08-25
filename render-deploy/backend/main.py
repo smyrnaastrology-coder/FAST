@@ -4837,7 +4837,7 @@ def _natal_hayat_alani_analizi(motor):
                 "seyahat": "Viajes y Descubrimiento",
             }
             ALAN_ES_GIRIS = {
-                "spor": "La actividad física ocupa un lugar importante en tu vida; tu cuerpo lleva una llamada natural a moverse.",
+                "spor": "La actividad física ocupa un lugar importante en tu vida; tu cuerpo siente una necesidad natural de moverse.",
                 "sanat": "La creatividad y la sensibilidad estética forman el lado colorido de la vida para ti.",
                 "hobi": "La forma en que empleas tu tiempo libre está directamente ligada a la variedad de tus intereses.",
                 "saglik": "El equilibrio entre cuerpo y mente es un reflejo de tus hábitos diarios.",
@@ -5034,8 +5034,8 @@ def _natal_hayat_alani_analizi(motor):
             elif _ES:
                 ALAN_DOMINAN = {
                     "spor": f"Tienes una constitución física en la que destaca especialmente el elemento {dominan_es}. En lugar de forzar tu cuerpo, obtienes los resultados más eficientes cuando te alineas con su ritmo natural.",
-                    "sanat": f"Las huellas del elemento {dominan_es} son evidentes en tu expresión artística — {eac} es la fuente principal que alimenta tu creatividad.",
-                    "hobi": f"En tu tiempo libre te atraen más las actividades guiadas por el elemento {dominan_es}. {eac_baslik} forma la base de tus intereses.",
+                    "sanat": f"Las huellas del elemento {dominan_es} son evidentes en tu expresión artística — {eac} son la fuente principal que alimenta tu creatividad.",
+                    "hobi": f"En tu tiempo libre te atraen más las actividades guiadas por el elemento {dominan_es}. {eac_baslik} forma parte de la base de tus intereses.",
                     "saglik": f"Tu salud es sensible al equilibrio del elemento {dominan_es} — {eac} te ayuda a leer correctamente las señales de tu cuerpo.",
                     "beslenme": f"La influencia del elemento {dominan_es} se aprecia en tus hábitos alimentarios. {eac_baslik} juega un papel importante a la hora de determinar qué alimentos te sientan bien.",
                     "ask": f"En tu vida amorosa destaca la energía del elemento {dominan_es}. {eac_baslik} afecta profundamente a cómo formas vínculos emocionales.",
