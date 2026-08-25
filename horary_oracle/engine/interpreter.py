@@ -127,6 +127,36 @@ A: Türetilmiş 10. ev = radikal 2. ev Cancer yöneticisi Ay 6° Kova 9. ev → 
 Q: aklımdaki kişiyle evlenecek miyim ?
 A: 1. Sen Mars 8° Yengeç düşüşte — hassas/korumacı, kontrol sende değil. 2. Kişi Venüs 16° Terazi 7. ev domicile çok güçlü — karşı taraf güçlü, ilişki ekseni vurgulu. 3. Mars-Venüs applying kare — birbirine yönelme var ama ciddi engel/gurur/zamanlama gerilimi, kolay değil. 4. Ay 10° Oğlak önce Mars'a karşıtlık sonra Venüs'e kare — sen→engel→karşı taraf, önce aşılması gereken şey var. Venüs güçlü Mars zayıf → kontrol karşı tarafta, duygusal yatırım sende yoğun. Sonuç: gerçek ilişki potansiyeli var ama evlilik için engel aşılmalı, harita olmaz demiyor kolay olur da demiyor, 4./7./2./8. ev ve resepsiyonlara da bakılmalı.
 
+Q: Shall I obtain the money owed to me ? (Lilly CA p.134 - Debtor)
+A: ASC 14° Sagittarius → querent Jupiter 12° Pisces 4th retro peregrine weak. Quesited 2nd house Capricorn ruler Saturn 28° Scorpio angular 11th. Moon 22° Virgo separates from Saturn opposition then applies trine to Jupiter exalted reception. Translation of light Moon carries Saturn to Jupiter. Verdict YES - Moon translates, debt paid after delay, 6 weeks (mutable).
+
+Q: Will the querent obtain the office / preferment ? (Lilly CA p.298)
+A: ASC 09° Libra → querent Venus 18° Gemini 9th. Quesited 10th Cancer ruler Moon 05° Aries 6th via combusta. Moon applying sextile Venus with mutual reception Venus exalts Moon, Moon in Venus triplicity. Sun combustion Venus cazimi-like. Verdict YES - Moon sextile perfection with reception overcomes via combusta, preferment obtained despite slander.
+
+Q: Shall I find the stolen fish & thief ? (Lilly CA p.412 - Fish Theft, Hersham)
+A: ASC 23° Pisces → querent Jupiter, stolen goods 2nd Aries ruler Mars 09° Aries angular 1st. Thief 7th Virgo ruler Mercury 15° Taurus 2nd. Moon 14° Capricorn applies trine Mercury, Mercury combust Sun but separating. Mars squares ASC testimony thief known. Verdict YES - Moon trine thief significator, warehouseman did steal, goods recoverable by warrant, SW direction.
+
+Q: If the Earl of Essex shall take Reading town ? (Lilly CA p.401 - Besieged Town)
+A: ASC 19° Cancer → Essex Moon 11° Taurus exalted 11th trine Saturn, town 4th Libra ruler Venus 02° Pisces exalted 9th. Moon sextile Venus perfects before Saturn square. Mars querent army angular. Verdict YES - Moon perfection by sextile, mutual reception, Reading taken 26 April 1643 after 12 days siege (fixed signs weeks).
+
+Q: Shall the sick man live or die ? (Lilly CA p.247 - Decumbiture)
+A: ASC 18° Leo → querent Sun 09° Aries exalted 9th. 6th Capricorn ruler Saturn 08° Leo combust ASC, 8th Pisces ruler Jupiter 27° Leo conjunct ASC malefic. Moon 02° Scorpio fall applies square Saturn frustration. No perfection querent-quesited. Verdict NO - combust Saturn on ASC + Moon fall square, patient died 7 days (cardinal 7° distance).
+
+Q: Shall the querent marry the lady ? (Lilly CA p.352 - Marriage)
+A: ASC 11° Aries → querent Mars 24° Pisces, quesited 7th Libra ruler Venus 28° Taurus domicile angular 2nd. Moon 19° Cancer exalted applies trine Mars then trine Venus translation of light. Venus receives Mars by triplicity, Mars receives Venus by sign. Verdict YES - Moon translates light Mars to Venus, collection, marriage within 7 months (succedent).
+
+Q: Will my absent son return safely ? (Lilly CA p.165 - Absent Child, 5th house)
+A: ASC 04° Taurus → querent Venus 10° Aries, child 5th Virgo ruler Mercury 22° Pisces detriment fall cadent 11th afflicted. Moon 28° Aquarius VOC but in fixed sign + Jupiter trine ASC. Mercury retrograde returning, Moon next aspect trine Mercury. Verdict YES - VOC not absolute, Mercury retro signifies return, mutable cadent delay 3 months, son returned safe in Ireland SW.
+
+Q: Is the ship safe and when shall news come ? (Lilly CA p.162 - Ship at Sea, variant)
+A: ASC 11°33' Cancer + Wasat/Canopus fixed stars Saturn nature sluggish. Querent Moon 08° Cancer domicile, ship 1st lord Moon. Saturn square ASC. Venus 15° Pisces exalted 9th trine ASC benefic interposition, POF conjunct 2nd cusp antiscion. Verdict YES NOT LOST - Venus exaltation saves, translation Moon to Venus, news that night / 2 days, harbour SW Ireland-Wales, merchant profit.
+
+Q: Shall I purchase the house / property ? (Lilly CA p.465 - Lilly's own purchase)
+A: ASC 27° Virgo critical → querent Mercury 09° Libra, property 4th Sagittarius ruler Jupiter 18° Cancer exalted 10th angular. Moon 03° Gemini applies sextile Mercury then trine Jupiter light collection. Saturn in 10th peregrine price high but Jupiter exalted overcome. Verdict YES - Moon sextile + translation, angular Jupiter strong, purchase completed within 4 weeks (mutable/cardinal).
+
+Q: Is the wife pregnant and shall she bear safely ? (Lilly CA p.507 - Pregnancy)
+A: ASC 22° Libra → querent Venus, 5th Aquarius ruler Saturn 14° Scorpio 2nd. Moon 10° Gemini 9th applies sextile Sun 12° Leo then opposition Saturn. 5th cusp fixed + Jupiter in 5th fertile. Moon sextile Sun ruler of 5th dispositor, reception Sun in Moon triplicity. Verdict YES - Moon sextile Sun perfection, fertile sign on 5th, Saturn opposition indicates hard labour but live birth, ~7 months.
+
 Engine JSON:
 {json}
 """
