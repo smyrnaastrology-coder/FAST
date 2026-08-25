@@ -19,6 +19,27 @@ import swisseph as swe
 from core import FBST_Engine
 from core.i18n import pdf_label, get_lang as _i18n_get_lang
 from core.data import ARAP_ILISKI
+def _es_fix_tire(text):
+    if not isinstance(text, str):
+        return text
+    # Tire: LunaUrano -> Luna-Urano, Luna Mercurio -> Luna-Mercurio, etc.
+    # Handle all Luna-planet combos and also fix spacing
+    planets = ["Urano","Mercurio","Venus","Marte","Júpiter","Saturno","Neptuno","Plutón","Quirón","Sol","Luna"]
+    for pl in planets:
+        text = text.replace(f"Luna{pl}", f"Luna-{pl}")
+        text = text.replace(f"Luna {pl}", f"Luna-{pl}")
+        text = text.replace(f"luna{pl.lower()}", f"luna-{pl.lower()}")
+    # Also fix double hyphen
+    text = text.replace("Luna--", "Luna-")
+    # Place names: Turkish -> Spanish
+    text = text.replace("Ekvator Ginesi", "Guinea Ecuatorial")
+    text = text.replace("Sao Tome ve Principe", "Santo Tomé y Príncipe")
+    text = text.replace("Sao Tome ve Princi", "Santo Tomé y Príncipe")
+    text = text.replace("Sao Tome ve", "Santo Tomé y")
+    text = text.replace("Ekvator", "Ecuador")
+    # Keep other place names as is but ensure correct accent
+    return text
+
 from core.utils import (
     GEZEGENLER, get_planetary_position, kadersel_yildiz_taramasi,
     aci_farki_safe, sehir_veritabani_yukle, sehir_bul,
@@ -2248,9 +2269,9 @@ def _generate_natal_pdf(motor):
                 muhur = (_muhur_etiketi + " " + muhur.strip())[:170]
             gez_isim = s.get('gezegen','')
             sembol_h = 30
-            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86)
+            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86) + (12 if _ES else 0)
             if muhur:
-                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6
+                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6 + (8 if _ES else 0)
             if y - sembol_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
             # Call-out card — gold accent
@@ -2427,9 +2448,12 @@ def _generate_natal_pdf(motor):
                         c.setFillColor(koyu)
                         c.setFont("DejaVu-Bold", 7.5)
                         c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}")
+                        # Fix tire & truncation for ES (baba correccion 18-20)
+                        _iy_raw = _es_fix_tire(ilk_yorum) if _ES else ilk_yorum
+                        _iy = _iy_raw[:180] if _ES else _iy_raw[:135]
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 7)
-                        c.drawString(SOL + 118, ly, ilk_yorum[:135])
+                        c.drawString(SOL + 118, ly, _iy)
                 y -= grid_h + 12
 
     # ═══════════════════════════════════════════
@@ -2491,7 +2515,7 @@ def _generate_natal_pdf(motor):
             c.rect(SOL + 2, y - kat_h + 6, 3, kat_h - 12, fill=1, stroke=0)
             inner_y = y - 28
             for i, city in enumerate(cities):
-                sehir_adi = city.get("sehir", "")[:42]
+                sehir_adi = _es_fix_tire(city.get("sehir", "")[:42]) if _ES else city.get("sehir", "")[:42]
                 skor_val = city.get("skor", 0)
                 c.setFont("DejaVu-Bold", 8)
                 c.setFillColor(koyu)
