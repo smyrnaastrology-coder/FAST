@@ -2069,8 +2069,10 @@ def _generate_natal_pdf(motor):
                 yorum = _ab.get("yorum", "") or ""
                 parag = " ".join(p for p in [yorum, etki] if p)
                 if not parag:
-                    parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else (f"{asto_ad} está en conjunción con tu energía de {gez_ad}." if _ES else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."))
-                baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunción)" if _ES else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)"))
+                    _gez_es2 = pdf_label(gez_ad) if _ES else gez_ad
+                parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else (f"{asto_ad} está en conjunción con tu energía de {_gez_es2}." if _ES else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."))
+                _gez_es = pdf_label(gez_ad) if _ES else gez_ad
+                baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else (f"✦ {asto_ad} — {_gez_es} ({fark}° conjunción)" if _ES else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)"))
                 ast_h = 16 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
                 if y - ast_h < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
