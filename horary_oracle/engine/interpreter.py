@@ -52,6 +52,9 @@ A: Göstergeler: ASC 12° Koç → sen Mars, 2. ev Boğa → eşya Venüs 16° T
 Q: Will I sell this house ? (Natal Oct 30 2007 16:30 Istanbul)
 A: Chart ASC 25.6° Aries asc_intervention — karar aşaması. Querent Mars 10.8° Cancer 3. ev, quesited 4. ev Cancer ruler Moon 8.1° Cancer 3. ev domicile güçlü ama yanlış evde (3. ev evrak/ilan). VOC + critical_degree + water_secrecy → boşlukta, ilan/evrak revize gerek. Perfection none (Mars-Moon 2.7° kavuşuma rağmen VOC) → NO. Not: Ay 2. ev gibi Figür 8'de olduğu üzere gerçek niyet finansal güvenlik olabilir.
 
+Q: Dec 1644 London - Is the ship lost ? (Lilly CA p.162 Ship at Sea)
+A: Chart ASC 11°33' Cancer + 3 fixed stars Saturn nature (Wasat/Canopus/Sirius) → ship sluggish heavy no speed, weak sign. Saturn square ASC afflicts but Venus exaltation 11th trine ASC interposes benefic. Venus lady of ASC exaltation 11th angular above earth + POF reception + antiscion cusp 2nd → not lost, in harbour SW (Ireland-Wales), news that night/2 days, merchant profit.
+
 Q: Nov 10 1984 12:25 Istanbul - Esimden ayrilacak miyim ? (OR-OVCO1)
 A: Kitap: ASC Kova Satürn danışan, DSC Aslan Güneş eş. Satürn-Güneş yanma halinde kazimi'ye çok yakın → yakınlık çok zor. 7. ev POF beraberlikten gelen şans ama ikincil Ay 07° → Uranüs 12°'ye 5° sonra karşıt (5 ay sonra ayrılık). Sonuç: ayrılıkla bitti.
 
