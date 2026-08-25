@@ -590,12 +590,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # --- Sabit yıldız 2° (gezegen) / 5° (açı) - gerçek ekliptik boylam karşılaştırması ---
     # Yıldızların yaklaşık ekliptik boylamları (J2026, 1° tolerans) - burç+degree -> lon
     FIXED_STARS_LON = {
-        "Algol": 56.0,      # 26 Taurus
-        "Alcyone": 60.0,    # 0 Gemini (Pleiades)
+        "Algol": 56.0,      # 26 Taurus - Caput Algol
         "Aldebaran": 69.5,  # 9 Gemini
-        "Bellatrix": 81.0,  # 21 Gemini
+        "Capella": 81.0,    # 21 Gemini
+        "Bellatrix": 80.5,  # 20 Gemini
         "Betelgeuse": 88.5, # 28 Gemini
-        "Saiph": 86.5,      # 26 Gemini
+        "Canopus": 15.0,
+        "Saiph": 86.5,
         "Sirius": 104.0,    # 14 Cancer
         "Regulus": 149.5,   # 29 Leo
         "Vega": 285.3,      # 15 Capricorn
@@ -603,7 +604,8 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         "Arcturus": 204.5,  # 24 Libra
         "Antares": 249.7,   # 9 Sagittarius
         "Fomalhaut": 333.8, # 3 Pisces
-        "Thuban": 47.0,     # 17 Taurus approx (Draco)
+        "Scheat": 359.0,    # 29 Pisces
+        "Thuban": 47.0,
     }
     for pname, pdata in planets.items():
         plon = pdata["lon"] % 360
@@ -796,6 +798,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             strictures.append({"code":"radical","level":"info","hour_ruler":hour_ruler,"asc_ruler":asc_ruler,"meaning":f"Radikal: saat={hour_ruler} ASC={asc_ruler} {'üçlü uyum' if hour_ruler in trip_rules else ''} {'mizaç uyum' if same_temp else ''} {f'Ay-saat {moon_hour_angle:.1f}°' if moon_hour_angle else ''} - harita okunmaya değer"})
         else:
             strictures.append({"code":"non_radical","level":"info","hour_ruler":hour_ruler,"asc_ruler":asc_ruler,"meaning":"Radikal değil: saat yöneticisi ASC ile uyumsuz - harita çalışabilir ama radikal kadar güçlü değil"})
+        # Gün yöneticisi ev vurgusu (aphorism day)
+        try:
+            day_ruler = ph.get("day_ruler")
+            if day_ruler and day_ruler in planets:
+                dr_house = planets[day_ruler]["house"]
+                strictures.append({"code":"day_ruler_house","level":"info","day_ruler":day_ruler,"house":dr_house,"meaning":f"Gün yöneticisi {day_ruler} Ev{dr_house} ({planets[day_ruler]['sign']}) — bu evde vurgu, dikkat edilmeli."})
+        except: pass
     except Exception as e:
         pass
 
