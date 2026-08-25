@@ -3603,17 +3603,19 @@ def _aspect_interpretasyon_kutuphanesi():
             p1n = pdf_label(p1); p2n = pdf_label(p2)
             pair = (p1, p2) if (p1, p2) in CIFT_TEMA_ES else ((p2, p1) if (p2, p1) in CIFT_TEMA_ES else None)
             tema = CIFT_TEMA_ES.get(pair, f"la conexión entre las energías de {p1n} y {p2n}") if pair else f"la conexión entre las energías de {p1n} y {p2n}"
+            # Limpieza de artículos: de el -> del, a el -> al
+            tema = tema.replace(" de el ", " del ").replace(" De el ", " Del ").replace(" a el ", " al ").replace(" A el ", " Al ")
             p1o = _ES_OZ.get(p1) or f"la energía de {p1n}"; p2o = _ES_OZ.get(p2) or f"la energía de {p2n}"
             if aci == "Kavuşum":
-                return f"Las energías de {p1n} y {p2n} se unen en el mismo punto. {tema}. La {p1o} de {p1n} y la {p2o} de {p2n} forman un todo unificado. Esta conjunción te permite experimentar ambas energías con gran intensidad."
+                return f"Las energías de {p1n} y {p2n} se unen en el mismo punto. {tema}. {p1o[0].upper()+p1o[1:]} de {p1n} y {p2o} de {p2n} forman un todo unificado. Esta conjunción te permite experimentar ambas energías con gran intensidad."
             elif aci == "Karşıt":
                 return f"{p1n} y {p2n} se sitúan en polos opuestos. {tema}. Hay una búsqueda constante de equilibrio entre la {p1o} de {p1n} y la {p2o} de {p2n}. Esta oposición te exige comprender por completo ambos lados."
             elif aci == "Kare":
-                return f"El cuadrado entre {p1n} y {p2n} genera tensión alrededor de {tema}. Esta energía exigente te empuja fuera de tu zona de confort y obliga al crecimiento. La lucha entre la {p1o} de {p1n} y la {p2o} de {p2n} es una de tus oportunidades de transformación más poderosas."
+                return f"El cuadrado entre {p1n} y {p2n} genera tensión alrededor de {tema}. Esta energía exigente te empuja fuera de tu zona de confort y obliga al crecimiento. La lucha entre {p1o} de {p1n} y {p2o} de {p2n} es una de tus oportunidades de transformación más poderosas."
             elif aci == "Trigon":
-                return f"El trígono entre {p1n} y {p2n} crea una armonía natural alrededor de {tema}. Usada con conscencia, esta energía puede fluir en tu vida. La {p1o} de {p1n} y la {p2o} de {p2n} construyen naturalmente un puente."
+                return f"El trígono entre {p1n} y {p2n} crea una armonía natural alrededor de {tema}. Usada con conciencia, esta energía puede fluir en tu vida. {p1o[0].upper()+p1o[1:]} de {p1n} y {p2o} de {p2n} construyen naturalmente un puente."
             elif aci == "Sekstil":
-                return f"La sextil entre {p1n} y {p2n} ofrece oportunidades alrededor de {tema}. Para activar esta energía, debes dar un paso consciente. Existe un vínculo de apoyo entre la {p1o} de {p1n} y la {p2o} de {p2n}."
+                return f"El sextil entre {p1n} y {p2n} ofrece oportunidades alrededor de {tema}. Para activar esta energía, debes dar un paso consciente. Existe un vínculo de apoyo entre {p1o} de {p1n} y {p2o} de {p2n}."
             return ""
         if key in OZEL_YORUMLAR: return OZEL_YORUMLAR[key]
         if key_t in OZEL_YORUMLAR: return OZEL_YORUMLAR[key_t]
