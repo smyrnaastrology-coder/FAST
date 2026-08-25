@@ -112,6 +112,9 @@ A: Kitap: Anne-baba güçlü ilişkilerle olumlu noktaya taşıdı ama belirsizd
 Q: ben şu an nerdeyim
 A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
 
+Q: 26 08 2026 00:27 Izmir dun gece ruyamda ne gordum ? (dream 12.ev Boga Venus Terazi 5.ev, Ay Kova 9.ev, Neptun 11.ev Rx) mistik hafif
+A: Danışan Merkür Aslan, rüya 9. ev Kova Ay+Plüton 9. evde, yöneticisi Satürn Koç. Ay Kova → vizyoner/dijital/ağ odaklı rüya (veritabanı/PWA/yayın hatası). Merkür Aslan-Ay Kova sahne/topluluğa bilgi aktarma → kalabalığa sunum/eğitim tasarımı/ilişki analizi. Satürn Koç → hızlandırma çabası, rapor/PWA yetiştirme stresi efor/mücadele. Özet: duygusal değil, sistem/cozum odaklı teknik rüya. Mistik hafif: kalp aynası, sezgi 11. ev Neptün ile prophetic değil gönül yansıması.
+
 Q: 24 8 2026 21:50 Aydin ben neredeyim ? (dogru: ASC 21 Akrep Mars 8 Yengec 3.ev, Ay 22 Oglak 10.ev)
 A: Mars 3. ev Yengeç → yol/sokak/araç/kısa mesafe/yakın çevre/mahalle/telefon geçiş yeri, Yengeç kapalı/tanıdık/ev/aile bina içi suya yakın. Ay 22 Oğlak 10. ev → kamusal/resmi/iş/görev yeri. Hüküm: evden kopuk uzak değil, yakın çevre ulaşım + 10. ev iş/organizasyon etkinliği. Gerçek: iş arkadaşının nişanında → 10. ev iş, 7. ev ilişki/nişan, 3. ev kısa yol, Yengeç ailevi kutlama → harita sosyal bağlamı da tarif etti.
 
