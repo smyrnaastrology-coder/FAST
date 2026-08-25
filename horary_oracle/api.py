@@ -116,6 +116,19 @@ async def admin_create(email: str, key: str = ""):
 async def cast(req: CastRequest):
     # --- Sohbet modülü (horary_app.py:118 ile birebir) ---
     qlow = req.question.strip().lower()
+    # Sohbet sürekliliği: takip mi yeni soru mu?
+    is_followup = False
+    if req.history and len(req.history) >= 2:
+        # kısa + zamir + yeni significator yok ise takip
+        follow_keys = ["peki","ya o","o ne","bu ne","nasıl","nasil","neden","niye","sonra","devam","acikla","açar mısın","acar misin"]
+        if len(qlow.split()) < 10 and any(k in qlow for k in follow_keys):
+            is_followup = True
+        # history'de son soru ile aynı konu ise de takip
+        if any(k in qlow for k in ["o","bu","şu"]) and len(qlow) < 40:
+            is_followup = True
+    if is_followup:
+        # takip: yeni chart açmadan önceki cevabın üzerine muhabbet devam (LLM'e history ver)
+        pass  # aşağıda engine_json'a history eklenecek
     if qlow in ["merhaba","selam","selamlar","hey","hi","hello"] or qlow.startswith("merhaba") or qlow.startswith("selam"):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* veya *bu işe girecek miyim?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber"]):
@@ -208,7 +221,8 @@ async def cast(req: CastRequest):
         "perfection": res["perfection"], "timing": res.get("timing"),
         "strictures": res["strictures"],
         "querent": res["querent"]["planet"], "quesited": res["quesited"]["planet"],
-        "question": req.question, "location": loc_info
+        "question": req.question, "location": loc_info,
+        "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
     # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
     if is_visitor_who or is_visitor_why or is_dream:
