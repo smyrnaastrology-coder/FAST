@@ -119,13 +119,19 @@ async def cast(req: CastRequest):
     # Sohbet sürekliliği: takip mi yeni soru mu?
     is_followup = False
     if req.history and len(req.history) >= 2:
-        # kısa + zamir + yeni significator yok ise takip
-        follow_keys = ["peki","ya o","o ne","bu ne","nasıl","nasil","neden","niye","sonra","devam","acikla","açar mısın","acar misin"]
-        if len(qlow.split()) < 10 and any(k in qlow for k in follow_keys):
-            is_followup = True
-        # history'de son soru ile aynı konu ise de takip
-        if any(k in qlow for k in ["o","bu","şu"]) and len(qlow) < 40:
-            is_followup = True
+        has_qmark = "?" in req.question or "mı" in qlow or "mi" in qlow or "mu" in qlow
+        # yeni horary sorgu anahtarları
+        new_q_keys = ["evlenecek","bosanacak","bosan","ise girecek","seviyor","kayip","kayi","nerede","nerde","hasta","araba","para","is yeri","kedi","kopek","ev al","satin"]
+        is_new_question = has_qmark and any(k in qlow for k in new_q_keys)
+        if not is_new_question:
+            follow_keys = ["peki","ya o","o ne","bu ne","nasıl","nasil","neden","niye","sonra","devam","acikla","açar mısın","acar misin"]
+            if len(qlow.split()) < 10 and any(k in qlow for k in follow_keys):
+                is_followup = True
+            if any(k in qlow for k in ["o","bu","şu"]) and len(qlow) < 40 and not has_qmark:
+                is_followup = True
+            # soru işareti yok + kısa cümle = normal akış
+            if "?" not in req.question and len(qlow.split()) < 12 and not is_new_question:
+                is_followup = True
     if is_followup:
         # takip: yeni chart açmadan önceki cevabın üzerine muhabbet devam (LLM'e history ver)
         pass  # aşağıda engine_json'a history eklenecek
