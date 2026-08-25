@@ -7948,7 +7948,7 @@ class FBST_Engine:
                 burc_arg_key = f"{burc_key} (Rx)" if rx_str else burc_key
                 ev_no = self.ev_konumu_bul(j_gun, gezegen_id)
                 
-                suf = f" — {ev_no}. Ev" if _core_get_lang() != "en" else f" — House {ev_no}"
+                suf = f" — Casa {ev_no}" if _core_get_lang() == "es" else (f" — House {ev_no}" if _core_get_lang() == "en" else f" — {ev_no}. Ev")
                 gosterim_hatti = f"🪐 <b>{pdf_label(gezegen_ad)}:</b> {pdf_label(burc_adi_tr)} {deg}° {mnt:02d}'{rx_str}{suf}"
                 story.append(Paragraph(f"<font color='#1A1A2E'><b>{gosterim_hatti}</b></font>", styles['TurkishNormal']))
                 
@@ -7981,7 +7981,7 @@ class FBST_Engine:
                 mnt = int(((mutlak_derece % 30) - deg) * 60)
                 ev_no = self.ev_konumu_bul(j_gun, gezegen_id)
                 
-                suf = f" — {ev_no}. Ev" if _core_get_lang() != "en" else f" — House {ev_no}"
+                suf = f" — Casa {ev_no}" if _core_get_lang() == "es" else (f" — House {ev_no}" if _core_get_lang() == "en" else f" — {ev_no}. Ev")
                 gosterim_hatti = f"🩸 <b>{pdf_label(gezegen_ad)}:</b> {pdf_label(burc_adi_tr)} {deg}° {mnt:02d}'{suf}"
                 story.append(Paragraph(f"<font color='#8A1538'><b>{gosterim_hatti}</b></font>", styles['TurkishNormal']))
                 
@@ -8808,7 +8808,7 @@ class FBST_Engine:
         # ⚡ AÇI GRIDİ (PDF)
         story.append(Spacer(1, 15))
         grid_blok = []
-        baslik_karti_ekle(("PLANETARY ASPECT MAP" if _EN else "GEZEGEN AÇILARI HARİTASI"), 
+        baslik_karti_ekle(("PLANETARY ASPECT MAP" if _EN else ("MAPA DE ASPECTOS PLANETARIOS" if _ES else "GEZEGEN AÇILARI HARİTASI")), 
                           alt_baslik=("A map showing all angular connections between the two charts" if _EN else "İki harita arasındaki tüm açısal bağlantıları gösteren harita"), 
                           emoji="⚡",
                           hedef=grid_blok)
@@ -9025,7 +9025,7 @@ class FBST_Engine:
             story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.5))
             story.append(Spacer(1, 15))
 
-        baslik_karti_ekle("6 AYLIK GÜNLÜK AKIŞ", alt_baslik=("Effects of daily planetary movements" if _EN else "Günlük gezegen hareketlerinin etkileri"), emoji="⛅")
+        baslik_karti_ekle("6 AYLIK GÜNLÜK AKIŞ", alt_baslik=("Effects of daily planetary movements" if _EN else ("Efectos diarios del movimiento planetario" if _ES else "Günlük gezegen hareketlerinin etkileri")), emoji="⛅")
         
         gunluk_alarmlar = self.gunluk_bsp_taramasi(gun_sayisi=180, pdf_icin=True)
         
@@ -9048,7 +9048,7 @@ class FBST_Engine:
                 story.append(progress_table)
                 story.append(Spacer(1, 8))
         else:
-            story.append(Paragraph(("No minor trigger is expected in the next 6 months. You are in a stable flow." if _EN else "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."), styles['TurkishNormal']))
+            story.append(Paragraph(("No minor trigger is expected in the next 6 months. You are in a stable flow." if _EN else ("No se espera ningún desencadenante menor en los próximos 6 meses. Estás en un flujo estable." if _ES else "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız.")), styles['TurkishNormal']))
 
         # 🌟 7. BÖLÜM: KADERSEL YILDIZ MÜHÜRLERİ 🌟
         story.append(PageBreak())
@@ -9123,7 +9123,13 @@ class FBST_Engine:
 
                 # O Katmanda Mühür Yoksa Verilecek Zarif Uyarı
                 if not katman_muhurleri:
-                    story.append(Paragraph(f"<i>Bu kadersel katmanda ({katman['isim']}), belirlenen tolerans sınırlarında aktif bir sabit yıldız teması bulunmamaktadır.</i>", styles['TurkishNormal']))
+                    if _ES:
+                        _msg_no_seal = f"<i>No se encontró ningún tema de estrella fija activo en esta capa kármica ({katman['isim']}) dentro de los límites de tolerancia.</i>"
+                    elif _EN:
+                        _msg_no_seal = f"<i>No active fixed star theme found in this karmic layer ({katman['isim']}) within tolerance.</i>"
+                    else:
+                        _msg_no_seal = f"<i>Bu kadersel katmanda ({katman['isim']}), belirlenen tolerans sınırlarında aktif bir sabit yıldız teması bulunmamaktadır.</i>"
+                    story.append(Paragraph(_msg_no_seal, styles['TurkishNormal']))
                 
                 # O Katmanda Mühür Varsa Altın Kutular İçinde Ekrana Bas
                 else:
@@ -9175,7 +9181,7 @@ class FBST_Engine:
         try:
             story.append(PageBreak())
             if self.mod == "ebeveyn_cocuk":
-                baslik_karti_ekle(("ASTEROID INTERACTIONS" if (_EN or _ES) else "ASTEROİT ETKİLEŞİMLERİ"),
+                baslik_karti_ekle(("ASTEROID INTERACTIONS" if _EN else ("INTERACCIONES DE ASTEROIDES" if _ES else "ASTEROİT ETKİLEŞİMLERİ")),
                                   alt_baslik="Ceres, Pallas, Vesta, Psyche, Hygiea, Euphrosyne, Nemesis, Chiron asteroids.",
                                   emoji="🌱")
                 story.append(Spacer(1, 10))
@@ -12979,5 +12985,4 @@ class FBST_Engine:
             <hr/>
             """
         return metin
-
 
