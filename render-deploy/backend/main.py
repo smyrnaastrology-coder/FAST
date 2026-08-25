@@ -2091,7 +2091,7 @@ def _generate_natal_pdf(motor):
                 parag = " ".join(p for p in [yorum, etki] if p)
                 if not parag:
                     _gez_es2 = pdf_label(gez_ad) if _ES else gez_ad
-                parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else (f"{asto_ad} está en conjunción con tu energía de {_gez_es2}." if _ES else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."))
+                    parag = (f"{asto_ad} is in conjunction with your {gez_ad} energy." if _EN else (f"{asto_ad} está en conjunción con tu energía de {_gez_es2}." if _ES else f"{asto_ad} asteroidi {gez_ad} enerjinizle kavuşumda."))
                 _gez_es = pdf_label(gez_ad) if _ES else gez_ad
                 baslik = (f"✦ {asto_ad} — {gez_ad} ({fark}° conjunction)" if _EN else (f"✦ {asto_ad} — {_gez_es} ({fark}° conjunción)" if _ES else f"✦ {asto_ad} — {gez_ad} ({fark}° kavuşum)"))
                 ast_h = 16 + yazi_olcul(parag, "DejaVu", 8, 90) + 8
@@ -4861,34 +4861,34 @@ def _natal_hayat_alani_analizi(motor):
                 "seyahat": "Viajes y Descubrimiento",
             }
             ALAN_ES_GIRIS = {
-                "spor": "La actividad física ocupa un lugar importante en tu vida; tu cuerpo siente una necesidad natural de moverse.",
-                "sanat": "La creatividad y la sensibilidad estética forman el lado colorido de la vida para ti.",
-                "hobi": "La forma en que empleas tu tiempo libre está directamente ligada a la variedad de tus intereses.",
-                "saglik": "El equilibrio entre cuerpo y mente es un reflejo de tus hábitos diarios.",
+                "spor": "La actividad física ocupa un lugar importante en tu vida; El movimiento es parte esencial de tu vida; tu cuerpo anhela expresarse y ponerse en acción de forma natural.",
+                "sanat": "La creatividad y la sensibilidad estética dan color y sentido a tu vida.",
+                "hobi": "Tu tiempo libre revela la riqueza de tus intereses y la forma en que disfrutas la vida.",
+                "saglik": "El equilibrio entre cuerpo y mente se refleja en tus hábitos cotidianos.",
                 "beslenme": "Lo que comes afecta no solo a tu cuerpo, sino también directamente a tu mundo emocional.",
-                "ask": "Tu vida amorosa se moldea con los códigos emocionales ocultos en lo profundo de tu corazón.",
-                "kariyer": "Tu camino profesional se forma donde se unen la disciplina y la visión.",
-                "aile": "Tus lazos familiares y tus raíces son la clave para entender quién eres.",
-                "maddi": "Cuando tu flujo económico está en sintonía con tus valores, la abundancia llega de forma natural.",
-                "sosyal": "Tu círculo social, tu forma de comunicarte y tu interacción enriquecen tu vida.",
-                "egitim": "Tu deseo de aprender y tu curiosidad mental te impulsan constantemente a crecer.",
-                "manevi": "Tu viaje interior llega a las profundidades de conexiones invisibles y de tu conciencia intuitiva.",
-                "seyahat": "Tu ansia de explorar es un reflejo de tu anhelo por nuevos horizontes.",
+                "ask": "Tu vida amorosa nace de los códigos emocionales más profundos de tu corazón.",
+                "kariyer": "Tu camino profesional se forja en el encuentro entre disciplina y visión.",
+                "aile": "Tus raíces y lazos familiares son la base que te define.",
+                "maddi": "Cuando tu flujo económico vibra en sintonía con tus valores, la abundancia fluye con naturalidad.",
+                "sosyal": "Tu círculo social y tu forma de comunicar enriquecen cada aspecto de tu vida.",
+                "egitim": "Tu curiosidad y deseo de aprender te impulsan a crecer sin pausa.",
+                "manevi": "Tu viaje interior te lleva a lo invisible, a tu intuición más profunda.",
+                "seyahat": "Tu anhelo de explorar nace del deseo de abrir nuevos horizontes.",
             }
             ALAN_ES_KAPANIS = {
-                "spor": "El movimiento es vida; escucha a tu cuerpo.",
-                "sanat": "El arte es el alimento del alma; nutre la creatividad que llevas dentro.",
-                "hobi": "Cada momento de disfrute es un regalo que alimenta tu alma.",
-                "saglik": "Una vida sana se construye con el gran efecto de los pequeños hábitos.",
-                "beslenme": "Lo que comes alimenta no solo tu cuerpo, sino también tu alma.",
-                "ask": "El amor verdadero empieza por el amor que te tienes a ti mismo.",
-                "kariyer": "El éxito llega con pasos valientes dados en el momento adecuado.",
-                "aile": "Tus lazos familiares son tu mayor herencia espiritual.",
-                "maddi": "El equilibrio material comienza por aclarar tus valores.",
-                "sosyal": "Tu entorno es tu mejor espejo y maestro.",
-                "egitim": "Aprender es un viaje que nunca termina.",
-                "manevi": "La paz interior es la esencia de todo lo que buscas fuera.",
-                "seyahat": "Cada viaje es una oportunidad de descubrirte a ti mismo.",
+                "spor": "Moverse es vivir; escucha con atención lo que tu cuerpo te pide.",
+                "sanat": "El arte alimenta el alma; cultiva sin miedo la creatividad que habita en ti.",
+                "hobi": "Cada instante de disfrute es un regalo que nutre tu esencia.",
+                "saglik": "Una vida saludable nace de pequeños hábitos sostenidos con amor.",
+                "beslenme": "Alimentar tu cuerpo es también alimentar tu alma.",
+                "ask": "El amor verdadero comienza por el amor que te das a ti mismo.",
+                "kariyer": "El éxito florece cuando das pasos valientes en el momento justo.",
+                "aile": "Tus lazos familiares son tu herencia espiritual más valiosa.",
+                "maddi": "La claridad en tus valores es la base de tu equilibrio material.",
+                "sosyal": "Tu entorno refleja con honestidad quién eres y te enseña a crecer.",
+                "egitim": "Aprender es un viaje infinito que te expande.",
+                "manevi": "La paz interior es el verdadero destino de toda búsqueda externa.",
+                "seyahat": "Cada viaje es un reencuentro contigo mismo.",
             }
             # Fix page 10-12 systematic translations
             def _fix_es_alan(s):
