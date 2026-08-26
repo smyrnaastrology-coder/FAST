@@ -115,8 +115,50 @@ class _HoraryHomeState extends State<HoraryHome> {
   final SpeechToText _speech = SpeechToText();
   bool _listening=false;
   final FlutterTts _tts = FlutterTts();
+  List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
+  bool _showDetails=false;
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
+
+  @override void initState(){ super.initState(); _loadHistory(); }
+
+  Future<void> _loadHistory() async {
+    final p=await SharedPreferences.getInstance();
+    final h=p.getStringList('chat_history');
+    if(h!=null && h.isNotEmpty){ try{ setState(()=> _historyList = h.reversed.take(20).map((e)=> {'q': e}).toList()); }catch(_){} }
+    lang=p.getString('lang')??'tr';
+    setState((){});
+  }
+  Future<void> _saveHistory(String q) async {
+    final p=await SharedPreferences.getInstance();
+    final list=p.getStringList('chat_history')??[];
+    list.add('${DateTime.now().toIso8601String().substring(0,10)} | $q');
+    if(list.length>30) list.removeAt(0);
+    await p.setStringList('chat_history', list);
+    await p.setString('lang', lang);
+    setState(()=> _historyList = list.reversed.take(20).map((e)=> {'q':e}).toList());
+  }
+  String _timingDate(Map<String,dynamic>? timing){
+    if(timing==null) return '';
+    final txt=timing['text']??'';
+    final m=RegExp(r'(\d+)').firstMatch(txt);
+    if(m==null) return '';
+    int n=int.parse(m.group(1)!);
+    String unit=(timing['unit']??'').toString();
+    Duration d;
+    if(unit.contains('GÜN')) d=Duration(days:n);
+    else if(unit.contains('HAFTA')) d=Duration(days:n*7);
+    else if(unit.contains('AY')) d=Duration(days:n*30);
+    else if(unit.contains('YIL')) d=Duration(days:n*365);
+    else {
+      if(txt.contains('GÜN')) d=Duration(days:n);
+      else if(txt.contains('HAFTA')) d=Duration(days:n*7);
+      else if(txt.contains('AY')) d=Duration(days:n*30);
+      else return '';
+    }
+    final target=DateTime.now().add(d);
+    return '${target.day.toString().padLeft(2,'0')}.${target.month.toString().padLeft(2,'0')}.${target.year}';
+  }
 
   final langs = const [
     {'code':'tr','label':'TR','flag':'🇹🇷'},
@@ -155,6 +197,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     final q = _ctrl.text.trim();
     if (q.isEmpty) return;
     setState(() { _chat.add({'role':'user','content':q}); _loading=true; _ctrl.clear(); });
+    _saveHistory(q);
     try {
       final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang);
       final ans = res['answer'] as String? ?? '${res['verdict']}';
@@ -173,6 +216,15 @@ class _HoraryHomeState extends State<HoraryHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(backgroundColor: const Color(0xFF1A1423), child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.all(16), child: Text('Geçmiş Sorular', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize:18, fontWeight: FontWeight.bold))),
+        const Divider(color: Color(0xFF3d2e50)),
+        Expanded(child: _historyList.isEmpty ? const Padding(padding: EdgeInsets.all(16), child: Text('Henüz soru yok', style: TextStyle(color: Color(0xFFa898c0)))) : ListView.builder(itemCount: _historyList.length, itemBuilder: (_,i){
+          final h=_historyList[i]['q'] as String;
+          return ListTile(dense:true, title: Text(h, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:12), maxLines:2, overflow: TextOverflow.ellipsis), leading: const Icon(Icons.history, size:16, color: Color(0xFFC9A96E)), onTap: (){ Navigator.pop(context); _ctrl.text = h.split('|').last.trim(); });
+        })),
+        Padding(padding: const EdgeInsets.all(12), child: OutlinedButton(onPressed: () async { final p=await SharedPreferences.getInstance(); await p.remove('chat_history'); setState(()=> _historyList=[]); }, child: Text(tr('clear'), style: const TextStyle(color: Color(0xFFa898c0))))),
+      ]))),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1423),
         title: Column(children: [
@@ -204,20 +256,26 @@ class _HoraryHomeState extends State<HoraryHome> {
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
           ])),
-          // mini SolarFire chart
+          // mini SolarFire chart + timing geri sayım + strictures detay
           if(_lastChart!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(color: const Color(0xFF1A1423), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF3d2e50))),
-              child: Row(children: [
-                SizedBox(width:72, height:72, child: CustomPaint(painter: MiniChartPainter(_lastChart!))),
-                const SizedBox(width:10),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${tr('asc')}: ${_lastChart!['houses']?['asc_sign'] ?? ''} ${(_lastChart!['houses']?['asc']!=null? (_lastChart!['houses']['asc']%30).toStringAsFixed(1)+'°':'')}  •  ${tr('moon')}: ${_lastChart!['planets']?['Moon']?['sign'] ?? ''} ${_lastChart!['planets']?['Moon']?['deg']?.toStringAsFixed(1) ?? ''}°', style: const TextStyle(color: Color(0xFFC9A96E), fontSize:11)),
-                  const SizedBox(height:2),
-                  Text('${_lastChart!['verdict'] ?? ''}  •  ${_lastChart!['timing']?['text'] ?? ''}  •  ${_lastChart!['strictures']!=null? (_lastChart!['strictures'] as List).take(2).map((s)=>s['code']).join(', '):''}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10), maxLines:2, overflow: TextOverflow.ellipsis),
-                ])),
+              child: Column(children: [
+                Row(children: [
+                  SizedBox(width:72, height:72, child: CustomPaint(painter: MiniChartPainter(_lastChart!))),
+                  const SizedBox(width:10),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('${tr('asc')}: ${_lastChart!['houses']?['asc_sign'] ?? ''} ${(_lastChart!['houses']?['asc']!=null? (_lastChart!['houses']['asc']%30).toStringAsFixed(1)+'°':'')}  •  ${tr('moon')}: ${_lastChart!['planets']?['Moon']?['sign'] ?? ''} ${_lastChart!['planets']?['Moon']?['deg']?.toStringAsFixed(1) ?? ''}°', style: const TextStyle(color: Color(0xFFC9A96E), fontSize:11)),
+                    const SizedBox(height:2),
+                    Text('${_lastChart!['verdict'] ?? ''}  •  ${_lastChart!['timing']?['text'] ?? ''}${_timingDate(_lastChart!['timing']).isNotEmpty? ' → ${_timingDate(_lastChart!['timing'])}':''}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10), maxLines:2, overflow: TextOverflow.ellipsis),
+                    if(_lastChart!['timing']?['ephemeris_text']!=null) Text('Ephemeris: ${_lastChart!['timing']['ephemeris_text']}', style: const TextStyle(color: Color(0xFF6a9ae2), fontSize:10)),
+                  ])),
+                ]),
+                const SizedBox(height:6),
+                GestureDetector(onTap: ()=> setState(()=> _showDetails=!_showDetails), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(_showDetails? Icons.expand_less: Icons.expand_more, size:16, color: const Color(0xFFC9A96E)), Text(_showDetails? ' Detayları gizle':' Detayları gör', style: const TextStyle(color: Color(0xFFC9A96E), fontSize:11))])),
+                if(_showDetails) Container(margin: const EdgeInsets.only(top:6), padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(8)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: (_lastChart!['strictures'] as List).map((s)=> Padding(padding: const EdgeInsets.only(bottom:4), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width:6,height:6,margin: const EdgeInsets.only(top:5, right:6), decoration: BoxDecoration(color: s['level']=='warning'? Colors.orange: s['level']=='critical'? Colors.redAccent: const Color(0xFFC9A96E), shape: BoxShape.circle)), Expanded(child: Text('${s['code']}: ${s['meaning']??''}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11)))]))).toList())),
               ]),
             ),
           ),
