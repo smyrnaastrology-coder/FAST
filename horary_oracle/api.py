@@ -61,19 +61,34 @@ def cached_chart(y, m, d, utc_dec, lat, lon, qtype):
 def resolve_time(req: CastRequest):
     if req.year and req.month and req.day and req.hour is not None:
         y, mo, da, local_dec = req.year, req.month, req.day, req.hour
+        off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, local_dec)
+        utc_dec = local_dec - off
+        # gün sarkması düzeltmesi (gece 00:30 local -> utc önceki gün)
+        if utc_dec < 0:
+            utc_dec += 24
+            # tarih bir gün geri (basit - ay sınırı için datetime kullan)
+            try:
+                from datetime import timedelta
+                dt = datetime(y, mo, da) + timedelta(days=-1)
+                y, mo, da = dt.year, dt.month, dt.day
+            except: pass
+        elif utc_dec >= 24:
+            utc_dec -= 24
+            try:
+                from datetime import timedelta
+                dt = datetime(y, mo, da) + timedelta(days=1)
+                y, mo, da = dt.year, dt.month, dt.day
+            except: pass
+        return y, mo, da, utc_dec, off, tzname, local_dec
     else:
-        # Render UTC'de çalışıyor -> utcnow al, İzmir'e çevir
         utc_now = datetime.utcnow()
         y, mo, da = utc_now.year, utc_now.month, utc_now.day
         utc_dec = utc_now.hour + utc_now.minute/60 + utc_now.second/3600
-        # İzmir off'u bulmak için önce utc'den local tahmini
-        off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, utc_dec+3)
-        # düzelt: jd için utc kullanıyoruz
+        off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, 12)
         local_dec = utc_dec + off
+        if local_dec >= 24: local_dec -= 24
+        if local_dec < 0: local_dec += 24
         return y, mo, da, utc_dec, off, tzname, local_dec
-    off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, local_dec)
-    utc_dec = local_dec - off
-    return y, mo, da, utc_dec, off, tzname, local_dec
 
 @app.get("/api/health", response_model=HealthResponse)
 async def health():

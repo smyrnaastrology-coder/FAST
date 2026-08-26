@@ -15,14 +15,20 @@ class HoraryApi {
     List<Map<String, dynamic>>? history,
   }) async {
     final uri = Uri.parse('$baseUrl/api/horary/cast');
-    // OpenAI + Render cold-start için 90sn + 1 retry (20sn çok kısaydı)
+    final now = DateTime.now(); // yerel saat - transit için kritik
+    final payload = {
+      'question': question, 'lat': lat, 'lon': lon, 'lang': lang,
+      'year': now.year, 'month': now.month, 'day': now.day,
+      'hour': now.hour + now.minute/60 + now.second/3600,
+      if(history!=null) 'history': history,
+    };
     http.Response? res;
     for (var attempt = 0; attempt < 2; attempt++) {
       try {
         res = await http.post(
           uri,
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'question': question, 'lat': lat, 'lon': lon, 'lang': lang, if(history!=null) 'history': history}),
+          body: jsonEncode(payload),
         ).timeout(const Duration(seconds: 90));
         break;
       } catch (e) {

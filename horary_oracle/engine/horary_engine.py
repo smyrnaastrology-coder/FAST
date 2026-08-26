@@ -241,27 +241,29 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 # Yeni Ay özel: Moon 0-2 ve Sun ile kavuşum => new_moon
                 if p=="Moon" and c["layer"]=="cazimi_like_0_2":
                     strictures.append({"code":"new_moon","level":"critical","meaning":"Güneş-Ay kavuşumu - çok feci manipülasyon/bilinçli kötülük"})
-    # VOC v0.6: 45 ve 150 dahil (7 açı + conjunction), Regulus 29 istisna
+    # VOC v0.6 fix: Ay burç sonuna kadar klassik 7 gezegenle applying açı yapmazsa VOC
     voc = True
     voc_aspects = RULES["strictures"].get("moon_void_of_course",{}).get("aspects_considered",[0,45,60,90,120,150,180])
     if 0 not in voc_aspects: voc_aspects = [0] + list(voc_aspects)
-    # orb mapping - Lilly + moiety uyumlu
-    orb_map = {0:10,45:6,60:6,90:8,120:8,150:3,180:10}
+    moon_deg = planets["Moon"]["deg"]
+    remaining = 30.0 - moon_deg  # burç sonuna kalan derece (~ Ay'ın bu burçta kat edeceği yol)
+    # Lilly: Burç değiştirmeden önce orb içine girerse VOC değil (moiety/Barclay). Kalan yol içinde exact açı var mı?
     for target in ["Sun","Mercury","Venus","Mars","Jupiter","Saturn"]:
-        if target == "Moon":
+        if target not in planets:
             continue
-        diff = (planets[target]["lon"] - moon_lon) % 360
-        rel = planets["Moon"]["speed"] - planets[target]["speed"]
-        if rel > 0:
-            for ang in voc_aspects:
-                orb = orb_map.get(ang,8)
-                d = abs((diff - ang + 180) % 360 - 180)
-                if d <= orb:
-                    diff_next = ((planets[target]["lon"]+planets[target]["speed"]) - (moon_lon+planets["Moon"]["speed"])) % 360
-                    d_next = abs((diff_next - ang + 180) % 360 - 180)
-                    if d_next < d:
-                        voc = False
-                        break
+        for ang in voc_aspects:
+            diff = (planets[target]["lon"] - moon_lon) % 360
+            # diff = target - moon; Moon hızlı olduğu için diff her gün azalır.
+            # diff == ang olunca exact açı. Moon'un kat etmesi gereken yol = diff - ang (pozitifse)
+            needed = (diff - ang) % 360
+            # needed 0 ise zaten exact; 300+ ise açı geride kaldı (bir tur atması gerekir) -> VOC için geçersiz
+            if needed < 0.1:
+                needed = 0
+            if 0 <= needed <= remaining + 0.5:  # kalan yol içinde exact'a ulaşır
+                # applying kontrolü: needed yol pozitif ve Moon hedefe yaklaşıyor
+                # Eğer needed 0-remaining içindeyse Moon burç çıkmadan kavuşur -> NOT VOC
+                voc = False
+                break
         if not voc:
             break
     # Regulus 29 istisna: Moon 29 Aslan Regulus ise VOC sayma
