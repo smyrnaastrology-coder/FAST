@@ -619,6 +619,20 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             d = abs((alon - slon + 180) % 360 - 180)
             if d <= 5:  # açı noktaları 5°
                 strictures.append({"code":f"fixed_star_angle_{star}","level":"info","angle":angle_name,"deg":round(deg_in_sign(alon),1),"star":star,"dist":round(d,1),"orb":5})
+    # Antiscion genel (Deirdre retro söz değişimi dahil) - 0 Cancer/0 Capricorn eksenine göre ayna
+    try:
+        def antiscion(lon): return (360 - lon) % 360  # 0 Cancer/0 Cap ekseni: 90-270
+        # querent-quesited antiscion var mı
+        q_lon = querent["data"]["lon"]; qs_lon = quesited["data"]["lon"]
+        q_anti = antiscion(q_lon); qs_anti = antiscion(qs_lon)
+        for a,b,lab in [(q_lon, qs_anti, "querent antiscion-quesited"), (qs_lon, q_anti, "quesited antiscion-querent")]:
+            d = abs((a - b + 180) % 360 - 180)
+            if d < 2:
+                strictures.append({"code":"antiscion","level":"info","dist":round(d,1),"meaning":f"Antiscion {lab} {d:.1f}° — gizli bağlantı/açı, Deirdre'de retro Merkür söz değişimi gibi."})
+        # retro Merkür söz değişimi (Deirdre)
+        if planets.get("Mercury",{}).get("retro"):
+            strictures.append({"code":"retro_mercury_word","level":"info","meaning":"Retro Merkür — söylenen söz değişir (Deirdre), ifade/görüş değişimi."})
+    except: pass
     # Thuban antiscia (paralel/kontraparalel - deklination proxy: lon simetrisi) - istek üzerine not
     # Gerçek paralel declination ister, şimdilik sadece Thuban kavuşumu rapor edildi
 
