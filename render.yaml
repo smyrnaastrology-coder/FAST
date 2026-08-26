@@ -7,7 +7,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: bash start.sh
     healthCheckPath: /api/health
-  - type: web
+   - type: web
     name: horary-oracle-api
     runtime: python
     plan: free
@@ -19,6 +19,8 @@ services:
         value: "true"
       - key: PYTHON_VERSION
         value: "3.12.8"
+      - key: OPENAI_API_KEY
+        sync: false
   - type: web
     name: horary-oracle-web
     runtime: python
@@ -37,7 +39,7 @@ services:
     name: horary-pwa
     runtime: static
     plan: free
-    buildCommand: cd horary_ios && flutter build web --release
+    buildCommand: cd horary_ios && flutter build web --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
     staticPublishPath: horary_ios/build/web
     routes:
       - type: rewrite
