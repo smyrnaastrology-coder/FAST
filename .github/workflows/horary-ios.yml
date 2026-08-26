@@ -12,9 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-        with: { flutter-version: 'stable', channel: 'stable' }
+        with: { flutter-version: '3.24.5', channel: 'stable', cache: true }
       - run: flutter pub get
-      - run: cd ios && pod install --repo-update
-      - run: flutter build ipa --release --no-codesign
+      - run: pod install --repo-update
+        working-directory: horary_ios/ios
+      - run: flutter build ios --release --no-codesign
+      - run: |
+          mkdir -p build/ios/ipa
+          cd build/ios/iphoneos
+          mkdir -p Payload && cp -r Runner.app Payload/ && zip -r ../ipa/Horary-unsigned.ipa Payload
       - uses: actions/upload-artifact@v4
         with: { name: Horary-unsigned-ipa, path: horary_ios/build/ios/ipa/*.ipa }
