@@ -895,13 +895,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             if abs(d["speed"]) < 0.2 and d["house"] in (1,7,10):
                 strictures.append({"code":"lilly_15_slow","level":"info","planet":p,"speed":round(d["speed"],3),"meaning":f"Aforizma 15: {p} çok yavaş — sonuç uzar (burç {d['sign']})."})
         # 22: hem iyicil hem kötücül güçsüz ise ertelenmeli
-        # 26: Güneş ışınları 12° vs Cazimi 0-16' (17' içinde)
+        # 26: Güneş ışınları 12° vs Cazimi 0-16' (genişletilmiş Menconi yearly review 1°17' cazimi gibi)
         sun_lon = planets["Sun"]["lon"]
         for p, d in planets.items():
             if p=="Sun": continue
             dist_sun = abs((d["lon"]-sun_lon+180)%360-180)
-            if dist_sun < 0.27: # 16' ~0.27°
-                strictures.append({"code":"lilly_26_cazimi","level":"info","planet":p,"dist":round(dist_sun,2),"meaning":f"Aforizma 26: {p} Cazimi (Güneş 0°16' içinde) — muazzam güç."})
+            if dist_sun < 1.5: # Menconi cazimi geniş: 17' -> 1.5° (Yearly Review)
+                strictures.append({"code":"lilly_26_cazimi","level":"info","planet":p,"dist":round(dist_sun,2),"meaning":f"Aforizma 26: {p} Cazimi (Güneş 1.5° içinde Menconi geniş) — muazzam güç."})
             elif dist_sun < 12:
                 strictures.append({"code":"lilly_26_sun_beams","level":"warn","planet":p,"dist":round(dist_sun,1),"meaning":f"Aforizma 26: {p} Güneş ışınları altında 12° içinde — güçsüz."})
         # 28/34: sabit/öncü/değişken + köşe/ardıl/düşük ev
