@@ -270,11 +270,14 @@ async def cast(req: CastRequest):
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000
+    # planets for mini chart
+    planets_out = {k:{"lon":v["lon"],"sign":v["sign"],"deg":round(v["deg"],2),"house":v["house"]} for k,v in res.get("planets",{}).items() if k in ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Pluto","Uranus","Neptune"]}
     return {
         "verdict": res["verdict"], "score": res["score"],
         "perfection": res["perfection"], "timing": res.get("timing"),
         "querent": res["querent"], "quesited": res["quesited"],
-        "houses": {"asc": res["houses"]["asc"], "asc_sign": res["houses"]["asc_sign"], "mc": res["houses"]["mc"]},
+        "houses": {"asc": res["houses"]["asc"], "asc_sign": res["houses"]["asc_sign"], "mc": res["houses"]["mc"], "cusps": res["houses"]["cusps"]},
+        "planets": planets_out,
         "strictures": res["strictures"][:12],
         "lots": res.get("lots",{}),
         "location": loc_info,
