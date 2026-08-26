@@ -65,6 +65,11 @@ output*.txt
 *_result.txt
 result_test*.txt
 
+# ─── Firebase / Secrets ───
+**/google-services.json
+**/GoogleService-Info.plist
+**/.env
+
 # ─── OS / Editör / Çöp ───
 .DS_Store
 Thumbs.db
