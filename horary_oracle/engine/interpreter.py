@@ -2,16 +2,19 @@
 LLM Tercüman - Kilitli Prompt
 Motor JSON'u dışında hiçbir hesap yapamaz, sadece dile çevirir.
 """
-LOCKED_PROMPT = """You are Horary Oracle translator. RULES:
-- You receive ONLY engine JSON: verdict, score, perfection, timing, strictures, querent, quesited.
-- NEVER calculate aspects/houses yourself. NEVER invent chart data.
-- Even if VOC/asc_immature/via_combusta present, STILL interpret like Lilly: VOC => 'nothing will come of the matter' but continue to judge perfection/reception.
-- Lilly: VOC = no perfection => usually NO, but check if Moon in Taurus/Cancer or angular => some virtue.
-- Frawley/Barclay: VOC is strong NO testimony, but not absolute block; others: VOC in mutable may still act.
-- STRICTURES to verbalize (all must be mentioned if present): asc_immature/critical/intervention, rx_26_28/rx_28/rx_29, via_combusta, water_secrecy, combustion_*, new_moon, voc, critical_degree, saturn_1_7/mars_in_7th/pluto_in_7th, moon_last/next_aspect + moon_roles + Kalde (Moon>Mer>Ven>Sun>Mar>Jup>Sat fast->slow), radical/non_radical (hour ruler vs ASC), almuten_moon (Almuten = strongest dignity at ASC), horary_minerva (Jup-Moon-Mars 60/120), aries_point (0 Aries), uranian_info, two_option_hint (Moon benefic to Venus/Mars for long-term), uranus/neptune/pluto ignored/activated, kad/gad conjunction, timing_planet_years, bonatus/vergilius, betelgeuse_28.
- - Always give verdict + why, mention strictures as caution not block, in warm conversational tone (muhabbet).
- - Output in requested language. MUHABBET IS VALID FOR ALL 10 LANGUAGES (tr,en,es,ar,pt,fr,de,ru,it,hi) - translate the FEW-SHOT style faithfully.
- - FEW-SHOT examples below are in Turkish - TRANSLATE the same technical reasoning + warm muhabbet tone to the requested language.
+LOCKED_PROMPT = """Sen Asartepe horary astrologusun — sıcak, doğal, muhabbet gibi konuşan bir dost. Robot gibi değil, insan gibi.
+KURALLAR:
+- Sadece motor JSON'unu alırsın: verdict, score, perfection, timing, strictures, querent, quesited.
+- KESİNLİKLE kendin aspect/ev hesaplaması YAPMA, chart data YOKSAY.
+- VOC/asc_immature/via_combusta/asc_near_boundary varsa Lilly gibi yorumla ama doğal dille: VOC => 'şu an akmıyor gibi' ama perfection/reception yine de değerlendir.
+- Lilly: VOC = perfection yok => genelde HAYIR, ama Moon Taurus/Cancer veya angular ise biraz umut var.
+- Frawley/Barclay: VOC güçlü HAYIR işareti ama mutlak engel DEĞİL; mutable'de yine de hareket edebilir.
+- asc_near_boundary (29-30° veya 0-1°) => SolarFire uyarısı: 'harita burç sınırında, soru çift niyetli/kararsız, netleştir' diye muhabbetle söyle.
+- HER MESAJI horary sorusu gibi görme: selam/sohbet/dertleşme ise önce sohbet et, sonra nazikçe horary sorusuna davet et + 2-3 örnek soru öner.
+- MUTLAKA verdict + neden, strictures'ı uyarı olarak söyle (engel değil uyarı), SAMİMİ, SOHBET tonunda (muhabbet). Kısa paragraflar, emoji max 1.
+- Sohbet modunda öneri sun: 'istersen şunu sorabilirsin: ...' gibi.
+- İstenen dilde cevap ver. MUHABBET 10 DİLDE GEÇERLİ (tr,en,es,ar,pt,fr,de,ru,it,hi).
+- Aşağıdaki FEW-SHOT örnekler Türkçe — AYNI TEKNİK + AYNI SICAK MUHABBET TONUNU istenen dile çevir.
 
 FEW-SHOT (Asartepe tarzı - bu üslubu kullan - tum diller icin gecerli):
 Q: boşanacak mıyım ?
@@ -227,6 +230,8 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     strict_codes = [s["code"] for s in strict]
     timing_txt = t.get("text","")
     question = engine_json.get("question","").lower()
+    is_followup = engine_json.get("is_followup", False)
+    history = engine_json.get("history", [])
     is_where = any(k in question for k in ["nerede","nerde","nere","kaybol","kayıp","kayip","where"])
     is_how = any(k in question for k in ["nasıl","nasil","how"])
     is_doing = any(k in question for k in ["ne yapıyor","ne yapiyor","ne yapiyo","what is doing"])
@@ -235,20 +240,24 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     has_voc = "voc" in strict_codes
     has_immature = "asc_immature" in strict_codes
     q = engine_json.get("querent",""); qs = engine_json.get("quesited","")
+    # Follow-up ise önceki haritayı referans ver
+    followup_intro = ""
+    if is_followup and history:
+        followup_intro = "Az önce baktığımız haritanın üzerine... "
+    
     # ne yapıyor - aktivite sorusu, YES/NO değil tarif
     if is_doing and loc:
-        # karım -> 7.ev, kocam ->7, cocugum->5 gibi
         person = loc.get('person','quesited')
         house = loc.get('house',7)
         height = loc.get('height','')
-        # quesited planetin evi ve burcu aktiviteyi gosterir
-        return {"tr":f"{person.capitalize() if person else 'O'} şu an {loc.get('direction','')} yönünde, {height} bir yerde — ev {house} ({'evde' if house==4 else 'işte' if house==10 else 'dışarda'}). Haritada significatoru {qs} {loc.get('house',7)}.evde, {engine_json.get('quesited_sign','')} burcunda — o evin konularıyla meşgul. Zaman: {timing_txt} içinde hareket edebilir.",
+        return {"tr":f"{followup_intro}{person.capitalize() if person else 'O'} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — {loc.get('house','')} numaralı evde ({'evde' if house==4 else 'işte' if house==10 else 'dışarda'}). Haritada significatoru {qs} {loc.get('house','')}.evde, {engine_json.get('quesited_sign','')} burcunda — o evin konularıyla meşgul. Zaman: {timing_txt} içinde hareket edebilir.",
                 "en":f"{person} is in house {house} {height}","es":"","ar":""}[lang]
-    # Tüm strictures için insan dili - teknik olup açıklaması olmayanları kapat
+    # Tüm strictures için insan dili - doğal muhabbet tonu
     STRICTURE_TEXT = {
-        "asc_immature": "Harita 0-3° — soru olgunlaşmamış, şartlar hazır değil.",
-        "asc_critical": "ASC 27-29° kritik — konu bitmiş/gizli problem.",
-        "asc_intervention": "ASC 25-26° — müdahale/karar aşaması.",
+        "asc_near_boundary": "ASC burç sınırında — harita biraz kararsız, sorun çift niyetli olabilir (SolarFire uyarısı).",
+        "asc_immature": "Harita çok taze (0-3°) — soru henüz olgunlaşmamış, biraz beklemek iyi olur.",
+        "asc_critical": "ASC 27-29° kritik — konu kapanış eşiğinde, gizli bir düğüm var gibi.",
+        "asc_intervention": "ASC 25-26° — tam karar/müdahale anı, sen de hissediyorsun.",
         "querent_critical_deg": "Senin significatorun 27-29° kritik derecede.",
         "quesited_critical_deg": "Karşı tarafın significatoru 27-29° kritik.",
         "querent_review_26_27": "Senin significatorun 26-27° — yeniden gözden geçir.",
@@ -353,8 +362,12 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         elif qs_sign in ["Oğlak","Kova","Başak"]: long_detail += " Biraz mesafeli, mantıklı ve içine kapanık."
         elif qs_sign in ["Koç","Aslan","Yay"]: long_detail += " Hareketli, atik, bir şeyler yapmak istiyor."
     except: pass
+    # doğal kapanış önerileri
+    suggest = " İstersen netleştirelim — mesela 'bu işe girecek miyim?' veya 'bana yazacak mı?' gibi tek ve net bir soru sorabilirsin."
     if v=="YES":
-        base = f"Cevap evet görünüyor — merak etme, {q} ile {qs} arasında {perf.get('type','kavuşum')} ile güzel bir buluşma var. {long_detail} Korkma, bu harita sana göz kırpıyor."
+        base = f"Evet gibi duruyor — {q} ile {qs} arasında {perf.get('type','kavuşum')} var, harita olumlu akıyor. {long_detail} İçini ferah tut, gidişat senden yana."
+        if "asc_near_boundary" in strict_codes:
+            base += " Not: ASC sınırda olduğu için niyetini bir cümlede netleştirirsen harita daha keskin konuşur."
         return base
     if v=="NO":
         if is_where and loc:
@@ -376,15 +389,17 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             return f"Aradığın şey şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde duruyor — ev {loc.get('house','')} . Mesafe yaklaşık {loc.get('distance','')} ."
         if is_thought:
             q_data = engine_json.get("quesited_sign","")
-            return {"tr":f"Eşin significatoru {qs} {q_data} burcunda, ev {loc.get('house',7)}. Düşüncesinde seni {chr(34)}düşünüyor{chr(34)} demek için {q} ile {qs} arasında olumlu açı gerekir — şu an {perf.get(chr(34)+"type"+chr(34),chr(34)+"yok"+chr(34))} var. {long_explain()}", "en":f"Thought","es":"","ar":""}[lang]
+            return {"tr":f"{qs} {q_data} burcunda, ev {loc.get('house',7)} — seni düşünüyor mu diye bakınca {q}-{qs} arası {perf.get(chr(34)+'type'+chr(34),chr(34)+'yok'+chr(34))} var. {long_explain()} Biraz daha net sorarsan (ör: 'beni özlüyor mu?') daha keskin söylerim.", "en":f"Thought","es":"","ar":""}[lang]
         if is_how:
-            return f"Şu an için cevap hayır — {q} ile {qs} arasında olumlu açı yok. Nasıl? Haritada {perf.get('type','')} yok, engeli aşmak için 6 ay sonra tekrar bakmak daha doğru. Zaman: {timing_txt}."
+            return f"Şu an için hayır gibi — {q} ile {qs} arasında olumlu açı yok. {long_detail} 6 ay sonra koşullar değişince tekrar bakabiliriz.{suggest}"
         if has_voc:
-            return f"Şu an için cevap hayır görünüyor. Ay boşlukta olduğu için konu bir süre ilerlemeyecek. Haritada da {q} ile {qs} arasında kavuşum ya da olumlu açı yok. Dilersen 6 ay sonra tekrar sorabilirsin. Tahmini zaman: {timing_txt}."
-        return f"Şu an için cevap hayır. {q} ile {qs} arasında kavuşum ya da olumlu açı yok. Tahmini zaman: {timing_txt}."
+            return f"Şu an biraz askıda — Ay boşlukta olduğu için konu akmıyor gibi. Haritada da {q}-{qs} arası olumlu açı yok. Acele etme, 1-2 hafta sonra aynı niyetle tek bir soru sorarsan daha net akar.{suggest}"
+        return f"Şu an için hayır gibi duruyor. {long_detail} Üzülme, koşullar değişince yeniden sorabilirsin.{suggest}"
     if has_immature:
-        return f"Harita olgunlaşmamış (ASC 0-3°) — soru erken ama yorum: {v} {perf.get('type')} Zaman {timing_txt}."
-    return f"Belirsiz ({v}) — {perf.get('type')} Zaman {timing_txt}"
+        return f"Harita çok taze (ASC 0-3°) — soru henüz olgunlaşmamış gibi hissettirdi. Yine de gördüğüm: {v} {perf.get('type')} Zaman {timing_txt}. Biraz demlensin, 1-2 gün sonra aynı soruyu tek cümlede net sorarsan çok daha keskin cevap gelir."
+    if v=="UNCERTAIN":
+        return f"Şu an belirsiz — {long_detail} Harita kararsız, evet de hayır da değil. Niyetini tek bir soruda netleştirirsen (ör: 'X ile barışacak mıyım?') daha keskin söylerim."
+    return f"Belirsiz ({v}) — {perf.get('type')} Zaman {timing_txt}.{suggest}"
 
 if __name__=="__main__":
     demo={"verdict":"YES","score":10,"perfection":{"type":"trine"},"timing":{"text":"12 HAFTA"},"strictures":[]}

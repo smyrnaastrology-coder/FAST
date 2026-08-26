@@ -172,6 +172,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     strictures = []
     for n in masha_notes:
         strictures.append({"code":"masha_allah","level":"info","meaning":n})
+    # SolarFire benzeri: ASC burç sınırına yakın (29-30 ve 0-1) - ayrı uyarı
+    next_sign = {"Koç":"Boğa","Boğa":"İkizler","İkizler":"Yengeç","Yengeç":"Aslan","Aslan":"Başak","Başak":"Terazi","Terazi":"Akrep","Akrep":"Yay","Yay":"Oğlak","Oğlak":"Kova","Kova":"Balık","Balık":"Koç"}.get(asc_sign,"")
+    if asc_deg >= 29:
+        strictures.append({"code":"asc_near_boundary","level":"critical","deg":round(asc_deg,2),"sign":asc_sign,"next_sign":next_sign,"meaning":f"ASC {asc_sign} {asc_deg:.2f}° — burç sınırına çok yakın (SolarFire: near sign boundary → {next_sign} sınırında), harita kararsız/çift niyet, aynı soruyu tekrar sorma eşiği"})
+    elif asc_deg < 1:
+        prev_sign = {"Boğa":"Koç","İkizler":"Boğa","Yengeç":"İkizler","Aslan":"Yengeç","Başak":"Aslan","Terazi":"Başak","Akrep":"Terazi","Yay":"Akrep","Oğlak":"Yay","Kova":"Oğlak","Balık":"Kova","Koç":"Balık"}.get(asc_sign,"")
+        strictures.append({"code":"asc_near_boundary","level":"warning","deg":round(asc_deg,2),"sign":asc_sign,"prev_sign":prev_sign,"meaning":f"ASC {asc_sign} {asc_deg:.2f}° — yeni burca yeni girmiş (near boundary), soru taze/olgunlaşmamış olabilir"})
     # Yeni 4 kademeli ASC (0-3 immature, 3-25 ideal, 25-27 intervention, 27-30 critical)
     asc_cfg = RULES["strictures"].get("asc_degrees")
     if asc_cfg:

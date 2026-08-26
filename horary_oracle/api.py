@@ -151,10 +151,21 @@ async def cast(req: CastRequest):
     if is_followup:
         # takip: yeni chart açmadan önceki cevabın üzerine muhabbet devam (LLM'e history ver)
         pass  # aşağıda engine_json'a history eklenecek
-    if qlow in ["merhaba","selam","selamlar","hey","hi","hello"] or qlow.startswith("merhaba") or qlow.startswith("selam"):
-        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* veya *bu işe girecek miyim?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
-    if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber"]):
-        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, senin sorularını bekliyorum! Horary için en önemli soruyu sor — kalbinden geçen, uykunu kaçıran soru. Ne sormak istersin?","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    # Doğal sohbet yakalama - her yazılanı horary sanma
+    chat_greetings = ["merhaba","selam","selamlar","hey","hi","hello","günaydın","iyi akşamlar","iyi geceler","sa","mrb"]
+    if qlow in chat_greetings or any(qlow.startswith(g) for g in chat_greetings):
+        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* / *bu işe girecek miyim?* / *bana yazacak mı?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber","nasilsin"]):
+        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
+    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu"]
+    is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
+    if not is_horary and len(qlow.split()) < 12:
+        # sohbet modu - öneri sun
+        if any(k in qlow for k in ["teşekkür","sağol","sagol","eyvallah","tamam","anladım","anladim","haklısın","haklisin"]):
+            return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Rica ederim, ne demek! Aklına başka bir soru düşerse buradayım — tek ve net sorarsan harita daha keskin konuşur. Örn: 'o iş olacak mı?' gibi.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+        if len(qlow) < 40 and "?" not in req.question:
+            return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Seni dinliyorum — biraz daha anlatır mısın? İstersen bunu horary sorusuna çevirelim: tek cümlede, net sor. Örn: 'bu evi alacak mıyım?' / 'bana dönecek mi?' / 'kaybolan nerede?' — hangisi kalbine yakın?","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     # follow-up: önceki haritayı hatırla (history içinde son assistant charth olabilir, ama basit: client history gönderirse)
     # history varsa ve soru "açar mısın / neden / nasıl" ise önceki chart'a dair detay dön (horary_app.py:132)
     # Bu endpoint stateless olduğu için follow-up için history'de son chart'ı client göndermeli; şimdilik passthrough
