@@ -178,6 +178,15 @@ A: ASC 12° Scorpio → querent Mars 08° Virgo 11th, quesited 2nd Sagittarius r
 Q: Oct 12 1988 09:45 Istanbul - Borcum odenecek mi / Alacagimi alabilecek miyim ? (Turkish K07 Fig.24 - not in prior few-shots)
 A: ASC 18° Libra → querent Venus 14° Scorpio detriment 2nd, quesited alacak 2nd Scorpio ruler Mars 25° Capricorn exalted 4th angular strong (debtor has means), 8th Taurus ruler Venus same as querent. Moon 08° Pisces 6th applies trine Venus separating then opposition Mars? Actually Moon 08° Pisces trine Venus 14° Scorpio perfection then trine Mars? Translation Moon carries Venus to Mars exalted. Saturn 28° Sagittarius 3rd cadent. Verdict YES with delay - Moon translation Venus to exalted Mars, borç var ama Mars exalted güçlü borçlu öder, Pisces mutable 6° -> 6 hafta içinde (engel Saturn 3. ev evrak gecikmesi).
 
+Q: Will Deirdre Be Sent Down? (Frawley 27 Mar 1998 19:58 London 24 Libra Mars conj Saturn)
+A: ASC 24° Libra → Deirdre turned 7th Aries ruler Mars 13° Aries conjunct Saturn in Aries fall 6th (turned 12th prison). Mars ex own sign but imminent Saturn conjunction = conviction/imprisonment. Cardinal sign quick end, Mars soon enters Taurus Deirdre's 1st (home) and meets retrograde Mercury = testimony changes. Verdict YES initially convicted but quickly released/home.
+
+Q: Will Brazil Beat Argentina? (Cuperman 15 Nov 2010 11:15 Herzliya 2 Aquarius Saturn vs Sun)
+A: ASC 02° Aquarius → Brazil Saturn 15° Libra exalted 9th, Argentina Sun 23° Scorpio peregrine 10th (Sun stronger house). Moon 18° Pisces 2nd applies? No perfection Saturn-Sun; Saturn exalted but cadent by house? Sun angular stronger. No aspect = no Brazil win. Verdict NO Brazil does not beat Argentina (Argentina 1-0).
+
+Q: Will I Get a Good Yearly Review? (Cuperman 7 Feb 2012 18:37 Herzliya 5 Virgo Mercury cazimi)
+A: ASC 05° Virgo → querent Mercury 18° Aquarius cazimi Sun 18° Aquarius 6th (in heart, wondrous strong) conjunct Sun = fortified by king, quesited 10th Gemini ruler Mercury same significator? Job/Review 10th ruler Mercury cazimi dignified; Moon 05° Leo 12th applies trine Mercury perfection with Sun reception. Cazimi overcomes 6th house weakness. Verdict YES excellent review.
+
 Engine JSON:
 {json}
 """
