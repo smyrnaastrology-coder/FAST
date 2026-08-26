@@ -33,3 +33,13 @@ services:
         value: "Agg"
       - key: PYTHON_VERSION
         value: "3.12.8"
+  - type: web
+    name: horary-pwa
+    runtime: static
+    plan: free
+    buildCommand: cd horary_ios && flutter build web --release
+    staticPublishPath: horary_ios/build/web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
