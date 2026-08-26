@@ -6,16 +6,17 @@ on:
 jobs:
   build-ios:
     runs-on: macos-14
-    defaults:
-      run:
-        working-directory: horary_ios
     steps:
       - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '3.24.5', channel: 'stable', cache: true }
-      - run: cd horary_ios && flutter pub get
-      - run: cd horary_ios/ios && pod install --repo-update
-      - run: cd horary_ios && flutter build ios --release --no-codesign
-      - run: cd horary_ios && mkdir -p build/ios/ipa && cd build/ios/iphoneos && mkdir -p Payload && cp -r Runner.app Payload/ && zip -r ../ipa/Horary-unsigned.ipa Payload
+      - run: flutter pub get
+        working-directory: horary_ios
+      - run: pod install --repo-update
+        working-directory: horary_ios/ios
+      - run: flutter build ios --release --no-codesign
+        working-directory: horary_ios
+      - run: mkdir -p build/ios/ipa && cd build/ios/iphoneos && mkdir -p Payload && cp -r Runner.app Payload/ && zip -r ../ipa/Horary-unsigned.ipa Payload
+        working-directory: horary_ios
       - uses: actions/upload-artifact@v4
         with: { name: Horary-unsigned-ipa, path: horary_ios/build/ios/ipa/*.ipa }
