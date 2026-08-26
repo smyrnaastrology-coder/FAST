@@ -2,6 +2,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'services/horary_api.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const HoraryApp());
 
@@ -20,13 +21,38 @@ class HoraryApp extends StatelessWidget {
 
 class AuthGate extends StatefulWidget { const AuthGate({super.key}); @override State<AuthGate> createState()=> _AuthGateState(); }
 class _AuthGateState extends State<AuthGate> {
-  bool _ok=false;
+  bool _ok=false; bool _check=true;
+  @override void initState(){ super.initState(); _load(); }
+  Future<String> _deviceId() async {
+    final p = await SharedPreferences.getInstance();
+    var id = p.getString('device_id');
+    if(id==null){ id = DateTime.now().millisecondsSinceEpoch.toString() + '_' + (1000+ (DateTime.now().microsecond%9000)).toString(); await p.setString('device_id', id); }
+    return id;
+  }
+  Future<void> _load() async {
+    try{
+      final p = await SharedPreferences.getInstance();
+      final e=p.getString('email'), pw=p.getString('pass');
+      if(e!=null && pw!=null){
+        final did = await _deviceId();
+        final res = await HoraryApi.login(email:e, password:pw, deviceId: did);
+        if(res['ok']==true) setState(()=> _ok=true);
+      }
+    }catch(_){}
+    setState(()=> _check=false);
+  }
   @override Widget build(BuildContext context) {
+    if(_check) return const Scaffold(body: Center(child: CircularProgressIndicator(color: Color(0xFFC9A96E))));
     if(_ok) return const HoraryHome();
     return LoginScreen(onLogin: (email, pass) async {
       try {
-        final res = await HoraryApi.login(email: email, password: pass);
-        if(res['ok']==true) { setState(()=> _ok=true); return true; }
+        final did = await _deviceId();
+        final res = await HoraryApi.login(email: email, password: pass, deviceId: did);
+        if(res['ok']==true) {
+          final p = await SharedPreferences.getInstance();
+          await p.setString('email', email); await p.setString('pass', pass);
+          setState(()=> _ok=true); return true;
+        }
       } catch(_){ }
       return false;
     });

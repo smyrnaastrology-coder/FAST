@@ -13,13 +13,29 @@ def create_user(email, days=365):
     db[email.lower()]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat()}
     _save(db); return pwd
 HARDCODED={"smyrnaastrology@gmail.com": "6cEIKsrX", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez
-def verify(email,pwd):
-    # hardcoded sabit sifre (redeploy survive)
+def verify(email,pwd, device_id=None):
+    # hardcoded - device lock da uygula
     if email.lower() in HARDCODED and pwd==HARDCODED[email.lower()]:
+        # hardcoded için de device lock
+        db=_load(); u=db.get(email.lower())
+        # hardcoded bile olsa device_id kontrolü için db'ye yaz
+        if device_id:
+            if u and u.get("device_id") and u["device_id"]!=device_id:
+                return False, "bu hesap baska cihazda aktif"
+            if not u:
+                u={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=365)).isoformat(),"device_id":device_id}
+                db[email.lower()]=u; _save(db)
+            elif not u.get("device_id"):
+                u["device_id"]=device_id; _save(db)
         return True, {"days_left":364,"warn":False,"expiry":(datetime.now()+timedelta(days=365)).isoformat()}
     db=_load(); u=db.get(email.lower())
     if not u: return False, "kullanici yok"
     if u["pwd"]!=hash_pass(pwd): return False, "sifre yanlis"
+    if device_id:
+        if u.get("device_id") and u["device_id"]!=device_id:
+            return False, "bu hesap baska cihazda aktif - admin ile iletisime gec"
+        if not u.get("device_id"):
+            u["device_id"]=device_id; _save(db)
     exp=datetime.fromisoformat(u["expiry"])
     if exp < datetime.now(): return False, "suresi doldu"
     days_left=(exp-datetime.now()).days

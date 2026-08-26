@@ -45,6 +45,7 @@ class CastRequest(BaseModel):
 class AuthRequest(BaseModel):
     email: str
     password: str
+    device_id: str | None = None
 
 class HealthResponse(BaseModel):
     status: str
@@ -81,7 +82,7 @@ async def health():
 @app.post("/api/auth/login")
 async def auth_login(req: AuthRequest):
     from auth import verify
-    ok, info = verify(req.email, req.password)
+    ok, info = verify(req.email, req.password, req.device_id)
     if not ok: raise HTTPException(401, str(info))
     return {"ok":True, **info}
 

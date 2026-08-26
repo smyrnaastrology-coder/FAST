@@ -35,9 +35,10 @@ class HoraryApi {
     return jsonDecode(utf8.decode(r.bodyBytes)) as Map<String, dynamic>;
   }
 
-  static Future<Map<String, dynamic>> login({required String email, required String password}) async {
+  static Future<Map<String, dynamic>> login({required String email, required String password, String? deviceId}) async {
     final uri = Uri.parse('$baseUrl/api/auth/login');
-    final res = await http.post(uri, headers:{'Content-Type':'application/json'}, body: jsonEncode({'email':email,'password':password})).timeout(const Duration(seconds:15));
+    final body = {'email':email,'password':password, if(deviceId!=null) 'device_id':deviceId};
+    final res = await http.post(uri, headers:{'Content-Type':'application/json'}, body: jsonEncode(body)).timeout(const Duration(seconds:30));
     if(res.statusCode!=200) throw Exception(res.body);
     return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String,dynamic>;
   }
