@@ -1,0 +1,11 @@
+name: horary auto-learn
+on:
+  schedule:
+    - cron: '0 3 * * *' # her gün 03:00 - gunde 3 ornek
+  workflow_dispatch:
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Auto-learn: scrape 5 new Lilly examples (manual trigger via agent)"
