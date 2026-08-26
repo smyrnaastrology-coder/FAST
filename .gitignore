@@ -30,6 +30,8 @@ server_stderr.log
 
 # Gerçek kaynak görselleri (uygulama asset'leri) koru
 !fast_mobile/flutter_app/assets/**
+!horary_mobile/assets/**
+!horary_ios/assets/**
 !FBST_Project/frontend/src/assets/**
 !FBST_Project/frontend/public/**
 !**/Asartepe_Kapak.pdf
