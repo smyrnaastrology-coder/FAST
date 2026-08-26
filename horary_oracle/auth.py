@@ -12,7 +12,7 @@ def create_user(email, days=365):
     db=_load(); pwd=gen_pass()
     db[email.lower()]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat()}
     _save(db); return pwd
-HARDCODED={"smyrnaastrology@gmail.com": "6cEIKsrX"} # kalici, redeploy'da silinmez (hash ile karsilastir)
+HARDCODED={"smyrnaastrology@gmail.com": "6cEIKsrX", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez
 def verify(email,pwd):
     # hardcoded sabit sifre (redeploy survive)
     if email.lower() in HARDCODED and pwd==HARDCODED[email.lower()]:
