@@ -112,6 +112,15 @@ A: Kitap: Anne-baba güçlü ilişkilerle olumlu noktaya taşıdı ama belirsizd
 Q: ben şu an nerdeyim
 A: Not: GPS değil sembolik yer. ASC 14° Koç → sen Mars 4° Yengeç 3. evde → yakın çevre/kısa mesafe/yol/araç/mahalle/komşuluk, Yengeç ev/aile/tanıdık ortam. 4. ev Yengeç yöneticisi Ay 10. ev Oğlakta → ev ile dış/resmi ortam arası. Tahmin: evine uzak değil, tanıdık yakın çevre/kısa mesafe/araç bağlantılı, Yengeç vurgusuyla aile evi ihtimali güçlü. Eleme: başkasının/aile evi en güçlü, kendi evin güçlü, araçta mümkün (3. ev), kısa mesafe kapalı mekan orta, açık/uzak zayıf, uzak seyahat desteklenmiyor.
 
+Q: Sekil 1 - Bu proje basarili olacak mi ? Paramı alabilecek miyim ? (Döşer 2019 radikal - Gunes hem ASC hem saat yöneticisi)
+A: Döşer: ASC Aslan Güneş hem ASC hem saat yöneticisi → aynı gezegen → radikal. Yöntem 1: saat=ASC → yargılanabilir.
+
+Q: Sekil 2 - Arkadasim istedigi isi alabilecek mi ? (Döşer 2019 radikal - Mars Bosa üçlü)
+A: Döşer: ASC Boğa, saat Mars → Mars Boğa'nın üçlü yöneticisi → radikal. Yöntem 2.
+
+Q: Via combusta nedir ? (Döşer 2019 15 Terazi-15 Akrep)
+A: Döşer: Ay 15 Terazi-15 Akrep via combusta → kötücül yıldızlar artık o derecelerde değil (presesyon), Lilly bile iptal önermez, Barclay/Coley değerlendirilebilir, modern Watters Uranüs/Mars/Satürn ateşı hastalığı/tehlike.
+
 Q: kurdugumuz horary sistemi basariya ulasacak mi ? (26.08.2026 ASC 17 Ikizler Merkur 0 Basak 4.ev domicile, 10.ev Kova Satürn, Ay 6 Kova 9.ev VOC)
 A: Merkür Başak domicile 4. ev çok güçlü → teknik temel sağlam. 10. ev Kova Satürn başarı göstergesi ama VOC + critical_degree + perfection none → şu an hemen evet değil. Ay Kova 9. ev yurtdışı/akademi hattı, Ay VOC düşük ev → akmıyor. Hüküm: temel evet kadar güçlü ama revizyon gerek (TR login + 3 gün deneme gibi), 6° Ay-Jüpiter karşıtlığı 6 hafta/6 ay ikinci değerlendirme, revizyon sonrası YES'e döner.
 
