@@ -203,10 +203,34 @@ Engine JSON:
 {json}
 """
 
+def _retrieve_examples(engine_json: dict, k=3):
+    """horary_examples.json'dan engine_json strictures/perfection'a göre en alakalı k örneği çek"""
+    try:
+        import json, os
+        p=os.path.join(os.path.dirname(__file__), "../data/horary_examples.json")
+        if not os.path.exists(p): return []
+        data=json.load(open(p, encoding='utf-8'))
+        codes=set(s.get("code","") for s in engine_json.get("strictures",[]))
+        perf=engine_json.get("perfection",{}).get("type","")
+        scored=[]
+        for ex in data:
+            score=sum(1 for t in ex.get("tags",[]) if t in codes or t==perf)
+            # Döşer/Menconi ayrımı - soru tipine göre bonus
+            if "radical" in codes and "radical" in ex.get("tags",[]): score+=2
+            if perf and perf in ex.get("tags",[]): score+=2
+            scored.append((score, ex))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [ex for s,ex in scored[:k] if s>0] or data[:k]
+    except: return []
+
 def build_prompt(engine_json: dict, lang="tr") -> str:
     import json
     j = json.dumps(engine_json, ensure_ascii=False, indent=2)
-    return LOCKED_PROMPT.format(json=j) + f"\nLanguage: {lang}\nAnswer in {lang}."
+    exs=_retrieve_examples(engine_json, k=3)
+    ex_txt=""
+    if exs:
+        ex_txt="\n\nRETRIEVED EXAMPLES (use style only, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']})" for e in exs)
+    return LOCKED_PROMPT.format(json=j) + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
 
 def call_openai(engine_json: dict, lang="tr") -> str:
     import os, json
@@ -217,7 +241,7 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         from openai import OpenAI
         client = OpenAI(api_key=key)
         prompt = build_prompt(engine_json, lang)
-        resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role":"user","content":prompt}], temperature=0.7, max_tokens=500)
+        resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role":"user","content":prompt}], temperature=0.7, max_tokens=800)
         return resp.choices[0].message.content
     except Exception as e:
         return mock_interpret(engine_json, lang) + f"\n[OpenAI hata: {e}]"

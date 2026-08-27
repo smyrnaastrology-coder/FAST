@@ -965,5 +965,14 @@
     "istek": "Belirleyici olmasa da Ay belirleyici bolgedeyse cok istiyor demek (motivasyon Ay)",
     "aile_ornegi": "Basbakan 10 esi 4, Kraliçe 10 kocasi 4, kardesler ayni anda sorarsa ilk gecerli",
     "iliski_1_5": "1-5 yaklasan EVET birlikte, ayrilan ayrilir, 6+ uzaklasma ayrilir, 0-2 yaklasan zaten birlikte"
+  },
+  "doser_menconi_rules": {
+    "doser_radical_early_late": "Döşer: ASC 0-3 erken/27-30 geç, 25-26 müdahale, via combusta 15 Terazi-15 Akrep presesyonla kaydı modernde hafif, Spica 1° içinde başarı, ASC via stricture değil",
+    "doser_moiety_orb": "Döşer: Orb moiety (Güneş15 Ay12 Sat9 Jup9 Mar8 Ven7 Mer7) disi kavuşum gündem sayılmaz, sadece tarih notu",
+    "doser_derived_houses": "Döşer: Türetilmiş ev şart (baba 10, babanın annesi 10dan4=1, komşunun çocuğu 3ten5=7 gibi) tüm Figür 1-30'da uygula",
+    "menconi_cazimi": "Menconi: Cazimi 17' (1°17'), yearly review cazimi wondrous strong, Sun ile 0-17' gezegen kral desteğinde",
+    "menconi_reception": "Menconi: Mutual reception kavuşum sayılır, ağırlama zayıfsa az yardım, kare/karsit ağırlamada sorunla çözüm",
+    "menconi_yearly": "Menconi: Yearly review'de 10.ev Kova Satürn + Ay Kova VOC gibi donor chart tekniği, 6 ay sonra ikinci değerlendirme",
+    "common_voc_late": "Döşer+Menconi ortak: VOC mutlak engel değil, angular Ay veya Boğa/Yengeç/Yay/Balık'ta ise gecikmeyle olur, kayıp geri gelir"
   }
 }

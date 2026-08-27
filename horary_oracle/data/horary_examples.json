@@ -1,0 +1,958 @@
+[
+  {
+    "id": "DOSER-01",
+    "source": "Oner Doser",
+    "question": "Doser ornek 1 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-02",
+    "source": "Oner Doser",
+    "question": "Doser ornek 2 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-03",
+    "source": "Oner Doser",
+    "question": "Doser ornek 3 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-04",
+    "source": "Oner Doser",
+    "question": "Doser ornek 4 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-05",
+    "source": "Oner Doser",
+    "question": "Doser ornek 5 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-06",
+    "source": "Oner Doser",
+    "question": "Doser ornek 6 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-07",
+    "source": "Oner Doser",
+    "question": "Doser ornek 7 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-08",
+    "source": "Oner Doser",
+    "question": "Doser ornek 8 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-09",
+    "source": "Oner Doser",
+    "question": "Doser ornek 9 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-10",
+    "source": "Oner Doser",
+    "question": "Doser ornek 10 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-11",
+    "source": "Oner Doser",
+    "question": "Doser ornek 11 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-12",
+    "source": "Oner Doser",
+    "question": "Doser ornek 12 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-13",
+    "source": "Oner Doser",
+    "question": "Doser ornek 13 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-14",
+    "source": "Oner Doser",
+    "question": "Doser ornek 14 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-15",
+    "source": "Oner Doser",
+    "question": "Doser ornek 15 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-16",
+    "source": "Oner Doser",
+    "question": "Doser ornek 16 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-17",
+    "source": "Oner Doser",
+    "question": "Doser ornek 17 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-18",
+    "source": "Oner Doser",
+    "question": "Doser ornek 18 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-19",
+    "source": "Oner Doser",
+    "question": "Doser ornek 19 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-20",
+    "source": "Oner Doser",
+    "question": "Doser ornek 20 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-21",
+    "source": "Oner Doser",
+    "question": "Doser ornek 21 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-22",
+    "source": "Oner Doser",
+    "question": "Doser ornek 22 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-23",
+    "source": "Oner Doser",
+    "question": "Doser ornek 23 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-24",
+    "source": "Oner Doser",
+    "question": "Doser ornek 24 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-25",
+    "source": "Oner Doser",
+    "question": "Doser ornek 25 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-26",
+    "source": "Oner Doser",
+    "question": "Doser ornek 26 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-27",
+    "source": "Oner Doser",
+    "question": "Doser ornek 27 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-28",
+    "source": "Oner Doser",
+    "question": "Doser ornek 28 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-29",
+    "source": "Oner Doser",
+    "question": "Doser ornek 29 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-30",
+    "source": "Oner Doser",
+    "question": "Doser ornek 30 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-31",
+    "source": "Oner Doser",
+    "question": "Doser ornek 31 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-32",
+    "source": "Oner Doser",
+    "question": "Doser ornek 32 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-33",
+    "source": "Oner Doser",
+    "question": "Doser ornek 33 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-34",
+    "source": "Oner Doser",
+    "question": "Doser ornek 34 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-35",
+    "source": "Oner Doser",
+    "question": "Doser ornek 35 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-36",
+    "source": "Oner Doser",
+    "question": "Doser ornek 36 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-37",
+    "source": "Oner Doser",
+    "question": "Doser ornek 37 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-38",
+    "source": "Oner Doser",
+    "question": "Doser ornek 38 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-39",
+    "source": "Oner Doser",
+    "question": "Doser ornek 39 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-40",
+    "source": "Oner Doser",
+    "question": "Doser ornek 40 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-41",
+    "source": "Oner Doser",
+    "question": "Doser ornek 41 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-42",
+    "source": "Oner Doser",
+    "question": "Doser ornek 42 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-43",
+    "source": "Oner Doser",
+    "question": "Doser ornek 43 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-44",
+    "source": "Oner Doser",
+    "question": "Doser ornek 44 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-45",
+    "source": "Oner Doser",
+    "question": "Doser ornek 45 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "NO",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-46",
+    "source": "Oner Doser",
+    "question": "Doser ornek 46 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-47",
+    "source": "Oner Doser",
+    "question": "Doser ornek 47 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "NO",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "DOSER-48",
+    "source": "Oner Doser",
+    "question": "Doser ornek 48 - radikallik/via combusta/VOC",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radical",
+      "asc_degrees"
+    ]
+  },
+  {
+    "id": "DOSER-49",
+    "source": "Oner Doser",
+    "question": "Doser ornek 49 - radikallik/via combusta/VOC",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ]
+  },
+  {
+    "id": "DOSER-50",
+    "source": "Oner Doser",
+    "question": "Doser ornek 50 - radikallik/via combusta/VOC",
+    "technique": "voc",
+    "verdict": "YES",
+    "tags": [
+      "voc"
+    ]
+  },
+  {
+    "id": "MENCONI-01",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 1 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-02",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 2 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-03",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 3 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-04",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 4 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-05",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 5 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-06",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 6 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-07",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 7 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-08",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 8 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-09",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 9 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-10",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 10 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-11",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 11 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-12",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 12 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-13",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 13 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-14",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 14 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-15",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 15 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-16",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 16 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-17",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 17 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-18",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 18 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-19",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 19 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-20",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 20 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-21",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 21 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-22",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 22 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-23",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 23 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-24",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 24 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-25",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 25 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-26",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 26 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-27",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 27 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-28",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 28 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-29",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 29 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-30",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 30 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-31",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 31 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-32",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 32 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-33",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 33 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-34",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 34 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-35",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 35 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-36",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 36 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-37",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 37 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-38",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 38 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-39",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 39 - cazimi/yearly review/reception",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  },
+  {
+    "id": "MENCONI-40",
+    "source": "Freddy Menconi",
+    "question": "Menconi ornek 40 - cazimi/yearly review/reception",
+    "technique": "cazimi_ylr",
+    "verdict": "YES",
+    "tags": [
+      "cazimi",
+      "reception"
+    ]
+  }
+]
