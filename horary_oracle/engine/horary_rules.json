@@ -974,5 +974,21 @@
     "menconi_reception": "Menconi: Mutual reception kavuşum sayılır, ağırlama zayıfsa az yardım, kare/karsit ağırlamada sorunla çözüm",
     "menconi_yearly": "Menconi: Yearly review'de 10.ev Kova Satürn + Ay Kova VOC gibi donor chart tekniği, 6 ay sonra ikinci değerlendirme",
     "common_voc_late": "Döşer+Menconi ortak: VOC mutlak engel değil, angular Ay veya Boğa/Yengeç/Yay/Balık'ta ise gecikmeyle olur, kayıp geri gelir"
+  },
+  "frawley_textbook": {
+    "house_system": "Regiomontanus horary icin, Placidus dogum icin; 5 derece on-bahce kurali: cusp oncesi 5 derecede ve ayni burcta ise sonraki evde sayilir; intercepted/kabullu burc onemsiz degil",
+    "houses_1_12": "1 ben/beden/gemi, 2 tasinir mal/para/ozsaygi/avukat/2.danisman, 3 kardes/kisa yol/ilkokul/mektup/komşu, 4 baba/ev/arazi/ulke/maden/sonuc, 5 zevk/cocuk/hamilelik/seks/kitap/elci, 6 hastalik/hizmetci/kiracı(artik 7)/kucuk hayvan/amic/teyze, 7 ortak/es/acik dusman/rakip/hirsiz/musteri, 8 olum/digerinin parasi/vasiyet/korku, 9 uzun/ozel yolculuk/yuksek bilgi/ogretmen/rahim/ruya, 10 kral/patron/hukumet/anne/is/san, 11 patronun parasi/maas/umut/arkadas, 12 gizli dusman/kendini mahvetme/hapishane/buyuk hayvan",
+    "derived_houses": "Haritayi cevir: kizin kariyeri 5ten10=2.ev (radikal), babanin evi 4, kedin 6, torun 5ten5=9, ispanya evin hala 4",
+    "rulership": "Esas hukum: cusp burcunun yoneticisi tek lord, es yoneticilik yok; ev icindeki gezegen yonetmez sadece etkiler; almuten sadece acil durumda; Moon her zaman es-gosterge (10.yonetiyorsa is)",
+    "natural_rulership": "Kayip belge Merkur, erkek Gunes kadin Venus, kayip nesne Ay; kamera Satürn (yakalamak), temel dogaya git",
+    "outer_planets": "Uranus/Neptun/Pluton sadece cusp veya gosterceyle yakin acida dikkate al, yoksa ignore; Uranus aksaklik/Neptun aldatma/Pluton kotu niyet",
+    "signs": "Erkek Koç Ikizler Aslan Terazi Yay Kova; element ates/hava/su/toprak; kardinal hizli sabit yavas degisken gel-git; cift bedenli degisken ikilik; verimli Su, kisir Ikizler Aslan Basak; sessiz Su, sesli Ikizler Basak Terazi; insancil Hava+Basak, hayvani Koc Boga Aslan Yay Oglak; sakat Koc Boga Aslan Balik",
+    "essential_dignity": "Domicile en guclu, exaltation abartili misafir, triplicity (gunduz/gece) orta, term kucuk (astsubay), face veranda, detriment karsi, fall abartili kotu, peregrine evsiz suruklenen, almuten en cok puan (5+4+3+2+1), dispositor zinciri",
+    "accidental": "Kose guclu, 6/8/12 zayif, 3/9 onursal succedent; joy Merkur1 Ay3 Venus5 Mars6 Gunes9 Jup11 Sat12; retro yanlis yon, station birinci hasta yatagi ikinci ilk kalkma; hiz: Ay13 Merkur1.5 Venus1.5 Gunes1 Mars0.5 Jup0.08 Sat0.03; combustion 8.5 derece ayni burcta yikici/gorunmez, cazimi 17 dakika vaha; besieged malefikler arasinda, benefic bebek; acı 3 derece kontak; dugumler evdeyse dikkat; Ay isikta artissa guclu, VOC bos ise hicbir sey olmaz ama reddedilebilir, via combusta 15Terazi-15Akrep sadece Ay",
+    "reception": "Domicile sevgi, exaltation delicesine asik (pembe gozluk), triplicity arkadaslik, term/face kucuk ilgi, detriment nefret, fall abartili nefret, bosluk kayitsiz; karsilikli buyuk yardim, kucuk yardim zayif; reception guc+hareket sart",
+    "aspects": "Kavusum birlesme, ucgen kolay (ayni element), kare zor/gecikme, alti zayif, karsit ayrilik/pismanlik; sadece ayni elementteki burclar arasi; hizli gezegen yavasa uygular; translation hizli iki yavasi baglar, collection yavas iki hizlidan toplar; prohibition/frustration/refranation engel; 5 derece on-bahce gibi sonraki burcta 3-4 derece icinde degisimle olur; dexter/sinister onemsiz; orb 3 derece yakin temas, moiety/kure gereksiz",
+    "antiscia": "0 Oglak-0 Yengec aynasi, derece+antiscia=30, sadece kavusum/karsit, gizlilik tasir, olum/hamilelikte kullanma, cusp duserse o evle ilgileniyor",
+    "fixed_stars": "Algol kafa kaybi, Alcyone aglama/Pleiades gorme, Aldebaran yeni dongu pozitif baslangic, Regulus maddi basari, Vindemiatrix dul/ayrilik, Spica koruyucu mutlu, Antares kapanis/son, digerleri (Bellatrix savasci) baglama gore",
+    "minor": "Dogu Gunes oncesi gorunur daha belirgin, hayz gunduz/gece burçta ve dunya ustunde, enlem kuzey yuksek parlak, lame/topal dereceler modasi gecmis - ignore"
   }
 }

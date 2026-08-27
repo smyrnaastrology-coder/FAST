@@ -98,18 +98,24 @@ def houses_regiomontanus(jd: float, lat: float, lon: float):
     return {"cusps": [c % 360 for c in cusps], "asc": asc_lon, "mc": mc_lon, "asc_sign": sign_from_lon(asc_lon), "mc_sign": sign_from_lon(mc_lon), "ascmc": ascmc}
 
 def house_of_planet(planet_lon: float, cusps) -> int:
-    """Gezegenin evini bul (1-12). Basit cusp arası kontrol."""
-    # cusps: 12 eleman, cups[0]=1.ev girişi ... cusps[11]=12.ev girişi
-    # Normalize: eğer gezegen ASC'den önceyse 12.ev vb. - basit segment search
+    """Gezegenin evini bul (1-12). Frawley 5° ön-bahçe kuralı: cusp öncesi 5° ve aynı burçta ise sonraki evde sayılır."""
     lon = planet_lon % 360
+    # 5° kuralı: sonraki cusp'a 5° kala ve aynı burçta ise bir sonraki ev
+    for i in range(12):
+        nxt = cusps[(i+1) % 12] % 360
+        nxt_sign = sign_from_lon(nxt)
+        # gezegenden sonraki cusp'a uzaklık (0-360, ileri yönde)
+        dist_to_next = (nxt - lon) % 360
+        if dist_to_next <= 5 and dist_to_next > 0 and sign_from_lon(lon) == nxt_sign:
+            return (i+2) if (i+2) <=12 else 1 if (i+1)==12 else i+2  # sonraki ev
+            # Not: loop içinde doğru evi döndürmek için basit: bulunduğumuz dilim +1
     for i in range(12):
         c1 = cusps[i] % 360
         c2 = cusps[(i+1) % 12] % 360
-        # ev dilimi 0-360 sarmalı
         if c1 < c2:
             if c1 <= lon < c2:
                 return i+1
-        else:  # 360 geçişi (örn 300 -> 20)
+        else:
             if lon >= c1 or lon < c2:
                 return i+1
     return 12

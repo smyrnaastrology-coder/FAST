@@ -1036,5 +1036,247 @@
       "reception"
     ],
     "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
+  },
+  {
+    "id": "FRAWLEY-01",
+    "source": "John Frawley",
+    "question": "Piyanom 5.ev mi 2.ev mi? Tasinir mal 2.ev",
+    "technique": "house_meaning",
+    "verdict": "YES",
+    "tags": [
+      "house_meaning"
+    ],
+    "explanation": "Piyano tasinabilir mulk oldugu icin 2.ev, zevk 5.ev degil - sey ile islevi ayir"
+  },
+  {
+    "id": "FRAWLEY-02",
+    "source": "John Frawley",
+    "question": "Kylie benimle cikacak mi? 7.ev",
+    "technique": "7th_partner",
+    "verdict": "YES",
+    "tags": [
+      "7th_partner"
+    ],
+    "explanation": "Iliski henuz yoksa da 7.ev kisi gosterilir"
+  },
+  {
+    "id": "FRAWLEY-03",
+    "source": "John Frawley",
+    "question": "Oglumun evcil tavşanı hangi ev?",
+    "technique": "derived",
+    "verdict": "YES",
+    "tags": [
+      "derived"
+    ],
+    "explanation": "Oglum 5.ev, tavşan 6.ev => 5ten6=10.ev radikal"
+  },
+  {
+    "id": "FRAWLEY-04",
+    "source": "John Frawley",
+    "question": "Babanin evi hangi ev?",
+    "technique": "derived",
+    "verdict": "YES",
+    "tags": [
+      "derived"
+    ],
+    "explanation": "Baba 4.ev"
+  },
+  {
+    "id": "FRAWLEY-05",
+    "source": "John Frawley",
+    "question": "Rahibin erkek kardesi?",
+    "technique": "derived",
+    "verdict": "YES",
+    "tags": [
+      "derived"
+    ],
+    "explanation": "Rahip 9.ev (bilge), kardesi 9dan3=11.ev"
+  },
+  {
+    "id": "FRAWLEY-06",
+    "source": "John Frawley",
+    "question": "Ispanya krali yabanci ulke krali 9dan10",
+    "technique": "derived",
+    "verdict": "YES",
+    "tags": [
+      "derived"
+    ],
+    "explanation": "Yabanci kral 9.evden 10=6.ev"
+  },
+  {
+    "id": "FRAWLEY-07",
+    "source": "John Frawley",
+    "question": "Kiz arkadasim beni seviyor mu? Mars 7.yonetici",
+    "technique": "reception",
+    "verdict": "NO",
+    "tags": [
+      "reception"
+    ],
+    "explanation": "Mars Venusun zararinda, sevgi yok"
+  },
+  {
+    "id": "FRAWLEY-08",
+    "source": "John Frawley",
+    "question": "Kocam beni aldatiyor mu? Gunes-Mars",
+    "technique": "natural",
+    "verdict": "YES",
+    "tags": [
+      "natural"
+    ],
+    "explanation": "Erkek Gunes, kadin Venus dogal yonetim"
+  },
+  {
+    "id": "FRAWLEY-09",
+    "source": "John Frawley",
+    "question": "Regiomontanus 5 derece on-bahce kurali",
+    "technique": "house_system",
+    "verdict": "YES",
+    "tags": [
+      "house_system"
+    ],
+    "explanation": "Cusp oncesi 5 derece ayni burcta ise sonraki evde sayilir"
+  },
+  {
+    "id": "FRAWLEY-10",
+    "source": "John Frawley",
+    "question": "Intercepted burc onemsiz degil",
+    "technique": "house_system",
+    "verdict": "YES",
+    "tags": [
+      "house_system"
+    ],
+    "explanation": "Icinde cusp olmayan burc kabul edilmis, onemi yok"
+  },
+  {
+    "id": "FRAWLEY-11",
+    "source": "John Frawley",
+    "question": "Peregrine evsiz gezgin nasil yorumlanir?",
+    "technique": "essential",
+    "verdict": "NO",
+    "tags": [
+      "essential"
+    ],
+    "explanation": "Peregrine iyi/kotu egilim yok, suruklenen, yardim zayif"
+  },
+  {
+    "id": "FRAWLEY-12",
+    "source": "John Frawley",
+    "question": "Cazimi 17 dakika vaha",
+    "technique": "combustion",
+    "verdict": "YES",
+    "tags": [
+      "combustion"
+    ],
+    "explanation": "Gunesle 0-17 arası cazimi en iyi, yanma en kotu"
+  },
+  {
+    "id": "FRAWLEY-13",
+    "source": "John Frawley",
+    "question": "Besieged benefic arasinda yastik gibi",
+    "technique": "besieged",
+    "verdict": "YES",
+    "tags": [
+      "besieged"
+    ],
+    "explanation": "Iki benefic arasinda kusatma hediye yagmuru"
+  },
+  {
+    "id": "FRAWLEY-14",
+    "source": "John Frawley",
+    "question": "Ay isigi artiyorsa guclu",
+    "technique": "moon",
+    "verdict": "YES",
+    "tags": [
+      "moon"
+    ],
+    "explanation": "Dolunaya giderken isik artarsa guclu, VOC bos ise hicbir sey olmaz"
+  },
+  {
+    "id": "FRAWLEY-15",
+    "source": "John Frawley",
+    "question": "Via combusta 15 Terazi-15 Akrep sadece Ay",
+    "technique": "via_combusta",
+    "verdict": "NO",
+    "tags": [
+      "via_combusta"
+    ],
+    "explanation": "Sadece Ay etkilenir, sikinti verir ama zayiflatmaz"
+  },
+  {
+    "id": "FRAWLEY-16",
+    "source": "John Frawley",
+    "question": "Translation: Ay Merkur isigini Jupitere tasir",
+    "technique": "translation",
+    "verdict": "YES",
+    "tags": [
+      "translation"
+    ],
+    "explanation": "Hizli gezegen iki yavasi baglar, ucuncu kisi devrede"
+  },
+  {
+    "id": "FRAWLEY-17",
+    "source": "John Frawley",
+    "question": "Collection: Mars+Venus Jupitere basvurur",
+    "technique": "collection",
+    "verdict": "YES",
+    "tags": [
+      "collection"
+    ],
+    "explanation": "Yavas gezegen iki hizlinin isigini toplar, mudur gibi"
+  },
+  {
+    "id": "FRAWLEY-18",
+    "source": "John Frawley",
+    "question": "Prohibition: Ay Satrune giderken Jupiter araya girer",
+    "technique": "prohibition",
+    "verdict": "NO",
+    "tags": [
+      "prohibition"
+    ],
+    "explanation": "Onune gecen gezegen engeller, baglam onemli"
+  },
+  {
+    "id": "FRAWLEY-19",
+    "source": "John Frawley",
+    "question": "Antiscia hesabi: derece+antiscia=30",
+    "technique": "antiscia",
+    "verdict": "YES",
+    "tags": [
+      "antiscia"
+    ],
+    "explanation": "0 Oglak-0 Yengec aynasi, sadece kavusum/karsit gizlilik tasir"
+  },
+  {
+    "id": "FRAWLEY-20",
+    "source": "John Frawley",
+    "question": "Regulus maddi basari, Spica koruyucu, Algol kafa kaybi",
+    "technique": "fixed_stars",
+    "verdict": "YES",
+    "tags": [
+      "fixed_stars"
+    ],
+    "explanation": "Yukselen veya gosterge 2-3 derecede kavusumda etkili"
+  },
+  {
+    "id": "FRAWLEY-21",
+    "source": "John Frawley",
+    "question": "Dogu Gunes oncesi daha belirgin",
+    "technique": "oriental",
+    "verdict": "YES",
+    "tags": [
+      "oriental"
+    ],
+    "explanation": "Dogu gezegen eylemde belirgin, bati degil"
+  },
+  {
+    "id": "FRAWLEY-22",
+    "source": "John Frawley",
+    "question": "Hayz gunduz haritada gunduz gezegeni ustte",
+    "technique": "hayz",
+    "verdict": "YES",
+    "tags": [
+      "hayz"
+    ],
+    "explanation": "Hayz dogumda onemli horaryde ignore edilebilir"
   }
 ]
