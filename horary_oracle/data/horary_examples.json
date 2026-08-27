@@ -2,102 +2,112 @@
   {
     "id": "DOSER-01",
     "source": "Oner Doser",
-    "question": "Esimden ayrilacak miyim?",
+    "question": "Esimden ayrilacak miyim? | ASC 27-30 gec, karar verilmis, Lilly 27-29 caresizlik, soru samimi degil -> gece",
     "technique": "radical_early_late",
     "verdict": "NO",
     "tags": [
       "radical"
-    ]
+    ],
+    "explanation": "ASC 27-30 gec, karar verilmis, Lilly 27-29 caresizlik, soru samimi degil -> gecersiz ama NO agirlikli"
   },
   {
     "id": "DOSER-02",
     "source": "Oner Doser",
-    "question": "Via combusta nedir? Ay 15 Terazi-15 Akrepteyken sorulur mu?",
+    "question": "Via combusta nedir? Ay 15 Terazi-15 Akrepteyken sorulur mu? | 15 Terazi-15 Akrep via combusta kayip/zorluk, Spica 1 derecede ise basari, moder",
     "technique": "via_combusta",
     "verdict": "NO",
     "tags": [
       "via"
-    ]
+    ],
+    "explanation": "15 Terazi-15 Akrep via combusta kayip/zorluk, Spica 1 derecede ise basari, modernde hafif, ASC via sayilmaz"
   },
   {
     "id": "DOSER-03",
     "source": "Oner Doser",
-    "question": "Saat yoneticisi ile ASC yoneticisi ayni ise radikal mi?",
+    "question": "Saat yoneticisi ile ASC yoneticisi ayni ise radikal mi? | Saat yoneticisi == ASC yoneticisi veya uclu yoneticisi ise radikal, yargilanabil",
     "technique": "radicality",
     "verdict": "YES",
     "tags": [
       "radicality"
-    ]
+    ],
+    "explanation": "Saat yoneticisi == ASC yoneticisi veya uclu yoneticisi ise radikal, yargilanabilir (Doser Sekil 1-2)"
   },
   {
     "id": "DOSER-04",
     "source": "Oner Doser",
-    "question": "Kayip evragim nerede? ASC Aykırı?",
+    "question": "Kayip evragim nerede? ASC Aykırı? | Kayip 2.ev + lot + dogal significator, element/burc/ev dikkate, ASC yakin ise ev",
     "technique": "via_combusta",
     "verdict": "YES",
     "tags": [
       "via"
-    ]
+    ],
+    "explanation": "Kayip 2.ev + lot + dogal significator, element/burc/ev dikkate, ASC yakin ise evde"
   },
   {
     "id": "DOSER-05",
     "source": "Oner Doser",
-    "question": "Ay bosta iken is olur mu?",
+    "question": "Ay bosta iken is olur mu? | VOC Bonatti engel, Lilly burc degistirip orb girerse bos degil, ikizler/akrep/og",
     "technique": "voc",
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "VOC Bonatti engel, Lilly burc degistirip orb girerse bos degil, ikizler/akrep/oglak kotu"
   },
   {
     "id": "DOSER-06",
     "source": "Oner Doser",
-    "question": "Borcum odenecek mi? Ay VOC ama angular",
+    "question": "Borcum odenecek mi? Ay VOC ama angular | VOC mutlak engel degil, angular Ay veya Boga/Yengec/Yay/Balikta gecikmeyle olur",
     "technique": "voc",
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "VOC mutlak engel degil, angular Ay veya Boga/Yengec/Yay/Balikta gecikmeyle olur"
   },
   {
     "id": "DOSER-07",
     "source": "Oner Doser",
-    "question": "Mashaallah kriteri nasil kontrol edilir?",
+    "question": "Mashaallah kriteri nasil kontrol edilir? | Mashaallah 6 kriter: lord ASCye bakiyorsa o, degilse Ay, son dereceler, benefic ",
     "technique": "radicality",
     "verdict": "YES",
     "tags": [
       "radicality"
-    ]
+    ],
+    "explanation": "Mashaallah 6 kriter: lord ASCye bakiyorsa o, degilse Ay, son dereceler, benefic ilk aci"
   },
   {
     "id": "DOSER-08",
     "source": "Oner Doser",
-    "question": "15-24 Foramen/Spica istisnasi nedir?",
+    "question": "15-24 Foramen/Spica istisnasi nedir? | 22-24 Terazi Foramen/Spica/Arcturus via combusta istisna, devam et olumsuz degil",
     "technique": "via_combusta",
     "verdict": "YES",
     "tags": [
       "via"
-    ]
+    ],
+    "explanation": "22-24 Terazi Foramen/Spica/Arcturus via combusta istisna, devam et olumsuz degil"
   },
   {
     "id": "DOSER-09",
     "source": "Oner Doser",
-    "question": "Saturn 7.evde astrolog yanilir mi?",
+    "question": "Saturn 7.evde astrolog yanilir mi? | Saturn 7.evde danisma evi, astrolog zorlanir, Pluto da ayni, lord afflicted ise ",
     "technique": "saturn_7",
     "verdict": "NO",
     "tags": [
       "saturn"
-    ]
+    ],
+    "explanation": "Saturn 7.evde danisma evi, astrolog zorlanir, Pluto da ayni, lord afflicted ise yanlis harita"
   },
   {
     "id": "DOSER-10",
     "source": "Oner Doser",
-    "question": "Turetilmis ev: Babanin kardesi hangi ev?",
+    "question": "Turetilmis ev: Babanin kardesi hangi ev? | Turetilmis ev: es kardesi 7den 3=9, anne kitabi 10dan2=11, babanin annesi 10dan4",
     "technique": "derived",
     "verdict": "YES",
     "tags": [
       "derived"
-    ]
+    ],
+    "explanation": "Turetilmis ev: es kardesi 7den 3=9, anne kitabi 10dan2=11, babanin annesi 10dan4=1"
   },
   {
     "id": "DOSER-11",
@@ -107,7 +117,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-12",
@@ -118,7 +129,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-13",
@@ -128,7 +140,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-14",
@@ -138,7 +151,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-15",
@@ -149,7 +163,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-16",
@@ -159,7 +174,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-17",
@@ -169,7 +185,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-18",
@@ -180,7 +197,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-19",
@@ -190,7 +208,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-20",
@@ -200,7 +219,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-21",
@@ -211,7 +231,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-22",
@@ -221,7 +242,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-23",
@@ -231,7 +253,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-24",
@@ -242,7 +265,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-25",
@@ -252,7 +276,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-26",
@@ -262,7 +287,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-27",
@@ -273,7 +299,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-28",
@@ -283,7 +310,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-29",
@@ -293,7 +321,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-30",
@@ -304,7 +333,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-31",
@@ -314,7 +344,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-32",
@@ -324,7 +355,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-33",
@@ -335,7 +367,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-34",
@@ -345,7 +378,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-35",
@@ -355,7 +389,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-36",
@@ -366,7 +401,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-37",
@@ -376,7 +412,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-38",
@@ -386,7 +423,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-39",
@@ -397,7 +435,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-40",
@@ -407,7 +446,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-41",
@@ -417,7 +457,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-42",
@@ -428,7 +469,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-43",
@@ -438,7 +480,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-44",
@@ -448,7 +491,8 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-45",
@@ -459,7 +503,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-46",
@@ -469,7 +514,8 @@
     "verdict": "YES",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-47",
@@ -479,7 +525,8 @@
     "verdict": "NO",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-48",
@@ -490,7 +537,8 @@
     "tags": [
       "radical",
       "asc_degrees"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-49",
@@ -500,7 +548,8 @@
     "verdict": "NO",
     "tags": [
       "via_combusta"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "DOSER-50",
@@ -510,57 +559,63 @@
     "verdict": "YES",
     "tags": [
       "voc"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-01",
     "source": "Freddy Menconi",
-    "question": "Cazimi 17 dakika nedir? Gunesle 0-17 arası",
+    "question": "Cazimi 17 dakika nedir? Gunesle 0-17 arası | Cazimi 0-17 dakika Sun ile kral destegi, wondrous strong, yearly reviewde de gec",
     "technique": "cazimi",
     "verdict": "YES",
     "tags": [
       "cazimi"
-    ]
+    ],
+    "explanation": "Cazimi 0-17 dakika Sun ile kral destegi, wondrous strong, yearly reviewde de gecerli"
   },
   {
     "id": "MENCONI-02",
     "source": "Freddy Menconi",
-    "question": "Yearly review haritasi nasil yorumlanir?",
+    "question": "Yearly review haritasi nasil yorumlanir? | Yearly review donor chart 10.ev Kova Saturn + Ay VOC, 6 ay sonra ikinci degerlen",
     "technique": "cazimi_ylr",
     "verdict": "YES",
     "tags": [
       "cazimi"
-    ]
+    ],
+    "explanation": "Yearly review donor chart 10.ev Kova Saturn + Ay VOC, 6 ay sonra ikinci degerlendirme"
   },
   {
     "id": "MENCONI-03",
     "source": "Freddy Menconi",
-    "question": "Mutual reception kavusum sayilir mi?",
+    "question": "Mutual reception kavusum sayilir mi? | Mutual reception kavusum sayilir, zayifsa az yardim, kare/karsit agirlamada soru",
     "technique": "reception",
     "verdict": "YES",
     "tags": [
       "reception"
-    ]
+    ],
+    "explanation": "Mutual reception kavusum sayilir, zayifsa az yardim, kare/karsit agirlamada sorunla cozum"
   },
   {
     "id": "MENCONI-04",
     "source": "Freddy Menconi",
-    "question": "Venus-Mars karesi receptionla cozulebilir mi?",
+    "question": "Venus-Mars karesi receptionla cozulebilir mi? | Venus detriment ama reception varsa kare/mutual ile cozum, destek var",
     "technique": "reception",
     "verdict": "YES",
     "tags": [
       "reception"
-    ]
+    ],
+    "explanation": "Venus detriment ama reception varsa kare/mutual ile cozum, destek var"
   },
   {
     "id": "MENCONI-05",
     "source": "Freddy Menconi",
-    "question": "Bonatti: onceki dolunay kose ise %50 olumlu mu?",
+    "question": "Bonatti: onceki dolunay kose ise %50 olumlu mu? | Bonatti onceki dolunay yoneticisi kose ise kotu aciya ragmen %50 olumlu, iyi aci",
     "technique": "bonatus",
     "verdict": "YES",
     "tags": [
       "bonatus"
-    ]
+    ],
+    "explanation": "Bonatti onceki dolunay yoneticisi kose ise kotu aciya ragmen %50 olumlu, iyi acida %100"
   },
   {
     "id": "MENCONI-06",
@@ -571,7 +626,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-07",
@@ -582,7 +638,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-08",
@@ -593,7 +650,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-09",
@@ -604,7 +662,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-10",
@@ -615,7 +674,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-11",
@@ -626,7 +686,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-12",
@@ -637,7 +698,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-13",
@@ -648,7 +710,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-14",
@@ -659,7 +722,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-15",
@@ -670,7 +734,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-16",
@@ -681,7 +746,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-17",
@@ -692,7 +758,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-18",
@@ -703,7 +770,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-19",
@@ -714,7 +782,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-20",
@@ -725,7 +794,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-21",
@@ -736,7 +806,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-22",
@@ -747,7 +818,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-23",
@@ -758,7 +830,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-24",
@@ -769,7 +842,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-25",
@@ -780,7 +854,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-26",
@@ -791,7 +866,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-27",
@@ -802,7 +878,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-28",
@@ -813,7 +890,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-29",
@@ -824,7 +902,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-30",
@@ -835,7 +914,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-31",
@@ -846,7 +926,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-32",
@@ -857,7 +938,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-33",
@@ -868,7 +950,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-34",
@@ -879,7 +962,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-35",
@@ -890,7 +974,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-36",
@@ -901,7 +986,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-37",
@@ -912,7 +998,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-38",
@@ -923,7 +1010,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-39",
@@ -934,7 +1022,8 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   },
   {
     "id": "MENCONI-40",
@@ -945,6 +1034,7 @@
     "tags": [
       "cazimi",
       "reception"
-    ]
+    ],
+    "explanation": "Kitaptaki kural ve harita mantigi ile aciklama - perfection/reception/timing ile gerekcelendirilir"
   }
 ]

@@ -229,7 +229,7 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     exs=_retrieve_examples(engine_json, k=3)
     ex_txt=""
     if exs:
-        ex_txt="\n\nRETRIEVED EXAMPLES (use style only, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']})" for e in exs)
+        ex_txt="\n\nRETRIEVED EXAMPLES (use style+reasoning, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']}) | Aciklama: {e.get('explanation','')}" for e in exs)
     return LOCKED_PROMPT.format(json=j) + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
 
 def call_openai(engine_json: dict, lang="tr") -> str:
