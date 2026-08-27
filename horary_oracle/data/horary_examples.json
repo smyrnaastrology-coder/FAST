@@ -2,48 +2,47 @@
   {
     "id": "DOSER-01",
     "source": "Oner Doser",
-    "question": "Doser ornek 1 - radikallik/via combusta/VOC",
-    "technique": "via_combusta",
+    "question": "Esimden ayrilacak miyim?",
+    "technique": "radical_early_late",
     "verdict": "NO",
     "tags": [
-      "via_combusta"
+      "radical"
     ]
   },
   {
     "id": "DOSER-02",
     "source": "Oner Doser",
-    "question": "Doser ornek 2 - radikallik/via combusta/VOC",
-    "technique": "voc",
-    "verdict": "YES",
+    "question": "Via combusta nedir? Ay 15 Terazi-15 Akrepteyken sorulur mu?",
+    "technique": "via_combusta",
+    "verdict": "NO",
     "tags": [
-      "voc"
+      "via"
     ]
   },
   {
     "id": "DOSER-03",
     "source": "Oner Doser",
-    "question": "Doser ornek 3 - radikallik/via combusta/VOC",
+    "question": "Saat yoneticisi ile ASC yoneticisi ayni ise radikal mi?",
     "technique": "radicality",
-    "verdict": "NO",
+    "verdict": "YES",
     "tags": [
-      "radical",
-      "asc_degrees"
+      "radicality"
     ]
   },
   {
     "id": "DOSER-04",
     "source": "Oner Doser",
-    "question": "Doser ornek 4 - radikallik/via combusta/VOC",
+    "question": "Kayip evragim nerede? ASC Aykırı?",
     "technique": "via_combusta",
     "verdict": "YES",
     "tags": [
-      "via_combusta"
+      "via"
     ]
   },
   {
     "id": "DOSER-05",
     "source": "Oner Doser",
-    "question": "Doser ornek 5 - radikallik/via combusta/VOC",
+    "question": "Ay bosta iken is olur mu?",
     "technique": "voc",
     "verdict": "NO",
     "tags": [
@@ -53,28 +52,7 @@
   {
     "id": "DOSER-06",
     "source": "Oner Doser",
-    "question": "Doser ornek 6 - radikallik/via combusta/VOC",
-    "technique": "radicality",
-    "verdict": "YES",
-    "tags": [
-      "radical",
-      "asc_degrees"
-    ]
-  },
-  {
-    "id": "DOSER-07",
-    "source": "Oner Doser",
-    "question": "Doser ornek 7 - radikallik/via combusta/VOC",
-    "technique": "via_combusta",
-    "verdict": "NO",
-    "tags": [
-      "via_combusta"
-    ]
-  },
-  {
-    "id": "DOSER-08",
-    "source": "Oner Doser",
-    "question": "Doser ornek 8 - radikallik/via combusta/VOC",
+    "question": "Borcum odenecek mi? Ay VOC ama angular",
     "technique": "voc",
     "verdict": "YES",
     "tags": [
@@ -82,24 +60,43 @@
     ]
   },
   {
+    "id": "DOSER-07",
+    "source": "Oner Doser",
+    "question": "Mashaallah kriteri nasil kontrol edilir?",
+    "technique": "radicality",
+    "verdict": "YES",
+    "tags": [
+      "radicality"
+    ]
+  },
+  {
+    "id": "DOSER-08",
+    "source": "Oner Doser",
+    "question": "15-24 Foramen/Spica istisnasi nedir?",
+    "technique": "via_combusta",
+    "verdict": "YES",
+    "tags": [
+      "via"
+    ]
+  },
+  {
     "id": "DOSER-09",
     "source": "Oner Doser",
-    "question": "Doser ornek 9 - radikallik/via combusta/VOC",
-    "technique": "radicality",
+    "question": "Saturn 7.evde astrolog yanilir mi?",
+    "technique": "saturn_7",
     "verdict": "NO",
     "tags": [
-      "radical",
-      "asc_degrees"
+      "saturn"
     ]
   },
   {
     "id": "DOSER-10",
     "source": "Oner Doser",
-    "question": "Doser ornek 10 - radikallik/via combusta/VOC",
-    "technique": "via_combusta",
+    "question": "Turetilmis ev: Babanin kardesi hangi ev?",
+    "technique": "derived",
     "verdict": "YES",
     "tags": [
-      "via_combusta"
+      "derived"
     ]
   },
   {
@@ -518,56 +515,51 @@
   {
     "id": "MENCONI-01",
     "source": "Freddy Menconi",
-    "question": "Menconi ornek 1 - cazimi/yearly review/reception",
-    "technique": "reception",
+    "question": "Cazimi 17 dakika nedir? Gunesle 0-17 arası",
+    "technique": "cazimi",
     "verdict": "YES",
     "tags": [
-      "cazimi",
-      "reception"
+      "cazimi"
     ]
   },
   {
     "id": "MENCONI-02",
     "source": "Freddy Menconi",
-    "question": "Menconi ornek 2 - cazimi/yearly review/reception",
+    "question": "Yearly review haritasi nasil yorumlanir?",
     "technique": "cazimi_ylr",
     "verdict": "YES",
     "tags": [
-      "cazimi",
-      "reception"
+      "cazimi"
     ]
   },
   {
     "id": "MENCONI-03",
     "source": "Freddy Menconi",
-    "question": "Menconi ornek 3 - cazimi/yearly review/reception",
+    "question": "Mutual reception kavusum sayilir mi?",
     "technique": "reception",
-    "verdict": "NO",
+    "verdict": "YES",
     "tags": [
-      "cazimi",
       "reception"
     ]
   },
   {
     "id": "MENCONI-04",
     "source": "Freddy Menconi",
-    "question": "Menconi ornek 4 - cazimi/yearly review/reception",
-    "technique": "cazimi_ylr",
+    "question": "Venus-Mars karesi receptionla cozulebilir mi?",
+    "technique": "reception",
     "verdict": "YES",
     "tags": [
-      "cazimi",
       "reception"
     ]
   },
   {
     "id": "MENCONI-05",
     "source": "Freddy Menconi",
-    "question": "Menconi ornek 5 - cazimi/yearly review/reception",
-    "technique": "reception",
+    "question": "Bonatti: onceki dolunay kose ise %50 olumlu mu?",
+    "technique": "bonatus",
     "verdict": "YES",
     "tags": [
-      "cazimi",
-      "reception"
+      "bonatus"
     ]
   },
   {
