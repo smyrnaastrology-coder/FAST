@@ -289,9 +289,9 @@ class _HoraryHomeState extends State<HoraryHome> {
               return Align(alignment: isUser? Alignment.centerRight:Alignment.centerLeft,
                 child: Container(margin: const EdgeInsets.symmetric(vertical:4), padding: const EdgeInsets.all(12),
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.82),
-                  decoration: BoxDecoration(color: isUser? const Color(0xFF2a1f38):const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
+                  decoration: BoxDecoration(color: isUser? const Color(0xFFC9A96E):const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(m['content']!, style: const TextStyle(color: Color(0xFFe8e0f0), height:1.45)),
+                    Text(m['content']!, style: TextStyle(color: isUser? Colors.black : const Color(0xFFe8e0f0), height:1.45, fontWeight: isUser? FontWeight.w600 : FontWeight.normal)),
                     if(!isUser) Padding(padding: const EdgeInsets.only(top:6), child: Row(mainAxisSize: MainAxisSize.min, children: [
                       GestureDetector(onTap: ()=> _copy(m['content']!), child: Row(children: [const Icon(Icons.copy, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('copy'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
                       const SizedBox(width:12),
