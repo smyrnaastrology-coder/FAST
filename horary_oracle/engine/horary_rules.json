@@ -181,6 +181,8 @@
       "child": 5,
       "health": 6,
       "pet": 6,
+      "thief": 7,
+      "sibling": 3,
       "missing_person": 7,
       "missing_child": 5,
       "general": 7
@@ -479,8 +481,9 @@
     "mutual_reception_bonus": 2
   },
   "scoring": {
-    "perfection_yes": 10,
-    "perfection_translation": 7,
+    "perfection_yes": 12,
+    "perfection_dominus": 8,
+    "perfection_translation": 12,
     "perfection_collection": 6,
     "reception_positive": 5,
     "moon_aspect_querent_quesited": 3,

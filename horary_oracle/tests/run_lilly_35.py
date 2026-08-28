@@ -15,8 +15,8 @@ QUESITED_BY_KEYWORD = {
     "sick": "health", "disease": "health", "health": "health", "recovery": "health", "cure": "health",
     "lawsuit": "lawsuit", "court": "lawsuit",
     "house": "house_property", "property": "house_property",
-    "thief": "lost_object", "stolen": "lost_object", "lost": "lost_object", "ring": "lost_object", "horse": "lost_object",
-    "prison": "lawsuit", "sibling": "general", "brother": "general",
+    "thief": "thief", "stolen": "thief", "lost": "lost_object", "ring": "lost_object", "horse": "lost_object",
+    "prison": "lawsuit", "sibling": "sibling", "brother": "sibling",
     "treasure": "money", "venture": "money", "exams": "education",
 }
 def guess_quesited(q: str) -> str:

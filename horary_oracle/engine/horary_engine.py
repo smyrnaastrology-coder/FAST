@@ -6,7 +6,7 @@ import json, os, math
 import swisseph as swe
 from core.ephemeris import (
     planetary_positions, houses_regiomontanus, house_of_planet,
-    planetary_hour, DOMICILE, EXALTATION, sign_from_lon, deg_in_sign, SIGNS_TR
+    planetary_hour, DOMICILE, EXALTATION, DETRIMENT, FALL, sign_from_lon, deg_in_sign, SIGNS_TR
 )
 
 RULES_PATH = os.path.join(os.path.dirname(__file__), "horary_rules.json")
@@ -28,26 +28,47 @@ def next_aspect_distance(lon_fast, speed_fast, lon_slow, speed_slow, target_angl
     Hızlar derece/gün. Eğer fast slow'dan hızlı değilse applying olamaz (translation hariç).
     """
     diff = (lon_slow - lon_fast) % 360
-    # hedef açıya uzaklık
-    for ang in [target_angle]:
-        delta = (diff - ang) % 360
-        if delta > 180:
-            delta = 360 - delta  # en yakın açı farkı değil, applying yönü önemli
-    # Daha doğru: applying kontrolü -> fast slow'a yaklaşıyor mu?
-    # Yaklaşım: relatıve speed >0 ise ve diff target'a doğru kapanıyorsa applying
     rel_speed = speed_fast - speed_slow
-    # target angle normalization
-    # diff 0-360, hedef 0,60,90,120,180
-    # applying: diff -> target'a doğru rel_speed ile daralıyor
     closest_target = min([0,60,90,120,180], key=lambda a: abs((diff - a + 180) % 360 - 180))
     dist_to_target = abs((diff - closest_target + 180) % 360 - 180)
-    # applying mi? diff hedefe doğru hareket ediyor mu?
-    # Bir sonraki gün diff ne olur?
     diff_next = ((lon_slow + speed_slow*1) - (lon_fast + speed_fast*1)) % 360
     dist_next = abs((diff_next - closest_target + 180) % 360 - 180)
-    applying = dist_next < dist_to_target and rel_speed > 0.05  # eşik
+    applying = dist_next < dist_to_target and rel_speed > 0.05
     within_orb = dist_to_target <= orb
     return {"target": closest_target, "dist": dist_to_target, "applying": applying, "within_orb": within_orb, "diff": diff, "rel_speed": rel_speed}
+
+def aspect_pair(lon_fast, lon_slow, angle):
+    """En yakın tam açı noktası: slow +/- angle (mod 360). (applying, dist) döner.
+    applying=True: tam açı noktası fast'in ÖNÜNDE (<180° gitmek gerek), False: arkada kaldı."""
+    best = None
+    for E in ((lon_slow + angle) % 360, (lon_slow - angle) % 360):
+        f = (E - lon_fast) % 360
+        d = f if f <= 180 else 360 - f
+        app = f <= 180
+        if best is None or d < best[1]:
+            best = (app, d)
+    return best
+
+def best_applying_major(lon_fast, lon_slow, p1, p2, orbs):
+    """iki gösterge arası en yakın APPLYING majör açı. (ang, dist, type) veya None.
+    orbs: {(angle): base_orb} — moiety orbu dışarıda hesaplanır."""
+    best = None
+    for ang, base_orb in orbs.items():
+        app, d = aspect_pair(lon_fast, lon_slow, ang)
+        if not app:
+            continue
+        m1 = RULES["moiety"].get(p1, 7); m2 = RULES["moiety"].get(p2, 7)
+        orb = max(base_orb, min((m1 + m2) / 2, 12))
+        if d <= orb:
+            if best is None or d < best[1]:
+                best = (ang, d)
+    return best
+
+def in_dom_ex(planet, sign):
+    return DOMICILE.get(sign) == planet or EXALTATION.get(sign) == planet
+
+def in_det_fall(planet, sign):
+    return DETRIMENT.get(sign) == planet or FALL.get(sign) == planet
 
 def is_combust(planet_lon, sun_lon, orb=8.5):
     d = abs((planet_lon - sun_lon + 180) % 360 - 180)
@@ -132,18 +153,22 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     for name, data in planets.items():
         data["house"] = house_of_planet(data["lon"], houses["cusps"])
 
-    # Significator atama - Akrep için Pluto öncelikli, Mars ikincil (senin talimatın)
+    # Significator atama - KLASIK LILLY: yalnizca 7 klasik gezegen significator olur.
+    # Akrep = Mars, Kova = Saturn, Balik = Jupiter (modern Uran/Nept/Pluto significator degil).
+    CLASSIC_SIGNIFICATOR = {"Pluto":"Mars","Uranus":"Saturn","Neptune":"Jupiter"}
+    def classic(p):
+        return CLASSIC_SIGNIFICATOR.get(p, p)
     asc_sign = houses["asc_sign"]
-    asc_ruler = DOMICILE.get(asc_sign, "Mars")
+    asc_ruler = classic(DOMICILE.get(asc_sign, "Mars"))
     asc_ruler_trad = None
     if asc_sign == "Akrep":
         asc_ruler_trad = "Mars"
-        # Pluto ko-significator olarak not düş
+        # Mars tek significator; Pluto kullanilmaz (klasik)
     quesited_house_num = RULES["houses"]["quesited_map"].get(quesited_type, 7)
     # quesited evin burcu: cusp burcu
     quesited_cusp_lon = houses["cusps"][quesited_house_num - 1]
     quesited_sign = sign_from_lon(quesited_cusp_lon)
-    quesited_ruler = DOMICILE.get(quesited_sign, "Venus")
+    quesited_ruler = classic(DOMICILE.get(quesited_sign, "Venus"))
 
     querent = {"planet": asc_ruler, "house": 1, "sign": asc_sign, "data": planets.get(asc_ruler)}
     if asc_ruler_trad:
@@ -346,50 +371,72 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         # Lilly: orb en az base, en fazla avg; moiety disi kavusum gundem sayilmaz (791)
         return max(base_orb, min(avg, 12))
     best = None
+    # Doğru geometri: fast'in tam açıya (slow +/- ang) uzaklığı; fast yavaştan HIZLI ve
+    # tam açı öndeyse applying. (Modulo wrap hatası düzeltildi.)
     for ang_name, cfg in RULES["aspects"]["major"].items():
         ang = cfg["angle"]; base_orb = cfg["orb"]
-        orb = moiety_orb(fast["planet"], slow["planet"], base_orb)
-        diff = (slow_lon - fast_lon) % 360
-        d = abs((diff - ang + 180) % 360 - 180)
-        diff_next = ((slow_lon+slow_speed) - (fast_lon+fast_speed)) % 360
-        d_next = abs((diff_next - ang + 180) % 360 - 180)
-        applying = d_next < d and (fast_speed - slow_speed) > 0.02
-        if d <= orb and applying:
+        app, d = aspect_pair(fast_lon, slow_lon, ang)
+        if not app:
+            continue
+        m1 = RULES["moiety"].get(fast["planet"], 7); m2 = RULES["moiety"].get(slow["planet"], 7)
+        orb = max(base_orb, min((m1 + m2) / 2, 12))
+        if d <= orb and (fast_speed - slow_speed) > 0.02:
             best = {"type": ang_name, "angle": ang, "dist": d, "applying": True, "orb": orb}
             break
     if best:
-        # Prohibition kontrolü: fast ile slow arasında daha yakın bir gezegen aynı açıyı kesiyor mu?
-        blocker = None
+        # Prohibition kontrolü: FAST'in önünde tam açıya ulaşmadan ÖNCE bir MALEFİK (Saturn/Mars)
+        # SERT açı (kare/karşıt) ile fast'i kesiyorsa ve fast kendi alanında değilse engel.
+        # Ay (querent'in ortak göstereni) ve generation planetler blocker sayılmaz.
+        blocker = None; t_path = None; blk_ang = blk_dist = None
+        # hedef tam açının fast'e göre ön taraf mesafesi
+        for E in ((slow_lon + best["angle"]) % 360, (slow_lon - best["angle"]) % 360):
+            f = (E - fast_lon) % 360
+            if f <= 180:
+                t_path = f
+                break
+        if t_path is None:
+            t_path = 360  # güvenlik
         for pname, pdata in planets.items():
-            if pname in (fast["planet"], slow["planet"], "NorthNode","Uranus","Neptune","Pluto"):
+            if pname in (fast["planet"], slow["planet"], "Moon", "NorthNode", "Uranus", "Neptune", "Pluto"):
                 continue
-            # fast -> blocker mesafesi daha küçük mü ve applying mi?
-            diff_fb = (pdata["lon"] - fast_lon) % 360
-            for ang_name2, cfg2 in RULES["aspects"]["major"].items():
-                ang2 = cfg2["angle"]; orb2 = cfg2["orb"]
-                d2 = abs((diff_fb - ang2 + 180) % 360 - 180)
-                diff_fb_next = ((pdata["lon"]+pdata["speed"]) - (fast_lon+fast_speed)) % 360
-                d2_next = abs((diff_fb_next - ang2 + 180) % 360 - 180)
-                applying2 = d2_next < d2 and (fast_speed - pdata["speed"]) > 0.02
-                if d2 <= orb2 and applying2:
-                    # blocker fast'ten önce mi? Yani fast->blocker dist < fast->slow dist ?
-                    # Gerçek prohibition: blocker fast ile slow arasında
-                    # Basitleştir: blocker applying ve fast slow'dan daha yakın ise
-                    if d2 < best["dist"] + 5:  # tolerans
-                        # blocker'ın slow ile de ilişkisi kontrol edilmez - Lilly prohibition budur
-                        # Ancak blocker slow'dan önce fast'a ulaşıyorsa true prohibition
-                        # Kaba: eğer blocker dist < best dist ise prohibition
-                        if (abs((pdata["lon"]-fast_lon+360)%360) < abs((slow_lon-fast_lon+360)%360)):
-                            blocker = pname
-                            break
+            if pname not in ("Saturn", "Mars"):
+                continue
+            for ang2 in (90, 180):  # sadece SERT blocker = gerçek prohibition
+                app2, d2 = aspect_pair(fast_lon, pdata["lon"], ang2)
+                if not app2:
+                    continue
+                b_path = None
+                for Eb in ((pdata["lon"] + ang2) % 360, (pdata["lon"] - ang2) % 360):
+                    fb = (Eb - fast_lon) % 360
+                    if fb <= 180:
+                        b_path = fb
+                        break
+                if b_path is None:
+                    continue
+                m1b = RULES["moiety"].get(fast["planet"], 7); m2b = RULES["moiety"].get(pname, 7)
+                orbb = max(RULES["aspects"]["major"].get("square", {}).get("orb", 8), min((m1b + m2b) / 2, 12))
+                if b_path < t_path and d2 <= orbb:
+                    blocker = pname; blk_ang = ang2; blk_dist = d2
+                    break
             if blocker:
                 break
         if blocker and RULES["perfection"]["prohibition"]["enabled"]:
-            perfection = {"type":"prohibition","result":"blocked","blocker":blocker, "would_be": best["type"]}
-            score += RULES["scoring"]["prohibition_penalty"]
+            # İstisna: fast significator kendi alanında (domicile/exaltation) ise engeli aşar.
+            if in_dom_ex(fast["planet"], sign_from_lon(fast_lon)):
+                perfection = {"type": best["type"], "result": "yes",
+                              "between": [fast["planet"], slow["planet"]],
+                              "note": f"{blocker} araya girer ama fast kendi alanında - engeli aştı"}
+                score += RULES["scoring"]["perfection_yes"]
+                score += RULES["scoring"].get("perfection_dominus", 8)
+            else:
+                perfection = {"type": "prohibition", "result": "blocked",
+                              "blocker": blocker, "would_be": best["type"],
+                              "blocker_angle": blk_ang, "blocker_dist": blk_dist}
+                score += RULES["scoring"]["prohibition_penalty"]
         else:
-            perfection = {"type": best["type"], "result":"yes", "between": [fast["planet"], slow["planet"]]}
+            perfection = {"type": best["type"], "result": "yes", "between": [fast["planet"], slow["planet"]]}
             score += RULES["scoring"]["perfection_yes"]
+            score += RULES["scoring"].get("perfection_dominus", 8)
             # Reception: mutual reception check - domicile/exaltation
             from core.ephemeris import DOMICILE as DOM, EXALTATION as EX
             sign_fast = sign_from_lon(fast_lon)
@@ -409,37 +456,39 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             elif EX.get(sign_slow) == fast["planet"]:
                 score += 2
 
-    # 2) Eğer direkt perfection yoksa translation / collection dene
+    # 2) Eğer direkt perfection yoksa translation dene (kabul ALINMIŞSA = Lilly: reception şart)
     if perfection is None or perfection.get("result")=="blocked":
-        # Translation: fast -> mediator -> slow, mediator daha hızlı olmalı (her ikisinden)
-        # Collection: slow ve fast ikisi de daha ağır bir gezegene applying
+        # Translation: fast -> mediator -> slow, mediator daha hızlı olmalı (her ikisinden).
+        # Reception yoksa translation "boş" sayılır - iş sonuç vermez (Lilly).
         mediators = []
         for med_name, med_data in planets.items():
-            if med_name in (fast["planet"], slow["planet"], "Sun","NorthNode","Uranus","Neptune","Pluto"):
+            if med_name in (fast["planet"], slow["planet"], "Sun","Moon","NorthNode","Uranus","Neptune","Pluto"):
                 continue
-            # Hız şartı: mediator hem fast hem slow'dan hızlı olmalı (Lilly)
+            # Hız şartı: mediator hem fast hem slow'dan hızlı olmalı
             if abs(med_data["speed"]) <= abs(fast_speed) or abs(med_data["speed"]) <= abs(slow_speed):
                 continue
-            # fast->med separating? fast med'i geçmiş mi?
-            # separating: d_next > d (uzaklaşıyor)
-            diff_fm = (med_data["lon"] - fast_lon) % 360
-            # en yakın açı
-            best_fm = min(RULES["aspects"]["major"].values(), key=lambda c: abs((diff_fm - c["angle"]+180)%360-180))
-            d_fm = abs((diff_fm - best_fm["angle"]+180)%360-180)
-            diff_fm_next = ((med_data["lon"]+med_data["speed"]) - (fast_lon+fast_speed))%360
-            d_fm_next = abs((diff_fm_next - best_fm["angle"]+180)%360-180)
-            separating_fm = d_fm_next > d_fm
-            # med -> slow applying?
-            diff_ms = (slow_lon - med_data["lon"]) % 360
-            best_ms = min(RULES["aspects"]["major"].values(), key=lambda c: abs((diff_ms - c["angle"]+180)%360-180))
-            d_ms = abs((diff_ms - best_ms["angle"]+180)%360-180)
-            diff_ms_next = ((slow_lon+slow_speed) - (med_data["lon"]+med_data["speed"]))%360
-            d_ms_next = abs((diff_ms_next - best_ms["angle"]+180)%360-180)
-            applying_ms = d_ms_next < d_ms and (med_data["speed"] - slow_speed) > 0.02
-            if separating_fm and applying_ms and d_fm <=10 and d_ms <=10:
-                mediators.append(med_name)
+            # fast->med separating (en yakın majör açı, düzeltilmiş geometri)
+            sep_fm = None
+            for ang in (0, 60, 90, 120, 180):
+                app_fm, d_fm = aspect_pair(fast_lon, med_data["lon"], ang)
+                if not app_fm and d_fm <= 10:
+                    if sep_fm is None or d_fm < sep_fm[1]:
+                        sep_fm = (ang, d_fm)
+            # med -> slow applying
+            app_ms = None
+            for ang in (0, 60, 90, 120, 180):
+                app_m, d_ms = aspect_pair(med_data["lon"], slow_lon, ang)
+                if app_m and d_ms <= 10 and (med_data["speed"] - slow_speed) > 0.02:
+                    if app_ms is None or d_ms < app_ms[1]:
+                        app_ms = (ang, d_ms)
+            if sep_fm and app_ms:
+                # Lilly: translation geçerli olması için mediator ile hedef arasında reception
+                med_sign = sign_from_lon(med_data["lon"])
+                recv = in_dom_ex(slow["planet"], med_sign) or in_dom_ex(med_name, sign_from_lon(slow_lon))
+                if recv:
+                    mediators.append((med_name, sep_fm, app_ms))
         if mediators:
-            perfection = {"type":"translation_of_light","result":"yes","mediator": mediators[0]}
+            perfection = {"type":"translation_of_light","result":"yes","mediator": mediators[0][0]}
             score += RULES["scoring"]["perfection_translation"]
 
     # Ay 3 rol + Kalde sıralaması: 1-duygu 2-niyet (evi) 3-gidişat; hızlı yavaş'a gider (Sat-Jup-Mar-Sun-Ven-Mer-Moon)
@@ -529,6 +578,108 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         bes = is_besieged(sig["data"]["lon"], planets)
         if bes["besieged"]:
             score -= 4
+
+    # --- Klasik güçlü YES: querent<->quesited MUSTERI RESEPTION (restor'dan bağımsız) ---
+    # Perfection bulunamasa bile karşılıklı kabul = güçlü YES göstergesi (Lilly).
+    try:
+        qr_name = querent["planet"]; qs_name = quesited["planet"]
+        qr_lon = querent["data"]["lon"]; qs_lon = quesited["data"]["lon"]
+        qr_sign = sign_from_lon(qr_lon); qs_sign = sign_from_lon(qs_lon)
+        qr_in_qs = (DOMICILE.get(qs_sign)==qr_name) or (EXALTATION.get(qs_sign)==qr_name)  # querent, qs'in burcunda -> qs querent'i kabul eder
+        qs_in_qr = (DOMICILE.get(qr_sign)==qs_name) or (EXALTATION.get(qr_sign)==qs_name)
+        if qr_in_qs and qs_in_qr:
+            mutual = True
+            score += 6
+            strictures.append({"code":"mutual_reception","level":"info","meaning":f"KLASIK: {qr_name}({qr_sign}) <-> {qs_name}({qs_sign}) karşılıklı kabul - güçlü YES göstergesi (+6), perfection yokken bile kabul işi sonuca götürür."})
+        # Moon da qs ile karşılıklı kabulde ise ek güç
+        moon_sign = sign_from_lon(planets["Moon"]["lon"])
+        if (DOMICILE.get(qs_sign)=="Moon" or EXALTATION.get(qs_sign)=="Moon") and (DOMICILE.get(moon_sign)==qs_name or EXALTATION.get(moon_sign)==qs_name):
+            score += 3
+            strictures.append({"code":"moon_reception_qs","level":"info","meaning":f"KLASIK: Ay ve quesited ({qs_name}) karşılıklı kabul (+3)."})
+    except: pass
+
+    # --- GÜÇLENDİRİLMİŞ YES testleri ---
+    # v0.12: klasik tamamlayıcı tester'lar. Düzeltilmiş açı geometrisi kullanılır.
+    try:
+        kr_name = querent["planet"]; ks_name = quesited["planet"]
+        kr_lon = querent["data"]["lon"]; ks_lon = quesited["data"]["lon"]
+        kr_sign = sign_from_lon(kr_lon); ks_sign = sign_from_lon(ks_lon)
+        moon = planets["Moon"]
+        ml = moon["lon"]; mh = moon["house"]
+        # R3: quesited güçlü (kendi alanında)
+        if in_dom_ex(ks_name, ks_sign):
+            score += 6
+            strictures.append({"code":"sig_strong_yes","level":"info","meaning":f"GÜÇLÜ YES: quesited {ks_name} {ks_sign} burcunda (dom/ex) (+6)."})
+        # R11: her iki gösterge aynı burçta - iş tek yerde toplanmış
+        if kr_sign == ks_sign:
+            score += 8
+            strictures.append({"code":"sign_agreement_yes","level":"info","meaning":f"GÜÇLÜ YES: querent ve quesited aynı burçta ({kr_sign}) (+8)."})
+        # R4: querent<->quesited yumuşak bağlantı (0/60/120, yaklaşan VEYA ayrılan ≤8°)
+        # guards: quesited düşüşte değil; Ay sonraki SERT açısı Saturn/Mars'a değil
+        r4 = None
+        f4 = querent if abs(querent["data"]["speed"]) >= abs(quesited["data"]["speed"]) else quesited
+        s4 = quesited if f4 is querent else querent
+        for ang in (0, 60, 120):
+            a4, d4 = aspect_pair(f4["data"]["lon"], s4["data"]["lon"], ang)
+            if d4 <= 8:
+                r4 = (ang, d4, a4)
+                break
+        mal_next = None
+        for mp in ("Saturn", "Mars"):
+            if mp not in planets:
+                continue
+            for ha in (0, 90, 180):
+                am, dm = aspect_pair(ml, planets[mp]["lon"], ha)
+                if am and dm <= 8:
+                    mal_next = (mp, ha, dm)
+                    break
+            if mal_next:
+                break
+        if r4 and FALL.get(ks_sign) != ks_name and mal_next is None:
+            score += 8
+            strictures.append({"code":"sig_soft_link_yes","level":"info","meaning":f"GÜÇLÜ YES: querent<->quesited yumuşak bağ ({r4[0]}°, {r4[1]:.1f}° {'yaklaşan' if r4[2] else 'ayrılan'}) (+8)."})
+        # R5: Ay quesited'e yumuşak YAKLAŞIYOR (≤8°), Ay quesited evinde değil, quesited zararda/düşüşte değil
+        mq_app = None; mq_sep = None
+        for ang in (0, 60, 120):
+            am, dm = aspect_pair(ml, ks_lon, ang)
+            if dm <= 8:
+                if am:
+                    mq_app = (ang, dm)
+                else:
+                    mq_sep = (ang, dm)
+        qsh = (mh == quesited["data"]["house"])
+        r5_fired = False
+        if mq_app and not qsh and not in_det_fall(ks_name, ks_sign):
+            score += 8
+            r5_fired = True
+            strictures.append({"code":"moon_app_quesited_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay quesited'e yumuşak {mq_app[0]}° yaklaşıyor ({mq_app[1]:.1f}°) (+8)."})
+        # R6: Ay quesited'ten yumuşak AYRILIYOR (≤8°)
+        if mq_sep and not in_det_fall(ks_name, ks_sign):
+            score += 5
+            strictures.append({"code":"moon_sep_quesited_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay quesited'ten yumuşak {mq_sep[0]}° ayrılıyor ({mq_sep[1]:.1f}°) (+5)."})
+        # R7: Ay ışık topluyor (qr ikisine de yaklaşıyor, qr ile karşıt değil)
+        mqr = None; mqs2 = None
+        for ang in (0, 60, 90, 120, 180):
+            am, dm = aspect_pair(ml, kr_lon, ang)
+            if am and dm <= 8:
+                mqr = (ang, dm)
+            am2, dm2 = aspect_pair(ml, ks_lon, ang)
+            if am2 and dm2 <= 8:
+                mqs2 = (ang, dm2)
+        if mqr and mqs2 and mqr[0] != 180:
+            score += 8
+            strictures.append({"code":"moon_collection_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay ışık topluyor ({mqr[0]}°/{mqs2[0]}°) (+8)."})
+        # R8: quesited querent'in 1.evinde
+        if quesited["data"]["house"] == 1:
+            score += 6
+            strictures.append({"code":"quesited_1st_yes","level":"info","meaning":f"GÜÇLÜ YES: quesited querent'in 1.evinde (+6)."})
+        # R9: querent güçlü (kendi alanında) VE Ay işe karışıyor (R5 ya da direkt perfection)
+        perf_direct = (perfection is not None and perfection.get("result") == "yes"
+                       and perfection.get("type") != "translation_of_light")
+        if in_dom_ex(kr_name, kr_sign) and (perf_direct or r5_fired):
+            score += 5
+            strictures.append({"code":"querent_strong_yes","level":"info","meaning":f"GÜÇLÜ YES: querent {kr_name} kendi alanında ({kr_sign}), Ay işe karışıyor (+5)."})
+    except: pass
 
     # Threshold
     if score >= RULES["scoring"]["threshold_yes"]:
