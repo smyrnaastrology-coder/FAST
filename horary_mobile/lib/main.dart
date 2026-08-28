@@ -112,6 +112,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   bool _loading = false;
   double lat = 38.4237, lon = 27.1428;
   String lang = 'tr';
+  String _category = 'general';
   Map<String,dynamic>? _lastChart;
   final SpeechToText _speech = SpeechToText();
   bool _listening=false;
@@ -200,7 +201,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     setState(() { _chat.add({'role':'user','content':q}); _loading=true; _ctrl.clear(); });
     _saveHistory(q);
     try {
-      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang);
+      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category);
       final ans = res['answer'] as String? ?? '${res['verdict']}';
       setState(() {
         _lastChart = res;
@@ -257,6 +258,27 @@ class _HoraryHomeState extends State<HoraryHome> {
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
           ])),
+          // kategori seçici (eski soru alanları geri)
+          Padding(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
+            for(final c in [
+              {'k':'general','l':'Otomatik'},
+              {'k':'relationship','l':'İlişki/Eş'},
+              {'k':'money','l':'Para'},
+              {'k':'job','l':'İş/Kariyer'},
+              {'k':'health','l':'Sağlık'},
+              {'k':'lost_object','l':'Kayıp Eşya'},
+              {'k':'missing_person','l':'Kayıp Kişi Nerede'},
+              {'k':'house_property','l':'Ev/Arsa'},
+              {'k':'child','l':'Çocuk'},
+              {'k':'pet','l':'Evcil'},
+            ]) Padding(padding: const EdgeInsets.only(right:6), child: ChoiceChip(
+              label: Text(c['l']!, style: TextStyle(fontSize:11, color: _category==c['k'] ? Colors.black : const Color(0xFFe8e0f0))),
+              selected: _category==c['k'],
+              selectedColor: const Color(0xFFC9A96E),
+              backgroundColor: const Color(0xFF2a1f38),
+              onSelected: (v){ if(v) setState(()=> _category=c['k']!); },
+            )),
+          ]))),
           // mini SolarFire chart + timing geri sayım + strictures detay
           if(_lastChart!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),

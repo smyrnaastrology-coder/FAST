@@ -34,6 +34,7 @@ class CastRequest(BaseModel):
     lat: float = Field(..., ge=-90, le=90, example=38.4237)
     lon: float = Field(..., ge=-180, le=180, example=27.1428)
     lang: str = Field("tr", pattern="^(tr|en|es|ar|pt|fr|de|ru|it|hi)$")
+    quesited_type: str = Field("general", description="UI kategori: relationship/money/job/lost_object/missing_person vb.")
     # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
     history: Optional[list] = None
     # opsiyonel: client kendi zamanını gönderirse
@@ -183,8 +184,8 @@ async def cast(req: CastRequest):
     t0 = time.perf_counter()
     y, mo, da, utc_dec, off, tzname, local_dec = resolve_time(req)
 
-    # quesited auto - genel (derived engine içinde question ile override ediliyor)
-    qtype = "general"
+    # quesited auto - UI kategori varsa onu kullan, yoksa genel + derived override
+    qtype = req.quesited_type if req.quesited_type and req.quesited_type != "general" else "general"
     try:
         res = copy.deepcopy(cached_chart(y, mo, da, utc_dec, req.lat, req.lon, qtype))
     except Exception as e:

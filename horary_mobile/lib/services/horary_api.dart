@@ -12,12 +12,14 @@ class HoraryApi {
     required double lat,
     required double lon,
     String lang = 'tr',
+    String category = 'general',
     List<Map<String, dynamic>>? history,
   }) async {
     final uri = Uri.parse('$baseUrl/api/horary/cast');
     final now = DateTime.now(); // yerel saat - transit için kritik
     final payload = {
       'question': question, 'lat': lat, 'lon': lon, 'lang': lang,
+      'quesited_type': category,
       'year': now.year, 'month': now.month, 'day': now.day,
       'hour': now.hour + now.minute/60 + now.second/3600,
       if(history!=null) 'history': history,
