@@ -2259,8 +2259,7 @@ def _generate_natal_pdf(motor):
         c.bookmarkPage("bolum_sabian")
         y = sayfa_basligi(pdf_label("Sabian Sembolleri"), numara=str(bolum_no[0]))
         for s in sabianlar:
-            _is_es_sab = _ES
-            sembol = _strip_html(str(s.get('sembol','')))[:400] if _is_es_sab else _strip_html(str(s.get('sembol','')))[:250]
+            sembol = _strip_html(str(s.get('sembol','')))[:600]
             sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*(?:Sabian Şifresi|Sabian Cipher) \(\d+°\):\s*', '', sembol)
             sembol = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3\u200D]', '', sembol)
             muhur = ""
@@ -2268,12 +2267,12 @@ def _generate_natal_pdf(motor):
             if "Mühür:" in sembol or "Seal:" in sembol:
                 _ayrac = "Mühür:" if "Mühür:" in sembol else "Seal:"
                 sembol, muhur = sembol.split(_ayrac, 1)
-                muhur = (_muhur_etiketi + " " + muhur.strip())[:300] if _is_es_sab else (_muhur_etiketi + " " + muhur.strip())[:170]
+                muhur = (_muhur_etiketi + " " + muhur.strip())[:400]
             gez_isim = s.get('gezegen','')
             sembol_h = 30
-            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86) + (24 if _ES else 0)
+            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86) + 16
             if muhur:
-                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6 + (16 if _ES else 0)
+                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 10
             if y - sembol_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
             # Call-out card — gold accent
