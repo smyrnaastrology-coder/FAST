@@ -2,6 +2,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'config/theme.dart';
 import 'services/horary_api.dart';
+import 'widgets/lost_radar_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -295,6 +296,17 @@ class _HoraryHomeState extends State<HoraryHome> {
                 Expanded(child: Text('⏳ ${_lastChart!['timing']['text']} → ${_timingDate(_lastChart!['timing'])}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11, fontWeight: FontWeight.w600))),
                 Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
               ])),
+          ),
+          // Kayıp radar (yön+mesafe ok)
+          if(_lastChart!=null && _lastChart!['location']!=null && _lastChart!['location']['direction']!=null) Padding(
+            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
+            child: LostRadarMap(
+              lat: lat, lon: lon,
+              direction: _lastChart!['location']['direction'] ?? 'BATI',
+              distance: _lastChart!['location']['distance'] ?? '',
+              place: _lastChart!['location']['place'] ?? '',
+              house: _lastChart!['location']['house'] ?? 7,
+            ),
           ),
           // 2) Derived ağaç görseli
           if(_lastChart!=null && _lastChart!['derived_info']!=null) Padding(

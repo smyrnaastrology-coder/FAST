@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+import 'dart:math' as math;
+import '../config/theme.dart';
+
+class LostRadarMap extends StatelessWidget {
+  final double lat;
+  final double lon;
+  final String direction; // DOĞU, BATI vb.
+  final String distance; // 41m / 1.2km
+  final String place;
+  final int house;
+
+  const LostRadarMap({super.key, required this.lat, required this.lon, required this.direction, required this.distance, required this.place, required this.house});
+
+  double get _bearing {
+    const map = {
+      "DOĞU": 90.0, "BATI": 270.0, "KUZEY": 0.0, "GÜNEY": 180.0,
+      "KUZEYDOĞU": 45.0, "KUZEY DOĞU":45.0, "DOĞU KUZEY-DOĞU":67.5, "KUZEY KUZEY-DOĞU":22.5,
+      "KUZEYBATI":315.0, "KUZEY BATI":315.0, "BATI KUZEYBATI":292.5, "KUZEY KUZEY-BATI":337.5,
+      "GÜNEYDOĞU":135.0, "GÜNEY DOĞU":135.0, "GÜNEY GÜNEY-DOĞU":157.5, "DOĞU GÜNEY-DOĞU":112.5,
+      "GÜNEYBATI":225.0, "GÜNEY BATI":225.0, "GÜNEY GÜNEY-BATI":202.5, "BATI GÜNEY-BATI":247.5,
+    };
+    return (map[direction] ?? 0).toDouble();
+  }
+
+  double get _distMeters {
+    final v = double.tryParse(distance.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    if (distance.contains('km')) return v * 1000;
+    return v;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF1A1423),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A96E), width:1)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.radar, size:16, color: Color(0xFFC9A96E)),
+            const SizedBox(width:6),
+            const Text('Kayıp Radar', style: TextStyle(color: Color(0xFFC9A96E), fontWeight: FontWeight.bold, fontSize:12)),
+            const Spacer(),
+            Text('$direction • $distance • Ev$house', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
+          ]),
+          const SizedBox(height:8),
+          Text(place, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11)),
+          const SizedBox(height:12),
+          AspectRatio(aspectRatio: 1.4, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: CustomPaint(
+            painter: _RadarPainter(bearing: _bearing, distMeters: _distMeters),
+            size: const Size(double.infinity, 200),
+          ))),
+          const SizedBox(height:6),
+          Text('Sen buradasın (${lat.toStringAsFixed(4)}, ${lon.toStringAsFixed(4)}) → ok yönünde ~$distance', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
+        ]),
+      ),
+    );
+  }
+}
+
+class _RadarPainter extends CustomPainter {
+  final double bearing;
+  final double distMeters;
+  _RadarPainter({required this.bearing, required this.distMeters});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width/2, cy = size.height/2;
+    final r = math.min(cx, cy) - 10;
+    // bg
+    canvas.drawCircle(Offset(cx,cy), r, Paint()..color=const Color(0xFF2a1f38));
+    canvas.drawCircle(Offset(cx,cy), r, Paint()..color=const Color(0xFFC9A96E).withOpacity(0.3)..style=PaintingStyle.stroke..strokeWidth=1);
+    // grid
+    for(int i=1;i<=3;i++){
+      canvas.drawCircle(Offset(cx,cy), r*i/3, Paint()..color=Colors.white.withOpacity(0.08)..style=PaintingStyle.stroke..strokeWidth=0.5);
+    }
+    // N
+    const dirs = ['K','D','G','B'];
+    for(int i=0;i<4;i++){
+      final ang = i*90*math.pi/180;
+      final x = cx + r*0.92*math.sin(ang);
+      final y = cy - r*0.92*math.cos(ang);
+      final tp = TextPainter(text: TextSpan(text: dirs[i], style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)), textDirection: TextDirection.ltr)..layout();
+      tp.paint(canvas, Offset(x-tp.width/2, y-tp.height/2));
+    }
+    // you
+    canvas.drawCircle(Offset(cx,cy), 5, Paint()..color=const Color(0xFF6a9ae2));
+    canvas.drawCircle(Offset(cx,cy), 5, Paint()..color=Colors.white..style=PaintingStyle.stroke..strokeWidth=1.5);
+    // arrow
+    final ang = bearing*math.pi/180;
+    // scale distance: max radius = ~500m, beyond clamp
+    final maxM = 500.0;
+    final norm = (distMeters.clamp(0, maxM))/maxM;
+    final len = r*0.15 + norm*(r*0.75);
+    final ex = cx + len*math.sin(ang);
+    final ey = cy - len*math.cos(ang);
+    final paint = Paint()..color=const Color(0xFFC9A96E)..strokeWidth=3..strokeCap=StrokeCap.round;
+    canvas.drawLine(Offset(cx,cy), Offset(ex,ey), paint);
+    // arrow head
+    final headLen = 10.0;
+    final leftAng = ang + 150*math.pi/180;
+    final rightAng = ang - 150*math.pi/180;
+    canvas.drawLine(Offset(ex,ey), Offset(ex+headLen*math.sin(leftAng), ey-headLen*math.cos(leftAng)), paint);
+    canvas.drawLine(Offset(ex,ey), Offset(ex+headLen*math.sin(rightAng), ey-headLen*math.cos(rightAng)), paint);
+    // target dot
+    canvas.drawCircle(Offset(ex,ey), 6, Paint()..color=Colors.redAccent);
+    canvas.drawCircle(Offset(ex,ey), 6, Paint()..color=Colors.white..style=PaintingStyle.stroke..strokeWidth=1);
+  }
+  @override bool shouldRepaint(covariant CustomPainter old) => true;
+}
