@@ -153,9 +153,9 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     for name, data in planets.items():
         data["house"] = house_of_planet(data["lon"], houses["cusps"])
 
-    # Significator atama - KLASIK LILLY: yalnizca 7 klasik gezegen significator olur.
-    # Akrep = Mars, Kova = Saturn, Balik = Jupiter (modern Uran/Nept/Pluto significator degil).
-    CLASSIC_SIGNIFICATOR = {"Pluto":"Mars","Uranus":"Saturn","Neptune":"Jupiter"}
+    # Significator atama - MODERN: Akrep = Pluto birincil, Mars ikincil (Lilly dönemi Pluto yoktu)
+    # Kullanıcı talimatı: geçmiş yapıyı aynen kullanmak zorunda değiliz, Pluto kullanılabilir
+    CLASSIC_SIGNIFICATOR = {"Uranus":"Uranus","Neptune":"Neptune"}  # dış gezegenler korunur
     def classic(p):
         return CLASSIC_SIGNIFICATOR.get(p, p)
     asc_sign = houses["asc_sign"]
@@ -163,7 +163,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     asc_ruler_trad = None
     if asc_sign == "Akrep":
         asc_ruler_trad = "Mars"
-        # Mars tek significator; Pluto kullanilmaz (klasik)
+        # Pluto birincil, Mars ko-significator (modern)
     quesited_house_num = RULES["houses"]["quesited_map"].get(quesited_type, 7)
     # quesited evin burcu: cusp burcu
     quesited_cusp_lon = houses["cusps"][quesited_house_num - 1]
