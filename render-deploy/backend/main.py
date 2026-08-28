@@ -2395,22 +2395,26 @@ def _generate_natal_pdf(motor):
                     _i0b = _es_fix_tire(_i0b) if _ES else _i0b
                     if len(_i0b) > 800:
                         _i0b = _i0b[:800].rsplit('. ', 1)[0] + '.'
-                    _h2 = max(16, yazi_olcul(_i0b, "DejaVu", 8.5, 72) + 6)
+                    _h2 = max(16, yazi_olcul(_i0b, "DejaVu", 8.5, 72) + 22)
                     _onemli_bilgi.append((_gd2, _i0b, _h2))
                 if _onemli_bilgi:
-                    _tum_h = sum(_h for _, _, _h in _onemli_bilgi)
-                    if y - (53 + satir_sayisi * HUCRE_H + _tum_h) - 6 < SAYFA_ALT:
+                    _P = 8.5 + 5
+                    _tum_h = sum(_h for _, _, _h in _onemli_bilgi) + (len(_onemli_bilgi) - 1) * _P + 18
+                    if y - (40 + satir_sayisi * HUCRE_H + _tum_h) - 6 < SAYFA_ALT:
                         yeni_sayfa(); y = SAYFA_UST
-                    _avail = (y - 38 - satir_sayisi * HUCRE_H) - SAYFA_ALT - 20
-                    _gr = []; _gr_h = 0
+                    _avail_h = (y - 40 - satir_sayisi * HUCRE_H) - SAYFA_ALT - 6
+                    _gr = []
                     for _it in _onemli_bilgi:
-                        if _gr and _gr_h + _it[2] > _avail:
-                            _gruplar.append(_gr); _gr = [_it]; _gr_h = _it[2]
+                        _trial = _gr + [_it]
+                        _gh_guess = sum(h for _, _, h in _trial) + (len(_trial) - 1) * _P + 18
+                        if _gr and _gh_guess > _avail_h:
+                            _gruplar.append(_gr); _gr = [_it]
                         else:
-                            _gr.append(_it); _gr_h += _it[2]
+                            _gr.append(_it)
                     if _gr:
                         _gruplar.append(_gr)
-                    grid_h = 53 + satir_sayisi * HUCRE_H + sum(_h for _, _, _h in _gruplar[0])
+                    _onk = sum(h for _, _, h in _gruplar[0])
+                    grid_h = 40 + satir_sayisi * HUCRE_H + _onk + (len(_gruplar[0]) - 1) * _P + 18
                 if y - grid_h - 6 < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
                 # Month card
@@ -2463,7 +2467,7 @@ def _generate_natal_pdf(motor):
                         col = 0; row += 1
                 # Featured days (tümü görünür; sayfa dolunca devam kartı)
                 if _onemli_bilgi:
-                    ly = y - 38 - satir_sayisi * HUCRE_H
+                    ly = y - 40 - satir_sayisi * HUCRE_H
                     c.setFillColor(bordo)
                     c.setFont("DejaVu-Bold", 9)
                     c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')}")
@@ -2483,7 +2487,7 @@ def _generate_natal_pdf(motor):
                         metin_yaz(_x_desc, ly, _iy, "DejaVu", 8.5, acik, 72)
                     _devam = 1
                     for _grp in _gruplar[1:]:
-                        _gh = 48 + sum(_h for _, _, _h in _grp) + 12
+                        _gh = 48 + sum(_h for _, _, _h in _grp) + (len(_grp) - 1) * _P + 18
                         yeni_sayfa(); y = SAYFA_UST
                         if y - _gh - 6 < SAYFA_ALT:
                             yeni_sayfa(); y = SAYFA_UST
