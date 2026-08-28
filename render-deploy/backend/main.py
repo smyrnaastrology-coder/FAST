@@ -1038,9 +1038,10 @@ def _natal_minor_progress_yorumlari(motor, gun_sayisi=3, baslangic_gunu=0):
         yas = (jd_now - jd_natal) / 365.25
         
         sonuclar = []
+        minor_oran = 27.32166 / 365.2422
         for kaydir in range(baslangic_gunu, baslangic_gunu + gun_sayisi):
-            # Progressed JD = birth JD + (current age + N) as days
-            jd_prog = jd_natal + yas + kaydir
+            # Progressed JD = birth JD + current age (secondary) + N * minor_oran (27.3 days = 1 year)
+            jd_prog = jd_natal + yas + kaydir * minor_oran
             
             # Planet positions at progressed JD
             gez_poz = {}
@@ -2441,7 +2442,7 @@ def _generate_natal_pdf(motor):
                     c.setFillColor(bordo)
                     c.setFont("DejaVu-Bold", 8)
                     c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(onemli)})")
-                    for gd in onemli[:4]:
+                    for gd in onemli:
                         ly -= 13
                         p_entry = gun_verileri[gd]
                         ilk_yorum = (p_entry.get("yorumlar") or [pdf_label("Açı bulunamadı")])[0]
@@ -2453,6 +2454,10 @@ def _generate_natal_pdf(motor):
                         _iy = _iy_raw[:180] if _ES else _iy_raw[:135]
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 7)
+                        # Wrap long ES text to avoid table overflow (baba correccion)
+                        if _ES and len(_iy) > 90:
+                            ly = metin_yaz(SOL + 118, ly, _iy, "DejaVu", 7, acik, 70) + 2
+                            continue
                         c.drawString(SOL + 118, ly, _iy)
                 y -= grid_h + 12
 
