@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../config/theme.dart';
 
 class LostRadarMap extends StatelessWidget {
@@ -29,8 +31,27 @@ class LostRadarMap extends StatelessWidget {
     return v;
   }
 
+  LatLng get _target {
+    // haversine destination
+    final R = 6371000.0;
+    final d = _distMeters / R;
+    final br = _bearing * math.pi / 180;
+    final lat1 = lat * math.pi / 180;
+    final lon1 = lon * math.pi / 180;
+    final lat2 = math.asin(math.sin(lat1)*math.cos(d) + math.cos(lat1)*math.sin(d)*math.cos(br));
+    final lon2 = lon1 + math.atan2(math.sin(br)*math.sin(d)*math.cos(lat1), math.cos(d)-math.sin(lat1)*math.sin(lat2));
+    return LatLng(lat2*180/math.pi, lon2*180/math.pi);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final target = _target;
+    final center = LatLng((lat+target.latitude)/2, (lon+target.longitude)/2);
+    // zoom: mesafeye göre
+    double zoom = 18;
+    if (_distMeters > 500) zoom = 16;
+    if (_distMeters > 2000) zoom = 14;
+    if (_distMeters > 10000) zoom = 12;
     return Card(
       color: const Color(0xFF1A1423),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFC9A96E), width:1)),
@@ -38,21 +59,28 @@ class LostRadarMap extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Icon(Icons.radar, size:16, color: Color(0xFFC9A96E)),
+            const Icon(Icons.satellite_alt, size:16, color: Color(0xFFC9A96E)),
             const SizedBox(width:6),
-            const Text('Kayıp Radar', style: TextStyle(color: Color(0xFFC9A96E), fontWeight: FontWeight.bold, fontSize:12)),
+            const Text('Uydu Radar', style: TextStyle(color: Color(0xFFC9A96E), fontWeight: FontWeight.bold, fontSize:12)),
             const Spacer(),
             Text('$direction • $distance • Ev$house', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
           ]),
           const SizedBox(height:8),
           Text(place, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11)),
           const SizedBox(height:12),
-          AspectRatio(aspectRatio: 1.4, child: ClipRRect(borderRadius: BorderRadius.circular(8), child: CustomPaint(
-            painter: _RadarPainter(bearing: _bearing, distMeters: _distMeters),
-            size: const Size(double.infinity, 200),
+          ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(height: 220, child: FlutterMap(
+            options: MapOptions(initialCenter: center, initialZoom: zoom),
+            children: [
+              TileLayer(urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', userAgentPackageName: 'com.horaryoracle.app'),
+              PolylineLayer(polylines: [Polyline(points: [LatLng(lat, lon), target], color: const Color(0xFFC9A96E), strokeWidth: 3)]),
+              MarkerLayer(markers: [
+                Marker(point: LatLng(lat, lon), width: 30, height: 30, child: const Icon(Icons.my_location, color: Colors.blueAccent, size:28)),
+                Marker(point: target, width: 30, height: 30, child: const Icon(Icons.location_on, color: Colors.redAccent, size:30)),
+              ]),
+            ],
           ))),
           const SizedBox(height:6),
-          Text('Sen buradasın (${lat.toStringAsFixed(4)}, ${lon.toStringAsFixed(4)}) → ok yönünde ~$distance', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
+          Text('Mavi sensin → kırmızı hedef ~$distance $direction', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
         ]),
       ),
     );
