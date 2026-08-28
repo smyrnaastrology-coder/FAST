@@ -2338,10 +2338,10 @@ def _generate_natal_pdf(motor):
         yeni_sayfa()
         c.bookmarkPage("bolum_minor")
         y = sayfa_basligi(pdf_label("6 Aylık Minor Progress — Gün Gün"), numara=str(bolum_no[0]))
-        c.setFont("DejaVu", 7.5)
+        c.setFont("DejaVu", 8.5)
         c.setFillColor(acik)
         c.drawString(SOL, y, pdf_label("İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir."))
-        y -= 4
+        y -= 14
         c.setFillColor(HexColor('#8FC0E8'))
         c.drawString(SOL, y, pdf_label("■ Uyumlu açı (Trigon · Sekstil) · "))
         c.setFillColor(HexColor('#D08A96'))
@@ -2390,8 +2390,9 @@ def _generate_natal_pdf(motor):
                     _pe2 = gun_verileri[_gd2]
                     _i0b = ((_pe2.get("yorumlar") or [pdf_label("Açı bulunamadı")])[0])
                     _i0b = _es_fix_tire(_i0b) if _ES else _i0b
-                    _i0b = _i0b[:180] if _ES else _i0b[:135]
-                    _h2 = max(13, yazi_olcul(_i0b, "DejaVu", 7, 72) + 4)
+                    if len(_i0b) > 500:
+                        _i0b = _i0b[:500].rsplit('. ', 1)[0] + '.'
+                    _h2 = max(16, yazi_olcul(_i0b, "DejaVu", 8.5, 72) + 5)
                     _onemli_bilgi.append((_gd2, _i0b, _h2))
                     _onemli_yukseklik += _h2
                 if _onemli_bilgi:
@@ -2399,7 +2400,7 @@ def _generate_natal_pdf(motor):
                     grid_h = 42 + satir_sayisi * HUCRE_H + 36 + _onemli_yukseklik
                     if y - grid_h - 6 < SAYFA_ALT:
                         yeni_sayfa(); y = SAYFA_UST
-                    _feat_budget = (y - 6 - SAYFA_ALT) - 42 - satir_sayisi * HUCRE_H - 36 - 14
+                    _feat_budget = (y - 6 - SAYFA_ALT) - 42 - satir_sayisi * HUCRE_H - 36 - 16
                     if _onemli_yukseklik > _feat_budget:
                         _acc2 = 0
                         _kalan = []
@@ -2410,7 +2411,7 @@ def _generate_natal_pdf(motor):
                                 _gizli_onemli += 1
                         _onemli_bilgi = _kalan
                         _onemli_yukseklik = _acc2
-                        grid_h = 42 + satir_sayisi * HUCRE_H + 36 + _onemli_yukseklik + (13 if _gizli_onemli else 0)
+                        grid_h = 42 + satir_sayisi * HUCRE_H + 36 + _onemli_yukseklik + (16 if _gizli_onemli else 0)
                 if y - grid_h - 6 < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
                 # Month card
@@ -2427,7 +2428,7 @@ def _generate_natal_pdf(motor):
                 c.line(SOL + 12, y - 23, SAG - 12, y - 23)
                 # Weekday headers
                 c.setFillColor(acik)
-                c.setFont("DejaVu-Bold", 7)
+                c.setFont("DejaVu-Bold", 8)
                 for hafta_i in range(7):
                     c.drawCentredString(SOL + 8 + hafta_i * HUCRE_W, y - 33, HAFTALAR[hafta_i])
                 # Cells
@@ -2450,13 +2451,13 @@ def _generate_natal_pdf(motor):
                         c.setFillColor(renk)
                         c.roundRect(cx, cy + 2, HUCRE_W - 4, HUCRE_H - 4, 3, fill=1, stroke=0)
                         c.setFillColor(HexColor('#12121A'))
-                        c.setFont("DejaVu-Bold", 8)
+                        c.setFont("DejaVu-Bold", 9)
                     else:
                         c.setStrokeColor(HexColor('#3A3A42'))
                         c.setLineWidth(0.5)
                         c.roundRect(cx, cy + 2, HUCRE_W - 4, HUCRE_H - 4, 3, fill=0, stroke=1)
                         c.setFillColor(acik)
-                        c.setFont("DejaVu", 8)
+                        c.setFont("DejaVu", 9)
                     c.drawCentredString(cx + (HUCRE_W - 4) / 2, cy + 8.5, str(gd.day))
                     col += 1
                     if col == 7:
@@ -2465,23 +2466,22 @@ def _generate_natal_pdf(motor):
                 if _onemli_bilgi:
                     ly = y - 46 - satir_sayisi * HUCRE_H - 2
                     c.setFillColor(bordo)
-                    c.setFont("DejaVu-Bold", 8)
+                    c.setFont("DejaVu-Bold", 9)
                     c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(_onemli_bilgi) + _gizli_onemli})")
                     for gd, _iy, _satir_h in _onemli_bilgi:
                         p_entry = gun_verileri[gd]
                         ly -= _satir_h
                         c.setFillColor(koyu)
-                        c.setFont("DejaVu-Bold", 7.5)
+                        c.setFont("DejaVu-Bold", 8.5)
                         c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}")
                         c.setFillColor(acik)
-                        c.setFont("DejaVu", 7)
-                        # Yazıya göre sarılıp çiz (taşma önlenir)
-                        metin_yaz(SOL + 118, ly, _iy, "DejaVu", 7, acik, 72)
+                        c.setFont("DejaVu", 8.5)
+                        # Yazıya göre sarılıp çiz (taşma önlenir, tam cümle)
+                        metin_yaz(SOL + 118, ly, _iy, "DejaVu", 8.5, acik, 72)
                     if _gizli_onemli:
-                        ly -= 13
                         c.setFillColor(gri)
-                        c.setFont("DejaVu-Oblique", 7)
-                        c.drawString(SOL + 118, ly, pdf_label(f"... ve {_gizli_onemli} gün daha (tam liste uygulamada)"))
+                        c.setFont("DejaVu-Oblique", 8)
+                        c.drawCentredString((SOL + SAG) / 2, (y - grid_h) + 17, pdf_label(f"... ve {_gizli_onemli} gün daha (tam liste uygulamada)"))
                 y -= grid_h + 12
 
     # ═══════════════════════════════════════════
