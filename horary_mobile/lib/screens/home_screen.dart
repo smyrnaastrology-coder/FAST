@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.cormorantGaramond(
                     fontSize: 28, fontWeight: FontWeight.w700,
-                    color: const Color(0xFF3D2E50), height: 1.2,
+                    color: FastTheme.text, height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),

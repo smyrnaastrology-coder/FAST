@@ -62,7 +62,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      const Icon(Icons.error_outline, size: 64, color: FastTheme.error),
                       const SizedBox(height: 16),
                       Text(l10n.errorTitle, style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 8),
@@ -837,7 +837,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             Row(
               children: [
                 SizedBox(width: 130, child: Text(labels[cat]!, style: const TextStyle(fontSize: 12))),
-                Expanded(child: LinearProgressIndicator(value: score / 100, backgroundColor: Colors.grey[200], color: colors[cat])),
+                Expanded(child: LinearProgressIndicator(value: score / 100, backgroundColor: FastTheme.border, color: colors[cat])),
                 SizedBox(width: 30, child: Text('${score.toInt()}%', style: const TextStyle(fontSize: 11))),
               ],
             ),
@@ -941,8 +941,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   child: Text(l10n.downloadPdfButton(widget.request.modLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: FastTheme.accent,
-                  foregroundColor: Colors.white,
+                  backgroundColor: FastTheme.accentGold,
+                  foregroundColor: FastTheme.bg,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 4,
                 ),

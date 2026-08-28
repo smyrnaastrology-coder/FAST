@@ -34,7 +34,7 @@ class CompositeChart extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: maxVal > 0 ? e.value / maxVal : 0,
                         minHeight: 14,
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: FastTheme.border,
                         valueColor: AlwaysStoppedAnimation(
                           e.value >= 0 ? FastTheme.primary : FastTheme.rose,
                         ),

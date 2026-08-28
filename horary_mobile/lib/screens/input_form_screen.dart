@@ -313,8 +313,6 @@ class _InputFormScreenState extends State<InputFormScreen> {
                 onPressed: _submit,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: FastTheme.primary,
-                  foregroundColor: Colors.white,
                 ),
                 child: Text(l10n.analyzerStart),
               ),
