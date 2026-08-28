@@ -418,11 +418,13 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
                 elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
                 elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
-                base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} . Mesafe yaklaşık {loc.get('distance','')} . Harita onu {loc.get('house')}.evle gösteriyor."
+                base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe yaklaşık {loc.get('distance','')}. Harita onu {loc.get('house')}.evle gösteriyor — {loc.get('place','')} alanı, {qs} {engine_json.get('quesited_sign','')} burcunda Ev{loc.get('house')}’de duruyor."
                 if loc.get('saturn_second'):
-                    base_txt += f" İkinci gösterge (doğal baba Satürn): {loc.get('saturn_second')}."
+                    base_txt += f" İkinci gösterge Satürn de {loc.get('saturn_second')} — baba figürü için çift teyit."
+                # teknikler geri: yön + ev anlamı + gezegen evi insanca
+                base_txt += f" Yön {loc.get('direction','')} , ev {loc.get('house')} ev konuları aktif."
                 return base_txt
-            return f"Aradığın şey şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde duruyor — ev {loc.get('house','')} . Mesafe yaklaşık {loc.get('distance','')} ."
+            return f"Aradığın şey şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe yaklaşık {loc.get('distance','')}. {qs} {engine_json.get('quesited_sign','')} burcunda, ev {loc.get('house')}’de — kayıp/aranan orada duruyor."
         if is_thought:
             q_data = engine_json.get("quesited_sign","")
             return {"tr":f"{qs} {q_data} burcunda, ev {loc.get('house',7)} — seni düşünüyor mu diye bakınca {q}-{qs} arası {perf.get(chr(34)+'type'+chr(34),chr(34)+'yok'+chr(34))} var. {long_explain()} Biraz daha net sorarsan (ör: 'beni özlüyor mu?') daha keskin söylerim.", "en":f"Thought","es":"","ar":""}[lang]
