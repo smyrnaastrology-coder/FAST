@@ -213,11 +213,17 @@ async def cast(req: CastRequest):
         use_data = res['querent']['data'] if is_self else res['quesited']['data']
         actual_house = use_data['house']
         from engine.location_engine import house_location_meaning
+        from engine.location_engine import height_by_sign, ELEMENT, ELEMENT_KALITE, burc_yer_detay, BURC_YER_DETAY
         loc_info = {
             "direction": direction_by_house(actual_house),
             "house": actual_house,
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
             "place": house_location_meaning(actual_house),
+            "height": height_by_sign(use_data['sign']),
+            "element_kalite": ELEMENT_KALITE.get(ELEMENT.get(use_data['sign'],''),''),
+            "burc_detail": burc_yer_detay(use_data['sign']),
+            "sign": use_data['sign'],
+            "deg": round(use_data['deg'],1),
             "center": f"{req.lat},{req.lon} merkezine gore"
         }
     except: pass
