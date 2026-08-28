@@ -2338,16 +2338,20 @@ def _generate_natal_pdf(motor):
         yeni_sayfa()
         c.bookmarkPage("bolum_minor")
         y = sayfa_basligi(pdf_label("6 Aylık Minor Progress — Gün Gün"), numara=str(bolum_no[0]))
-        c.setFont("DejaVu", 8.5)
-        c.setFillColor(acik)
-        c.drawString(SOL, y, pdf_label("İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir."))
-        y -= 14
-        c.setFillColor(HexColor('#8FC0E8'))
-        c.drawString(SOL, y, pdf_label("■ Uyumlu açı (Trigon · Sekstil) · "))
-        c.setFillColor(HexColor('#D08A96'))
-        c.drawString(SOL + 150, y, pdf_label("■ Zorlayıcı açı (Kare · Karşıt) · "))
-        c.setFillColor(acik)
-        c.drawString(SOL + 330, y, pdf_label("□ Açı yoğunluğu düşük"))
+        y = metin_yaz(SOL, y, pdf_label("İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir."), "DejaVu", 8.5, acik, 95) - 14
+        _leg_x = SOL
+        for _renk, _leg_metin in (
+            (HexColor('#8FC0E8'), pdf_label("■ Uyumlu açı (Trigon · Sekstil) · ")),
+            (HexColor('#D08A96'), pdf_label("■ Zorlayıcı açı (Kare · Karşıt) · ")),
+            (acik, pdf_label("□ Açı yoğunluğu düşük")),
+        ):
+            _leg_w = c.stringWidth(_leg_metin, "DejaVu", 8.5)
+            if _leg_x + _leg_w > SAG - 6:
+                y -= 12
+                _leg_x = SOL
+            c.setFillColor(_renk)
+            c.drawString(_leg_x, y, _leg_metin)
+            _leg_x += _leg_w + 12
         y -= 16
 
         import datetime as _dt_mod
@@ -2471,13 +2475,17 @@ def _generate_natal_pdf(motor):
                     for gd, _iy, _satir_h in _onemli_bilgi:
                         p_entry = gun_verileri[gd]
                         ly -= _satir_h
+                        _label = f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}"
                         c.setFillColor(koyu)
                         c.setFont("DejaVu-Bold", 8.5)
-                        c.drawString(SOL + 16, ly, f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}")
+                        c.drawString(SOL + 16, ly, _label)
+                        _x_desc = SOL + 118
+                        if SOL + 16 + c.stringWidth(_label, "DejaVu-Bold", 8.5) + 8 > _x_desc:
+                            _x_desc = SOL + 16 + c.stringWidth(_label, "DejaVu-Bold", 8.5) + 8
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 8.5)
                         # Yazıya göre sarılıp çiz (taşma önlenir, tam cümle)
-                        metin_yaz(SOL + 118, ly, _iy, "DejaVu", 8.5, acik, 72)
+                        metin_yaz(_x_desc, ly, _iy, "DejaVu", 8.5, acik, 72)
                     if _gizli_onemli:
                         c.setFillColor(gri)
                         c.setFont("DejaVu-Oblique", 8)
@@ -2513,10 +2521,16 @@ def _generate_natal_pdf(motor):
                     "Pasión y Aventura, Crisis y Transformación. ") if _ES else pdf_label("Her şehir 4 temel skorla değerlendirilir: Para & Bolluk, Huzur & İç Sakinlik, Tutku & Macera, Kriz & Dönüşüm. "))) +
                   (("The top 10 cities in each category by score represent the points where your energies resonate most powerfully on Earth." if _EN else
                     ("Las 10 ciudades con mayor puntuación en cada categoría representan los puntos donde tus energías resuenan con mayor fuerza sobre la Tierra." if _ES else "Her kategoride en yüksek skorlu ilk 10 şehir, enerjilerinizin dünya üzerinde en güçlü rezonans kurduğu noktaları temsil eder."))))
-        teknik_h = 24 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 12
+        teknik_h = 27 + yazi_olcul(teknik, "DejaVu", 7.5, 90) + 14
+        if y - teknik_h < SAYFA_ALT:
+            yeni_sayfa()
+            y = sayfa_basligi(pdf_label("Global Kader Pusulası") + (" (devam)" if not _EN and not _ES else (" (continuación)" if _ES else " (continued)")), numara=str(bolum_no[0]))
         kart_ciz(SOL, y - teknik_h, SAG - SOL, teknik_h, pdf_label("Hesaplama Tekniği"), "🔮")
-        metin_yaz(SOL + 14, y - teknik_h + 22, teknik, "DejaVu", 7.5, acik, 90)
-        y -= teknik_h + 12
+        _tek_son = metin_yaz(SOL + 14, y - 27, teknik, "DejaVu", 7.5, acik, 90)
+        if _tek_son < y - teknik_h:
+            y = _tek_son - 12
+        else:
+            y -= teknik_h + 12
         SIM_KAT_PDF = [
             ("para", "⚖", pdf_label("Para & Bolluk")),
             ("huzur", "✦", pdf_label("Huzur & İç Sakinlik")),
