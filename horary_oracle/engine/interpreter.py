@@ -199,6 +199,15 @@ A: ASC 02° Aquarius → Brazil Saturn 15° Libra exalted 9th, Argentina Sun 23�
 Q: Will I Get a Good Yearly Review? (Cuperman 7 Feb 2012 18:37 Herzliya 5 Virgo Mercury cazimi)
 A: ASC 05° Virgo → querent Mercury 18° Aquarius cazimi Sun 18° Aquarius 6th (in heart, wondrous strong) conjunct Sun = fortified by king, quesited 10th Gemini ruler Mercury same significator? Job/Review 10th ruler Mercury cazimi dignified; Moon 05° Leo 12th applies trine Mercury perfection with Sun reception. Cazimi overcomes 6th house weakness. Verdict YES excellent review.
 
+Q: Will the operation be successful? (Goldstein-Jacobson Simplified Horary Fig.22 - Hernia 15 Dec 1949 09:00 PST 118:15W 34:03N)
+A: ASC 20° Pisces → patient Saturn 15° Sagittarius angular 8th (same houses Virgo/Pisces), surgeon 8th Cancer ruler Moon 01° Cancer 4th, hospital 12th Gemini ruler Mercury 09° Leo; Mercury (surgeon) and Saturn (patient) in mutual reception (Mercury Cancer Sun exalted/detriment Leo? Moon Cancer). Surgery Part (C) 17° Capricorn exact square Neptune 17° Libra (anesthesia; Moon's last planet passed = already sedated). 1st lord in 8th + reception 8th lord, surgery-Mars conjunct 1st lord, Fortune in Scorpio 8th sextile ASC, (C) only applying aspect exact. Verdict YES - surgeon-patient mutual reception = successful surgery; Moon VOC = no complications, fast recovery (hernia confirmed by 1st lord Virgo semisextile Neptune).
+
+Q: Should the operation be done? (Goldstein-Jacobson - surgery judgment rules)
+A: Rule set: NO if Sun or Moon is in the sign ruling the body part to be operated, or Moon in bad aspect to Sun/Saturn, or Moon entering Mars quincunx (post-op fever/bleeding), or ASC/lord/1st-8th planet/Sun/Moon/Mars at critical degree or afflicted by bad fixed star, or any afflicting the Death Part (D); if horary Mars same sign as natal Moon operate on that part especially Moon combust Sun + bad aspect Mars = fatal. YES if Sun/Moon not in body-part sign, Moon increasing in light with good aspect Venus/Jupiter and not bad to Saturn/Mars, or 8th house strong by sign + well aspected to its lord and querent lord, or Moon separating good aspect from Mars without ending all aspects badly to patient lord/1-8-4 malefic.
+
+Q: Will the patient recover? (Goldstein-Jacobson - sickness/life rules)
+A: Check 1st/6th ruler cross: 6th lord + body part by sign, quincunx is the distinctive illness aspect, square/semisquare/sequisquare/opposition = severity; Saturn chronic/Mars acute/Mercury contagious/Sun constitutional; Saturn always a significator in illness. Death (D) Part = ASC+8th cusp-Moon. Ruler of 1st or Moon afflicted to 8th/(D) = death risk, but querent death NEVER shown. Recovery: 1st lord disposits 8th lord, or Moon/6th lord separating 8th lord then applying good to Sun in 1st/7th/10th, or Jupiter conjunct/good to 6th lord and Sun/Moon not afflicted.
+
 Engine JSON:
 {json}
 """

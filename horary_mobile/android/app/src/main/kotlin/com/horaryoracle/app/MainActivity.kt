@@ -1,4 +1,4 @@
-package com.fastastrology.fast
+package com.horaryoracle.app
 
 import io.flutter.embedding.android.FlutterActivity
 

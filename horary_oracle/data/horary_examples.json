@@ -1278,5 +1278,43 @@
       "hayz"
     ],
     "explanation": "Hayz dogumda onemli horaryde ignore edilebilir"
+  },
+  {
+    "id": "GJ-01",
+    "source": "Goldstein-Jacobson",
+    "question": "Will the operation be successful? (Hernia, 15 Dec 1949 09:00 PST 118:15W 34:03N)",
+    "technique": "surgery_success",
+    "verdict": "YES",
+    "tags": [
+      "gj_surgery",
+      "lot_surgery"
+    ],
+    "explanation": "Patient Saturn angular 8th, surgeon Mercury 8th ruler in mutual reception with patient lord, Surgery Part (C) 17 Capricorn exact square Neptune (anesthesia, Moon last passed), Fortune Scorpio 8th sextile ASC strong, Moon VOC = no complications; 1st lord in 8th + reception 8th lord = successful surgery, fast uncomplicated recovery"
+  },
+  {
+    "id": "GJ-02",
+    "source": "Goldstein-Jacobson",
+    "question": "Ameliyat riskli mi / yapilmali mi? (surgery NO rule set)",
+    "technique": "surgery_no_conditions",
+    "verdict": "NO",
+    "tags": [
+      "gj_surgery",
+      "gj_death_lot_risk"
+    ],
+    "explanation": "NO if Sun/Moon in sign ruling operation site, Moon bad aspect Sun/Saturn, Moon entering Mars quincunx (post-op fever/bleeding), ASC/lord/1-8 planet/Sun/Moon/Mars critical degree or afflicting Death Part (D), horary Mars same sign as natal Moon; YES if Sun/Moon not in site sign, Moon increasing light good to Venus/Jupiter not bad Saturn/Mars, or 8th strong by sign well aspected"
+  },
+  {
+    "id": "GJ-03",
+    "source": "Goldstein-Jacobson",
+    "question": "Will the patient recover? (sickness/life rules)",
+    "technique": "health_prognosis",
+    "verdict": "YES",
+    "tags": [
+      "gj_sick_cross",
+      "gj_saturn_serious",
+      "lot_sickness",
+      "lot_death"
+    ],
+    "explanation": "1st/6th ruler cross + sign body part localizes illness, Saturn chronic/Mars acute/Mercury contagious; recovery: 1st lord disposits 8th lord, or Moon/6th lord separating 8th lord applying good to Sun 1/7/10, or Jupiter conjunct/good 6th lord; querent death NEVER shown even when Death Part afflicted"
   }
 ]

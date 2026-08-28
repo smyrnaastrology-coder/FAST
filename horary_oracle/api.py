@@ -61,7 +61,13 @@ def cached_chart(y, m, d, utc_dec, lat, lon, qtype):
 def resolve_time(req: CastRequest):
     if req.year and req.month and req.day and req.hour is not None:
         y, mo, da, local_dec = req.year, req.month, req.day, req.hour
-        off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, local_dec)
+        # Tarihsel (<1900) için modern tzdb anachronistic -> LMT kullan (lon/15)
+        if y < 1900:
+            off = round(req.lon / 15.0, 2)
+            # Londra için LMT ~0, hassas: lon/15
+            tzname = "LMT"
+        else:
+            off, tzname = otomatik_utc_offset(req.lat, req.lon, y, mo, da, local_dec)
         utc_dec = local_dec - off
         # gün sarkması düzeltmesi (gece 00:30 local -> utc önceki gün)
         if utc_dec < 0:
@@ -111,19 +117,23 @@ async def admin_page():
 @app.get("/admin/list")
 async def admin_list(key: str = ""):
     import os, json
-    # Gecici: key kontrol kapali (forbidden cozulene kadar acik)
+    admin_key = os.getenv("ADMIN_KEY", "")
+    # Env set ise key zorunlu, yoksa geçici açık (ama logla)
+    if admin_key and key != admin_key:
+        raise HTTPException(403, "forbidden: admin key required")
+    db_path = os.path.join(os.path.dirname(__file__), "users.json")
+    if os.path.exists(db_path):
+        return json.load(open(db_path,encoding='utf-8'))
     if os.path.exists("horary_oracle/users.json"):
         return json.load(open("horary_oracle/users.json",encoding='utf-8'))
     return {}
-    import json
-    if not os.path.exists("horary_oracle/users.json"): return {}
-    return json.load(open("horary_oracle/users.json",encoding='utf-8'))
 
 @app.post("/admin/create")
 async def admin_create(email: str, key: str = ""):
     import os
-    # Gecici acik - forbidden kaldirildi
-    _ = key
+    admin_key = os.getenv("ADMIN_KEY", "")
+    if admin_key and key != admin_key:
+        raise HTTPException(403, "forbidden: admin key required")
     from auth import create_user
     pwd = create_user(email)
     return {"email":email, "password":pwd, "expiry": "1 yil"}
@@ -158,9 +168,10 @@ async def cast(req: CastRequest):
     if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber","nasilsin"]):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
+    # Follow-up ise bu guard atlanır (açıklama isteniyor)
     horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu"]
     is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
-    if not is_horary and len(qlow.split()) < 12:
+    if not is_followup and not is_horary and len(qlow.split()) < 12:
         # sohbet modu - öneri sun
         if any(k in qlow for k in ["teşekkür","sağol","sagol","eyvallah","tamam","anladım","anladim","haklısın","haklisin"]):
             return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Rica ederim, ne demek! Aklına başka bir soru düşerse buradayım — tek ve net sorarsan harita daha keskin konuşur. Örn: 'o iş olacak mı?' gibi.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}

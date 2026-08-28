@@ -34,10 +34,13 @@ for r in rows:
     h,mn=map(int,r["time"].split(":"))
     dec=h+mn/60
     lat=float(r["lat"]); lon=float(r["lon"])
-    # JD/UTC fix: local -> UTC (London 1640'larda ~0 ama genele uyumlu)
-    try:
-        off, _ = otomatik_utc_offset(lat, lon, y, m, da, dec)
-    except: off = round(lon/15)
+    # JD/UTC fix: <1900 için LMT (lon/15), yoksa tzdb
+    if y < 1900:
+        off = round(lon/15, 2)
+    else:
+        try:
+            off, _ = otomatik_utc_offset(lat, lon, y, m, da, dec)
+        except: off = round(lon/15, 2)
     utc_dec = dec - off
     qtype = guess_quesited(r["question"])
     res=cast_horary_chart(y,m,da,utc_dec,lat,lon,qtype)

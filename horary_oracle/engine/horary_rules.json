@@ -990,5 +990,93 @@
     "antiscia": "0 Oglak-0 Yengec aynasi, derece+antiscia=30, sadece kavusum/karsit, gizlilik tasir, olum/hamilelikte kullanma, cusp duserse o evle ilgileniyor",
     "fixed_stars": "Algol kafa kaybi, Alcyone aglama/Pleiades gorme, Aldebaran yeni dongu pozitif baslangic, Regulus maddi basari, Vindemiatrix dul/ayrilik, Spica koruyucu mutlu, Antares kapanis/son, digerleri (Bellatrix savasci) baglama gore",
     "minor": "Dogu Gunes oncesi gorunur daha belirgin, hayz gunduz/gece burçta ve dunya ustunde, enlem kuzey yuksek parlak, lame/topal dereceler modasi gecmis - ignore"
+  },
+  "goldstein_arabic_parts": {
+    "note": "Goldstein-Jacobson Turetilmis Noktalar (ilk kez S/M/C/D/P/L/W) - tamamlayici arap noktalari",
+    "S_sickness": {
+      "formula": "ASC + Mars - Saturn",
+      "name": "Hastalik Noktasi (S)",
+      "meaning": "Hastaligi lokalize eder; zihin-ikizler dekanatinda burakti ise zihinsel rahatsizlik; (S) ile kare = hastalik teyidi, klinik degil"
+    },
+    "M_marriage": {
+      "formula": "ASC + DSC - Venus",
+      "name": "Evlilik Noktasi (M)",
+      "meaning": "7. ev evlilik sorularinda; Ay karesi (M) = evlilikte engeller"
+    },
+    "C_surgery": {
+      "formula": "ASC + Saturn - Mars",
+      "name": "Cerrahi / Kesme Noktasi (C)",
+      "meaning": "Ameliyat/cerrahi noktasi; (C) 8/1/4de etkilenmemeli, Yükselenle ucgen veya 1.evde olumlu, Mars/Saturn/Ay'a kotu acida olmamali; etkilenmemis ve sadece iyi acilar yapiyorsa Ay ile kavusumda = basarili ameliyat"
+    },
+    "D_death": {
+      "formula": "ASC + 8.cusp - Moon",
+      "name": "Olum Noktasi (D)",
+      "meaning": "Olumle ilgili sagligi degil; 1. ev yoneticisi veya Ay (D) ile kotu/yakin acida = olum riski, siddetli"
+    },
+    "P_danger": {
+      "formula": "ASC + 8.ruler - Saturn",
+      "name": "Tehlike Noktasi (P)",
+      "meaning": "Tehlike noktasi; 8.evde Oglak her zaman (P) Yükselenle kavusur, etkilenmisse tehlikeli; (P) bir kotuculle kavusum ve Yükselen/yoneticisine kotu acida = tehlikede; 1.evde herhangi bir kotucullu Ay = tehlike sinyali"
+    },
+    "L_legalization": {
+      "formula": "9.cusp + 3.cusp - Venus",
+      "name": "Yasallastirma Noktasi (L)",
+      "meaning": "9. ev resmi/ritual/yasal onay - evlilik sertifikasi dahil; 1. ev yoneticisi 9. yoneticisine/9.ev gezegenine ve (L)'ye aci yapmali; evlilikte Dununler (W) ile ayni"
+    },
+    "W_wedding": {
+      "formula": "9.cusp + 3.cusp - Venus",
+      "name": "Dugunler Noktasi (W)",
+      "meaning": "Evlilikte (L) ile ayni formül; Ay (W)'ye kare = dugunu/toren ritüelini reddetmek/geciktirmek"
+    }
+  },
+  "goldstein_health": {
+    "note": "Goldstein-Jacobson hastalik kurallari (emed hasta bölümleri 189-199, 226-243)",
+    "diagnosis": "6. ev yoneticisi hastaligi burcun yonettigi vucut bolgesine tasir; gezegen dogasi kronik/akut/sakatlayici; 6.evdeki gezegen tedaviye yardimci/engeleller; Guney Dagumu her zaman hastalik haritalarinda - 1/6 evde veya yoneticileriyle/kotuculle/Yükselenle ayni derecede ise patolojik",
+    "illness_aspect": "6. yonetici ile 1. yonetici (Ay/Saturn/Mars/Merkur) arasinda ONEMLI yon QUINCUNX'tir (Yükselen-6.cusp dogal mesafesi); kare/yari-kare/sekare/karsit = hastaligin siddeti; Saturn kronik, Mars akut, Merkur bulasici, Gunes anayasal/organik, Ay islevsel",
+    "severity": "CIDDI anahtar kelime Saturn'e aittir: 1. ev yoneticisi Saturn'e kotu acida (kavusum dahil) ise konu gercekten ciddi; hastalik sorularinda Saturn her zaman gostergelerden biridir; 6/1 yoneticileri ve Ay kotucullere kotu acida ise CidDA hastalik",
+    "cancer": "Yengec ve Balik burclari, Neptun/Saturn/Mars gezegenleri ve kare/karsit acilar, 1 ve 6 ev yoneticileri kotu acida ve ayni anda belirginse kanser dusunulur",
+    "progression_worsening": "Ay isikta artiyor ve 1.cusp/yoneticisi/1.ev gezegenine veya 6.cusp/yoneticisine/6.evdaki kotucule kotu acida ise semptomlar artar, hasta iyilesmeden once kotulesir",
+    "cure_possible": "Tedavi edilebilir: Uranüs 1/6 yoneticisine kotu acida degilse veya Merkur/iyicil 1/6da kotuculden etkilenmemisse, 1/6 yoneticisi düsusta/zararli degilse",
+    "recovery_signs": "Iyilesir: 1. ev yoneticisi 8. yoneticisini yerlesirse; veya Ay/6.yonetici 8.yoneticisinden ayrilip hemen 1/7/10/1deki Günese iyi acida basvurursa; veya Jupiter 6.yoneticisiyle kavusumda/iyi acida ve Gunes/Ay kotucullerle kotu acida degilse; Jupiter/Venus/Gunes/Ay 1.evde ve 8.yoneticisiyle kotu acida degilse; Ay 10.evde kotucullerle ve Gunesle iyi acida ise; Ay kendi burcu Yengeçte veya Jupiter/Venus burcunda ve onlarla iyi acida ise",
+    "recovery_time": "1 veya 6 yoneticisi veya Ay (son dorduncu ev yoneticisine en yakin aci yapan) icine bakilir: Oncu burcta gun, Ortak burcta hafta, Sabit burcta ay; acigi tamamlamak icin gereken derece sayisi kadar birim",
+    "death_warning": "1. ev yoneticisi veya Ay 8. ev/yoneticisine/kotuculune veya (D) Olum Noktasina sikintiliysa; 1. ev yoneticisi Saturn ile kavusumda veya (D) ile kotu acida ise risk; sorgulayanin olumu ASLA gosterilmez",
+    "chronic_duration": "6. ev yoneticisi düsus burcunda 8.evde, geri gidiyorsa, Gunesle kavusumda veya kotuculden etkileniyorsa hastalik omur boyu; 6.yonetici Sabit burcta ise daha sakatlayici; 1 ve 6 yoneticileri kavusum/kare ve ikisi de köşe ise tedavi edilemez",
+    "mercury_benefic_care": "Merkur ve iyicil bakim/tedavi ile ilgili - burc olarak güclu ve 1/6 yoneticisiyle iyi acida veya karsilikli kabulde ise bakim faydali; peregrine ise amacsiz"
+  },
+  "goldstein_surgery": {
+    "note": "Goldstein-Jacobson ameliyat kurallari (238-239)",
+    "houses": "6. ev dis hekimi/kiropraktör/sifaci, 7. ev doktor/hekim, 8. ev cerrah (kesme, olum) - büyük/kucuk yaralanma yonetimi",
+    "success": "Cerrah-8. yoneticisi hasta-1. yoneticisine iyi acida ise ve ameliyathan-8 yoneticisi ile hasta yoneticisi karsilikli kabulde ise ameliyat basarili",
+    "failure": "Cerrah-8. yoneticisi hasta-1. yoneticisine kotu acida ise cerrah hasta yardim edemez, ameliyat ise yaramaz",
+    "no_surgery_conditions": "Gunes veya Ay ameliyat edilecek vucut bolgesini yoneten burcta ise; Ay Gunes/Saturn/Mars ile kotu acida ise; Ay Mars kinquincunx'unda ise (post-op ates/kanama); Yükselen/yoneticisi/1.8/8.ev gezegeni veya Gunes/Ay/Mars kritik veya kotu sabit yildizla veya (D) Olum Noktasini etkiliyorsa HAYIR",
+    "natal_mars_moon": "Mars saatlik haritada natal Ay ile ayni burçtaysa o vucut bolgesinde islem yapma; ozellikle saatlik Ay Gunes ile yanik ve Mars ile kotu acida ise oldurucu olabilir",
+    "yes_surgery": "Gunes/Ay bolge burcunda degilse ve Ay isikta artiyorsa, Venus/Jupiterle iyi acida ve Saturn/Mars'a kotu acida degilse; veya 8.ev burc olarak guclu ve yoneticisine ve danisan yoneticisine iyi acida ise; veya Ay Mars'a iyi acida ve tum acilarini hasta yoneticisine/1/8/4deki kotucul-ev'e kotu acida sonlandirmiyorsa EVET",
+    "c_part": "Cerrahi (C) 8/1/4de etkilenmemeli, Yükselene ucgen veya 1.evde olumlu, Mars/Saturn/Ay'a kotu acida olmamali - etkilenmemisse ve sadece iyi acilar yapiyorsa Ay ile kavusumda basarili",
+    "anesthesia": "Neptun en yakin acidaki anestezi turunu gosterir; Mars'Ay arasi aci operasyonu ifsa eder",
+    "election": "Seçim haritasi: Ay/ASC ameliyat bolgesini yoneten burcta olmayacak, o burc 8/12 evde olmayacak; Jupiter/Venus 1/10da, Ay 1.cusp ve natal ASC yoneticisine iyi acida"
+  },
+  "goldstein_affliction": {
+    "note": "Goldstein-Jacobson Sikinti Acisi - yonettigi gezegenden alti ev sonra gelen GEOZEGEN o evin islerini sıkıntıya sokar/alt ust eder",
+    "rule": "1. ev yoneticisinin 6.evde olmasi sikinti; herhangi bir gezegen yonettigi evden 6 ev sonra = o evin islerini bozar (ornek 4. yonetici 4+6=10.evde = aileyi uzar/ev rutinini bozar)",
+    "death_application": "1. evdeki 8. ev yoneticisi (8. evden 6 ev sonrasi 2.ev degil, ev sahibinin yonettigi evden 6 sonra) intihar turu gibi rutin olum bicimini bozar"
+  },
+  "goldstein_practical": {
+    "note": "Goldstein-Jacobson pratik evler/uygulamalar - satis/satin alma/issizlik/evlilik secimleri",
+    "sale": "Satici icin Ay isikta artmali ve Jupiter/Venus/Fortuna/2.yonetici ile ucgen/altili aci; Merkur/Ay/2.yonetici burc olarak iyi, Yükselen etkilenmemeli",
+    "purchase": "Alici icin Ay isikta azalmali (daha az oduyor), burcta iyi ve Merkur ile kavusum/iyi acida, Merkur hicbir yerde kotu degil; Ay Merkur 2.yonetici birbirine iyi aci; Merkur/Mars peregrine veya Neptun 2/7de zararli = bozuk mal",
+    "purchase_resale": "Alim-satim: Ay 0 Yengec-30 Yay araliginda daha az oduyor/daha yuksek satiyor; 0 Oglak-30 Ikizler daha cok oduyor/daha dusuk satiyor",
+    "clothes": "Ay Boga/Aslan/Terazi/Yay ve Venus/6.cusp ile iyi aciyken kiyafet al",
+    "marriage_election": "Evlilik secimi: 7/1.cusp Terazi/Boga/Kova/Yay/Balik ve yonetici etkilenmemis/direct/burc güclu; Ay Terazi/Boga'da isikta artmali, etkilenmemis, Venus'e iyi aci; 1-7 yoneticileri kavusum/ucgen/karşılıklı kabul",
+    "job_start": "Is secimi: natal MC Yükselen secilsin, yoneticisi Merkur ve Ay 10/2 yoneticilerine ucgen/altili; kotuculler dusuk evlerde (2/6 degil); henefiler+Fortune kosede; Gunes+Ay ufkun uzerinde",
+    "insurance": "Sigorta 9.ev ve Jupiter; pollicie Merkur; 9/7 yoneticisi Ay/Merkur/1/2 yoneticisi ile kavusum/sekstil/ucgen/reception olmali; yoksa yararlanici degil",
+    "career_rulership": "10.ev Gunes/Jupiter/Saturn/Mars = kendi isi/resmi; Ay = atanan/publika gecici; Venus = isbirligi/hizmet; Merkur = temsilci/satıcı"
+  },
+  "goldstein_electional": {
+    "note": "Goldstein-Jacobson Seçim tablosu kuralari (266-267) - yalnizca seçim/electional sorulari icin",
+    "moon_fixed_asc_fixed": "Girisim yillarca sureceklerse Yükselen ve Ay Sabit burcta; Ortak = degisim sansi; Oncu = aninda ileri hareket",
+    "malefics": "Saturn/S. Dugum asla 1.evde veya 1.yoneticiyle kavusumda; Saturn/Mars guvenli tek kose 10.ev (onur varsa ve soru evini yonetmiyorsa); 12.ev haric Fortune/Talisizlik noktasini 12.evde veya Balik kiyisinda tutma",
+    "moon_publicity": "Tantitim/hizli hareket istenen konularda Ay ufkun ustunde ve isikta artmali; azalirsa/altta yavas hareket",
+    "new_moon_election": "Yeni Ay natal iyicille kavusumda veya iyi acida ise iyi; kotuculle ise kotu; 24 saat yaslanmasi beklenmeli (Gunes yakmasin); 24 Boga Caput Algol ile kullnma",
+    "moon_less_aspects": "Ay ne kadar az aci yaparsa islem o kadar cabuk biter; sadece Fortuna paraleli varsa grafik basarilidir"
   }
 }

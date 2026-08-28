@@ -1,6 +1,11 @@
 import json, os, hashlib, secrets, string
 from datetime import datetime, timedelta
-DB="horary_oracle/users.json"
+# DB yolu: hem root'tan (uvicorn api:app) hem horary_oracle içinden çalıştırılsa doğru
+_BASE = os.path.dirname(__file__)
+DB = os.path.join(_BASE, "users.json")
+# fallback: root/horary_oracle/users.json da olabilir
+if not os.path.exists(DB) and os.path.exists(os.path.join(os.getcwd(), "horary_oracle", "users.json")):
+    DB = os.path.join(os.getcwd(), "horary_oracle", "users.json")
 def _load():
     if not os.path.exists(DB): return {}
     try: return json.load(open(DB,encoding='utf-8'))

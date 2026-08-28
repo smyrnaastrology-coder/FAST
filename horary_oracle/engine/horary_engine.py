@@ -390,23 +390,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         else:
             perfection = {"type": best["type"], "result":"yes", "between": [fast["planet"], slow["planet"]]}
             score += RULES["scoring"]["perfection_yes"]
-            # Reception bonus
-            # fast slow'un asaleti içinde mi veya tersi?
-            # Her iki yön
-            from core.ephemeris import reception_score
-            r1 = reception_score(fast_lon, fast["planet"], slow["planet"])  # hata: reception_score lon,planet,other
-            # Doğru: fast gezegeni slow'un burcunda mı? -> reception_score(fast_lon, slow_planet?)
-            # reception_score(planet_lon, planet_name, other) -> planet other'in burcunda mı?
-            # Biz fast slow'un burcunda mı soruyoruz -> reception_score(fast_lon, slow_planet)
-            # Fonksiyon sign(fast_lon) ruler slow mu diye bakar, o yüzden planet=slow olmalı
-            # Düzelt:
-            r_fast_in_slow = reception_score(fast_lon, slow["planet"], slow["planet"])  # aslında fast_lon slow burcunda mı?
-            # Yukarıdaki logic karışık - ephemeris.reception_score'u doğru kullan: reception_score(lon, other)
-            # ephemeris: essentials(sign) ruler == other ise 5
-            # Yani fast slow'u seviyor mu? fast_lon'un sign ruler'ı slow mu?
-            # O halde: reception_score(fast_lon, slow_planet) doğru
-            r_fast_loves_slow = reception_score(fast_lon, slow["planet"], slow["planet"])
-            # Daha temiz: doğrudan essentials kullan
+            # Reception: mutual reception check - domicile/exaltation
             from core.ephemeris import DOMICILE as DOM, EXALTATION as EX
             sign_fast = sign_from_lon(fast_lon)
             sign_slow = sign_from_lon(slow_lon)
@@ -418,22 +402,23 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 perfection["reception"] = f"{fast['planet']} in {slow['planet']} exaltation (+2)"
             if DOM.get(sign_slow) == fast["planet"]:
                 score += 3
+                if "reception" in perfection:
+                    perfection["reception"] += f" + {slow['planet']} in {fast['planet']} domicile (+3 mutual)"
+                else:
+                    perfection["reception"] = f"{slow['planet']} in {fast['planet']} domicile (+3)"
             elif EX.get(sign_slow) == fast["planet"]:
                 score += 2
 
     # 2) Eğer direkt perfection yoksa translation / collection dene
     if perfection is None or perfection.get("result")=="blocked":
-        # Translation: fast -> mediator -> slow, mediator daha hızlı olmalı
+        # Translation: fast -> mediator -> slow, mediator daha hızlı olmalı (her ikisinden)
         # Collection: slow ve fast ikisi de daha ağır bir gezegene applying
-        # Basitleştirilmiş: 3. bir gezegen fast ve slow ile ayrı ayrı applying açı yapıyorsa
         mediators = []
         for med_name, med_data in planets.items():
             if med_name in (fast["planet"], slow["planet"], "Sun","NorthNode","Uranus","Neptune","Pluto"):
                 continue
-            # med fast'tan ayrılıyor (separating) ve slow'a applying olmalı - Lilly translation
-            # Basit kriter: med hızlıysa ve fast->med separating, med->slow applying
-            # Hız şartı: med fast'tan hızlı olmalı
-            if abs(med_data["speed"]) <= abs(fast_speed):
+            # Hız şartı: mediator hem fast hem slow'dan hızlı olmalı (Lilly)
+            if abs(med_data["speed"]) <= abs(fast_speed) or abs(med_data["speed"]) <= abs(slow_speed):
                 continue
             # fast->med separating? fast med'i geçmiş mi?
             # separating: d_next > d (uzaklaşıyor)
@@ -676,6 +661,22 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         dsc = (asc+180)%360
         lots["marriage"] = (asc + dsc - ven_lon) % 360
         lots["divorce"] = (asc + dsc - planets["Mars"]["lon"]) % 360
+        # --- Goldstein-Jacobson tamamlayici Arap Noktalari (S/C/D/P/L/W) ---
+        try:
+            mar_lon = planets["Mars"]["lon"]; sat_lon2 = planets["Saturn"]["lon"]
+            lots["sickness"] = (asc + mar_lon - sat_lon2) % 360                  # S = ASC+Mars-Saturn
+            lots["surgery"] = (asc + sat_lon2 - mar_lon) % 360                   # C = ASC+Saturn-Mars
+            eighth_cusp = houses["cusps"][7] % 360
+            lots["death"] = (asc + eighth_cusp - moon_lon) % 360                 # D = ASC+8.cusp-Moon
+            eighth_sign = sign_from_lon(eighth_cusp)
+            eighth_ruler = DOMICILE.get(eighth_sign, "Mars")
+            eighth_ruler_lon = planets[eighth_ruler]["lon"]
+            lots["danger"] = (asc + eighth_ruler_lon - sat_lon2) % 360           # P = ASC+8.ruler-Saturn
+            ninth_cusp = houses["cusps"][8] % 360
+            third_cusp = houses["cusps"][2] % 360
+            lots["legalization"] = (ninth_cusp + third_cusp - ven_lon) % 360     # L = 9.cusp+3.cusp-Venus
+            lots["wedding"] = lots["legalization"]                               # W = ayni
+        except: pass
         for k,v in lots.items():
             if k=="POF": continue
             strictures.append({"code":f"lot_{k}","level":"info","lon":round(v,1),"sign":sign_from_lon(v),"house":house_of_planet(v, houses["cusps"]),"meaning":f"Lot {k}: {sign_from_lon(v)} {deg_in_sign(v):.1f}°"})
@@ -951,6 +952,70 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 if dom:
                     strictures.append({"code":"lilly_39_pof","level":"info","sign":pof_sign,"ruler":dom,"meaning":f"Aforizma 39: POF {pof_sign} ({dom} yönetiminde) — bu evin kişileri/şeyleri ile sonuca ulaşılır."})
         except: pass
+    except: pass
+
+    # --- Goldstein-Jacobson: Hastalik / Ameliyat acili (health quesited icin) ---
+    try:
+        if quesited_type in ("health",):
+            asc_lon = houses["asc"] % 360
+            q1_ruler = quesited.get("planet", planets.get("Moon",{}).get("name","Moon"))
+            # Sickness lot (S)
+            s_lot = lots.get("sickness")
+            d_lot = lots.get("death")
+            if s_lot is not None:
+                # Ay'in (S)'e yakin/keskin acisi hastalik teyidi
+                moon_s = abs((planets["Moon"]["lon"]-s_lot+180)%360-180)
+                for ang in (0,90,180):
+                    if abs(moon_s-ang) < 6:
+                        strictures.append({"code":"gj_sickness_lot","level":"info","dist":round(moon_s,1),"angle":ang,"meaning":f"Goldstein: Ay (S) Hastalık Noktasına {ang}° açıda ({moon_s:.1f}°) - mevcut hastalığın teyidi/şiddeti ({'klinik değil' if ang==90 else 'belirgin'})."})
+            # Death lot (D) riski - keskin/kotu aci
+            if d_lot is not None:
+                q1_lon = planets.get(q1_ruler,{}).get("lon")
+                if q1_lon:
+                    dq = abs((q1_lon-d_lot+180)%360-180)
+                    dm = abs((planets["Moon"]["lon"]-d_lot+180)%360-180)
+                    for name,dist in (("1.yönetici",dq),("Ay",dm)):
+                        if dist < 6:
+                            strictures.append({"code":"gj_death_lot_risk","level":"warn","dist":round(dist,1),"who":name,"meaning":f"Goldstein: {name} (D) Ölüm Noktasına çok yakın ({dist:.1f}°) - ciddi olumsuz; sorgulayanın ölümü asla gösterilmez, tedavi/umut notu eşliğinde."})
+            # 6-1 yonetici quincunx (hastalik ana acisi) - natal 6.cusp mesafesi
+            sixth_sign = sign_from_lon(houses["cusps"][5]%360)
+            sixth_ruler = DOMICILE.get(sixth_sign,"Mercury")
+            sixth_ruler_lon = planets.get(sixth_ruler,{}).get("lon")
+            if sixth_ruler_lon and q1_ruler in planets:
+                q1_lon2 = planets[q1_ruler]["lon"]
+                d61 = abs((sixth_ruler_lon-q1_lon2+180)%360-180)
+                hard_ang = None
+                for ang in (0,45,90,135,180):
+                    if abs(d61-ang) < 6:
+                        hard_ang = ang; break
+                if hard_ang is not None:
+                    strictures.append({"code":"gj_sick_cross","level":"info","angle":hard_ang,"dist":round(d61,1),"meaning":f"Goldstein: 1.yönetici {q1_ruler} - 6.yönetici {sixth_ruler} arası {hard_ang}° acı ({d61:.1f}°) - hastalığın şiddeti/bölgesi ({sixth_sign} vücut bölgesi). Quincunx (150) ayırt edici; kare/karsit daha şiddetli."})
+                # Saturn ciddiyet anahtari
+                sat_lon_h = planets.get("Saturn",{}).get("lon")
+                if sat_lon_h:
+                    ds = abs((sat_lon_h-q1_lon2+180)%360-180)
+                    if ds < 6:
+                        strictures.append({"code":"gj_saturn_serious","level":"warn","dist":round(ds,1),"meaning":f"Goldstein: 1.yönetici {q1_ruler} Saturn'e yakın ({ds:.1f}°) - CİDDİ. Saturn kronik, Mars akut, Merkur bulaşıcı."})
+            # South Node hastalik haritasinda
+            sn_lon = planets.get("SouthNode",{}).get("lon")
+            if sn_lon:
+                for p in ("Moon","Sun"):
+                    if abs((planets[p]["lon"]-sn_lon+180)%360-180) < 3:
+                        strictures.append({"code":"gj_southnode_sick","level":"info","planet":p,"meaning":f"Goldstein: {p} Güney Düğümüne çok yakın - hastalık haritasında olumsuz (patolojik)."})
+    except: pass
+
+    # --- Goldstein-Jacobson: Ameliyat riskli/olumlu notlari (health + surgery quesited) ---
+    try:
+        if quesited_type in ("health","surgery"):
+            s_lot = lots.get("surgery")
+            if s_lot is not None:
+                s_house = house_of_planet(s_lot, houses["cusps"])
+                s_sign = sign_from_lon(s_lot)
+                aff = (s_house in (8,1,4)) or (s_sign in ("Boğa","Aslan","Akrep","Kova"))
+                if aff:
+                    strictures.append({"code":"gj_surgery_lot_aff","level":"info","house":s_house,"sign":s_sign,"meaning":f"Goldstein: Cerrahi Noktası (C) Ev{s_house} {s_sign} - ameliyat için etkilenmiş (risk/komplikasyon)."})
+                else:
+                    strictures.append({"code":"gj_surgery_lot_ok","level":"info","house":s_house,"sign":s_sign,"meaning":f"Goldstein: Cerrahi Noktası (C) Ev{s_house} {s_sign} - etkilenmemiş, ameliyat uygun."})
     except: pass
 
     # Combust penalty var mı? (yeni kod combustion_*)
