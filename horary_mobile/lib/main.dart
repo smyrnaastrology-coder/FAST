@@ -258,6 +258,12 @@ class _HoraryHomeState extends State<HoraryHome> {
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
           ])),
+          // konum uyarısı
+          Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:2), child: Row(children: const [
+            Icon(Icons.location_on, size:14, color: Color(0xFFfbbf24)),
+            SizedBox(width:6),
+            Text('Soruyu sormadan önce konumunuzu seçin', style: TextStyle(color: Color(0xFFfbbf24), fontSize:11, fontStyle: FontStyle.italic)),
+          ])),
           // kategori seçici (eski soru alanları geri)
           Padding(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
             for(final c in [
