@@ -348,6 +348,14 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Perfection araması
     perfection = None
     score = 0
+    _tr = []
+    import os as _os
+    _DO_TRACE = _os.environ.get("HORARY_TRACE")
+    def _sc(v, label):
+        nonlocal score
+        score = score + v
+        if _DO_TRACE:
+            _tr.append((label, v, score))
     q_lon = querent["data"]["lon"]; q_speed = querent["data"]["speed"]
     qs_lon = quesited["data"]["lon"]; qs_speed = quesited["data"]["speed"]
 
@@ -426,35 +434,35 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 perfection = {"type": best["type"], "result": "yes",
                               "between": [fast["planet"], slow["planet"]],
                               "note": f"{blocker} araya girer ama fast kendi alanında - engeli aştı"}
-                score += RULES["scoring"]["perfection_yes"]
-                score += RULES["scoring"].get("perfection_dominus", 8)
+                _sc(RULES["scoring"]["perfection_yes"], "perfection_yes_dominus")
+                _sc(RULES["scoring"].get("perfection_dominus", 8), "perfection_dominus2")
             else:
                 perfection = {"type": "prohibition", "result": "blocked",
                               "blocker": blocker, "would_be": best["type"],
                               "blocker_angle": blk_ang, "blocker_dist": blk_dist}
-                score += RULES["scoring"]["prohibition_penalty"]
+                _sc(RULES["scoring"]["prohibition_penalty"], "prohibition_penalty")
         else:
             perfection = {"type": best["type"], "result": "yes", "between": [fast["planet"], slow["planet"]]}
-            score += RULES["scoring"]["perfection_yes"]
-            score += RULES["scoring"].get("perfection_dominus", 8)
+            _sc(RULES["scoring"]["perfection_yes"], "perfection_yes")
+            _sc(RULES["scoring"].get("perfection_dominus", 8), "perfection_dominus")
             # Reception: mutual reception check - domicile/exaltation
             from core.ephemeris import DOMICILE as DOM, EXALTATION as EX
             sign_fast = sign_from_lon(fast_lon)
             sign_slow = sign_from_lon(slow_lon)
             if DOM.get(sign_fast) == slow["planet"]:
-                score += 3
+                _sc(3, "perf_recv_fast_dom")
                 perfection["reception"] = f"{fast['planet']} in {slow['planet']} domicile (+3)"
             elif EX.get(sign_fast) == slow["planet"]:
-                score += 2
+                _sc(2, "perf_recv_fast_ex")
                 perfection["reception"] = f"{fast['planet']} in {slow['planet']} exaltation (+2)"
             if DOM.get(sign_slow) == fast["planet"]:
-                score += 3
+                _sc(3, "perf_recv_slow_dom")
                 if "reception" in perfection:
                     perfection["reception"] += f" + {slow['planet']} in {fast['planet']} domicile (+3 mutual)"
                 else:
                     perfection["reception"] = f"{slow['planet']} in {fast['planet']} domicile (+3)"
             elif EX.get(sign_slow) == fast["planet"]:
-                score += 2
+                _sc(2, "perf_recv_slow_ex")
 
     # 2) Eğer direkt perfection yoksa translation dene (kabul ALINMIŞSA = Lilly: reception şart)
     if perfection is None or perfection.get("result")=="blocked":
@@ -489,7 +497,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                     mediators.append((med_name, sep_fm, app_ms))
         if mediators:
             perfection = {"type":"translation_of_light","result":"yes","mediator": mediators[0][0]}
-            score += RULES["scoring"]["perfection_translation"]
+            _sc(RULES["scoring"]["perfection_translation"], "perfection_translation")
 
     # Ay 3 rol + Kalde sıralaması: 1-duygu 2-niyet (evi) 3-gidişat; hızlı yavaş'a gider (Sat-Jup-Mar-Sun-Ven-Mer-Moon)
     try:
@@ -560,24 +568,24 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Final judgement
     if perfection is None:
         perfection = {"type":"none","result":"no"}
-        score += -6
+        _sc(-6, "perfection_none")
 
     # Angularity / Peregrine / Kuşatılma katkıları (2. fix)
     for label, sig in [("querent", querent), ("quesited", quesited)]:
         h = sig["data"]["house"]
         if h in [1,4,7,10]:
-            score += 2
+            _sc(2, f"angularity_{label}")
         elif h in [2,5,8,11]:
-            score += 1
+            _sc(1, f"succedent_{label}")
         else:
-            score -= 1
+            _sc(-1, f"cadent_{label}")
         # peregrine: asaleti yoksa -2
         if not (DOMICILE.get(sig["data"]["sign"])==sig["planet"] or EXALTATION.get(sig["data"]["sign"])==sig["planet"]):
-            score -= 2
+            _sc(-2, f"peregrine_{label}")
         # kuşatılma
         bes = is_besieged(sig["data"]["lon"], planets)
         if bes["besieged"]:
-            score -= 4
+            _sc(-4, f"besieged_{label}")
 
     # --- Klasik güçlü YES: querent<->quesited MUSTERI RESEPTION (restor'dan bağımsız) ---
     # Perfection bulunamasa bile karşılıklı kabul = güçlü YES göstergesi (Lilly).
@@ -589,12 +597,12 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         qs_in_qr = (DOMICILE.get(qr_sign)==qs_name) or (EXALTATION.get(qr_sign)==qs_name)
         if qr_in_qs and qs_in_qr:
             mutual = True
-            score += 6
+            _sc(6, "mutual_reception")
             strictures.append({"code":"mutual_reception","level":"info","meaning":f"KLASIK: {qr_name}({qr_sign}) <-> {qs_name}({qs_sign}) karşılıklı kabul - güçlü YES göstergesi (+6), perfection yokken bile kabul işi sonuca götürür."})
         # Moon da qs ile karşılıklı kabulde ise ek güç
         moon_sign = sign_from_lon(planets["Moon"]["lon"])
         if (DOMICILE.get(qs_sign)=="Moon" or EXALTATION.get(qs_sign)=="Moon") and (DOMICILE.get(moon_sign)==qs_name or EXALTATION.get(moon_sign)==qs_name):
-            score += 3
+            _sc(3, "moon_reception_qs")
             strictures.append({"code":"moon_reception_qs","level":"info","meaning":f"KLASIK: Ay ve quesited ({qs_name}) karşılıklı kabul (+3)."})
     except: pass
 
@@ -608,11 +616,11 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         ml = moon["lon"]; mh = moon["house"]
         # R3: quesited güçlü (kendi alanında)
         if in_dom_ex(ks_name, ks_sign):
-            score += 6
+            _sc(6, "R3_quesited_strong")
             strictures.append({"code":"sig_strong_yes","level":"info","meaning":f"GÜÇLÜ YES: quesited {ks_name} {ks_sign} burcunda (dom/ex) (+6)."})
         # R11: her iki gösterge aynı burçta - iş tek yerde toplanmış
         if kr_sign == ks_sign:
-            score += 8
+            _sc(8, "R11_sign_agreement")
             strictures.append({"code":"sign_agreement_yes","level":"info","meaning":f"GÜÇLÜ YES: querent ve quesited aynı burçta ({kr_sign}) (+8)."})
         # R4: querent<->quesited yumuşak bağlantı (0/60/120, yaklaşan VEYA ayrılan ≤8°)
         # guards: quesited düşüşte değil; Ay sonraki SERT açısı Saturn/Mars'a değil
@@ -636,7 +644,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             if mal_next:
                 break
         if r4 and FALL.get(ks_sign) != ks_name and mal_next is None:
-            score += 8
+            _sc(8, "R4_soft_link")
             strictures.append({"code":"sig_soft_link_yes","level":"info","meaning":f"GÜÇLÜ YES: querent<->quesited yumuşak bağ ({r4[0]}°, {r4[1]:.1f}° {'yaklaşan' if r4[2] else 'ayrılan'}) (+8)."})
         # R5: Ay quesited'e yumuşak YAKLAŞIYOR (≤8°), Ay quesited evinde değil, quesited zararda/düşüşte değil
         mq_app = None; mq_sep = None
@@ -650,12 +658,12 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         qsh = (mh == quesited["data"]["house"])
         r5_fired = False
         if mq_app and not qsh and not in_det_fall(ks_name, ks_sign):
-            score += 8
+            _sc(8, "R5_moon_app_qs")
             r5_fired = True
             strictures.append({"code":"moon_app_quesited_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay quesited'e yumuşak {mq_app[0]}° yaklaşıyor ({mq_app[1]:.1f}°) (+8)."})
         # R6: Ay quesited'ten yumuşak AYRILIYOR (≤8°)
         if mq_sep and not in_det_fall(ks_name, ks_sign):
-            score += 5
+            _sc(5, "R6_moon_sep_qs")
             strictures.append({"code":"moon_sep_quesited_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay quesited'ten yumuşak {mq_sep[0]}° ayrılıyor ({mq_sep[1]:.1f}°) (+5)."})
         # R7: Ay ışık topluyor (qr ikisine de yaklaşıyor, qr ile karşıt değil)
         mqr = None; mqs2 = None
@@ -667,21 +675,77 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             if am2 and dm2 <= 8:
                 mqs2 = (ang, dm2)
         if mqr and mqs2 and mqr[0] != 180:
-            score += 8
+            _sc(8, "R7_collection")
             strictures.append({"code":"moon_collection_yes","level":"info","meaning":f"GÜÇLÜ YES: Ay ışık topluyor ({mqr[0]}°/{mqs2[0]}°) (+8)."})
         # R8: quesited querent'in 1.evinde
         if quesited["data"]["house"] == 1:
-            score += 6
+            _sc(6, "R8_quesited_1st")
             strictures.append({"code":"quesited_1st_yes","level":"info","meaning":f"GÜÇLÜ YES: quesited querent'in 1.evinde (+6)."})
         # R9: querent güçlü (kendi alanında) VE Ay işe karışıyor (R5 ya da direkt perfection)
         perf_direct = (perfection is not None and perfection.get("result") == "yes"
                        and perfection.get("type") != "translation_of_light")
         if in_dom_ex(kr_name, kr_sign) and (perf_direct or r5_fired):
-            score += 5
+            _sc(5, "R9_querent_strong")
             strictures.append({"code":"querent_strong_yes","level":"info","meaning":f"GÜÇLÜ YES: querent {kr_name} kendi alanında ({kr_sign}), Ay işe karışıyor (+5)."})
     except: pass
 
+    # --- v0.13: Klasik tamamlayıcı YES göstergeleri (Lilly) ---
+    try:
+        _SOFT = (0, 60, 120); _MAJ = (0, 60, 90, 120, 180)
+        # R13: Işık Nakli — Ay iki işaretçi arasında aracı (qr'den yumuşak ayrılır + qs'e yaklaşır, VEYA tersi; ≤8°)
+        _m_s = {}; _m_a = {}
+        for _nm, _lon in (("qr", kr_lon), ("qs", ks_lon)):
+            _sa = _aa = None
+            for _ang in _MAJ:
+                _app13, _d13 = aspect_pair(ml, _lon, _ang)
+                if _d13 <= 8:
+                    if _app13:
+                        if _aa is None or _d13 < _aa[1]:
+                            _aa = (_ang, _d13)
+                    else:
+                        if _sa is None or _d13 < _sa[1]:
+                            _sa = (_ang, _d13)
+            _m_s[_nm] = _sa; _m_a[_nm] = _aa
+        if (bool(_m_s["qr"] and _m_s["qr"][0] in _SOFT) and bool(_m_a["qs"])) or \
+           (bool(_m_s["qs"] and _m_s["qs"][0] in _SOFT) and bool(_m_a["qr"])):
+            _sc(10, "R13_moon_translation")
+            strictures.append({"code":"moon_translation_yes","level":"info","meaning":"KLASİK: Ay querent ve quesited işaretçileri arasında ışık naklediyor — aracılık/tamamlama (+10)."})
+        # R14: Ay, quesited'in burcuna (dispositor'unun burcuna) giriyor — iş diğer tarafın alanına geçiyor
+        _seg14 = 30 - (ml % 30)
+        _nxt14 = (int((ml + _seg14) // 30) * 30) % 360
+        if DOMICILE.get(sign_from_lon(_nxt14)) == ks_name:
+            _sc(2, "R14_moon_enters_qs_sign")
+            strictures.append({"code":"moon_enters_quesited_sign","level":"info","meaning":"KLASİK: Ay quesited'in burcuna giriyor — iş diğer tarafın alanına geçmiş durumda (+2)."})
+        # R15: Ay quesited'ten yumuşak AYRILIYOR (≤8°) — ışık harekete geçmiş, sonuçlanır
+        for _ang in _SOFT:
+            _app15, _d15 = aspect_pair(ml, ks_lon, _ang)
+            if _app15 is False and _d15 <= 8:
+                _sc(12, "R15_moon_sep_qs_transit")
+                strictures.append({"code":"moon_sep_soft_transit_yes","level":"info","meaning":"KLASİK: Ay quesited'ten yumuşak ayrılıyor — iş/ışık yola çıkmış, sonuçlanacak (+12)."})
+                break
+        # R16: Ay, GÜÇLÜ (dom/ex) quesited'in burcunun yöneticisine yumuşak yaklaşıyor (60/120, ≤8°)
+        _qss16 = sign_from_lon(ks_lon)
+        _disp16 = DOMICILE.get(_qss16)
+        if _disp16 and _disp16 != "Moon" and _disp16 in planets and in_dom_ex(ks_name, _qss16):
+            for _ang in _SOFT:
+                _app16, _d16 = aspect_pair(ml, planets[_disp16]["lon"], _ang)
+                if _app16 and _d16 <= 8:
+                    _sc(8, "R16_moon_to_strong_qs_disp")
+                    strictures.append({"code":"moon_to_strong_quesited_dispositor","level":"info","meaning":f"KLASİK: Ay, güçlü quesited ({ks_name}) burcunun yöneticisi {_disp16}'e yumuşak yaklaşıyor — iş sağlam elde (+8)."})
+                    break
+        # R17: Hayırlı qr (Venüs/Jüpiter) quesited'i kabul ediyor — querent işi gönül rahatlığıyla alıyor
+        if kr_name in ("Venus", "Jupiter") and \
+           (DOMICILE.get(ks_sign) == kr_name or EXALTATION.get(ks_sign) == kr_name):
+            _sc(2, "R17_benefic_receives_qs")
+            strictures.append({"code":"benefic_receives_quesited","level":"info","meaning":f"KLASİK: {kr_name} (hayırlı) quesited {ks_name}'i evinde/alımlında — querent işi kabul ediyor (+2)."})
+    except: pass
+
     # Threshold
+    if _DO_TRACE:
+        import sys as _sys
+        print("TRACE", quesited_type, "score=", score, file=_sys.stderr)
+        for _t in _tr:
+            print("   ", _t[0], _t[1], "->", _t[2], file=_sys.stderr)
     if score >= RULES["scoring"]["threshold_yes"]:
         verdict = "YES"
     elif score <= RULES["scoring"]["threshold_no"]:
@@ -717,10 +781,10 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                     has_good = any("combustion" not in s["code"] for s in strictures)  # basit
                     if perfection and perfection.get("result")=="yes":
                         strictures.append({"code":"bonatus","level":"info","meaning":"Bonatus: önceki dolunay yöneticisi köşede + iyi açı => %100 olumlu (kötü açıda %50)"})
-                        score += 2
+                        _sc(2, "bonatus_full")
                     else:
                         strictures.append({"code":"bonatus_partial","level":"info","meaning":"Bonatus: önceki dolunay yöneticisi köşede ama açı kötü => %50 olumlu"})
-                        score += 1
+                        _sc(1, "bonatus_partial")
         if next_jd:
             next_moon_sign = sign_from_lon(next_moon_lon)
             next_ruler = DOMICILE.get(next_moon_sign)
@@ -728,7 +792,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 next_ruler_house = planets.get(next_ruler,{}).get("house",0)
                 if next_ruler_house in [1,4,7,10]:
                     strictures.append({"code":"vergilius","level":"info","meaning":"Vergilius: sonraki dolunay yöneticisi köşede + olumlu => gelecekte olumluya dönecek"})
-                    score += 1
+                    _sc(1, "vergilius")
     except Exception as e:
         pass
 
@@ -1017,7 +1081,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         if mj and (has_mars or mp):
             who = "Mars" if has_mars else "Pluto"
             strictures.append({"code":"horary_minerva","level":"info","meaning":f"Horary Minervası: Jup-Ay-{who} {ang1}/{ang2}° - en olumsuzda bile büyük iyilik (karmik koruma)","dist":f"{d1:.1f}/{d2:.1f}"})
-            score += 4  # bonus Lilly en olumsuzda bile iyilik
+            _sc(4, "horary_minerva")  # bonus Lilly en olumsuzda bile iyilik
     except: pass
 
     # 6.txt İkilem: sabit taşınmaz uzun vadeli → Ay+Satürn önemli, Ay hangi belirteçle olumlu açı yapıyorsa onu al
@@ -1172,7 +1236,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Combust penalty var mı? (yeni kod combustion_*)
     for s in strictures:
         if "combustion" in s["code"]:
-            score += RULES["scoring"].get("combust_penalty",-5) // 2  # hafifletilmiş
+            _sc(RULES["scoring"].get("combust_penalty",-5) // 2, "combust_penalty"); # hafifletilmiş
 
     return {
         "jd": jd,
@@ -1187,6 +1251,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         "quesited_type": quesited_type,
         "timing": timing,
         "lots": lots if 'lots' in locals() else {},
+        "_trace": _tr if _DO_TRACE else [],
     }
 
 # CLI'de test
