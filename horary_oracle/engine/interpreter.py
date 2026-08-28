@@ -377,11 +377,19 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             bag = "Şu an aranızda net bir akış görünmüyor."
         epi_txt = t.get("ephemeris_text") or timing_txt
         zaman = f" {epi_txt} içinde bir hareket olabilir." if epi_txt and "BELİRSİZ" not in epi_txt else ""
-        # VOC gibi tek önemli uyarıyı insanca ekle
-        not_txt = ""
-        if has_voc:
-            not_txt = " Ay şu an biraz boşlukta, o yüzden konu askıda gibi."
-        return f"{harita} {bag}{zaman}{not_txt}".strip()
+        not_txt = " Ay şu an biraz boşlukta, o yüzden konu askıda gibi." if has_voc else ""
+        # karşı taraf hissi - insanca 1 cümle
+        qs_sign = engine_json.get("quesited_sign","")
+        his = ""
+        if qs_sign in ["Balık","Yengeç","Boğa"]:
+            his = " Karşı taraf duygusal, sahiplenici bir halde."
+        elif qs_sign in ["Oğlak","Kova","Başak"]:
+            his = " Karşı taraf biraz mesafeli ve mantığıyla hareket ediyor."
+        elif qs_sign in ["Koç","Aslan","Yay"]:
+            his = " Karşı taraf hareketli, bir şeyler yapmak istiyor."
+        elif qs_sign in ["İkizler","Terazi"]:
+            his = " Karşı taraf kararsız, seçenekleri tartıyor."
+        return f"{harita} {bag}{his}{zaman}{not_txt}".strip()
     long_detail = long_explain()
     # İdrak katmanı - bütüncül his
     try:
@@ -393,9 +401,9 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     # doğal kapanış önerileri
     suggest = " İstersen netleştirelim — mesela 'bu işe girecek miyim?' veya 'bana yazacak mı?' gibi tek ve net bir soru sorabilirsin."
     if v=="YES":
-        base = f"**HÜKÜM: EVET** ✓\n\n{long_detail}\n\nİçini ferah tut — gidişat senden yana."
+        base = f"{long_detail}\n\nGidişat senden yana canım — içini ferah tut, güzel bir akış var. ✓"
         if "asc_near_boundary" in strict_codes:
-            base += " (Harita sınırda, niyetini tek cümlede netleştirirsen daha keskin olur.)"
+            base += " (Harita biraz sınırda, niyetini tek cümlede netleştirirsen daha keskin olur.)"
         return base
     if v=="NO":
         if is_where and loc:
@@ -419,10 +427,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             q_data = engine_json.get("quesited_sign","")
             return {"tr":f"{qs} {q_data} burcunda, ev {loc.get('house',7)} — seni düşünüyor mu diye bakınca {q}-{qs} arası {perf.get(chr(34)+'type'+chr(34),chr(34)+'yok'+chr(34))} var. {long_explain()} Biraz daha net sorarsan (ör: 'beni özlüyor mu?') daha keskin söylerim.", "en":f"Thought","es":"","ar":""}[lang]
         if is_how:
-            return f"**HÜKÜM: HAYIR**\n\n{long_detail}\n\n6 ay sonra koşullar değişince tekrar bakalım.{suggest}"
+            return f"{long_detail}\n\nŞu an için biraz zor görünüyor canım, ama bu kalıcı değil — 6 ay sonra koşullar değişince tekrar bakalım.{suggest}"
         if has_voc:
-            return f"**HÜKÜM: BEKLEMEDE**\nAy boşlukta, konu şu an akmıyor.\n\n{long_detail}\n\n1-2 hafta sonra aynı niyetle tek soru sor.{suggest}"
-        return f"**HÜKÜM: HAYIR**\n\n{long_detail}\n\nÜzülme, koşullar değişince yeniden sorabilirsin.{suggest}"
+            return f"{long_detail}\n\nAy şu an biraz boşlukta, konu askıda gibi. 1-2 hafta sonra aynı niyetle tek bir soru sorarsan çok daha net akar.{suggest}"
+        return f"{long_detail}\n\nŞu an için akış biraz kapalı görünüyor, ama üzülme — bu geçici. Koşullar değişince yeniden soralım, içini ferah tut.{suggest}"
     if has_immature:
         return f"Harita çok taze (ASC 0-3°) — soru henüz olgunlaşmamış gibi hissettirdi. Yine de gördüğüm: {v} {perf.get('type')} Zaman {timing_txt}. Biraz demlensin, 1-2 gün sonra aynı soruyu tek cümlede net sorarsan çok daha keskin cevap gelir."
     if v=="UNCERTAIN":
