@@ -4,7 +4,7 @@ Horary Oracle FastAPI - Yüksek Performans
 - Async + orjson
 - Streamlit'ten bağımsız, Flutter APK direkt çağırır
 """
-import os, sys, time
+import os, sys, time, copy
 from functools import lru_cache
 from datetime import datetime, date
 from typing import Optional
@@ -186,7 +186,7 @@ async def cast(req: CastRequest):
     # quesited auto - genel (derived engine içinde question ile override ediliyor)
     qtype = "general"
     try:
-        res = cached_chart(y, mo, da, utc_dec, req.lat, req.lon, qtype)
+        res = copy.deepcopy(cached_chart(y, mo, da, utc_dec, req.lat, req.lon, qtype))
     except Exception as e:
         raise HTTPException(500, f"Chart error: {e}")
 
@@ -262,12 +262,15 @@ async def cast(req: CastRequest):
                 res['strictures'].insert(0, {"code":"dream_meaning","level":"info","meaning":f"Gizli DREAM: 12.ev {twelfth_sign} yöneticisi {twelfth_ruler} {tw_data.get('sign','')} Ev{tw_data.get('house','?')} → rüyanın kaynağı o evin konuları; Ay {moon_sign} Ev{moon_house} rüyanın taşıyıcısı; {nept_note} prophetic/karmaşa ayırt eder; 9.ev {ninth_sign} kehanet potansiyeli."})
         except: pass
 
-    # LLM sadece tercüman
+    # LLM sadece tercüman - GERÇEK harita verisini gönder (halüsinasyonu önle)
     engine_json = {
         "verdict": res["verdict"], "score": res["score"],
         "perfection": res["perfection"], "timing": res.get("timing"),
         "strictures": res["strictures"],
         "querent": res["querent"]["planet"], "quesited": res["quesited"]["planet"],
+        "querent_sign": res["querent"]["sign"], "quesited_sign": res["quesited"]["sign"],
+        "houses": {"asc": res["houses"]["asc"], "asc_sign": res["houses"]["asc_sign"], "mc": res["houses"]["mc"]},
+        "planets": {k: {"sign": v["sign"], "deg": round(v["deg"],2), "house": v["house"], "retro": v.get("retro",False)} for k,v in res.get("planets",{}).items()},
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
