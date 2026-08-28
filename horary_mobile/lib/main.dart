@@ -285,6 +285,27 @@ class _HoraryHomeState extends State<HoraryHome> {
               onSelected: (v){ if(v) setState(()=> _category=c['k']!); },
             )),
           ]))),
+          // 1) Zaman geri sayım widget'i
+          if(_lastChart!=null && _lastChart!['timing']!=null && _lastChart!['timing']['text']!=null && (_lastChart!['timing']['text'] as String).isNotEmpty && !_timingDate(_lastChart!['timing']).isEmpty) Padding(
+            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
+            child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.5))),
+              child: Row(children: [
+                const Icon(Icons.timer_outlined, size:16, color: Color(0xFFC9A96E)),
+                const SizedBox(width:8),
+                Expanded(child: Text('⏳ ${_lastChart!['timing']['text']} → ${_timingDate(_lastChart!['timing'])}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11, fontWeight: FontWeight.w600))),
+                Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
+              ])),
+          ),
+          // 2) Derived ağaç görseli
+          if(_lastChart!=null && _lastChart!['derived_info']!=null) Padding(
+            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
+            child: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF1A1423), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF6a9ae2).withOpacity(0.4))),
+              child: Row(children: [
+                const Icon(Icons.account_tree, size:16, color: Color(0xFF6a9ae2)),
+                const SizedBox(width:8),
+                Expanded(child: Text('${_lastChart!['derived_info']['base_word']} (${_lastChart!['derived_info']['base_house']}.ev) → ${_lastChart!['derived_info']['topic']} (${_lastChart!['derived_info']['offset']}.ev) = ${_lastChart!['derived_info']['derived']}.ev  •  ${_lastChart!['derived_info']['formula']}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10))),
+              ])),
+          ),
           // mini SolarFire chart + timing geri sayım + strictures detay
           if(_lastChart!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),

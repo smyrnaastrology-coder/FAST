@@ -334,6 +334,7 @@ async def cast(req: CastRequest):
         "strictures": res["strictures"][:12],
         "lots": res.get("lots",{}),
         "location": loc_info,
+        "derived_info": res.get("derived_info"),
         "answer": answer,
         "meta": {"tz": tzname, "utc_offset": off, "local_dec": round(local_dec,2), "ms": round(dt,1)}
     }
