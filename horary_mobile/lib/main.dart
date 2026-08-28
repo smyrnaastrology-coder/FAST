@@ -114,6 +114,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   double lat = 38.4237, lon = 27.1428;
   String lang = 'tr';
   String _category = 'general';
+  String _lastQuestion = '';
   Map<String,dynamic>? _lastChart;
   final SpeechToText _speech = SpeechToText();
   bool _listening=false;
@@ -122,6 +123,10 @@ class _HoraryHomeState extends State<HoraryHome> {
   bool _showDetails=false;
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
+  bool get _showRadar {
+    final q = _lastQuestion.toLowerCase();
+    return q.contains('nerede') || q.contains('nerde') || q.contains('nere') || q.contains('kayip') || q.contains('kayıp') || q.contains('tasin') || q.contains('taşın') || q.contains('nereye');
+  }
 
   @override void initState(){ super.initState(); _loadHistory(); }
 
@@ -199,7 +204,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   Future<void> _ask() async {
     final q = _ctrl.text.trim();
     if (q.isEmpty) return;
-    setState(() { _chat.add({'role':'user','content':q}); _loading=true; _ctrl.clear(); });
+    setState(() { _chat.add({'role':'user','content':q}); _lastQuestion=q; _loading=true; _ctrl.clear(); });
     _saveHistory(q);
     try {
       final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category);
@@ -297,8 +302,8 @@ class _HoraryHomeState extends State<HoraryHome> {
                 Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
               ])),
           ),
-          // Kayıp radar (yön+mesafe ok)
-          if(_lastChart!=null && _lastChart!['location']!=null && _lastChart!['location']['direction']!=null) Padding(
+          // Kayıp radar - sadece nerede/kayıp/taşınma sorularında
+          if(_lastChart!=null && _showRadar && _lastChart!['location']!=null && _lastChart!['location']['direction']!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
             child: LostRadarMap(
               lat: lat, lon: lon,
@@ -343,7 +348,8 @@ class _HoraryHomeState extends State<HoraryHome> {
             ),
           ),
           Expanded(child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(12,8,12,100),
+            padding: const EdgeInsets.fromLTRB(12,8,12,140),
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: _chat.length,
             itemBuilder: (_,i){
               final m=_chat[i];
@@ -365,9 +371,9 @@ class _HoraryHomeState extends State<HoraryHome> {
           if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
           const SizedBox(height: 88),
         ]),
-        // centered input floating - biraz yukari alindi (secmesi kolay)
+        // centered input floating - klavye ile uyumlu
         Positioned(
-          left: 0, right: 0, bottom: 32,
+          left: 0, right: 0, bottom: 12 + MediaQuery.of(context).viewInsets.bottom,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),

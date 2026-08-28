@@ -74,8 +74,9 @@ class LostRadarMap extends StatelessWidget {
             child: Row(children: [
               const Icon(Icons.explore, size:12, color: Color(0xFFC9A96E)),
               const SizedBox(width:6),
-              Expanded(child: Text('Milyem: ${_bearing.toStringAsFixed(1)}° = ${(_bearing*6400/360).round()} milyem  •  Hassas azimut', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:10, fontFamily: 'monospace'))),
-              Text('K:0 Doğu:1600 G:3200 B:4800', style: const TextStyle(color: Color(0xFFa898c0), fontSize:8)),
+              Flexible(child: Text('Milyem: ${_bearing.toStringAsFixed(1)}° = ${(_bearing*6400/360).round()} milyem', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:10, fontFamily: 'monospace'))),
+              const SizedBox(width:6),
+              const Text('K:0 D:1600 G:3200 B:4800', style: TextStyle(color: Color(0xFFa898c0), fontSize:8)),
             ])),
           const SizedBox(height:8),
           Text(place, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11)),
