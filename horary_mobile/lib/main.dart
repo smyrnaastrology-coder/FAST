@@ -325,9 +325,9 @@ class _HoraryHomeState extends State<HoraryHome> {
           if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
           const SizedBox(height: 88),
         ]),
-        // centered input floating slightly above bottom
+        // centered input floating - biraz yukari alindi (secmesi kolay)
         Positioned(
-          left: 0, right: 0, bottom: 18,
+          left: 0, right: 0, bottom: 32,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),
