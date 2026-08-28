@@ -374,7 +374,9 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         if loc.get('house'):
             lines.append(f"• Konu evi: {loc.get('house')}.ev — {loc.get('place', loc.get('height',''))} ({loc.get('direction','')} )")
         if perf.get('type') != 'none':
-            lines.append(f"• Açı: {perf.get('type')} — {perf.get('result','')} {f\"(ağırlama: {perf.get('reception')})\" if perf.get('reception') else ''}")
+            rec = perf.get('reception')
+            rec_txt = f" (ağırlama: {rec})" if rec else ""
+            lines.append(f"• Açı: {perf.get('type')} — {perf.get('result','')}{rec_txt}")
         else:
             lines.append(f"• Açı: applying olumlu açı yok")
         if has_voc:
@@ -382,6 +384,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         for s in strict:
             code=s.get("code")
             if code in ("voc",): continue
+            if code.startswith("lot_"): continue
             if code in STRICTURE_TEXT or s.get("meaning"):
                 # sadece önemli uyarıları ekle, en fazla 3 tane
                 if len([l for l in lines if l.startswith("• Uyarı")]) >= 3: break
