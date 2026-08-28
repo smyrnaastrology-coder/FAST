@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'config/theme.dart';
 import 'services/horary_api.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +32,7 @@ class HoraryApp extends StatelessWidget {
     return MaterialApp(
       title: 'Horary Oracle',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF0F0A18)),
+      theme: FastTheme.dark,
       home: const AuthGate(),
     );
   }
