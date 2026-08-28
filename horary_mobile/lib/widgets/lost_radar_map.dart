@@ -11,8 +11,9 @@ class LostRadarMap extends StatelessWidget {
   final String distance; // 41m / 1.2km
   final String place;
   final int house;
+  final double deg;
 
-  const LostRadarMap({super.key, required this.lat, required this.lon, required this.direction, required this.distance, required this.place, required this.house});
+  const LostRadarMap({super.key, required this.lat, required this.lon, required this.direction, required this.distance, required this.place, required this.house, this.deg = 15});
 
   double get _bearing {
     const map = {
@@ -22,7 +23,10 @@ class LostRadarMap extends StatelessWidget {
       "GÜNEYDOĞU":135.0, "GÜNEY DOĞU":135.0, "GÜNEY GÜNEY-DOĞU":157.5, "DOĞU GÜNEY-DOĞU":112.5,
       "GÜNEYBATI":225.0, "GÜNEY BATI":225.0, "GÜNEY GÜNEY-BATI":202.5, "BATI GÜNEY-BATI":247.5,
     };
-    return (map[direction] ?? 0).toDouble();
+    final base = (map[direction] ?? 0).toDouble();
+    // gezegen derecesine göre ince sapma: 15° merkez, ±12° max (0°→ -12°, 30°→ +12°)
+    final fine = (deg - 15) * 0.8;
+    return (base + fine) % 360;
   }
 
   double get _distMeters {
