@@ -1778,13 +1778,13 @@ def _generate_natal_pdf(motor):
                 c.setFont(font, boyut)
                 c.setFillColor(renk)
             c.drawString(x, y, satir)
-            y -= boyut + 3.5
+            y -= boyut + 5
         return y
 
     def yazi_olcul(metin, font="DejaVu", boyut=8.5, max_genislik=90):
         """Calculate how tall the text block will be."""
         satirlar = _wrap_text(metin, max_genislik)
-        return len(satirlar) * (boyut + 3.5)
+        return len(satirlar) * (boyut + 5)
 
     def bolum_ayraci(y):
         """Draw a decorative gold section separator."""
@@ -2385,37 +2385,32 @@ def _generate_natal_pdf(motor):
                 ay_gunleri = ay_kayit["gunler"]
                 ilk_hafta_gun = _dt_mod.date(yy, mm, 1).weekday()
                 satir_sayisi = -(-(ilk_hafta_gun + len(ay_gunleri)) // 7)
-                grid_h = 18 + 14 + satir_sayisi * HUCRE_H + 12
+                grid_h = 48 + satir_sayisi * HUCRE_H + 10
                 onemli = [gd for gd in ay_gunleri if (gun_verileri[gd].get("aspekt_adet") or 0) >= 2]
                 _onemli_bilgi = []
-                _onemli_yukseklik = 0
-                _gizli_onemli = 0
+                _gruplar = []
                 for _gd2 in onemli:
                     _pe2 = gun_verileri[_gd2]
                     _i0b = ((_pe2.get("yorumlar") or [pdf_label("Açı bulunamadı")])[0])
                     _i0b = _es_fix_tire(_i0b) if _ES else _i0b
-                    if len(_i0b) > 500:
-                        _i0b = _i0b[:500].rsplit('. ', 1)[0] + '.'
-                    _h2 = max(16, yazi_olcul(_i0b, "DejaVu", 8.5, 72) + 5)
+                    if len(_i0b) > 800:
+                        _i0b = _i0b[:800].rsplit('. ', 1)[0] + '.'
+                    _h2 = max(16, yazi_olcul(_i0b, "DejaVu", 8.5, 72) + 6)
                     _onemli_bilgi.append((_gd2, _i0b, _h2))
-                    _onemli_yukseklik += _h2
                 if _onemli_bilgi:
-                    # Tablo, yazının uzunluğuna göre büyür (baba correccion: taşma düzeltmesi)
-                    grid_h = 42 + satir_sayisi * HUCRE_H + 36 + _onemli_yukseklik
-                    if y - grid_h - 6 < SAYFA_ALT:
+                    _tum_h = sum(_h for _, _, _h in _onemli_bilgi)
+                    if y - (53 + satir_sayisi * HUCRE_H + _tum_h) - 6 < SAYFA_ALT:
                         yeni_sayfa(); y = SAYFA_UST
-                    _feat_budget = (y - 6 - SAYFA_ALT) - 42 - satir_sayisi * HUCRE_H - 36 - 16
-                    if _onemli_yukseklik > _feat_budget:
-                        _acc2 = 0
-                        _kalan = []
-                        for (_g3, _t3, _h3) in _onemli_bilgi:
-                            if _acc2 + _h3 <= _feat_budget:
-                                _kalan.append((_g3, _t3, _h3)); _acc2 += _h3
-                            else:
-                                _gizli_onemli += 1
-                        _onemli_bilgi = _kalan
-                        _onemli_yukseklik = _acc2
-                        grid_h = 42 + satir_sayisi * HUCRE_H + 36 + _onemli_yukseklik + (16 if _gizli_onemli else 0)
+                    _avail = (y - 38 - satir_sayisi * HUCRE_H) - SAYFA_ALT - 20
+                    _gr = []; _gr_h = 0
+                    for _it in _onemli_bilgi:
+                        if _gr and _gr_h + _it[2] > _avail:
+                            _gruplar.append(_gr); _gr = [_it]; _gr_h = _it[2]
+                        else:
+                            _gr.append(_it); _gr_h += _it[2]
+                    if _gr:
+                        _gruplar.append(_gr)
+                    grid_h = 53 + satir_sayisi * HUCRE_H + sum(_h for _, _, _h in _gruplar[0])
                 if y - grid_h - 6 < SAYFA_ALT:
                     yeni_sayfa(); y = SAYFA_UST
                 # Month card
@@ -2449,7 +2444,7 @@ def _generate_natal_pdf(motor):
                 row = 0
                 for gd in ay_gunleri:
                     cx = SOL + 6 + col * HUCRE_W
-                    cy = y - 42 - row * HUCRE_H
+                    cy = y - 48 - row * HUCRE_H
                     renk = gd_renk.get(gd)
                     if renk:
                         c.setFillColor(renk)
@@ -2462,17 +2457,17 @@ def _generate_natal_pdf(motor):
                         c.roundRect(cx, cy + 2, HUCRE_W - 4, HUCRE_H - 4, 3, fill=0, stroke=1)
                         c.setFillColor(acik)
                         c.setFont("DejaVu", 9)
-                    c.drawCentredString(cx + (HUCRE_W - 4) / 2, cy + 8.5, str(gd.day))
+                    c.drawCentredString(cx + (HUCRE_W - 4) / 2, cy + 13, str(gd.day))
                     col += 1
                     if col == 7:
                         col = 0; row += 1
-                # Featured days
+                # Featured days (tümü görünür; sayfa dolunca devam kartı)
                 if _onemli_bilgi:
-                    ly = y - 46 - satir_sayisi * HUCRE_H - 2
+                    ly = y - 38 - satir_sayisi * HUCRE_H
                     c.setFillColor(bordo)
                     c.setFont("DejaVu-Bold", 9)
-                    c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} ({len(_onemli_bilgi) + _gizli_onemli})")
-                    for gd, _iy, _satir_h in _onemli_bilgi:
+                    c.drawString(SOL + 12, ly, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')}")
+                    for gd, _iy, _satir_h in _gruplar[0]:
                         p_entry = gun_verileri[gd]
                         ly -= _satir_h
                         _label = f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}"
@@ -2486,10 +2481,41 @@ def _generate_natal_pdf(motor):
                         c.setFont("DejaVu", 8.5)
                         # Yazıya göre sarılıp çiz (taşma önlenir, tam cümle)
                         metin_yaz(_x_desc, ly, _iy, "DejaVu", 8.5, acik, 72)
-                    if _gizli_onemli:
-                        c.setFillColor(gri)
-                        c.setFont("DejaVu-Oblique", 8)
-                        c.drawCentredString((SOL + SAG) / 2, (y - grid_h) + 17, pdf_label(f"... ve {_gizli_onemli} gün daha (tam liste uygulamada)"))
+                    _devam = 1
+                    for _grp in _gruplar[1:]:
+                        _gh = 48 + sum(_h for _, _, _h in _grp) + 12
+                        yeni_sayfa(); y = SAYFA_UST
+                        if y - _gh - 6 < SAYFA_ALT:
+                            yeni_sayfa(); y = SAYFA_UST
+                        c.setFillColor(kart_bg)
+                        c.roundRect(SOL, y - _gh, SAG - SOL, _gh, 5, fill=1, stroke=0)
+                        c.setStrokeColor(gri)
+                        c.setLineWidth(0.4)
+                        c.roundRect(SOL, y - _gh, SAG - SOL, _gh, 5, fill=0, stroke=1)
+                        c.setFillColor(altin)
+                        c.setFont("DejaVu-Bold", 11)
+                        c.drawString(SOL + 12, y - 17, f"{AY_ADLARI[mm-1]} {yy}")
+                        c.setStrokeColor(sari_cizgi)
+                        c.setLineWidth(0.4)
+                        c.line(SOL + 12, y - 23, SAG - 12, y - 23)
+                        c.setFillColor(bordo)
+                        c.setFont("DejaVu-Bold", 9)
+                        c.drawString(SOL + 12, y - 38, f"✦ {pdf_label('Bu Ayın Öne Çıkan Günleri')} · {pdf_label('devam')} {_devam}")
+                        ly = y - 48
+                        for gd, _iy, _satir_h in _grp:
+                            p_entry = gun_verileri[gd]
+                            ly -= _satir_h
+                            _label = f"{gd.day:02d} {AY_ADLARI[mm-1]} · {pdf_label(p_entry.get('ay_burc',''))} {pdf_label('Ay')}"
+                            c.setFillColor(koyu)
+                            c.setFont("DejaVu-Bold", 8.5)
+                            c.drawString(SOL + 16, ly, _label)
+                            _x_desc = SOL + 118
+                            if SOL + 16 + c.stringWidth(_label, "DejaVu-Bold", 8.5) + 8 > _x_desc:
+                                _x_desc = SOL + 16 + c.stringWidth(_label, "DejaVu-Bold", 8.5) + 8
+                            c.setFillColor(acik)
+                            c.setFont("DejaVu", 8.5)
+                            metin_yaz(_x_desc, ly, _iy, "DejaVu", 8.5, acik, 72)
+                        _devam += 1
                 y -= grid_h + 12
 
     # ═══════════════════════════════════════════
