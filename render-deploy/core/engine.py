@@ -12403,7 +12403,7 @@ class FBST_Engine:
                 10: "Ebeveynlikte ciddiyet ve yapı ön planda. Çocuğunuz için kalıcı temeller atma, kurallar ve sorumluluklar oluşturma yılı.",
                 11: "Çocuğunuzun sosyal çevre ihtiyaçları, arkadaşlıkları ve geleceğe dair umutları bu yılın odak noktası. Birlikte gelecek planları yapmak kritik.",
                 12: "Bu yıl içe çekilme, ruhsal derinleşme ve sezgisel bağın güçlendirilmesi ön planda. Çocuğunuzla sessiz ve derin bir bağ kurmak için ideal bir dönem."
-            } if _ES else {
+            } if not _EN and not _ES else {
                 1: "Este año, como padre/madre, llevas una energía guía instintiva desde tu interior. En lugar de esperar consejos externos, guiarás tu relación con tu hijo a través de tu propia intuición.",
                 2: "Toda tu motivación se dirige a descubrir y cultivar los valores, talentos y la autoconfianza de tu hijo. Dar pasos concretos es la clave de este año.",
                 3: "Tu tráfico de comunicación con tu hijo aumenta. La necesidad de aprender, hablar, compartir y descubrir cosas nuevas juntos pasa al primer plano.",
@@ -12416,7 +12416,7 @@ class FBST_Engine:
                 10: "La seriedad y la estructura pasan al primer plano en la crianza. El año de sentar bases duraderas y establecer reglas y responsabilidades para tu hijo.",
                 11: "Las necesidades sociales, las amistades y las esperanzas de futuro de tu hijo son el punto focal de este año. Hacer planes de futuro juntos es fundamental.",
                 12: "Este año el retiro, la profundización espiritual y el fortalecimiento del vínculo intuitivo pasan al primer plano. Un período ideal para construir un vínculo tranquilo y profundo con tu hijo."
-            } if _EN else {
+            } if _ES else {
                 1: "This year, as a parent, you carry an instinctive guiding energy from within yourself. Rather than waiting for outside advice, you will steer your relationship with your child through your own intuition.",
                 2: "All your motivation is directed toward discovering and nurturing your child's values, talents and self-confidence. Taking concrete steps is this year's key.",
                 3: "Your communication traffic with your child increases. The need for learning, talking, sharing and discovering new things together takes the foreground.",
@@ -12444,7 +12444,7 @@ class FBST_Engine:
                 10: "İlişkinin dış dünyada statü kazanmak, kariyer yapmak ve 'imparatorluk' olarak görünmek istediği zirve yılı.",
                 11: "Sosyal çevrenizin, ortak arkadaşlarınızın ve geleceğe dair büyük umutlarınızın ilişkinin lokomotifi olduğu bir dönem.",
                 12: "Gözlerden uzak kalmak istediğiniz, ruhsal inziva, iyileşme ve gizli korkuları birlikte şifalandırma yılı."
-            } if _ES else {
+            } if not _EN and not _ES else {
                 1: "Este año, en lugar de esperar apoyo externo, gestionas la relación con tus propias estructuras internas, enteramente con tus propias manos.",
                 2: "Toda la energía fundamental y la dirección de la relación fluye a través de las finanzas compartidas, creando valor y multiplicando la riqueza material.",
                 3: "Toda la motivación se ha desplazado hacia proyectos mentales, firmas, educación y un intenso tráfico de comunicación.",
@@ -12457,7 +12457,7 @@ class FBST_Engine:
                 10: "El año cumbre en el que la relación quiere ganar estatus en el mundo exterior, construir una carrera y aparecer como un 'imperio'.",
                 11: "Un período en el que vuestro círculo social, los amigos compartidos y las grandes esperanzas para el futuro son la locomotora de la relación.",
                 12: "El año de querer permanecer fuera de la vista — retiro espiritual, sanación y curar juntos los miedos ocultos."
-            } if _EN else {
+            } if _ES else {
                 1: "This year, instead of expecting outside support, you manage the relationship with your own inner structures, entirely with your own hands.",
                 2: "The entire fundamental energy and direction of the relationship flows through shared finances, creating value and multiplying material wealth.",
                 3: "All motivation has shifted toward mental projects, signatures, education and an intense traffic of communication.",
@@ -12487,7 +12487,7 @@ class FBST_Engine:
                 10: "<b>Yapı ve Sorumluluk Eğitimi:</b><br/><i>• Somut Etki:</i> Kurallar, sınırlar, sorumluluklar ve disiplin uygulamaları bu yılın somut olayları.<br/><i>• Soyut Etki:</i> Ebeveynin otoritesini sevgiyle harmanladığı, çocuğun yapı ve düzen ihtiyacını pedagojik bir şekilde karşıladığı yıl.",
                 11: "<b>Sosyal Çevre ve Gelecek Planları:</b><br/><i>• Somut Etki:</i> Çocuğun arkadaşlık ilişkileri, sosyal etkinlikler ve geleceğe dair planlar bu yılın odak noktası.<br/><i>• Soyut Etki:</i> Ebeveynin çocuğunun geleceğine dair umutlarını ve vizyonunu birlikte şekillendirdiği, ortak hayaller kurduğu dönem.",
                 12: "<b>Ruhsal Derinleşme ve Şifa:</b><br/><i>• Somut Etki:</i> Sessizlik, meditasyon, doğa yürüyüşleri ve içe çekilme faaliyetleri bu yılın somut olayları.<br/><i>• Soyut Etki:</i> Ebeveyn ve çocuğun bilinçaltındaki korkuları ve endişeleri birlikte şifalandırdığı, ruhsal olarak derinleştiği kutsal bir dönem."
-            } if _ES else {
+            } if not _EN and not _ES else {
                 1: "<b>Descubrimiento de la Identidad del Hijo:</b><br/><i>• Impacto concreto:</i> Un año en que el hijo expresa su propio ser, toma decisiones independientes y se siente seguro.<br/><i>• Impacto abstracto:</i> Un año de espejo pedagógico en el que el padre también redescubre su propia identidad y se encuentra en el reflejo del hijo.",
                 2: "<b>Construcción de Valor y Autoconfianza:</b><br/><i>• Impacto concreto:</i> Pasos concretos para que el hijo tome conciencia de sus capacidades, descubra sus valores y crezca en autoconfianza.<br/><i>• Impacto abstracto:</i> Un año sagrado en el que la fe y el aprecio del padre por el hijo nutren el mundo interior del hijo.",
                 3: "<b>Puente de Aprendizaje y Comunicación:</b><br/><i>• Impacto concreto:</i> Mucha lectura, escritura, habla y aprendizaje conjunto. Ideal para descubrir una nueva habilidad o campo de conocimiento.<br/><i>• Impacto abstracto:</i> Un período en el que se forma una sincronización mental entre padre e hijo y se comprenden profundamente.",
@@ -12500,7 +12500,7 @@ class FBST_Engine:
                 10: "<b>Educación en Estructura y Responsabilidad:</b><br/><i>• Impacto concreto:</i> Las reglas, los límites, las responsabilidades y las prácticas de disciplina son los eventos concretos de este año.<br/><i>• Impacto abstracto:</i> El año en el que el padre combina su autoridad con amor y satisface pedagógicamente la necesidad de estructura y orden del hijo.",
                 11: "<b>Círculo Social y Planes de Futuro:</b><br/><i>• Impacto concreto:</i> Las relaciones de amistad del hijo, las actividades sociales y los planes para el futuro son el punto focal de este año.<br/><i>• Impacto abstracto:</i> El período en el que el padre y el hijo juntos moldean esperanzas y una visión para el futuro del hijo y sueñan juntos.",
                 12: "<b>Profundización Espiritual y Sanación:</b><br/><i>• Impacto concreto:</i> El silencio, la meditación, los paseos por la naturaleza y las actividades de retiro son los eventos concretos de este año.<br/><i>• Impacto abstracto:</i> Un período sagrado en el que padre e hijo sanan conjuntamente los miedos y preocupaciones que acechan en el subconsciente y crecen espiritualmente."
-            } if _EN else {
+            } if _ES else {
                 1: "<b>Child's Identity Discovery:</b><br/><i>• Concrete Impact:</i> A year when the child expresses their own self, makes independent decisions and feels safe.<br/><i>• Abstract Impact:</i> A pedagogical mirror year in which the parent also rediscovers their own identity and finds themselves in the child's reflection.",
                 2: "<b>Building Value and Self-Confidence:</b><br/><i>• Concrete Impact:</i> Concrete steps for the child to become aware of their abilities, discover their values and grow in self-confidence.<br/><i>• Abstract Impact:</i> A sacred year in which the parent's faith in and appreciation of the child nourish the child's inner world.",
                 3: "<b>Bridge of Learning and Communication:</b><br/><i>• Concrete Impact:</i> Plenty of reading, writing, speaking and learning together. Ideal for discovering a new skill or field of knowledge.<br/><i>• Abstract Impact:</i> A period when a mental synchronization forms between parent and child and they deeply understand each other.",
