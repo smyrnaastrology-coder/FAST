@@ -207,13 +207,11 @@ async def cast(req: CastRequest):
     # location (yer bulma) - is_self / is_live mantığı
     loc_info = {}
     try:
-        from engine.location_engine import direction_by_house, distance_fixed
+        from engine.location_engine import direction_by_house, distance_fixed, house_location_meaning, height_by_sign, ELEMENT, ELEMENT_KALITE, burc_yer_detay
         q = req.question.lower()
         is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
         use_data = res['querent']['data'] if is_self else res['quesited']['data']
         actual_house = use_data['house']
-        from engine.location_engine import house_location_meaning
-        from engine.location_engine import height_by_sign, ELEMENT, ELEMENT_KALITE, burc_yer_detay, BURC_YER_DETAY
         loc_info = {
             "direction": direction_by_house(actual_house),
             "house": actual_house,
@@ -226,7 +224,9 @@ async def cast(req: CastRequest):
             "deg": round(use_data['deg'],1),
             "center": f"{req.lat},{req.lon} merkezine gore"
         }
-    except: pass
+    except Exception as e:
+        print(f"loc_info hata: {e}")
+        loc_info = {"house": 7, "direction": "BATI", "distance": "", "place": "", "height": "", "element_kalite": "", "burc_detail": ""}
 
     # --- Gizli visitor modelleri (sistem içinde, dışarıda görünmez) ---
     qlow2 = req.question.lower()
