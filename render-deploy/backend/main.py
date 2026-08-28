@@ -2259,7 +2259,8 @@ def _generate_natal_pdf(motor):
         c.bookmarkPage("bolum_sabian")
         y = sayfa_basligi(pdf_label("Sabian Sembolleri"), numara=str(bolum_no[0]))
         for s in sabianlar:
-            sembol = _strip_html(str(s.get('sembol','')))[:250]
+            _is_es_sab = _ES
+            sembol = _strip_html(str(s.get('sembol','')))[:400] if _is_es_sab else _strip_html(str(s.get('sembol','')))[:250]
             sembol = re.sub(r'^[\U0001F000-\U0001FAFF\uFE0F\u200D\s]*(?:Sabian Şifresi|Sabian Cipher) \(\d+°\):\s*', '', sembol)
             sembol = re.sub(r'[\U0001F000-\U0001FAFF\uFE0F\u20E3\u200D]', '', sembol)
             muhur = ""
@@ -2267,12 +2268,12 @@ def _generate_natal_pdf(motor):
             if "Mühür:" in sembol or "Seal:" in sembol:
                 _ayrac = "Mühür:" if "Mühür:" in sembol else "Seal:"
                 sembol, muhur = sembol.split(_ayrac, 1)
-                muhur = (_muhur_etiketi + " " + muhur.strip())[:170]
+                muhur = (_muhur_etiketi + " " + muhur.strip())[:300] if _is_es_sab else (_muhur_etiketi + " " + muhur.strip())[:170]
             gez_isim = s.get('gezegen','')
             sembol_h = 30
-            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86) + (12 if _ES else 0)
+            sembol_h += yazi_olcul(sembol.strip(), "DejaVu", 8, 86) + (24 if _ES else 0)
             if muhur:
-                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6 + (8 if _ES else 0)
+                sembol_h += yazi_olcul(muhur, "DejaVu-Oblique", 8, 86) + 6 + (16 if _ES else 0)
             if y - sembol_h < SAYFA_ALT:
                 yeni_sayfa(); y = SAYFA_UST
             # Call-out card — gold accent
@@ -3703,30 +3704,46 @@ def _collect_solar_lunar_data(motor):
         jd = motor.get_natal_julian_day("p1")
         import datetime
         simdi = datetime.datetime.now()
-        sr = motor.calculate_solar_return_tema(jd, simdi.year)
-        if sr and isinstance(sr, str) and len(sr) > 20:
-            sr_clean = _bireysellestir(_strip_html(sr))
-            if len(sr_clean) > 20:
-                data["solar_return"] = sr_clean
-            try:
-                data["solar_return_html"] = _bireysellestir(sr)
-            except:
-                data["solar_return_html"] = ""
+        # Solar: 2 yıl arka arkaya (baba correccion #3)
+        sr_list = []
+        sr_html_list = []
+        for y in [simdi.year, simdi.year + 1]:
+            sr = motor.calculate_solar_return_tema(jd, y)
+            if sr and isinstance(sr, str) and len(sr) > 20:
+                sr_list.append(_bireysellestir(_strip_html(sr)))
+                try:
+                    sr_html_list.append(_bireysellestir(sr))
+                except:
+                    pass
+        if sr_list:
+            data["solar_return"] = "\n\n".join(sr_list)
+            data["solar_return_html"] = "<hr/>".join(sr_html_list)
     except:
         pass
     try:
         jd = motor.get_natal_julian_day("p1")
         import datetime
         simdi = datetime.datetime.now()
-        lr = motor.calculate_lunar_return_tema(jd, simdi.year, simdi.month)
-        if lr and isinstance(lr, str) and len(lr) > 20:
-            lr_clean = _bireysellestir(_strip_html(lr))
-            if len(lr_clean) > 20:
-                data["lunar_return"] = lr_clean
-            try:
-                data["lunar_return_html"] = _bireysellestir(lr)
-            except:
-                data["lunar_return_html"] = ""
+        # Lunar: 6 ay (baba correccion #4) + tarih başlığı
+        lr_list = []
+        lr_html_list = []
+        y, m = simdi.year, simdi.month
+        for i in range(6):
+            yy = y + (m + i - 1) // 12
+            mm = (m + i - 1) % 12 + 1
+            lr = motor.calculate_lunar_return_tema(jd, yy, mm)
+            if lr and isinstance(lr, str) and len(lr) > 20:
+                # Tarih ekle
+                lr_with_date = f"<b>{mm:02d}/{yy} — {lr[0:30]}</b><br/>" + lr if len(lr) < 200 else f"<b>{mm:02d}/{yy}</b> — " + lr
+                _lr_date_html = f"<b>{mm:02d}/{yy}</b> — " + lr
+                lr_list.append(_bireysellestir(_strip_html(_lr_date_html)))
+                try:
+                    lr_html_list.append(_bireysellestir(_lr_date_html))
+                except:
+                    pass
+        if lr_list:
+            data["lunar_return"] = "\n\n".join(lr_list)
+            data["lunar_return_html"] = "<hr/>".join(lr_html_list)
     except:
         pass
     try:
