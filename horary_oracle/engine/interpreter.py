@@ -12,10 +12,12 @@ KURALLAR:
 - Frawley/Barclay: VOC güçlü HAYIR işareti ama mutlak engel DEĞİL; mutable'de yine de hareket edebilir.
 - asc_near_boundary (29-30° veya 0-1°) => SolarFire uyarısı: 'harita burç sınırında, soru çift niyetli/kararsız, netleştir' diye muhabbetle söyle.
 - HER MESAJI horary sorusu gibi görme: selam/sohbet/dertleşme ise önce sohbet et, sonra nazikçe horary sorusuna davet et + 2-3 örnek soru öner.
-- MUTLAKA verdict + neden, strictures'ı uyarı olarak söyle (engel değil uyarı), SAMİMİ, SOHBET tonunda (muhabbet). Kısa paragraflar, emoji max 1.
+- MUTLAKA verdict + neden, SAMİMİ, SOHBET tonunda (muhabbet). Kısa paragraflar, emoji max 1.
+- TEKNİK JARGON YASAK: significator, domicile, peregrine, VOC, via combusta, Lot, detriment, reception gibi kelimeleri ASLA yazma. Bunları insanca çevir: 'karşı taraf kendini güçlü ve mesafeli hissediyor', 'sen biraz yorgun/kırılgan görünüyorsun', 'arada sıcak bir bağ var ama pürüzlü' gibi.
+- Harita bilgisini sadece 1 cümlede ver: 'Yükselen {asc}... Ay {sign}...' sonra hemen insani yorum. Derece/ev listesi, Lot listesi, strictures listesi ASLA dökme.
 - Sohbet modunda öneri sun: 'istersen şunu sorabilirsin: ...' gibi.
 - İstenen dilde cevap ver. MUHABBET 10 DİLDE GEÇERLİ (tr,en,es,ar,pt,fr,de,ru,it,hi).
-- Aşağıdaki FEW-SHOT örnekler Türkçe — AYNI TEKNİK + AYNI SICAK MUHABBET TONUNU istenen dile çevir.
+- Aşağıdaki FEW-SHOT örnekler Türkçe — AYNI SICAK MUHABBET TONUNU istenen dile çevir.
 
 FEW-SHOT (Asartepe tarzı - bu üslubu kullan - tum diller icin gecerli):
 Q: boşanacak mıyım ?
@@ -362,38 +364,24 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         return base+extra
 
     def long_explain():
-        lines=[]
-        # Başlıklar halinde düzenli format
-        lines.append(f"• Sen: {q} ({engine_json.get('querent_sign','')} {engine_json.get('planets',{}).get(q,{}).get('deg','')}° Ev{engine_json.get('planets',{}).get(q,{}).get('house','')})")
-        lines.append(f"• O/Konu: {qs} ({engine_json.get('quesited_sign','')} {engine_json.get('planets',{}).get(qs,{}).get('deg','')}° Ev{engine_json.get('planets',{}).get(qs,{}).get('house','')})")
-        # Yükselen doğru kaynaktan
+        # İnsanca tek paragraf — teknik liste değil, 1 cümle harita + his + zaman
         asc_sig = engine_json.get("houses",{}).get("asc_sign","")
         asc_deg = engine_json.get("houses",{}).get("asc",0) % 30 if engine_json.get("houses",{}).get("asc") else 0
-        if asc_sig:
-            lines.append(f"• Yükselen: {asc_sig} {asc_deg:.1f}°")
-        if loc.get('house'):
-            lines.append(f"• Konu evi: {loc.get('house')}.ev — {loc.get('place', loc.get('height',''))} ({loc.get('direction','')} )")
-        if perf.get('type') != 'none':
-            rec = perf.get('reception')
-            rec_txt = f" (ağırlama: {rec})" if rec else ""
-            lines.append(f"• Açı: {perf.get('type')} — {perf.get('result','')}{rec_txt}")
+        moon = engine_json.get("planets",{}).get("Moon",{})
+        harita = f"Haritan {asc_sig} yükseliyor ({asc_deg:.0f}°), Ay {moon.get('sign','')} burcunda." if asc_sig else ""
+        if perf.get('type') != 'none' and perf.get('result') == 'YES':
+            bag = "Aranızda sıcak ve akıcı bir bağ görünüyor."
+        elif perf.get('type') != 'none':
+            bag = "Aranızda bir temas var ama biraz pürüzlü."
         else:
-            lines.append(f"• Açı: applying olumlu açı yok")
+            bag = "Şu an aranızda net bir akış görünmüyor."
+        epi_txt = t.get("ephemeris_text") or timing_txt
+        zaman = f" {epi_txt} içinde bir hareket olabilir." if epi_txt and "BELİRSİZ" not in epi_txt else ""
+        # VOC gibi tek önemli uyarıyı insanca ekle
+        not_txt = ""
         if has_voc:
-            lines.append(f"• Not: Ay boşlukta (VOC) — konu askıda")
-        for s in strict:
-            code=s.get("code")
-            if code in ("voc",): continue
-            if code.startswith("lot_"): continue
-            if code in STRICTURE_TEXT or s.get("meaning"):
-                # sadece önemli uyarıları ekle, en fazla 3 tane
-                if len([l for l in lines if l.startswith("• Uyarı")]) >= 3: break
-                lines.append(f"• Uyarı: {stricture_sentence(s)}")
-        epi_txt = t.get("ephemeris_text") or t.get("ephemeris_unit")
-        use_timing = epi_txt if epi_txt else timing_txt
-        if use_timing and use_timing != "0 BELİRSİZ (1 hafta içinde tekrar sor)":
-            lines.append(f"• Zamanlama: {use_timing}")
-        return "\n".join(lines)
+            not_txt = " Ay şu an biraz boşlukta, o yüzden konu askıda gibi."
+        return f"{harita} {bag}{zaman}{not_txt}".strip()
     long_detail = long_explain()
     # İdrak katmanı - bütüncül his
     try:
@@ -405,9 +393,9 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     # doğal kapanış önerileri
     suggest = " İstersen netleştirelim — mesela 'bu işe girecek miyim?' veya 'bana yazacak mı?' gibi tek ve net bir soru sorabilirsin."
     if v=="YES":
-        base = f"**HÜKÜM: EVET** ✓\n{q} → {qs} arası {perf.get('type','kavuşum')} ile olumlu akıyor.\n\n{long_detail}\n\n— İçini ferah tut, gidişat senden yana."
+        base = f"**HÜKÜM: EVET** ✓\n\n{long_detail}\n\nİçini ferah tut — gidişat senden yana."
         if "asc_near_boundary" in strict_codes:
-            base += "\nNot: ASC sınırda, niyetini tek cümlede netleştirirsen harita daha keskin konuşur."
+            base += " (Harita sınırda, niyetini tek cümlede netleştirirsen daha keskin olur.)"
         return base
     if v=="NO":
         if is_where and loc:
@@ -431,10 +419,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             q_data = engine_json.get("quesited_sign","")
             return {"tr":f"{qs} {q_data} burcunda, ev {loc.get('house',7)} — seni düşünüyor mu diye bakınca {q}-{qs} arası {perf.get(chr(34)+'type'+chr(34),chr(34)+'yok'+chr(34))} var. {long_explain()} Biraz daha net sorarsan (ör: 'beni özlüyor mu?') daha keskin söylerim.", "en":f"Thought","es":"","ar":""}[lang]
         if is_how:
-            return f"**HÜKÜM: HAYIR**\n{q} → {qs} arası olumlu açı yok.\n\n{long_detail}\n\n— 6 ay sonra koşullar değişince tekrar bakalım.{suggest}"
+            return f"**HÜKÜM: HAYIR**\n\n{long_detail}\n\n6 ay sonra koşullar değişince tekrar bakalım.{suggest}"
         if has_voc:
-            return f"**HÜKÜM: BEKLEMEDE (VOC)**\nAy boşlukta, konu akmıyor.\n\n{long_detail}\n\n— 1-2 hafta sonra aynı niyetle tek soru sor.{suggest}"
-        return f"**HÜKÜM: HAYIR**\n\n{long_detail}\n\n— Üzülme, koşullar değişince yeniden sorabilirsin.{suggest}"
+            return f"**HÜKÜM: BEKLEMEDE**\nAy boşlukta, konu şu an akmıyor.\n\n{long_detail}\n\n1-2 hafta sonra aynı niyetle tek soru sor.{suggest}"
+        return f"**HÜKÜM: HAYIR**\n\n{long_detail}\n\nÜzülme, koşullar değişince yeniden sorabilirsin.{suggest}"
     if has_immature:
         return f"Harita çok taze (ASC 0-3°) — soru henüz olgunlaşmamış gibi hissettirdi. Yine de gördüğüm: {v} {perf.get('type')} Zaman {timing_txt}. Biraz demlensin, 1-2 gün sonra aynı soruyu tek cümlede net sorarsan çok daha keskin cevap gelir."
     if v=="UNCERTAIN":
