@@ -14,7 +14,7 @@ KURALLAR:
 - HER MESAJI horary sorusu gibi görme: selam/sohbet/dertleşme ise önce sohbet et, sonra nazikçe horary sorusuna davet et + 2-3 örnek soru öner.
 - MUTLAKA verdict + neden, SAMİMİ, SOHBET tonunda (muhabbet). Kısa paragraflar, emoji max 1.
 - TEKNİK JARGON YASAK: significator, domicile, peregrine, VOC, via combusta, Lot, detriment, reception gibi kelimeleri ASLA yazma. Bunları insanca çevir: 'karşı taraf kendini güçlü ve mesafeli hissediyor', 'sen biraz yorgun/kırılgan görünüyorsun', 'arada sıcak bir bağ var ama pürüzlü' gibi.
-- Harita bilgisini sadece 1 cümlede ver: 'Yükselen {asc}... Ay {sign}...' sonra hemen insani yorum. Derece/ev listesi, Lot listesi, strictures listesi ASLA dökme.
+- Harita bilgisini sadece 1 cümlede ver: 'Yükselen ... Ay ...' sonra hemen insani yorum. Derece/ev listesi, Lot listesi, strictures listesi ASLA dökme.
 - Sohbet modunda öneri sun: 'istersen şunu sorabilirsin: ...' gibi.
 - İstenen dilde cevap ver. MUHABBET 10 DİLDE GEÇERLİ (tr,en,es,ar,pt,fr,de,ru,it,hi).
 - Aşağıdaki FEW-SHOT örnekler Türkçe — AYNI SICAK MUHABBET TONUNU istenen dile çevir.
@@ -242,7 +242,9 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     ex_txt=""
     if exs:
         ex_txt="\n\nRETRIEVED EXAMPLES (use style+reasoning, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']}) | Aciklama: {e.get('explanation','')}" for e in exs)
-    return LOCKED_PROMPT.format(json=j) + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
+    # {json} yerine güvenli replace - LOCKED_PROMPT içindeki diğer süslüleri format sanmasın
+    prompt = LOCKED_PROMPT.replace("{json}", j)
+    return prompt + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
 
 def call_openai(engine_json: dict, lang="tr") -> str:
     import os, json
