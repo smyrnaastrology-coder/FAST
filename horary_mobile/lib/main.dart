@@ -128,6 +128,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   final ScrollController _scroll = ScrollController();
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
+  bool _showLanding=true;
   int _daysLeft=365; String _expiryStr='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
@@ -144,7 +145,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     if(e.isNotEmpty){
       try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
     }
-    setState(()=> {_daysLeft=d, _expiryStr=e});
+    setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty});
   }
 
   Future<void> _loadHistory() async {
@@ -226,7 +227,16 @@ class _HoraryHomeState extends State<HoraryHome> {
       const SizedBox(height:16),
       const Text('Horary göksel uyum ile çalışır.\nCevabı veren gökyüzüdür.\nSoruda radikalliği yakalamak için gerçekten bir cevaba ihtiyacınız olduğunda soruyu sorun.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFe8e0f0), fontSize:14, height:1.6)),
       const SizedBox(height:24),
-      ElevatedButton(onPressed: (){}, child: const Text('Soruyu Sor')),
+      ElevatedButton(onPressed: ()=> setState(()=> _showLanding=false), child: const Text('Soruyu Sor')),
+    ])));
+  }
+  Widget _fullLanding(){
+    return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.auto_awesome, size:64, color: Color(0xFFC9A96E)),
+      const SizedBox(height:20),
+      const Text('Horary göksel uyum ile çalışır.\nCevabı veren gökyüzüdür.\nSoruda radikalliği yakalamak için gerçekten bir cevaba ihtiyacınız olduğunda soruyu sorun.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFe8e0f0), fontSize:16, height:1.7)),
+      const SizedBox(height:32),
+      SizedBox(width:200, child: ElevatedButton(onPressed: ()=> setState(()=> _showLanding=false), child: const Text('Soruyu Sor'))),
     ])));
   }
   Future<void> _ask() async {
@@ -273,7 +283,7 @@ class _HoraryHomeState extends State<HoraryHome> {
           IconButton(onPressed: ()=> setState(()=> _chat.clear()), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
-      body: Stack(children: [
+      body: _showLanding && _chat.isEmpty ? _fullLanding() : Stack(children: [
         Column(children: [
           // top bar: lang + mini location chip
           Padding(padding: const EdgeInsets.fromLTRB(8,8,8,4), child: Row(children: [
@@ -406,9 +416,9 @@ class _HoraryHomeState extends State<HoraryHome> {
               return Align(alignment: isUser? Alignment.centerRight:Alignment.centerLeft,
                 child: Container(margin: const EdgeInsets.symmetric(vertical:4), padding: const EdgeInsets.all(12),
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.82),
-                  decoration: BoxDecoration(color: isUser? const Color(0xFFC9A96E):const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
+                  decoration: BoxDecoration(color: isUser? Colors.white :const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(m['content']!, style: TextStyle(color: isUser? Colors.black : const Color(0xFFe8e0f0), height:1.45, fontWeight: isUser? FontWeight.w600 : FontWeight.normal)),
+                    Text(m['content']!, style: TextStyle(color: isUser? Colors.black : const Color(0xFFe8e0f0), height:1.45, fontWeight: isUser? FontWeight.bold : FontWeight.normal)),
                     if(!isUser) Padding(padding: const EdgeInsets.only(top:6), child: Row(mainAxisSize: MainAxisSize.min, children: [
                       GestureDetector(onTap: ()=> _copy(m['content']!), child: Row(children: [const Icon(Icons.copy, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('copy'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
                       const SizedBox(width:12),
@@ -420,9 +430,9 @@ class _HoraryHomeState extends State<HoraryHome> {
           if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
           const SizedBox(height: 88),
         ]),
-        // centered input floating - klavye ile uyumlu, ilk acilista cok asagida degil
+        // centered input floating - Gemini gibi klavyenin hemen ustu
         Positioned(
-          left: 0, right: 0, bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 12 + MediaQuery.of(context).viewInsets.bottom : 24,
+          left: 0, right: 0, bottom: 12,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),
