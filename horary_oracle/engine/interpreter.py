@@ -400,8 +400,8 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         elif qs_sign in ["Oğlak","Kova","Başak"]: long_detail += " Biraz mesafeli, mantıklı ve içine kapanık."
         elif qs_sign in ["Koç","Aslan","Yay"]: long_detail += " Hareketli, atik, bir şeyler yapmak istiyor."
     except: pass
-    # doğal kapanış önerileri
-    suggest = " İstersen netleştirelim — mesela 'bu işe girecek miyim?' veya 'bana yazacak mı?' gibi tek ve net bir soru sorabilirsin."
+    # doğal kapanış önerileri - sadece gerektiğinde, tıkla-çalışır olacak şekilde kısa
+    suggest = ""
     if v=="YES":
         base = f"{long_detail}\n\nGidişat senden yana canım — içini ferah tut, güzel bir akış var. ✓"
         if "asc_near_boundary" in strict_codes:
