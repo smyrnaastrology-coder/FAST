@@ -380,6 +380,9 @@ class _HoraryHomeState extends State<HoraryHome> {
               place: _lastChart!['location']['place'] ?? '',
               house: _lastChart!['location']['house'] ?? 7,
               deg: (_lastChart!['location']['deg'] is num) ? (_lastChart!['location']['deg'] as num).toDouble() : 15,
+              signDirection: _lastChart!['location']['sign_direction'] ?? '',
+              directionNote: _lastChart!['location']['direction_note'] ?? '',
+              directionOk: _lastChart!['location']['direction_ok'] ?? true,
             ),
           ),
           // 2) Derived ağaç görseli

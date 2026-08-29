@@ -12,8 +12,11 @@ class LostRadarMap extends StatelessWidget {
   final String place;
   final int house;
   final double deg;
+  final String signDirection;
+  final String directionNote;
+  final bool directionOk;
 
-  const LostRadarMap({super.key, required this.lat, required this.lon, required this.direction, required this.distance, required this.place, required this.house, this.deg = 15});
+  const LostRadarMap({super.key, required this.lat, required this.lon, required this.direction, required this.distance, required this.place, required this.house, this.deg = 15, this.signDirection = '', this.directionNote = '', this.directionOk = true});
 
   double get _bearing {
     const map = {
@@ -80,6 +83,8 @@ class LostRadarMap extends StatelessWidget {
             ])),
           const SizedBox(height:8),
           Text(place, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11)),
+          if(directionNote.isNotEmpty) Padding(padding: const EdgeInsets.only(top:6), child: Text(directionNote, style: const TextStyle(color: Color(0xFFf87171), fontSize:10, fontStyle: FontStyle.italic))),
+          if(signDirection.isNotEmpty) Text('Burç yönü: $signDirection', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
           const SizedBox(height:12),
           ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(height: 220, child: FlutterMap(
             options: MapOptions(initialCenter: center, initialZoom: zoom),

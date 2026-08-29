@@ -244,8 +244,28 @@ async def cast(req: CastRequest):
             is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
             use_data = res['querent']['data'] if is_self else res['quesited']['data']
             actual_house = use_data['house']
+        from engine.location_engine import direction_by_sign
+        house_dir = direction_by_house(actual_house)
+        sign_dir = direction_by_sign(use_data['sign'])
+        # çocuk kayıp için çift teyit: ev yönü + burç yönü + Ay yönü en az 2 uyuşsun
+        is_child = "çocuk" in q or "cocuk" in q or "oğlum" in q or "kızım" in q or req.quesited_type in ("missing_child","child")
+        direction_ok = True
+        direction_note = ""
+        if is_child:
+            # basit uyum: aynı ana yön kelimesi geçiyor mu?
+            house_main = house_dir.split()[0]
+            sign_main = sign_dir.split()[0]
+            moon_dir = direction_by_sign(res['planets']['Moon']['sign'])
+            moon_main = moon_dir.split()[0]
+            matches = sum([house_main in sign_dir or sign_main in house_dir, house_main in moon_dir or moon_main in house_dir, sign_main in moon_dir or moon_main in sign_dir])
+            if matches < 1:
+                direction_ok = False
+                direction_note = f"Yön teyidi zayıf: ev {house_dir} / burç {sign_dir} / Ay {moon_dir} — tek başına güvenme, teyit gerek"
         loc_info = {
-            "direction": direction_by_house(actual_house),
+            "direction": house_dir,
+            "sign_direction": sign_dir,
+            "direction_ok": direction_ok,
+            "direction_note": direction_note,
             "house": actual_house,
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
             "place": house_location_meaning(actual_house),
