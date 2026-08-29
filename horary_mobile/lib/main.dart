@@ -114,11 +114,13 @@ class _HoraryHomeState extends State<HoraryHome> {
   double lat = 38.4237, lon = 27.1428;
   String lang = 'tr';
   String _category = 'general';
+  String _asker = 'ben';
   String _lastQuestion = '';
   Map<String,dynamic>? _lastChart;
   final SpeechToText _speech = SpeechToText();
   bool _listening=false;
   final FlutterTts _tts = FlutterTts();
+  final ScrollController _scroll = ScrollController();
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
 
@@ -137,6 +139,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     lang=p.getString('lang')??'tr';
     setState((){});
   }
+  @override void dispose(){ _scroll.dispose(); _ctrl.dispose(); _speech.cancel(); _tts.stop(); super.dispose(); }
   Future<void> _saveHistory(String q) async {
     final p=await SharedPreferences.getInstance();
     final list=p.getStringList('chat_history')??[];
@@ -201,18 +204,30 @@ class _HoraryHomeState extends State<HoraryHome> {
     Future.delayed(const Duration(seconds:8), () async { if(_listening){ await _speech.stop(); setState(()=> _listening=false); }});
   }
 
+  void _scrollDown(){ WidgetsBinding.instance.addPostFrameCallback((_) { if(_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent+120, duration: const Duration(milliseconds:300), curve: Curves.easeOut); }); }
+  Widget _landingWidget(){
+    return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.auto_awesome, size:48, color: Color(0xFFC9A96E)),
+      const SizedBox(height:16),
+      const Text('Horary göksel uyum ile çalışır.\nCevabı veren gökyüzüdür.\nSoruda radikalliği yakalamak için gerçekten bir cevaba ihtiyacınız olduğunda soruyu sorun.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFe8e0f0), fontSize:14, height:1.6)),
+      const SizedBox(height:24),
+      ElevatedButton(onPressed: (){}, child: const Text('Soruyu Sor')),
+    ])));
+  }
   Future<void> _ask() async {
     final q = _ctrl.text.trim();
     if (q.isEmpty) return;
     setState(() { _chat.add({'role':'user','content':q}); _lastQuestion=q; _loading=true; _ctrl.clear(); });
+    _scrollDown();
     _saveHistory(q);
     try {
-      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category);
+      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category, asker: _asker);
       final ans = res['answer'] as String? ?? '${res['verdict']}';
       setState(() {
         _lastChart = res;
         _chat.add({'role':'assistant','content': ans, 'meta': res});
       });
+      _scrollDown();
     } catch (e) {
       setState(() => _chat.add({'role':'assistant','content': 'Hata: $e'}));
     } finally { setState(()=> _loading=false); }
@@ -263,6 +278,16 @@ class _HoraryHomeState extends State<HoraryHome> {
                 Text('${lat.toStringAsFixed(2)}, ${lon.toStringAsFixed(2)}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:11)),
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
+          ])),
+          // soruyu soran kim? (5)
+          Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:4), child: Row(children: [
+            const Text('Soran:', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
+            const SizedBox(width:8),
+            ChoiceChip(label: const Text('Ben', style: TextStyle(fontSize:11)), selected: _asker=='ben', selectedColor: const Color(0xFFC9A96E), onSelected: (v){ if(v) setState(()=> _asker='ben'); }),
+            const SizedBox(width:6),
+            ChoiceChip(label: const Text('Başkası', style: TextStyle(fontSize:11)), selected: _asker=='baskasi', selectedColor: const Color(0xFFC9A96E), onSelected: (v){ if(v) setState(()=> _asker='baskasi'); }),
+            const SizedBox(width:8),
+            if(_asker=='baskasi') const Text('→ Yükselen soran kişidir', style: TextStyle(color: Color(0xFF6a9ae2), fontSize:10, fontStyle: FontStyle.italic)),
           ])),
           // konum uyarısı
           Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:2), child: Row(children: const [
@@ -347,7 +372,8 @@ class _HoraryHomeState extends State<HoraryHome> {
               ]),
             ),
           ),
-          Expanded(child: ListView.builder(
+          Expanded(child: _chat.isEmpty ? _landingWidget() : ListView.builder(
+            controller: _scroll,
             padding: const EdgeInsets.fromLTRB(12,8,12,140),
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: _chat.length,
@@ -371,9 +397,9 @@ class _HoraryHomeState extends State<HoraryHome> {
           if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
           const SizedBox(height: 88),
         ]),
-        // centered input floating - klavye ile uyumlu
+        // centered input floating - klavye ile uyumlu, ilk acilista cok asagida degil
         Positioned(
-          left: 0, right: 0, bottom: 12 + MediaQuery.of(context).viewInsets.bottom,
+          left: 0, right: 0, bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 12 + MediaQuery.of(context).viewInsets.bottom : 24,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),

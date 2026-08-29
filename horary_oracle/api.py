@@ -35,6 +35,7 @@ class CastRequest(BaseModel):
     lon: float = Field(..., ge=-180, le=180, example=27.1428)
     lang: str = Field("tr", pattern="^(tr|en|es|ar|pt|fr|de|ru|it|hi)$")
     quesited_type: str = Field("general", description="UI kategori: relationship/money/job/lost_object/missing_person vb.")
+    asker: str = Field("ben", description="ben / baskasi - yükselen kim?")
     # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
     history: Optional[list] = None
     # opsiyonel: client kendi zamanını gönderirse
@@ -224,27 +225,25 @@ async def cast(req: CastRequest):
             natural = "Moon"
         elif "baba" in q or "babam" in q:
             natural = "Saturn"
-        # kullanım: derived varsa derived evinin yöneticisi, yoksa is_self mantığı
-        if derived_loc:
-            # derived evinin burcu ve yöneticisi
+        # öncelik: doğal gezegen varsa onu baz al (kullanıcı talimatı: baba=Satürn, anne=Ay)
+        if natural and res['planets'].get(natural):
+            use_data = res['planets'][natural]
+            actual_house = use_data['house']
+            loc_info["_natural"] = natural
+            # derived bilgisini de ek not
+            if derived_loc:
+                loc_info["_derived_house"] = derived_loc["derived"]
+        elif derived_loc:
             cusp_lon = res['houses']['cusps'][derived_loc["derived"]-1]
             from core.ephemeris import sign_from_lon as _sfl2, DOMICILE as _DOM2
             dsign = _sfl2(cusp_lon)
             dplanet = _DOM2.get(dsign, "Moon")
             use_data = res['planets'].get(dplanet, res['quesited']['data'])
             actual_house = use_data['house']
-            # doğal ikon ek not için sakla
-            if natural:
-                loc_info["_natural"] = natural
         else:
             is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
             use_data = res['querent']['data'] if is_self else res['quesited']['data']
             actual_house = use_data['house']
-            if natural:
-                # doğal gezegeni de ikincil gösterge olarak ekle
-                nat_data = res['planets'].get(natural)
-                if nat_data:
-                    loc_info["_natural_sec"] = f"{natural} {nat_data['sign']} Ev{nat_data['house']}"
         loc_info = {
             "direction": direction_by_house(actual_house),
             "house": actual_house,
