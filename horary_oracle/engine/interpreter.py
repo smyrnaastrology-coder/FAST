@@ -366,7 +366,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         return base+extra
 
     def long_explain():
-        # İnsanca tek paragraf — teknik liste değil, 1 cümle harita + his + zaman
+        # İnsanca tek paragraf + txt'den 5 teknik ipucu (via/bonatus vb öncelikli)
         asc_sig = engine_json.get("houses",{}).get("asc_sign","")
         asc_deg = engine_json.get("houses",{}).get("asc",0) % 30 if engine_json.get("houses",{}).get("asc") else 0
         moon = engine_json.get("planets",{}).get("Moon",{})
@@ -380,7 +380,6 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         epi_txt = t.get("ephemeris_text") or timing_txt
         zaman = f" {epi_txt} içinde bir hareket olabilir." if epi_txt and "BELİRSİZ" not in epi_txt else ""
         not_txt = " Ay şu an biraz boşlukta, o yüzden konu askıda gibi." if has_voc else ""
-        # karşı taraf hissi - insanca 1 cümle
         qs_sign = engine_json.get("quesited_sign","")
         his = ""
         if qs_sign in ["Balık","Yengeç","Boğa"]:
@@ -391,7 +390,20 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             his = " Karşı taraf hareketli, bir şeyler yapmak istiyor."
         elif qs_sign in ["İkizler","Terazi"]:
             his = " Karşı taraf kararsız, seçenekleri tartıyor."
-        return f"{harita} {bag}{his}{zaman}{not_txt}".strip()
+        base = f"{harita} {bag}{his}{zaman}{not_txt}".strip()
+        # txt'den teknikler - öncelikli 5 kuralı insanca ekle (detayda da var)
+        prio = ["via_combusta","via_combusta_asc","voc","bonatus","vergilius","critical_degree","critical_degree_asc","combustion_combust_2_8_5","saturn_1_7","moon_roles"]
+        txt_lines=[]
+        for code in prio:
+            if code in strict_codes and len(txt_lines)<5:
+                # strictures içinden bul
+                for s in strict:
+                    if s.get("code")==code:
+                        txt_lines.append(f"• {stricture_sentence(s)}")
+                        break
+        if txt_lines:
+            base += "\n\n" + "\n".join(txt_lines)
+        return base
     long_detail = long_explain()
     # İdrak katmanı - bütüncül his
     try:
