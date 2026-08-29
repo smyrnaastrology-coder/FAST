@@ -136,6 +136,16 @@ class _HoraryHomeState extends State<HoraryHome> {
     final q = _lastQuestion.toLowerCase();
     return q.contains('nerede') || q.contains('nerde') || q.contains('nere') || q.contains('kayip') || q.contains('kayıp') || q.contains('tasin') || q.contains('taşın') || q.contains('nereye');
   }
+  List<String> get _quickSuggestions {
+    switch(_category){
+      case 'relationship': return ['Beni seviyor mu?', 'Barışacak mıyız?', 'Evlenecek miyiz?'];
+      case 'job': return ['İşe girecek miyim?', 'Terfi alacak mıyım?', 'Bu iş olacak mı?'];
+      case 'money': return ['Para gelecek mi?', 'Borç ödenecek mi?', 'Ev alacak mıyım?'];
+      case 'lost_object': return ['Nerede?', 'Bulacak mıyım?', 'Kim aldı?'];
+      case 'health': return ['İyileşecek miyim?', 'Ameliyat olmalı mıyım?'];
+      default: return ['Bu işe girecek miyim?', 'Bana yazacak mı?', 'Evim olacak mı?'];
+    }
+  }
 
   @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); }
   Future<void> _loadExpiry() async {
@@ -423,6 +433,14 @@ class _HoraryHomeState extends State<HoraryHome> {
                       GestureDetector(onTap: ()=> _copy(m['content']!), child: Row(children: [const Icon(Icons.copy, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('copy'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
                       const SizedBox(width:12),
                       GestureDetector(onTap: ()=> _speak(m['content']!), child: Row(children: [const Icon(Icons.volume_up, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('listen'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
+                    ])),
+                    if(!isUser) Padding(padding: const EdgeInsets.only(top:8), child: Wrap(spacing:6, runSpacing:4, children: [
+                      for(final s in _quickSuggestions) ActionChip(
+                        label: Text(s, style: const TextStyle(fontSize:11, color: Color(0xFFe8e0f0))),
+                        backgroundColor: const Color(0xFF2a1f38),
+                        side: const BorderSide(color: Color(0xFFC9A96E)),
+                        onPressed: (){ _ctrl.text = s; _ask(); },
+                      ),
                     ])),
                   ])));
             },
