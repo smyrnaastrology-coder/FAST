@@ -56,7 +56,11 @@ class _AuthGateState extends State<AuthGate> {
       if(e!=null && pw!=null){
         final did = await _deviceId();
         final res = await HoraryApi.login(email:e, password:pw, deviceId: did);
-        if(res['ok']==true) setState(()=> _ok=true);
+        if(res['ok']==true){
+          await p.setString('expiry', res['expiry'] ?? '');
+          await p.setInt('days_left', res['days_left'] ?? 365);
+          setState(()=> _ok=true);
+        }
       }
     }catch(_){}
     setState(()=> _check=false);
@@ -71,6 +75,7 @@ class _AuthGateState extends State<AuthGate> {
         if(res['ok']==true) {
           final p = await SharedPreferences.getInstance();
           await p.setString('email', email); await p.setString('pass', pass);
+          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365);
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -123,6 +128,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   final ScrollController _scroll = ScrollController();
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
+  int _daysLeft=365; String _expiryStr='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
   bool get _showRadar {
@@ -130,7 +136,16 @@ class _HoraryHomeState extends State<HoraryHome> {
     return q.contains('nerede') || q.contains('nerde') || q.contains('nere') || q.contains('kayip') || q.contains('kayıp') || q.contains('tasin') || q.contains('taşın') || q.contains('nereye');
   }
 
-  @override void initState(){ super.initState(); _loadHistory(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); }
+  Future<void> _loadExpiry() async {
+    final p=await SharedPreferences.getInstance();
+    final e=p.getString('expiry')??''; 
+    int d=365;
+    if(e.isNotEmpty){
+      try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
+    }
+    setState(()=> {_daysLeft=d, _expiryStr=e});
+  }
 
   Future<void> _loadHistory() async {
     final p=await SharedPreferences.getInstance();
@@ -279,6 +294,14 @@ class _HoraryHomeState extends State<HoraryHome> {
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
           ])),
+          // lisans geri sayım - son 30 gün gün gün
+          if(_daysLeft <= 30) Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:4), child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), decoration: BoxDecoration(color: _daysLeft<=7 ? const Color(0xFFf87171).withOpacity(0.15) : const Color(0xFFfbbf24).withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24))),
+            child: Row(children: [
+              Icon(_daysLeft<=7 ? Icons.warning_amber_rounded : Icons.hourglass_bottom, size:16, color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24)),
+              const SizedBox(width:8),
+              Expanded(child: Text(_daysLeft<=0 ? 'Lisansınız doldu — yenileyin' : 'Lisansınız $_daysLeft gün sonra dolacak', style: TextStyle(color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24), fontSize:11, fontWeight: FontWeight.bold))),
+              Text(_expiryStr.isNotEmpty ? _expiryStr.substring(0,10) : '', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
+            ]))),
           // soruyu soran kim? (5)
           Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:4), child: Row(children: [
             const Text('Soran:', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
