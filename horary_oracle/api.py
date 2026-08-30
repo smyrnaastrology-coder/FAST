@@ -378,6 +378,9 @@ async def cast(req: CastRequest):
         if any(k in qlow3 for k in ["ben nerede","ben nerde","ben şimdi","ben simdi","neredeyim","nerdeyim"]):
             loc_info["is_self"] = True
             loc_info["person"] = ""
+        # Kayıp mı merak mı ayrımı: gerçek kayıp/çalınma işareti yoksa "merak" (manasızlık riski, hafif yorum)
+        kayip_kw = ["kaybol","kayıp ","kayipli","kayip ","kaybettim","kaybetti","kaybettik","kaybetmiş","kaybetmis","bulunamıyor","bulunamiyor","bulunmuyor","çalındı","calindi","çalınd","calind","çalınmış","calinmis","çalındılar","calindilar","çaldılar","caldilar","aşırdı","asirdi","aşırdılar","asirdilar","dönmedi","donmedi","geri gelmedi","geri donmedi","ulaşamıyorum","ulasamiyorum","ulasamıyorum","uzun zamandır yok","haber yok","kayıpsa","kayıp ise"]
+        loc_info["urgency"] = "kayip" if any(k in qlow3 for k in kayip_kw) else "merak"
         res["verdict"] = "LOCATION"
 
     # --- Gizli visitor modelleri (sistem içinde, dışarıda görünmez) ---
@@ -451,6 +454,8 @@ async def cast(req: CastRequest):
     # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
     if res["verdict"] == "LOCATION" and loc_info.get("ev_ici"):
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
+    if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak":
+        engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " NOT: bu soru kayıp/çalınma değil, gündelik MERAK kategorisinde (manasızlık riski) — kişinin şu an nerede olabileceğini yön+mesafe ile NAZİKÇE söyle, 'gitmiş/dönmüyor/kayıp' gibi kesin telaşlı hüküm ve tehdit tespiti verme. Cevabının SONUNA şunu da ekle: 'Kişi gerçekten kayıpsa veya ulaşamıyorsan bunu ayrıca söyle, kayıp analizi açarım.'"
     # --- HIRSIZLIK/KAYIP AYRIMI (Deneb Kaitos): 12. ev yöneticisinin açıları ---
     theft_kw = ["hırsız","hirsiz","hırsızlık","hirsizlik","çalınd","calind","çalın","calin","çaldı","caldi","aşırdı","asirdi","aşırıldı","asirildi","çalınmış","calinmis","soyuldu","soygun","kaptırdı","kaptirdi"]
     if any(k in req.question.lower() for k in theft_kw):
