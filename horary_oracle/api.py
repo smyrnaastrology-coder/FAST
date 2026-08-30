@@ -209,7 +209,7 @@ async def cast(req: CastRequest):
     # location (yer bulma) - is_self / is_live + doğal gösterge + derived house
     loc_info = {}
     try:
-        from engine.location_engine import direction_by_house, distance_fixed, house_location_meaning, height_by_sign, ELEMENT, ELEMENT_KALITE, burc_yer_detay
+        from engine.location_engine import direction_by_house, distance_fixed, house_location_meaning, height_by_sign, ELEMENT, ELEMENT_KALITE, burc_yer_detay, ev_ici_yer
         q = req.question.lower()
         # derived house varsa (anne/baba/eş/öğrenci/ben vb) onu kullan
         derived_loc = None
@@ -350,6 +350,7 @@ async def cast(req: CastRequest):
             "_natural": loc_info.get("_natural",""),
             "_derived_house": loc_info.get("_derived_house",""),
             "place": house_location_meaning(actual_house),
+            "ev_ici": ev_ici_yer(actual_house),
             "height": height_by_sign(use_data['sign']),
             "element_kalite": ELEMENT_KALITE.get(ELEMENT.get(use_data['sign'],''),''),
             "burc_detail": burc_yer_detay(use_data['sign']),
@@ -361,7 +362,7 @@ async def cast(req: CastRequest):
         }
     except Exception as e:
         print(f"loc_info hata: {e}")
-        loc_info = {"house": 7, "direction": "BATI", "distance": "", "place": "", "height": "", "element_kalite": "", "burc_detail": ""}
+        loc_info = {"house": 7, "direction": "BATI", "distance": "", "place": "", "height": "", "element_kalite": "", "burc_detail": "", "ev_ici": ""}
 
     # --- NEREDE/KAYIP soruları: YES/NO değil LOCATION (baba nerede, kaybolan nerede) ---
     # Konum sorusu olduğu için karar "evet/hayır" değil; sorgulayan hep NO almamalı
@@ -447,6 +448,9 @@ async def cast(req: CastRequest):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']'. MESAFE: KESİNLİKLE kendi hesap/çarpma yapma ve 'qq_distance_km' dışında başka hiçbir km/metre rakamı verme. location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), formülünün 'Yükselen yönetici derecesi × sorulanın derecesi × 10' olduğunu kısaca belirt. Yükselen yöneticisi (klasik tablo): location['_qr_ruler_klasik']. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
+    # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
+    if res["verdict"] == "LOCATION" and loc_info.get("ev_ici"):
+        engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000

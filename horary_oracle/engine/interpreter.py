@@ -444,12 +444,16 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             if loc.get('burc_detail'):
                 base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
+            if loc.get('ev_ici'):
+                base_txt += f"\nEv-içi ipucu: {loc.get('ev_ici')}."
             if loc.get('clarify'):
                 base_txt += f"\n\n{loc['clarify']}"
             return base_txt
         env = f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
         detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
         out = f"Aradığın şey {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+        if loc.get('ev_ici'):
+            out += f" Ev-içi ipucu: {loc.get('ev_ici')}."
         if loc.get('clarify'):
             out += f"\n\n{loc['clarify']}"
         return out
@@ -485,12 +489,16 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
                 if loc.get('burc_detail'):
                     base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
+                if loc.get('ev_ici'):
+                    base_txt += f"\nEv-içi ipucu: {loc.get('ev_ici')}."
                 if loc.get('clarify'):
                     base_txt += f"\n\n{loc['clarify']}"
                 return base_txt
             env = f"\n\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
             out = f"Aradığın şey {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+            if loc.get('ev_ici'):
+                out += f" Ev-içi ipucu: {loc.get('ev_ici')}."
             if loc.get('clarify'):
                 out += f"\n\n{loc['clarify']}"
             return out

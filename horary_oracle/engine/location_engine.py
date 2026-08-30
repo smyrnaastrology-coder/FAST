@@ -213,3 +213,21 @@ def distance_querent_quesited(q_deg, qs_deg):
     return round(q_deg * qs_deg * 10, 1)
 
 def house_location_meaning(h): return alan_tipi(h)
+
+# --- Eve göre yer kaliteleri (Deneb Kaitos: kaybolan kişi/eşyanın göstergesi hangi evdeyse ev-içi yer) ---
+EV_ICI_YER = {
+    1:  "En çok kullandığın yer/oda; üzerindeki kıyafette, çantanın bir gözünde, sürekli dokunduğun eşyanın yanında",
+    2:  "Para/ mücevher/ değerli malın durduğu oda; kasa, cüzdan, mücevher kutusu, değerli eşya çekmecesi",
+    3:  "Çalışma odası; telefon, televizyon, radyo yanı; araba anahtarı, kitap, kırtasiye; olabilir ki arabada",
+    4:  "Evin en eski bölümü; mutfak, depo, kiler, çatı dairesi; yaşlı/anne tarafı; çeyiz sandığı, dolap içi, salon vitrini, dededen kalma mobilya",
+    5:  "Dinlenme, oyun, çocuk odası, hobi köşesi, eğlence yeri; spor aletleri, oyuncak, takılar, makyaj çantası, tavla kutusu, piyango biletleri",
+    6:  "Hizmetçi/hasta odası; ecza dolabı, temizlik malzemeleri, ilaçlar; köpek/kedi maması ve bakım malzemelerinin yeri",
+    7:  "Eşinin yeri: TV karşısındaki koltuğu, oturma odası/lounge köşesi; evlilik cüzdanı; çay-kahve içilen yer",
+    8:  "Banyo, tuvalet, çöplük/çöp konteyneri yeri; kredi kartları, faturalar, banka/kredi belgeleri; silah, tapu/evrak, zehirli kimyasallar ve fare ilacı dolabı; yeni evliyseniz yatak odası",
+    9:  "Ders çalışma, meditasyon, dua odası; din ve meslek kitapları, tesbih rafı; pasaport, bavullar, seyahat evrakları, uçak biletleri",
+    10: "İş yapılan yer: çalışma masası, bilgisayar, yazıcı, home office köşesi; resmi/kimlik/iş evrakları",
+    11: "Misafir odası/salon, arkadaş ağırlama yeri; evdeki teknolojik cihazlar, teras, balkon; teleskop, dürbün, büyüteç",
+    12: "Yatak odası/uyku odası; içki dolabı; gardırop, yastık-yorgan bölümü; kapalı/gizli/izole odalar; tütsü ve meditasyon köşesi",
+}
+def ev_ici_yer(h):
+    return EV_ICI_YER.get(h, "")
