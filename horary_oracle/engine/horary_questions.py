@@ -61,7 +61,7 @@ TYPE_KEYWORDS = [
     ("student", ("öğrencim", "ogrencim", "öğrencimin", "ogrencimin", "öğrencimle", "ogrencimle", "kayıtlı öğrenci", "ogrenci")),
     ("friend", ("arkadaşım", "arkadasim", "arkadaşının", "arkadasinin", "dostum")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
-    ("child", ("oğlum", "oglum", "kızım", "kizim", "çocuğum", "cocugum", "bebeğim", "bebegim", "çocuklarım", "cocuklarim")),
+    ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
     ("coworker", ("iş arkadaşım", "is arkadasim", "iş arkadaşı", "is arkadasi", "mesai arkadaşım", "mesai arkadasim", "çalışma arkadaşım", "calisma arkadasim")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
     ("employee", ("çalışanım", "calisanim", "elemanım", "elemanim", "personelim", "işçim", "iscim")),

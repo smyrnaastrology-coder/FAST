@@ -202,5 +202,27 @@
     "real_bearing": 65.0,
     "_id": 7,
     "ts": "2026-08-30T22:01:04"
+  },
+  {
+    "question_type": "child",
+    "origin": "38.4237,27.1428",
+    "destination": "soranın yanı (1 m)",
+    "house": 5,
+    "significator": "Sun",
+    "sign": "Başak",
+    "sign_querent": "İkizler",
+    "degree": 7.67,
+    "querent_planet": "Mercury",
+    "querent_degree": 10.85,
+    "angular_difference": 14.77,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "condition": 1.0,
+    "real_distance_km": 0.001,
+    "real_bearing": null,
+    "mentor_note": "Kızım yanımda 1 m — motor 5306 km/DGD salladı; proximity eşiği (≤10°) tetiklenmedi (gösterge Sun, ASC 31°/IC 47.8°). Oda-içi katmanı 2. kanıtı (eş 2m ile birlikte).",
+    "real_scale": "oda içi (k≈0.0002 km/Δθ)",
+    "ts": "2026-08-30T22:15:00",
+    "_id": 8
   }
 ]
