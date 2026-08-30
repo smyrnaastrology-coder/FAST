@@ -171,7 +171,7 @@ async def cast(req: CastRequest):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
     # Follow-up ise bu guard atlanır (açıklama isteniyor)
-    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi"]
+    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi","hangi","hangisi"]
     is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
     if not is_followup and not is_horary and len(qlow.split()) < 12:
         # sohbet modu - öneri sun
@@ -498,9 +498,74 @@ async def cast(req: CastRequest):
             engine_json["theft_thief"] = un_txt
         except Exception as e:
             engine_json["theft_analysis"] = f"HIRSIZLIK analizi hesaplanamadı ({e}) — genel kayıp kuralları (12. ev) geçerli."
+    # --- İKİ SEÇENEK / HANGİ? kararı (Deneb Kaitos: Ay'ın olumlu açısı) ---
+    import re as _re2
+    _mıc = len(_re2.findall(r"\bm[ıiuü]\b", qlow))
+    _hangi = any(k in qlow for k in ["hangisini", "hangisine", "hangisi ", "hangisi?", "hangisinde", "hangisini ?"])
+    if _mıc >= 2 or _hangi:
+        try:
+            _moon2 = res['planets'].get('Moon', {})
+            OPT_PLANET = {
+                "dolar": "Jupiter", "usd": "Jupiter", "euro": "Jupiter", "avro": "Jupiter", "döviz": "Jupiter", "doviz": "Jupiter",
+                "altın": "Venus", "altin": "Venus", "gümüş": "Venus", "gumus": "Venus", "para": "Venus", "pırlanta": "Venus",
+                "ev": "Saturn", "daire": "Saturn", "rezidans": "Saturn", "arsa": "Saturn", "taşınmaz": "Saturn", "tasınmaz": "Saturn",
+                "bina": "Saturn", "gayrimenkul": "Saturn", "villa": "Saturn", "yazlık": "Saturn", "yazlik": "Saturn", "tarla": "Saturn",
+                "araba": "Mars", "oto": "Mars", "taşıt": "Mars", "tasit": "Mars",
+                "iş": "Mercury", "is": "Mercury", "işyeri": "Mercury", "isyeri": "Mercury", "okul": "Mercury", "şirket": "Jupiter", "sirket": "Jupiter", "ders": "Mercury",
+                "anne": "Moon", "annem": "Moon", "kız": "Venus", "kiz": "Venus", "sevgili": "Venus", "karı": "Venus", "kari": "Venus",
+                "baba": "Sun", "babam": "Sun", "erkek": "Mars", "abi": "Mars", "ağabey": "Mars", "agabey": "Mars",
+            }
+            _words2 = _re2.findall(r"[a-zçğıöşü]+", qlow)
+            _stops2 = {"mı", "mi", "mu", "mü", "miyim", "miyiz", "ile", "yoksa", "veya", "ya", "ama", "ben", "sen", "hangi", "hangisini", "hangisi", "olsa", "olsun", "alsam", "alsaydım", "alsaydim", "alayım", "alayim", "alan", "hmm", "karar", "veremiyorum", "veremem", "kararım", "kararim"}
+            _seen2 = []
+            for _w in _words2:
+                if len(_w) > 16 or _w in _stops2 or _w in _seen2:
+                    continue
+                _best = ""
+                for _k in OPT_PLANET:
+                    if _w.startswith(_k) and len(_k) > len(_best):
+                        _best = _k
+                if _best and _best not in _seen2:
+                    _seen2.append(_best)
+            def _asp3(a, b):
+                d = (b - a) % 360
+                if d > 180:
+                    d = 360 - d
+                ms = [0, 60, 90, 120, 180]
+                mm = min(ms, key=lambda x: abs(x - d))
+                return mm, round(abs(mm - d), 1)
+            _rows2 = []
+            _fav2 = []
+            for _w in _seen2:
+                _pp = OPT_PLANET[_w]
+                _pl = res['planets'].get(_pp, {})
+                if not _pl:
+                    continue
+                _a, _o = _asp3(_moon2.get('lon', 0), _pl.get('lon', 0))
+                _k = "OLUMLU" if (_a in (0, 60, 120) and _o <= 6) else ("OLUMSUZ" if (_a in (90, 180) and _o <= 6) else "SIFIR")
+                if _k == "OLUMLU":
+                    _fav2.append(_w)
+                _rows2.append(f"{_w} ({_pp} {_pl.get('sign','')} Ev{_pl.get('house','?')}) -> Ay-{_pp}: {_a} derece {_k}, orb {_o} derece")
+            if len(_fav2) == 1:
+                _verdict2 = f"AY'IN LEHİNE OLAN SEÇENEK: '{_fav2[0]}' — Ay, bu seçeneğin temsilcisiyle olumlu açı yapan tek seçenek (mentor karar kuralı). Diğer seçeneklere sert/sıfır açı var."
+            elif len(_fav2) > 1:
+                _verdict2 = f"Birden fazla seçenek Ay ile olumlu: {', '.join(_fav2)} — uzun vadeli/taşınmaz seçimlerde uzun vadeyi Satürn belirler, ona göre yorumla; Ay'ın yaklaşan açısı kime önce dokunacaksa hafif avantaj o seçenekte."
+            elif _seen2:
+                _verdict2 = "Ay, seçeneklerin hiçbiriyle 6° içinde olumlu açı yapmıyor — karar belirsiz, acele etme; Ay'ın bir sonraki yaklaşan açısına bak (hangi gezegene gidecekse konu oraya kayar)."
+            else:
+                _verdict2 = "Seçenekler gezegen karşılığı çıkarılamadı (ise/isim gibi ifadeler) — Ay'ın burcu/evi ve sonraki açısı üzerinden insani şekilde yorumla; 'hangisi olumlu' diye kesin rakam verme."
+            _t2 = "İKİLİ KARAR kuralı (mentor/Deneb Kaitos: Ay, sorunun belirteciyle hangisiyle olumlu açı yapıyorsa onu seç; uzun vadeli/taşınmazda Ay+Satürn belirler): " + _verdict2 + ". " + (" | ".join(_rows2) if _rows2 else f"Ay {_moon2.get('sign','')} Ev{_moon2.get('house','?')}, sonraki yaklaşan açısına bak.")
+            res['strictures'].insert(0, {"code": "two_option", "level": "info", "meaning": _t2})
+            engine_json["two_option"] = _t2
+            engine_json["two_option_verdict"] = _verdict2
+        except Exception as e:
+            engine_json["two_option"] = f"İkili karar hesaplanamadı ({e}) — Ay'ın burç/ev durumuna göre değerlendir."
+            engine_json["two_option_verdict"] = "belirsiz"
     answer = call_openai(engine_json, req.lang)
     if engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
+    if engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
+        answer = "İki seçenek kararı (Ay açısı kuralı): " + engine_json["two_option_verdict"] + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000
     # planets for mini chart
