@@ -165,7 +165,7 @@ async def cast(req: CastRequest):
         pass  # aşağıda engine_json'a history eklenecek
     # Doğal sohbet yakalama - her yazılanı horary sanma
     chat_greetings = ["merhaba","selam","selamlar","hey","hi","hello","günaydın","iyi akşamlar","iyi geceler","sa","mrb"]
-    if qlow in chat_greetings or any(qlow.startswith(g) for g in chat_greetings):
+    if qlow in chat_greetings or (len(qlow)<=8 and any(qlow.startswith(g) for g in ["merhaba","selam","günaydın","iyi akşam","iyi geceler","hey","hello"])):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* / *bu işe girecek miyim?* / *bana yazacak mı?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber","nasilsin"]):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
@@ -237,6 +237,19 @@ async def cast(req: CastRequest):
         elif is_female_sib:
             natural = "Moon"       # kız kardeş: Ay birincil (kadının doğalı)
             natural_second = "Venus"  # Venüs ikincil teyit
+        # kayıp eşya doğal göstergeleri (Deneb Kaitos yöntemi: bıçak=Mars, yüzük=Venüs,
+        # değerli saat=Satürn(+Venüs), evrak/not=Merkür). Cüzdan/tekstil 1. ev, kıymetli mal 2. ev işler.
+        object_label = None
+        if any(k in q for k in ["bıçak","bicak","bıçağım","bicagim","çakı","caki","silah","bıçakla","kılıç","kılic"]):
+            natural, natural_second, object_label = "Mars", None, "bıçak"
+        elif any(k in q for k in ["yüzük","yuzuk","yüzüğüm","yuzugum","yüzükler","alyans"]):
+            natural, natural_second, object_label = "Venus", None, "yüzük"
+        elif any(k in q for k in ["saatim","saatini","kol saat","kol saati","kol saatim"]) or ("saat" in q and "yi kir" not in q and "yı kir" not in q):
+            natural, natural_second, object_label = "Saturn", "Venus", "saat"
+        elif any(k in q for k in ["evrak","evrakım","evrakları","doküman","dokuman","evrakını","ders notu","ders notlarım","notlarım","belge","belgeler","sözleşme","sozlesme","kontrat","diploma","pasaport"]):
+            natural, natural_second, object_label = "Mercury", None, "evrak"
+        if object_label:
+            loc_info["_object"] = object_label
         # öncelik: doğal gezegen varsa onu baz al (baba=Güneş, anne=Ay)
         if natural and res['planets'].get(natural):
             use_data = res['planets'][natural]
@@ -266,6 +279,21 @@ async def cast(req: CastRequest):
         from engine.location_engine import direction_by_sign
         house_dir = direction_by_house(actual_house)
         sign_dir = direction_by_sign(use_data['sign'])
+        # Kural (kullanıcı): gösterge ASC/MC/DSC/IC'den <=10° ise kişi sorana ÇOK YAKINDIR.
+        # patron testi: 10.ev Aslan, yöneticisi Güneş; Güneş MC'ye 9.8° -> birlikte 12-13 m gerçeği.
+        _angles = {"ASC": res['houses']['asc'], "MC": res['houses']['mc']}
+        _angles["DSC"] = (_angles["ASC"]+180)%360
+        _angles["IC"] = (_angles["MC"]+180)%360
+        _prox_name, _prox_dist = None, 999.0
+        _plon = use_data['lon']
+        for _an, _av in _angles.items():
+            _ad = min(abs(_plon - _av), 360 - abs(_plon - _av))
+            if _ad < _prox_dist:
+                _prox_dist, _prox_name = _ad, _an
+        if _prox_dist <= 10.0:
+            loc_info["proximity"] = "cok yakin"
+            loc_info["proximity_angle"] = f"{_prox_name}'ye {_prox_dist:.1f}°"
+            loc_info["proximity_orb"] = round(_prox_dist, 1)
         # çocuk/kayıp hayvan için çift teyit: ev yönü + burç yönü + Ay yönü en az 2 uyuşsun
         is_child = "çocuk" in q or "cocuk" in q or "oğlum" in q or "kızım" in q or req.quesited_type in ("missing_child","child")
         is_pet = "kedi" in q or "köpek" in q or "kopek" in q or "hayvan" in q or "evcil" in q or req.quesited_type in ("pet","lost_pet","animal")
@@ -297,6 +325,9 @@ async def cast(req: CastRequest):
             loc_info["_qr_ruler_klasik"] = f"{asc_ruler_klasik} {qr_deg:.1f}° ({_asc_sign_r} yöneticisi)"
         except Exception:
             qq_dist = None
+        # çok yakın kuralı: km formülü geçersiz, analtitik izler sıfırlanır
+        if loc_info.get("proximity"):
+            qq_dist = None
         # ikincil doğal gösterge notu (baba=Satürn / kız kardeş=Venüs)
         second_note = ""
         if loc_info.get("_natural_second") and res['planets'].get(loc_info["_natural_second"]):
@@ -312,6 +343,10 @@ async def cast(req: CastRequest):
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
             "qq_distance_km": qq_dist,
             "saturn_second": second_note,
+            "proximity": loc_info.get("proximity",""),
+            "proximity_angle": loc_info.get("proximity_angle",""),
+            "proximity_orb": loc_info.get("proximity_orb",""),
+            "_object": loc_info.get("_object",""),
             "_natural": loc_info.get("_natural",""),
             "_derived_house": loc_info.get("_derived_house",""),
             "place": house_location_meaning(actual_house),
@@ -335,7 +370,7 @@ async def cast(req: CastRequest):
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
-        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("ablam","kardeş"),("abim","kardeş"),("abla","kardeş"),("abi","kardeş"),("ağabey","kardeş"),("agabey","kardeş"),("bacı","kardeş"),("baci","kardeş"),("öğrencim","öğrenci"),("ogrencim","öğrenci"),("öğrenci","öğrenci"),("ogrenci","öğrenci"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
+        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("ablam","kardeş"),("abim","kardeş"),("abla","kardeş"),("abi","kardeş"),("ağabey","kardeş"),("agabey","kardeş"),("bacı","kardeş"),("baci","kardeş"),("öğrencim","öğrenci"),("ogrencim","öğrenci"),("öğrenci","öğrenci"),("ogrenci","öğrenci"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek"),("patronum","patron"),("patron","patron"),("müdürüm","patron"),("müdür","patron"),("yüzüğüm","yüzük"),("yüzüğ","yüzük"),("yuzug","yüzük"),("yüzük","yüzük"),("yuzuk","yüzük"),("bıçak","bıçak"),("bicak","bıçak"),("bıçağ","bıçak"),("bicag","bıçak"),("evrak","evrak"),("doküman","evrak"),("dokuman","evrak"),("belge","evrak"),("ders notu","evrak"),("saatim","saat"),("kol saati","saat")]:
             if kw in qlow3:
                 loc_info["person"] = lab.replace("oğlum","çocuk").replace("kızım","çocuk").replace("kocam","eş")
                 break
@@ -404,7 +439,11 @@ async def cast(req: CastRequest):
         if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
         engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
-    if res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
+    if res["verdict"] == "LOCATION" and loc_info.get("proximity"):
+        engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu ve gösterge bir açıya (ASC/MC/DSC/IC) çok yakın (" + str(loc_info.get("proximity_angle","")) + " ≤10°) — kural: KİŞİ SORANA ÇOK YAKINDIR. Cevabında kişinin hemen yakınlarda/aynı mekanda olduğunu söyle; km çarpım formülü bu durumda GEÇERSİZ, HİÇBİR km/metre rakamı verme. Yine de 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']' kısımlarını rapor et (kişinin hangi yönde durduğuna işaret eder). Gösterge: " + str(loc_info.get('_qr_ruler_klasik','')) + "."
+        if loc_info.get("clarify"):
+            engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
+    elif res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']'. MESAFE: KESİNLİKLE kendi hesap/çarpma yapma ve 'qq_distance_km' dışında başka hiçbir km/metre rakamı verme. location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), formülünün 'Yükselen yönetici derecesi × sorulanın derecesi × 10' olduğunu kısaca belirt. Yükselen yöneticisi (klasik tablo): location['_qr_ruler_klasik']. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"

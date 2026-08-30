@@ -432,9 +432,12 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
             elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
             elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
+            elif person in ("yüzük","saat","evrak","bıçak"): label={"yüzük":"Yüzüğün","saat":"Saatin","evrak":"Evrakın","bıçak":"Bıçağın"}[person]
             sig_name = loc.get('_natural') or "Türetilmiş ev yöneticisi"
             base_txt = f"{label} şu an {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Gösterge {sig_name}: {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de."
-            if loc.get('qq_distance_km'):
+            if loc.get('proximity'):
+                base_txt += f"\n\nGösterge {loc.get('proximity_angle','')} açıya yakın (≤10°) → {label} sorana ÇOK YAKIN — aynı mekan, birkaç metre."
+            elif loc.get('qq_distance_km'):
                 base_txt += f"\n\nUzaklık: Yükselen yöneticisi ({loc.get('_qr_ruler_klasik','')}) × {loc.get('sign','')} ({loc.get('deg','')}°) ×10 → yaklaşık {loc['qq_distance_km']} km."
             if loc.get('saturn_second'):
                 base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
@@ -471,8 +474,11 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
                 elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
                 elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
+                elif person in ("yüzük","saat","evrak","bıçak"): label={"yüzük":"Yüzüğün","saat":"Saatin","evrak":"Evrakın","bıçak":"Bıçağın"}[person]
                 base_txt = f"{label} şu an {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor; gösterge {loc.get('_natural','') or 'türetilmiş ev yöneticisi'}."
-                if loc.get('qq_distance_km'):
+                if loc.get('proximity'):
+                    base_txt += f"\n\nGösterge {loc.get('proximity_angle','')} açıya yakın (≤10°) → {label} sorana ÇOK YAKIN — aynı mekan, birkaç metre."
+                elif loc.get('qq_distance_km'):
                     base_txt += f"\n\nUzaklık: Yükselen yöneticisi ({loc.get('_qr_ruler_klasik','')}) × {loc.get('sign','')} ({loc.get('deg','')}°) ×10 → yaklaşık {loc['qq_distance_km']} km."
                 if loc.get('saturn_second'):
                     base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
