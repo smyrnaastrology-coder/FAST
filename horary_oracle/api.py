@@ -367,106 +367,107 @@ async def cast(req: CastRequest):
             "_qr_ruler_klasik": loc_info.get("_qr_ruler_klasik", "")
         }
         # Yeni HORARY UZAKLIK MOTORU (ev+burç+gezegen ağırlıklı yön; kalibrasyonlu mesafe bandı)
+        # NOT: legacy 'proximity' (Jüpiter açıya yakın vs.) bu motoru ASLA kapatmaz;
+        #      aktif motorun kendi yakınlık kuralı var (angular<5 -> mesafe yok).
         geo_res = None
         try:
-            if not loc_info.get("proximity"):
-                from engine.horary_distance import (HoraryDistanceEngine, HoraryCalibration,
-                                                    condition_factor, load_weights, verify_prediction, CITY_COORDINATES)
-                from engine.horary_questions import classify_question, parse_nested
-                from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3, sign_from_lon as _sfl_g
-                _asc_s3 = res['houses']['asc_sign']
-                _qur3 = _DOMT3.get(_asc_s3, res['querent']['planet'])
-                # soru tipi -> kalibrasyon bucket'ı (hoca/arkadaş/öğrenci/...)
-                _qc = classify_question(req.question) or {}
-                _qn = parse_nested(req.question)
-                qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
-                # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
-                # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > gösterge gezegeninin bulunduğu ev
-                _ghouse = actual_house
-                if _qn:
-                    _ghouse = _qn["derived"]
-                elif _qc.get("house"):
-                    _ghouse = _qc["house"]
-                _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
-                if _qn:
-                    _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
-                    _gsign = _sfl_g(_cusp_g)
-                    _gplanet = _DOMT3.get(_gsign, "Moon")
-                    _guse = res['planets'].get(_gplanet, use_data)
-                elif _qc.get("house"):
-                    _cusp_g = res['houses']['cusps'][_qc["house"] - 1]
-                    _gsign = _sfl_g(_cusp_g)
-                    _gplanet = _DOMT3.get(_gsign, "Moon")
-                    _guse = res['planets'].get(_gplanet, use_data)
-                # gezegen gücü (F3/F4): asalet + retro + combust -> mesafe katsayısı
-                _cf = condition_factor(_gplanet, _gsign, lon=_guse.get('lon'),
-                                       retro=_guse.get('retro', False),
-                                       sun_lon=res['planets']['Sun'].get('lon'))
-                _eng_g = HoraryDistanceEngine(weights=load_weights())
-                geo_res = _eng_g.analyze(
-                    house=_ghouse,
-                    sign=_gsign,
-                    planet=_gplanet,
-                    friend_longitude=_guse.get('lon'),
-                    querent_longitude=res['planets'][_qur3]['lon'],
-                    condition=_cf['factor'],
-                    return_components=True,
-                    sign_querent=res['planets'][_qur3].get('sign'),
-                )
-                geo_res["dignity"] = ", ".join(_cf["labels"])
-                if _qc:
-                    geo_res["qtype"] = _qc["type"]
-                    geo_res["qtype_label"] = _qc["label"]
-                if _qn:
-                    geo_res["chain"] = _qn["formula"]
-                _cal3 = HoraryCalibration()
-                _cal3.load()
-                geo_res = _cal3.apply(geo_res, question_type=qtype_g)
-                if geo_res.get("angular") < 5:
-                    geo_res["band"] = ""
-                    geo_res["category"] = "yakın (soranın kendisi şu an bulunduğu konumda)"
-                    geo_res["mesafe_kalibre_km"] = None
-                # DOĞRULAMA: gerçek konum tahmine ASLA karışmaz; sadece kayıt + geri bildirim
-                if req.verify_city:
-                    _cl = req.verify_city.strip().lower()
-                    _mcity = next((k for k in CITY_COORDINATES if k.lower() == _cl), None)
-                    if _mcity and geo_res.get("mesafe_kalibre_km"):
-                        _c0, _c1 = CITY_COORDINATES[_mcity]
-                        _verify = verify_prediction(geo_res["azimut"], geo_res["mesafe_kalibre_km"],
-                                                    req.lat, req.lon, _c0, _c1)
-                        if _verify.get("real_bearing") is not None:
-                            _cal3.add_record(
-                                upsert=True,
-                                question_type=qtype_g,
-                                origin=f"{req.lat},{req.lon}",
-                                destination=_mcity,
-                                house=geo_res["house"],
-                                significator=geo_res["significator"],
-                                sign=geo_res["sign"],
-                                sign_querent=res['planets'][_qur3].get('sign'),
-                                degree=round(_guse.get('deg', 0) % 30, 2),
-                                querent_planet=_qur3,
-                                querent_degree=round(res['planets'][_qur3].get('deg', 0) % 30, 2),
-                                angular_difference=geo_res["orb_deg"],
-                                modality=geo_res["modality"],
-                                modality_multiplier=geo_res["modality_multiplier"],
-                                components=geo_res.get("components"),
-                                condition=geo_res.get("condition", 1.0),
-                                real_distance_km=_verify["real_distance_km"],
-                                real_bearing=_verify["real_bearing"],
-                            )
-                            _cal3.save()
-                            _rec_id = _cal3.records[-1]["_id"]
-                            _verify["record_added"] = _rec_id
-                            _verify["feedback"] = (
-                                f"Vaka #{_rec_id} kalibrasyona eklendi — gerçek {_mcity}: "
-                                f"{_verify['real_distance_km']} km / yön {_verify['real_bearing']}°. "
-                                f"Yön hatası {_verify['direction_error_deg']}°, mesafe hatası {_verify['distance_error_km']} km. "
-                                f"({_verify['verdict_text']})"
-                            )
-                            geo_res["calibration_n"] = len(_cal3.records)
-                            _cal3.apply(geo_res, question_type=qtype_g)
-                            geo_res["verification"] = _verify
+            from engine.horary_distance import (HoraryDistanceEngine, HoraryCalibration,
+                                                condition_factor, load_weights, verify_prediction, CITY_COORDINATES)
+            from engine.horary_questions import classify_question, parse_nested
+            from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3, sign_from_lon as _sfl_g
+            _asc_s3 = res['houses']['asc_sign']
+            _qur3 = _DOMT3.get(_asc_s3, res['querent']['planet'])
+            # soru tipi -> kalibrasyon bucket'ı (hoca/arkadaş/öğrenci/...)
+            _qc = classify_question(req.question) or {}
+            _qn = parse_nested(req.question)
+            qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
+            # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
+            # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > gösterge gezegeninin bulunduğu ev
+            _ghouse = actual_house
+            if _qn:
+                _ghouse = _qn["derived"]
+            elif _qc.get("house"):
+                _ghouse = _qc["house"]
+            _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
+            if _qn:
+                _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
+                _gsign = _sfl_g(_cusp_g)
+                _gplanet = _DOMT3.get(_gsign, "Moon")
+                _guse = res['planets'].get(_gplanet, use_data)
+            elif _qc.get("house"):
+                _cusp_g = res['houses']['cusps'][_qc["house"] - 1]
+                _gsign = _sfl_g(_cusp_g)
+                _gplanet = _DOMT3.get(_gsign, "Moon")
+                _guse = res['planets'].get(_gplanet, use_data)
+            # gezegen gücü (F3/F4): asalet + retro + combust -> mesafe katsayısı
+            _cf = condition_factor(_gplanet, _gsign, lon=_guse.get('lon'),
+                                   retro=_guse.get('retro', False),
+                                   sun_lon=res['planets']['Sun'].get('lon'))
+            _eng_g = HoraryDistanceEngine(weights=load_weights())
+            geo_res = _eng_g.analyze(
+                house=_ghouse,
+                sign=_gsign,
+                planet=_gplanet,
+                friend_longitude=_guse.get('lon'),
+                querent_longitude=res['planets'][_qur3]['lon'],
+                condition=_cf['factor'],
+                return_components=True,
+                sign_querent=res['planets'][_qur3].get('sign'),
+            )
+            geo_res["dignity"] = ", ".join(_cf["labels"])
+            if _qc:
+                geo_res["qtype"] = _qc["type"]
+                geo_res["qtype_label"] = _qc["label"]
+            if _qn:
+                geo_res["chain"] = _qn["formula"]
+            _cal3 = HoraryCalibration()
+            _cal3.load()
+            geo_res = _cal3.apply(geo_res, question_type=qtype_g)
+            if geo_res.get("angular") < 5:
+                geo_res["band"] = ""
+                geo_res["category"] = "yakın (soranın kendisi şu an bulunduğu konumda)"
+                geo_res["mesafe_kalibre_km"] = None
+            # DOĞRULAMA: gerçek konum tahmine ASLA karışmaz; sadece kayıt + geri bildirim
+            if req.verify_city:
+                _cl = req.verify_city.strip().lower()
+                _mcity = next((k for k in CITY_COORDINATES if k.lower() == _cl), None)
+                if _mcity and geo_res.get("mesafe_kalibre_km"):
+                    _c0, _c1 = CITY_COORDINATES[_mcity]
+                    _verify = verify_prediction(geo_res["azimut"], geo_res["mesafe_kalibre_km"],
+                                                req.lat, req.lon, _c0, _c1)
+                    if _verify.get("real_bearing") is not None:
+                        _cal3.add_record(
+                            upsert=True,
+                            question_type=qtype_g,
+                            origin=f"{req.lat},{req.lon}",
+                            destination=_mcity,
+                            house=geo_res["house"],
+                            significator=geo_res["significator"],
+                            sign=geo_res["sign"],
+                            sign_querent=res['planets'][_qur3].get('sign'),
+                            degree=round(_guse.get('deg', 0) % 30, 2),
+                            querent_planet=_qur3,
+                            querent_degree=round(res['planets'][_qur3].get('deg', 0) % 30, 2),
+                            angular_difference=geo_res["orb_deg"],
+                            modality=geo_res["modality"],
+                            modality_multiplier=geo_res["modality_multiplier"],
+                            components=geo_res.get("components"),
+                            condition=geo_res.get("condition", 1.0),
+                            real_distance_km=_verify["real_distance_km"],
+                            real_bearing=_verify["real_bearing"],
+                        )
+                        _cal3.save()
+                        _rec_id = _cal3.records[-1]["_id"]
+                        _verify["record_added"] = _rec_id
+                        _verify["feedback"] = (
+                            f"Vaka #{_rec_id} kalibrasyona eklendi — gerçek {_mcity}: "
+                            f"{_verify['real_distance_km']} km / yön {_verify['real_bearing']}°. "
+                            f"Yön hatası {_verify['direction_error_deg']}°, mesafe hatası {_verify['distance_error_km']} km. "
+                            f"({_verify['verdict_text']})"
+                        )
+                        geo_res["calibration_n"] = len(_cal3.records)
+                        _cal3.apply(geo_res, question_type=qtype_g)
+                        geo_res["verification"] = _verify
         except Exception as _e3:
             print(f"horary_geo hata: {_e3}")
             geo_res = None

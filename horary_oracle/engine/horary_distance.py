@@ -19,6 +19,7 @@ from datetime import datetime
 
 _DEFAULT_CALIB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "horary_calibration.json")
 _DEFAULT_WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "horary_weights.json")
+_DEFAULT_BIAS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "horary_bias.json")
 
 DEFAULT_WEIGHTS = {"house": 0.50, "sign": 0.30, "planet": 0.20}
 MIN_FIT_RECORDS = 4
@@ -373,6 +374,7 @@ class HoraryCalibration:
         geo_result["confidence"] = round(confidence, 2)
         geo_result["calibration_scale"] = round(scale, 3)
         geo_result["calibration_n"] = len(self.records)
+        apply_direction_bias(geo_result, question_type=question_type)
         if geo_result.get("formula") and "(k≈" not in geo_result.get("formula", ""):
             geo_result["formula"] = geo_result["formula"] + f"  (k≈{scale:.3f})"
         elif geo_result.get("formula"):
@@ -448,6 +450,81 @@ def save_weights(weights, filename=None):
     path = filename or _DEFAULT_WEIGHTS_FILE
     with open(path, "w", encoding="utf-8") as f:
         json.dump({k: round(v, 3) for k, v in weights.items()}, f, ensure_ascii=False, indent=2)
+
+
+# ---------------- TİP BAZLI YÖN SAPMASI (BIAS) ----------------
+def _circular_mean(deg_list):
+    """Dairesel ortalama: 330° ve 30° -> 0° (360.cpp)."""
+    if not deg_list:
+        return None
+    x = sum(math.cos(math.radians(d)) for d in deg_list) / len(deg_list)
+    y = sum(math.sin(math.radians(d)) for d in deg_list) / len(deg_list)
+    return (math.degrees(math.atan2(y, x)) + 360) % 360
+
+
+def fit_direction_bias(records, min_records=MIN_FIT_RECORDS):
+    """Tip bazlı sistematik yön sapmasını öğren: bias = dairesel_ort(gerçek - sembolik tahmin).
+
+    Her soru tipi için: sembolik model (mevcut ağırlıklar) belirli yönlerde
+    SİSTEMATİK kayıyor (ör. öğrenci sürekli KD söylüyor ama gerçek GD). Bu sapmayı
+    tip bazında ortalayıp 'düzeltme' olarak saklarız. En az min_records vaka gerekir
+    (tek kayıt 'ezber', genellenmez).
+    """
+    weights = load_weights()
+    usable = [r for r in records
+              if r.get("components") and r.get("real_bearing") is not None
+              and float(r.get("real_distance_km", 0)) >= MIN_FIT_DIRECTION_KM]
+    by_type = {}
+    for r in usable:
+        pred = _direction_predict(r["components"], weights)
+        drift = (r["real_bearing"] - pred) % 360  # gerçek, sembolik tahminin ilerisinde mi?
+        by_type.setdefault(r.get("question_type", "?"), []).append(drift)
+    bias = {}
+    for t, drifts in by_type.items():
+        if len(drifts) >= min_records:
+            bias[t] = {"bias_deg": round(_circular_mean(drifts), 2), "n": len(drifts)}
+        else:
+            bias[t] = {"bias_deg": None, "n": len(drifts), "yetersiz_veri": True}
+    return {"bias": bias, "n": len(usable), "fitted": bool(bias)}
+
+
+def load_direction_bias(filename=None):
+    path = filename or _DEFAULT_BIAS_FILE
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_direction_bias(bias, filename=None):
+    path = filename or _DEFAULT_BIAS_FILE
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(bias, f, ensure_ascii=False, indent=2)
+
+
+def apply_direction_bias(geo_result, question_type=None, bias_db=None):
+    """Bias varsa azimut/yön etiketini düzelt. Dönen dict: düzeltilen geo_result."""
+    if not question_type or not geo_result.get("azimut"):
+        return geo_result
+    db = bias_db if bias_db is not None else load_direction_bias()
+    entry = db.get(question_type)
+    if not entry:
+        return geo_result
+    if entry.get("bias_deg") is None:
+        geo_result["direction_bias_n"] = entry.get("n", 0)
+        geo_result["direction_bias_status"] = "yetersiz_veri"
+        return geo_result
+    new_az = (geo_result["azimut"] + entry["bias_deg"]) % 360
+    geo_result["azimut"] = round(new_az, 2)
+    geo_result["yon"] = HoraryDistanceEngine.angle_to_direction(new_az)
+    geo_result["yon_label"] = HoraryDistanceEngine.DIRECTION_LABEL[geo_result["yon"]]
+    geo_result["direction_bias_deg"] = entry["bias_deg"]
+    geo_result["direction_bias_n"] = entry["n"]
+    geo_result["direction_bias_status"] = "uygulandi"
+    return geo_result
 
 
 # ---------------- MODEL İSTATİSTİĞİ ----------------
@@ -532,7 +609,7 @@ CITY_COORDINATES = {
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),
     "Bursa": (40.1950, 29.0600), "Antalya": (36.8969, 30.7133), "Konya": (37.8746, 32.4932),
     "Tokat": (40.3167, 36.5500), "Niksar": (40.5903, 36.9492), "Ayrancılar": (38.10, 27.25),
-    "Samsun": (41.2867, 36.33), "Ereğli": (41.2417, 31.4256), "Katar": (25.3548, 51.1839),
+    "Samsun": (41.2867, 36.33), "Ereğli": (41.2417, 31.4256), "Katar": (25.3548, 51.1839), "Mersin": (36.8119, 34.6389),
     "Şanghay": (31.2304, 121.4737), "Valencia": (39.4699, -0.3763), "Milano": (45.4642, 9.1900),
     "Halkapınar": (38.4237, 27.1428),
 }

@@ -26,6 +26,7 @@ from engine.horary_distance import (
     HoraryCalibration, fit_direction_weights, load_weights, model_stats,
     save_weights, geographic_distance, geographic_bearing, CITY_COORDINATES,
     HoraryDistanceEngine, DEFAULT_SCALE_TIERS,
+    fit_direction_bias, load_direction_bias, save_direction_bias,
 )
 from engine.horary_questions import classify_question
 
@@ -70,6 +71,17 @@ def cmd_fit():
         print("  kaydedildi -> horary_weights.json")
     else:
         print(f"Ağırlık öğrenilemedi: {res['reason']}")
+
+
+def cmd_biasfit():
+    """Tip bazlı yön sapmasını öğren (>=4 kayıtlı tipler genellenir, şeffaf çıktı)."""
+    res = fit_direction_bias(CAL.records)
+    print(json.dumps(res, ensure_ascii=False, indent=2))
+    if res.get("bias"):
+        save_direction_bias(res["bias"])
+        print("  kaydedildi -> horary_bias.json")
+    else:
+        print(f"Sapma öğrenilemedi: {res['n']} kullanılabilir vaka (< {MIN_FIT_RECORDS}?)")
 
 
 def cmd_tohum():
