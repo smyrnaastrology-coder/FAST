@@ -43,6 +43,8 @@ class CastRequest(BaseModel):
     month: Optional[int] = None
     day: Optional[int] = None
     hour: Optional[float] = None  # local decimal
+    # kalibrasyon/doğrulama: gerçek konum şehir adı (tahmine asla karışmaz, sadece kayıt)
+    verify_city: Optional[str] = None
 
 class AuthRequest(BaseModel):
     email: str
@@ -364,28 +366,93 @@ async def cast(req: CastRequest):
             "clarify": loc_info.get("clarify", ""),
             "_qr_ruler_klasik": loc_info.get("_qr_ruler_klasik", "")
         }
-        # Yeni HORARY UZAKLIK MOTORU (ev+büyük+gezegen yön; kalibrasyonlu mesafe bandı)
+        # Yeni HORARY UZAKLIK MOTORU (ev+burç+gezegen ağırlıklı yön; kalibrasyonlu mesafe bandı)
         geo_res = None
         try:
             if not loc_info.get("proximity"):
-                from engine.horary_distance import HoraryDistanceEngine, HoraryCalibration
-                from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3
+                from engine.horary_distance import (HoraryDistanceEngine, HoraryCalibration,
+                                                    condition_factor, load_weights, verify_prediction, CITY_COORDINATES)
+                from engine.horary_questions import classify_question, parse_nested
+                from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3, sign_from_lon as _sfl_g
                 _asc_s3 = res['houses']['asc_sign']
                 _qur3 = _DOMT3.get(_asc_s3, res['querent']['planet'])
-                geo_res = HoraryDistanceEngine().analyze(
-                    house=actual_house,
-                    sign=use_data['sign'],
-                    planet=sig_planet,
-                    friend_longitude=use_data['lon'],
+                # soru tipi -> kalibrasyon bucket'ı (hoca/arkadaş/öğrenci/...)
+                _qc = classify_question(req.question) or {}
+                _qn = parse_nested(req.question)
+                qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
+                # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
+                _ghouse = actual_house
+                _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
+                if _qn:
+                    _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
+                    _gsign = _sfl_g(_cusp_g)
+                    _gplanet = _DOMT3.get(_gsign, "Moon")
+                    _guse = res['planets'].get(_gplanet, use_data)
+                    _ghouse = _qn["derived"]
+                # gezegen gücü (F3/F4): asalet + retro + combust -> mesafe katsayısı
+                _cf = condition_factor(_gplanet, _gsign, lon=_guse.get('lon'),
+                                       retro=_guse.get('retro', False),
+                                       sun_lon=res['planets']['Sun'].get('lon'))
+                _eng_g = HoraryDistanceEngine(weights=load_weights())
+                geo_res = _eng_g.analyze(
+                    house=_ghouse,
+                    sign=_gsign,
+                    planet=_gplanet,
+                    friend_longitude=_guse.get('lon'),
                     querent_longitude=res['planets'][_qur3]['lon'],
+                    condition=_cf['factor'],
+                    return_components=True,
                 )
+                geo_res["dignity"] = ", ".join(_cf["labels"])
+                if _qc:
+                    geo_res["qtype"] = _qc["type"]
+                    geo_res["qtype_label"] = _qc["label"]
+                if _qn:
+                    geo_res["chain"] = _qn["formula"]
                 _cal3 = HoraryCalibration()
                 _cal3.load()
-                geo_res = _cal3.apply(geo_res)
+                geo_res = _cal3.apply(geo_res, question_type=qtype_g)
                 if geo_res.get("angular") < 5:
                     geo_res["band"] = ""
                     geo_res["category"] = "yakın (soranın kendisi şu an bulunduğu konumda)"
                     geo_res["mesafe_kalibre_km"] = None
+                # DOĞRULAMA: gerçek konum tahmine ASLA karışmaz; sadece kayıt + geri bildirim
+                if req.verify_city:
+                    _cl = req.verify_city.strip().lower()
+                    _mcity = next((k for k in CITY_COORDINATES if k.lower() == _cl), None)
+                    if _mcity and geo_res.get("mesafe_kalibre_km"):
+                        _c0, _c1 = CITY_COORDINATES[_mcity]
+                        _verify = verify_prediction(geo_res["azimut"], geo_res["mesafe_kalibre_km"],
+                                                    req.lat, req.lon, _c0, _c1)
+                        if _verify.get("real_bearing") is not None:
+                            _cal3.add_record(
+                                question_type=qtype_g,
+                                origin=f"{req.lat},{req.lon}",
+                                destination=_mcity,
+                                house=geo_res["house"],
+                                significator=geo_res["significator"],
+                                sign=geo_res["sign"],
+                                degree=round(_guse.get('deg', 0) % 30, 2),
+                                querent_planet=_qur3,
+                                querent_degree=round(res['planets'][_qur3].get('deg', 0) % 30, 2),
+                                angular_difference=geo_res["angular"],
+                                components=geo_res.get("components"),
+                                condition=geo_res.get("condition", 1.0),
+                                real_distance_km=_verify["real_distance_km"],
+                                real_bearing=_verify["real_bearing"],
+                            )
+                            _cal3.save()
+                            _rec_id = _cal3.records[-1]["_id"]
+                            _verify["record_added"] = _rec_id
+                            _verify["feedback"] = (
+                                f"Vaka #{_rec_id} kalibrasyona eklendi — gerçek {_mcity}: "
+                                f"{_verify['real_distance_km']} km / yön {_verify['real_bearing']}°. "
+                                f"Yön hatası {_verify['direction_error_deg']}°, mesafe hatası {_verify['distance_error_km']} km. "
+                                f"({_verify['verdict_text']})"
+                            )
+                            geo_res["calibration_n"] = len(_cal3.records)
+                            _cal3.apply(geo_res, question_type=qtype_g)
+                            geo_res["verification"] = _verify
         except Exception as _e3:
             print(f"horary_geo hata: {_e3}")
             geo_res = None
@@ -481,11 +548,16 @@ async def cast(req: CastRequest):
         g = loc_info["horary_geo"]
         engine_json["loc_instruction"] = (
             "Bu bir NEREDE/KONUM sorusu - HORARY UZAKLIK MOTORU ciktisini kullan, kendi km hesabi/carpim yapma.\n"
-            f"Panel (cevabinda bu blok gibi profesyonel sun):\n"
-            f"- Sorulan evi: H{g['house']} | Significator: {g['significator']} {g['sign']} ({loc_info.get('deg','')}°) | Querent: {loc_info.get('_qr_ruler_klasik','')} | Ekliptik fark: {g['angular']}°\n"
-            f"- Yon: {g['yon_label']} (azimut yaklasik {g['azimut']} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi\n"
-            f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu") + f" | Kategori: {g['category']} | Guven: {g['confidence']}\n"
-            "Ev-ici ipucu: " + loc_info.get("ev_ici", "") + " | Yukseklik: " + loc_info.get("height", "")
+            "Panel (cevabinda bu blok gibi profesyonel sun):\n"
+            + (f"- Soru kategorisi: {g['qtype_label']}{' | Zincir: ' + g['chain'] if g.get('chain') else ''}\n" if g.get("qtype") else "")
+            + f"- Sorulan evi: H{g['house']} | Significator: {g['significator']} {g['sign']} ({loc_info.get('deg','')}°) | Querent: {loc_info.get('_qr_ruler_klasik','')} | Ekliptik fark: {g['angular']}°\n"
+            + (f"- Gösterge gücü: {g['dignity']}\n" if g.get("dignity") else "")
+            + f"- Yon: {g['yon_label']} (azimut yaklasik {g['azimut']} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi (ağırlıklar: ev .50 / burç .30 / gezegen .20)\n"
+            + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
+            + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
+            + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"
+            + ("- Doğrulama (kullanıcının verdiği gerçek konum): " + g['verification']['feedback'] + "\n" if g.get("verification") else "")
+            + "Ev-ici ipucu: " + loc_info.get("ev_ici", "") + " | Yukseklik: " + loc_info.get("height", "")
         )
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"

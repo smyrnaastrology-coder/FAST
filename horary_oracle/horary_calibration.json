@@ -1,7 +1,19 @@
 [
   {
-    "angular_distance": 68.5,
-    "house_type": "succedent",
-    "real_distance": 572
+    "_id": 1,
+    "question_type": "teacher",
+    "origin": "38.3176,27.2025",
+    "destination": "Kırıkkale",
+    "house": 9,
+    "significator": "Sun",
+    "sign": "Virgo",
+    "degree": 7.1,
+    "querent_planet": "Jupiter",
+    "querent_degree": 13.4,
+    "angular_difference": 68.5,
+    "condition": 1.0,
+    "real_distance_km": 571.8,
+    "real_bearing": 71.94,
+    "ts": "2026-08-30T14:16:00"
   }
 ]

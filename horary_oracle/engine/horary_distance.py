@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
-"""HORARY UZAKLIK & YÖN MOTORU (Deneb Kaitos ekolü, kalibrasyon destekli).
+"""HORARY UZAKLIK & YÖN MOTORU (Deneb Kaitos ekolü, öğrenen kalibrasyon).
 
-Modüler model:
-  EV   -> temel azimut          (%60 ağırlık)
-  BURÇ -> yön düzeltmesi        (%25 ağırlık)
-  GEZEGEN -> küçük yön düzeltmesi (%15 ağırlık)
-  Jüpiter(querent) <-> significator ekliptik farkı -> yöne ±15° açısal düzeltme
+Katmanlar:
+  1. Kişiyi belirle        -> QUESTION_HOUSES / derived_houses (horary_questions.py)
+  2. Significator          -> ev yöneticisi (klasik)
+  3. YÖN motoru            -> ev + burç + gezegen  (başlangıç 0.50/0.30/0.20, veriden fit)
+  4. MESAFE motoru         -> açısal fark × ev-katsayı × gezegen gücü × kalibrasyon
+  5. Kalibrasyon           -> gerçek vakalardan ölçek; tip bazlı; hata istatistiği
 
-Mesafe:
-  base = sqrt(angular_distance) * 100
-  mesafe = base * ev_tipi_çarpanı * kalibrasyon_ölçeği
-  Kalibrasyon: gerçek vakalardan (gerçek_km / base) oranı öğrenilir.
-
-Gerçek konum (haversine/bearing) tahmine KARIŞTIRILMAZ; sadece kalibrasyonda kullanılır.
+PRENSIP: astrolojik formül önceden doğru KABUL EDILMEZ; gerçek vakalarla test
+edilir ve katsayılar (ağırlıklar + ölçek) veriden öğrenilir. Gerçek konum,
+tahmin oluşturulurken KULLANILMAZ (data-leak yasak); sadece doğrulama/kalibrasyon.
 """
 import json
 import math
 import os
+from datetime import datetime
 
 _DEFAULT_CALIB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "horary_calibration.json")
+_DEFAULT_WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "horary_weights.json")
+
+DEFAULT_WEIGHTS = {"house": 0.50, "sign": 0.30, "planet": 0.20}
+MIN_FIT_RECORDS = 4
 
 
 class HoraryDistanceEngine:
@@ -51,6 +54,16 @@ class HoraryDistanceEngine:
         "B": "Batı", "BKB": "Batı-Kuzeybatı", "KB": "Kuzeybatı", "KKB": "Kuzey-Kuzeybatı",
     }
 
+    def __init__(self, weights=None):
+        self.weights = dict(DEFAULT_WEIGHTS)
+        if weights:
+            self.set_weights(weights)
+
+    def set_weights(self, weights):
+        w = dict(DEFAULT_WEIGHTS)
+        w.update({k: max(0.0, min(1.0, float(v))) for k, v in (weights or {}).items() if k in DEFAULT_WEIGHTS})
+        self.weights = w
+
     @staticmethod
     def normalize_angle(angle):
         return angle % 360
@@ -78,33 +91,42 @@ class HoraryDistanceEngine:
     def planet_correction(self, planet):
         return self.PLANET_DIRECTION_CORRECTION.get(planet, 0)
 
-    def calculate_direction(self, house, sign, planet, planet_longitude=None, querent_longitude=None):
-        direction = (
-            self.house_direction(house)
-            + self.sign_correction(sign) * 0.25
-            + self.planet_correction(planet) * 0.15
-        )
+    def calculate_direction(self, house, sign, planet, planet_longitude=None, querent_longitude=None, return_components=False):
+        h = self.house_direction(house)
+        s = self.sign_correction(sign)
+        p = self.planet_correction(planet)
+        ang = None
         if planet_longitude is not None and querent_longitude is not None:
-            angular = self.angular_distance(planet_longitude, querent_longitude)
-            direction += ((angular - 90) / 90) * 15
+            ang = self.angular_distance(planet_longitude, querent_longitude)
+        ang_adj = ((ang - 90) / 90) * 15 if ang is not None else 0.0
+        w = self.weights
+        direction = w["house"] * h + w["sign"] * s + w["planet"] * p + ang_adj
         direction = self.normalize_angle(direction)
-        return {
+        res = {
             "azimut": round(direction, 2),
             "yon": self.angle_to_direction(direction),
             "yon_label": self.DIRECTION_LABEL[self.angle_to_direction(direction)],
         }
+        if return_components:
+            res["components"] = {"house": h, "sign_corr": s, "planet_corr": p, "ang_adj": round(ang_adj, 2), "angular": ang}
+        return res
 
-    def estimate_distance(self, angular_distance_value, house):
+    def estimate_distance(self, angular_distance_value, house, condition=1.0):
         house_type = self.HOUSE_TYPE.get(house, "succedent")
         multiplier = self.DISTANCE_MULTIPLIER[house_type]
         base_distance = math.sqrt(max(angular_distance_value, 0)) * 100
-        return {"mesafe_km": round(base_distance * multiplier), "ev_tipi": house_type, "base_km": round(base_distance)}
-
-    def analyze(self, house, sign, planet, friend_longitude, querent_longitude):
-        angular = self.angular_distance(friend_longitude, querent_longitude)
-        direction = self.calculate_direction(house, sign, planet, friend_longitude, querent_longitude)
-        distance = self.estimate_distance(angular, house)
         return {
+            "mesafe_km": round(base_distance * multiplier * condition),
+            "ev_tipi": house_type,
+            "base_km": round(base_distance),
+            "condition": round(condition, 3),
+        }
+
+    def analyze(self, house, sign, planet, friend_longitude, querent_longitude, condition=1.0, return_components=False):
+        angular = self.angular_distance(friend_longitude, querent_longitude)
+        direction = self.calculate_direction(house, sign, planet, friend_longitude, querent_longitude, return_components=return_components)
+        distance = self.estimate_distance(angular, house, condition)
+        res = {
             "house": house,
             "significator": planet,
             "sign": sign,
@@ -114,17 +136,79 @@ class HoraryDistanceEngine:
             "yon_label": direction["yon_label"],
             "mesafe_km": distance["mesafe_km"],
             "base_km": distance["base_km"],
+            "condition": distance["condition"],
             "ev_tipi": distance["ev_tipi"],
         }
+        if return_components:
+            res["components"] = direction["components"]
+        return res
 
 
+# ---------------- GEZEGEN GÜCÜ (F3/F4) ----------------
+def condition_factor(significator, sign, lon=None, retro=False, sun_lon=None, sun_name_lon=None):
+    """Asalet/retro/combust -> mesafe katsayısı. Önceden doğru değil, veriden öğrenilecek."""
+    from core.ephemeris import DOMICILE_TRADITIONAL, EXALTATION, DETRIMENT, FALL
+    f = 1.0
+    labels = []
+    if DOMICILE_TRADITIONAL.get(sign) == significator:
+        f *= 1.00
+        labels.append("domicile")
+    elif EXALTATION.get(sign) == significator:
+        f *= 1.05
+        labels.append("exaltation")
+    elif DETRIMENT.get(sign) == significator:
+        f *= 0.90
+        labels.append("detriment")
+    elif FALL.get(sign) == significator:
+        f *= 0.85
+        labels.append("fall")
+    else:
+        labels.append("neutral")
+    if retro and significator not in ("Sun", "Moon"):
+        f *= 0.90
+        labels.append("retrograde")
+    if significator != "Sun" and lon is not None and sun_lon is not None:
+        d = abs((lon - sun_lon + 180) % 360 - 180)
+        if d < 8.5:
+            f *= 0.85
+            labels.append("combust")
+    return {"factor": round(f, 3), "labels": labels}
+
+
+# ---------------- KM KATEGORİ TABLOSU (iki aşama) ----------------
+DISTANCE_BANDS_KM = [
+    (0, 50, "çok yakın"),
+    (50, 150, "yakın"),
+    (150, 400, "orta"),
+    (400, 750, "orta-uzak"),
+    (750, 1500, "uzak"),
+    (1500, math.inf, "çok uzak"),
+]
+
+
+def km_category(km):
+    for lo, hi, label in DISTANCE_BANDS_KM:
+        if lo <= km < hi:
+            return {"altsınır": lo, "üstsınır": hi, "label": label}
+    return {"altsınır": 1500, "üstsınır": math.inf, "label": "çok uzak"}
+
+
+# ---------------- KALİBRASYON ----------------
 class HoraryCalibration:
     def __init__(self, filename=None):
         self.filename = filename or _DEFAULT_CALIB_FILE
         self.records = []
 
-    def add_record(self, angular_distance, house_type, real_distance_km):
-        self.records.append({"angular_distance": angular_distance, "house_type": house_type, "real_distance": real_distance_km})
+    # kayıt şeması:
+    # {"_id", "question_type", "origin","destination", "house", "significator","sign","degree",
+    #  "querent_planet","querent_degree", "angular_difference", "components", "condition",
+    #  "real_distance_km", "real_bearing", "ts"}
+    def add_record(self, **kw):
+        rec = dict(kw)
+        rec["_id"] = (max([r.get("_id", 0) for r in self.records]) + 1) if self.records else 1
+        rec.setdefault("ts", datetime.now().isoformat(timespec="seconds"))
+        self.records.append(rec)
+        return rec
 
     def save(self, filename=None):
         with open(filename or self.filename, "w", encoding="utf-8") as f:
@@ -138,59 +222,174 @@ class HoraryCalibration:
         with open(path, "r", encoding="utf-8") as f:
             self.records = json.load(f)
 
-    def scale_for(self, house_type):
-        # öğrenilen oran: gerçek_km / (sqrt(angular)*multiplier)
-        preds = []
+    def _base_preds(self, house_type):
+        """(base_km, gerçek_km, kayıt) listesi."""
+        out = []
         for r in self.records:
-            if r.get("house_type") == house_type:
-                mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(house_type, 1.0)
-                base = math.sqrt(max(r["angular_distance"], 1)) * 100 * mult
-                if base > 0:
-                    preds.append(r["real_distance"] / base)
-        return (sum(preds) / len(preds)) if preds else 1.0
-
-    def global_scale(self):
-        preds = []
-        for r in self.records:
-            mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(r.get("house_type"), 1.0)
-            base = math.sqrt(max(r["angular_distance"], 1)) * 100 * mult
+            mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(house_type, 1.0)
+            ang = float(r.get("angular_difference", 1))
+            cond = float(r.get("condition", 1.0))
+            base = math.sqrt(max(ang, 1)) * 100 * mult * cond
             if base > 0:
-                preds.append(r["real_distance"] / base)
-        return (sum(preds) / len(preds)) if preds else 1.0
+                out.append((base, float(r["real_distance_km"]), r))
+        return out
 
-    def apply(self, geo_result):
-        """geo_result (HoraryDistanceEngine.analyze çıktısı) üzerine kalibrasyon + bant + kategori ekler."""
+    def scale_for(self, house_type, question_type=None):
+        """Aynı (qtype) -> aynı ev-tipi -> global; ölçek oran ortalaması (gerçek/base)."""
+        if question_type:
+            bucket = [r for r in self._base_preds(house_type) if r[2].get("question_type") == question_type]
+            if bucket:
+                return sum(real / base for base, real, _ in bucket) / len(bucket)
+        bucket = self._base_preds(house_type)
+        if bucket:
+            return sum(real / base for base, real, _ in bucket) / len(bucket)
+        return 1.0 if question_type else 1.0
+
+    def apply(self, geo_result, question_type=None):
         ht = geo_result.get("ev_tipi", "succedent")
-        scale = self.scale_for(ht)
-        if scale == 1.0:
-            scale = self.global_scale()
+        scale = self.scale_for(ht, question_type)
         km = geo_result["mesafe_km"] * scale
         lo = max(5, int(round(km * 0.8 / 50) * 50))
         hi = max(lo + 50, int(round(km * 1.25 / 50) * 50))
-        cat = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
+        cat_q = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
+        cat_km = km_category(km)
         confidence = 0.68 + min(0.12, 0.04 * len(self.records))
         geo_result["mesafe_kalibre_km"] = round(km)
         geo_result["band"] = f"~{lo}–{hi}"
-        geo_result["category"] = cat
+        geo_result["category"] = cat_q
+        geo_result["km_category"] = cat_km["label"]
+        geo_result["km_category_range"] = f"{cat_km['altsınır']}–{cat_km['üstsınır']} km"
         geo_result["confidence"] = round(confidence, 2)
         geo_result["calibration_scale"] = round(scale, 3)
+        geo_result["calibration_n"] = len(self.records)
         return geo_result
 
-    def average_error_pct(self):
-        if not self.records:
-            return None
-        errs = []
+    def get_record(self, ident):
         for r in self.records:
-            mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(r.get("house_type"), 1.0)
-            base = math.sqrt(max(r["angular_distance"], 1)) * 100 * mult
-            scale = self.scale_for(r.get("house_type"))
-            if base > 0:
-                pred = base * scale
-                errs.append(abs(pred - r["real_distance"]) / r["real_distance"] * 100)
-        return round(sum(errs) / len(errs), 1) if errs else None
+            if r.get("_id") == ident:
+                return r
+        return None
 
 
-# ---------------- GERÇEK COĞRAFİ HESAP (sadece kalibrasyon için) ----------------
+# ---------------- AĞIRLIK ÖĞRENİMİ ----------------
+def _circular_diff(a, b):
+    d = abs(a - b) % 360
+    return d if d <= 180 else 360 - d
+
+
+def _direction_predict(comp, weights):
+    return (weights["house"] * comp["house"] + weights["sign"] * comp["sign_corr"]
+            + weights["planet"] * comp["planet_corr"] + comp.get("ang_adj", 0)) % 360
+
+
+def fit_direction_weights(records):
+    """Veriden ev/burç/gezegen ağırlıklarını öğren (küçültme: ortalama dairesel hata).
+    Kayıtlarda 'components' + 'real_bearing' gerekir; en az MIN_FIT_RECORDS vaka.
+    """
+    usable = [r for r in records if r.get("components") and r.get("real_bearing") is not None]
+    if len(usable) < MIN_FIT_RECORDS:
+        return {"weights": dict(DEFAULT_WEIGHTS), "n": len(usable), "fitted": False, "reason": f"en az {MIN_FIT_RECORDS} vaka gerek"}
+
+    def mean_err(w1, w2):
+        w = {"house": w1, "sign": w2, "planet": 1.0 - w1 - w2}
+        errs = [_circular_diff(_direction_predict(r["components"], w), r["real_bearing"]) for r in usable]
+        return sum(errs) / len(errs)
+
+    best = None
+    for step in (0.05, 0.01, 0.002):
+        w1 = 0.0
+        while w1 <= 1.0 + 1e-9:
+            w2 = 0.0
+            while w2 <= (1.0 - w1) + 1e-9:
+                e = mean_err(w1, w2)
+                if best is None or e < best[0]:
+                    best = (e, w1, w2)
+                w2 += step
+            w1 += step
+    e, w1, w2 = best
+    w = {"house": round(w1, 3), "sign": round(w2, 3), "planet": round(1.0 - w1 - w2, 3)}
+    return {"weights": w, "mean_err_deg": round(e, 1), "n": len(usable), "fitted": True}
+
+
+def load_weights(filename=None):
+    path = filename or _DEFAULT_WEIGHTS_FILE
+    if not os.path.exists(path):
+        return dict(DEFAULT_WEIGHTS)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return {k: float(v) for k, v in json.load(f).items() if k in DEFAULT_WEIGHTS}
+    except Exception:
+        return dict(DEFAULT_WEIGHTS)
+
+
+def save_weights(weights, filename=None):
+    path = filename or _DEFAULT_WEIGHTS_FILE
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({k: round(v, 3) for k, v in weights.items()}, f, ensure_ascii=False, indent=2)
+
+
+# ---------------- MODEL İSTATİSTİĞİ ----------------
+def model_stats(records):
+    """Yön (±22.5/±45) + mesafe (±50/100/200 km) doğruluğu, genel + tip bazlı."""
+    weights = load_weights()
+
+    def _stats(subset):
+        if not subset:
+            return None
+        dir_errs = []
+        km_errs = []
+        for r in subset:
+            if r.get("components") and r.get("real_bearing") is not None:
+                pred_az = _direction_predict(r["components"], weights)
+                dir_errs.append(_circular_diff(pred_az, r["real_bearing"]))
+            if r.get("angular_difference") and r.get("real_distance_km") is not None:
+                mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(HoraryDistanceEngine.HOUSE_TYPE.get(r.get("house"), "succedent"), 1.0)
+                base = math.sqrt(max(float(r["angular_difference"]), 1)) * 100 * mult * float(r.get("condition", 1.0))
+                cal = HoraryCalibration()
+                scale = cal.scale_for(HoraryDistanceEngine.HOUSE_TYPE.get(r.get("house"), "succedent"), r.get("question_type"))
+                pred_km = base * scale
+                km_errs.append(abs(pred_km - float(r["real_distance_km"])))
+        out = {"n": len(subset)}
+        if dir_errs:
+            out["yon_err_ort"] = round(sum(dir_errs) / len(dir_errs), 1)
+            out["yon_<=22.5"] = round(sum(1 for e in dir_errs if e <= 22.5) / len(dir_errs) * 100)
+            out["yon_<=45"] = round(sum(1 for e in dir_errs if e <= 45) / len(dir_errs) * 100)
+        if km_errs:
+            out["km_err_ort"] = round(sum(km_errs) / len(km_errs), 1)
+            out["km_<=50"] = round(sum(1 for e in km_errs if e <= 50) / len(km_errs) * 100)
+            out["km_<=100"] = round(sum(1 for e in km_errs if e <= 100) / len(km_errs) * 100)
+            out["km_<=200"] = round(sum(1 for e in km_errs if e <= 200) / len(km_errs) * 100)
+        return out
+
+    result = {"genel": _stats(records)}
+    by_type = {}
+    for r in records:
+        by_type.setdefault(r.get("question_type", "?"), []).append(r)
+    for t, sub in by_type.items():
+        result[t] = _stats(sub)
+    return result
+
+
+# ---------------- DOĞRULAMA / VERIFICATION ----------------
+def verify_prediction(predicted_azimut, predicted_km, origin_lat, origin_lon, real_lat, real_lon):
+    """Gerçek konum (hint) TAHMİN ÜRETİMİNDE kullanılmaz; sadece karşılaştırma+kalibrasyon."""
+    real_dm = round(geographic_distance(origin_lat, origin_lon, real_lat, real_lon), 1)
+    real_bearing = round(geographic_bearing(origin_lat, origin_lon, real_lat, real_lon), 2)
+    dir_err = _circular_diff(predicted_azimut, real_bearing)
+    km_err = abs(predicted_km - real_dm) if predicted_km else None
+    return {
+        "real_distance_km": real_dm,
+        "real_bearing": real_bearing,
+        "direction_error_deg": round(dir_err, 1),
+        "distance_error_km": round(km_err, 1) if km_err is not None else None,
+        "direction_ok": dir_err <= 45,
+        "band_ok": (km_err is not None and km_err <= predicted_km * 0.25) if predicted_km else None,
+        "verdict_text": ("✅ Yön + mesafe uyumlu" if dir_err <= 45 and (km_err is not None and km_err <= predicted_km * 0.25)
+                         else "⚠️ Kısmen uyumlu" if dir_err <= 90 else "❌ Uyuşmuyor"),
+    }
+
+
+# ---------------- GERÇEK COĞRAFİ HESAP (sadece doğrulama) ----------------
 def geographic_distance(lat1, lon1, lat2, lon2):
     R = 6371.0
     lat1, lat2, dlon = math.radians(lat1), math.radians(lat2), math.radians(lon2 - lon1)
@@ -209,5 +408,5 @@ CITY_COORDINATES = {
     "İzmir": (38.4237, 27.1428), "Kırıkkale": (39.8468, 33.5153), "Ankara": (39.9334, 32.8597),
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),
     "Bursa": (40.1950, 29.0600), "Antalya": (36.8969, 30.7133), "Konya": (37.8746, 32.4932),
-    "Tokat": (40.3167, 36.5500),
+    "Tokat": (40.3167, 36.5500), "Kırıkkale" : (39.8468, 33.5153),
 }
