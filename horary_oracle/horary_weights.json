@@ -1,5 +1,5 @@
 {
-  "house": 0.5,
-  "sign": 0.3,
-  "planet": 0.2
+  "house": 0.35,
+  "sign": 0.65,
+  "planet": 0.0
 }

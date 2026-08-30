@@ -20,7 +20,14 @@
     "mentor_orb": "Ay(4°03' Koç) - Merkür(9°47' Başak) = 5.73°",
     "mentor_note": "Yasin Kırıkkale, k=100 gerçek; kullanıcı onayı: 576 km kuş uçuşu → vaka eklendi",
     "real_scale": "ülke içi (k≈100 km)",
-    "ts": "2026-08-30T14:16:00"
+    "ts": "2026-08-30T14:16:00",
+    "components": {
+      "house": 45,
+      "sign_corr": 5,
+      "planet_corr": 0,
+      "angular": 5.73,
+      "ang_adj": -14.04
+    }
   },
   {
     "_id": 2,
@@ -43,7 +50,14 @@
     "mentor_orb": "Satürn(19° Koç) - Ay(13° Koç) = 6°",
     "mentor_note": "Eski doktor Aslı, yerel k=1; Google maps: 11.7 km kuş uçuşu / 18 km karayolu → 7.ev yöneticisi Ay",
     "real_scale": "şehir içi (k≈1 km)",
-    "ts": "2026-08-30T17:20:00"
+    "ts": "2026-08-30T17:20:00",
+    "components": {
+      "house": 270,
+      "sign_corr": 0,
+      "planet_corr": 5,
+      "angular": 6.0,
+      "ang_adj": -14.0
+    }
   },
   {
     "_id": 3,
@@ -66,7 +80,14 @@
     "mentor_orb": "Satürn(19° Koç) - Ay(13° Koç) = 6°; kıtalararası k=1300",
     "mentor_note": "Kullanıcı: 'ben İzmir'deyim o Şangay'da' → gerçek 7890 km; k=1300 çarpanı",
     "real_scale": "kıtalararası (k≈1300 km)",
-    "ts": "2026-08-30T17:20:00"
+    "ts": "2026-08-30T17:20:00",
+    "components": {
+      "house": 270,
+      "sign_corr": 0,
+      "planet_corr": 5,
+      "angular": 6.0,
+      "ang_adj": -14.0
+    }
   },
   {
     "_id": 4,
@@ -89,7 +110,14 @@
     "mentor_orb": "Mars(12°06' Yengeç) - Venüs(22°09' Terazi) = 10°03'",
     "mentor_note": "Eş Sevde: '2 metre yanımda'. k=0.2 m/° oda ölçeği → ölçek katsayısının mekâna göre evrilmesi kanıtı",
     "real_scale": "oda içi (k≈0.2 m/°)",
-    "ts": "2026-08-30T20:47:00"
+    "ts": "2026-08-30T20:47:00",
+    "components": {
+      "house": 270,
+      "sign_corr": 20,
+      "planet_corr": 15,
+      "angular": 10.05,
+      "ang_adj": -13.33
+    }
   },
   {
     "_id": 5,
@@ -112,6 +140,40 @@
     "mentor_orb": "Mars(12°08' Yengeç) - Güneş(13°07' Başak) sekstil ≈ 9°",
     "mentor_note": "Dayı sorusu (Ayrancılar 30.08.21:06): dayı=turned anne4→3=6.ev Aslan kesen→Güneş; gerçek Tokat Niksar 878 km / KD. Mentör: D=9×1×100=900 km tuttu.",
     "real_scale": "ülke içi (k≈100 km)",
-    "ts": "2026-08-30T21:06:00"
+    "ts": "2026-08-30T21:06:00",
+    "components": {
+      "house": 225,
+      "sign_corr": 5,
+      "planet_corr": 0,
+      "angular": 9.0,
+      "ang_adj": -13.5
+    }
+  },
+  {
+    "question_type": "uncle",
+    "origin": "38.3626,27.184",
+    "destination": "Niksar",
+    "house": 6,
+    "significator": "Sun",
+    "sign": "Başak",
+    "sign_querent": "Yengeç",
+    "degree": 7.39,
+    "querent_planet": "Mars",
+    "querent_degree": 12.6,
+    "angular_difference": 5.21,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 225,
+      "sign_corr": 5,
+      "planet_corr": 0,
+      "ang_adj": -5.87,
+      "angular": 54.7859353789533
+    },
+    "condition": 1.0,
+    "real_distance_km": 873.4,
+    "real_bearing": 70.46,
+    "_id": 6,
+    "ts": "2026-08-30T21:35:38"
   }
 ]

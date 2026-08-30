@@ -5,7 +5,8 @@ Komutlar:
   list                       mevcut kayıtları göster
   add <gerçek_bilgi_json>    vaka ekle (json dosya yolu)
   stats                      yön/mesafe hata istatistiği (genel + tip bazlı)
-  fit                        veriden ev/burç/gezegen ağırlıklarını öğren (>=4 vaka)
+  fit                        veriden ev/burç/gezegen ağırlıklarını öğren (>=4 vaka; <1km oda kayıtları yön fit'inden hariç)
+  ladder                     ölçek katmanı merdiveni (kayıtların k değerleri hangi katmanda kümeleniyor)
   tohum                      seed Kırıkkale veya şehir çifti kaydı ekle
 
 Örn:

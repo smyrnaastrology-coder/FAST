@@ -22,6 +22,8 @@ _DEFAULT_WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 
 DEFAULT_WEIGHTS = {"house": 0.50, "sign": 0.30, "planet": 0.20}
 MIN_FIT_RECORDS = 4
+# Yön fit'ine girmek için minimum gerçek mesafe (oda/ev içi kayıtlarda yön ölçülemez)
+MIN_FIT_DIRECTION_KM = 1.0
 
 # Mentör ölçek katmanları (km / (Δθ·M birimi)) — sabit tek k yerine MERDİVEN.
 # Aynı horary haritası (ör. doktor) 12 km (şehir) VEYA 7890 km (kıtalararası) olabilir;
@@ -338,8 +340,13 @@ class HoraryCalibration:
         geo_result["confidence"] = round(confidence, 2)
         geo_result["calibration_scale"] = round(scale, 3)
         geo_result["calibration_n"] = len(self.records)
-        if geo_result.get("formula"):
+        if geo_result.get("formula") and "(k≈" not in geo_result.get("formula", ""):
             geo_result["formula"] = geo_result["formula"] + f"  (k≈{scale:.3f})"
+        elif geo_result.get("formula"):
+            geo_result["formula"] = next(
+                (seg for seg in geo_result["formula"].split("  (") if not seg.startswith("k≈")),
+                geo_result["formula"],
+            ) + f"  (k≈{scale:.3f})"
         return geo_result
 
     def get_record(self, ident):
@@ -363,8 +370,12 @@ def _direction_predict(comp, weights):
 def fit_direction_weights(records):
     """Veriden ev/burç/gezegen ağırlıklarını öğren (küçültme: ortalama dairesel hata).
     Kayıtlarda 'components' + 'real_bearing' gerekir; en az MIN_FIT_RECORDS vaka.
+    Mikro-ölçek kayıtlar (gerçek mesafe <1 km: oda/oda içi) YÖN ölçümü yapamaz —
+    yağın konumu bilinemeyeceği için fit'e dahil edilmez (eş 2m gibi).
     """
-    usable = [r for r in records if r.get("components") and r.get("real_bearing") is not None]
+    usable = [r for r in records
+              if r.get("components") and r.get("real_bearing") is not None
+              and float(r.get("real_distance_km", 0)) >= MIN_FIT_DIRECTION_KM]
     if len(usable) < MIN_FIT_RECORDS:
         return {"weights": dict(DEFAULT_WEIGHTS), "n": len(usable), "fitted": False, "reason": f"en az {MIN_FIT_RECORDS} vaka gerek"}
 
