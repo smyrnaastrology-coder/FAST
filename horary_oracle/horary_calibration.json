@@ -257,5 +257,32 @@
     "real_distance_km": 481.5,
     "real_bearing": 48.05,
     "_id": 10
+  },
+  {
+    "question_type": "student",
+    "origin": "38.4237,27.1428",
+    "destination": "Katar",
+    "house": 3,
+    "significator": "Moon",
+    "sign": "Yengeç",
+    "sign_querent": "Terazi",
+    "degree": 9.38,
+    "querent_planet": "Venus",
+    "querent_degree": 22.22,
+    "angular_difference": 12.83,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 45,
+      "sign_corr": -10,
+      "planet_corr": 5,
+      "ang_adj": 12.86,
+      "angular": 167.16695641065672
+    },
+    "condition": 1.0,
+    "real_distance_km": 2682.1,
+    "real_bearing": 115.73,
+    "_id": 11,
+    "ts": "2026-08-30T22:56:21"
   }
 ]
