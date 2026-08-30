@@ -223,6 +223,39 @@
     "mentor_note": "Kızım yanımda 1 m — motor 5306 km/DGD salladı; proximity eşiği (≤10°) tetiklenmedi (gösterge Sun, ASC 31°/IC 47.8°). Oda-içi katmanı 2. kanıtı (eş 2m ile birlikte).",
     "real_scale": "oda içi (k≈0.0002 km/Δθ)",
     "ts": "2026-08-30T22:15:00",
-    "_id": 8
+    "_id": 8,
+    "components": {
+      "house": 315,
+      "sign_corr": 5,
+      "planet_corr": 0,
+      "angular": 14.77,
+      "ang_adj": -12.54
+    }
+  },
+  {
+    "question_type": "friend",
+    "origin": "38.4237,27.1428",
+    "destination": "Ereğli",
+    "house": 11,
+    "significator": "Saturn",
+    "sign": "Kova",
+    "sign_querent": "Terazi",
+    "degree": 13.75,
+    "querent_planet": "Venus",
+    "querent_degree": 22.21,
+    "angular_difference": 8.46,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 45,
+      "sign_corr": 10,
+      "planet_corr": -5,
+      "ang_adj": 13.59,
+      "angular": 171.53558874634925
+    },
+    "condition": 0.9,
+    "real_distance_km": 481.5,
+    "real_bearing": 48.05,
+    "_id": 10
   }
 ]

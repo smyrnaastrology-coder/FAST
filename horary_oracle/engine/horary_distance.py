@@ -241,7 +241,17 @@ class HoraryCalibration:
     # {"_id", "question_type", "origin","destination", "house", "significator","sign","degree",
     #  "querent_planet","querent_degree", "angular_difference", "components", "condition",
     #  "real_distance_km", "real_bearing", "ts"}
-    def add_record(self, **kw):
+    def add_record(self, upsert=False, **kw):
+        if upsert:
+            for i, r in enumerate(self.records):
+                same = (r.get("question_type") == kw.get("question_type")
+                        and r.get("origin") == kw.get("origin")
+                        and r.get("destination") == kw.get("destination"))
+                if same:
+                    rec = dict(kw)
+                    rec["_id"] = r["_id"]
+                    self.records[i] = rec
+                    return rec
         rec = dict(kw)
         rec["_id"] = (max([r.get("_id", 0) for r in self.records]) + 1) if self.records else 1
         rec.setdefault("ts", datetime.now().isoformat(timespec="seconds"))
@@ -522,7 +532,7 @@ CITY_COORDINATES = {
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),
     "Bursa": (40.1950, 29.0600), "Antalya": (36.8969, 30.7133), "Konya": (37.8746, 32.4932),
     "Tokat": (40.3167, 36.5500), "Niksar": (40.5903, 36.9492), "Ayrancılar": (38.10, 27.25),
-    "Samsun": (41.2867, 36.33),
+    "Samsun": (41.2867, 36.33), "Ereğli": (41.2417, 31.4256),
     "Şanghay": (31.2304, 121.4737), "Valencia": (39.4699, -0.3763), "Milano": (45.4642, 9.1900),
     "Halkapınar": (38.4237, 27.1428),
 }

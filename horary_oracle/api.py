@@ -381,14 +381,23 @@ async def cast(req: CastRequest):
                 _qn = parse_nested(req.question)
                 qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
                 # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
+                # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > gösterge gezegeninin bulunduğu ev
                 _ghouse = actual_house
+                if _qn:
+                    _ghouse = _qn["derived"]
+                elif _qc.get("house"):
+                    _ghouse = _qc["house"]
                 _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
                 if _qn:
                     _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
                     _gsign = _sfl_g(_cusp_g)
                     _gplanet = _DOMT3.get(_gsign, "Moon")
                     _guse = res['planets'].get(_gplanet, use_data)
-                    _ghouse = _qn["derived"]
+                elif _qc.get("house"):
+                    _cusp_g = res['houses']['cusps'][_qc["house"] - 1]
+                    _gsign = _sfl_g(_cusp_g)
+                    _gplanet = _DOMT3.get(_gsign, "Moon")
+                    _guse = res['planets'].get(_gplanet, use_data)
                 # gezegen gücü (F3/F4): asalet + retro + combust -> mesafe katsayısı
                 _cf = condition_factor(_gplanet, _gsign, lon=_guse.get('lon'),
                                        retro=_guse.get('retro', False),
@@ -427,6 +436,7 @@ async def cast(req: CastRequest):
                                                     req.lat, req.lon, _c0, _c1)
                         if _verify.get("real_bearing") is not None:
                             _cal3.add_record(
+                                upsert=True,
                                 question_type=qtype_g,
                                 origin=f"{req.lat},{req.lon}",
                                 destination=_mcity,
