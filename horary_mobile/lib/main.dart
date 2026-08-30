@@ -350,10 +350,13 @@ class _HoraryHomeState extends State<HoraryHome> {
         ],
       ),
       body: _showLanding && _chat.isEmpty ? _fullLanding() : Stack(children: [
-        Column(children: [
-          // Üst sabit bölge (kategori/radar/harita) - ekrana sığmayınca içeride kayar,
-          // böylece cevap listesi her zaman yeterli yüksekliği korur (açıklama görünmez kalma sorunu)
-          Flexible(flex:0, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        // Tek liste: üst bilgiler + radar/harita + chat kabarcıkları aynı kaydırmada akar.
+        // Ayrı Flexible/Expanded hesabı olmadığı için taşma şeridi ve 'açıklamaya inememe' imkânsız.
+        ListView(
+          controller: _scroll,
+          padding: const EdgeInsets.fromLTRB(12,8,12,96),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
           // top bar: lang + mini location chip
           Padding(padding: const EdgeInsets.fromLTRB(8,8,8,4), child: Row(children: [
             // language dropdown
@@ -477,14 +480,9 @@ class _HoraryHomeState extends State<HoraryHome> {
               ]),
             ),
           ),
-          ]))), // /üst sabit bölge (Flexible+SingleChildScrollView kapanışı)
-          Expanded(child: _chat.isEmpty ? _landingWidget() : ListView.builder(
-            controller: _scroll,
-            padding: const EdgeInsets.fromLTRB(12,8,12,140),
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: _chat.length,
-            itemBuilder: (_,i){
-              final m=_chat[i];
+          // ---- chat kabarcıkları (üst bilgilerle aynı listede) ----
+          ..._chat.map((_m){
+              final m=_m;
               final isUser=m['role']=='user';
               return Align(alignment: isUser? Alignment.centerRight:Alignment.centerLeft,
                 child: Container(margin: const EdgeInsets.symmetric(vertical:4), padding: const EdgeInsets.all(12),
@@ -506,11 +504,11 @@ class _HoraryHomeState extends State<HoraryHome> {
                       ),
                     ])),
                   ])));
-            },
-          )),
-          if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
-          const SizedBox(height: 88),
-        ]),
+            }),
+          if(_loading) const Padding(padding: EdgeInsets.symmetric(vertical:6), child: LinearProgressIndicator(color: Color(0xFFC9A96E))),
+          const SizedBox(height: 12),
+          ],
+        ),
         // centered input floating - Gemini gibi klavyenin hemen ustu
         Positioned(
           left: 0, right: 0, bottom: 12,
