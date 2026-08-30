@@ -295,6 +295,25 @@ class HoraryCalibration:
             return "şehir içi"
         return max(votes, key=votes.get)
 
+    def direction_confidence(self, weights=None):
+        """Yön modelinin gerçek isabet güveni: kalibrasyon kayıtlarındaki
+        ortalama yön hatasına göre 'iyi'/'orta'/'düşük' etiketi."""
+        w = weights if weights is not None else load_weights()
+        usable = [r for r in self.records
+                  if r.get("components") and r.get("real_bearing") is not None
+                  and float(r.get("real_distance_km", 0)) >= MIN_FIT_DIRECTION_KM]
+        if not usable:
+            return {"label": "bilinmiyor", "mean_err_deg": None, "n": 0}
+        errs = [_circular_diff(_direction_predict(r["components"], w), r["real_bearing"]) for r in usable]
+        mean = sum(errs) / len(errs)
+        if mean <= 22.5:
+            label = "iyi"
+        elif mean <= 45:
+            label = "orta"
+        else:
+            label = "düşük"
+        return {"label": label, "mean_err_deg": round(mean, 1), "n": len(usable)}
+
     def scale_for(self, house_type=None, question_type=None):
         """k ölçeği: önce soru tipi bucket'ı, sonra global (gerçek/base ortalaması)."""
         if question_type:
@@ -318,6 +337,10 @@ class HoraryCalibration:
         cat_q = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
         cat_km = km_category(km)
         confidence = 0.68 + min(0.12, 0.04 * len(self.records))
+        _dc = self.direction_confidence()
+        geo_result["direction_confidence"] = _dc["label"]
+        geo_result["direction_mean_err_deg"] = _dc["mean_err_deg"]
+        geo_result["direction_n"] = _dc["n"]
         geo_result["mesafe_kalibre_km"] = round(km)
         # ölçek katmanı merdiveni: hangi katman gerçekçi? (kullanıcı onayı belirler)
         geo_result["scale_ladder"] = self.tier_ladder(base_exact)
@@ -499,6 +522,7 @@ CITY_COORDINATES = {
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),
     "Bursa": (40.1950, 29.0600), "Antalya": (36.8969, 30.7133), "Konya": (37.8746, 32.4932),
     "Tokat": (40.3167, 36.5500), "Niksar": (40.5903, 36.9492), "Ayrancılar": (38.10, 27.25),
+    "Samsun": (41.2867, 36.33),
     "Şanghay": (31.2304, 121.4737), "Valencia": (39.4699, -0.3763), "Milano": (45.4642, 9.1900),
     "Halkapınar": (38.4237, 27.1428),
 }

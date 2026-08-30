@@ -556,7 +556,7 @@ async def cast(req: CastRequest):
             + (f"- Soru kategorisi: {g['qtype_label']}{' | Zincir: ' + g['chain'] if g.get('chain') else ''}\n" if g.get("qtype") else "")
             + f"- Sorulan evi: H{g['house']} | Significator: {g['significator']} {g['sign']} ({loc_info.get('deg','')}°) | Querent: {loc_info.get('_qr_ruler_klasik','')} | Ekliptik fark: {g['angular']}°\n"
             + (f"- Gösterge gücü: {g['dignity']}\n" if g.get("dignity") else "")
-            + f"- Yon: {g['yon_label']} (azimut yaklasik {g['azimut']} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi (ağırlıklar: ev .50 / burç .30 / gezegen .20)\n"
+            + f"- Yon: {g['yon_label']} civari (model isabeti: {g.get('direction_confidence','belirsiz')} - kalibrasyon ort yon hatasi {g.get('direction_mean_err_deg','?')} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi (ağırlıklar: ev .50 / burç .30 / gezegen .20, azimut yaklasik {g['azimut']} derece)\n"
             + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
             + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
             + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"

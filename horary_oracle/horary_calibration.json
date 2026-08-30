@@ -175,5 +175,32 @@
     "real_bearing": 70.46,
     "_id": 6,
     "ts": "2026-08-30T21:35:38"
+  },
+  {
+    "question_type": "uncle",
+    "origin": "38.4237,27.1428",
+    "destination": "Samsun",
+    "house": 10,
+    "significator": "Saturn",
+    "sign": "Oğlak",
+    "sign_querent": "Yengeç",
+    "degree": 13.75,
+    "querent_planet": "Mars",
+    "querent_degree": 12.62,
+    "angular_difference": 1.13,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 180,
+      "sign_corr": -10,
+      "planet_corr": -5,
+      "ang_adj": -0.19,
+      "angular": 88.8663046679396
+    },
+    "condition": 0.9,
+    "real_distance_km": 845.8,
+    "real_bearing": 65.0,
+    "_id": 7,
+    "ts": "2026-08-30T22:01:04"
   }
 ]
