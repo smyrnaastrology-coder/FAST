@@ -250,6 +250,8 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
         prompt += f"\n\nTHEFT ANALYSIS: {engine_json['theft_analysis']}"
     if engine_json.get("two_option"):
         prompt += f"\n\nTWO-OPTION RULE: {engine_json['two_option']}"
+    if engine_json.get("health_axis"):
+        prompt += f"\n\nHEALTH AXIS: {engine_json['health_axis']}"
     return prompt + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
 
 def call_openai(engine_json: dict, lang="tr") -> str:

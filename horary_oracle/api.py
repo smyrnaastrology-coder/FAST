@@ -171,7 +171,7 @@ async def cast(req: CastRequest):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
     # Follow-up ise bu guard atlanır (açıklama isteniyor)
-    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi","hangi","hangisi"]
+    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi","hangi","hangisi","ameliyat","tedavi","iyile","iyiles","kanser","şifa","sifa","doktor","cerrahi","sağlık","saglik"]
     is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
     if not is_followup and not is_horary and len(qlow.split()) < 12:
         # sohbet modu - öneri sun
@@ -561,11 +561,96 @@ async def cast(req: CastRequest):
         except Exception as e:
             engine_json["two_option"] = f"İkili karar hesaplanamadı ({e}) — Ay'ın burç/ev durumuna göre değerlendir."
             engine_json["two_option_verdict"] = "belirsiz"
+    # --- SAĞLIK AKSI (Deneb Kaitos: hasta=1, hastalık=6L, doktor=7L, ameliyat=8L, tedavi=10L, sonuç=4L) ---
+    health_kw = ["hasta", "hastay", "hastası", "hastasi", "iyileş", "iyiles", "şifa", "sifa", "ameliyat", "tedavi", "doktor", "cerrahi", "kanser", "tümör", "tumor", "ağrı", "agri", "sancı", "sanci", "rahatsız", "rahatsiz", "sağlık", "saglik", "sıhhat", "sihhat"]
+    if any(k in qlow for k in health_kw):
+        try:
+            from core.ephemeris import sign_from_lon as _sfl_hl, DOMICILE_TRADITIONAL as _DOMT_hl
+            from core.ephemeris import EXALTATION as _EX_hl, DETRIMENT as _DET_hl, FALL as _FALL_hl
+            _pat_kw_child = any(k in qlow for k in ["kızım", "kizim", "oğlum", "oglum", "çocuğ", "cocug", "bebeğ", "bebeg"])
+            _pat_kw_es = any(k in qlow for k in ["eşim", "esim", "karım", "karim", "kocam", "sevgilim", "arkadaşımın"])
+            _pat_h = 5 if _pat_kw_child else (7 if _pat_kw_es else 1)
+            _pat_s = _sfl_hl(res['houses']['cusps'][_pat_h - 1] % 360)
+            _pat_r = _DOMT_hl.get(_pat_s, res['querent']['planet'])
+            _pat_p = res['planets'].get(_pat_r, {})
+            def _rlr_h(h):
+                s = _sfl_hl(res['houses']['cusps'][h - 1] % 360)
+                return s, _DOMT_hl.get(s, "Moon")
+            _rows_h = []
+            for h in (6, 8, 12, 4):
+                _s, _p = _rlr_h(h)
+                _pl = res['planets'].get(_p, {})
+                _st = []
+                if _pl.get('sign') == _s:
+                    _st.append("domicile")
+                if _EX_hl.get(_pl.get('sign', '')) == _p:
+                    _st.append("exaltation")
+                if _DET_hl.get(_pl.get('sign', '')) == _p:
+                    _st.append("detriment")
+                if _FALL_hl.get(_pl.get('sign', '')) == _p:
+                    _st.append("fall")
+                _rows_h.append(f"H{h}L({h}.ev {_s}): {_p} {_pl.get('sign','')} {(_pl.get('deg',0)%30):.1f}° Ev{_pl.get('house','?')}{' Rx' if _pl.get('retro') else ''}[{','.join(_st) if _st else 'nötr'}]")
+            def _asp_h(a, b):
+                d = (b - a) % 360
+                if d > 180:
+                    d = 360 - d
+                ms = [0, 60, 90, 120, 180]
+                mm = min(ms, key=lambda m: abs(m - d))
+                return mm, round(abs(mm - d), 1)
+            _krit = []
+            for h in (6, 8, 12, 4):
+                _s, _p = _rlr_h(h)
+                _pl = res['planets'].get(_p, {})
+                if not _pl or not _pat_p:
+                    continue
+                _aa, _oo = _asp_h(_pat_p.get('lon', 0), _pl.get('lon', 0))
+                if _aa in (90, 180) and _oo <= 6:
+                    _krit.append(f"H{_pat_h} yöneticisi {_pat_r} <-> H{h} yöneticisi {_p} {_aa}° kare/karşıt")
+            for _pn, _pd in res['planets'].items():
+                if _pn in ("NorthNode", "SouthNode"):
+                    continue
+                if _pd.get('house') in (6, 8, 12) and _pn in ("Mars", "Saturn", "Pluto", "Uranus"):
+                    _krit.append(f"Malefik {_pn} H{_pd['house']} ({_pd['sign']})")
+            _sun_h = res['planets'].get('Sun', {})
+            if _sun_h and _pat_p:
+                _dd = abs((_pat_p.get('lon', 0) - _sun_h.get('lon', 0) + 180) % 360 - 180)
+                if _dd < 8.5:
+                    _krit.append(f"{_pat_r} {_dd:.1f}° Güneş yanığı — gizli durum/Hasta hali saklı")
+            _sn_h = res['planets'].get('SouthNode', {})
+            _moon_h = res['planets'].get('Moon', {})
+            for _nm, _np in (("Hasta gösterge", _pat_p), ("Moon", _moon_h)):
+                if _sn_h and _np:
+                    _dd = abs((_np.get('lon', 0) - _sn_h.get('lon', 0) + 180) % 360 - 180)
+                    if _dd <= 3:
+                        _krit.append(f"{_nm} {_np.get('sign','')} GAD kavuşumu ({_dd:.1f}°) — ağır")
+            ORG_H = {"Saturn": "kemik/eklem/cilt/kronik/urlar", "Mars": "kesik/yara/iltihap/yüksek ateş/ameliyat", "Sun": "kalp/sırt/göz/bilinç kaybı", "Moon": "rahim/mide/hormon/gebelik/alerji", "Mercury": "sinir/zihinsel/solunum/ciğer", "Venus": "şeker/böbrek/yumurtalık kisti/kadın hastalıkları", "Jupiter": "karaciğer", "Pluto": "kanser/dönüşüm", "Neptune": "belirsiz/hayal kırıklığı", "Uranus": "sinir sistemi/vücut ritmi"}
+            _org = set()
+            for _pn, _pd in res['planets'].items():
+                if _pd.get('house') in (6, 8, 12) and _pn in ORG_H:
+                    _org.add(f"{_pn} H{_pd['house']} → {ORG_H[_pn]}")
+            _orgz = "; ".join(sorted(_org)) if _org else "belirgin organ ipucu yok"
+            _n = len(_krit)
+            _hast = _pat_kw_child and 5 or (_pat_kw_es and 7 or 1)
+            if _n >= 2:
+                _dk = f"DURUM KRİTİK — {_n} ağır gösterge (6/8/12/4 yöneticileri H{_hast} göstergesine sert açı + malefik/yanık/GAD): tıbbi teyit şart, akışı monitörize edin"
+            elif _n == 1:
+                _dk = "DURUM DİKKAT — tek sert gösterge: toparlanma mümkün ama kötüleşme ihtimali izlenmeli, doktor görüşü alın"
+            else:
+                _dk = "DURUM NİSPETEN İYİ — 6/8/12/4 yöneticileri H" + str(_hast) + " göstergesine 6° içinde sert açı yapmıyor, malefik evlerde tehdit yok"
+            _ht = ("SAĞLIK ANALİZİ: " + _dk + " | Hasta=H" + str(_hast) + "(" + str(_pat_r) + " " + _pat_p.get('sign','') + " Ev" + str(_pat_p.get('house','?')) + (" Rx" if _pat_p.get('retro') else "") + ") Hastalık=6L Doktor=7L Ameliyat=8L Tedavi=10L Sonuç=4L | " + " | ".join(_rows_h) + (" | Kritik işaretler: " + "; ".join(_krit) if _krit else " | Keskin kritik işaret yok") + " | Organ ipucu: " + _orgz)
+            res['strictures'].insert(0, {"code": "health_axis", "level": "info", "meaning": _ht})
+            engine_json["health_analysis"] = _ht
+            engine_json["health_verdict"] = _dk
+        except Exception as e:
+            engine_json["health_analysis"] = f"Sağlık analizi hesaplanamadı ({e})"
+            engine_json["health_verdict"] = "belirsiz"
     answer = call_openai(engine_json, req.lang)
     if engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
     if engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
         answer = "İki seçenek kararı (Ay açısı kuralı): " + engine_json["two_option_verdict"] + "\n\n" + answer
+    if engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
+        answer = "Sağlık analizi: " + engine_json["health_verdict"] + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000
     # planets for mini chart
