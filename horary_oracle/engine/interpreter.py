@@ -244,6 +244,8 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
         ex_txt="\n\nRETRIEVED EXAMPLES (use style+reasoning, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']}) | Aciklama: {e.get('explanation','')}" for e in exs)
     # {json} yerine güvenli replace - LOCKED_PROMPT içindeki diğer süslüleri format sanmasın
     prompt = LOCKED_PROMPT.replace("{json}", j)
+    if engine_json.get("loc_instruction"):
+        prompt += f"\n\nSPECIAL INSTRUCTION: {engine_json['loc_instruction']}"
     return prompt + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
 
 def call_openai(engine_json: dict, lang="tr") -> str:
@@ -414,6 +416,31 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     except: pass
     # doğal kapanış önerileri - sadece gerektiğinde, tıkla-çalışır olacak şekilde kısa
     suggest = ""
+    # NEREDE sorusu: verdict LOCATION ise her zaman konum cevabı (NO'ya takılma)
+    if v == "LOCATION" and loc:
+        person = loc.get('person','')
+        if loc.get('is_self'):
+            return f"Şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerdesin — ev {loc.get('house','')}. Mesafe yaklaşık {loc.get('distance','')}."
+        if person:
+            label = (person if isinstance(person,str) else str(person)).replace("im","").replace("ım","").capitalize()
+            if "baba" in person: label="Baban"
+            elif "anne" in person: label="Annen"
+            elif "kardeş" in person: label="Kardeşin"
+            elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
+            elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
+            elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
+            base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor."
+            if loc.get('qq_distance_km'):
+                base_txt += f"\n\nUzaklık: Yükselen yöneticisi ° × {qs} (°) ×10 → yaklaşık {loc['qq_distance_km']} km."
+            if loc.get('saturn_second'):
+                base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
+            base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
+            if loc.get('burc_detail'):
+                base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
+            return base_txt
+        env = f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
+        detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
+        return f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
     if v=="YES":
         base = f"{long_detail}\n\nGidişat senden yana canım — içini ferah tut, güzel bir akış var. ✓"
         if "asc_near_boundary" in strict_codes:
@@ -432,12 +459,14 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
                 elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
                 elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
-                base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe yaklaşık {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor."
-                base_txt += f"\n\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
-                if loc.get('burc_detail'):
-                    base_txt += f" Burç ipucu: {loc.get('burc_detail')}"
+                base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor; doğal gösterge {loc.get('_natural','') or 'yöneticisi'}."
+                if loc.get('qq_distance_km'):
+                    base_txt += f"\n\nUzaklık: Yükselen yöneticisi ° × {loc.get('_natural','') or loc.get('sign','')} (°) ×10 → yaklaşık {loc['qq_distance_km']} km."
                 if loc.get('saturn_second'):
-                    base_txt += f"\nİkinci gösterge Satürn de {loc.get('saturn_second')} — çift teyit."
+                    base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
+                base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
+                if loc.get('burc_detail'):
+                    base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
                 return base_txt
             env = f"\n\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""

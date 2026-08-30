@@ -219,17 +219,23 @@ async def cast(req: CastRequest):
             if d and d.get("derived"):
                 derived_loc = d
         except: pass
-        # doğal gezegen ikincili: anne->Ay, baba->Satürn
+        # doğal gezegen ikincili: anne->Ay, baba->Güneş(birincil)+Satürn(ikincil)
+        # Kullanıcı bulgusu: baba sorusunda Güneş=1. gösterge (yön ve mesafede nokta atışı),
+        # "güneş de baba demek" + querent×quesited×10 formülü (bkz. distance_querent_quesited)
         natural = None
+        natural_second = None
         if "anne" in q or "annem" in q:
             natural = "Moon"
         elif "baba" in q or "babam" in q:
-            natural = "Saturn"
-        # öncelik: doğal gezegen varsa onu baz al (kullanıcı talimatı: baba=Satürn, anne=Ay)
+            natural = "Sun"        # baba: Güneş birincil
+            natural_second = "Saturn"  # Satürn ikincil teyit
+        # öncelik: doğal gezegen varsa onu baz al (baba=Güneş, anne=Ay)
         if natural and res['planets'].get(natural):
             use_data = res['planets'][natural]
             actual_house = use_data['house']
             loc_info["_natural"] = natural
+            if natural_second:
+                loc_info["_natural_second"] = natural_second
             # derived bilgisini de ek not
             if derived_loc:
                 loc_info["_derived_house"] = derived_loc["derived"]
@@ -261,6 +267,26 @@ async def cast(req: CastRequest):
             if matches < 1:
                 direction_ok = False
                 direction_note = f"Yön teyidi zayıf: ev {house_dir} / burç {sign_dir} / Ay {moon_dir} — tek başına güvenme, teyit gerek"
+        # Uzaklık: soruyu soran yükselen yöneticisi derecesi × sorulan derecesi ×10 (kullanıcı bulgusu)
+        # Merkür 8.45 × Güneş 6.35 = 53.65 → ×10 = 536 km (İzmir→Bağcılar 480 km bandı, nokta atışı)
+        try:
+            from engine.location_engine import distance_querent_quesited
+            qr_deg = res['querent']['data']['deg']  % 30
+            qs_deg = use_data['deg'] % 30
+            qq_dist = distance_querent_quesited(qr_deg, qs_deg)
+        except Exception:
+            qq_dist = None
+        # ikincil doğal gösterge notu (baba=Satürn)
+        second_note = ""
+        if loc_info.get("_natural_second") and res['planets'].get(loc_info["_natural_second"]):
+            s2 = res['planets'][loc_info["_natural_second"]]
+            s2_deg = s2['deg'] % 30
+            second_note = f"{loc_info['_natural_second']} {s2['sign']} {s2_deg:.1f}° Ev{s2['house']}"
+            # ikinci doğal göstergenin de mesafesini querent ile dene (karşılaştırma)
+            try:
+                s2_dist = distance_querent_quesited(res['querent']['data']['deg'] % 30, s2_deg)
+                second_note += f" (×10={s2_dist} km)"
+            except Exception: pass
         loc_info = {
             "direction": house_dir,
             "sign_direction": sign_dir,
@@ -268,6 +294,9 @@ async def cast(req: CastRequest):
             "direction_note": direction_note,
             "house": actual_house,
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
+            "qq_distance_km": qq_dist,
+            "saturn_second": second_note,
+            "_natural": loc_info.get("_natural",""),
             "place": house_location_meaning(actual_house),
             "height": height_by_sign(use_data['sign']),
             "element_kalite": ELEMENT_KALITE.get(ELEMENT.get(use_data['sign'],''),''),
@@ -279,6 +308,22 @@ async def cast(req: CastRequest):
     except Exception as e:
         print(f"loc_info hata: {e}")
         loc_info = {"house": 7, "direction": "BATI", "distance": "", "place": "", "height": "", "element_kalite": "", "burc_detail": ""}
+
+    # --- NEREDE/KAYIP soruları: YES/NO değil LOCATION (baba nerede, kaybolan nerede) ---
+    # Konum sorusu olduğu için karar "evet/hayır" değil; sorgulayan hep NO almamalı
+    qlow3 = req.question.lower()
+    is_where_q = any(k in qlow3 for k in ["nerede","nerde","nere","nereye","nere da","kaybol","kayıp","kayip","tutar mı","nere git","nereye gid","hangi yön","hangi yon","hangi taraf"]) or req.quesited_type in ("missing_person","missing_child","pet","lost_object")
+    if is_where_q:
+        loc_info["person"] = "quesited"
+        # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
+        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
+            if kw in qlow3:
+                loc_info["person"] = lab.replace("oğlum","çocuk").replace("kızım","çocuk").replace("kocam","eş")
+                break
+        if any(k in qlow3 for k in ["ben nerede","ben nerde","ben şimdi","ben simdi","neredeyim","nerdeyim"]):
+            loc_info["is_self"] = True
+            loc_info["person"] = ""
+        res["verdict"] = "LOCATION"
 
     # --- Gizli visitor modelleri (sistem içinde, dışarıda görünmez) ---
     qlow2 = req.question.lower()
@@ -339,6 +384,9 @@ async def cast(req: CastRequest):
         if is_visitor_why: hidden.append("WHY: 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat")
         if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
         engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
+    # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
+    if res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
+        engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü location['direction'] ile ver. Mesafe için KESİNLİKLE kendi hesap/çarpma yapma: location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), kısaca 'Yükselen yönetici derecesi × sorulanın derecesi × 10' formülü olduğunu belirt. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] ikinci doğal göstergesini de kısaca ekle."
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000

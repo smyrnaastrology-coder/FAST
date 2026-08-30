@@ -568,7 +568,10 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Final judgement
     if perfection is None:
         perfection = {"type":"none","result":"no"}
-        _sc(-6, "perfection_none")
+        # Günlük/pratik sorularda perfectionsuzluk bu kadar ağır olmamalı (kullanıcı bulgusu)
+        # "yarın işe gidecek miyim" gibi kısa vadeli rutin sorular: -6 yerine -2
+        _mundane = quesited_type in ("travel","job","education","daily")
+        _sc(-2 if _mundane else -6, "perfection_none")
 
     # Angularity / Peregrine / Kuşatılma katkıları (2. fix)
     for label, sig in [("querent", querent), ("quesited", quesited)]:

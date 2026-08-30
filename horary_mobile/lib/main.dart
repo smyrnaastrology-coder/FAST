@@ -241,13 +241,69 @@ class _HoraryHomeState extends State<HoraryHome> {
     ])));
   }
   Widget _fullLanding(){
-    return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const Icon(Icons.auto_awesome, size:64, color: Color(0xFFC9A96E)),
-      const SizedBox(height:20),
-      const Text('Horary göksel uyum ile çalışır.\nCevabı veren gökyüzüdür.\nSoruda radikalliği yakalamak için gerçekten bir cevaba ihtiyacınız olduğunda soruyu sorun.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFe8e0f0), fontSize:16, height:1.7)),
-      const SizedBox(height:32),
-      SizedBox(width:200, child: ElevatedButton(onPressed: ()=> setState(()=> _showLanding=false), child: const Text('Soruyu Sor'))),
-    ])));
+    // Gemini Android uygulaması formatında açılış: ortada yuvarlak kutu + soru ipucu
+    return SafeArea(
+      child: Column(
+        children: [
+          const Spacer(flex: 2),
+          Center(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 84, height: 84,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFFC9A96E), Color(0xFF8a6d3b)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(26),
+                  boxShadow: [BoxShadow(color: const Color(0xFFC9A96E).withOpacity(0.25), blurRadius: 24, offset: const Offset(0,8))],
+                ),
+                child: const Icon(Icons.auto_awesome, size: 44, color: Color(0xFF1A1423)),
+              ),
+              const SizedBox(height: 20),
+              Text(tr('title'), style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize: 26, letterSpacing: 3, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              const Text('Evrenle soru anının diliyle konuş.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFa898c0), fontSize: 13, letterSpacing: 0.5)),
+              const SizedBox(height: 28),
+              // Gemini tarzı soru başlık önerileri
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: Wrap(
+                spacing: 8, runSpacing: 8, alignment: WrapAlignment.center,
+                children: [
+                  for (final s in const ['Babam nerede?', 'Bu işe girecek miyim?', 'Beni seviyor mu?', 'Kaybolan kedim nerede?'])
+                    ActionChip(
+                      label: Text(s, style: const TextStyle(fontSize: 12, color: Color(0xFFe8e0f0))),
+                      backgroundColor: const Color(0xFF2a1f38),
+                      side: BorderSide(color: const Color(0xFFC9A96E).withOpacity(0.5)),
+                      onPressed: (){ setState(()=> _showLanding=false); _ctrl.text = s; _ask(); },
+                    ),
+                ],
+              )),
+            ]),
+          ),
+          const Spacer(flex: 3),
+          // alt kısımda Gemini gibi yuvarlak giriş görünümü (dokununca gerçek sohbet açılır)
+          Padding(padding: const EdgeInsets.fromLTRB(16,0,16,24), child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: GestureDetector(
+                onTap: ()=> setState(()=> _showLanding=false),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2a1f38),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.45)),
+                  ),
+                  child: Row(children: [
+                    const Expanded(child: Text('Sorunu yaz, gökyüzü cevaplasın…', style: TextStyle(color: Color(0xFF8a7f9c), fontSize: 15))),
+                    const Icon(Icons.mic_none, color: Color(0xFFa898c0), size: 22),
+                    const SizedBox(width: 12),
+                    Container(decoration: const BoxDecoration(color: Color(0xFFC9A96E), shape: BoxShape.circle), padding: const EdgeInsets.all(8), child: const Icon(Icons.arrow_upward, color: Color(0xFF1A1423), size: 20)),
+                  ]),
+                ),
+              ),
+            ),
+          )),
+        ],
+      ),
+    );
   }
   Future<void> _ask() async {
     final q = _ctrl.text.trim();
@@ -290,11 +346,14 @@ class _HoraryHomeState extends State<HoraryHome> {
           Text(tr('subtitle'), style: const TextStyle(color: Color(0xFFa898c0), fontSize: 9, letterSpacing: 2)),
         ]), centerTitle: true,
         actions: [
-          IconButton(onPressed: ()=> setState(()=> _chat.clear()), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
+          IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
       body: _showLanding && _chat.isEmpty ? _fullLanding() : Stack(children: [
         Column(children: [
+          // Üst sabit bölge (kategori/radar/harita) - ekrana sığmayınca içeride kayar,
+          // böylece cevap listesi her zaman yeterli yüksekliği korur (açıklama görünmez kalma sorunu)
+          Flexible(flex:0, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
           // top bar: lang + mini location chip
           Padding(padding: const EdgeInsets.fromLTRB(8,8,8,4), child: Row(children: [
             // language dropdown
@@ -418,6 +477,7 @@ class _HoraryHomeState extends State<HoraryHome> {
               ]),
             ),
           ),
+          ]))), // /üst sabit bölge (Flexible+SingleChildScrollView kapanışı)
           Expanded(child: _chat.isEmpty ? _landingWidget() : ListView.builder(
             controller: _scroll,
             padding: const EdgeInsets.fromLTRB(12,8,12,140),

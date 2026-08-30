@@ -86,7 +86,7 @@ class LostRadarMap extends StatelessWidget {
           if(directionNote.isNotEmpty) Padding(padding: const EdgeInsets.only(top:6), child: Text(directionNote, style: const TextStyle(color: Color(0xFFf87171), fontSize:10, fontStyle: FontStyle.italic))),
           if(signDirection.isNotEmpty) Text('Burç yönü: $signDirection', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
           const SizedBox(height:12),
-          ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(height: 220, child: FlutterMap(
+          ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(height: 150, child: FlutterMap(
             options: MapOptions(initialCenter: center, initialZoom: zoom),
             children: [
               TileLayer(urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', userAgentPackageName: 'com.horaryoracle.app'),

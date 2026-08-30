@@ -206,4 +206,10 @@ def distance_moon_first_major(moon_lon, moon_speed, planet_lon, planet_speed):
         return (None, None)
     return (best_deg, best_ang)
 
+def distance_querent_quesited(q_deg, qs_deg):
+    """Yeni kural: querent derecesi * quesited derecesi *10 (virgül kaydır) = km
+    Örn Merkür 8.45 * Güneş 6.35 =53.65*10=536 km (İzmir-Bağcılar 480km bandı)
+    """
+    return round(q_deg * qs_deg * 10, 1)
+
 def house_location_meaning(h): return alan_tipi(h)
