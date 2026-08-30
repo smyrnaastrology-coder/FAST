@@ -75,7 +75,7 @@ TOPIC_OFFSET = {
     # 9 yüksek eğitim / uzun yol / inanç / mahkeme
     "eğitim":9, "egitim":9, "üniversite":9, "yurtdışı":9, "yurtdisi":9, "uzak":9, "mahkeme":9, "inanç":9, "seyahat":9,
     # 10 kariyer / baba / otorite / statü
-    "kariyer":10, "iş":10, "is":10, "meslek":10, "patron":10, "baba":10, "statü":10, "ün":10,
+    "kariyer":10, "iş":10, "meslek":10, "patron":10, "baba":10, "statü":10, "ün":10,
     # 11 arkadaş / sosyal / umut
     "arkadaş":11, "arkadas":11, "sosyal":11, "umut":11, "topluluk":11,
     # 12 gizli / kayıp / hastane / hapishane
@@ -88,18 +88,37 @@ TOPIC_OFFSET = {
 def derived_house(base_house, offset):
     return (base_house + offset - 2) % 12 + 1
 
+# Yer-descriptor kelimeler (üniversite/hastane/hapishane) tek başına base olabilir ama
+# yanında gerçek kişi ilişkisi varsa base YAPILMAZ - kişinin kendisini tarif ederler.
+DESCRIPTOR_WORDS = ("üniversite", "universite", "hastane", "hapishane", "gizli")
+# İlişki önceliği: hoca/öğretmen en özgül; arkadaş ikinci; diğer akrabalık son.
+def _person_rank(word):
+    if any(k in word for k in ("hoca", "öğretmen", "ogretmen", "profesör", "profesor", "hakim")):
+        return 0
+    if any(k in word for k in ("arkadaş", "arkadas", "dost")):
+        return 1
+    return 2
+
 def parse_derived(question: str):
     q = question.lower()
-    base = None; base_word=""
-    # en uzun eşleşme önce
-    for word, house in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True):
-        if word in q:
-            base = house; base_word = word; break
-    if not base:
+    # 1) direkt kişi ilişkisi (üniversite/hastane vs. hariç)
+    matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if m[0] in q and m[0] not in DESCRIPTOR_WORDS]
+    # 2) yoksa descriptor kendisi base olur (örn. "üniversite nerede")
+    if not matched:
+        matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if m[0] in q]
+    if not matched:
         return None
+    base_word, base = min(matched, key=lambda m: (_person_rank(m[0]), -len(m[0])))
+    # İyelik (genitive) yoksa "arkadaşım ... üniversitede hoca nerede" gibi durumlarda
+    # başka ilişki kelimeleri offset/topic YAPILMAMALI (aynı kişiyi tarif ediyorlar).
+    # Offset sadece "eşimin işi / arkadaşımın parası" gibi iyelikli konularda çalışır.
+    _GEN_SUF = ("ınnın", "inin", "nın", "nin", "nün", "nun", "ın", "in", "un", "ün")
+    possession = any(w + s in q for w in BASE_PERSON for s in _GEN_SUF)
+    if not possession:
+        return {"base_house": base, "base_word": base_word, "derived": base, "topic": "kişi kendisi"}
     offset = None; topic_word=""
     for word, off in sorted(TOPIC_OFFSET.items(), key=lambda x: len(x[0]), reverse=True):
-        if word in q and word != base_word and word not in base_word and base_word not in word:
+        if word in q and word not in DESCRIPTOR_WORDS and word != base_word and word not in base_word and base_word not in word:
             # aynı kökse (baba/babam) atla
             offset = off; topic_word = word; break
     if not offset:

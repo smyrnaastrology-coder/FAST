@@ -254,6 +254,7 @@ async def cast(req: CastRequest):
         if natural and res['planets'].get(natural):
             use_data = res['planets'][natural]
             actual_house = use_data['house']
+            sig_planet = natural
             loc_info["_natural"] = natural
             if natural_second:
                 loc_info["_natural_second"] = natural_second
@@ -267,9 +268,11 @@ async def cast(req: CastRequest):
             dplanet = _DOM2.get(dsign, "Moon")
             use_data = res['planets'].get(dplanet, res['quesited']['data'])
             actual_house = use_data['house']
+            sig_planet = dplanet
             loc_info["_derived_house"] = derived_loc["derived"]
         else:
             is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
+            sig_planet = res['querent']['planet'] if is_self else res['quesited']['planet']
             use_data = res['querent']['data'] if is_self else res['quesited']['data']
             actual_house = use_data['house']
         # kardeş belirsizliği: ad/cinsiyet/büyüklük yoksa hangi kardeş? netleştir
@@ -340,6 +343,7 @@ async def cast(req: CastRequest):
             "direction_ok": direction_ok,
             "direction_note": direction_note,
             "house": actual_house,
+            "sig_planet": sig_planet,
             "distance": f"{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[0]:.0f}{distance_fixed(req.lat, use_data['deg'], actual_house, req.lat>0)[1]}",
             "qq_distance_km": qq_dist,
             "saturn_second": second_note,
@@ -360,6 +364,32 @@ async def cast(req: CastRequest):
             "clarify": loc_info.get("clarify", ""),
             "_qr_ruler_klasik": loc_info.get("_qr_ruler_klasik", "")
         }
+        # Yeni HORARY UZAKLIK MOTORU (ev+büyük+gezegen yön; kalibrasyonlu mesafe bandı)
+        geo_res = None
+        try:
+            if not loc_info.get("proximity"):
+                from engine.horary_distance import HoraryDistanceEngine, HoraryCalibration
+                from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3
+                _asc_s3 = res['houses']['asc_sign']
+                _qur3 = _DOMT3.get(_asc_s3, res['querent']['planet'])
+                geo_res = HoraryDistanceEngine().analyze(
+                    house=actual_house,
+                    sign=use_data['sign'],
+                    planet=sig_planet,
+                    friend_longitude=use_data['lon'],
+                    querent_longitude=res['planets'][_qur3]['lon'],
+                )
+                _cal3 = HoraryCalibration()
+                _cal3.load()
+                geo_res = _cal3.apply(geo_res)
+                if geo_res.get("angular") < 5:
+                    geo_res["band"] = ""
+                    geo_res["category"] = "yakın (soranın kendisi şu an bulunduğu konumda)"
+                    geo_res["mesafe_kalibre_km"] = None
+        except Exception as _e3:
+            print(f"horary_geo hata: {_e3}")
+            geo_res = None
+        loc_info["horary_geo"] = geo_res
     except Exception as e:
         print(f"loc_info hata: {e}")
         loc_info = {"house": 7, "direction": "BATI", "distance": "", "place": "", "height": "", "element_kalite": "", "burc_detail": "", "ev_ici": ""}
@@ -445,6 +475,18 @@ async def cast(req: CastRequest):
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
     if res["verdict"] == "LOCATION" and loc_info.get("proximity"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu ve gösterge bir açıya (ASC/MC/DSC/IC) çok yakın (" + str(loc_info.get("proximity_angle","")) + " ≤10°) — kural: KİŞİ SORANA ÇOK YAKINDIR. Cevabında kişinin hemen yakınlarda/aynı mekanda olduğunu söyle; km çarpım formülü bu durumda GEÇERSİZ, HİÇBİR km/metre rakamı verme. Yine de 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']' kısımlarını rapor et (kişinin hangi yönde durduğuna işaret eder). Gösterge: " + str(loc_info.get('_qr_ruler_klasik','')) + "."
+        if loc_info.get("clarify"):
+            engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
+    elif res["verdict"] == "LOCATION" and loc_info.get("horary_geo"):
+        g = loc_info["horary_geo"]
+        engine_json["loc_instruction"] = (
+            "Bu bir NEREDE/KONUM sorusu - HORARY UZAKLIK MOTORU ciktisini kullan, kendi km hesabi/carpim yapma.\n"
+            f"Panel (cevabinda bu blok gibi profesyonel sun):\n"
+            f"- Sorulan evi: H{g['house']} | Significator: {g['significator']} {g['sign']} ({loc_info.get('deg','')}°) | Querent: {loc_info.get('_qr_ruler_klasik','')} | Ekliptik fark: {g['angular']}°\n"
+            f"- Yon: {g['yon_label']} (azimut yaklasik {g['azimut']} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi\n"
+            f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu") + f" | Kategori: {g['category']} | Guven: {g['confidence']}\n"
+            "Ev-ici ipucu: " + loc_info.get("ev_ici", "") + " | Yukseklik: " + loc_info.get("height", "")
+        )
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     elif res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
