@@ -254,6 +254,7 @@ async def cast(req: CastRequest):
             dplanet = _DOM2.get(dsign, "Moon")
             use_data = res['planets'].get(dplanet, res['quesited']['data'])
             actual_house = use_data['house']
+            loc_info["_derived_house"] = derived_loc["derived"]
         else:
             is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
             use_data = res['querent']['data'] if is_self else res['quesited']['data']
@@ -312,6 +313,7 @@ async def cast(req: CastRequest):
             "qq_distance_km": qq_dist,
             "saturn_second": second_note,
             "_natural": loc_info.get("_natural",""),
+            "_derived_house": loc_info.get("_derived_house",""),
             "place": house_location_meaning(actual_house),
             "height": height_by_sign(use_data['sign']),
             "element_kalite": ELEMENT_KALITE.get(ELEMENT.get(use_data['sign'],''),''),
@@ -333,7 +335,7 @@ async def cast(req: CastRequest):
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
-        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("ablam","kardeş"),("abim","kardeş"),("abla","kardeş"),("abi","kardeş"),("ağabey","kardeş"),("agabey","kardeş"),("bacı","kardeş"),("baci","kardeş"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
+        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("ablam","kardeş"),("abim","kardeş"),("abla","kardeş"),("abi","kardeş"),("ağabey","kardeş"),("agabey","kardeş"),("bacı","kardeş"),("baci","kardeş"),("öğrencim","öğrenci"),("ogrencim","öğrenci"),("öğrenci","öğrenci"),("ogrenci","öğrenci"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
             if kw in qlow3:
                 loc_info["person"] = lab.replace("oğlum","çocuk").replace("kızım","çocuk").replace("kocam","eş")
                 break
