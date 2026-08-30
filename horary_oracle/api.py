@@ -222,6 +222,8 @@ async def cast(req: CastRequest):
         # doğal gezegen ikincili: anne->Ay, baba->Güneş(birincil)+Satürn(ikincil)
         # Kullanıcı bulgusu: baba sorusunda Güneş=1. gösterge (yön ve mesafede nokta atışı),
         # "güneş de baba demek" + querent×quesited×10 formülü (bkz. distance_querent_quesited)
+        is_male_sib = any(k in q for k in ["erkek kardeş","erkek kardes","erkek kardeşim","erkek kardesim","ağabey","agabey","abi","abim"])
+        is_female_sib = any(k in q for k in ["kız kardeş","kiz kardes","kız kardeşim","kiz kardesim","bacı","baci","abla","ablam"])
         natural = None
         natural_second = None
         if "anne" in q or "annem" in q:
@@ -229,6 +231,12 @@ async def cast(req: CastRequest):
         elif "baba" in q or "babam" in q:
             natural = "Sun"        # baba: Güneş birincil
             natural_second = "Saturn"  # Satürn ikincil teyit
+        elif is_male_sib:
+            natural = "Sun"        # erkek kardeş: Güneş birincil (kadın/erkek doğalı)
+            natural_second = "Mars"  # Mars ikincil teyit
+        elif is_female_sib:
+            natural = "Moon"       # kız kardeş: Ay birincil (kadının doğalı)
+            natural_second = "Venus"  # Venüs ikincil teyit
         # öncelik: doğal gezegen varsa onu baz al (baba=Güneş, anne=Ay)
         if natural and res['planets'].get(natural):
             use_data = res['planets'][natural]
@@ -250,6 +258,10 @@ async def cast(req: CastRequest):
             is_self = "ben" in q and any(k in q for k in ["nerede","nerde","nere"])
             use_data = res['querent']['data'] if is_self else res['quesited']['data']
             actual_house = use_data['house']
+        # kardeş belirsizliği: ad/cinsiyet/büyüklük yoksa hangi kardeş? netleştir
+        is_generic_sib = ("kardeş" in q or "kardes" in q) and not is_male_sib and not is_female_sib
+        if is_generic_sib:
+            loc_info["clarify"] = "Hangi kardeş olduğunu netleştir (erkek mi/kız mı, adı veya büyük-küçük) — birden fazla kardeşten hangisini sorduğunu söylersen nokta atışı çıkar."
         from engine.location_engine import direction_by_sign
         house_dir = direction_by_house(actual_house)
         sign_dir = direction_by_sign(use_data['sign'])
@@ -305,7 +317,8 @@ async def cast(req: CastRequest):
             "burc_detail": burc_yer_detay(use_data['sign']),
             "sign": use_data['sign'],
             "deg": round(use_data['deg'],1),
-            "center": f"{req.lat},{req.lon} merkezine gore"
+            "center": f"{req.lat},{req.lon} merkezine gore",
+            "clarify": loc_info.get("clarify", "")
         }
     except Exception as e:
         print(f"loc_info hata: {e}")
@@ -389,6 +402,8 @@ async def cast(req: CastRequest):
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
     if res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü location['direction'] ile ver. Mesafe için KESİNLİKLE kendi hesap/çarpma yapma: location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), kısaca 'Yükselen yönetici derecesi × sorulanın derecesi × 10' formülü olduğunu belirt. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] ikinci doğal göstergesini de kısaca ekle."
+        if loc_info.get("clarify"):
+            engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     answer = call_openai(engine_json, req.lang)
 
     dt = (time.perf_counter()-t0)*1000

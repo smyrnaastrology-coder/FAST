@@ -425,7 +425,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             label = (person if isinstance(person,str) else str(person)).replace("im","").replace("ım","").capitalize()
             if "baba" in person: label="Baban"
             elif "anne" in person: label="Annen"
-            elif "kardeş" in person: label="Kardeşin"
+            elif "kardeş" in person:
+                if "erkek" in question or "abi" in question or "ağabey" in question or "agabey" in question: label="Erkek kardeşin"
+                elif "kız" in question or "kiz" in question or "abla" in question or "bacı" in question or "baci" in question: label="Kız kardeşin"
+                else: label="Kardeşin"
             elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
             elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
             elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
@@ -437,10 +440,15 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             if loc.get('burc_detail'):
                 base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
+            if loc.get('clarify'):
+                base_txt += f"\n\n{loc['clarify']}"
             return base_txt
         env = f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
         detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
-        return f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+        out = f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+        if loc.get('clarify'):
+            out += f"\n\n{loc['clarify']}"
+        return out
     if v=="YES":
         base = f"{long_detail}\n\nGidişat senden yana canım — içini ferah tut, güzel bir akış var. ✓"
         if "asc_near_boundary" in strict_codes:
@@ -455,7 +463,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 label = (person if isinstance(person,str) else str(person)).replace("im","").replace("ım","").capitalize()
                 if "baba" in person: label="Baban"
                 elif "anne" in person: label="Annen"
-                elif "kardeş" in person: label="Kardeşin"
+                elif "kardeş" in person:
+                    if "erkek" in question or "abi" in question or "ağabey" in question or "agabey" in question: label="Erkek kardeşin"
+                    elif "kız" in question or "kiz" in question or "abla" in question or "bacı" in question or "baci" in question: label="Kız kardeşin"
+                    else: label="Kardeşin"
                 elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
                 elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
                 elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
@@ -467,10 +478,15 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
                 if loc.get('burc_detail'):
                     base_txt += f"\nBurç ipucu: {loc.get('burc_detail')}"
+                if loc.get('clarify'):
+                    base_txt += f"\n\n{loc['clarify']}"
                 return base_txt
             env = f"\n\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
-            return f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+            out = f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+            if loc.get('clarify'):
+                out += f"\n\n{loc['clarify']}"
+            return out
         if is_thought:
             q_data = engine_json.get("quesited_sign","")
             return {"tr":f"{qs} {q_data} burcunda, ev {loc.get('house',7)} — seni düşünüyor mu diye bakınca {q}-{qs} arası {perf.get(chr(34)+'type'+chr(34),chr(34)+'yok'+chr(34))} var. {long_explain()} Biraz daha net sorarsan (ör: 'beni özlüyor mu?') daha keskin söylerim.", "en":f"Thought","es":"","ar":""}[lang]
