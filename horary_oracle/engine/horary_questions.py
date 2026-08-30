@@ -22,6 +22,7 @@ QUESTION_HOUSES = {
     "coworker": 6,
     "employee": 6,
     "sibling": 3,
+    "uncle": 6,          # dayı/amca: annenin/babanın kardeşi -> 4/10'dan 3.ev = 6/12 (dayı 6)
     "teacher": 9,
     "hoca": 9,
     "university": 9,
@@ -36,6 +37,7 @@ LABEL_TR = {
     "self": "Soranın kendisi", "friend": "Arkadaş", "spouse": "Eş/Partner",
     "child": "Çocuk", "mother": "Anne", "father": "Baba", "boss": "Patron/Amir",
     "coworker": "İş arkadaşı", "employee": "Çalışan", "sibling": "Kardeş",
+    "uncle": "Dayı/Amca",
     "teacher": "Hoca/Öğretmen", "university": "Üniversite", "student": "Öğrenci",
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "partner": "Eş/Partner",
@@ -64,6 +66,7 @@ TYPE_KEYWORDS = [
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
     ("employee", ("çalışanım", "calisanim", "elemanım", "elemanim", "personelim", "işçim", "iscim")),
     ("sibling", ("kardeşim", "kardesim", "ablam", "abim", "ağabeyim", "agabeyim", "bacım", "bacim", "kardeşimin", "kardesimin")),
+    ("uncle", ("dayım", "dayimin", "dayımın", "dayi", "amcam", "amcamin", "amcamın")),
     ("mother", ("annem", "annemin", "anam", "anneciğim", "annecigim")),
     ("father", ("babam", "babamin", "babamın", "babacığım", "babacigim")),
     ("money", ("param", "maaşım", "maasim", "gelirim", "cüzdanım", "cuzdanim", "mücevherim", "mucevherim", "altınlarım", "altinlarim")),

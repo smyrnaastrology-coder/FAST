@@ -402,6 +402,7 @@ async def cast(req: CastRequest):
                     querent_longitude=res['planets'][_qur3]['lon'],
                     condition=_cf['factor'],
                     return_components=True,
+                    sign_querent=res['planets'][_qur3].get('sign'),
                 )
                 geo_res["dignity"] = ", ".join(_cf["labels"])
                 if _qc:
@@ -432,10 +433,13 @@ async def cast(req: CastRequest):
                                 house=geo_res["house"],
                                 significator=geo_res["significator"],
                                 sign=geo_res["sign"],
+                                sign_querent=res['planets'][_qur3].get('sign'),
                                 degree=round(_guse.get('deg', 0) % 30, 2),
                                 querent_planet=_qur3,
                                 querent_degree=round(res['planets'][_qur3].get('deg', 0) % 30, 2),
-                                angular_difference=geo_res["angular"],
+                                angular_difference=geo_res["orb_deg"],
+                                modality=geo_res["modality"],
+                                modality_multiplier=geo_res["modality_multiplier"],
                                 components=geo_res.get("components"),
                                 condition=geo_res.get("condition", 1.0),
                                 real_distance_km=_verify["real_distance_km"],
@@ -556,6 +560,7 @@ async def cast(req: CastRequest):
             + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
             + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
             + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"
+            + (f"- Olcek merdiveni (aynı Δθ farklı ölçekte farklı km demek — mentor kuralı): oda içi ~{g['scale_ladder'].get('oda içi','?')} m / şehir içi ~{g['scale_ladder'].get('şehir içi','?')} km / ülke içi ~{g['scale_ladder'].get('ülke içi','?')} km / kıtalararası ~{g['scale_ladder'].get('kıtalararası','?')} km. Şu an varsayılan katman: {g.get('likely_tier','şehir içi')}.\n" if g.get("scale_ladder") else "")
             + ("- Doğrulama (kullanıcının verdiği gerçek konum): " + g['verification']['feedback'] + "\n" if g.get("verification") else "")
             + "Ev-ici ipucu: " + loc_info.get("ev_ici", "") + " | Yukseklik: " + loc_info.get("height", "")
         )

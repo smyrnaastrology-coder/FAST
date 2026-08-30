@@ -10,7 +10,8 @@ BASE_PERSON = {
     "ben":1, "kendim":1, "kendimin":1,
     # 3. ev kardeş / komşu / akraba / öğrenci / kısa yol
     "kardeş":3, "kardes":3, "kardeşim":3, "kardesim":3, "kardeşimin":3, "abim":3, "ablam":3, "kardeşimle":3,
-    "amca":3, "dayı":3, "dayi":3, "teyze":3, "hala":3,
+    "dayı":6, "dayi":6, "teyze":6,   # dayı/teyze = annenin(kardeşi) -> anne 4'ten 3.ev = 6 (mentör)
+    "amca":12, "hala":12,            # amca/hala = babanın kardeşi -> baba 10'dan 3.ev = 12
     "komşu":3, "komsu":3, "komşum":3,
     "kuzen":3,
     "öğrenci":3, "ogrenci":3, "öğrencim":3, "ogrencim":3, "ogrencimin":3,

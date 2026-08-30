@@ -23,6 +23,16 @@ _DEFAULT_WEIGHTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 DEFAULT_WEIGHTS = {"house": 0.50, "sign": 0.30, "planet": 0.20}
 MIN_FIT_RECORDS = 4
 
+# Mentör ölçek katmanları (km / (Δθ·M birimi)) — sabit tek k yerine MERDİVEN.
+# Aynı horary haritası (ör. doktor) 12 km (şehir) VEYA 7890 km (kıtalararası) olabilir;
+# doğru katmanı kalibrasyon kayıtları / kullanıcı geribildirimi seçer.
+DEFAULT_SCALE_TIERS = {
+    "oda içi": 0.0002,      # Eş örneği: 10.05 Δθ · 0.0002 ≈ 2 m
+    "şehir içi": 2.0,       # Aslı örneği: 6 Δθ · 2 ≈ 12 km
+    "ülke içi": 100.0,      # Yasin örneği: 5.73 Δθ · 100 ≈ 573 km
+    "kıtalararası": 1300.0, # Şanghay örneği: 6 Δθ · 1300 ≈ 7800 km
+}
+
 
 class HoraryDistanceEngine:
     # Azimut: 0=K, 45=KD, 90=D, 135=GD, 180=G, 225=GB, 270=B, 315=KB
@@ -45,7 +55,8 @@ class HoraryDistanceEngine:
     HOUSE_TYPE = {1: "angular", 2: "succedent", 3: "cadent", 4: "angular", 5: "succedent",
                   6: "cadent", 7: "angular", 8: "succedent", 9: "cadent", 10: "angular",
                   11: "succedent", 12: "cadent"}
-    DISTANCE_MULTIPLIER = {"angular": 0.75, "succedent": 1.00, "cadent": 1.35}
+    # Mentör formülü D = Δθ · M · k  (M: burcun modalite çarpanı, k: öğrenilen ölçek)
+    MODALITY_MULT = {"cardinal": 1.0, "mutable": 10.0, "fixed": 100.0}
     DIRECTIONS16 = ["K", "KKD", "KD", "DKD", "D", "DGD", "GD", "GGD", "G", "GGB", "GB", "BGB", "B", "BKB", "KB", "KKB"]
     DIRECTION_LABEL = {
         "K": "Kuzey", "KKD": "Kuzey-Kuzeydoğu", "KD": "Kuzeydoğu", "DKD": "Doğu-Kuzeydoğu",
@@ -111,33 +122,58 @@ class HoraryDistanceEngine:
             res["components"] = {"house": h, "sign_corr": s, "planet_corr": p, "ang_adj": round(ang_adj, 2), "angular": ang}
         return res
 
-    def estimate_distance(self, angular_distance_value, house, condition=1.0):
+    MODALITY_OF_SIGN = {
+        "Koç": "cardinal", "Boğa": "fixed", "İkizler": "mutable", "Yengeç": "cardinal",
+        "Aslan": "fixed", "Başak": "mutable", "Terazi": "cardinal", "Akrep": "fixed",
+        "Yay": "mutable", "Oğlak": "cardinal", "Kova": "fixed", "Balık": "mutable",
+        "Aries": "cardinal", "Taurus": "fixed", "Gemini": "mutable", "Cancer": "cardinal",
+        "Leo": "fixed", "Virgo": "mutable", "Libra": "cardinal", "Scorpio": "fixed",
+        "Sagittarius": "mutable", "Capricorn": "cardinal", "Aquarius": "fixed", "Pisces": "mutable",
+    }
+
+    def estimate_distance(self, orb_deg, house, condition=1.0, sign_querent=None):
+        """Mentör formülü: D_temel = Δθ · M · condition  (k yalnızca apply()'de kalibrasyon ölçeği).
+        Δθ (orb) = gösterge derecelerinin BURÇ-İÇİ farkı (ör. 4°03' ile 9°47' -> 5.73°),
+        M  = SORAN göstergesinin burcunun modalitesi: öncü(cardinal)=1 / değişken(mutable)=10 / sabit(fixed)=100.
+        """
         house_type = self.HOUSE_TYPE.get(house, "succedent")
-        multiplier = self.DISTANCE_MULTIPLIER[house_type]
-        base_distance = math.sqrt(max(angular_distance_value, 0)) * 100
+        modality = self.MODALITY_OF_SIGN.get(sign_querent, "cardinal")
+        mult = self.MODALITY_MULT[modality]
+        base_distance = max(orb_deg, 0.001) * mult * condition
         return {
-            "mesafe_km": round(base_distance * multiplier * condition),
+            "mesafe_km": round(base_distance),
+            "base_exact": round(base_distance, 4),
             "ev_tipi": house_type,
             "base_km": round(base_distance),
             "condition": round(condition, 3),
+            "modality": modality,
+            "modality_multiplier": mult,
+            "formula": f"D = Δθ·M·k = {orb_deg:.2f}° · {mult} · kalibrasyon_olcegi",
         }
 
-    def analyze(self, house, sign, planet, friend_longitude, querent_longitude, condition=1.0, return_components=False):
+    def analyze(self, house, sign, planet, friend_longitude, querent_longitude, condition=1.0, return_components=False, sign_querent=None):
         angular = self.angular_distance(friend_longitude, querent_longitude)
+        # mesafe için burç-içi orb: |gösterge derecesi%30 - soran derecesi%30|  (mentör yöntemi)
+        orb = abs((friend_longitude % 30) - (querent_longitude % 30))
         direction = self.calculate_direction(house, sign, planet, friend_longitude, querent_longitude, return_components=return_components)
-        distance = self.estimate_distance(angular, house, condition)
+        distance = self.estimate_distance(orb, house, condition, sign_querent)
         res = {
             "house": house,
             "significator": planet,
             "sign": sign,
             "angular": round(angular, 2),
+            "orb_deg": round(orb, 2),
             "azimut": direction["azimut"],
             "yon": direction["yon"],
             "yon_label": direction["yon_label"],
             "mesafe_km": distance["mesafe_km"],
             "base_km": distance["base_km"],
+            "base_exact": distance["base_exact"],
             "condition": distance["condition"],
             "ev_tipi": distance["ev_tipi"],
+            "modality": distance["modality"],
+            "modality_multiplier": distance["modality_multiplier"],
+            "formula": distance["formula"],
         }
         if return_components:
             res["components"] = direction["components"]
@@ -222,46 +258,88 @@ class HoraryCalibration:
         with open(path, "r", encoding="utf-8") as f:
             self.records = json.load(f)
 
-    def _base_preds(self, house_type):
-        """(base_km, gerçek_km, kayıt) listesi."""
+    def _base_value(self, r):
+        ang = float(r.get("angular_difference", 1))
+        cond = float(r.get("condition", 1.0))
+        mm = r.get("modality_multiplier")
+        if not mm:
+            mod = HoraryDistanceEngine.MODALITY_OF_SIGN.get(r.get("sign"), "cardinal")
+            mm = HoraryDistanceEngine.MODALITY_MULT.get(mod, 1.0)
+        base = max(ang, 0.001) * mm * cond
+        return base if base > 0 else None
+
+    def _base_preds(self, house_type=None):
+        """(base_km, gerçek_km, kayıt) listesi — D_temel = Δθ · M · condition."""
         out = []
         for r in self.records:
-            mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(house_type, 1.0)
-            ang = float(r.get("angular_difference", 1))
-            cond = float(r.get("condition", 1.0))
-            base = math.sqrt(max(ang, 1)) * 100 * mult * cond
-            if base > 0:
+            base = self._base_value(r)
+            if base is not None:
                 out.append((base, float(r["real_distance_km"]), r))
         return out
 
-    def scale_for(self, house_type, question_type=None):
-        """Aynı (qtype) -> aynı ev-tipi -> global; ölçek oran ortalaması (gerçek/base)."""
+    def likely_tier(self, records=None):
+        """Kalibrasyon kayıtlarından soru tipine en uygun ölçek katmanını seç.
+        Her kayıtta k = gerçek/base; en yakın varsayılan katman çoğunlukla kazanır."""
+        recs = records if records is not None else self.records
+        votes = {}
+        for r in recs:
+            base = self._base_value(r)
+            if not base:
+                continue
+            k = float(r["real_distance_km"]) / base
+            tier = min(DEFAULT_SCALE_TIERS, key=lambda t: abs(math.log10(DEFAULT_SCALE_TIERS[t]) - math.log10(k)))
+            votes[tier] = votes.get(tier, 0) + 1
+        if not votes:
+            return "şehir içi"
+        return max(votes, key=votes.get)
+
+    def scale_for(self, house_type=None, question_type=None):
+        """k ölçeği: önce soru tipi bucket'ı, sonra global (gerçek/base ortalaması)."""
         if question_type:
-            bucket = [r for r in self._base_preds(house_type) if r[2].get("question_type") == question_type]
+            bucket = [r for r in self._base_preds() if r[2].get("question_type") == question_type]
             if bucket:
                 return sum(real / base for base, real, _ in bucket) / len(bucket)
-        bucket = self._base_preds(house_type)
+        bucket = self._base_preds()
         if bucket:
             return sum(real / base for base, real, _ in bucket) / len(bucket)
-        return 1.0 if question_type else 1.0
+        return DEFAULT_SCALE_TIERS[self.likely_tier()]
+
+    def tier_ladder(self, base_exact):
+        """Tüm ölçek katmanlarını döndür: aynı Δθ farklı ölçek anlamlarına gelebilir."""
+        return {tier: round(base_exact * k, 4) for tier, k in DEFAULT_SCALE_TIERS.items()}
 
     def apply(self, geo_result, question_type=None):
         ht = geo_result.get("ev_tipi", "succedent")
+        base_exact = geo_result.get("base_exact", geo_result.get("base_km", geo_result["mesafe_km"]))
         scale = self.scale_for(ht, question_type)
-        km = geo_result["mesafe_km"] * scale
-        lo = max(5, int(round(km * 0.8 / 50) * 50))
-        hi = max(lo + 50, int(round(km * 1.25 / 50) * 50))
+        km = base_exact * scale
         cat_q = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
         cat_km = km_category(km)
         confidence = 0.68 + min(0.12, 0.04 * len(self.records))
         geo_result["mesafe_kalibre_km"] = round(km)
-        geo_result["band"] = f"~{lo}–{hi}"
+        # ölçek katmanı merdiveni: hangi katman gerçekçi? (kullanıcı onayı belirler)
+        geo_result["scale_ladder"] = self.tier_ladder(base_exact)
+        geo_result["likely_tier"] = self.likely_tier()
+        if km < 1:  # mikro ölçek (oda içi) — metreyi göster
+            m = round(km * 1000)
+            lo = max(0.5, round(m * 0.8 / 50) * 50)
+            hi = max(lo + 50, round(m * 1.25 / 50) * 50)
+            geo_result["band"] = f"~{int(lo)}–{int(hi)} m"
+            geo_result["display"] = f"~{m} m (oda/ev içi seviyesi)"
+            cat_q = "çok yakın (oda içi)"
+        else:
+            lo = max(5, int(round(km * 0.8 / 50) * 50))
+            hi = max(lo + 50, int(round(km * 1.25 / 50) * 50))
+            geo_result["band"] = f"~{lo}–{hi} km"
+            geo_result["display"] = f"~{round(km)} km"
         geo_result["category"] = cat_q
         geo_result["km_category"] = cat_km["label"]
         geo_result["km_category_range"] = f"{cat_km['altsınır']}–{cat_km['üstsınır']} km"
         geo_result["confidence"] = round(confidence, 2)
         geo_result["calibration_scale"] = round(scale, 3)
         geo_result["calibration_n"] = len(self.records)
+        if geo_result.get("formula"):
+            geo_result["formula"] = geo_result["formula"] + f"  (k≈{scale:.3f})"
         return geo_result
 
     def get_record(self, ident):
@@ -343,10 +421,11 @@ def model_stats(records):
                 pred_az = _direction_predict(r["components"], weights)
                 dir_errs.append(_circular_diff(pred_az, r["real_bearing"]))
             if r.get("angular_difference") and r.get("real_distance_km") is not None:
-                mult = HoraryDistanceEngine.DISTANCE_MULTIPLIER.get(HoraryDistanceEngine.HOUSE_TYPE.get(r.get("house"), "succedent"), 1.0)
-                base = math.sqrt(max(float(r["angular_difference"]), 1)) * 100 * mult * float(r.get("condition", 1.0))
+                mm = r.get("modality_multiplier") or HoraryDistanceEngine.MODALITY_MULT.get(
+                    HoraryDistanceEngine.MODALITY_OF_SIGN.get(r.get("sign"), "cardinal"), 1.0)
+                base = max(float(r["angular_difference"]), 0.001) * mm * float(r.get("condition", 1.0))
                 cal = HoraryCalibration()
-                scale = cal.scale_for(HoraryDistanceEngine.HOUSE_TYPE.get(r.get("house"), "succedent"), r.get("question_type"))
+                scale = cal.scale_for(None, r.get("question_type"))
                 pred_km = base * scale
                 km_errs.append(abs(pred_km - float(r["real_distance_km"])))
         out = {"n": len(subset)}
@@ -408,5 +487,7 @@ CITY_COORDINATES = {
     "İzmir": (38.4237, 27.1428), "Kırıkkale": (39.8468, 33.5153), "Ankara": (39.9334, 32.8597),
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),
     "Bursa": (40.1950, 29.0600), "Antalya": (36.8969, 30.7133), "Konya": (37.8746, 32.4932),
-    "Tokat": (40.3167, 36.5500), "Kırıkkale" : (39.8468, 33.5153),
+    "Tokat": (40.3167, 36.5500), "Niksar": (40.5903, 36.9492), "Ayrancılar": (38.10, 27.25),
+    "Şanghay": (31.2304, 121.4737), "Valencia": (39.4699, -0.3763), "Milano": (45.4642, 9.1900),
+    "Halkapınar": (38.4237, 27.1428),
 }

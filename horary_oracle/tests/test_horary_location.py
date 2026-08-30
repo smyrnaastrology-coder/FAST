@@ -84,25 +84,29 @@ def test_condition_factor_values():
 
 def test_calibration_scale_and_verify(tmp_path):
     cal = HoraryCalibration(filename=os.path.join(tmp_path, "cal.json"))
-    # seed kaydı: teacher, cadent 9.ev, angular 68.5, gerçek 571.8
-    cal.add_record(question_type="teacher", house=9, significator="Sun", sign="Virgo",
-                   angular_difference=68.5, condition=1.0,
-                   real_distance_km=571.8, real_bearing=71.94)
+    # seed kaydı: teacher -> Kırıkkale, Δθ=5.73 (Ay-Merkür orb), M=1 (öncü card), gerçek 576 km
+    cal.add_record(question_type="teacher", house=9, significator="Mercury", sign="Virgo",
+                   sign_querent="Aries", angular_difference=5.73, modality="cardinal",
+                   modality_multiplier=1.0, condition=1.0,
+                   real_distance_km=576, real_bearing=71.94)
     cal.save()
     cal2 = HoraryCalibration(filename=os.path.join(tmp_path, "cal.json"))
     cal2.load()
     assert len(cal2.records) == 1
 
     eng = HoraryDistanceEngine()
-    geo = eng.analyze(9, "Virgo", "Sun", 152.1, 133.4, return_components=True)
+    # sign_querent=Aries (Koç/öncü) → M=1; orb=5.73 → base=5.73, k=576/5.73≈100.5
+    geo = eng.analyze(9, "Virgo", "Mercury", 159.78, 4.05, return_components=True, sign_querent="Aries")
     out = cal2.apply(geo, question_type="teacher")
-    assert out["category"] == "uzak"
-    assert out["km_category"] == "orta"       # 299 km → 150‑400 aralığı
-    assert out["calibration_scale"] > 0
+    # k = 576/5.73 ≈ 100.5 → mesafe_kalibre ≈ 576 km
     assert out["mesafe_kalibre_km"] is not None
+    assert 520 <= out["mesafe_kalibre_km"] <= 630
+    assert out["calibration_scale"] == round(576 / 5.73, 3)
+    assert out["km_category"] == "orta-uzak"        # 400–750 km
+    assert out["category"] == "uzak"                # 9.ev cadent
 
     v = verify_prediction(out["azimut"], out["mesafe_kalibre_km"], 38.3176, 27.2025, 39.8468, 33.5153)
-    assert v["real_distance_km"] and v["real_bearing"]
+    assert v["real_distance_km"] is not None and v["real_bearing"] is not None
     assert v["direction_error_deg"] is not None
 
 

@@ -14,6 +14,7 @@ Komutlar:
   python horary_oracle/tools/horary_calibrate.py fit
 """
 import json
+import math
 import os
 import sys
 
@@ -23,7 +24,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
 from engine.horary_distance import (
     HoraryCalibration, fit_direction_weights, load_weights, model_stats,
     save_weights, geographic_distance, geographic_bearing, CITY_COORDINATES,
-    HoraryDistanceEngine,
+    HoraryDistanceEngine, DEFAULT_SCALE_TIERS,
 )
 from engine.horary_questions import classify_question
 
@@ -98,6 +99,22 @@ def cmd_tohum():
     print(f"Seed kaydı #{CAL.records[-1]['_id']} eklendi. Toplam {len(CAL.records)}.")
 
 
+def cmd_ladder():
+    """Ölçek katmanı merdiveni: each kaydın Δθ·M'ye göre katman dağılımı."""
+    tiers = {}
+    for r in CAL.records:
+        base = CAL._base_value(r)
+        if not base:
+            continue
+        k = float(r["real_distance_km"]) / base
+        tier = min(DEFAULT_SCALE_TIERS, key=lambda t: abs(math.log10(DEFAULT_SCALE_TIERS[t]) - math.log10(k)))
+        tiers.setdefault(tier, []).append((r["_id"], round(k, 4)))
+    out = {"likely_tier": CAL.likely_tier(), "tiers": {}}
+    for t, rows in sorted(tiers.items(), key=lambda kv: kv[0]):
+        out["tiers"][t] = {"n": len(rows), "k_ornekleri": rows[:8]}
+    _json_print(out)
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "list"
     if cmd == "list":
@@ -110,7 +127,9 @@ if __name__ == "__main__":
         cmd_stats()
     elif cmd == "fit":
         cmd_fit()
+    elif cmd == "ladder":
+        cmd_ladder()
     elif cmd == "tohum":
         cmd_tohum()
     else:
-        print("Bilinmeyen komut. list | add <json> | stats | fit | tohum")
+        print("Bilinmeyen komut. list | add <json> | stats | fit | ladder | tohum")
