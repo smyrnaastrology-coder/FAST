@@ -249,7 +249,7 @@ async def cast(req: CastRequest):
                 loc_info["_derived_house"] = derived_loc["derived"]
         elif derived_loc:
             cusp_lon = res['houses']['cusps'][derived_loc["derived"]-1]
-            from core.ephemeris import sign_from_lon as _sfl2, DOMICILE as _DOM2
+            from core.ephemeris import sign_from_lon as _sfl2, DOMICILE_TRADITIONAL as _DOM2
             dsign = _sfl2(cusp_lon)
             dplanet = _DOM2.get(dsign, "Moon")
             use_data = res['planets'].get(dplanet, res['quesited']['data'])
@@ -283,24 +283,25 @@ async def cast(req: CastRequest):
                 direction_note = f"{who}da yön teyidi zayıf: ev {house_dir} / burç {sign_dir} / Ay {moon_dir} — tek başına güvenme, teyit gerek"
         # Uzaklık: soruyu soran yükselen yöneticisi derecesi × sorulan derecesi ×10 (kullanıcı bulgusu)
         # Merkür 8.45 × Güneş 6.35 = 53.65 → ×10 = 536 km (İzmir→Bağcılar 480 km bandı, nokta atışı)
+        # 2026-08-30 Gaziemir testi: Akrep ASC klasik yöneticisi MARS 12.36° × Moon 3.49° ×10 = 431 km (gerçek Manavgat ~413 km ✓);
+        # modern Pluto dersek 123.7 km çıkıyor (yanlış) → km formülünde klasik yönetici (DOMICILE_TRADITIONAL) kullanılır.
         try:
             from engine.location_engine import distance_querent_quesited
-            qr_deg = res['querent']['data']['deg']  % 30
+            from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT
+            _asc_sign_r = res['houses']['asc_sign']
+            asc_ruler_klasik = _DOMT.get(_asc_sign_r, res['querent']['planet'])
+            qr_deg = res['planets'][asc_ruler_klasik]['deg'] % 30
             qs_deg = use_data['deg'] % 30
             qq_dist = distance_querent_quesited(qr_deg, qs_deg)
+            loc_info["_qr_ruler_klasik"] = f"{asc_ruler_klasik} {qr_deg:.1f}° ({_asc_sign_r} yöneticisi)"
         except Exception:
             qq_dist = None
-        # ikincil doğal gösterge notu (baba=Satürn)
+        # ikincil doğal gösterge notu (baba=Satürn / kız kardeş=Venüs)
         second_note = ""
         if loc_info.get("_natural_second") and res['planets'].get(loc_info["_natural_second"]):
             s2 = res['planets'][loc_info["_natural_second"]]
             s2_deg = s2['deg'] % 30
             second_note = f"{loc_info['_natural_second']} {s2['sign']} {s2_deg:.1f}° Ev{s2['house']}"
-            # ikinci doğal göstergenin de mesafesini querent ile dene (karşılaştırma)
-            try:
-                s2_dist = distance_querent_quesited(res['querent']['data']['deg'] % 30, s2_deg)
-                second_note += f" (×10={s2_dist} km)"
-            except Exception: pass
         loc_info = {
             "direction": house_dir,
             "sign_direction": sign_dir,
@@ -318,7 +319,8 @@ async def cast(req: CastRequest):
             "sign": use_data['sign'],
             "deg": round(use_data['deg'],1),
             "center": f"{req.lat},{req.lon} merkezine gore",
-            "clarify": loc_info.get("clarify", "")
+            "clarify": loc_info.get("clarify", ""),
+            "_qr_ruler_klasik": loc_info.get("_qr_ruler_klasik", "")
         }
     except Exception as e:
         print(f"loc_info hata: {e}")
@@ -331,7 +333,7 @@ async def cast(req: CastRequest):
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
-        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
+        for kw,lab in [("anne","anne"),("babam","baba"),("baba","baba"),("kardeş","kardeş"),("kardes","kardeş"),("ablam","kardeş"),("abim","kardeş"),("abla","kardeş"),("abi","kardeş"),("ağabey","kardeş"),("agabey","kardeş"),("bacı","kardeş"),("baci","kardeş"),("arkadaş","arkadaş"),("arkadas","arkadaş"),("eşim","eş"),("esim","eş"),("kocam","koca"),("karım","karı"),("oğlum","oğlum"),("og lum","oğlum"),("kızım","kızım"),("kizim","kızım"),("çocuk","çocuk"),("cocuk","çocuk"),("kedi","kedi"),("kopek","köpek"),("köpek","köpek")]:
             if kw in qlow3:
                 loc_info["person"] = lab.replace("oğlum","çocuk").replace("kızım","çocuk").replace("kocam","eş")
                 break
@@ -401,7 +403,7 @@ async def cast(req: CastRequest):
         engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
     if res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
-        engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü location['direction'] ile ver. Mesafe için KESİNLİKLE kendi hesap/çarpma yapma: location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), kısaca 'Yükselen yönetici derecesi × sorulanın derecesi × 10' formülü olduğunu belirt. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] ikinci doğal göstergesini de kısaca ekle."
+        engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']'. MESAFE: KESİNLİKLE kendi hesap/çarpma yapma ve 'qq_distance_km' dışında başka hiçbir km/metre rakamı verme. location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), formülünün 'Yükselen yönetici derecesi × sorulanın derecesi × 10' olduğunu kısaca belirt. Yükselen yöneticisi (klasik tablo): location['_qr_ruler_klasik']. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     answer = call_openai(engine_json, req.lang)

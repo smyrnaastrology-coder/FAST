@@ -432,9 +432,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
             elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
             elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
-            base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor."
+            sig_name = loc.get('_natural') or "Türetilmiş ev yöneticisi"
+            base_txt = f"{label} şu an {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Gösterge {sig_name}: {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de."
             if loc.get('qq_distance_km'):
-                base_txt += f"\n\nUzaklık: Yükselen yöneticisi ° × {qs} (°) ×10 → yaklaşık {loc['qq_distance_km']} km."
+                base_txt += f"\n\nUzaklık: Yükselen yöneticisi ({loc.get('_qr_ruler_klasik','')}) × {loc.get('sign','')} ({loc.get('deg','')}°) ×10 → yaklaşık {loc['qq_distance_km']} km."
             if loc.get('saturn_second'):
                 base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
             base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
@@ -445,7 +446,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             return base_txt
         env = f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
         detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
-        out = f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+        out = f"Aradığın şey {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
         if loc.get('clarify'):
             out += f"\n\n{loc['clarify']}"
         return out
@@ -470,9 +471,9 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 elif "arkadaş" in person: label="Arkadaşın Yasin" if "yasin" in question else "Arkadaşın"
                 elif "eş" in person or "koca" in person or "karı" in person: label="Eşin"
                 elif "çocuk" in person or "oğlum" in person or "kızım" in person: label="Çocuğun"
-                base_txt = f"{label} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor; doğal gösterge {loc.get('_natural','') or 'yöneticisi'}."
+                base_txt = f"{label} şu an {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de duruyor; gösterge {loc.get('_natural','') or 'türetilmiş ev yöneticisi'}."
                 if loc.get('qq_distance_km'):
-                    base_txt += f"\n\nUzaklık: Yükselen yöneticisi ° × {loc.get('_natural','') or loc.get('sign','')} (°) ×10 → yaklaşık {loc['qq_distance_km']} km."
+                    base_txt += f"\n\nUzaklık: Yükselen yöneticisi ({loc.get('_qr_ruler_klasik','')}) × {loc.get('sign','')} ({loc.get('deg','')}°) ×10 → yaklaşık {loc['qq_distance_km']} km."
                 if loc.get('saturn_second'):
                     base_txt += f"\nİkinci gösterge: {loc['saturn_second']}."
                 base_txt += f"\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
@@ -483,7 +484,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
                 return base_txt
             env = f"\n\nOrtam: {loc.get('height','')} — {loc.get('element_kalite','')}."
             detail = f" Burç: {loc.get('burc_detail','')}" if loc.get('burc_detail') else ""
-            out = f"Aradığın şey {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {qs} {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
+            out = f"Aradığın şey {loc.get('direction','')} yönünde (burç yönü: {loc.get('sign_direction','')}), {loc.get('height','')} bir yerde — ev {loc.get('house','')} ({loc.get('place','')}). Mesafe {loc.get('distance','')}. {loc.get('sign','')} {loc.get('deg','')}° Ev{loc.get('house')}’de.{env}{detail}"
             if loc.get('clarify'):
                 out += f"\n\n{loc['clarify']}"
             return out
