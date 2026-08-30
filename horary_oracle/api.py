@@ -253,11 +253,13 @@ async def cast(req: CastRequest):
         from engine.location_engine import direction_by_sign
         house_dir = direction_by_house(actual_house)
         sign_dir = direction_by_sign(use_data['sign'])
-        # çocuk kayıp için çift teyit: ev yönü + burç yönü + Ay yönü en az 2 uyuşsun
+        # çocuk/kayıp hayvan için çift teyit: ev yönü + burç yönü + Ay yönü en az 2 uyuşsun
         is_child = "çocuk" in q or "cocuk" in q or "oğlum" in q or "kızım" in q or req.quesited_type in ("missing_child","child")
+        is_pet = "kedi" in q or "köpek" in q or "kopek" in q or "hayvan" in q or "evcil" in q or req.quesited_type in ("pet","lost_pet","animal")
         direction_ok = True
         direction_note = ""
-        if is_child:
+        if is_child or is_pet:
+            who = "çocuk kayıp" if is_child else "kedi/köpek"
             # basit uyum: aynı ana yön kelimesi geçiyor mu?
             house_main = house_dir.split()[0]
             sign_main = sign_dir.split()[0]
@@ -266,7 +268,7 @@ async def cast(req: CastRequest):
             matches = sum([house_main in sign_dir or sign_main in house_dir, house_main in moon_dir or moon_main in house_dir, sign_main in moon_dir or moon_main in sign_dir])
             if matches < 1:
                 direction_ok = False
-                direction_note = f"Yön teyidi zayıf: ev {house_dir} / burç {sign_dir} / Ay {moon_dir} — tek başına güvenme, teyit gerek"
+                direction_note = f"{who}da yön teyidi zayıf: ev {house_dir} / burç {sign_dir} / Ay {moon_dir} — tek başına güvenme, teyit gerek"
         # Uzaklık: soruyu soran yükselen yöneticisi derecesi × sorulan derecesi ×10 (kullanıcı bulgusu)
         # Merkür 8.45 × Güneş 6.35 = 53.65 → ×10 = 536 km (İzmir→Bağcılar 480 km bandı, nokta atışı)
         try:

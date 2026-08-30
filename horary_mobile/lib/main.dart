@@ -435,7 +435,7 @@ class _HoraryHomeState extends State<HoraryHome> {
             child: LostRadarMap(
               lat: lat, lon: lon,
               direction: _lastChart!['location']['direction'] ?? 'BATI',
-              distance: _lastChart!['location']['distance'] ?? '',
+              distance: ((_lastChart!['location']['qq_distance_km'] ?? 0) != 0 && _lastChart!['location']['person'] != 'kedi' && _lastChart!['location']['person'] != 'köpek') ? '${((_lastChart!['location']['qq_distance_km'] as num).round())} km' : (_lastChart!['location']['distance'] ?? ''),
               place: _lastChart!['location']['place'] ?? '',
               house: _lastChart!['location']['house'] ?? 7,
               deg: (_lastChart!['location']['deg'] is num) ? (_lastChart!['location']['deg'] as num).toDouble() : 15,
