@@ -171,7 +171,7 @@ async def cast(req: CastRequest):
         return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
     # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
     # Follow-up ise bu guard atlanır (açıklama isteniyor)
-    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu"]
+    horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi"]
     is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
     if not is_followup and not is_horary and len(qlow.split()) < 12:
         # sohbet modu - öneri sun
@@ -451,7 +451,56 @@ async def cast(req: CastRequest):
     # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
     if res["verdict"] == "LOCATION" and loc_info.get("ev_ici"):
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
+    # --- HIRSIZLIK/KAYIP AYRIMI (Deneb Kaitos): 12. ev yöneticisinin açıları ---
+    theft_kw = ["hırsız","hirsiz","hırsızlık","hirsizlik","çalınd","calind","çalın","calin","çaldı","caldi","aşırdı","asirdi","aşırıldı","asirildi","çalınmış","calinmis","soyuldu","soygun","kaptırdı","kaptirdi"]
+    if any(k in req.question.lower() for k in theft_kw):
+        try:
+            from core.ephemeris import sign_from_lon as _sfl_teft
+            from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT_teft
+            _c12 = res['houses']['cusps'][11] % 360
+            _s12 = _sfl_teft(_c12)
+            _l12p = _DOMT_teft.get(_s12, "Moon")
+            _l12 = res['planets'].get(_l12p, {})
+            _asc_p = _DOMT_teft.get(res['houses']['asc_sign'], res['querent']['planet'])
+            _asc_l = res['planets'].get(_asc_p, {})
+            _moon = res['planets'].get('Moon', {})
+            def _asp_12(a, b):
+                d = (b - a) % 360
+                if d > 180: d = 360 - d
+                ms = [0, 60, 90, 120, 180]
+                mm = min(ms, key=lambda m: abs(m - d))
+                return mm, round(abs(mm - d), 1)
+            a1, o1 = _asp_12(_l12.get('lon', 0), _asc_l.get('lon', 0))
+            a2, o2 = _asp_12(_l12.get('lon', 0), _moon.get('lon', 0))
+            hards = [x for x in ((a1, o1), (a2, o2)) if x[0] in (90, 180) and x[1] <= 6]
+            softs = [x for x in ((a1, o1), (a2, o2)) if x[0] in (0, 60, 120) and x[1] <= 6]
+            if hards and not softs:
+                verdict_hm = "ÇALINTI (dürüst kayıp değil, biri almış)"
+            elif hards:
+                verdict_hm = "ÇALINTI-MELEZ (sert açı baskın ama iyi açı da var — bazı parçalar geri gelebilir)"
+            elif softs:
+                verdict_hm = "KAYIP (çalınmamış, kaybolmuş/yer değiştirmiş)"
+            else:
+                verdict_hm = "KAYIP-BELİRSİZ (12. ev yöneticisi 6° içinde belirgin açı yapmıyor — çoğunlukla kayıptır)"
+            _c7 = res['houses']['cusps'][6] % 360
+            _s7 = _sfl_teft(_c7)
+            _l7p = _DOMT_teft.get(_s7, "Venus")
+            _l7h = res['planets'].get(_l7p, {}).get('house')
+            un_txt = "AÇIK DÜŞMAN/AİLE İÇİ — hırsız tanıdık, ev içi (bakıcı, temizlikçi, sekreter, gelin gibi; 7. ev karşıdan gelir)" if _l7h in (1, 4, 7, 10) else "UZAK/DIŞARI — hırsız tanımadığın biri, 7. ev köşe evde değil"
+            th_txt = (f"HIRSIZLIK/ÇALINMA analizi (12. evin açı kuralı): karar → {verdict_hm}. "
+                      f"12.ev {_s12} yöneticisi {_l12p} {_l12.get('sign','')} Ev{_l12.get('house','?')}, "
+                      f"ASC yöneticisi {_asc_p} ile {a1}° ({'hard' if a1 in (90,180) else 'soft' if a1 in (0,60,120) else 'none'}, {o1}° orb); "
+                      f"Ay ile {a2}° ({o2}° orb). Hırsız konumu: {un_txt}. "
+                      f"7.ev yöneticisi {_l7p} Ev{_l7h}. Not: hırsızı gösteren mitolojik göstergeler Neptün (=12, dolandırıcı) ile 12. ev yöneticisidir.")
+            res['strictures'].insert(0, {"code": "theft_analysis", "level": "info", "meaning": th_txt})
+            engine_json["theft_analysis"] = th_txt
+            engine_json["theft_verdict"] = verdict_hm
+            engine_json["theft_thief"] = un_txt
+        except Exception as e:
+            engine_json["theft_analysis"] = f"HIRSIZLIK analizi hesaplanamadı ({e}) — genel kayıp kuralları (12. ev) geçerli."
     answer = call_openai(engine_json, req.lang)
+    if engine_json.get("theft_verdict"):
+        answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000
     # planets for mini chart
