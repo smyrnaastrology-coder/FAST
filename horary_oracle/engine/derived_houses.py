@@ -114,7 +114,10 @@ def parse_derived(question: str):
     # başka ilişki kelimeleri offset/topic YAPILMAMALI (aynı kişiyi tarif ediyorlar).
     # Offset sadece "eşimin işi / arkadaşımın parası" gibi iyelikli konularda çalışır.
     _GEN_SUF = ("ınnın", "inin", "nın", "nin", "nün", "nun", "ın", "in", "un", "ün")
-    possession = any(w + s in q for w in BASE_PERSON for s in _GEN_SUF)
+    # İyelik ünsüzü: "kuzenin" (onun) vs "kuzenimin" (benim) — 'im/ım/um/üm' araya girer.
+    _GEN_SUF_IYELIK = [p + g for p in ("ım", "im", "um", "üm", "im") for g in _GEN_SUF]
+    possession = any((w + s) in q for w in BASE_PERSON for s in _GEN_SUF) or \
+                 any((w + s) in q for w in BASE_PERSON for s in _GEN_SUF_IYELIK)
     if not possession:
         return {"base_house": base, "base_word": base_word, "derived": base, "topic": "kişi kendisi"}
     offset = None; topic_word=""

@@ -374,20 +374,25 @@ async def cast(req: CastRequest):
             from engine.horary_distance import (HoraryDistanceEngine, HoraryCalibration,
                                                 condition_factor, load_weights, verify_prediction, CITY_COORDINATES)
             from engine.horary_questions import classify_question, parse_nested
+            from engine.derived_houses import parse_derived as _parse_derived_g
             from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT3, sign_from_lon as _sfl_g
             _asc_s3 = res['houses']['asc_sign']
             _qur3 = _DOMT3.get(_asc_s3, res['querent']['planet'])
             # soru tipi -> kalibrasyon bucket'ı (hoca/arkadaş/öğrenci/...)
             _qc = classify_question(req.question) or {}
             _qn = parse_nested(req.question)
+            # derived-house fallback: 'kuzenimin altınları' gibi ev-zinciri soruları için
+            _qd = _parse_derived_g(req.question) if (not _qn and not _qc.get("house")) else None
             qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
             # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
-            # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > gösterge gezegeninin bulunduğu ev
+            # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > derived(parse_derived) > gösterge gezegeninin bulunduğu ev
             _ghouse = actual_house
             if _qn:
                 _ghouse = _qn["derived"]
             elif _qc.get("house"):
                 _ghouse = _qc["house"]
+            elif _qd and _qd.get("derived"):
+                _ghouse = _qd["derived"]
             _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
             if _qn:
                 _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
@@ -396,6 +401,11 @@ async def cast(req: CastRequest):
                 _guse = res['planets'].get(_gplanet, use_data)
             elif _qc.get("house"):
                 _cusp_g = res['houses']['cusps'][_qc["house"] - 1]
+                _gsign = _sfl_g(_cusp_g)
+                _gplanet = _DOMT3.get(_gsign, "Moon")
+                _guse = res['planets'].get(_gplanet, use_data)
+            elif _qd and _qd.get("derived"):
+                _cusp_g = res['houses']['cusps'][_qd["derived"] - 1]
                 _gsign = _sfl_g(_cusp_g)
                 _gplanet = _DOMT3.get(_gsign, "Moon")
                 _guse = res['planets'].get(_gplanet, use_data)
@@ -420,6 +430,8 @@ async def cast(req: CastRequest):
                 geo_res["qtype_label"] = _qc["label"]
             if _qn:
                 geo_res["chain"] = _qn["formula"]
+            elif _qd and _qd.get("formula"):
+                geo_res["chain"] = _qd["formula"]
             _cal3 = HoraryCalibration()
             _cal3.load()
             geo_res = _cal3.apply(geo_res, question_type=qtype_g)

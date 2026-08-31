@@ -43,6 +43,18 @@ def test_parse_nested():
     assert parse_nested("arkadaşım nerede?") is None  # iyelikli ikinci kişi yok
 
 
+def test_derived_kuzen_altin_house():
+    """Kuzenin kayıp altınları: soran(1)->kuzen(3)->altın(2)=4.ev (iç içe ev zinciri)."""
+    from engine.derived_houses import parse_derived
+    r = parse_derived("kuzenimin kayıp altınları nerde")
+    assert r and r["derived"] == 4
+    assert r["base_house"] == 3 and r["offset"] == 2
+    assert "3.evden 2.ev = 4.ev" in r["formula"]
+    # 'kuzenimin' (benim) iyelikli genitive de çalışmalı
+    r2 = parse_derived("kuzenimin altınları kayıp nerede olabilir")
+    assert r2 and r2["derived"] == 4
+
+
 def test_direction_components():
     eng = HoraryDistanceEngine()
     res = eng.analyze(9, "Virgo", "Sun", 152.1, 133.4, return_components=True)
