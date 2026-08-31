@@ -461,7 +461,7 @@ async def cast(req: CastRequest):
             if req.verify_city:
                 _cl = req.verify_city.strip().lower()
                 _mcity = next((k for k in CITY_COORDINATES if k.lower() == _cl), None)
-                if _mcity and geo_res.get("mesafe_kalibre_km"):
+                if _mcity and geo_res.get("mesafe_kalibre_km") is not None:
                     _c0, _c1 = CITY_COORDINATES[_mcity]
                     _verify = verify_prediction(geo_res["azimut"], geo_res["mesafe_kalibre_km"],
                                                 req.lat, req.lon, _c0, _c1)

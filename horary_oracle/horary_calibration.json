@@ -418,5 +418,32 @@
     "real_bearing": 180.0,
     "_id": 16,
     "ts": "2026-08-31T17:47:09"
+  },
+  {
+    "question_type": "coworker",
+    "origin": "38.323,27.126",
+    "destination": "Tilburg",
+    "house": 2,
+    "significator": "Moon",
+    "sign": "Koç",
+    "sign_querent": "Koç",
+    "degree": 20.35,
+    "querent_planet": "Saturn",
+    "querent_degree": 13.7,
+    "angular_difference": 6.65,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 135,
+      "sign_corr": 0,
+      "planet_corr": 5,
+      "ang_adj": -13.89,
+      "angular": 6.65263358769689
+    },
+    "condition": 1.0,
+    "real_distance_km": 2258.5,
+    "real_bearing": 317.78,
+    "_id": 17,
+    "ts": "2026-08-31T18:19:39"
   }
 ]
