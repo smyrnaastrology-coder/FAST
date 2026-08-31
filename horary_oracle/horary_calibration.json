@@ -22,7 +22,7 @@
     "real_scale": "ülke içi (k≈100 km)",
     "ts": "2026-08-30T14:16:00",
     "components": {
-      "house": 45,
+      "house": 315.0,
       "sign_corr": 5,
       "planet_corr": 0,
       "angular": 5.73,
@@ -52,7 +52,7 @@
     "real_scale": "şehir içi (k≈1 km)",
     "ts": "2026-08-30T17:20:00",
     "components": {
-      "house": 270,
+      "house": 270.0,
       "sign_corr": 0,
       "planet_corr": 5,
       "angular": 6.0,
@@ -82,7 +82,7 @@
     "real_scale": "kıtalararası (k≈1300 km)",
     "ts": "2026-08-30T17:20:00",
     "components": {
-      "house": 270,
+      "house": 270.0,
       "sign_corr": 0,
       "planet_corr": 5,
       "angular": 6.0,
@@ -112,7 +112,7 @@
     "real_scale": "oda içi (k≈0.2 m/°)",
     "ts": "2026-08-30T20:47:00",
     "components": {
-      "house": 270,
+      "house": 270.0,
       "sign_corr": 20,
       "planet_corr": 15,
       "angular": 10.05,
@@ -142,7 +142,7 @@
     "real_scale": "ülke içi (k≈100 km)",
     "ts": "2026-08-30T21:06:00",
     "components": {
-      "house": 225,
+      "house": 45.0,
       "sign_corr": 5,
       "planet_corr": 0,
       "angular": 9.0,
@@ -164,7 +164,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 225,
+      "house": 45.0,
       "sign_corr": 5,
       "planet_corr": 0,
       "ang_adj": -5.87,
@@ -191,7 +191,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 180,
+      "house": 180.0,
       "sign_corr": -10,
       "planet_corr": -5,
       "ang_adj": -0.19,
@@ -225,7 +225,7 @@
     "ts": "2026-08-30T22:15:00",
     "_id": 8,
     "components": {
-      "house": 315,
+      "house": 22.5,
       "sign_corr": 5,
       "planet_corr": 0,
       "angular": 14.77,
@@ -247,7 +247,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 45,
+      "house": 202.5,
       "sign_corr": 10,
       "planet_corr": -5,
       "ang_adj": 13.59,
@@ -273,7 +273,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 45,
+      "house": 135.0,
       "sign_corr": -10,
       "planet_corr": 5,
       "ang_adj": 12.86,
@@ -300,7 +300,7 @@
     "modality": "fixed",
     "modality_multiplier": 100.0,
     "components": {
-      "house": 45,
+      "house": 135.0,
       "sign_corr": 10,
       "planet_corr": -5,
       "ang_adj": 4.98,
@@ -327,7 +327,7 @@
     "modality": "fixed",
     "modality_multiplier": 100.0,
     "components": {
-      "house": 45,
+      "house": 315.0,
       "sign_corr": 5,
       "planet_corr": 10,
       "ang_adj": -10.31,
@@ -353,7 +353,7 @@
     "modality": "fixed",
     "modality_multiplier": 100.0,
     "components": {
-      "house": 225,
+      "house": 45.0,
       "sign_corr": 15,
       "planet_corr": 10,
       "ang_adj": -13.22,
@@ -380,7 +380,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 45,
+      "house": 135.0,
       "sign_corr": 0,
       "planet_corr": -10,
       "ang_adj": -0.09,
@@ -407,7 +407,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 45,
+      "house": 135.0,
       "sign_corr": 0,
       "planet_corr": -10,
       "ang_adj": -0.09,
@@ -434,7 +434,7 @@
     "modality": "cardinal",
     "modality_multiplier": 1.0,
     "components": {
-      "house": 135,
+      "house": 135.0,
       "sign_corr": 0,
       "planet_corr": 5,
       "ang_adj": -13.89,

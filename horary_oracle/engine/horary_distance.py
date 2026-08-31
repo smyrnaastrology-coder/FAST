@@ -40,8 +40,8 @@ DEFAULT_SCALE_TIERS = {
 class HoraryDistanceEngine:
     # Azimut: 0=K, 45=KD, 90=D, 135=GD, 180=G, 225=GB, 270=B, 315=KB
     HOUSE_DIRECTION = {
-        1: 90, 2: 135, 3: 45, 4: 0, 5: 315, 6: 225,
-        7: 270, 8: 315, 9: 45, 10: 180, 11: 45, 12: 315,
+        1: 90, 2: 135, 3: 135, 4: 0, 5: 22.5, 6: 45,
+        7: 270, 8: 292.5, 9: 315, 10: 180, 11: 202.5, 12: 225,
     }
     SIGN_DIRECTION_CORRECTION = {
         "Koç": 0, "Boğa": 10, "İkizler": 15, "Yengeç": -10, "Aslan": -5, "Başak": 5,
