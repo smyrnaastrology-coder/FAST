@@ -387,6 +387,52 @@ def test_case_chart33_watch_ring_real_chart():
     assert element_height("Başak")["height"] == "alçak / zeminde"
 
 
+def test_analyze_multi_weighted_distance():
+    """PDF madde B: çoklu gösterge ağırlıklı mesafe skoru. Tüm göstergeler
+    aynı derecedeyse nihai base her bir D_i'nin ağırlıklı ortalamasıdır ve
+    kalibrasyon _base_value() ile birebir yeniden hesaplanabilir."""
+    eng = HoraryDistanceEngine(weights=None)
+    ql = 105.0  # soran derecesi (burç-içi)
+    inds = [
+        {"label": "quesited", "lon": 115.3, "sign": "Boğa", "house": 4, "planet": "Mercury", "condition": 1.0},
+        {"label": "moon", "lon": 98.2, "sign": "İkizler", "house": 1, "planet": "Moon", "condition": 1.05},
+        {"label": "ruler4", "lon": 122.7, "sign": "Yengeç", "house": 4, "planet": "Venus", "condition": 0.9},
+        {"label": "querent", "lon": 110.0, "sign": "Oğlak", "house": 1, "planet": "Sun", "condition": 1.0},
+        {"label": "pof", "lon": 95.5, "sign": "Terazi", "house": 1, "planet": "Moon", "condition": 1.0},
+    ]
+    r = eng.analyze_multi(ql, inds, primary="quesited", house=4, sign="Boğa",
+                          planet="Mercury", return_components=True)
+    assert r["multi_indicator_n"] == 5
+    # tek göstergenin ezici Boğa (fixed×100) etkisi ağırlıklı ort ortalamayla yumuşar:
+    # 444 < quesited tek başına (1030) — birden çok gösterge ağırlıklı olduğunu kanıtlar
+    assert r["base_exact"] > 0
+    assert r["base_exact"] < 1030
+    # kalibrasyon uyumluluğu: efektif bileşenlerden _base_value() aynı base'i verir
+    cal = HoraryCalibration()
+    rec = {"angular_difference": r["orb_deg"], "condition": r["condition"],
+           "modality_multiplier": r["modality_multiplier"]}
+    recomputed = cal._base_value(rec)
+    assert recomputed is not None
+    assert abs(recomputed - r["base_exact"]) / r["base_exact"] < 0.01  # %1 rounding kabul
+    assert r["ev_tipi"] == "angular"  # birincil(quesited) 4. ev üstünden
+    # ayırt edici: tek gösterge aynı girdiyle çok daha yüksek base üretir
+    single = eng.analyze(4, "Boğa", "Mercury", 115.3, ql, condition=1.0,
+                         return_components=True, sign_querent="Boğa")
+    assert single["base_exact"] > r["base_exact"] * 1.5
+
+
+def test_analyze_multi_handles_missing_lon():
+    """lon'u olmayan göstergeler atlanır; hepsi None ise analyze() fallback."""
+    eng = HoraryDistanceEngine(weights=None)
+    inds = [
+        {"label": "quesited", "lon": 7.0, "sign": "Koç", "house": 7, "planet": "Venus", "condition": 1.0},
+        {"label": "moon", "lon": None, "sign": "Koç", "house": 1, "planet": "Moon", "condition": 1.0},
+    ]
+    r = eng.analyze_multi(10.0, inds, primary="quesited", house=7, sign="Koç",
+                          planet="Venus", return_components=True)
+    assert r["multi_indicator_n"] == 1
+
+
 if __name__ == "__main__":
     import tempfile as _tf, os
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]

@@ -432,15 +432,43 @@ async def cast(req: CastRequest):
                                    retro=_guse.get('retro', False),
                                    sun_lon=res['planets']['Sun'].get('lon'))
             _eng_g = HoraryDistanceEngine(weights=load_weights())
-            geo_res = _eng_g.analyze(
+            # PDF madde B: ÇOKLU gösterge ağırlıklı mesafe skoru.
+            # Soran + sorulan + Ay + 4.ev yöneticisi + POF; her birinin burç-içi
+            # orb'u mentör formülüyle D_i = Δθ_i·M_i·cond_i üretir, nihai base
+            # ağırlıklı ortalamadır (analyze_multi). Yön ev+burç+gezegen korunur.
+            _moon_g = res['planets'].get('Moon', {})
+            _c4g = res.get('houses', {}).get('cusps', [None]*12)[3]
+            _r4_g = _DOMT3.get(_sfl_g(_c4g), 'Moon') if _c4g is not None else None
+            _r4_p = res['planets'].get(_r4_g, {}) if _r4_g else {}
+            _pof_g = res.get('lots', {}).get('POF')
+            _sunl_g = res['planets'].get('Sun', {}).get('lon')
+            _qdeg_g = res['planets'][_qur3]['lon']
+            _qsign_g = res['planets'][_qur3].get('sign')
+            _indicators = [
+                {"label": "quesited", "lon": _guse.get('lon'), "sign": _gsign,
+                 "house": _ghouse, "planet": _gplanet, "condition": _cf['factor']},
+                {"label": "moon", "lon": _moon_g.get('lon'), "sign": _moon_g.get('sign'),
+                 "house": _moon_g.get('house'), "planet": "Moon",
+                 "condition": condition_factor("Moon", _moon_g.get('sign'), lon=_moon_g.get('lon'),
+                                               retro=_moon_g.get('retro', False), sun_lon=_sunl_g).get('factor', 1.0)},
+                {"label": "ruler4", "lon": _r4_p.get('lon'), "sign": _r4_p.get('sign'),
+                 "house": _r4_p.get('house'), "planet": _r4_g,
+                 "condition": (condition_factor(_r4_g, _r4_p.get('sign'), lon=_r4_p.get('lon'),
+                                                retro=_r4_p.get('retro', False), sun_lon=_sunl_g)
+                               .get('factor', 1.0)) if _r4_g else 1.0},
+                {"label": "querent", "lon": _qdeg_g, "sign": _qsign_g,
+                 "house": res['planets'][_qur3].get('house'), "planet": _qur3, "condition": 1.0},
+                {"label": "pof", "lon": _pof_g, "sign": (_sfl_g(_pof_g) if _pof_g is not None else None),
+                 "house": None, "planet": "POF", "condition": 1.0},
+            ]
+            geo_res = _eng_g.analyze_multi(
+                querent_longitude=_qdeg_g,
+                indicators=_indicators,
+                primary="quesited",
                 house=_ghouse,
                 sign=_gsign,
                 planet=_gplanet,
-                friend_longitude=_guse.get('lon'),
-                querent_longitude=res['planets'][_qur3]['lon'],
-                condition=_cf['factor'],
                 return_components=True,
-                sign_querent=res['planets'][_qur3].get('sign'),
             )
             geo_res["dignity"] = ", ".join(_cf["labels"])
             if _qc:

@@ -182,6 +182,97 @@ class HoraryDistanceEngine:
             res["components"] = direction["components"]
         return res
 
+    # PDF madde B: ÇOKLU gösterge ağırlıklı mesafe skoru.
+    # Tek gösterge Δθ'si yerine N gösterge (soran, sorulan, Ay, 4.ev yöneticisi,
+    # POF...) her biri kendi burç-içi orb'u ile D_i = Δθ_i·M_i·cond_i üretir;
+    # nihai base = ağırlıklı ortalama. Yön her zamanki ev+burç+gezegen (birincil
+    # gösterge) korunur. Kalibrasyon geriye tam uyumlu: efektif Δθ̂ / M̂ / ĉ öyle
+    # üretilir ki base = Δθ̂·M̂·ĉ -> _base_value() ve apply() hiç değişmeden çalışır.
+    DEFAULT_MULTI_INDICATORS = {
+        "quesited": 1.6,   # sorulanın göstergesi (en güçlü ağırlık)
+        "moon": 1.0,       # Ay - soranın doğal ortak göstergesi (Lilly)
+        "ruler4": 0.6,     # 4. ev yöneticisi - yerin/konumun yöneticisi
+        "querent": 0.4,    # soran (ASC yöneticisi)
+        "pof": 0.3,        # Part of Fortune
+        "significator": 1.0,  # takma/fallback (Merkür, Venüs...) etiketi
+    }
+
+    def analyze_multi(self, querent_longitude, indicators, weights=None,
+                      primary=None, house=1, sign=None, planet="Moon",
+                      return_components=False):
+        wi = dict(self.DEFAULT_MULTI_INDICATORS)
+        if weights:
+            wi.update({k: max(0.0, float(v)) for k, v in weights.items()})
+        qdeg = (querent_longitude or 0.0) % 30
+        ws, orbs, mms, dsi = [], [], [], []
+        rows = []
+        for ind in indicators:
+            if ind.get("lon") is None:
+                continue
+            w = wi.get(ind.get("label"), 1.0)
+            orb = abs((ind["lon"] % 30) - qdeg)
+            sig = ind.get("sign")
+            mod = self.MODALITY_OF_SIGN.get(sig, "cardinal")
+            mm = self.MODALITY_MULT.get(mod, 1.0)
+            cond = float(ind.get("condition", 1.0))
+            d = max(orb, 0.001) * mm * cond
+            ws.append(w); orbs.append(orb); mms.append(mm)
+            dsi.append(d)
+            rows.append({
+                "label": ind.get("label"), "planet": ind.get("planet"),
+                "sign": sig, "house": ind.get("house"),
+                "orb_deg": round(orb, 3), "modality": mod,
+                "modality_multiplier": mm, "condition": round(cond, 3),
+                "D_km": round(d, 4), "weight": round(w, 3),
+            })
+        if not dsi:
+            return self.analyze(house, sign or "Koç", planet, indicators[0]["lon"],
+                                querent_longitude, condition=1.0,
+                                return_components=return_components,
+                                sign_querent=(indicators[0].get("sign") if indicators else None))
+        W = sum(ws) or 1.0
+        base = sum(w * d for w, d in zip(ws, dsi)) / W
+        # efektif bileşenler: base = Δθ̂ · M̂ · ĉ
+        dth = sum(w * o for w, o in zip(ws, orbs)) / W
+        Mh = sum(w * m for w, m in zip(ws, mms)) / W
+        denom = dth * Mh
+        ch = (base / denom) if denom > 0 else 1.0
+        # birincil gösterge (yön + ev tipi + angular için)
+        pidx = 0
+        if primary is not None:
+            for i, r in enumerate(rows):
+                if r.get("label") == primary:
+                    pidx = i
+                    break
+        pri_lon = indicators[pidx]["lon"]
+        angular = self.angular_distance(pri_lon, querent_longitude)
+        direc = self.calculate_direction(house, sign, planet, pri_lon,
+                                         querent_longitude, return_components=return_components)
+        pri_house = indicators[pidx].get("house", house)
+        res = {
+            "house": house,
+            "significator": planet,
+            "sign": sign,
+            "angular": round(angular, 2),
+            "orb_deg": round(dth, 2),
+            "azimut": direc["azimut"],
+            "yon": direc["yon"],
+            "yon_label": direc["yon_label"],
+            "mesafe_km": round(base),
+            "base_km": round(base),
+            "base_exact": round(base, 4),
+            "condition": round(ch, 3),
+            "ev_tipi": self.HOUSE_TYPE.get(pri_house, "succedent"),
+            "modality": rows[pidx].get("modality", "cardinal"),
+            "modality_multiplier": round(Mh, 4),
+            "formula": f"D = Σ(w_i·Δθ_i·M_i·k)/Σw_i ({len(rows)} gösterge, ağırlıklı ort)",
+            "multi_indicator_n": len(rows),
+            "multi_indicators": rows,
+        }
+        if return_components:
+            res["components"] = direc["components"]
+        return res
+
 
 # ---------------- GEZEGEN GÜCÜ (F3/F4) ----------------
 def condition_factor(significator, sign, lon=None, retro=False, sun_lon=None, sun_name_lon=None):
