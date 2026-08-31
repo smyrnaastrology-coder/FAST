@@ -119,26 +119,62 @@ def classify_question(question):
     return None
 
 
+_GEN_3RD = ("nın", "nin", "nun", "nün", "ının", "inin", "ınnın", "innin", "ın", "in", "un", "ün")
+
+
+def _nested_tokens_ordered(q):
+    """Metindeki nested (iyelikli ikinci-kişi) KELİMElerini konum sırasına göre (word, house).
+    Tam-token eşleşmesi + üçüncü-kişi genitive eki sıyırma:
+    'abisinin'->'abisi', 'kızının'->'kızı'; ama 'arkadaşımın'->'arkadaşım' (NESTED'de yok, 'arkadaşı' DEĞİL).
+    """
+    hits = []
+    low = q.lower()
+    seen = set()
+    for m in re.finditer(r"[\w]+", low):
+        tok = m.group(0)
+        w = None; h = None
+        if tok in NESTED_PERSON:
+            w, h = tok, NESTED_PERSON[tok]
+        else:
+            for suf in _GEN_3RD:
+                if tok.endswith(suf):
+                    root = tok[: -len(suf)]
+                    if root in NESTED_PERSON:
+                        w, h = root, NESTED_PERSON[root]
+                        break
+        if w and (m.start(), w) not in seen:
+            seen.add((m.start(), w))
+            hits.append((m.start(), w, h))
+    hits.sort(key=lambda x: x[0])
+    return [(w, h) for _, w, h in hits]
+
+
 def parse_nested(question):
     """"arkadaşımın eşi" → base(friend 11) içinden nested(eş 7) → turned=5.
+    Zincirsel (çok katmanlı): "iş arkadaşımın abisinin kızı" → 6 →(abi 3)→ 8 →(kız 5)→ 12.
     İyelikli İKİNCİ KİŞİ kelimesi (eşi/babası/arkadaşı...) varsa döner, yoksa None.
     """
     q = question.lower()
-    nested_hit = None
-    for w, h in sorted(NESTED_PERSON.items(), key=lambda x: len(x[0]), reverse=True):
-        if w in _tokens(q):
-            nested_hit = (w, h)
-            break
-    if not nested_hit:
+    nested = _nested_tokens_ordered(q)
+    if not nested:
         return None
     primary = classify_question(question)
     if not primary:
         return None
     base_h = primary["house"]
-    derived = turned_house(base_h, nested_hit[1])
+    derived = base_h
+    steps = []
+    for w, h in nested:
+        nxt = turned_house(derived, h)
+        steps.append((w, h, derived, nxt))
+        derived = nxt
+    # formül: ilk halkanın başlangıcı base_h; her adım "X. evden h. ev = nxt. ev"
+    fparts = [f"{s[2]}. evden {s[1]}. ev = {s[3]}. ev" for s in steps]
+    last_w = steps[-1][0]; last_h = steps[-1][1]
     return {
         "base_house": base_h, "base_word": primary["label"],
-        "nested_word": nested_hit[0], "nested_house": nested_hit[1],
+        "nested_word": last_w, "nested_house": last_h,
+        "nested_chain": [(w, h) for w, h in nested],
         "derived": derived,
-        "formula": f"{base_h}. evden {nested_hit[1]}. ev = {derived}. ev",
+        "formula": "; ".join(fparts),
     }

@@ -228,7 +228,22 @@ async def cast(req: CastRequest):
         is_female_sib = any(k in q for k in ["kız kardeş","kiz kardes","kız kardeşim","kiz kardesim","bacı","baci","abla","ablam","ablası","ablasi"])
         natural = None
         natural_second = None
-        if "anne" in q or "annem" in q:
+        # çok-katmanlı iç içe ilişkide doğal göstergeyi SON sorulan kişinin cinsiyetine bağla
+        # ('iş arkadaşım X'in abisinin kızı Defne' -> kızı = dişil -> Venüs/Ay)
+        from engine.horary_questions import parse_nested as _pn_local
+        _pn = _pn_local(req.question) if not ("ben" in q and any(k in q for k in ("nerede","nerde","nere"))) else None
+        _pgen = None
+        if _pn:
+            _nw = _pn.get("nested_word", "")
+            if any(s in _nw for s in ("kızı","kizi","ablası","ablasi","annesi","karısı","karisi","sevgilisi","bacısı")):
+                _pgen = "female"
+            elif any(s in _nw for s in ("abisi","ağabeyi","agabeyi","oğlu","oglu","babası","babasi","kocası","kocasi")):
+                _pgen = "male"
+        if _pn and _pgen == "female":
+            natural = "Moon"; natural_second = "Venus"
+        elif _pn and _pgen == "male":
+            natural = "Mars"; natural_second = "Sun"
+        elif "anne" in q or "annem" in q:
             natural = "Moon"
         elif "baba" in q or "babam" in q:
             natural = "Sun"        # baba: Güneş birincil

@@ -69,6 +69,16 @@ def test_nested_coworker_abi():
     assert r2 and r2["derived"] == 8
 
 
+def test_nested_chain_multi_level():
+    """Çok-katmanlı: iş arkadaşı(6) -> abi(3) = 8 -> kızı(5) = 12.ev."""
+    r = parse_nested("iş arkadaşım muazzezin abisinin kızı defne nerde")
+    assert r and r["derived"] == 12
+    assert r["nested_chain"] == [("abisi", 3), ("kızı", 5)]
+    assert "6. evden 3. ev = 8. ev; 8. evden 5. ev = 12. ev" in r["formula"]
+    # genitive token (abisinin) kök 'abisi'; 'arkadaşım' içinde 'arkadaşı' yanlış eşleşmez
+    assert parse_nested("iş arkadaşım muazzezin abisinin kızı defne nerde")["derived"] == 12
+
+
 def test_direction_components():
     eng = HoraryDistanceEngine()
     res = eng.analyze(9, "Virgo", "Sun", 152.1, 133.4, return_components=True)
