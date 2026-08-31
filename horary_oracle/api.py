@@ -450,6 +450,45 @@ async def cast(req: CastRequest):
                 geo_res["chain"] = _qn["formula"]
             elif _qd and _qd.get("formula"):
                 geo_res["chain"] = _qd["formula"]
+            # LILLY/LOUIS KONUM KATMANI: 8 gösterge çoğunluk yönü + element/modalite yükseklik
+            # + Appleby aynı-çeyrek mesafe bandı (kayıp eşya/kişi klasik lokasyon motoru).
+            # Veri: Louis Table 16/17/19 + Appleby Bölüm 9/15.
+            try:
+                from engine.lilly_location import (
+                    lilly_eight_indicators, element_height, modality_height,
+                    modality_of_sign, house_direction as _lh_house_dir,
+                    sign_direction as _lh_sign_dir, angular_quadrant_band,
+                )
+                from core.ephemeris import DOMICILE_TRADITIONAL as _DOMT_L, sign_from_lon as _sfl_L
+                _cusp_L = res['houses']['cusps']
+                _ascsign_L = res['houses']['asc_sign']
+                _ascruler_L = _DOMT_L.get(_ascsign_L, res['querent']['planet'])
+                _c4sign_L = _sfl_L(_cusp_L[3])
+                _r4sign_L = res['planets'][_DOMT_L.get(_c4sign_L, 'Moon')]['sign']
+                _c2sign_L = _sfl_L(_cusp_L[1])
+                _r2sign_L = res['planets'][_DOMT_L.get(_c2sign_L, 'Moon')]['sign']
+                _moon_sign_L = res['planets']['Moon']['sign']
+                _pof_L = res.get('lots', {}).get('POF')
+                _pof_sign_L = _sfl_L(_pof_L) if _pof_L is not None else None
+                _lilly = lilly_eight_indicators(
+                    asc_sign=_ascsign_L, asc_ruler_sign=res['planets'][_ascruler_L]['sign'],
+                    cusp4_sign=_c4sign_L, ruler4_sign=_r4sign_L,
+                    moon_sign=_moon_sign_L, cusp2_sign=_c2sign_L,
+                    ruler2_sign=_r2sign_L, pof_sign=_pof_sign_L,
+                )
+                geo_res["lilly"] = _lilly
+                geo_res["lilly_house_dir"] = _lh_house_dir(_ghouse)
+                geo_res["lilly_sign_dir"] = _lh_sign_dir(_gsign)
+                _elh = element_height(_gsign)
+                geo_res["element_height"] = _elh.get("height") if _elh else None
+                geo_res["element_place"] = _elh.get("place") if _elh else None
+                _modh = modality_height(_gsign) if _gsign else None
+                geo_res["modality_height"] = _modh.get("height") if _modh else None
+                _ang_diff_L = geo_res.get("angular")
+                if _ang_diff_L is not None:
+                    geo_res["quadrant_band"] = angular_quadrant_band(_ang_diff_L)
+            except Exception as _lilly_err:
+                print(f"lilly_location hata: {_lilly_err}")
             # PDF adım 7-8: Ay'ın göstergeye uygulayan/ayrılan açısı + retrogradlık (hareket katmanı)
             try:
                 from engine.horary_distance import moon_movement as _mvm

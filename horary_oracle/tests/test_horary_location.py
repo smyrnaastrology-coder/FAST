@@ -20,6 +20,10 @@ from engine.horary_distance import (
 from engine.horary_questions import (
     classify_question, parse_nested, turned_house, QUESTION_HOUSES, NESTED_PERSON,
 )
+from engine.lilly_location import (
+    lilly_eight_indicators, element_height, modality_height, sign_direction,
+    house_direction, angular_quadrant_band, angle_to_dir, angle_to_dir_label,
+)
 
 
 def test_classify_question_basics():
@@ -208,6 +212,91 @@ def test_baseline_izmir_kirikkale_probe():
     # v1 motorun verdiği tutarlılık: cadent 9.ev, KD
     assert geo["house"] == 9
     assert geo["ev_tipi"] == "cadent"
+
+
+def test_lilly_sign_direction_table():
+    """Table 16 (Louis Bölüm 12): burç -> yön azimut."""
+    assert sign_direction("Koç") == 90      # East
+    assert sign_direction("Terazi") == 270  # West
+    assert sign_direction("Yengeç") == 0    # North
+    assert sign_direction("Oğlak") == 180   # South
+    assert sign_direction("Boğa") == 135    # South by East
+    assert sign_direction("İkizler") == 225 # West by South
+    assert sign_direction("Virgo") == 225   # EN karışığı da çalışır
+    assert sign_direction("Gemini") == 225
+    assert sign_direction("Aslan") == 45    # East by North
+    assert sign_direction("Balık") == 315   # North by West
+    assert sign_direction("Keçşi") is None  # bilinmeyen
+
+
+def test_lilly_house_direction_table():
+    """Table 17 (Louis): ev -> yön, 16 yele yakın kesintisiz pusula."""
+    assert house_direction(4) == 0.0        # North
+    assert house_direction(1) == 90.0       # East
+    assert house_direction(7) == 270.0      # West
+    assert house_direction(10) == 180.0     # South
+    seq = [house_direction(h) for h in range(1, 13)]
+    assert all(h is not None and 0 <= h < 360 for h in seq)
+    # 12 ev 12 farklı yönü kapsar (kuzeyden başlayarak saat yönünde kesintisiz süpürme)
+    assert len(set(round(h, 1) for h in seq)) == 12
+    # 1->4->7->10 (köşeler) K/D/G/B ana yönlerini, 8-evin ikincilini doğrula
+    assert house_direction(8) == 225.0      # Southwest
+    assert house_direction(2) == 67.5       # East Northeast
+    assert house_direction(9) == 202.5      # South Southwest
+
+
+def test_lilly_eight_indicators_watch_ring():
+    """Louis'in saat+yüzük örneği (Chart 33): 3x Başak = GB çoğunluğu."""
+    r = lilly_eight_indicators(
+        asc_sign="Başak", asc_ruler_sign="Başak",   # Virgo x2
+        cusp4_sign="Yay", ruler4_sign="Yengeç",
+        moon_sign="Akrep", cusp2_sign="Terazi",
+        ruler2_sign="Başak", pof_sign="Akrep",      # Virgo 3. kez
+    )
+    assert r["n"] == 8
+    assert r["majority_dir"] == "GB"                # Güneybatı (Louis'in sonucu)
+    assert r["majority_azimut"] == 225
+    assert r["clear"] is False                      # 3/8 çoğunluk değil -> dağınık uyarısı
+
+
+def test_lilly_eight_indicators_clear_majority():
+    """Net çoğunluk: 5 biri aynı yana düşünce clear=True, majority yakalanır."""
+    r = lilly_eight_indicators(
+        asc_sign="Koç", asc_ruler_sign="Koç",
+        cusp4_sign="Koç", ruler4_sign="Koç",
+        moon_sign="Koç", cusp2_sign="Terazi",
+        ruler2_sign="Terazi", pof_sign="Aslan",
+    )
+    assert r["clear"] is True
+    assert r["majority_azimut"] == 90               # Doğu çoğunluk
+    assert r["majority_dir"] == "D"
+
+
+def test_lilly_element_height():
+    """Element -> yükseklik/yer tarifi (Louis): ateş orta, hava üst, su alçak."""
+    assert element_height("Aslan")["height"] == "orta yükseklikte"
+    assert element_height("Kova")["height"] == "yüksek / üst kat"
+    assert element_height("Yengeç")["height"] == "alçak / su seviyesi"
+    assert element_height("Oğlak")["height"] == "alçak / zeminde"
+    assert element_height("Bilinmeyen") is None
+
+
+def test_lilly_modality_height():
+    """Modalite -> yer yüksekliği (Louis): öncü yüksek, sabit gizli/alçak."""
+    assert modality_height("Koç")["height"].startswith("yüksek")
+    assert "zemine yakın" in modality_height("Boğa")["height"]
+    assert "hendek" in modality_height("İkizler")["height"]
+    assert modality_height("Bilinmeyen")["modality"] is None
+
+
+def test_appleby_quadrant_band():
+    """Appleby Bölüm 15 aynı-çeyrek açısal mesafe bandı."""
+    assert angular_quadrant_band(10)["band"] == "evde / çok yakın"
+    assert angular_quadrant_band(30)["band"] == "evde / çok yakın"
+    assert angular_quadrant_band(45)["band"] == "aynı çevrede / yakın"
+    assert angular_quadrant_band(70)["band"] == "aynı çevrede / yakın"
+    assert angular_quadrant_band(120)["band"] == "uzakta"
+    assert angular_quadrant_band(200)["band"] == "çok uzakta"
 
 
 if __name__ == "__main__":
