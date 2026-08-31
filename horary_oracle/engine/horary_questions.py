@@ -27,6 +27,7 @@ QUESTION_HOUSES = {
     "hoca": 9,
     "university": 9,
     "student": 3,
+    "astrology_student": 9,  # astroloji öğrencisi -> 9. ev (Yay/Jüpiter: yüksek öğrenim, felsefe, bilgelik)
     "money": 2,
     "lost_object": 2,
     "job": 10,
@@ -39,6 +40,7 @@ LABEL_TR = {
     "coworker": "İş arkadaşı", "employee": "Çalışan", "sibling": "Kardeş",
     "uncle": "Dayı/Amca",
     "teacher": "Hoca/Öğretmen", "university": "Üniversite", "student": "Öğrenci",
+    "astrology_student": "Astroloji öğrencisi",
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "partner": "Eş/Partner",
 }
@@ -58,6 +60,7 @@ NESTED_PERSON = {
 # Soru tipi -> anahtar kelimeler (özgülden genele)
 TYPE_KEYWORDS = [
     ("teacher", ("hoca", "öğretmen", "ogretmen", "profesör", "profesor", "öğretim", "ogretim", "akademisyen", "akademik", "üniversitede", "universitede")),
+    ("astrology_student", ("astroloji öğrencim", "astroloji ogrencim", "astroloji öğrencisi", "astroloji ogrencisi", "astroloji öğrenen", "astroloji ogrenen", "astroloji dersi alan", "astroloji dersi alan")),
     ("student", ("öğrencim", "ogrencim", "öğrencimin", "ogrencimin", "öğrencimle", "ogrencimle", "kayıtlı öğrenci", "ogrenci")),
     ("friend", ("arkadaşım", "arkadasim", "arkadaşının", "arkadasinin", "dostum")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
