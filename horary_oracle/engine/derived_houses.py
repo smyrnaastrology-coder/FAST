@@ -100,8 +100,22 @@ def _person_rank(word):
         return 1
     return 2
 
+# Kuzen zinciri: hala/amca/dayı/teyze + (oğlu/kızı/çocuğu) = kuzen -> 3. ev (klasik horary kuralı)
+KUSEN_REL = ("hala", "amca", "dayı", "dayi", "teyze")
+KUSEN_KIND = ("oğlu", "oglu", "kızı", "kizi", "çocuğu", "cocugu", "oğluyla", "kızıyla")
+
+def _kusen_chain(q):
+    """halamın oğlu / amcamın kızı / dayımın çocuğu -> kuzen (3. ev)."""
+    if any(k in q for k in KUSEN_REL) and any(k in q for k in KUSEN_KIND):
+        return {"id": "kusen", "base_house": 3, "base_word": "halamın/amcamın/dayımın/teyzemin oğlu/kızı",
+                "derived": 3, "topic": "kuzen", "formula": "kuzen -> 3. ev (klasik)"}
+    return None
+
 def parse_derived(question: str):
     q = question.lower()
+    kc = _kusen_chain(q)
+    if kc:
+        return kc
     # 1) direkt kişi ilişkisi (üniversite/hastane vs. hariç)
     matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if m[0] in q and m[0] not in DESCRIPTOR_WORDS]
     # 2) yoksa descriptor kendisi base olur (örn. "üniversite nerede")
@@ -132,6 +146,9 @@ def parse_derived(question: str):
 
 def parse_multi(question: str):
     q = question.lower()
+    kc = _kusen_chain(q)
+    if kc:
+        return {"chain": [3], "house": 3, "base_word": kc["base_word"], "topics": ["kuzen"]}
     persons = []
     for w,h in BASE_PERSON.items():
         if w in q:
