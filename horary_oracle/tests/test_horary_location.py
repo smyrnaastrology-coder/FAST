@@ -28,6 +28,9 @@ def test_classify_question_basics():
     assert classify_question("üniversitede hoca Yasin nerede?")["type"] == "teacher"
     assert classify_question("annem nerede?")["type"] == "mother"
     assert classify_question("cüzdanım nerede?")["type"] in ("money",)
+    # iş arkadaşı -> coworker(6), genel arkadaş -> friend(11) — özgül önce
+    assert classify_question("iş arkadaşım ibrahim nerede?")["type"] == "coworker"
+    assert classify_question("iş arkadaşım nerede?")["house"] == 6
 
 
 def test_turned_house_math():

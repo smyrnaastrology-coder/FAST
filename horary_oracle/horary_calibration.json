@@ -337,5 +337,32 @@
     "real_distance_km": 420.2,
     "real_bearing": 114.34,
     "_id": 13
+  },
+  {
+    "question_type": "coworker",
+    "origin": "38.323,27.126",
+    "destination": "yanımda (iş arkadaşı)",
+    "house": 6,
+    "significator": "Mercury",
+    "sign": "İkizler",
+    "sign_querent": "Aslan",
+    "degree": 22.14,
+    "querent_planet": "Jupiter",
+    "querent_degree": 11.47,
+    "angular_difference": 10.67,
+    "modality": "fixed",
+    "modality_multiplier": 100.0,
+    "components": {
+      "house": 225,
+      "sign_corr": 15,
+      "planet_corr": 10,
+      "ang_adj": -13.22,
+      "angular": 10.667045777340775
+    },
+    "condition": 0.85,
+    "real_distance_km": 0.001,
+    "real_bearing": null,
+    "_id": 14,
+    "ts": "2026-08-31T16:10:30"
   }
 ]
