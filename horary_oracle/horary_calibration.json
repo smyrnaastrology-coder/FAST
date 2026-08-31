@@ -445,5 +445,31 @@
     "real_bearing": 317.78,
     "_id": 17,
     "ts": "2026-08-31T18:19:39"
+  },
+  {
+    "question_type": "student",
+    "origin": "38.10,27.25",
+    "destination": "Çerkezköy",
+    "house": 5,
+    "significator": "Jupiter",
+    "sign": "Aslan",
+    "degree": 13.66,
+    "querent_planet": "Venus",
+    "querent_degree": 23.0,
+    "sign_querent": "Terazi",
+    "angular_difference": 9.34,
+    "condition": 1.0,
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 22.5,
+      "sign_corr": -5,
+      "planet_corr": 5,
+      "ang_adj": -3.33,
+      "angular": 70.0
+    },
+    "real_distance_km": 360.2,
+    "real_bearing": 10.2,
+    "_id": 18,
+    "ts": "2026-08-31T22:04:31"
   }
 ]
