@@ -668,6 +668,49 @@ def destination_point(lat, lon, bearing_deg, km):
     return (math.degrees(lat2), (math.degrees(lon2) + 540) % 360 - 180)
 
 
+# PDF adım 7-8: Ay'ın aranan kişinin yöneticisine uygulayan/ayrılan açısı + retrogradlık.
+# Uygulayan (applying) = Ay bu açıya yaklaşıyor (yakınlaşma/hareket); ayrılan (separating) = uzaklaşıyor.
+_MAJOR_ASPECTS = (0, 60, 90, 120, 180)
+
+
+def _closest_aspect(lon_a, lon_b, orbs=(0, 8, 6, 6, 8, 8)):
+    """(açı, orb) — iki boylam arasındaki en yakın ana açı ve orb'u."""
+    d = abs(lon_a - lon_b) % 360
+    if d > 180:
+        d = 360 - d
+    m = min(_MAJOR_ASPECTS, key=lambda x: abs(x - d))
+    return m, round(abs(m - d), 1)
+
+
+def moon_movement(moon_lon, quesited_lon, moon_retro=False, quesited_retro=False,
+                  aspect_orbs=(0, 8, 6, 6, 8, 8)):
+    """Ay <-> sorulan gösterge arası katman: açı, uygulayan/ayrılan, retrogradlık.
+
+    applying: Ay, göstergeye uygulayan ana açıya DOĞRU ilerliyor (yaklaşma/hareket).
+    separating: Ay o açıdan UZAKLAŞIYOR (ayrılık/uzaklaşma). Retrograd, yön değiştirme
+    /geri dönüş temasını güçlendirir (PDF).
+    """
+    asp, orb = _closest_aspect(float(moon_lon), float(quesited_lon))
+    # Ay ileri (doğal) ise boylamı artar: açı küçülüyorsa uyguluyordur
+    sep_natural = (quesited_lon - moon_lon) % 360
+    if sep_natural > 180:
+        sep_natural = 360 - sep_natural
+    sense = 1.0 if not moon_retro else -1.0
+    # Ay'ın hedefe (uygulanan açı noktasına) uzaklığı: hedef - Ay
+    target = (moon_lon + asp * (1 if (quesited_lon - moon_lon) % 360 <= 180 else -1)) % 360
+    dist_to_target = ((target - moon_lon) % 360) * sense
+    applying = orb <= 8 and dist_to_target >= 0 and dist_to_target <= 4.0
+    state = "uygulayan" if applying else ("ayrılan" if orb <= 8 else "dışında")
+    retro = (moon_retro or quesited_retro)
+    note = f"Ay {asp}° açısında (orb {orb}°) {'uyguluyor' if applying else 'ayrılıyor'}"
+    if moon_retro:
+        note += "; Ay retro"
+    if quesited_retro:
+        note += "; gösterge retro"
+    return {"aspect": asp, "orb": orb, "state": state, "applying": applying,
+            "retro": retro, "note": note}
+
+
 CITY_COORDINATES = {
     "İzmir": (38.4237, 27.1428), "Kırıkkale": (39.8468, 33.5153), "Ankara": (39.9334, 32.8597),
     "İstanbul": (41.0082, 28.9784), "Aydın": (37.8560, 27.8416), "Manisa": (38.6191, 27.4289),

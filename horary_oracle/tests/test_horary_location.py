@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
 from engine.horary_distance import (
     HoraryDistanceEngine, HoraryCalibration, condition_factor, fit_direction_weights,
     geographic_bearing, geographic_distance, km_category, load_weights, model_stats,
-    verify_prediction, MIN_FIT_RECORDS, destination_point,
+    verify_prediction, MIN_FIT_RECORDS, destination_point, moon_movement,
 )
 from engine.horary_questions import (
     classify_question, parse_nested, turned_house, QUESTION_HOUSES, NESTED_PERSON,
@@ -97,6 +97,19 @@ def test_tier_scale_split():
     lat, lon = destination_point(38.323, 27.126, 107.37, 1857.23)
     b = geographic_bearing(38.323, 27.126, lat, lon)
     assert abs(b - 107.37) < 2.0, b
+
+
+def test_moon_movement():
+    """PDF adım 7-8: Ay'ın göstergeye uygulayan/ayrılan açısı + retrogradlık."""
+    # Ay 8° -> gösterge 14° : 0° (kavuşum) orb 6, uygulayan (Ay açıya doğru)
+    r = moon_movement(8.0, 14.0)
+    assert r["aspect"] == 0 and r["applying"] and r["state"] == "uygulayan"
+    # gösterge retro -> retro bayrağı taşınır
+    r2 = moon_movement(300.0, 120.0, quesited_retro=True)
+    assert r2["retro"] is True and "retro" in r2["note"]
+    # çok uzak açı -> dışında
+    r3 = moon_movement(10.0, 150.0)
+    assert r3["state"] == "dışında"
 
 
 def test_direction_components():

@@ -450,6 +450,19 @@ async def cast(req: CastRequest):
                 geo_res["chain"] = _qn["formula"]
             elif _qd and _qd.get("formula"):
                 geo_res["chain"] = _qd["formula"]
+            # PDF adım 7-8: Ay'ın göstergeye uygulayan/ayrılan açısı + retrogradlık (hareket katmanı)
+            try:
+                from engine.horary_distance import moon_movement as _mvm
+                _moon_p = res['planets'].get('Moon', {})
+                if _moon_p.get('lon') is not None and _guse.get('lon') is not None:
+                    geo_res["movement"] = _mvm(
+                        moon_lon=_moon_p['lon'],
+                        quesited_lon=_guse['lon'],
+                        moon_retro=_moon_p.get('retro', False),
+                        quesited_retro=_guse.get('retro', False),
+                    )
+            except Exception as _mvm_err:
+                print(f"movement hata: {_mvm_err}")
             _cal3 = HoraryCalibration()
             _cal3.load()
             geo_res = _cal3.apply(geo_res, question_type=qtype_g, origin=(req.lat, req.lon))
