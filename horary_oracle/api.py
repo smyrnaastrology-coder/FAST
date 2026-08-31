@@ -681,6 +681,11 @@ async def cast(req: CastRequest):
             + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
             + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
             + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"
+            + (f"- Coklu gosterge mesafe skoru ({g['multi_indicator_n']} gosterge, agirlikli ort): "
+               + "; ".join(
+                   f"{x['label']}({x['planet']}) Δθ{x['orb_deg']}°·M{x['modality_multiplier']}·w{x['weight']}={x['D_km']}km"
+                   for x in g.get('multi_indicators', [])
+               ) + "\n" if g.get('multi_indicators') else "")
             + (f"- Olcek merdiveni (aynı Δθ farklı ölçekte farklı km demek — mentor kuralı): oda içi ~{g['scale_ladder'].get('oda içi','?')} m / şehir içi ~{g['scale_ladder'].get('şehir içi','?')} km / ülke içi ~{g['scale_ladder'].get('ülke içi','?')} km / kıtalararası ~{g['scale_ladder'].get('kıtalararası','?')} km. Şu an varsayılan katman: {g.get('likely_tier','şehir içi')}.\n" if g.get("scale_ladder") else "")
             + ("- Doğrulama (kullanıcının verdiği gerçek konum): " + g['verification']['feedback'] + "\n" if g.get("verification") else "")
             # LILLY/LOUIS klasik konum katmanı: 8 gösterge çoğunluk yönü + element/modalite yükseklik + band

@@ -433,6 +433,53 @@ def test_analyze_multi_handles_missing_lon():
     assert r["multi_indicator_n"] == 1
 
 
+def test_analyze_multi_calibration_roundtrip():
+    """Kalibrasyon geriye uyumluluğu: analyze_multi'nin ürettiği base_exact,
+    real-API'nin doğrulama bloğunda kayda yazdığı alanlardan (orb_deg +
+    modality_multiplier + condition) _base_value() ile birebir yeniden çıkmalı.
+    Aksi halde multi-significator kayıtları ölçek kalibrasyonunu bozar."""
+    eng = HoraryDistanceEngine(weights=None)
+    ql = 105.0
+    inds = [
+        {"label": "quesited", "lon": 115.3, "sign": "Boğa", "house": 4, "planet": "Mercury", "condition": 1.0},
+        {"label": "moon", "lon": 98.2, "sign": "İkizler", "house": 1, "planet": "Moon", "condition": 1.2},
+        {"label": "ruler4", "lon": 122.7, "sign": "Yengeç", "house": 4, "planet": "Venus", "condition": 0.8},
+    ]
+    r = eng.analyze_multi(ql, inds, primary="quesited", house=4, sign="Boğa",
+                          planet="Mercury", return_components=True)
+    # real-API doğrulama bloğu kayda bu üç alanı yazıyor
+    rec = {"angular_difference": r["orb_deg"], "condition": r["condition"],
+           "modality_multiplier": r["modality_multiplier"]}
+    cal = HoraryCalibration()
+    recomputed = cal._base_value(rec)
+    assert recomputed is not None
+    # yuvarlama toleransı %1 içinde birebir
+    assert abs(recomputed - r["base_exact"]) / r["base_exact"] < 0.01
+    # base_exact hiç sıfır/huge değil (sağlıklı birden çok gösterge katkısı)
+    assert 0 < r["base_exact"] < 20000
+
+
+def test_calibration_multi_apply_pipeline(tmp_path):
+    """analyze_multi çıktısı tam kalibrasyon apply() boru hattından geçebilmeli:
+    ölçek katmanı, band, km_category üretilir — multi motorun uçtan uca
+    regresyonu (lilly/loading katmanıyla aynı geçişi kullanır)."""
+    eng = HoraryDistanceEngine(weights=None)
+    ql = 105.0
+    inds = [
+        {"label": "quesited", "lon": 115.3, "sign": "Boğa", "house": 4, "planet": "Mercury", "condition": 1.0},
+        {"label": "moon", "lon": 98.2, "sign": "İkizler", "house": 1, "planet": "Moon", "condition": 1.0},
+    ]
+    r = eng.analyze_multi(ql, inds, primary="quesited", house=4, sign="Boğa",
+                          planet="Mercury", return_components=True)
+    # bağımsız: boş kayıt setiyle çalıştırmak için apply'i doğrudan çağır
+    applied = HoraryCalibration(filename=os.path.join(str(tmp_path), "empty.json")).apply(r, question_type="mother")
+    assert "mesafe_kalibre_km" in r
+    assert "band" in r
+    assert "km_category" in r
+    assert r["multi_indicator_n"] == 2
+    assert applied is not None
+
+
 if __name__ == "__main__":
     import tempfile as _tf, os
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
