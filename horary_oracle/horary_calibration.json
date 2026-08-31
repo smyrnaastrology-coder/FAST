@@ -284,5 +284,58 @@
     "real_bearing": 115.73,
     "_id": 11,
     "ts": "2026-08-30T22:56:21"
+  },
+  {
+    "question_type": "student",
+    "origin": "38.3923,27.1355",
+    "destination": "Mersin",
+    "house": 3,
+    "significator": "Saturn",
+    "sign": "Kova",
+    "sign_querent": "Aslan",
+    "degree": 13.71,
+    "querent_planet": "Jupiter",
+    "querent_degree": 13.59,
+    "angular_difference": 0.12,
+    "modality": "fixed",
+    "modality_multiplier": 100.0,
+    "components": {
+      "house": 45,
+      "sign_corr": 10,
+      "planet_corr": -5,
+      "ang_adj": 4.98,
+      "angular": 119.87630569998326
+    },
+    "condition": 0.9,
+    "real_distance_km": 683.8,
+    "real_bearing": 102.58,
+    "_id": 12,
+    "ts": "2026-08-31T14:10:05"
+  },
+  {
+    "question_type": "sibling",
+    "origin": "38.4237,27.1428",
+    "destination": "Manavgat",
+    "house": 9,
+    "significator": "Mercury",
+    "sign": "Başak",
+    "sign_querent": "Aslan",
+    "degree": 11.76,
+    "querent_planet": "Jupiter",
+    "querent_degree": 13.59,
+    "angular_difference": 1.84,
+    "modality": "fixed",
+    "modality_multiplier": 100.0,
+    "components": {
+      "house": 45,
+      "sign_corr": 5,
+      "planet_corr": 10,
+      "ang_adj": -10.31,
+      "angular": 28.16320459662296
+    },
+    "condition": 0.85,
+    "real_distance_km": 420.2,
+    "real_bearing": 114.34,
+    "_id": 13
   }
 ]
