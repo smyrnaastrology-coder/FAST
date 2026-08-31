@@ -54,6 +54,7 @@ NESTED_PERSON = {
     "hocası": 9, "hocasi": 9, "öğrencisi": 3, "ogrencisi": 3, "öğretmeni": 9, "ogretmeni": 9,
     "patronu": 10, "müdürü": 10, "muduru": 10, "müdürü": 10,
     "arkadaşı": 11, "arkadasi": 11, "dostu": 11, "kardeşi": 3, "kardesi": 3,
+    "abisi": 3, "ablası": 3, "ablasi": 3, "ağabeyi": 3, "agabeyi": 3,
     "komşusu": 3, "komsusu": 3, "müşterisi": 7, "musterisi": 7, "yeğeni": 3, "yegeni": 3,
 }
 

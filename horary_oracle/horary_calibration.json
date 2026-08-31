@@ -364,5 +364,59 @@
     "real_bearing": null,
     "_id": 14,
     "ts": "2026-08-31T16:10:30"
+  },
+  {
+    "question_type": "student",
+    "origin": "38.323,27.126",
+    "destination": "Özdere",
+    "house": 3,
+    "significator": "Mars",
+    "sign": "Koç",
+    "sign_querent": "Koç",
+    "degree": 13.14,
+    "querent_planet": "Saturn",
+    "querent_degree": 13.7,
+    "angular_difference": 0.57,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 45,
+      "sign_corr": 0,
+      "planet_corr": -10,
+      "ang_adj": -0.09,
+      "angular": 89.43382545149456
+    },
+    "condition": 1.0,
+    "real_distance_km": 29.8,
+    "real_bearing": 184.72,
+    "_id": 15,
+    "ts": "2026-08-31T17:40:21"
+  },
+  {
+    "question_type": "sibling",
+    "origin": "38.323,27.126",
+    "destination": "Libya",
+    "house": 3,
+    "significator": "Mars",
+    "sign": "Koç",
+    "sign_querent": "Koç",
+    "degree": 13.14,
+    "querent_planet": "Saturn",
+    "querent_degree": 13.7,
+    "angular_difference": 0.56,
+    "modality": "cardinal",
+    "modality_multiplier": 1.0,
+    "components": {
+      "house": 45,
+      "sign_corr": 0,
+      "planet_corr": -10,
+      "ang_adj": -0.09,
+      "angular": 89.43670305303311
+    },
+    "condition": 1.0,
+    "real_distance_km": 1394.89,
+    "real_bearing": 180.0,
+    "_id": 16,
+    "ts": "2026-08-31T17:47:09"
   }
 ]

@@ -58,6 +58,17 @@ def test_derived_kuzen_altin_house():
     assert r2 and r2["derived"] == 4
 
 
+def test_nested_coworker_abi():
+    """'iş arkadaşım X'in abisi' -> coworker(6) içinden abi(3) = 8.ev."""
+    r = parse_nested("iş arkadaşım muazzezin abisi nerde")
+    assert r and r["derived"] == 8
+    assert r["base_house"] == 6 and r["nested_house"] == 3
+    assert "6. evden 3. ev = 8. ev" in r["formula"]
+    # ablası/ağabeyi de kardeş(3) olarak derive edilmeli
+    r2 = parse_nested("iş arkadaşımın ablası nerede")
+    assert r2 and r2["derived"] == 8
+
+
 def test_direction_components():
     eng = HoraryDistanceEngine()
     res = eng.analyze(9, "Virgo", "Sun", 152.1, 133.4, return_components=True)
