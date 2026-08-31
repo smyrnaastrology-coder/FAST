@@ -655,6 +655,15 @@ async def cast(req: CastRequest):
             + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"
             + (f"- Olcek merdiveni (aynı Δθ farklı ölçekte farklı km demek — mentor kuralı): oda içi ~{g['scale_ladder'].get('oda içi','?')} m / şehir içi ~{g['scale_ladder'].get('şehir içi','?')} km / ülke içi ~{g['scale_ladder'].get('ülke içi','?')} km / kıtalararası ~{g['scale_ladder'].get('kıtalararası','?')} km. Şu an varsayılan katman: {g.get('likely_tier','şehir içi')}.\n" if g.get("scale_ladder") else "")
             + ("- Doğrulama (kullanıcının verdiği gerçek konum): " + g['verification']['feedback'] + "\n" if g.get("verification") else "")
+            # LILLY/LOUIS klasik konum katmanı: 8 gösterge çoğunluk yönü + element/modalite yükseklik + band
+            + (f"- Lilly 8 gösterge çoğunluk yönü: {g.get('lilly', {}).get('majority_dir_label','belirsiz')}"
+               + (f" (azimut {g.get('lilly', {}).get('majority_azimut')}°, {g.get('lilly', {}).get('n',0)} gösterge"
+                  + (", açık çoğunluk" if g.get('lilly', {}).get('clear') else ", dağınık/yön net değil")
+                  + ")\n" if g.get('lilly') and g['lilly'].get('majority_azimut') is not None else "\n"))
+            + (f"- Lilly ev yönü: {g['lilly_house_dir']}° | Lilly burç yönü: {g['lilly_sign_dir']}°\n" if g.get('lilly_house_dir') is not None else "")
+            + (f"- Element yer/yükseklik: {g['element_height']} — {g['element_place']}\n" if g.get('element_height') else "")
+            + (f"- Modalite yer: {g['modality_height']}\n" if g.get('modality_height') else "")
+            + (f"- Açısal mesafe bandı (Appleby): {g['quadrant_band']['band']} ({g['quadrant_band']['range_km']})\n" if g.get('quadrant_band') else "")
             + "Ev-ici ipucu: " + loc_info.get("ev_ici", "") + " | Yukseklik: " + loc_info.get("height", "")
         )
         if loc_info.get("clarify"):
