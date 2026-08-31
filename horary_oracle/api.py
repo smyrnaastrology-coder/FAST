@@ -224,8 +224,8 @@ async def cast(req: CastRequest):
         # doğal gezegen ikincili: anne->Ay, baba->Güneş(birincil)+Satürn(ikincil)
         # Kullanıcı bulgusu: baba sorusunda Güneş=1. gösterge (yön ve mesafede nokta atışı),
         # "güneş de baba demek" + querent×quesited×10 formülü (bkz. distance_querent_quesited)
-        is_male_sib = any(k in q for k in ["erkek kardeş","erkek kardes","erkek kardeşim","erkek kardesim","ağabey","agabey","abi","abim"])
-        is_female_sib = any(k in q for k in ["kız kardeş","kiz kardes","kız kardeşim","kiz kardesim","bacı","baci","abla","ablam"])
+        is_male_sib = any(k in q for k in ["erkek kardeş","erkek kardes","erkek kardeşim","erkek kardesim","ağabey","agabey","abi","abim","abisi","ağabeyi","agabeyi"])
+        is_female_sib = any(k in q for k in ["kız kardeş","kiz kardes","kız kardeşim","kiz kardesim","bacı","baci","abla","ablam","ablası","ablasi"])
         natural = None
         natural_second = None
         if "anne" in q or "annem" in q:
@@ -234,8 +234,8 @@ async def cast(req: CastRequest):
             natural = "Sun"        # baba: Güneş birincil
             natural_second = "Saturn"  # Satürn ikincil teyit
         elif is_male_sib:
-            natural = "Sun"        # erkek kardeş: Güneş birincil (kadın/erkek doğalı)
-            natural_second = "Mars"  # Mars ikincil teyit
+            natural = "Mars"       # erkek kardeş/abi/asker: Mars birincil (kullanıcı bulgusu)
+            natural_second = "Sun"  # Güneş ikincil teyit
         elif is_female_sib:
             natural = "Moon"       # kız kardeş: Ay birincil (kadının doğalı)
             natural_second = "Venus"  # Venüs ikincil teyit
@@ -386,25 +386,28 @@ async def cast(req: CastRequest):
             qtype_g = _qc.get("type") or (req.quesited_type if req.quesited_type != "general" else "location")
             # significator: iç içe ilişkiyse (arkadaşımın eşi) turned-house yöneticisi
             # EV ÖNCELİĞİ: nested-derived > soru-tipi evi > derived(parse_derived) > gösterge gezegeninin bulunduğu ev
+            # doğal gösterge (Mars=abi/asker, Ay=anne...) tespit edildiyse ÖNCELİKLİ:
+            # nested/turned ev yöneticisi onu ezmesin (muazzezin abisi -> Mars, 8.ev Merkür değil)
+            _natural_g = loc_info.get("_natural")
             _ghouse = actual_house
-            if _qn:
+            if _qn and not _natural_g:
                 _ghouse = _qn["derived"]
-            elif _qc.get("house"):
+            elif _qc.get("house") and not _natural_g:
                 _ghouse = _qc["house"]
-            elif _qd and _qd.get("derived"):
+            elif _qd and _qd.get("derived") and not _natural_g:
                 _ghouse = _qd["derived"]
             _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
-            if _qn:
+            if _qn and not _natural_g:
                 _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
                 _gsign = _sfl_g(_cusp_g)
                 _gplanet = _DOMT3.get(_gsign, "Moon")
                 _guse = res['planets'].get(_gplanet, use_data)
-            elif _qc.get("house"):
+            elif _qc.get("house") and not _natural_g:
                 _cusp_g = res['houses']['cusps'][_qc["house"] - 1]
                 _gsign = _sfl_g(_cusp_g)
                 _gplanet = _DOMT3.get(_gsign, "Moon")
                 _guse = res['planets'].get(_gplanet, use_data)
-            elif _qd and _qd.get("derived"):
+            elif _qd and _qd.get("derived") and not _natural_g:
                 _cusp_g = res['houses']['cusps'][_qd["derived"] - 1]
                 _gsign = _sfl_g(_cusp_g)
                 _gplanet = _DOMT3.get(_gsign, "Moon")
