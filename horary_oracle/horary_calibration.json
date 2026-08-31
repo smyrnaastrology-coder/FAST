@@ -497,5 +497,33 @@
     "real_bearing": 68.6,
     "_id": 19,
     "ts": "2026-08-31T22:40:48"
+  },
+  {
+    "question_type": "lost_object",
+    "origin": "38.4656,27.3383",
+    "destination": "Gaziemir",
+    "house": 5,
+    "significator": "Venus",
+    "sign": "Terazi",
+    "sign_querent": "Başak",
+    "degree": 23.09,
+    "querent_planet": "Mercury",
+    "querent_degree": 12.5,
+    "angular_difference": 8.57,
+    "modality": "cardinal",
+    "modality_multiplier": 10.9231,
+    "components": {
+      "house": 22.5,
+      "sign_corr": 20,
+      "planet_corr": 15,
+      "ang_adj": -8.24,
+      "angular": 40.59
+    },
+    "condition": 0.858,
+    "real_distance_km": 24.1,
+    "real_bearing": 229.2,
+    "note": "1.9.2026 Izmir safir yuzuk: Ayrancilar->Gaziemir 24.1km GB. Motor 23km uyumlu",
+    "_id": 20,
+    "ts": "2026-09-01T00:35:04"
   }
 ]
