@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
 from engine.horary_distance import (
     HoraryDistanceEngine, HoraryCalibration, condition_factor, fit_direction_weights,
     geographic_bearing, geographic_distance, km_category, load_weights, model_stats,
-    verify_prediction, MIN_FIT_RECORDS,
+    verify_prediction, MIN_FIT_RECORDS, destination_point,
 )
 from engine.horary_questions import (
     classify_question, parse_nested, turned_house, QUESTION_HOUSES, NESTED_PERSON,
@@ -77,6 +77,26 @@ def test_nested_chain_multi_level():
     assert "6. evden 3. ev = 8. ev; 8. evden 5. ev = 12. ev" in r["formula"]
     # genitive token (abisinin) kök 'abisi'; 'arkadaşım' içinde 'arkadaşı' yanlış eşleşmez
     assert parse_nested("iş arkadaşım muazzezin abisinin kızı defne nerde")["derived"] == 12
+
+
+def test_tier_scale_split():
+    """Uzaklık katmanları ayrı skala alır: coworker İbrahim(~0m) oda-içi,
+    Defne(2258km) kıtalararası — tek bucket'ta birbirini bozmaz."""
+    for fn in ("_scale_ladders", "_tier_of_real", "destination_point", "geographic_bearing"):
+        assert hasattr(HoraryCalibration, fn) or fn in globals(), fn
+    c = HoraryCalibration()
+    c.load()
+    cw = c._scale_ladders("coworker")
+    assert cw.get("oda içi") is not None, "İbrahim 1m -> oda katmanı"
+    assert cw.get("kıtalararası") is not None, "Defne 2258km -> kıtal. katmanı"
+    # iki katman bariz farklı ölçekte (join olmamalı)
+    assert cw["kıtalararası"] / cw["oda içi"] > 1000
+    # öneri: kıta skalası ile base 6.65 -> ~1830km (oda'dan çok büyük)
+    assert cw["kıtalararası"] * 6.65 > 100
+    # destination_point: ters coğrafi yön — aynı noktaya dönmeli
+    lat, lon = destination_point(38.323, 27.126, 107.37, 1857.23)
+    b = geographic_bearing(38.323, 27.126, lat, lon)
+    assert abs(b - 107.37) < 2.0, b
 
 
 def test_direction_components():

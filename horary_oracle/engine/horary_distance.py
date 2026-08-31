@@ -325,8 +325,38 @@ class HoraryCalibration:
             label = "düşük"
         return {"label": label, "mean_err_deg": round(mean, 1), "n": len(usable)}
 
-    def scale_for(self, house_type=None, question_type=None):
-        """k ölçeği: önce soru tipi bucket'ı, sonra global (gerçek/base ortalaması)."""
+    # gerçek uzaklık (km) -> ölçek katmanı eşiği. Oda/şehir join'ini (ör.
+    # coworker: İbrahim ~0m + Defne 2258km) ayrı katmanlara böler.
+    _TIER_EDGES = (("oda içi", 0.2), ("şehir içi", 20.0), ("ülke içi", 1500.0))
+
+    def _tier_of_real(self, real_km):
+        for name, edge in self._TIER_EDGES:
+            if real_km < edge:
+                return name
+        return "kıtalararası"
+
+    def _scale_ladders(self, question_type=None):
+        """Her uzaklık katmanı için ayrı k ölçeği: real/base medyanı (aykırı dayanıklı)."""
+        groups = {name: [] for name in ("oda içi", "şehir içi", "ülke içi", "kıtalararası")}
+        for base, real, r in self._base_preds():
+            if question_type and r.get("question_type") != question_type:
+                continue
+            groups[self._tier_of_real(real)].append(real / base)
+        ladders = {}
+        for name, ks in groups.items():
+            if ks:
+                ks2 = sorted(ks)
+                ladders[name] = ks2[len(ks2) // 2]
+        return ladders
+
+    def scale_for(self, house_type=None, question_type=None, tier=None):
+        """k ölçeği: önce (istenirse) belirli katman, sonra uzaklık katmanı medyanı,
+        sonra soru tipi bucket ortalaması, en son global / varsayılan katman."""
+        ladders = self._scale_ladders(question_type)
+        if tier and tier in ladders:
+            return ladders[tier]
+        if ladders:  # olası katmanların medyanı (collapse'u <-> uç dengesi)
+            return sorted(ladders.values())[len(ladders) // 2]
         if question_type:
             bucket = [r for r in self._base_preds() if r[2].get("question_type") == question_type]
             if bucket:
@@ -340,10 +370,17 @@ class HoraryCalibration:
         """Tüm ölçek katmanlarını döndür: aynı Δθ farklı ölçek anlamlarına gelebilir."""
         return {tier: round(base_exact * k, 4) for tier, k in DEFAULT_SCALE_TIERS.items()}
 
-    def apply(self, geo_result, question_type=None):
+    def apply(self, geo_result, question_type=None, origin=(None, None)):
         ht = geo_result.get("ev_tipi", "succedent")
         base_exact = geo_result.get("base_exact", geo_result.get("base_km", geo_result["mesafe_km"]))
-        scale = self.scale_for(ht, question_type)
+        ladders = self._scale_ladders(question_type)
+        # hedef katman: ev tipi (angular->oda, succedent->şehir, cadent->ülke/kıta) öncelikli
+        _tier_hint = {"angular": "oda içi", "succedent": "şehir içi", "cadent": "ülke içi"}.get(ht)
+        if not (_tier_hint and _tier_hint in ladders):
+            _tier_hint = self.likely_tier()
+        scale = ladders.get(_tier_hint) if _tier_hint else self.scale_for(ht, question_type)
+        if scale is None:
+            scale = self.scale_for(ht, question_type)
         km = base_exact * scale
         cat_q = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
         cat_km = km_category(km)
@@ -353,9 +390,24 @@ class HoraryCalibration:
         geo_result["direction_mean_err_deg"] = _dc["mean_err_deg"]
         geo_result["direction_n"] = _dc["n"]
         geo_result["mesafe_kalibre_km"] = round(km)
-        # ölçek katmanı merdiveni: hangi katman gerçekçi? (kullanıcı onayı belirler)
-        geo_result["scale_ladder"] = self.tier_ladder(base_exact)
-        geo_result["likely_tier"] = self.likely_tier()
+        # ölçek katmanı merdiveni: aynı yönde, 3 (4) farklı uzunluk okunun koordinatları
+        _brg = geo_result.get("azimut", geo_result.get("bouy", 0.0))
+        try:
+            _brg = float(_brg)
+        except Exception:
+            _brg = 0.0
+        _ladder_out = {}
+        for _tname in ("oda içi", "şehir içi", "ülke içi", "kıtalararası"):
+            _k = ladders.get(_tname)
+            _tkm = round(base_exact * _k, 6) if _k is not None else None
+            _dest = None
+            if _tkm is not None and origin[0] is not None and origin[1] is not None:
+                _dlat, _dlon = destination_point(origin[0], origin[1], _brg, _tkm)
+                _dest = {"lat": round(_dlat, 5), "lon": round(_dlon, 5)}
+            _ladder_out[_tname] = {"km": _tkm, "bearing": round(_brg, 1), "dest": _dest}
+        geo_result["scale_ladder"] = _ladder_out
+        geo_result["likely_tier"] = _tier_hint or self.likely_tier()
+        geo_result["scale_ladder_km"] = {k: v["km"] for k, v in _ladder_out.items()}
         if km < 1:  # mikro ölçek (oda içi) — metreyi göster
             m = round(km * 1000)
             lo = max(0.5, round(m * 0.8 / 50) * 50)
@@ -602,6 +654,18 @@ def geographic_bearing(lat1, lon1, lat2, lon2):
     x = math.sin(dlon) * math.cos(lat2)
     y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dlon)
     return (math.degrees(math.atan2(x, y)) + 360) % 360
+
+
+def destination_point(lat, lon, bearing_deg, km):
+    """İlerisini hesapla: origin + rota + uzaklık -> hedef koordinatı (3 ok / katman)."""
+    R = 6371.0
+    brg = math.radians(bearing_deg)
+    lat1, lon1 = math.radians(lat), math.radians(lon)
+    d = km / R
+    lat2 = math.asin(math.sin(lat1) * math.cos(d) + math.cos(lat1) * math.sin(d) * math.cos(brg))
+    lon2 = lon1 + math.atan2(math.sin(brg) * math.sin(d) * math.cos(lat1),
+                             math.cos(d) - math.sin(lat1) * math.sin(lat2))
+    return (math.degrees(lat2), (math.degrees(lon2) + 540) % 360 - 180)
 
 
 CITY_COORDINATES = {

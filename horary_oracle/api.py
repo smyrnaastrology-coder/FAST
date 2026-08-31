@@ -452,7 +452,7 @@ async def cast(req: CastRequest):
                 geo_res["chain"] = _qd["formula"]
             _cal3 = HoraryCalibration()
             _cal3.load()
-            geo_res = _cal3.apply(geo_res, question_type=qtype_g)
+            geo_res = _cal3.apply(geo_res, question_type=qtype_g, origin=(req.lat, req.lon))
             if geo_res.get("angular") < 5:
                 geo_res["band"] = ""
                 geo_res["category"] = "yakın (soranın kendisi şu an bulunduğu konumda)"
@@ -496,7 +496,7 @@ async def cast(req: CastRequest):
                             f"({_verify['verdict_text']})"
                         )
                         geo_res["calibration_n"] = len(_cal3.records)
-                        _cal3.apply(geo_res, question_type=qtype_g)
+                        _cal3.apply(geo_res, question_type=qtype_g, origin=(req.lat, req.lon))
                         geo_res["verification"] = _verify
         except Exception as _e3:
             print(f"horary_geo hata: {_e3}")
