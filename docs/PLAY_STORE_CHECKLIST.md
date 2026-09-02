@@ -30,7 +30,8 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 - **`sub_daily` / `sub_daily_yearly`** (abonelik): tüm PDF tipleri sınırsız.
 - **`pdf_single`** (tek seferlik): herhangi bir rapor PDF'ini kalıcı olarak indirme hakkı (`pdf_purchases.json`), abonelik gerekmez.
 - Hakkı yoksa → `402 PAYMENT_REQUIRED`. Client `analyzer/results` bu durumda `pdfPaymentRequired` mesajı gösterir.
-- `render-deploy/data/` runtime durumu (abonelik/bedava hak/satın alım) — **git'e alınmaz** (`.gitignore` eklendi). Render'da dosya sistemi kalıcı değilse Postgres'e taşınmalı (devam eden bakım maddesi).
+- **Veri kalıcılığı (uygulandı):** `billing.py` çift modlu — `DATABASE_URL` env verilirse **PostgreSQL** (kalıcı), verilmezse dosya modu. Render'da ücretsiz Postgres (örn. Supabase/Neon) kurup connection string'i `DATABASE_URL` env'ine ekle. Tablolar webhook'ta otomatik oluşur (`billing_subs`, `billing_free`, `billing_pdf_single`).
+- `render-deploy/data/` yalnızca dosya-fallback modunda kullanılır ve **git'e alınmaz** (`.gitignore` eklendi).
 
 ## 3. Mağaza Listesi
 

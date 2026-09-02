@@ -13,3 +13,4 @@ pypdf
 plotly
 pytz
 timezonefinder
+psycopg2-binary
