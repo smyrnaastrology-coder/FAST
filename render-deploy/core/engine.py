@@ -12813,9 +12813,11 @@ class FBST_Engine:
         elif _ES:
             ay_isimleri = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
         else:
-            ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Kasım", "Aralık"]
+            ay_isimleri = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
         yil = lr_data["yil"]
         ay_no = lr_data["ay"]
+        if not isinstance(ay_no, int) or ay_no < 0 or ay_no >= len(ay_isimleri):
+            ay_no = max(0, min(12, int(round(ay_no))))
         ay_isim = ay_isimleri[ay_no]
         
         asc = lr_data["aylik_vitrin"]
