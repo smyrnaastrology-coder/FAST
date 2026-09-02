@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'FAST';
+  String get appTitle => 'Fast Synastry';
 
   @override
   String get appSlogan => 'Stellar Bond Analysis System';
@@ -109,7 +109,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get featuresDesc =>
-      'Explore every dimension of astrological analysis with FAST';
+      'Explore every dimension of astrological analysis with Fast Synastry';
 
   @override
   String get feature1Title => 'Synastry Analysis';
@@ -455,7 +455,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get footerContact => 'Contact';
 
   @override
-  String get footerRights => '© 2024 FAST. All rights reserved.';
+  String get footerRights => '© 2024 Fast Synastry. All rights reserved.';
 
   @override
   String get language => 'Language';
@@ -473,7 +473,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTitle => 'Fatih Asartepe\nSynastry Technique';
 
   @override
-  String get homeSubtitle => 'FAST — Stellar Bond Analysis System';
+  String get homeSubtitle => 'Fast Synastry — Stellar Bond Analysis System';
 
   @override
   String get homeVersion => 'Version 4.0';
@@ -645,7 +645,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Analysis could not be completed. Please check your information and try again.';
 
   @override
-  String get analyzerSidebarTagline => 'FAST — Stellar Bond Analysis';
+  String get analyzerSidebarTagline => 'Fast Synastry — Stellar Bond Analysis';
 
   @override
   String get analyzerSidebarVersion => 'Version 4.0 | 21-Year Cycle';
@@ -861,6 +861,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get analyzerReportTitle => 'Report';
+
+  @override
+  String get exitToMenu => 'Back to Menu';
+
+  @override
+  String get newAnalysis => 'New Analysis';
+
+  @override
+  String get pdfPaymentRequired =>
+      'This report requires a subscription or a one-time purchase.';
 
   @override
   String analyzerProgressionYear(Object year) {

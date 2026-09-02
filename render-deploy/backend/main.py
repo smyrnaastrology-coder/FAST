@@ -6251,9 +6251,9 @@ def debug_ephe():
 
 # ─── Billing & Entitlement ───
 try:
-    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status
+    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single
 except Exception:
-    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status
+    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single
 
 class FreeClaim(BaseModel):
     uid: str
@@ -6295,9 +6295,14 @@ def billing_webhook(body: BillingWebhook, request: Request):
         # TODO: Google PlayIntegrity API çağrısı -> device/emulator/root kontrolü
         # Şu an iskelet: token yoksa bile geçiş, enforce=1 ise logla
         print(f"[billing] play integrity token present uid={body.uid} len={len(play_token)}")
+    # Tek seferlik PDF ürünü: abonelik değil, kalıcı hak
+    if (body.product_id or "").startswith("pdf_single"):
+        if body.status in ("active", "purchase"):
+            grant_pdf_single(body.uid)
+        return {"ok": True}
+    # Abonelik ürünleri
     upsert_subscription(body.uid, body.product_id, body.expiry or 0, body.status or "active")
     return {"ok": True}
-
 @app_fast.post("/api/billing/verify-play-integrity")
 def verify_play_integrity(request: Request):
     """Play Integrity token doğrulama iskeleti — APK'dan X-Play-Integrity-Token ile çağırılır."""
@@ -6568,7 +6573,15 @@ def analiz_bireysel_natal(input: BireyselNatalInput):
     return sonuc
 
 @app_fast.get("/api/pdf/{session_id}/{tip}")
-def pdf_indir(session_id: str, tip: str):
+def pdf_indir(session_id: str, tip: str, uid: str = "", device_token: str = ""):
+    if not uid:
+        raise HTTPException(status_code=401, detail={"code": "AUTH_REQUIRED", "msg": "uid gerekli (billing doğrulaması için)"})
+    karar = can_download_pdf(uid, device_token, tip)
+    if not karar["allowed"]:
+        reason = karar["reason"]
+        if reason == "no_right":
+            raise HTTPException(status_code=402, detail={"code": "PAYMENT_REQUIRED", "msg": "PDF hakkınız yok. Abone olun, tek PDF satın alın veya ücretsiz hakkınızı kullanın."})
+        raise HTTPException(status_code=402, detail={"code": "PAYMENT_REQUIRED", "msg": "PDF indirilemiyor (altyapı)"})
     if tip == "natal":
         dosya_adi = f"{session_id}_Bireysel_Natal.pdf"
     elif tip == "potansiyel":
@@ -6584,6 +6597,8 @@ def pdf_indir(session_id: str, tip: str):
             except Exception:
                 pass
     if os.path.exists(yol):
+        # Hakkı tüket (sadece ücretsiz hak tüketilir; abonelik/pdf_single kalıcı)
+        consume_pdf(uid, device_token, tip, karar["reason"])
         return FileResponse(yol, media_type="application/pdf", filename=dosya_adi)
     raise HTTPException(404, "PDF bulunamadı. Önce analiz çalıştırılmalı.")
 

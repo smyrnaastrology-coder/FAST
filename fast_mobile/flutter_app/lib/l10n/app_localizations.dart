@@ -103,7 +103,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'FAST'**
+  /// **'Fast Synastry'**
   String get appTitle;
 
   /// No description provided for @appSlogan.
@@ -289,7 +289,7 @@ abstract class AppLocalizations {
   /// No description provided for @featuresDesc.
   ///
   /// In en, this message translates to:
-  /// **'Explore every dimension of astrological analysis with FAST'**
+  /// **'Explore every dimension of astrological analysis with Fast Synastry'**
   String get featuresDesc;
 
   /// No description provided for @feature1Title.
@@ -925,7 +925,7 @@ abstract class AppLocalizations {
   /// No description provided for @footerRights.
   ///
   /// In en, this message translates to:
-  /// **'© 2024 FAST. All rights reserved.'**
+  /// **'© 2024 Fast Synastry. All rights reserved.'**
   String get footerRights;
 
   /// No description provided for @language.
@@ -961,7 +961,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'FAST — Stellar Bond Analysis System'**
+  /// **'Fast Synastry — Stellar Bond Analysis System'**
   String get homeSubtitle;
 
   /// No description provided for @homeVersion.
@@ -1291,7 +1291,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyzerSidebarTagline.
   ///
   /// In en, this message translates to:
-  /// **'FAST — Stellar Bond Analysis'**
+  /// **'Fast Synastry — Stellar Bond Analysis'**
   String get analyzerSidebarTagline;
 
   /// No description provided for @analyzerSidebarVersion.
@@ -1665,6 +1665,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report'**
   String get analyzerReportTitle;
+
+  /// No description provided for @exitToMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Menu'**
+  String get exitToMenu;
+
+  /// No description provided for @newAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'New Analysis'**
+  String get newAnalysis;
+
+  /// No description provided for @pdfPaymentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This report requires a subscription or a one-time purchase.'**
+  String get pdfPaymentRequired;
 
   /// No description provided for @analyzerProgressionYear.
   ///

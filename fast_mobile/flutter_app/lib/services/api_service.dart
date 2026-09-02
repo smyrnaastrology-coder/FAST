@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/analysis_request.dart';
+import 'billing_service.dart';
 
 class ApiService {
   Future<Map<String, dynamic>> _post(String url, Map<String, dynamic> body, {Duration? timeout}) async {
@@ -78,8 +79,10 @@ class ApiService {
   String getGorselUrl(String sessionId, String tip) =>
       '${ApiConfig.gorselBase}/$sessionId/$tip';
 
-  String getPdfUrl(String sessionId, String tip) =>
-      '${ApiConfig.pdfBase}/$sessionId/$tip';
+  Future<String> getPdfUrl(String sessionId, String tip) async {
+    final uid = await BillingService.getUid();
+    return '${ApiConfig.pdfBase}/$sessionId/$tip?uid=${Uri.encodeQueryComponent(uid)}';
+  }
 
   String getAcgHaritaUrl(String sessionId) =>
       '${ApiConfig.acgHarita}/$sessionId';

@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'FAST';
+  String get appTitle => 'Fast Synastry';
 
   @override
   String get appSlogan => 'Yıldız Bağ Analizi Sistemi';
@@ -109,7 +109,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get featuresDesc =>
-      'FAST ile astrolojik analizlerin her boyutunu keşfedin';
+      'Fast Synastry ile astrolojik analizlerin her boyutunu keşfedin';
 
   @override
   String get feature1Title => 'Sinastri Analizi';
@@ -455,7 +455,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get footerContact => 'İletişim';
 
   @override
-  String get footerRights => '© 2024 FAST. Tüm hakları saklıdır.';
+  String get footerRights => '© 2024 Fast Synastry. Tüm hakları saklıdır.';
 
   @override
   String get language => 'Dil';
@@ -473,7 +473,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeTitle => 'Fatih Asartepe\nSinastri Tekniği';
 
   @override
-  String get homeSubtitle => 'FAST — Yıldız Bağ Analizi Sistemi';
+  String get homeSubtitle => 'Fast Synastry — Yıldız Bağ Analizi Sistemi';
 
   @override
   String get homeVersion => 'Sürüm 4.0';
@@ -645,7 +645,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Analiz tamamlanamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.';
 
   @override
-  String get analyzerSidebarTagline => 'FAST — Yıldız Bağ Analizi';
+  String get analyzerSidebarTagline => 'Fast Synastry — Yıldız Bağ Analizi';
 
   @override
   String get analyzerSidebarVersion => 'Sürüm 4.0 | 21 Yıllık Döngü';
@@ -857,6 +857,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get analyzerReportTitle => 'Rapor';
+
+  @override
+  String get exitToMenu => 'Menüye Dön';
+
+  @override
+  String get newAnalysis => 'Yeni Analiz';
+
+  @override
+  String get pdfPaymentRequired =>
+      'Bu rapor için abonelik veya tek seferlik satın alma gerekiyor.';
 
   @override
   String analyzerProgressionYear(Object year) {

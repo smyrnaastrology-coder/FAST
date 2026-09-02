@@ -289,7 +289,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               icon: const Icon(Icons.menu),
               onPressed: () => Scaffold.of(ctx).openDrawer(),
             )),
-            title: Text('FAST — ${_modeLabel(l10n)}'),
+            title: Text('${l10n.appTitle} — ${_modeLabel(l10n)}'),
             actions: [
               const LanguageSwitcher(),
               IconButton(
@@ -384,7 +384,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('FAST', style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+              Text(l10n.appTitle, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
               Text(l10n.analyzerSimulationSelect, style: const TextStyle(color: FastTheme.textDim, fontSize: 9)),
             ]),
           ]),
@@ -806,7 +806,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
           const SizedBox(height: 12),
           Text(l10n.homeTitle.replaceAll('\n', ' '), style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-          Text('FAST — ${l10n.appSlogan}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 13, letterSpacing: 2)),
+          Text('${l10n.appTitle} — ${l10n.appSlogan}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 13, letterSpacing: 2)),
           const SizedBox(height: 8),
           Text(l10n.analyzerHeaderDesc,
             style: const TextStyle(color: FastTheme.textDim, fontSize: 11), textAlign: TextAlign.center),
@@ -927,7 +927,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         // PDF
         _pdfSection(provider, r, sessionId, l10n),
 
-        // Sim notification
+        const SizedBox(height: 8),
+
+        // Exit / actions
+        _exitSection(l10n),
+
+        const SizedBox(height: 24),
         if (r['sim_sehir'] != null)
           Container(
             margin: const EdgeInsets.only(top: 16),
@@ -1975,9 +1980,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   Future<void> _downloadPdf(String sessionId, String? tip, AppLocalizations l10n) async {
-    final url = _api.getPdfUrl(sessionId, tip ?? 'rapor');
+    final url = await _api.getPdfUrl(sessionId, tip ?? 'rapor');
     try {
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
+      if (resp.statusCode == 402) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+        return;
+      }
       if (resp.statusCode != 200) {
         throw Exception(l10n.analyzerPdfNotFound('${resp.statusCode}'));
       }
@@ -1995,6 +2005,44 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
+  }
+
+  // ========== EXIT / ACTIONS ==========
+  Widget _exitSection(AppLocalizations l10n) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 360),
+      child: Column(
+        children: [
+          ElevatedButton.icon(
+            onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+            icon: const Icon(Icons.home_outlined, size: 20),
+            label: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text(l10n.exitToMenu, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FastTheme.accent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: _submit,
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: FastTheme.border),
+              foregroundColor: FastTheme.text,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text(l10n.newAnalysis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ========== HELPERS ==========

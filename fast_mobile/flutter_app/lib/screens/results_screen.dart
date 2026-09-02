@@ -961,9 +961,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
       'ebeveyn_cocuk' => 'ebeveyn',
       _ => 'es_sevgili',
     };
-    final url = _api.getPdfUrl(sessionId, tip);
+    final url = await _api.getPdfUrl(sessionId, tip);
     try {
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
+      if (resp.statusCode == 402) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+        return;
+      }
       if (resp.statusCode != 200) {
         throw Exception(l10n.analyzerPdfNotFound('${resp.statusCode}'));
       }

@@ -1,9 +1,11 @@
-# Play Store — Satışa Hazırlık Checklist (FAST v4.3)
+# Play Store — Satışa Hazırlık Checklist (Fast Synastry)
+
+> Uygulama adı artık **Fast Synastry** (teknik/method adı hâlâ "FAST"). Görünen ad, AndroidManifest label, sıçrama ekranı ve tüm başlıklar güncellendi.
 
 ## 1. AAB
-- Dosya: `fast_mobile/FAST_v4_3.aab` (68.1 MB, `com.fastastrology.fast`, version 1.0.0+1)
+- Dosya: `fast_mobile/` içinde `flutter build appbundle` ile yeniden üretilmeli (ad ve gating değişiklikleri sonrası).
+- Uygulama ID: `com.fastastrology.fast`, imza: `fbst-release.jks`.
 - Yükle: Play Console > Uygulamanız > Üretim > Yeni sürüm oluştur > AAB yükle
-- Not: `flutter build appbundle` ile üretildi, `fbst-release.jks` ile imzalı
 
 ## 2. Ürünler (Para kazanma > Ürünler)
 
@@ -22,12 +24,20 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 
 > **RevenueCat eşlemesi:** Play ürün ID'leri RevenueCat dashboard'da aynı ID ile Entitlement `premium` altına ekle. Webhook: `https://fbst-api.onrender.com/api/billing/webhook` + `REVENUECAT_WEBHOOK_SECRET` env.
 
+### 2.3 PDF indirme hakları (backend gating — uygulandı)
+- `/api/pdf/indir/{session_id}/{tip}?uid=...` artık **hakkı kontrol eder** (`billing.py::can_download_pdf`).
+- **Ücretsiz**: ilk PDF her kullanıcı için ücretsiz (uid/cihaz başına 1 kez, `free_pdf_used.json`). Sonrası 402.
+- **`sub_daily` / `sub_daily_yearly`** (abonelik): tüm PDF tipleri sınırsız.
+- **`pdf_single`** (tek seferlik): herhangi bir rapor PDF'ini kalıcı olarak indirme hakkı (`pdf_purchases.json`), abonelik gerekmez.
+- Hakkı yoksa → `402 PAYMENT_REQUIRED`. Client `analyzer/results` bu durumda `pdfPaymentRequired` mesajı gösterir.
+- `render-deploy/data/` runtime durumu (abonelik/bedava hak/satın alım) — **git'e alınmaz** (`.gitignore` eklendi). Render'da dosya sistemi kalıcı değilse Postgres'e taşınmalı (devam eden bakım maddesi).
+
 ## 3. Mağaza Listesi
 
 ### Kısa açıklama (80 karakter)
-- TR: FAST — 21 yıllık kadersel döngü, sinastri ve şehir uyumu
-- EN: FAST — 21-year karmic cycle, synastry & city compatibility
-- ES: FAST — Ciclo kármico de 21 años, sinastría y compatibilidad de ciudades
+- TR: Fast Synastry — 21 yıllık kadersel döngü, sinastri ve şehir uyumu
+- EN: Fast Synastry — 21-year karmic cycle, synastry & city compatibility
+- ES: Fast Synastry — Ciclo kármico de 21 años, sinastría y compatibilidad de ciudades
 
 ### Uzun açıklama (örnek ES - EN/TR benzer)
 ```
@@ -56,11 +66,12 @@ Primer informe GRATIS. Suscripción: guía diaria en vivo cada mañana.
 
 ## 6. Test
 - Kapalı test kanalı: `testers@...` listesi ekle > AAB yükle > lisanslı test kullanıcısı ile gerçek kart olmadan satın alma testi (Google Play Billing test)
-- RevenueCat webhook log: Render log'da `upsert_subscription` görülmeli
+- RevenueCat webhook log: Render log'da `upsert_subscription` (abonelik) / `grant_pdf_single` (tek PDF) görülmeli
+- PDF gating testi: (a) ilk PDF ücretsiz indirilir, (b) ikinci denemede 402, (c) abonelik/pdf_single sonrası tekrar indirilebilir
 - FCM: `google-services.json` zaten `android/app/` içinde, bildirim izni isteği `main.dart`'ta
 
 ## 7. App Store (iOS) Notu
 - `flutter build ipa` sadece Mac+Xcode ile. Bundle ID aynı `com.fastastrology.fast`, Apple Developer $99/yıl, App Store Connect'de ayrı kayıt. Backend aynı kalır.
 
 ## 8. Sonraki Komut
-- Play'e yüklemeden önce: `flutter build appbundle` zaten hazır, sürüm kodunu artır (+2) için `pubspec.yaml` version `1.0.0+2` yap.
+- Ad/gating değişiklikleri sonrası: `pubspec.yaml` version sürümü (`1.0.0+N`) artır, sonra `flutter build appbundle --release` ile güncel AAB üret, `fbst-release.jks` ile imzalı Play'e yükle.

@@ -31,7 +31,7 @@ class LanguageIntroScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('FAST', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
+              const Text('Fast Synastry', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
               const SizedBox(height: 40),
               Text(l10n.chooseLanguage, style: const TextStyle(color: FastTheme.text, fontSize: 18)),
               Text(l10n.chooseLanguageSub, style: const TextStyle(color: FastTheme.textMuted, fontSize: 14)),

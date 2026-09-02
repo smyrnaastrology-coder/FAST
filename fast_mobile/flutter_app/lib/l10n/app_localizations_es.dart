@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'FAST';
+  String get appTitle => 'Fast Synastry';
 
   @override
   String get appSlogan => 'Sistema de Análisis de Vínculos Estelares';
@@ -109,7 +109,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get featuresDesc =>
-      'Explora cada dimensión del análisis astrológico con FAST';
+      'Explora cada dimensión del análisis astrológico con Fast Synastry';
 
   @override
   String get feature1Title => 'Análisis de Sinastría';
@@ -455,7 +455,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get footerContact => 'Contacto';
 
   @override
-  String get footerRights => '© 2024 FAST. Todos los derechos reservados.';
+  String get footerRights =>
+      '© 2024 Fast Synastry. Todos los derechos reservados.';
 
   @override
   String get language => 'Idioma';
@@ -473,7 +474,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeTitle => 'Técnica de Sinastría\nFatih Asartepe';
 
   @override
-  String get homeSubtitle => 'FAST — Sistema de Análisis de Vínculos Estelares';
+  String get homeSubtitle =>
+      'Fast Synastry — Sistema de Análisis de Vínculos Estelares';
 
   @override
   String get homeVersion => 'Versión 4.0';
@@ -647,7 +649,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'El análisis no se pudo completar. Revisa tu información e inténtalo de nuevo.';
 
   @override
-  String get analyzerSidebarTagline => 'FAST — Análisis de Vínculo Estelar';
+  String get analyzerSidebarTagline =>
+      'Fast Synastry — Análisis de Vínculo Estelar';
 
   @override
   String get analyzerSidebarVersion => 'Versión 4.0 | Ciclo de 21 Años';
@@ -873,6 +876,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get analyzerReportTitle => 'Informe';
+
+  @override
+  String get exitToMenu => 'Volver al Menú';
+
+  @override
+  String get newAnalysis => 'Nuevo Análisis';
+
+  @override
+  String get pdfPaymentRequired =>
+      'Este informe requiere una suscripción o una compra única.';
 
   @override
   String analyzerProgressionYear(Object year) {

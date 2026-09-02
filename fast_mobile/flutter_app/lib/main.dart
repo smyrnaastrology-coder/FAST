@@ -9,6 +9,7 @@ import 'providers/analysis_provider.dart';
 import 'providers/locale_provider.dart';
 import 'screens/landing_screen.dart';
 import 'screens/language_intro_screen.dart';
+import 'services/revenuecat_service.dart';
 import 'widgets/splash_logo.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -37,6 +38,7 @@ void main() async {
     // ignore: avoid_print
     print('[FCM] init error: $e');
   }
+  await RevenueCatService.init();
   runApp(
     MultiProvider(
       providers: [
@@ -56,7 +58,7 @@ class FastApp extends StatelessWidget {
     return Consumer<LocaleProvider>(
       builder: (context, localeProvider, _) {
         return MaterialApp(
-          title: 'FAST',
+          title: 'Fast Synastry',
           debugShowCheckedModeBanner: false,
           theme: FastTheme.dark,
           locale: localeProvider.locale,

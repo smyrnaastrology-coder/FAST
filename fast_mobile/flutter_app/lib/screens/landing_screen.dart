@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +5,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
+import '../services/revenuecat_service.dart';
 import 'analyzer_screen.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -81,13 +81,13 @@ class _LandingScreenState extends State<LandingScreen> {
       'highlight': false,
     },
     {
-      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 129, 'desc': l10n.planPremiumDesc,
+      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 129, 'productId': 'sub_daily', 'interval': 'month', 'desc': l10n.planPremiumDesc,
       'features': [l10n.planPremiumFeat1, l10n.planPremiumFeat2, l10n.planPremiumFeat3, l10n.planPremiumFeat4, l10n.planPremiumFeat5, l10n.planPremiumFeat6, l10n.planPremiumFeat7],
       'disabled': <String>[],
       'highlight': true,
     },
     {
-      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 249, 'desc': l10n.planProDesc,
+      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 249, 'productId': 'sub_daily_yearly', 'interval': 'year', 'desc': l10n.planProDesc,
       'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4, l10n.planProFeat5],
       'disabled': <String>[],
       'highlight': false,
@@ -162,7 +162,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 children: [
                   Container(width: 32, height: 32, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold), child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
                   const SizedBox(width: 6),
-                  Text('FAST', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                  Text('Fast Synastry', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
                 ],
               ),
             ),
@@ -493,7 +493,12 @@ class _LandingScreenState extends State<LandingScreen> {
   Widget _planCard(Map p, AppLocalizations l10n) {
     final highlight = p['highlight'] as bool;
     final price = p['price'] as int;
-    final discPrice = _priceYearly ? (price * 10 * 0.8).round() : price;
+    // RevenueCat'ten bölgesel fiyat: ürün ID'sine göre (örn. '7.99').
+    // Yoksa eski TL kopya ile fallback.
+    final productId = (p['productId'] as String?) ?? '';
+    final rcPrice = RevenueCatService.priceFor(productId);
+    final interval = p['interval'] as String? ?? 'month';
+    final perLabel = interval == 'year' ? l10n.planPerYear : l10n.planPerMonth;
     return Container(
       width: 280,
       padding: const EdgeInsets.all(24),
@@ -528,8 +533,8 @@ class _LandingScreenState extends State<LandingScreen> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('₺$discPrice', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                        Text(_priceYearly ? l10n.planPerYear : l10n.planPerMonth, style: const TextStyle(fontSize: 13, color: FastTheme.textDim)),
+                        Text(rcPrice.isNotEmpty ? rcPrice : '₺$price', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                        Text(perLabel, style: const TextStyle(fontSize: 13, color: FastTheme.textDim)),
                       ],
                     ),
               const SizedBox(height: 16),

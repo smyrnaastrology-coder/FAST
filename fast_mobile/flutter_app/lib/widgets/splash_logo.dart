@@ -24,7 +24,7 @@ class SplashLogo extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            Text('FAST', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
+            Text('Fast Synastry', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
           ],
         ),
       ),
