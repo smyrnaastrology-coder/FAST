@@ -1,4 +1,5 @@
-import os, sys, logging, base64, stripe, json, hmac, hashlib, re
+import os, sys, logging, base64, stripe, json, hmac, hashlib, re, time, tempfile
+import requests
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -6305,42 +6306,194 @@ def claim_free(body: FreeClaim):
     return {"ok": True, "msg": "Free PDF claimed"}
 
 @app_fast.post("/api/billing/webhook")
-def billing_webhook(body: BillingWebhook, request: Request):
-    # RevenueCat webhook doğrulaması (opsiyonel)
-    rc_sig = request.headers.get("X-RevenueCat-Signature") or request.headers.get("Authorization")
-    rc_secret = os.getenv("REVENUECAT_WEBHOOK_SECRET", "")
-    if rc_secret and rc_sig:
-        # HMAC SHA256 kontrolü (RevenueCat docs: header = HMAC)
-        import hmac as _hmac
-        body_raw = body.model_dump_json() if hasattr(body, "model_dump_json") else json.dumps(body.__dict__)
-        expected = _hmac.new(rc_secret.encode(), body_raw.encode(), hashlib.sha256).hexdigest()
-        if not _hmac.compare_digest(expected, rc_sig.replace("Bearer ", "")):
-            # logla ama bloklama — test webhook'ları için esnek
-            print(f"[billing] webhook sig mismatch uid={body.uid}")
-    # Play Integrity iskeleti: header X-Play-Integrity-Token varsa doğrula (gerçek doğrulama Google API ile)
-    play_token = request.headers.get("X-Play-Integrity-Token") or request.headers.get("x-play-integrity-token")
-    if play_token and os.getenv("PLAY_INTEGRITY_ENFORCE") == "1":
-        # TODO: Google PlayIntegrity API çağrısı -> device/emulator/root kontrolü
-        # Şu an iskelet: token yoksa bile geçiş, enforce=1 ise logla
-        print(f"[billing] play integrity token present uid={body.uid} len={len(play_token)}")
-    # Tek seferlik PDF ürünü: abonelik değil, kalıcı hak
-    if (body.product_id or "").startswith("pdf_single"):
-        if body.status in ("active", "purchase"):
-            grant_pdf_single(body.uid)
+async def billing_webhook(request: Request):
+    """RevenueCat webhook — HMAC imzasıyla doğrulanır; geçersiz ise 401 ile bloklanır.
+
+    HMAC imzalama dashboard'da açılır. Header formatı:
+        X-RevenueCat-Webhook-Signature: t=<unix_timestamp>,v1=<hmac_sha256_hex>
+    İmza, ham (çözümlenmemiş) istek gövdesi üzerinden hesaplanır: HMAC-SHA256("<t>.<ham_body>").
+    İsteğe bağlı Authorization header (dashboard'daki webhook ayarı) da doğrulanır.
+    """
+    raw_body_b = await request.body()
+    try:
+        raw_body = raw_body_b.decode("utf-8")
+    except Exception:
+        return JSONResponse(status_code=400, content={"ok": False, "msg": "invalid body"})
+
+    rc_signing_secret = os.getenv("REVENUECAT_WEBHOOK_SECRET", "").strip()
+    rc_auth_secret = os.getenv("REVENUECAT_WEBHOOK_AUTH", "").strip()
+
+    # İmza / Authorization doğrulaması
+    sig_header = request.headers.get("X-RevenueCat-Webhook-Signature") or request.headers.get("X-RevenueCat-Signature") or ""
+    auth_header = request.headers.get("Authorization") or ""
+    imza_ok = False
+    if rc_signing_secret and sig_header:
+        parts = {}
+        for kv in sig_header.split(","):
+            if "=" in kv:
+                k, v = kv.split("=", 1)
+                parts[k.strip()] = v.strip()
+        t = parts.get("t")
+        v1 = parts.get("v1")
+        if t and v1:
+            signed = f"{t}.".encode() + raw_body_b
+            expected = hmac.new(rc_signing_secret.encode(), signed, hashlib.sha256).hexdigest()
+            if hmac.compare_digest(expected, v1):
+                # Replay koruması: imza zaman damgası 5 dakika içinde olmalı
+                try:
+                    skew = abs(time.time() - int(t))
+                except Exception:
+                    skew = float("inf")
+                if skew <= 300:
+                    imza_ok = True
+    elif rc_auth_secret and auth_header:
+        auth_val = auth_header.replace("Bearer ", "").strip()
+        if hmac.compare_digest(auth_val, rc_auth_secret):
+            imza_ok = True
+
+    # Geliştirme/test modu: secret tanımlı değilse doğrulamayı atla (logla)
+    debug_mode = not (rc_signing_secret or rc_auth_secret)
+    if not imza_ok and not debug_mode:
+        print(f"[billing] webhook REDDEDILDI (imza/auth gecersiz) ip={request.client.host if request.client else ''}")
+        return JSONResponse(status_code=401, content={"ok": False, "msg": "unauthorized"})
+    if not imza_ok and debug_mode:
+        print("[billing] webhook doğrulaması ATLANDI (REVENUECAT_WEBHOOK_SECRET/AUTH tanımlı değil)")
+
+    # RevenueCat payload: api_version kökte, olay alanları .event içinde
+    try:
+        data = json.loads(raw_body)
+        event = data.get("event") or {}
+    except Exception:
+        return JSONResponse(status_code=400, content={"ok": False, "msg": "invalid json"})
+
+    etype = (event.get("type") or "").upper()
+    uid = (event.get("app_user_id") or "").strip()
+    product_id = (event.get("product_id") or "").strip()
+    period_type = (event.get("period_type") or "").upper()
+    store = (event.get("store") or "").upper()
+    transfer_entitlement = bool(event.get("transfer_entitlement"))
+
+    if not uid or not product_id:
+        logging.warning(f"[billing] eksik alan etype={etype}")
+        return {"ok": True, "skipped": "missing fields"}
+
+    # Yalnızca gerçek cihaz mağazası satın alımlarını kabul et (promosyon/transfer hariç değilse)
+    # PROMOTIONAL ve TESTER store tipleri hariç, sadece PLAY_STORE/APP_STORE/STRIPE kabul et.
+    if store and store not in ("PLAY_STORE", "APP_STORE", "STRIPE", "AMAZON"):
+        return {"ok": True, "skipped": f"unsupported store {store}"}
+
+    expiration_ms = event.get("expiration_at_ms")
+    if expiration_ms is None:
+        expiration_ms = event.get("expiration_at") or 0
+    if expiration_ms:
+        expiry_ts = float(expiration_ms) / 1000.0
+    else:
+        expiry_ts = 0.0
+
+    # Event tipleri haritalama
+    GRANT_TYPES = {"INITIAL_PURCHASE", "RENEWAL", "RENEWAL_FAILURE", "NON_RENEWING_PURCHASE",
+                   "SUBSCRIBER_ALIAS", "TRANSFER", "PRODUCT_CHANGE"}
+    REVOKE_TYPES = {"CANCELLATION", "EXPIRATION", "BILLING_ISSUE"}
+
+    # Tek seferlik PDF ürünü: kalıcı hak
+    if product_id.startswith("pdf_single"):
+        if etype in ("INITIAL_PURCHASE", "NON_RENEWING_PURCHASE", "PURCHASE", "UNSUBSCRIPTION"):
+            grant_pdf_single(uid, expiry_ts)
         return {"ok": True}
-    # Abonelik ürünleri
-    upsert_subscription(body.uid, body.product_id, body.expiry or 0, body.status or "active")
+
+    # Yalnızca gerçek hak kazandıran olayları işle (trial/kurumsal entitlement kontrolü)
+    grant_eligible = transfer_entitlement or (period_type in ("NORMAL", "INTRO", "TRIAL")) or not period_type
+    if etype in GRANT_TYPES:
+        if grant_eligible:
+            upsert_subscription(uid, product_id, expiry_ts, "active", provider="revenuecat")
+            logging.info(f"[billing] abonelik aktif uid={uid} prod={product_id} exp={expiry_ts}")
+    elif etype in REVOKE_TYPES:
+        upsert_subscription(uid, product_id, expiry_ts, "expired", provider="revenuecat")
+        logging.info(f"[billing] abonelik kapatildi uid={uid} prod={product_id} type={etype}")
+    else:
+        logging.info(f"[billing] islenmeyen event type={etype} uid={uid}")
+
     return {"ok": True}
 @app_fast.post("/api/billing/verify-play-integrity")
 def verify_play_integrity(request: Request):
-    """Play Integrity token doğrulama iskeleti — APK'dan X-Play-Integrity-Token ile çağırılır."""
+    """Play Integrity token'ı Google sunucularında gerçek doğrulamayla çözer.
+
+    Gereksinimler (env):
+      - PLAY_INTEGRITY_PACKAGE  : uygulama paket adı (örn. com.fastastrology.fast)
+      - PLAY_INTEGRITY_CRED_JSON: Play Console'daki hizmet hesabının JSON anahtarı
+      - (alternatif) GOOGLE_APPLICATION_CREDENTIALS: hizmet hesabı JSON dosya yolu
+
+    Doğrulama şartları: PLAY_RECOGNIZED + LICENSED + MEETS_DEVICE_INTEGRITY + paket/tespit
+    """
+    from google.oauth2 import service_account
+    from google.auth.transport.requests import Request as _GAuthRequest
+
     token = request.headers.get("X-Play-Integrity-Token") or ""
     if not token:
-        return JSONResponse(status_code=400, content={"ok": False, "msg": "token missing"})
-    # Gerçek doğrulama: https://playintegrity.googleapis.com/v1/... (service account gerekir)
-    # İskelet: token varsa ok dön, logla
-    print(f"[integrity] verify token len={len(token)} ip={request.client.host if request.client else ''}")
-    return {"ok": True, "mock": True, "msg": "Play Integrity iskelet — Google API bağlanınca gerçek doğrulama aktif olacak"}
+        return JSONResponse(status_code=400, content={"ok": False, "reason": "token_missing"})
+    pkg = os.getenv("PLAY_INTEGRITY_PACKAGE", "").strip()
+    cred_json = os.getenv("PLAY_INTEGRITY_CRED_JSON", "").strip()
+    if not pkg:
+        print("[integrity] PLAY_INTEGRITY_PACKAGE tanımlı değil")
+        return JSONResponse(status_code=503, content={"ok": False, "reason": "not_configured"})
+    if not cred_json:
+        print("[integrity] PLAY_INTEGRITY_CRED_JSON tanımlı değil")
+        return JSONResponse(status_code=503, content={"ok": False, "reason": "not_configured"})
+
+    # Service account bilgilerini temp dosyadan (env JSON) yükle ve access token al
+    try:
+        tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+        tmp.write(cred_json)
+        tmp.close()
+        credentials = service_account.Credentials.from_service_account_file(
+            tmp.name, scopes=["https://www.googleapis.com/auth/playintegrity"])
+        os.unlink(tmp.name)
+        credentials.refresh(_GAuthRequest())
+        access_token = credentials.token
+    except Exception as e:
+        print(f"[integrity] credential yuklenemedi: {e}")
+        return JSONResponse(status_code=500, content={"ok": False, "reason": "credential_error"})
+
+    # Google PlayIntegrity API: token'ı çöz
+    url = f"https://playintegrity.googleapis.com/v1/{pkg}:decodeIntegrityToken"
+    headers = {"Authorization": f"Bearer {access_token}"}
+    try:
+        r = requests.post(url, headers=headers, json={"integrity_token": token}, timeout=15)
+    except Exception as e:
+        print(f"[integrity] API istegi hatasi: {e}")
+        return JSONResponse(status_code=502, content={"ok": False, "reason": "api_error"})
+    if r.status_code != 200:
+        print(f"[integrity] API hata status={r.status_code}: {r.text[:300]}")
+        return JSONResponse(status_code=502, content={"ok": False, "reason": "api_error"})
+
+    try:
+        payload_b64 = r.json().get("tokenPayloadExternal", "")
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64 + "=" * (-len(payload_b64) % 4)))
+    except Exception as e:
+        print(f"[integrity] payload cozulemedi: {e}")
+        return JSONResponse(status_code=502, content={"ok": False, "reason": "decode_error"})
+
+    req = payload.get("requestDetails", {})
+    app = payload.get("appIntegrity", {})
+    dev = payload.get("deviceIntegrity", {})
+    acct = payload.get("accountDetails", {})
+
+    req_pkg = req.get("requestPackageName", "")
+    app_verdict = app.get("appRecognitionVerdict", "")
+    dev_verdicts = dev.get("deviceRecognitionVerdict", [])
+    lic_verdict = acct.get("appLicensingVerdict", "")
+
+    checks = {
+        "package": req_pkg == pkg,
+        "app_recognized": app_verdict == "PLAY_RECOGNIZED",
+        "licensed": lic_verdict == "LICENSED",
+        "device_integrity": "MEETS_DEVICE_INTEGRITY" in dev_verdicts,
+    }
+    ok = all(checks.values())
+    print(f"[integrity] pkg={req_pkg} app={app_verdict} dev={dev_verdicts} lic={lic_verdict} -> {'PASS' if ok else 'FAIL'}")
+    if not ok:
+        return JSONResponse(status_code=403, content={"ok": False, "reason": "integrity_failed", "checks": checks})
+    return {"ok": True, "checks": checks}
 
 @app_fast.get("/api/ulkeler")
 def ulkeler_listesi():

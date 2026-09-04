@@ -14,3 +14,6 @@ plotly
 pytz
 timezonefinder
 psycopg2-binary
+requests
+google-auth
+google-auth-oauthlib
