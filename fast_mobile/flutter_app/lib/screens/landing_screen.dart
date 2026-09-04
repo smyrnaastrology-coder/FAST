@@ -81,13 +81,13 @@ class _LandingScreenState extends State<LandingScreen> {
       'highlight': false,
     },
     {
-      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 129, 'productId': 'sub_daily', 'interval': 'month', 'desc': l10n.planPremiumDesc,
+      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 7.99, 'productId': 'sub_daily', 'interval': 'month', 'desc': l10n.planPremiumDesc,
       'features': [l10n.planPremiumFeat1, l10n.planPremiumFeat2, l10n.planPremiumFeat3, l10n.planPremiumFeat4, l10n.planPremiumFeat5, l10n.planPremiumFeat6, l10n.planPremiumFeat7],
       'disabled': <String>[],
       'highlight': true,
     },
     {
-      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 249, 'productId': 'sub_daily_yearly', 'interval': 'year', 'desc': l10n.planProDesc,
+      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 49.99, 'productId': 'sub_daily_yearly', 'interval': 'year', 'desc': l10n.planProDesc,
       'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4, l10n.planProFeat5],
       'disabled': <String>[],
       'highlight': false,
@@ -490,9 +490,14 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
+  String _fmt(num v) {
+    if (v == v.roundToDouble() && v < 100) return v.toStringAsFixed(0);
+    return v.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+  }
+
   Widget _planCard(Map p, AppLocalizations l10n) {
     final highlight = p['highlight'] as bool;
-    final price = p['price'] as int;
+    final price = p['price'] as num;
     // RevenueCat'ten bölgesel fiyat: ürün ID'sine göre (örn. '7.99').
     // Yoksa eski TL kopya ile fallback.
     final productId = (p['productId'] as String?) ?? '';
@@ -533,7 +538,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(rcPrice.isNotEmpty ? rcPrice : '₺$price', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                        Text(rcPrice.isNotEmpty ? rcPrice : '\$${_fmt(price)}', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
                         Text(perLabel, style: const TextStyle(fontSize: 13, color: FastTheme.textDim)),
                       ],
                     ),

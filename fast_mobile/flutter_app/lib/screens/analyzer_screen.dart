@@ -63,6 +63,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   int _expandedHayat = -1;
   bool _menuOpen = false;
   String _chartTab = 'situa_a';
+  bool _pdfLoading = false;
   Map<String, dynamic>? _prevSimData;
 
   String get _modKey {
@@ -1945,11 +1946,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 children: _pdfLinks(sessionId, l10n).map((link) => SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () => _downloadPdf(sessionId, link['tip'], l10n),
-                    icon: const Icon(Icons.download, size: 20),
+                    onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
+                    icon: _pdfLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: FastTheme.bg)) : const Icon(Icons.download, size: 20),
                     label: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text('📥 ${link['label']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                      child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : '📥 ${link['label']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: FastTheme.accentGold,
@@ -1980,15 +1981,19 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   Future<void> _downloadPdf(String sessionId, String? tip, AppLocalizations l10n) async {
-    final url = await _api.getPdfUrl(sessionId, tip ?? 'rapor');
+    if (_pdfLoading) return;
+    setState(() => _pdfLoading = true);
     try {
+      final url = await _api.getPdfUrl(sessionId, tip ?? 'rapor');
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
+      if (!mounted) return;
       if (resp.statusCode == 402) {
-        if (!mounted) return;
+        setState(() => _pdfLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
         return;
       }
       if (resp.statusCode != 200) {
+        setState(() => _pdfLoading = false);
         throw Exception(l10n.analyzerPdfNotFound('${resp.statusCode}'));
       }
       final dir = await getApplicationDocumentsDirectory();
@@ -1996,13 +2001,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       await dosya.writeAsBytes(resp.bodyBytes, flush: true);
       final sonuc = await OpenFile.open(dosya.path);
       if (!mounted) return;
-      if (sonuc.type == ResultType.done) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfDownloaded(dosya.path))));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfDownloaded(dosya.path))));
-      }
+      setState(() => _pdfLoading = false);
+      final msg = sonuc.type == ResultType.done
+          ? l10n.analyzerPdfDownloaded(dosya.path)
+          : l10n.analyzerPdfSuccess;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } catch (e) {
       if (!mounted) return;
+      setState(() => _pdfLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
   }
@@ -2014,7 +2020,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       child: Column(
         children: [
           ElevatedButton.icon(
-            onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).popUntil((r) => r.isFirst);
+            },
             icon: const Icon(Icons.home_outlined, size: 20),
             label: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),

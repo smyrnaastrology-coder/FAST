@@ -673,7 +673,7 @@ abstract class AppLocalizations {
   /// No description provided for @planProFeat3.
   ///
   /// In en, this message translates to:
-  /// **'30 minutes WhatsApp consultation'**
+  /// **'Unlimited messages to your astrologer'**
   String get planProFeat3;
 
   /// No description provided for @planProFeat4.
@@ -1504,6 +1504,18 @@ abstract class AppLocalizations {
   /// **'PDF downloaded: {path}'**
   String analyzerPdfDownloaded(Object path);
 
+  /// No description provided for @analyzerPdfSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Report downloaded and opened.'**
+  String get analyzerPdfSuccess;
+
+  /// No description provided for @analyzerPdfPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your report…'**
+  String get analyzerPdfPreparing;
+
   /// No description provided for @analyzerPdfError.
   ///
   /// In en, this message translates to:
@@ -1683,6 +1695,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This report requires a subscription or a one-time purchase.'**
   String get pdfPaymentRequired;
+
+  /// No description provided for @astrokartografiSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get astrokartografiSubscribe;
+
+  /// No description provided for @astrokartografiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'World map view is included with subscription.'**
+  String get astrokartografiHint;
+
+  /// No description provided for @subscribeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription is active. Welcome!'**
+  String get subscribeSuccess;
+
+  /// No description provided for @subscribeCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription cancelled.'**
+  String get subscribeCancelled;
 
   /// No description provided for @analyzerProgressionYear.
   ///

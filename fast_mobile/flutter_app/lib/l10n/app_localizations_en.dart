@@ -314,7 +314,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planProFeat2 => 'Personal astrology interpretation';
 
   @override
-  String get planProFeat3 => '30 minutes WhatsApp consultation';
+  String get planProFeat3 => 'Unlimited messages to your astrologer';
 
   @override
   String get planProFeat4 => '1 year update right';
@@ -774,6 +774,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get analyzerPdfSuccess => 'Report downloaded and opened.';
+
+  @override
+  String get analyzerPdfPreparing => 'Preparing your report…';
+
+  @override
   String analyzerPdfError(Object error) {
     return 'PDF download error: $error';
   }
@@ -871,6 +877,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pdfPaymentRequired =>
       'This report requires a subscription or a one-time purchase.';
+
+  @override
+  String get astrokartografiSubscribe => 'Subscribe';
+
+  @override
+  String get astrokartografiHint =>
+      'World map view is included with subscription.';
+
+  @override
+  String get subscribeSuccess => 'Your subscription is active. Welcome!';
+
+  @override
+  String get subscribeCancelled => 'Subscription cancelled.';
 
   @override
   String analyzerProgressionYear(Object year) {

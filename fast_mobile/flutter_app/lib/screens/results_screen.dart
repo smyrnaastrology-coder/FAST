@@ -10,6 +10,7 @@ import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../services/api_service.dart';
 import '../services/billing_service.dart';
+import '../services/revenuecat_service.dart';
 import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
@@ -25,6 +26,7 @@ class ResultsScreen extends StatefulWidget {
 class _ResultsScreenState extends State<ResultsScreen> {
   final _api = ApiService();
   String _chartTab = 'situa_a';
+  bool _pdfLoading = false;
 
   @override
   void initState() {
@@ -772,11 +774,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       const SizedBox(height: 8),
                       Text(l10n.analyzerSectionChartComment, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      Text('🔒 ${l10n.analyzerLoadWorldMap} — abonelik gerekli', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                      Text('🔒 ${l10n.analyzerLoadWorldMap}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
                       const SizedBox(height: 12),
-                      SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.star, size: 16), label: Text('Abone Ol — \$7.99/ay'), style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold), onPressed: () {})),
+                      SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.star, size: 16), label: Text(l10n.astrokartografiSubscribe), style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold), onPressed: () => _subscribe(l10n))),
                       const SizedBox(height: 8),
-                      Text('PDF alanlar PDF\'te görür, tarayıcıda görmek için abone olun', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                      Text(l10n.astrokartografiHint, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ),
@@ -934,11 +936,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
-                icon: const Icon(Icons.download, size: 20),
+                onPressed: _pdfLoading ? null : () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
+                icon: _pdfLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.download, size: 20),
                 label: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(l10n.downloadPdfButton(widget.request.modLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadPdfButton(widget.request.modLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: FastTheme.accent,
@@ -954,7 +956,26 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 
+  Future<void> _subscribe(AppLocalizations l10n) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final ok = await RevenueCatService.purchase('sub_daily');
+      if (!mounted) return;
+      if (ok) {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.subscribeSuccess)));
+        setState(() {});
+      } else {
+        messenger.showSnackBar(SnackBar(content: Text(l10n.subscribeCancelled)));
+      }
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.subscribeCancelled)));
+    }
+  }
+
   Future<void> _downloadPdf(AnalysisProvider provider, String sessionId, String mod, AppLocalizations l10n) async {
+    if (_pdfLoading) return;
+    setState(() => _pdfLoading = true);
     final tip = switch (mod) {
       'potansiyel_yetenek' => 'potansiyel',
       'bireysel_natal' => 'natal',
@@ -964,22 +985,27 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final url = await _api.getPdfUrl(sessionId, tip);
     try {
       final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
+      if (!mounted) return;
       if (resp.statusCode == 402) {
-        if (!mounted) return;
+        setState(() => _pdfLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
         return;
       }
       if (resp.statusCode != 200) {
+        setState(() => _pdfLoading = false);
         throw Exception(l10n.analyzerPdfNotFound('${resp.statusCode}'));
       }
       final dir = await getApplicationDocumentsDirectory();
       final dosya = File('${dir.path}/${sessionId}_$tip.pdf');
       await dosya.writeAsBytes(resp.bodyBytes, flush: true);
-      await OpenFile.open(dosya.path);
+      final sonuc = await OpenFile.open(dosya.path);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfDownloaded(dosya.path))));
+      setState(() => _pdfLoading = false);
+      final msg = sonuc.type == ResultType.done ? l10n.analyzerPdfSuccess : l10n.analyzerPdfDownloaded(dosya.path);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } catch (e) {
       if (!mounted) return;
+      setState(() => _pdfLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
   }

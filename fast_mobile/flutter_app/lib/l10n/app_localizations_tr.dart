@@ -314,7 +314,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planProFeat2 => 'Kişisel astroloji yorumu';
 
   @override
-  String get planProFeat3 => '30 dakika WhatsApp danışmanlık';
+  String get planProFeat3 => 'Astroloğa sınırsız mesaj gönderme hakkı';
 
   @override
   String get planProFeat4 => '1 yıl güncelleme hakkı';
@@ -769,6 +769,12 @@ class AppLocalizationsTr extends AppLocalizations {
   }
 
   @override
+  String get analyzerPdfSuccess => 'Rapor indirildi ve açıldı.';
+
+  @override
+  String get analyzerPdfPreparing => 'Raporunuz hazırlanıyor…';
+
+  @override
   String analyzerPdfError(Object error) {
     return 'PDF indirme hatası: $error';
   }
@@ -867,6 +873,19 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get pdfPaymentRequired =>
       'Bu rapor için abonelik veya tek seferlik satın alma gerekiyor.';
+
+  @override
+  String get astrokartografiSubscribe => 'Abone Ol';
+
+  @override
+  String get astrokartografiHint =>
+      'Dünya haritası görünümü aboneliğe dahildir.';
+
+  @override
+  String get subscribeSuccess => 'Aboneliğiniz aktifleştirildi. Hoş geldiniz!';
+
+  @override
+  String get subscribeCancelled => 'Abonelik işlemi iptal edildi.';
 
   @override
   String analyzerProgressionYear(Object year) {
