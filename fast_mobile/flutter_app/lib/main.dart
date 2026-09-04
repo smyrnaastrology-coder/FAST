@@ -10,10 +10,21 @@ import 'providers/locale_provider.dart';
 import 'screens/landing_screen.dart';
 import 'screens/language_intro_screen.dart';
 import 'services/revenuecat_service.dart';
+import 'services/notification_service.dart';
 import 'widgets/splash_logo.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+}
+
+/// Günlük minör progress bildirimini abonelere özel zamanlar.
+Future<void> _scheduleDailyIfSubscribed() async {
+  try {
+    final isSub = await RevenueCatService.isSubscribed();
+    if (!isSub) return;
+    await NotificationService.instance
+        .scheduleDaily(9, 0, title: 'Fast Synastry', body: 'Günlük minör ilerleme akışını keşfet 🌟');
+  } catch (_) {}
 }
 
 void main() async {
@@ -39,6 +50,8 @@ void main() async {
     print('[FCM] init error: $e');
   }
   await RevenueCatService.init();
+  await NotificationService.instance.init();
+  _scheduleDailyIfSubscribed();
   runApp(
     MultiProvider(
       providers: [
