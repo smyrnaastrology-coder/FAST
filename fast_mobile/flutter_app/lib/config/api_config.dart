@@ -1,7 +1,7 @@
 class ApiConfig {
-  // Fiziksel cihaz: bilgisayarın IP'sini yaz (örn: 192.168.1.166)
-  // Render üzerinde barındırılan backend (telefon internete bağlıysa her yerden çalışır)
-  static const String baseUrl = 'https://fast-oo6w.onrender.com';
+  // Üretim API backend'i (Render Web Service — fbst-api)
+  // Not: Billing/ödeme vb. tüm istekler aynı ana backend'e gider.
+  static const String baseUrl = 'https://fbst-api-mzum.onrender.com';
 
   // Health
   static const String health = '$baseUrl/api/health';

@@ -76,6 +76,7 @@ def _use_pg() -> bool:
 
 # — subscriptions —
 def _pg_is_subscribed(uid: str) -> bool:
+    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -117,6 +118,7 @@ def _pg_has_free_used(uid: str, device_token: str) -> bool:
         keys.append(f"dev:{_hash(device_token)}")
     if not keys:
         return False
+    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -144,6 +146,7 @@ def _pg_mark_free_used(uid: str, device_token: str):
 
 # — pdf_single —
 def _pg_has_pdf_single(uid: str) -> bool:
+    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -174,7 +177,11 @@ def is_subscribed(uid: str) -> bool:
     if not uid:
         return False
     if _use_pg():
-        return _pg_is_subscribed(uid)
+        try:
+            return _pg_is_subscribed(uid)
+        except Exception as e:
+            print(f"[billing] PG is_subscribed hatasi -> guvenli false: {e}")
+            return False
     rec = _load(SUBS_FILE).get(uid)
     if not rec:
         return False
@@ -189,8 +196,15 @@ def upsert_subscription(uid: str, product_id: str, expiry: float = 0, status: st
     if not uid:
         return
     if _use_pg():
-        _pg_ensure_schema()
-        _pg_upsert_subscription(uid, product_id, expiry, status, provider)
+        try:
+            _pg_ensure_schema()
+            _pg_upsert_subscription(uid, product_id, expiry, status, provider)
+        except Exception as e:
+            print(f"[billing] PG upsert hatasi (best-effort dosya): {e}")
+            # PG yoksa en azindan dosyaya yaz (kalici degil ama calistikca hak korunur)
+            subs = _load(SUBS_FILE)
+            subs[uid] = {"product_id": product_id, "expiry": expiry, "status": status, "provider": provider, "updated": time.time()}
+            _save(SUBS_FILE, subs)
         return
     subs = _load(SUBS_FILE)
     subs[uid] = {"product_id": product_id, "expiry": expiry, "status": status, "provider": provider, "updated": time.time()}
@@ -198,7 +212,11 @@ def upsert_subscription(uid: str, product_id: str, expiry: float = 0, status: st
 
 def has_free_used(uid: str, device_token: str = "") -> bool:
     if _use_pg():
-        return _pg_has_free_used(uid, device_token)
+        try:
+            return _pg_has_free_used(uid, device_token)
+        except Exception as e:
+            print(f"[billing] PG has_free_used hatasi -> guvenli false: {e}")
+            return False
     data = _load(FREE_FILE)
     if uid and data.get(f"uid:{uid}"):
         return True
@@ -229,7 +247,11 @@ def has_pdf_single(uid: str) -> bool:
     if not uid:
         return False
     if _use_pg():
-        return _pg_has_pdf_single(uid)
+        try:
+            return _pg_has_pdf_single(uid)
+        except Exception as e:
+            print(f"[billing] PG has_pdf_single hatasi -> guvenli false: {e}")
+            return False
     data = _load(PURCHASES_FILE)
     val = data.get(uid)
     if val is None:
@@ -244,8 +266,14 @@ def grant_pdf_single(uid: str, expiry: float = 0):
     if not uid:
         return
     if _use_pg():
-        _pg_ensure_schema()
-        _pg_grant_pdf_single(uid, expiry)
+        try:
+            _pg_ensure_schema()
+            _pg_grant_pdf_single(uid, expiry)
+        except Exception as e:
+            print(f"[billing] PG grant_pdf_single hatasi (best-effort dosya): {e}")
+            data = _load(PURCHASES_FILE)
+            data[uid] = str(expiry or 0)
+            _save(PURCHASES_FILE, data)
         return
     data = _load(PURCHASES_FILE)
     data[uid] = str(expiry or 0)

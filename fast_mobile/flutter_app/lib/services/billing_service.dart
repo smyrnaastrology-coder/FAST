@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fast_app/config/api_config.dart';
 
 class BillingService {
   static const _uidKey = 'fbst_uid';
-  // Render backend — aynı API base'i kullan
-  static const _base = 'https://fbst-api.onrender.com'; // TODO: .env'den al
+  // Render backend — ana API base'i kullan (aynı sunucu)
+  static String get _base => ApiConfig.baseUrl;
 
   static String? _cachedUid;
 
