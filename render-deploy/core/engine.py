@@ -29,7 +29,7 @@ from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     DUYGUSAL_IHTIYAC_AY, SAKINLESME_AY, GUVEN_ORTAMI_4EV, ANNE_ROLU_ZORLUK,
     OGRENME_MOTIVASYON_MERKUR, EGITIM_3EV, BESLENME_RUTIN_AY,
     OZGURLUK_SINIR_SATURN, YAS_DONEMLERI, ELEMENT_UYUM_ANNE_COCUK,
-    OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET)
+    OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET, BUYUK_SEHIRLER)
 from core.sifa_receteler_en import FBST_RECETELER_EN, FBST_RECETELER_EBEVEYN_EN
 from core.sifa_receteler_es import FBST_RECETELER_ES, FBST_RECETELER_EBEVEYN_ES
 try:
@@ -8073,85 +8073,17 @@ class FBST_Engine:
                               emoji="🌍")
             story.append(Spacer(1, 10))
             try:
-                BUYUK_SEHIRLER = {
-                    "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep",
-                    "Mersin", "Diyarbakır", "Kocaeli", "Hatay", "Manisa", "Kayseri", "Samsun",
-                    "Balıkesir", "Kahramanmaraş", "Trabzon", "Eskişehir", "Denizli",
-                    "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "San Antonio",
-                    "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville", "San Francisco",
-                    "Seattle", "Denver", "Boston", "Nashville", "Portland", "Las Vegas", "Miami",
-                    "London", "Manchester", "Birmingham", "Glasgow", "Edinburgh", "Liverpool",
-                    "Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Bordeaux", "Strasbourg",
-                    "Berlin", "Hamburg", "München", "Köln", "Frankfurt", "Stuttgart", "Düsseldorf",
-                    "Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Málaga",
-                    "Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova",
-                    "Moskova", "St. Petersburg", "Novosibirsk", "Yekaterinburg", "Kazan",
-                    "Pekin", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu", "Wuhan", "Hangzhou",
-                    "Tokyo", "Osaka", "Yokohama", "Nagoya", "Kyoto", "Fukuoka",
-                    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
-                    "São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza",
-                    "Buenos Aires", "Córdoba", "Rosario", "Mendoza",
-                    "Mexico City", "Guadalajara", "Monterrey", "Cancún",
-                    "Kahire", "İskenderiye", "Giza",
-                    "Dubai", "Abu Dhabi", "Riyad", "Cidde", "Doha", "Kuveyt", "Manama",
-                    "Tel Aviv", "Kudüs", "Hayfa",
-                    "Bangkok", "Singapur", "Kuala Lumpur", "Jakarta", "Manila", "Hanoi",
-                    "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
-                    "Toronto", "Vancouver", "Montreal", "Ottawa", "Calgary",
-                    "Kopenhag", "Stokholm", "Oslo", "Helsinki", "Reykjavik",
-                    "Atina", "Atina", "Lizbon", "Porto", "Varşova", "Kraków", "Prag", "Budapeşte",
-                    "Kapstadt", "Johannesburg", "Nairobi", "Lagos", "Accra", "Kazablanka",
-                    "Kolombo", "Kathmandu", "Kabil", "Tiflis", "Bakü", "Erivan",
-                    "Tiran", "Üsküp", "Saraybosna", "Zagreb", "Ljubljana", "Bratislava",
-                    "Kiev", "Odessa", "Minsk", "Vilnius", "Riga", "Tallinn"
-                }
-
                 top_sehirler_pdf = []
-                if 'radar_top_para' in st.session_state and st.session_state['radar_top_para']:
-                    db = sehir_veritabani_yukle()
-                    def _sehir_koordinat_bul(sehir_adi):
-                        for ulke, sehirler in db.items():
-                            if sehir_adi.endswith(ulke):
-                                sehir_ismi = sehir_adi[:-(len(ulke)+2)].strip()
-                                if sehir_ismi in sehirler:
-                                    v = sehirler[sehir_ismi]
-                                    return v["lat"] if isinstance(v, dict) else v[0], v["lon"] if isinstance(v, dict) else v[1]
-                            if sehir_adi.startswith(sehir_ismi) if (sehir_ismi := sehir_adi[:-len(ulke)-2].strip()) else False:
-                                pass
-                        for ulke, sehirler in db.items():
-                            for sehir_ismi, koord in sehirler.items():
-                                if sehir_adi.lower().startswith(sehir_ismi.lower()):
-                                    return (koord["lat"], koord["lon"]) if isinstance(koord, dict) else (koord[0], koord[1])
-                        return 0, 0
-
-                    for v in st.session_state['radar_top_para'][:3]:
-                        sehir_adi = v["sehir"]
-                        sehir_adi_sade = sehir_adi.split(",")[0].strip().split(" (")[0].strip()
-                        if sehir_adi_sade not in BUYUK_SEHIRLER:
-                            continue
-                        lat, lon = _sehir_koordinat_bul(sehir_adi)
-                        top_sehirler_pdf.append({"sehir": sehir_adi, "lat": lat, "lon": lon, "kategori": "para", "skor": v["para"]})
-                    for v in st.session_state['radar_top_huzur'][:3]:
-                        sehir_adi = v["sehir"]
-                        sehir_adi_sade = sehir_adi.split(",")[0].strip().split(" (")[0].strip()
-                        if sehir_adi_sade not in BUYUK_SEHIRLER:
-                            continue
-                        lat, lon = _sehir_koordinat_bul(sehir_adi)
-                        top_sehirler_pdf.append({"sehir": sehir_adi, "lat": lat, "lon": lon, "kategori": "huzur", "skor": v["huzur"]})
-                    for v in st.session_state['radar_top_tutku'][:2]:
-                        sehir_adi = v["sehir"]
-                        sehir_adi_sade = sehir_adi.split(",")[0].strip().split(" (")[0].strip()
-                        if sehir_adi_sade not in BUYUK_SEHIRLER:
-                            continue
-                        lat, lon = _sehir_koordinat_bul(sehir_adi)
-                        top_sehirler_pdf.append({"sehir": sehir_adi, "lat": lat, "lon": lon, "kategori": "tutku", "skor": v["tutku"]})
-                    for v in st.session_state['radar_top_kriz'][:2]:
-                        sehir_adi = v["sehir"]
-                        sehir_adi_sade = sehir_adi.split(",")[0].strip().split(" (")[0].strip()
-                        if sehir_adi_sade not in BUYUK_SEHIRLER:
-                            continue
-                        lat, lon = _sehir_koordinat_bul(sehir_adi)
-                        top_sehirler_pdf.append({"sehir": sehir_adi, "lat": lat, "lon": lon, "kategori": "kriz", "skor": v["kriz"]})
+                radar_top = getattr(self, "radar_top", None) or {}
+                def _harita_isaretleri(kategori, adet=3):
+                    return [{"sehir": v["sehir"], "lat": v.get("lat", 0), "lon": v.get("lon", 0),
+                             "kategori": kategori, "skor": v.get(kategori, 0)}
+                            for v in radar_top.get(kategori, [])[:adet]]
+                if radar_top.get("para"):
+                    top_sehirler_pdf.extend(_harita_isaretleri("para", 3))
+                    top_sehirler_pdf.extend(_harita_isaretleri("huzur", 3))
+                    top_sehirler_pdf.extend(_harita_isaretleri("tutku", 2))
+                    top_sehirler_pdf.extend(_harita_isaretleri("kriz", 2))
                 acg_dosya, acg_abs_yol = self.ciz_astrocartography(dosya_adi="FBST_Astrocartography_PDF.png", top_sehirler=top_sehirler_pdf)
                 cerceveli_gorsel_ekle(acg_abs_yol, 500, 250, ("Astrocartography World Map" if _EN else ("Mapa Mundial de Astrocartografía" if _ES else "Astrocartography Dünya Haritası")))
                 legend_parts = [
@@ -8177,28 +8109,22 @@ class FBST_Engine:
             story.append(luks_cizgi_ekle(renk="#C9A96E", kalinlik=1.0))
             story.append(Spacer(1, 10))
             story.append(Paragraph(pdf_label("EN UYGUN LOKASYONLAR"), styles['TurkishHeading']))
-            if 'radar_top_para' in st.session_state and st.session_state['radar_top_para']:
+            if getattr(self, "radar_top", None):
                 hassasiyet_metni = ("The system calculates millimeter-level deviations in the latitude and longitude coordinates of cities, identifying the locations that best match your universal wavelength signature." if _EN else "Sistem, şehirlerin enlem ve boylam koordinatlarındaki milimetrik sapmaları hesaplayarak evrensel dalga boyu imzanıza en uygun lokasyonları tespit etmiştir.")
                 story.append(Paragraph(hassasiyet_metni, styles['TurkishNormal']))
                 story.append(Spacer(1, 10))
-                def add_top_5_to_pdf(baslik, liste_adi, skor_anahtari):
+                def add_top_5_to_pdf(baslik, kategori, skor_anahtari):
                     story.append(Paragraph(baslik, styles['TurkishHeading']))
                     radar_rows = []
-                    filtrelenmis = []
-                    for veri in st.session_state[liste_adi]:
-                        sehir_adi = veri['sehir']
-                        sehir_adi_sade = sehir_adi.split(",")[0].strip().split(" (")[0].strip()
-                        if sehir_adi_sade not in BUYUK_SEHIRLER:
-                            continue
-                        filtrelenmis.append(veri)
-                        if len(filtrelenmis) >= 10:
-                            break
+                    filtrelenmis = self.radar_top.get(kategori, [])[:10]
                     for i, veri in enumerate(filtrelenmis):
                         etki_str = ""
                         if veri.get('etkiler'):
                             etki_str = f"<br/><font size='8' color='#666666'>  {veri['etkiler'][0]}</font>" if veri['etkiler'] else ""
                         row_txt = f"<b>{i+1}. {veri['sehir']}</b> - Skor: %{veri[skor_anahtari]}{etki_str}"
                         radar_rows.append([Paragraph(row_txt, styles['TurkishNormal'])])
+                    if not radar_rows:
+                        return
                     radar_table = Table(radar_rows, colWidths=[500])
                     radar_table.setStyle(TableStyle([
                         ('BACKGROUND', (0,0), (-1,-1), KART_ARKA_PLAN),
@@ -8209,10 +8135,10 @@ class FBST_Engine:
                     ]))
                     story.append(radar_table)
                     story.append(Spacer(1, 8))
-                add_top_5_to_pdf("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'radar_top_para', 'para')
-                add_top_5_to_pdf("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'radar_top_huzur', 'huzur')
-                add_top_5_to_pdf("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'radar_top_tutku', 'tutku')
-                add_top_5_to_pdf("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'radar_top_kriz', 'kriz')
+                add_top_5_to_pdf("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'para', 'para')
+                add_top_5_to_pdf("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'huzur', 'huzur')
+                add_top_5_to_pdf("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'tutku', 'tutku')
+                add_top_5_to_pdf("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'kriz', 'kriz')
             else:
                 uyari = ("⚠️ Radar data has not been calculated yet. Please press the 'Scan the World' button in the app to activate the destiny compass." if _EN else (("⚠️ Los datos del radar aún no se han calculado. Pulse el botón 'Explorar el Mundo' de la aplicación para activar la brújula kármica.") if _ES else "⚠️ Radar verileri henüz hesaplanmadı. Lütfen uygulamadaki 'Dünyayı Tara' butonuna basarak kadersel pusulayı aktif hale getirin."))
                 story.append(Paragraph(uyari, styles['TurkishNormal']))

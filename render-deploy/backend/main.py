@@ -18,7 +18,7 @@ os.chdir(_PROJECT_ROOT)
 import swisseph as swe
 from core import FBST_Engine
 from core.i18n import pdf_label, get_lang as _i18n_get_lang
-from core.data import ARAP_ILISKI
+from core.data import ARAP_ILISKI, BUYUK_SEHIRLER
 def _es_fix_tire(text):
     if not isinstance(text, str):
         return text
@@ -1565,9 +1565,37 @@ def _generate_pdf(motor, tip="rapor"):
     if tip == "natal":
         _generate_natal_pdf(motor)
     elif tip == "potansiyel":
+        _attach_radar_to_engine(motor, natal=True)
         motor.pdf_potansiyel_rapor_uret(dosya_adi=f"{motor._session_id}_Potansiyel_Yetenek.pdf")
     else:
+        _attach_radar_to_engine(motor, natal=False)
         motor.pdf_rapor_uret(dosya_adi=f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf")
+
+
+def _attach_radar_to_engine(motor, natal: bool = False):
+    """Global şehir (radar) taramasını hesaplayıp sonucu motor üzerine yazar.
+
+    PDF üretimi, bu veriyi ölü Streamlit kodu yerine canlı kaynak olarak kullanır.
+    """
+    if getattr(motor, "radar_top", None) is not None:
+        return
+    try:
+        if natal:
+            radar_raw = _natal_radar(p1_dt=motor.p1,
+                                     event_date_str=motor.event_date_str,
+                                     event_time=motor.event_time_str)
+        else:
+            radar_raw = _composite_radar(p1_dt=motor.p1,
+                                         p2_dt=motor.p2,
+                                         event_date_str=motor.event_date_str,
+                                         event_time=motor.event_time_str)
+        if radar_raw:
+            sirali, _ = _result_kategorize(radar_raw)
+            motor.radar_top = sirali
+        else:
+            motor.radar_top = {}
+    except Exception:
+        motor.radar_top = {}
 
 def _html_bolumleri_ayir(html):
     """Split '<b>Baslik:</b> icerik' HTML into (baslik, icerik) pairs.
@@ -6873,6 +6901,7 @@ def _result_kategorize(radar):
         raw = c["sehir"]
         sehir_ad, ulke = raw.rsplit(", ", 1) if ", " in raw else (raw, "")
         if (ulke in EXCLUDED) or (ulke and any(e in raw.lower() for e in excluded_any)): continue
+        if sehir_ad not in BUYUK_SEHIRLER: continue
         for kat in sirali:
             sirali[kat].append((sehir_ad, ulke, c[kat], c.get("lat"), c.get("lon"), c.get("etkiler", [])))
     for kat in sirali:

@@ -2303,3 +2303,71 @@ fbst_sabit_yildizlar = {
 fbst_sabit_yildizlar = LangDict(fbst_sabit_yildizlar, _load_en_dict("fbst_sabit_yildizlar.py"), _load_es_dict("fbst_sabit_yildizlar.py"))
 
 
+# ---------------------------------------------------------------------------
+# Metropol (nüfus yoğun) şehir whitelist'i
+# Amac: "arayüz özet / PDF derin" kuralında şehir sıralamalarının yalnızca
+# nüfus yoğun büyük şehirlerden seçilmesini garantilemek.
+# Bu adlar, cities_db.json'daki BİREBİR şehir adlarıyla eşleşir. Aynı ülkeden
+# birden fazla şehir olması sorun değildir çünkü kategorize mantığı ülke
+# başına tek şehir seçer.
+# ---------------------------------------------------------------------------
+BUYUK_SEHIRLER = {
+    # Türkiye
+    "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep",
+    "Mersin", "Diyarbakır", "Kocaeli", "Hatay", "Manisa", "Kayseri", "Samsun",
+    "Balıkesir", "Kahramanmaraş", "Trabzon", "Eskişehir", "Denizli",
+    # ABD
+    "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "San Antonio",
+    "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville", "San Francisco",
+    "Seattle", "Denver", "Boston", "Nashville", "Portland", "Las Vegas", "Miami",
+    "Philadelphia", "Atlanta", "Washington", "Detroit", "Minneapolis", "Orlando",
+    # İngiltere
+    "London", "Londra", "Manchester", "Birmingham", "Glasgow", "Edinburgh", "Liverpool",
+    "Leeds", "Bristol",
+    # Fransa
+    "Paris", "Marseille", "Marsilya", "Lyon", "Toulouse", "Nice", "Bordeaux", "Strasbourg",
+    # Almanya
+    "Berlin", "Hamburg", "München", "Münih", "Köln", "Frankfurt", "Stuttgart", "Düsseldorf",
+    "Leipzig", "Dortmund", "Essen", "Bremen",
+    # İspanya
+    "Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Málaga", "Malaga",
+    # İtalya
+    "Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Floransa", "Venedik",
+    # Rusya
+    "Moskova", "St. Petersburg", "Novosibirsk", "Yekaterinburg", "Kazan",
+    # Çin
+    "Pekin", "Shanghai", "Şanghay", "Guangzhou", "Shenzhen", "Chengdu", "Wuhan", "Hangzhou",
+    # Japonya
+    "Tokyo", "Osaka", "Yokohama", "Nagoya", "Kyoto", "Fukuoka",
+    # Hindistan
+    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune",
+    # Brezilya
+    "São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza",
+    # Arjantin
+    "Buenos Aires", "Córdoba", "Rosario", "Mendoza",
+    # Meksika
+    "Mexico City", "Guadalajara", "Monterrey", "Cancún", "Cancun",
+    # Mısır
+    "Kahire", "Cairo", "İskenderiye", "Alexandria", "Giza",
+    # Orta Doğu
+    "Dubai", "Abu Dhabi", "Riyad", "Cidde", "Doha", "Kuveyt", "Manama",
+    "Tel Aviv", "Kudüs", "Hayfa",
+    # Asya-Pasifik
+    "Bangkok", "Singapur", "Kuala Lumpur", "Jakarta", "Manila", "Hanoi",
+    "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide",
+    # Kanada
+    "Toronto", "Vancouver", "Montreal", "Ottawa", "Calgary",
+    # İskandinavya
+    "Kopenhag", "Stokholm", "Oslo", "Helsinki", "Reykjavik", "Reykjavík",
+    # Avrupa
+    "Atina", "Lizbon", "Porto", "Varşova", "Kraków", "Prag", "Budapeşte",
+    "Zürih", "Cenevre", "Amsterdam", "Brüksel", "Viyana", "Dublin",
+    # Afrika
+    "Kapstadt", "Johannesburg", "Nairobi", "Lagos", "Accra", "Kazablanka",
+    # Diğer
+    "Kolombo", "Kathmandu", "Kabil", "Tiflis", "Bakü", "Erivan",
+    "Tiran", "Üsküp", "Saraybosna", "Zagreb", "Ljubljana", "Bratislava",
+    "Kiev", "Odessa", "Minsk", "Vilnius", "Riga", "Tallinn",
+}
+
+

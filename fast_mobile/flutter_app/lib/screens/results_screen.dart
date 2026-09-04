@@ -880,7 +880,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               children: [
                 Text(katEtiket[kat]!, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: katRenk[kat])),
                 const SizedBox(height: 4),
-                ...sehirler.take(5).map((s) {
+                ...sehirler.take(2).map((s) {
                   if (s is Map) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
