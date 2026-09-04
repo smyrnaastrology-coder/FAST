@@ -12021,6 +12021,41 @@ class FBST_Engine:
         except Exception as e:
             story.append(Paragraph((f"<font color='red'>Share card error: {str(e)}</font>" if _EN else (f"<font color='red'>Error en la tarjeta de compartir: {str(e)}</font>" if _ES else f"<font color='red'>Paylaşım kartı hatası: {str(e)}</font>")), styles['TurkishNormal']))
 
+        # GLOBAL ŞEHİR / KADER PUSULASI BÖLÜMÜ (canlı radar verisi)
+        if getattr(self, "radar_top", None):
+            try:
+                story.append(PageBreak())
+                story.append(Paragraph(pdf_label("EN UYGUN LOKASYONLAR"), styles['TurkishHeading']))
+                hassasiyet_metni = ("The system calculates millimeter-level deviations in the latitude and longitude coordinates of cities, identifying the locations that best match your universal wavelength signature." if _EN else "Sistem, şehirlerin enlem ve boylam koordinatlarındaki milimetrik sapmaları hesaplayarak evrensel dalga boyu imzanıza en uygun lokasyonları tespit etmiştir.")
+                story.append(Paragraph(hassasiyet_metni, styles['TurkishNormal']))
+                story.append(Spacer(1, 8))
+                def _potansiyel_sehir_tablo(baslik, kategori):
+                    story.append(Paragraph(baslik, styles['TurkishHeading']))
+                    rows = []
+                    for i, v in enumerate(self.radar_top.get(kategori, [])[:10]):
+                        etki_str = ""
+                        if v.get('etkiler'):
+                            etki_str = f"<br/><font size='8' color='#666666'>  {v['etkiler'][0]}</font>"
+                        rows.append([Paragraph(f"<b>{i+1}. {v['sehir']}</b> - Skor: %{v[kategori]}{etki_str}", styles['TurkishNormal'])])
+                    if not rows:
+                        return
+                    t = Table(rows, colWidths=[500])
+                    t.setStyle(TableStyle([
+                        ('BACKGROUND', (0,0), (-1,-1), HexColor('#F7F3EC')),
+                        ('BOX', (0,0), (-1,-1), 0.5, HexColor('#C9A96E')),
+                        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+                        ('TOPPADDING', (0,0), (-1,-1), 6),
+                        ('LEFTPADDING', (0,0), (-1,-1), 10),
+                    ]))
+                    story.append(t)
+                    story.append(Spacer(1, 8))
+                _potansiyel_sehir_tablo("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'para')
+                _potansiyel_sehir_tablo("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'huzur')
+                _potansiyel_sehir_tablo("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'tutku')
+                _potansiyel_sehir_tablo("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'kriz')
+            except Exception:
+                pass
+
         # FİNAL
         ilk_sayfa_ciz = sayfa_ciz if _asartepe_kapak_var else kapak_ciz
         doc.build(story, onFirstPage=ilk_sayfa_ciz, onLaterPages=sayfa_ciz)
