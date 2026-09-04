@@ -6754,9 +6754,15 @@ def analiz_bireysel_natal(input: BireyselNatalInput):
     return sonuc
 
 @app_fast.get("/api/pdf/{session_id}/{tip}")
-def pdf_indir(session_id: str, tip: str, uid: str = "", device_token: str = ""):
+def pdf_indir(request: Request, session_id: str, tip: str, uid: str = "", device_token: str = ""):
     if not uid:
         raise HTTPException(status_code=401, detail={"code": "AUTH_REQUIRED", "msg": "uid gerekli (billing doğrulaması için)"})
+    # Play Integrity (opsiyonel, fail-open): token varsa gerçek doğrulama uygula.
+    pi_token = request.headers.get("X-Play-Integrity-Token") or ""
+    if pi_token:
+        v = verify_play_integrity(request)
+        if v.status_code != 200:
+            raise HTTPException(status_code=403, detail={"code": "INTEGRITY_FAILED", "msg": "Play Integrity doğrulaması başarısız"})
     karar = can_download_pdf(uid, device_token, tip)
     if not karar["allowed"]:
         reason = karar["reason"]
