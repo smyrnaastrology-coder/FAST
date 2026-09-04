@@ -45,13 +45,19 @@ class RevenueCatService {
       if (kDebugMode) print('[RC] API key yok — iskelet mod (mock)');
       return;
     }
-    await Purchases.setLogLevel(LogLevel.debug);
-    final uid = await BillingService.getUid();
-    PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
-    await Purchases.configure(config);
-    _inited = true;
-    await _loadPrices();
-    if (kDebugMode) print('[RC] init ok uid=$uid prices=$_prices');
+    try {
+      await Purchases.setLogLevel(LogLevel.debug);
+      final uid = await BillingService.getUid();
+      PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
+      await Purchases.configure(config);
+      _inited = true;
+      await _loadPrices();
+      if (kDebugMode) print('[RC] init ok uid=$uid prices=$_prices');
+    } catch (e) {
+      // Yanlis/gecersiz key'de uygulama acilista kirilmasin — mock moda dus.
+      _inited = false;
+      if (kDebugMode) print('[RC] init hata (mock mod): $e');
+    }
   }
 
   static Future<bool> purchase(String productId) async {
