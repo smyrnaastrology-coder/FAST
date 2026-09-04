@@ -48,6 +48,7 @@ dependencies:
   shimmer: ^4.0.0
   flutter_local_notifications: ^19.4.0
   timezone: ^0.10.0
+  flutter_play_integrity_wrapper: ^0.0.2
 
 
 dev_dependencies:
