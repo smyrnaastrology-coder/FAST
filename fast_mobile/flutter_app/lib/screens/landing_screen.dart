@@ -49,6 +49,21 @@ class _LandingScreenState extends State<LandingScreen> {
     ));
   }
 
+  Future<void> _onPlanTap(Map p, AppLocalizations l10n) async {
+    final productId = (p['productId'] as String?) ?? '';
+    if (productId.isEmpty) {
+      _startAnalysis();
+      return;
+    }
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await RevenueCatService.purchase(productId);
+    if (!mounted) return;
+    messenger.showSnackBar(SnackBar(
+      content: Text(ok ? l10n.subscribeSuccess : l10n.subscribeCancelled),
+    ));
+    if (ok) _startAnalysis();
+  }
+
   List<Map<String, dynamic>> _modes(AppLocalizations l10n) => [
     {'key': 'es_sevgili', 'title': l10n.modeEsTitle, 'desc': l10n.modeEsDesc, 'badge': l10n.modeEsBadge, 'icon': '💑'},
     {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.modeEbDesc, 'badge': l10n.modeEbBadge, 'icon': '👨‍👩‍👧‍👦'},
@@ -549,9 +564,9 @@ class _LandingScreenState extends State<LandingScreen> {
               SizedBox(
                 width: double.infinity,
                 child: highlight
-                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), () => _startAnalysis(), height: 44, fontSize: 13)
+                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), () => _onPlanTap(p, l10n), height: 44, fontSize: 13)
                     : OutlinedButton(
-                        onPressed: () => _startAnalysis(),
+                        onPressed: () => _onPlanTap(p, l10n),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: FastTheme.border),
                           foregroundColor: FastTheme.text,

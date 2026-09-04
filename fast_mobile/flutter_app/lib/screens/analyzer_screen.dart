@@ -13,6 +13,8 @@ import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
+import '../services/play_integrity_service.dart';
+import '../services/revenuecat_service.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart' as w;
 
@@ -1985,12 +1987,24 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     setState(() => _pdfLoading = true);
     try {
       final url = await _api.getPdfUrl(sessionId, tip ?? 'rapor');
-      final resp = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 90));
+      final integrityToken = await PlayIntegrityService().requestToken();
+      final headers = <String, String>{
+        if (integrityToken != null) 'X-Play-Integrity-Token': integrityToken,
+      };
+      var resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 90));
       if (!mounted) return;
       if (resp.statusCode == 402) {
-        setState(() => _pdfLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
-        return;
+        // Tek PDF ($19.99) satın alma teklif et; başarılıysa bir kez tekrar dene.
+        final bought = await RevenueCatService.purchase('pdf_single');
+        if (!mounted) return;
+        if (bought) {
+          resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 90));
+          if (!mounted) return;
+        } else {
+          setState(() => _pdfLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+          return;
+        }
       }
       if (resp.statusCode != 200) {
         setState(() => _pdfLoading = false);
