@@ -11,6 +11,17 @@ class RevenueCatService {
   /// RevenueCat offering'inden getirilir; yoksa '7.99' gibi sabit düşer.
   static Map<String, String> _prices = {};
 
+  /// Google aboneliklerinde identifier `urun:temelplan` formatindadir
+  /// (orn. `sub_daily:aylik-temel`). Hem birebir hem one ekli eslesme.
+  static bool _matchesProduct(String identifier, String productId) {
+    return identifier == productId || identifier.startsWith('$productId:');
+  }
+
+  static String _baseId(String identifier) {
+    final i = identifier.indexOf(':');
+    return i < 0 ? identifier : identifier.substring(0, i);
+  }
+
   static Future<void> _loadPrices() async {
     if (!_inited) return;
     try {
@@ -19,13 +30,17 @@ class RevenueCatService {
       if (current == null) return;
       final byId = <String, String>{};
       for (final pkg in current.availablePackages) {
-        byId[pkg.storeProduct.identifier] = pkg.storeProduct.priceString;
+        final id = pkg.storeProduct.identifier;
+        byId[id] = pkg.storeProduct.priceString;
+        byId.putIfAbsent(_baseId(id), () => pkg.storeProduct.priceString);
       }
       // Alt ürünlere de bak (offering yoksa bile paket listesinden)
       if (byId.isEmpty) {
         for (final off in offerings.all.values) {
           for (final pkg in off.availablePackages) {
-            byId[pkg.storeProduct.identifier] = pkg.storeProduct.priceString;
+            final id = pkg.storeProduct.identifier;
+            byId[id] = pkg.storeProduct.priceString;
+            byId.putIfAbsent(_baseId(id), () => pkg.storeProduct.priceString);
           }
         }
       }
@@ -71,7 +86,7 @@ class RevenueCatService {
       Package? pkg;
       for (final off in offerings.all.values) {
         for (final p in off.availablePackages) {
-          if (p.storeProduct.identifier == productId) {
+          if (_matchesProduct(p.storeProduct.identifier, productId)) {
             pkg = p;
             break;
           }
