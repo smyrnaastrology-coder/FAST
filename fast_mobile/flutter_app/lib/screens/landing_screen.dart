@@ -510,6 +510,18 @@ class _LandingScreenState extends State<LandingScreen> {
     return v.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
   }
 
+  /// Plan buton etiketi: TR'de PRO'YA BAŞLA / PREMIUM'A BAŞLA
+  /// (ünlüyle biterse 'YA, ünsüzle biterse 'A). Diğer dillerde l10n şablonu.
+  String _planStartLabel(String name, AppLocalizations l10n) {
+    if (Localizations.localeOf(context).languageCode != 'tr') {
+      return l10n.planStart(name);
+    }
+    final p = name.toUpperCase();
+    const vowels = 'AEIOUİÖÜ';
+    final last = p.isNotEmpty ? p[p.length - 1] : '';
+    return '$p${vowels.contains(last) ? "'YA BAŞLA" : "'A BAŞLA"}';
+  }
+
   Widget _planCard(Map p, AppLocalizations l10n) {
     final highlight = p['highlight'] as bool;
     final price = p['price'] as num;
@@ -564,7 +576,7 @@ class _LandingScreenState extends State<LandingScreen> {
               SizedBox(
                 width: double.infinity,
                 child: highlight
-                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), () => _onPlanTap(p, l10n), height: 44, fontSize: 13)
+                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), () => _onPlanTap(p, l10n), height: 44, fontSize: 13)
                     : OutlinedButton(
                         onPressed: () => _onPlanTap(p, l10n),
                         style: OutlinedButton.styleFrom(
@@ -573,7 +585,7 @@ class _LandingScreenState extends State<LandingScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text(p['price'] == 0 ? l10n.planTrial : l10n.planStart(p['name'] as String), style: const TextStyle(fontSize: 13)),
+                        child: Text(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), style: const TextStyle(fontSize: 13)),
                       ),
               ),
             ],
