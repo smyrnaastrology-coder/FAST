@@ -1277,12 +1277,74 @@ _ES_VERI_KELIMELER = {
     "Ev": "Casa",
 }
 
+# ─── EN veri alanı lokalizasyonu ───
+# ES haritasinin İngilizce karsiligi: teknik alanlardaki Turkce
+# burc/gezegen/kategori adlari EN modunda Ingilizce gorunur.
+_EN_VERI_KELIMELER = {
+    # Gezegenler
+    "Güneş": "Sun", "Ay": "Moon", "Merkür": "Mercury", "Venüs": "Venus",
+    "Mars": "Mars", "Jüpiter": "Jupiter", "Satürn": "Saturn",
+    "Uranüs": "Uranus", "Neptün": "Neptune", "Plüton": "Pluto",
+    "Chiron": "Chiron", "Ceres": "Ceres", "Pallas": "Pallas",
+    "Juno": "Juno", "Vesta": "Vesta", "KAD": "North Node", "GD": "South Node",
+    # Burçlar
+    "Koç": "Aries", "Boğa": "Taurus", "İkizler": "Gemini", "Yengeç": "Cancer",
+    "Aslan": "Leo", "Başak": "Virgo", "Terazi": "Libra", "Akrep": "Scorpio",
+    "Yay": "Sagittarius", "Oğlak": "Capricorn", "Kova": "Aquarius", "Balık": "Pisces",
+    # Açılar
+    "Kavuşum": "Conjunction", "Karşıt": "Opposition", "Kare": "Square",
+    "Zıtlık": "Opposition", "Trine": "Trine", "Trigon": "Trine", "Sextil": "Sextile",
+    # Gün adları
+    "Pazartesi": "Monday", "Salı": "Tuesday", "Çarşamba": "Wednesday",
+    "Perşembe": "Thursday", "Cuma": "Friday", "Cumartesi": "Saturday",
+    "Pazar": "Sunday",
+    # Ay adları
+    "Ocak": "January", "Şubat": "February", "Mart": "March", "Nisan": "April",
+    "Mayıs": "May", "Haziran": "June", "Temmuz": "July", "Ağustos": "August",
+    "Eylül": "September", "Ekim": "October", "Kasım": "November",
+    "Aralık": "December",
+    # Kategoriler
+    "Sağlık/Tıp": "Health/Medicine", "İletişim": "Communication", "Spor": "Sports",
+    "Maneviyat": "Spirituality", "Sanatsal Yetenek": "Artistic Talent",
+    "Liderlik": "Leadership", "Stratejik Zeka": "Strategic Intelligence",
+    "Yardımseverlik": "Kindness", "Girişimcilik": "Entrepreneurship",
+    "Akademik/Araştırma": "Academic/Research", "Zanaatkarlık": "Craftsmanship",
+    "Askeriye": "Military", "Bilgelik": "Wisdom", "Hukuk/Politika": "Law/Politics",
+    "Zihinsel Yetenek": "Mental Talent", "Yenilikçilik": "Innovation",
+    # Zeka tipi / oda adları (meslek detayları)
+    "Diplomatik/Sanatsal Zeka": "Diplomatic/Artistic Intelligence",
+    "Ortaklık/Diplomasi Zekası": "Partnership/Diplomacy Intelligence",
+    "Gizli/Derin Zeka": "Hidden/Deep Intelligence",
+    "Sezgisel/Yaratıcı Zeka": "Intuitive/Creative Intelligence",
+    # Açı türleri (alternatif yazımlar)
+    "Sekstil": "Sextile",
+    # Arap noktaları (ebeveyn-çocuk)
+    "Baba Noktası": "Father Point", "Anne Noktası": "Mother Point",
+    "Çocuk Ruhu": "Child Spirit", "Koruma Noktası": "Protection Point",
+    "Eğitim Noktası": "Education Point", "Sınır Noktası": "Boundary Point",
+    "Bağlanma Noktası": "Bonding Point", "Sorumluluk": "Responsibility",
+    # Arap noktaları (ilişki)
+    "Şans Noktası": "Part of Fortune", "Ruh Noktası": "Spirit Point",
+    "Evlilik Noktası": "Marriage Point", "Aşk Noktası": "Love Point",
+    "Tutku Noktası": "Passion Point", "Para Noktası": "Money Point",
+    # Ev
+    "Ev": "House",
+}
+
 def _es_cv_text(metin):
     """Bilinen Türkçe gezegen/burç/açı/ev adlarını İspanyolcaya çevirir."""
     if not isinstance(metin, str):
         return metin
     for _tr, _es in _ES_VERI_KELIMELER.items():
         metin = re.sub(r"(?<![A-Za-zÀ-ÖØ-öø-ÿ])" + re.escape(_tr) + r"(?![A-Za-zÀ-ÖØ-öø-ÿ])", _es, metin)
+    return metin
+
+def _en_cv_text(metin):
+    """Bilinen Türkçe gezegen/burç/açı/ev adlarını İngilizceye çevirir."""
+    if not isinstance(metin, str):
+        return metin
+    for _tr, _en in _EN_VERI_KELIMELER.items():
+        metin = re.sub(r"(?<![A-Za-zÀ-ÖØ-öø-ÿ])" + re.escape(_tr) + r"(?![A-Za-zÀ-ÖØ-öø-ÿ])", _en, metin)
     return metin
 
 def _es_localize(data):
@@ -1408,6 +1470,130 @@ def _es_localize(data):
                 _ke[_rk] = [_es_cv_text(x) if isinstance(x, str) else x for x in _ke[_rk]]
     return data
 
+def _en_localize(data):
+    """EN modunda API yanıtındaki Türkçe veri alanlarını İngilizceye çevirir.
+    _es_localize ile aynı alanları kapsar."""
+    if not isinstance(data, dict):
+        return data
+    # potansiyel_alanlar
+    for p in data.get("potansiyel_alanlar") or []:
+        if isinstance(p, dict):
+            p["alan"] = _en_cv_text(p.get("alan", ""))
+            p["aci"] = _en_cv_text(p.get("aci", ""))
+    # meslek_onerileri
+    for m in data.get("meslek_onerileri") or []:
+        if not isinstance(m, dict):
+            continue
+        m["alan"] = _en_cv_text(m.get("alan", ""))
+        if isinstance(m.get("gezegenler"), list):
+            m["gezegenler"] = [_en_cv_text(g) for g in m["gezegenler"]]
+        m["mc_burc"] = _en_cv_text(m.get("mc_burc", ""))
+        m["mc_yonetici"] = _en_cv_text(m.get("mc_yonetici", ""))
+        m["mc_yonetici_konum"] = _en_cv_text(m.get("mc_yonetici_konum", ""))
+        m["aci_detaylari"] = _en_cv_text(m.get("aci_detaylari", ""))
+        if isinstance(m.get("sabit_yildizlar"), list):
+            m["sabit_yildizlar"] = [_en_cv_text(s) for s in m["sabit_yildizlar"]]
+    # arap_sinastri (ebeveyn-çocuk ve sevgili modları)
+    for b in data.get("arap_sinastri") or []:
+        if not isinstance(b, dict):
+            continue
+        for _k in ("nokta_a", "nokta_b", "kaynak", "hedef", "nokta", "gezegen"):
+            if b.get(_k):
+                b[_k] = _en_cv_text(b[_k])
+    # arap_noktalari (nokta adı anahtarları - hem dış hem iç anahtarlar)
+    arap_noktalari = data.get("arap_noktalari")
+    if isinstance(arap_noktalari, dict):
+        def _arap_nokta_cevir_en(d):
+            if not isinstance(d, dict):
+                return d
+            return {_en_cv_text(k): _arap_nokta_cevir_en(v) if isinstance(v, dict) else v for k, v in d.items()}
+        data["arap_noktalari"] = _arap_nokta_cevir_en(arap_noktalari)
+    # asteroit_konumlar
+    for a in data.get("asteroit_konumlar") or []:
+        if isinstance(a, dict):
+            a["burc"] = _en_cv_text(a.get("burc", ""))
+    # progression açı türleri
+    for pr in data.get("progression") or []:
+        if isinstance(pr, dict) and isinstance(pr.get("ay_aci_yorumlari"), list):
+            for a in pr["ay_aci_yorumlari"]:
+                if isinstance(a, dict) and a.get("aci_turu"):
+                    a["aci_turu"] = _en_cv_text(a["aci_turu"])
+    # hava_durumu (gün adı + yorum + açı içi gezegen/açı adları)
+    for h in data.get("hava_durumu") or []:
+        if not isinstance(h, dict):
+            continue
+        if h.get("gun_ad"):
+            h["gun_ad"] = _en_cv_text(h["gun_ad"])
+        if h.get("ay_burc"):
+            h["ay_burc"] = _en_cv_text(h["ay_burc"])
+        if h.get("yorum"):
+            h["yorum"] = _en_cv_text(h["yorum"])
+        if isinstance(h.get("acilar"), list):
+            for a in h["acilar"]:
+                if isinstance(a, dict) and a.get("yorum"):
+                    a["yorum"] = _en_cv_text(a["yorum"])
+                elif isinstance(a, str):
+                    h["acilar"] = [_en_cv_text(x) if isinstance(x, str) else x for x in h["acilar"]]
+    # sabianlar
+    for s in data.get("sabianlar") or []:
+        if not isinstance(s, dict):
+            continue
+        if s.get("gezegen"):
+            s["gezegen"] = _en_cv_text(s["gezegen"])
+        if s.get("derece_str"):
+            s["derece_str"] = _en_cv_text(s["derece_str"])
+    # asteroitler
+    for a in data.get("asteroitler") or []:
+        if isinstance(a, dict) and a.get("gezegen"):
+            a["gezegen"] = _en_cv_text(a["gezegen"])
+    # minor_progress
+    for mp in data.get("minor_progress") or []:
+        if not isinstance(mp, dict):
+            continue
+        if mp.get("gun_ad"):
+            mp["gun_ad"] = _en_cv_text(mp["gun_ad"])
+        if mp.get("ay_burc"):
+            mp["ay_burc"] = _en_cv_text(mp["ay_burc"])
+        if mp.get("gunes_burc"):
+            mp["gunes_burc"] = _en_cv_text(mp["gunes_burc"])
+    # hayat_alanlari onerileri
+    for hl in data.get("hayat_alanlari") or []:
+        if not isinstance(hl, dict):
+            continue
+        if isinstance(hl.get("oneriler"), list):
+            for o in hl["oneriler"]:
+                if isinstance(o, dict) and o.get("metin"):
+                    o["metin"] = _en_cv_text(o["metin"])
+    # chart_yorumu_gezegenler ve chart_yorumu_acilar
+    for g in data.get("chart_yorumu_gezegenler") or []:
+        if isinstance(g, dict) and g.get("gezegen"):
+            g["gezegen"] = _en_cv_text(g["gezegen"])
+    for a in data.get("chart_yorumu_acilar") or []:
+        if isinstance(a, dict) and a.get("baslik"):
+            a["baslik"] = _en_cv_text(a["baslik"])
+    # minor_progress_6month
+    if data.get("minor_progress_6month"):
+        data["minor_progress_6month"] = _en_cv_text(data["minor_progress_6month"])
+    # astrokartografi etkileri
+    _skor = (data.get("astrokartografi") or {}).get("skor")
+    if isinstance(_skor, dict) and isinstance(_skor.get("etkiler"), list):
+        _skor["etkiler"] = [_en_cv_text(e) for e in _skor["etkiler"]]
+    # yildiz_muhurleri
+    for y in data.get("yildiz_muhurleri") or []:
+        if not isinstance(y, dict):
+            continue
+        if y.get("baslik"):
+            y["baslik"] = _en_cv_text(y["baslik"])
+        if y.get("icerik"):
+            y["icerik"] = _en_cv_text(y["icerik"])
+    # karmik_ev raporlari
+    _ke = data.get("karmik_ev")
+    if isinstance(_ke, dict):
+        for _rk in ("rapor_a", "rapor_b"):
+            if isinstance(_ke.get(_rk), list):
+                _ke[_rk] = [_en_cv_text(x) if isinstance(x, str) else x for x in _ke[_rk]]
+    return data
+
 def _analiz_hash(tag, girdi):
     try:
         _g = girdi.dict()
@@ -1430,6 +1616,8 @@ def _analiz_sonuc(tag, girdi, calistir):
     def _dondur(r_):
         if _isim == "es":
             return _es_localize(r_), None
+        if _isim == "en":
+            return _en_localize(r_), None
         return r_, None
     r = _ANALIZ_CACHE.get(h)
     if r is not None:
