@@ -6782,10 +6782,16 @@ def pdf_indir(request: Request, session_id: str, tip: str, uid: str = "", device
             try:
                 _generate_pdf(m, tip)
             except Exception:
-                pass
+                import traceback as _tb
+                print(f"[pdf-debug] _generate_pdf hatasi sid={session_id} tip={tip}:\n{_tb.format_exc()}", flush=True)
     if os.path.exists(yol):
         # Hakkı tüket (sadece ücretsiz hak tüketilir; abonelik/pdf_single kalıcı)
-        consume_pdf(uid, device_token, tip, karar["reason"])
+        try:
+            consume_pdf(uid, device_token, tip, karar["reason"])
+        except Exception:
+            import traceback as _tb2
+            print(f"[pdf-debug] consume_pdf hatasi uid={uid}:\n{_tb2.format_exc()}", flush=True)
+            raise HTTPException(status_code=500, detail={"code": "CONSUME_FAILED", "msg": "Hak islenirken hata"})
         return FileResponse(yol, media_type="application/pdf", filename=dosya_adi)
     raise HTTPException(404, "PDF bulunamadı. Önce analiz çalıştırılmalı.")
 
