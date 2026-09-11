@@ -6993,18 +6993,15 @@ def _composite_radar(p1_dt, p2_dt, event_date_str, event_time):
             else:
                 lat, lon = koordinat
             is_list.append((ulke, sehir, lat, lon))
-    from concurrent.futures import ThreadPoolExecutor, as_completed
     def _hesapla(u, s, la, lo):
         skor = _composite_sehir_skor(comp, jd_ev, la, lo)
         return {"sehir": f"{s}, {u}", "lat": la, "lon": lo,
                 "huzur": skor["huzur"], "para": skor["para"],
                 "tutku": skor["tutku"], "kriz": skor["kriz"],
                 "etkiler": skor["etkiler"]}
-    sonuc = []
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        futs = {ex.submit(_hesapla, u, s, la, lo): (u, s) for u, s, la, lo in is_list}
-        for f in as_completed(futs):
-            sonuc.append(f.result())
+    # NOT: Swiss Ephemeris C cekirdegi thread-safe degildir; paralel cagri
+    # bellegi bozup worker'i iz birakmadan oldurur (segfault). Sirali calis.
+    sonuc = [_hesapla(u, s, la, lo) for u, s, la, lo in is_list]
     return sonuc
 
 def _natal_radar(p1_dt, event_date_str, event_time):
@@ -7029,18 +7026,15 @@ def _natal_radar(p1_dt, event_date_str, event_time):
             else:
                 lat, lon = koordinat
             is_list.append((ulke, sehir, lat, lon))
-    from concurrent.futures import ThreadPoolExecutor, as_completed
     def _hesapla(u, s, la, lo):
         skor = _composite_sehir_skor(natal, jd_ev, la, lo)
         return {"sehir": f"{s}, {u}", "lat": la, "lon": lo,
                 "huzur": skor["huzur"], "para": skor["para"],
                 "tutku": skor["tutku"], "kriz": skor["kriz"],
                 "etkiler": skor["etkiler"]}
-    sonuc = []
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        futs = {ex.submit(_hesapla, u, s, la, lo): (u, s) for u, s, la, lo in is_list}
-        for f in as_completed(futs):
-            sonuc.append(f.result())
+    # NOT: Swiss Ephemeris C cekirdegi thread-safe degildir (yukaridaki
+    # composite fonksiyondaki ayni sebep). Sirali calis.
+    sonuc = [_hesapla(u, s, la, lo) for u, s, la, lo in is_list]
     return sonuc
 
 def _result_kategorize(radar):
