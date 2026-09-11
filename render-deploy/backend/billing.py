@@ -226,7 +226,18 @@ def has_free_used(uid: str, device_token: str = "") -> bool:
 
 def mark_free_used(uid: str, device_token: str = ""):
     if _use_pg():
-        _pg_mark_free_used(uid, device_token)
+        # Gecici DNS/ag baglanti hatalarina karsi 3 deneme; hepsi basarisizsa
+        # indirmeyi oldurme (logla, devam et) — dosya hazir, kullanici almali.
+        err = None
+        for deneme in range(3):
+            try:
+                _pg_mark_free_used(uid, device_token)
+                return
+            except Exception as e:
+                err = e
+                print(f"[billing] mark_free_used deneme {deneme+1}/3 hata: {e}")
+                time.sleep(1)
+        print(f"[billing] mark_free_used KALICI hata (indirme engellenmedi): {err}")
         return
     data = _load(FREE_FILE)
     if uid:
