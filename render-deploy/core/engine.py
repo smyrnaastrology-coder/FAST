@@ -8135,10 +8135,10 @@ class FBST_Engine:
                     ]))
                     story.append(radar_table)
                     story.append(Spacer(1, 8))
-                add_top_5_to_pdf("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'para', 'para')
-                add_top_5_to_pdf("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'huzur', 'huzur')
-                add_top_5_to_pdf("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'tutku', 'tutku')
-                add_top_5_to_pdf("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'kriz', 'kriz')
+                add_top_5_to_pdf("💰 " + ("BEST CITIES FINANCIALLY" if _EN else ("MEJORES CIUDADES FINANCIERAMENTE" if _ES else "MALİ AÇIDAN EN İYİ ŞEHİRLER")), 'para', 'skor')
+                add_top_5_to_pdf("🕊️ " + ("BEST CITIES FOR PEACE" if _EN else ("MEJORES CIUDADES PARA LA PAZ" if _ES else "HUZUR AÇISINDAN EN İYİ ŞEHİRLER")), 'huzur', 'skor')
+                add_top_5_to_pdf("🔥 " + ("BEST CITIES FOR PASSION AND ENERGY" if _EN else ("MEJORES CIUDADES PARA LA PASIÓN Y LA ENERGÍA" if _ES else "TUTKU VE ENERJİ AÇISINDAN EN İYİ ŞEHİRLER")), 'tutku', 'skor')
+                add_top_5_to_pdf("🌋 " + ("CITIES WITH HIGHEST CRISIS RISK" if _EN else ("CIUDADES CON MAYOR RIESGO DE CRISIS" if _ES else "KRİZ RİSKİ EN YÜKSEK ŞEHİRLER")), 'kriz', 'skor')
             else:
                 uyari = ("⚠️ Radar data has not been calculated yet. Please press the 'Scan the World' button in the app to activate the destiny compass." if _EN else (("⚠️ Los datos del radar aún no se han calculado. Pulse el botón 'Explorar el Mundo' de la aplicación para activar la brújula kármica.") if _ES else "⚠️ Radar verileri henüz hesaplanmadı. Lütfen uygulamadaki 'Dünyayı Tara' butonuna basarak kadersel pusulayı aktif hale getirin."))
                 story.append(Paragraph(uyari, styles['TurkishNormal']))
@@ -12036,7 +12036,7 @@ class FBST_Engine:
                         etki_str = ""
                         if v.get('etkiler'):
                             etki_str = f"<br/><font size='8' color='#666666'>  {v['etkiler'][0]}</font>"
-                        rows.append([Paragraph(f"<b>{i+1}. {v['sehir']}</b> - Skor: %{v[kategori]}{etki_str}", styles['TurkishNormal'])])
+                        rows.append([Paragraph(f"<b>{i+1}. {v['sehir']}</b> - Skor: %{v['skor']}{etki_str}", styles['TurkishNormal'])])
                     if not rows:
                         return
                     t = Table(rows, colWidths=[500])
