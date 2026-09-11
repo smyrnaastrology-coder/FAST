@@ -2,7 +2,7 @@ import os, sys, logging, base64, stripe, json, hmac, hashlib, re, time, tempfile
 import requests
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -7281,6 +7281,63 @@ TOTAL_ANALYSIS = 0  # incremented in handle_submit
 @app_fast.get("/api/stats")
 def get_stats():
     return {"total_analysis": TOTAL_ANALYSIS, "total_cities": 15000}
+
+@app_fast.get("/privacy", response_class=HTMLResponse)
+def privacy_policy():
+    """Gizlilik politikasi (Play Store listesi icin herkese acik sayfa)."""
+    return """<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Synastry - Gizlilik Politikasi</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Fast Synastry Gizlilik Politikasi</h1>
+<p><b>Son guncelleme:</b> Eylul 2026</p>
+<h2>1. Topladigimiz Veriler</h2>
+<ul>
+<li><b>Analiz girdileri:</b> girdiginiz dogum bilgileri (isim, tarih, saat, sehir) yalnizca analiz uretmek icin kullanilir.</li>
+<li><b>Cihaz kimligi:</b> ucretsiz hak ve abonelik durumunu takip etmek icin rastgele uretilmis anonim bir cihaz kimligi saklanir. E-posta veya sifre istemeyiz, uyelik yoktur.</li>
+<li><b>Bildirim jetonu:</b> gunluk hatirlatmalar icin Firebase bildirim jetonu (izin verirseniz).</li>
+<li><b>Satin alma bilgisi:</b> odemeler Google Play ve RevenueCat uzerinden islenir; kredi karti bilgisi bize ulasmaz.</li>
+</ul>
+<h2>2. Verilerin Kullanimi</h2>
+<p>Veriler yalnizca uygulamayi calistirmak (analiz, PDF raporu, abonelik dogrulama, bildirimler) icin kullanilir. Verileriniz satilmaz, reklam amaciyla paylasilmaz.</p>
+<h2>3. Ucuncu Taraflar</h2>
+<ul><li>Google Play (odeme), RevenueCat (abonelik yonetimi), Firebase (bildirimler), Supabase (guvenli veri depolama).</li></ul>
+<h2>4. Veri Saklama ve Silme</h2>
+<p>Analiz verileri cihazinizda ve sunucumuzda gecici olarak tutulur. Tum verilerinizin silinmesini isterseniz <b>smyrnaastrology@gmail.com</b> adresine yazin; talebiniz 30 gun icinde yerine getirilir.</p>
+<h2>5. Cocuklar</h2>
+<p>Uygulama 13 yas alti cocuklara yonelik degildir.</p>
+<h2>6. Iletisim</h2>
+<p>Gizlilik sorulariniz icin: <b>smyrnaastrology@gmail.com</b></p>
+<hr><p><a href="/privacy-en">English version</a></p>
+</body></html>"""
+
+@app_fast.get("/privacy-en", response_class=HTMLResponse)
+def privacy_policy_en():
+    """Privacy policy (English)."""
+    return """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Synastry - Privacy Policy</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Fast Synastry Privacy Policy</h1>
+<p><b>Last updated:</b> September 2026</p>
+<h2>1. Data We Collect</h2>
+<ul>
+<li><b>Analysis inputs:</b> birth details you enter (name, date, time, city) are used only to generate analyses.</li>
+<li><b>Device identifier:</b> a randomly generated anonymous device ID to track free entitlement and subscription status. No email, no password, no accounts.</li>
+<li><b>Notification token:</b> Firebase messaging token for daily reminders (if you allow).</li>
+<li><b>Purchase info:</b> payments are processed by Google Play and RevenueCat; card details never reach us.</li>
+</ul>
+<h2>2. Use of Data</h2>
+<p>Data is used solely to operate the app (analyses, PDF reports, subscription verification, notifications). Your data is never sold or shared for advertising.</p>
+<h2>3. Third Parties</h2>
+<ul><li>Google Play (payments), RevenueCat (subscription management), Firebase (notifications), Supabase (secure data storage).</li></ul>
+<h2>4. Retention and Deletion</h2>
+<p>To request deletion of all your data, write to <b>smyrnaastrology@gmail.com</b>; requests are fulfilled within 30 days.</p>
+<h2>5. Children</h2>
+<p>The app is not directed at children under 13.</p>
+<h2>6. Contact</h2>
+<p>For privacy questions: <b>smyrnaastrology@gmail.com</b></p>
+</body></html>"""
 
 # ─── Frontend serving ───
 _FRONTEND_HTML = os.path.join(_PROJECT_ROOT, "frontend", "dist", "index.html")
