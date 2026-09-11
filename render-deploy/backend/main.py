@@ -7311,6 +7311,25 @@ def privacy_policy():
 <hr><p><a href="/privacy-en">English version</a></p>
 </body></html>"""
 
+@app_fast.get("/delete", response_class=HTMLResponse)
+def data_deletion():
+    """Veri silme talebi sayfasi (Play Store veri guvenligi icin)."""
+    return """<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Synastry - Veri Silme Talebi</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Veri Silme Talebi</h1>
+<p>Fast Synastry'deki tum verilerinizin silinmesini istemek icin:</p>
+<ol>
+<li><b>smyrnaastrology@gmail.com</b> adresine e-posta gonderin.</li>
+<li>Konu satirina <b>"Veri Silme Talebi"</b> yazin.</li>
+<li>Mesaja, uygulamayi kullandiginiz cihazla ilgili kisa bir aciklama ekleyin (ornein telefon modeli); e-posta adresinizden kaydınızı buluruz.</li>
+</ol>
+<p>Talebiniz <b>30 gun icinde</b> yerine getirilir ve size e-posta ile bilgi verilir.</p>
+<p>Silinen veriler: analiz girdileri, cihaz kimligi, bildirim jetonu, abonelik kayitlari.</p>
+<hr><p><a href="/privacy">Gizlilik Politikasi</a></p>
+</body></html>"""
+
 @app_fast.get("/privacy-en", response_class=HTMLResponse)
 def privacy_policy_en():
     """Privacy policy (English)."""
