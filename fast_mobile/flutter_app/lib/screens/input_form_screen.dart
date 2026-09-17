@@ -66,10 +66,8 @@ class _InputFormScreenState extends State<InputFormScreen> {
 
   Future<void> _loadDB() async {
     try {
-      final d = await _api.getUlkeler();
-      if (d.isNotEmpty && d[0] is Map) {
-        _lokasyonDB = d[0] as Map<String, dynamic>;
-      }
+      final d = await _api.getUlkelerRaw();
+      _lokasyonDB = d.cast<String, dynamic>();
     } catch (_) {}
     _dbLoading = false;
     if (mounted) setState(() {});
