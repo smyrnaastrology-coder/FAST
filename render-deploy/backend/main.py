@@ -1207,7 +1207,7 @@ async def _tr_ip_gate(request: Request, call_next):
 
 # ─── In-memory engine cache ───
 _ENGINE_CACHE = {}
-_ENGINE_CACHE_MAX = 12
+_ENGINE_CACHE_MAX = 4
 
 def _cache_engine(motor):
     sid = motor._session_id
@@ -1223,7 +1223,7 @@ def _get_engine(sid: str):
 import hashlib as _hashlib
 import threading as _threading
 _ANALIZ_CACHE = {}
-_ANALIZ_CACHE_MAX = 40
+_ANALIZ_CACHE_MAX = 8
 _ANALIZ_RUNNING = {}
 _ANALIZ_GLOBAL_LOCK = _threading.Lock()
 
@@ -7324,6 +7324,13 @@ def simulasyon_alternatif(input: AlternatifInput):
 # ─── City image cache ───
 import urllib.request, urllib.parse, json as pyjson
 _CITY_IMG_CACHE = {}  # {norm: {"img": str|None, "page": str|None}}
+_CITY_IMG_CACHE_MAX = 200
+
+def _city_cache_put(norm, val):
+    _CITY_IMG_CACHE[norm] = val
+    if len(_CITY_IMG_CACHE) > _CITY_IMG_CACHE_MAX:
+        for _k in list(_CITY_IMG_CACHE)[:-_CITY_IMG_CACHE_MAX]:
+            del _CITY_IMG_CACHE[_k]
 
 def _sehir_wikipedia_bul(ad: str):
     """Wikipedia'da şehri ara, (img_url, page_url) döndür."""
@@ -7358,7 +7365,7 @@ def sehir_gorsel(sehir: str):
         raise HTTPException(404)
     ad = sehir.split(',')[0].strip()
     img, page = _sehir_wikipedia_bul(ad)
-    _CITY_IMG_CACHE[norm] = {"img": img, "page": page}
+    _city_cache_put(norm, {"img": img, "page": page})
     if img:
         from fastapi.responses import RedirectResponse
         return RedirectResponse(img)
@@ -7370,7 +7377,7 @@ def sehir_bilgi(sehir: str):
     if norm not in _CITY_IMG_CACHE:
         ad = sehir.split(',')[0].strip()
         img, page = _sehir_wikipedia_bul(ad)
-        _CITY_IMG_CACHE[norm] = {"img": img, "page": page}
+        _city_cache_put(norm, {"img": img, "page": page})
     return _CITY_IMG_CACHE[norm]
 
 @app_fast.get("/api/astrocartography/harita/{session_id}")
