@@ -715,6 +715,16 @@ async def cast(req: CastRequest):
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
     if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak":
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " NOT: bu soru kayıp/çalınma değil, gündelik MERAK kategorisinde (manasızlık riski) — kişinin şu an nerede olabileceğini yön+mesafe ile NAZİKÇE söyle, 'gitmiş/dönmüyor/kayıp' gibi kesin telaşlı hüküm ve tehdit tespiti verme. Cevabının SONUNA şunu da ekle: 'Kişi gerçekten kayıpsa veya ulaşamıyorsan bunu ayrıca söyle, kayıp analizi açarım.'"
+    # --- SPOR GOL DAKİKASI (kullanıcı taktiği: ASC°=1.gol, +2.ev°=2.gol, +3.ev°=3.gol...) ---
+    if any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
+        try:
+            from engine.horary_engine import sport_goal_minutes as _sgm
+            _goals = _sgm(res['houses']['cusps'])
+            if _goals:
+                engine_json["sport_goals"] = [{"gol": n, "dakika": d, "kaynak": s} for n, d, s in _goals]
+                engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " SPOR GOL DAKİKALARI (kullanıcı taktiği: ASC derecesi=1.gol, 2.ev cusp derecesi ekle=2.gol, 3.ev cusp ekle=3.gol...): " + ", ".join([f"{n}.gol ~{d:.0f}' ({s})" for n,d,s in _goals]) + " — bu dakikaları aynen rapor et, kendi tahmininle karıştırma."
+        except Exception as _e_sport:
+            print(f"sport_goals hata: {_e_sport}")
     # --- HIRSIZLIK/KAYIP AYRIMI (Deneb Kaitos): 12. ev yöneticisinin açıları ---
     theft_kw = ["hırsız","hirsiz","hırsızlık","hirsizlik","çalınd","calind","çalın","calin","çaldı","caldi","aşırdı","asirdi","aşırıldı","asirildi","çalınmış","calinmis","soyuldu","soygun","kaptırdı","kaptirdi"]
     if any(k in req.question.lower() for k in theft_kw):

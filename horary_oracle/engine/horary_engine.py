@@ -1257,6 +1257,28 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         "_trace": _tr if _DO_TRACE else [],
     }
 
+def sport_goal_minutes(cusps):
+    """Kullanıcı taktiği: 1.gol = ASC°, 2.gol = ASC°+2.ev cusp°, 3.gol = +3.ev cusp° ... 90' içinde.
+    cusps: 12 elemanlı ekliptik boylam listesi (0-360). Döner: [(gol_no, dakika, kaynak), ...]
+    """
+    if not cusps or len(cusps) < 4:
+        return []
+    asc_deg = cusps[0] % 30
+    out = []
+    cur = asc_deg
+    # 1.gol ASC
+    if 1 <= cur <= 90:
+        out.append((1, round(cur, 1), f"ASC {asc_deg:.1f}°"))
+    # 2..6.gol için 2.-6.ev cusp'ları ekle
+    for i, cusp_idx in enumerate([1, 2, 3, 4, 5], start=2):
+        deg = cusps[cusp_idx] % 30
+        cur = cur + deg
+        if cur > 95:  # 90+ uzatma, kes
+            break
+        if cur >= 1:
+            out.append((i, round(cur, 1), f"+{cusp_idx+1}.ev {deg:.1f}°"))
+    return out
+
 # CLI'de test
 if __name__ == "__main__":
     import sys
