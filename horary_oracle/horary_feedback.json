@@ -1,0 +1,28 @@
+[
+  {
+    "question": "oğlum iş bulacak mı?",
+    "asked": "2026-09-09T16:30:00",
+    "lat": 38.4237,
+    "lon": 27.1428,
+    "predicted": {
+      "verdict": "NO",
+      "score": -10,
+      "perfection": "none",
+      "house": 5,
+      "sig": "Mercury/Moon"
+    },
+    "real": {
+      "verdict": "YES",
+      "latency_hours": 2.5,
+      "job_start_days": 3,
+      "note": "2-3 saat sonra haber geldi, birkac gun sonra ise girdi"
+    },
+    "chart": {
+      "asc": "Oğlak 17.8",
+      "querent": "Saturn Koç 13.1 retro H3",
+      "quesited_raw": "Moon Aslan 26.4 H8",
+      "derived_expected": "child 5 -> job 10 = 2.ev"
+    },
+    "issue": "false negative - perfection none + Moon Gad, derived 5/2 yanlis significator"
+  }
+]
