@@ -32,6 +32,8 @@ QUESTION_HOUSES = {
     "lost_object": 2,
     "job": 10,
     "home": 4,
+    "sport_fav": 5,      # tuttuğun takım (oyun/spor) -> 5.ev; rakip onun 5.'si -> 11.ev (turned)
+    "sport_rival": 11,
 }
 
 LABEL_TR = {
@@ -43,6 +45,7 @@ LABEL_TR = {
     "astrology_student": "Astroloji öğrencisi",
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "partner": "Eş/Partner",
+    "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
 }
 
 # Nesne iyelikli ikinci kişi: "arkadaşımın EŞI" -> turned(base, nested)
@@ -66,6 +69,7 @@ TYPE_KEYWORDS = [
     ("coworker", ("iş arkadaşım", "is arkadasim", "iş arkadaşı", "is arkadasi", "mesai arkadaşım", "mesai arkadasim", "çalışma arkadaşım", "calisma arkadasim")),
     ("friend", ("arkadaşım", "arkadasim", "arkadaşının", "arkadasinin", "dostum")),
     ("sibling", ("kardeşim", "kardesim", "erkek kardeşim", "erkek kardesim", "ablam", "abim", "ağabeyim", "agabeyim", "bacım", "bacim", "kardeşimin", "kardesimin")),
+    ("sport_fav", ("beşiktaş kazanacak", "besiktas kazanacak", "galatasaray kazanacak", "fenerbahçe kazanacak", "fenerbahce kazanacak", "trabzon kazanacak", "tuttuğum takım kazanacak", "tuttugum takim kazanacak", "takımım kazanacak", "takimim kazanacak", "maçı kazanacak", "maci kazanacak")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
     ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
