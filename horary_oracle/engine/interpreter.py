@@ -16,7 +16,7 @@ KURALLAR:
 - TEKNİK JARGON YASAK: significator, domicile, peregrine, VOC, via combusta, Lot, detriment, reception gibi kelimeleri ASLA yazma. Bunları insanca çevir: 'karşı taraf kendini güçlü ve mesafeli hissediyor', 'sen biraz yorgun/kırılgan görünüyorsun', 'arada sıcak bir bağ var ama pürüzlü' gibi.
 - Harita bilgisini sadece 1 cümlede ver: 'Yükselen ... Ay ...' sonra hemen insani yorum. Derece/ev listesi, Lot listesi, strictures listesi ASLA dökme.
 - Sohbet modunda öneri sun: 'istersen şunu sorabilirsin: ...' gibi.
-- İstenen dilde cevap ver. MUHABBET 10 DİLDE GEÇERLİ (tr,en,es,ar,pt,fr,de,ru,it,hi).
+- KRİTİK DİL KURALI: Kullanıcının `lang` parametresinde istenen dilde CEVAP VER. Mesajın tamamı o dilde olmalı; Türkçe kelime karıştırma. FEW-SHOT örnekler Türkçe ama sen AYNI SICAK MUHABBET TONUNU istenen dile (en/es/ar/pt/fr/de/ru/it/hi) çevir. `Language: xx` satırını öncelikli talimat say.
 - Aşağıdaki FEW-SHOT örnekler Türkçe — AYNI SICAK MUHABBET TONUNU istenen dile çevir.
 
 FEW-SHOT (Asartepe tarzı - bu üslubu kullan - tum diller icin gecerli):
@@ -244,6 +244,10 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
         ex_txt="\n\nRETRIEVED EXAMPLES (use style+reasoning, not fact):\n" + "\n".join(f"- {e['id']} [{e['source']}] {e['question']} -> {e['verdict']} ({e['technique']}) | Aciklama: {e.get('explanation','')}" for e in exs)
     # {json} yerine güvenli replace - LOCKED_PROMPT içindeki diğer süslüleri format sanmasın
     prompt = LOCKED_PROMPT.replace("{json}", j)
+    # dil talimatını en başa ve en sona koy (LLM bazen sona bakıyor)
+    prompt = f"LANGUAGE OVERRIDE: Respond ONLY in '{lang}'. The entire answer must be in {lang}, no Turkish mix.\n" + prompt
+    if engine_json.get("tone_instruction"):
+        prompt += f"\n\nTONE: {engine_json['tone_instruction']}"
     if engine_json.get("loc_instruction"):
         prompt += f"\n\nSPECIAL INSTRUCTION: {engine_json['loc_instruction']}"
     if engine_json.get("theft_analysis"):
@@ -252,7 +256,9 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
         prompt += f"\n\nTWO-OPTION RULE: {engine_json['two_option']}"
     if engine_json.get("health_axis"):
         prompt += f"\n\nHEALTH AXIS: {engine_json['health_axis']}"
-    return prompt + ex_txt + f"\nLanguage: {lang}\nAnswer in {lang}."
+    if engine_json.get("sport_goals"):
+        prompt += f"\n\nSPORT GOALS: {engine_json['sport_goals']}"
+    return prompt + ex_txt + f"\n\nFINAL LANGUAGE CHECK: Language={lang}. Answer in {lang} only."
 
 def call_openai(engine_json: dict, lang="tr") -> str:
     import os, json
@@ -296,8 +302,10 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         person = loc.get('person','quesited')
         house = loc.get('house',7)
         height = loc.get('height','')
-        return {"tr":f"{followup_intro}{person.capitalize() if person else 'O'} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — {loc.get('house','')} numaralı evde ({'evde' if house==4 else 'işte' if house==10 else 'dışarda'}). Haritada significatoru {qs} {loc.get('house','')}.evde, {engine_json.get('quesited_sign','')} burcunda — o evin konularıyla meşgul. Zaman: {timing_txt} içinde hareket edebilir.",
-                "en":f"{person} is in house {house} {height}","es":"","ar":""}[lang]
+        tr_txt = f"{followup_intro}{person.capitalize() if person else 'O'} şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerde — {loc.get('house','')} numaralı evde ({'evde' if house==4 else 'işte' if house==10 else 'dışarda'}). Haritada significatoru {qs} {loc.get('house','')}.evde, {engine_json.get('quesited_sign','')} burcunda — o evin konularıyla meşgul. Zaman: {timing_txt} içinde hareket edebilir."
+        en_txt = f"{person} is in house {house} {height} — direction {loc.get('direction','')}, significator {qs} in {engine_json.get('quesited_sign','')} house {loc.get('house','')}. Timing: {timing_txt}."
+        mp = {"tr": tr_txt, "en": en_txt, "es": en_txt, "ar": en_txt, "pt": en_txt, "fr": en_txt, "de": en_txt, "ru": en_txt, "it": en_txt, "hi": en_txt}
+        return mp.get(lang, en_txt)
     # Tüm strictures için insan dili - doğal muhabbet tonu
     STRICTURE_TEXT = {
         "asc_near_boundary": "ASC burç sınırında — harita biraz kararsız, sorun çift niyetli olabilir (SolarFire uyarısı).",
@@ -424,6 +432,16 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     suggest = ""
     # NEREDE sorusu: verdict LOCATION ise her zaman konum cevabı (NO'ya takılma)
     if v == "LOCATION" and loc:
+        if lang != "tr" and lang != "en":
+            lang = "en"
+        if lang == "en":
+            # İngilizce fallback (mock)
+            if loc.get('is_self'):
+                return f"You are currently towards {loc.get('direction','')} — house {loc.get('house','')}. Distance approx {loc.get('distance','')}."
+            person = loc.get('person','')
+            if person:
+                return f"{person} is towards {loc.get('direction','')} (sign direction: {loc.get('sign_direction','')}), {loc.get('height','')} — house {loc.get('house','')} ({loc.get('place','')}). Significator {loc.get('sign','')} {loc.get('deg','')}°."
+            return f"The sought thing is towards {loc.get('direction','')} (sign: {loc.get('sign_direction','')}), {loc.get('height','')} — house {loc.get('house','')}."
         person = loc.get('person','')
         if loc.get('is_self'):
             return f"Şu an {loc.get('direction','')} yönünde, {loc.get('height','')} bir yerdesin — ev {loc.get('house','')}. Mesafe yaklaşık {loc.get('distance','')}."
@@ -463,7 +481,16 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         if loc.get('clarify'):
             out += f"\n\n{loc['clarify']}"
         return out
+    # dil fallback: mock sadece tr/en tam, diğer dillere en azından İngilizce döndür (LLM yokken)
+    if lang not in ("tr", "en"):
+        # diğer diller için İngilizce şablonu kullan, LLM varsa zaten orası çevirir
+        lang = "en"
     if v=="YES":
+        if lang == "en":
+            base_en = f"{long_detail}\n\nThe flow is in your favor — keep your heart open, there's a smooth current. ✓"
+            if "asc_near_boundary" in strict_codes:
+                base_en += " (Chart is a bit on the edge — clarify your intention in one sentence for sharper result.)"
+            return base_en
         base = f"{long_detail}\n\nGidişat senden yana canım — içini ferah tut, güzel bir akış var. ✓"
         if "asc_near_boundary" in strict_codes:
             base += " (Harita biraz sınırda, niyetini tek cümlede netleştirirsen daha keskin olur.)"
