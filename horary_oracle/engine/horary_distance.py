@@ -134,15 +134,29 @@ class HoraryDistanceEngine:
         "Sagittarius": "mutable", "Capricorn": "cardinal", "Aquarius": "fixed", "Pisces": "mutable",
     }
 
-    def estimate_distance(self, orb_deg, house, condition=1.0, sign_querent=None):
+    def estimate_distance(self, orb_deg, house, condition=1.0, sign_querent=None, celestial_lat=None):
         """Mentör formülü: D_temel = Δθ · M · condition  (k yalnızca apply()'de kalibrasyon ölçeği).
         Δθ (orb) = gösterge derecelerinin BURÇ-İÇİ farkı (ör. 4°03' ile 9°47' -> 5.73°),
         M  = SORAN göstergesinin burcunun modalitesi: öncü(cardinal)=1 / değişken(mutable)=10 / sabit(fixed)=100.
+
+        GÖKSEL ENLEM ÇARPANI (kullanıcı yöntemi): celestial_lat verilirse klasik modalite
+        çarpanı yerine göstergenin EKLİPTİK ENLEMİ ile çarpılır: D_temel = Δθ × |lat| × condition.
+        Bu, abartılı çarpanları (fixed=100, kalibrasyon ölçeği 400+) yapısal olarak engeller:
+        üst sınır Δθ(≤30°) × |lat|(≤~5°) ≈ 150 km -> haritada fiziksel olarak imkânsız
+        noktalar (dünya çapı aşan km) üretilemez.
         """
         house_type = self.HOUSE_TYPE.get(house, "succedent")
-        modality = self.MODALITY_OF_SIGN.get(sign_querent, "cardinal")
-        mult = self.MODALITY_MULT[modality]
-        base_distance = max(orb_deg, 0.001) * mult * condition
+        if celestial_lat is not None:
+            lat_abs = abs(float(celestial_lat))
+            base_distance = max(orb_deg, 0.001) * (lat_abs if lat_abs > 0 else 1.0) * condition
+            modality = "celestial_lat"
+            mult = round(lat_abs, 4)
+            formula = f"D = Δθ·|ekliptik enlem|·k = {orb_deg:.2f}° · |{lat_abs:.2f}°| · kalibrasyon_olcegi"
+        else:
+            modality = self.MODALITY_OF_SIGN.get(sign_querent, "cardinal")
+            mult = self.MODALITY_MULT[modality]
+            base_distance = max(orb_deg, 0.001) * mult * condition
+            formula = f"D = Δθ·M·k = {orb_deg:.2f}° · {mult} · kalibrasyon_olcegi"
         return {
             "mesafe_km": round(base_distance),
             "base_exact": round(base_distance, 4),
@@ -151,15 +165,15 @@ class HoraryDistanceEngine:
             "condition": round(condition, 3),
             "modality": modality,
             "modality_multiplier": mult,
-            "formula": f"D = Δθ·M·k = {orb_deg:.2f}° · {mult} · kalibrasyon_olcegi",
+            "formula": formula,
         }
 
-    def analyze(self, house, sign, planet, friend_longitude, querent_longitude, condition=1.0, return_components=False, sign_querent=None):
+    def analyze(self, house, sign, planet, friend_longitude, querent_longitude, condition=1.0, return_components=False, sign_querent=None, celestial_lat=None):
         angular = self.angular_distance(friend_longitude, querent_longitude)
         # mesafe için burç-içi orb: |gösterge derecesi%30 - soran derecesi%30|  (mentör yöntemi)
         orb = abs((friend_longitude % 30) - (querent_longitude % 30))
         direction = self.calculate_direction(house, sign, planet, friend_longitude, querent_longitude, return_components=return_components)
-        distance = self.estimate_distance(orb, house, condition, sign_querent)
+        distance = self.estimate_distance(orb, house, condition, sign_querent, celestial_lat)
         res = {
             "house": house,
             "significator": planet,
@@ -204,25 +218,41 @@ class HoraryDistanceEngine:
         if weights:
             wi.update({k: max(0.0, float(v)) for k, v in weights.items()})
         qdeg = (querent_longitude or 0.0) % 30
+        lat_mode = any(ind.get("celestial_lat") is not None and ind.get("lon") is not None
+                       for ind in indicators)
         ws, orbs, mms, dsi = [], [], [], []
         rows = []
         for ind in indicators:
             if ind.get("lon") is None:
                 continue
+            if lat_mode and ind.get("celestial_lat") is None:
+                # göksel enlem modunda lat'siz göstergeler (POF gibi sanal noktalar)
+                # formüle girmez; aksi halde modalite çarpanı odaklı şişirir.
+                continue
             w = wi.get(ind.get("label"), 1.0)
             orb = abs((ind["lon"] % 30) - qdeg)
             sig = ind.get("sign")
-            mod = self.MODALITY_OF_SIGN.get(sig, "cardinal")
-            mm = self.MODALITY_MULT.get(mod, 1.0)
             cond = float(ind.get("condition", 1.0))
-            d = max(orb, 0.001) * mm * cond
+            lat = ind.get("celestial_lat")
+            if lat is not None:
+                # KULLANICI YÖNTEMİ: göksel (ekliptik) enlem çarpanı. D_i = Δθ·|lat|·cond.
+                # Abartılı çarpanlar (fixed=100) devrede değil; üst sınır Δθ≤30°·|lat|≤~5°≈150 km.
+                mod = "celestial_lat"
+                mm = abs(float(lat))
+                d = max(orb, 0.001) * mm * cond
+            else:
+                mod = self.MODALITY_OF_SIGN.get(sig, "cardinal")
+                mm = self.MODALITY_MULT.get(mod, 1.0)
+                d = max(orb, 0.001) * mm * cond
             ws.append(w); orbs.append(orb); mms.append(mm)
             dsi.append(d)
             rows.append({
                 "label": ind.get("label"), "planet": ind.get("planet"),
                 "sign": sig, "house": ind.get("house"),
                 "orb_deg": round(orb, 3), "modality": mod,
-                "modality_multiplier": mm, "condition": round(cond, 3),
+                "celestial_lat": round(lat, 4) if lat is not None else None,
+                "modality_multiplier": round(mm, 4),
+                "condition": round(cond, 3),
                 "D_km": round(d, 4), "weight": round(w, 3),
             })
         if not dsi:
@@ -365,10 +395,14 @@ class HoraryCalibration:
     def _base_value(self, r):
         ang = float(r.get("angular_difference", 1))
         cond = float(r.get("condition", 1.0))
-        mm = r.get("modality_multiplier")
-        if not mm:
-            mod = HoraryDistanceEngine.MODALITY_OF_SIGN.get(r.get("sign"), "cardinal")
-            mm = HoraryDistanceEngine.MODALITY_MULT.get(mod, 1.0)
+        lat = r.get("celestial_lat")
+        if lat is not None and float(lat) > 0:
+            mm = abs(float(lat))
+        else:
+            mm = r.get("modality_multiplier")
+            if not mm:
+                mod = HoraryDistanceEngine.MODALITY_OF_SIGN.get(r.get("sign"), "cardinal")
+                mm = HoraryDistanceEngine.MODALITY_MULT.get(mod, 1.0)
         base = max(ang, 0.001) * mm * cond
         return base if base > 0 else None
 
@@ -442,7 +476,8 @@ class HoraryCalibration:
 
     def scale_for(self, house_type=None, question_type=None, tier=None):
         """k ölçeği: önce (istenirse) belirli katman, sonra uzaklık katmanı medyanı,
-        sonra soru tipi bucket ortalaması, en son global / varsayılan katman."""
+        sonra soru tipi bucketı, en son global / varsayılan katman.
+        Aykırı kayıtlara (k=1300+) dayanıklı olması için ORTALAMA yerine MEDYAN kullanılır."""
         ladders = self._scale_ladders(question_type)
         if tier and tier in ladders:
             return ladders[tier]
@@ -451,10 +486,12 @@ class HoraryCalibration:
         if question_type:
             bucket = [r for r in self._base_preds() if r[2].get("question_type") == question_type]
             if bucket:
-                return sum(real / base for base, real, _ in bucket) / len(bucket)
+                ks = sorted(real / base for base, real, _ in bucket)
+                return ks[len(ks) // 2]
         bucket = self._base_preds()
         if bucket:
-            return sum(real / base for base, real, _ in bucket) / len(bucket)
+            ks = sorted(real / base for base, real, _ in bucket)
+            return ks[len(ks) // 2]
         return DEFAULT_SCALE_TIERS[self.likely_tier()]
 
     def tier_ladder(self, base_exact):
@@ -465,6 +502,10 @@ class HoraryCalibration:
         ht = geo_result.get("ev_tipi", "succedent")
         base_exact = geo_result.get("base_exact", geo_result.get("base_km", geo_result["mesafe_km"]))
         ladders = self._scale_ladders(question_type)
+        # soru tipine özgü kayıt yoksa GLOBAL ladder'a düş, aksi halde merdiven boş kalır
+        # (haritada tüm katmanlar null görünürdü).
+        if not ladders:
+            ladders = self._scale_ladders(None)
         # hedef katman: ev tipi (angular->oda, succedent->şehir, cadent->ülke/kıta) öncelikli
         _tier_hint = {"angular": "oda içi", "succedent": "şehir içi", "cadent": "ülke içi"}.get(ht)
         if not (_tier_hint and _tier_hint in ladders):
@@ -473,6 +514,12 @@ class HoraryCalibration:
         if scale is None:
             scale = self.scale_for(ht, question_type)
         km = base_exact * scale
+        # FİZİKSEL TAVAN: dünya yüzeyinde iki nokta arası max ~yarım çevre.
+        # Göksel enlem çarpanı üst sınırı (Δθ≤30·|lat|≤~5=150km·k) zaten daraltır;
+        # bu son güvence, şişkin k ölçekleriyle bile saçma noktalar üretilmesini engeller.
+        _SEMI_CIRC_KM = 20015.0
+        if km > _SEMI_CIRC_KM:
+            km = _SEMI_CIRC_KM
         cat_q = {"angular": "yakın (kısa mesafe)", "succedent": "orta", "cadent": "uzak"}.get(ht, "orta")
         cat_km = km_category(km)
         confidence = 0.68 + min(0.12, 0.04 * len(self.records))

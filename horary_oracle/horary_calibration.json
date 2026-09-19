@@ -510,8 +510,9 @@
     "querent_planet": "Mercury",
     "querent_degree": 12.5,
     "angular_difference": 8.57,
-    "modality": "cardinal",
-    "modality_multiplier": 10.9231,
+    "modality": "celestial_lat",
+    "modality_multiplier": 3.3749,
+    "celestial_lat": -3.3749,
     "components": {
       "house": 22.5,
       "sign_corr": 20,
@@ -519,11 +520,40 @@
       "ang_adj": -8.24,
       "angular": 40.59
     },
-    "condition": 0.858,
-    "real_distance_km": 24.1,
-    "real_bearing": 229.2,
-    "note": "1.9.2026 Izmir safir yuzuk: Ayrancilar->Gaziemir 24.1km GB. Motor 23km uyumlu",
+    "condition": 1.0,
+    "real_distance_km": 0.02,
+    "real_bearing": null,
+    "note": "1.9.2026 Izmir safir yuzuk: yanındaki çantanın İÇİNDEYDİ (gerçek ~0km, oda içi). DOĞRULANDI. Lapis_formul_dogrulama",
     "_id": 20,
     "ts": "2026-09-01T00:35:04"
+  },
+  {
+    "question_type": "sibling",
+    "origin": "38.4237,27.1428",
+    "destination": "İstanbul",
+    "house": 2,
+    "significator": "Mars",
+    "sign": "Yengeç",
+    "sign_querent": null,
+    "degree": 8.63,
+    "querent_planet": "Mars",
+    "querent_degree": 0,
+    "angular_difference": 8.63,
+    "modality": "celestial_lat",
+    "modality_multiplier": 1.5542,
+    "celestial_lat": 0.8287,
+    "components": {
+      "house": 135,
+      "sign_corr": -10,
+      "planet_corr": -10,
+      "ang_adj": -1.72,
+      "angular": 79.6613791376786
+    },
+    "condition": 0.797,
+    "real_distance_km": 327.5,
+    "real_bearing": 28.1,
+    "note": "19.09.2026 23:07 İzmir erkek kardes - gercek İstanbul 327.5km brg 28.1 (kayıp degil, konum)",
+    "_id": 21,
+    "ts": "2026-09-19T23:10:53"
   }
 ]

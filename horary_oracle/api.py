@@ -446,20 +446,24 @@ async def cast(req: CastRequest):
             _qsign_g = res['planets'][_qur3].get('sign')
             _indicators = [
                 {"label": "quesited", "lon": _guse.get('lon'), "sign": _gsign,
-                 "house": _ghouse, "planet": _gplanet, "condition": _cf['factor']},
+                 "house": _ghouse, "planet": _gplanet, "condition": _cf['factor'],
+                 "celestial_lat": _guse.get('lat')},
                 {"label": "moon", "lon": _moon_g.get('lon'), "sign": _moon_g.get('sign'),
                  "house": _moon_g.get('house'), "planet": "Moon",
                  "condition": condition_factor("Moon", _moon_g.get('sign'), lon=_moon_g.get('lon'),
-                                               retro=_moon_g.get('retro', False), sun_lon=_sunl_g).get('factor', 1.0)},
+                                               retro=_moon_g.get('retro', False), sun_lon=_sunl_g).get('factor', 1.0),
+                 "celestial_lat": _moon_g.get('lat')},
                 {"label": "ruler4", "lon": _r4_p.get('lon'), "sign": _r4_p.get('sign'),
                  "house": _r4_p.get('house'), "planet": _r4_g,
                  "condition": (condition_factor(_r4_g, _r4_p.get('sign'), lon=_r4_p.get('lon'),
                                                 retro=_r4_p.get('retro', False), sun_lon=_sunl_g)
-                               .get('factor', 1.0)) if _r4_g else 1.0},
+                               .get('factor', 1.0)) if _r4_g else 1.0,
+                 "celestial_lat": _r4_p.get('lat')},
                 {"label": "querent", "lon": _qdeg_g, "sign": _qsign_g,
-                 "house": res['planets'][_qur3].get('house'), "planet": _qur3, "condition": 1.0},
+                 "house": res['planets'][_qur3].get('house'), "planet": _qur3, "condition": 1.0,
+                 "celestial_lat": res['planets'][_qur3].get('lat')},
                 {"label": "pof", "lon": _pof_g, "sign": (_sfl_g(_pof_g) if _pof_g is not None else None),
-                 "house": None, "planet": "POF", "condition": 1.0},
+                 "house": None, "planet": "POF", "condition": 1.0, "celestial_lat": None},
             ]
             geo_res = _eng_g.analyze_multi(
                 querent_longitude=_qdeg_g,
@@ -561,6 +565,7 @@ async def cast(req: CastRequest):
                             angular_difference=geo_res["orb_deg"],
                             modality=geo_res["modality"],
                             modality_multiplier=geo_res["modality_multiplier"],
+                            celestial_lat=(geo_res.get("multi_indicators") or [{}])[0].get("celestial_lat"),
                             components=geo_res.get("components"),
                             condition=geo_res.get("condition", 1.0),
                             real_distance_km=_verify["real_distance_km"],
