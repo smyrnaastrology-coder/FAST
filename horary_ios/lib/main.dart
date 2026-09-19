@@ -51,10 +51,19 @@ class _AuthGateState extends State<AuthGate> {
     try{
       final p = await SharedPreferences.getInstance();
       final e=p.getString('email'), pw=p.getString('pass');
-      if(e!=null && pw!=null){
+      final remember = p.getBool('remember') ?? true;
+      final ts = p.getInt('login_ts') ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final oneYear = 365*24*60*60*1000;
+      final expired = remember ? (now - ts > oneYear) : true;
+      if(e!=null && pw!=null && !expired){
         final did = await _deviceId();
         final res = await HoraryApi.login(email:e, password:pw, deviceId: did);
         if(res['ok']==true) setState(()=> _ok=true);
+        else if(remember && now - ts > oneYear){
+          // süresi doldu -> temizle
+          await p.remove('email'); await p.remove('pass'); await p.remove('login_ts');
+        }
       }
     }catch(_){}
     setState(()=> _check=false);
@@ -62,13 +71,15 @@ class _AuthGateState extends State<AuthGate> {
   @override Widget build(BuildContext context) {
     if(_check) return const Scaffold(body: Center(child: CircularProgressIndicator(color: Color(0xFFC9A96E))));
     if(_ok) return const HoraryHome();
-    return LoginScreen(onLogin: (email, pass) async {
+    return LoginScreen(onLogin: (email, pass, remember) async {
       try {
         final did = await _deviceId();
         final res = await HoraryApi.login(email: email, password: pass, deviceId: did);
         if(res['ok']==true) {
           final p = await SharedPreferences.getInstance();
           await p.setString('email', email); await p.setString('pass', pass);
+          await p.setBool('remember', remember);
+          await p.setInt('login_ts', DateTime.now().millisecondsSinceEpoch);
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -78,12 +89,12 @@ class _AuthGateState extends State<AuthGate> {
 }
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLogin});
-  final Future<bool> Function(String,String) onLogin;
+  final Future<bool> Function(String,String,bool) onLogin;
   @override State<LoginScreen> createState()=> _LoginScreenState();
 }
 class _LoginScreenState extends State<LoginScreen> {
   final _e=TextEditingController(), _p=TextEditingController();
-  bool _loading=false; String? _err;
+  bool _loading=false; String? _err; bool _remember=true;
   @override Widget build(BuildContext context) {
     return Scaffold(backgroundColor: const Color(0xFF0F0A18), body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth:400), child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
       const Text('ASARTEPE', style: TextStyle(color: Color(0xFFC9A96E), fontSize:28, letterSpacing:6, fontWeight: FontWeight.w700)),
@@ -92,10 +103,11 @@ class _LoginScreenState extends State<LoginScreen> {
       TextField(controller:_e, decoration: InputDecoration(labelText:'E-mail', filled:true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), style: const TextStyle(color:Colors.black)),
       const SizedBox(height:12),
       TextField(controller:_p, obscureText:true, decoration: InputDecoration(labelText:'Sifre', filled:true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), style: const TextStyle(color:Colors.black)),
+      Row(children: [Checkbox(value:_remember, onChanged:(v)=> setState(()=> _remember=v??true), activeColor: const Color(0xFFC9A96E)), const Text('Beni hatırla (1 yıl)', style: TextStyle(color: Colors.white70, fontSize:13))]),
       if(_err!=null) Padding(padding: const EdgeInsets.only(top:8), child: Text(_err!, style: const TextStyle(color:Colors.redAccent))),
       const SizedBox(height:20),
-      SizedBox(width:double.infinity, child: ElevatedButton(onPressed: _loading?null:() async { setState(()=> _loading=true); final ok=await widget.onLogin(_e.text.trim(), _p.text); if(!ok) setState(()=> _err='Giris basarisiz / suresi doldu'); setState(()=> _loading=false); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC9A96E), padding: const EdgeInsets.symmetric(vertical:16)), child: _loading? const SizedBox(height:20, child: CircularProgressIndicator(strokeWidth:2)): const Text('GIRIS', style: TextStyle(color:Colors.black, fontWeight: FontWeight.bold)))),
-      const SizedBox(height:12), const Text('TR kapali devre - 1 yil lisans', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
+      SizedBox(width:double.infinity, child: ElevatedButton(onPressed: _loading?null:() async { setState(()=> _loading=true); final ok=await widget.onLogin(_e.text.trim(), _p.text, _remember); if(!ok) setState(()=> _err='Giris basarisiz / suresi doldu'); setState(()=> _loading=false); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC9A96E), padding: const EdgeInsets.symmetric(vertical:16)), child: _loading? const SizedBox(height:20, child: CircularProgressIndicator(strokeWidth:2)): const Text('GIRIS', style: TextStyle(color:Colors.black, fontWeight: FontWeight.bold)))),
+      const SizedBox(height:12), const Text('Kapalı devre - 1 yıl lisans (hatırla açıkken şifre sorulmaz)', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
     ]))))); }
 }
 
