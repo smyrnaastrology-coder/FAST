@@ -967,7 +967,7 @@ def admin_page():
 <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin - Sifre Uret</title><style>body{font-family:system-ui;background:#0F0A18;color:#e8e0f0;padding:24px}input,button{padding:10px;border-radius:8px;border:1px solid #3d2e50}input{background:#1A1423;color:#e8e0f0}button{background:#C9A96E;color:#000;font-weight:700;cursor:pointer}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #3d2e50;padding:8px;font-size:13px}th{background:#2a1f38}</style>
 <h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
-<div>Admin Key: <input id="key" type="password" value="Tuana21." style="width:200px"> <button onclick="load()">Listele</button></div>
+<div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="2" style="width:60px"> gün <button onclick="createUser()">Uret</button> <span id="out"></span></div>
 <table id="tbl"><thead><tr><th>Kullanici</th><th>Expiry</th><th>Trial</th><th>Cihaz</th></tr></thead><tbody></tbody></table>
 <script>
@@ -997,10 +997,9 @@ load();
 
 @app.get("/admin/users")
 def admin_users(x_admin_key: str = _Header(None)):
-    if x_admin_key != os.getenv("ADMIN_KEY", "Tuana21."):
-        # fallback: smyrna sifresi de admin sayilir
-        if x_admin_key != "Tuana21.":
-            return {"error": "unauthorized"}
+    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
+    if x_admin_key not in _allowed:
+        return {"error": "unauthorized"}
     db=_auth._load()
     out=[]
     for k,v in db.items():
@@ -1009,9 +1008,9 @@ def admin_users(x_admin_key: str = _Header(None)):
 
 @app.post("/admin/create")
 def admin_create(payload: dict, x_admin_key: str = _Header(None)):
-    if x_admin_key != os.getenv("ADMIN_KEY", "Tuana21."):
-        if x_admin_key != "Tuana21.":
-            return {"error": "unauthorized"}
+    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
+    if x_admin_key not in _allowed:
+        return {"error": "unauthorized"}
     email=(payload.get("email") or payload.get("user") or "").strip().lower()
     if not email: return {"error": "email gerekli"}
     days=int(payload.get("days",2))
