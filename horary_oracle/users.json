@@ -105,5 +105,17 @@
     "expiry": "2026-09-22T21:26:16.105486",
     "created": "2026-09-20T21:26:16.105486",
     "is_trial": true
+  },
+  "berrahxyz@gmail.com": {
+    "pwd": "14e8aa2b3f684ce2a88766c97439546b1b3c1e1dde549bfd6990c5d6944d3f0f",
+    "expiry": "2026-09-22T21:27:22.727321",
+    "created": "2026-09-20T21:27:22.727321",
+    "is_trial": true
+  },
+  "berrahxyz": {
+    "pwd": "14e8aa2b3f684ce2a88766c97439546b1b3c1e1dde549bfd6990c5d6944d3f0f",
+    "expiry": "2026-09-22T21:27:22.727321",
+    "created": "2026-09-20T21:27:22.727321",
+    "is_trial": true
   }
 }
