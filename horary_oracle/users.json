@@ -141,5 +141,17 @@
     "expiry": "2026-09-22T21:30:57.683474",
     "created": "2026-09-20T21:30:57.683474",
     "is_trial": true
+  },
+  "gulcanantares@gmail.com": {
+    "pwd": "d47428be27b69d7ea9cd607754b319a4f7669bb1c8464e4664f3d0ed7c1ec800",
+    "expiry": "2026-09-22T21:32:20.640705",
+    "created": "2026-09-20T21:32:20.640705",
+    "is_trial": true
+  },
+  "gulcanantares": {
+    "pwd": "d47428be27b69d7ea9cd607754b319a4f7669bb1c8464e4664f3d0ed7c1ec800",
+    "expiry": "2026-09-22T21:32:20.640705",
+    "created": "2026-09-20T21:32:20.640705",
+    "is_trial": true
   }
 }
