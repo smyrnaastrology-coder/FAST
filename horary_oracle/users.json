@@ -177,5 +177,17 @@
     "expiry": "2026-09-22T23:49:40.592856",
     "created": "2026-09-20T23:49:40.592856",
     "is_trial": true
+  },
+  "nuvitbasaran@gmail.com": {
+    "pwd": "85a382ac5e17e1aa6fc0468b48891e1402d5fe7a086a65899950f2bb09fba574",
+    "expiry": "2026-09-22T23:51:36.913868",
+    "created": "2026-09-20T23:51:36.913868",
+    "is_trial": true
+  },
+  "nuvitbasaran": {
+    "pwd": "85a382ac5e17e1aa6fc0468b48891e1402d5fe7a086a65899950f2bb09fba574",
+    "expiry": "2026-09-22T23:51:36.913868",
+    "created": "2026-09-20T23:51:36.913868",
+    "is_trial": true
   }
 }
