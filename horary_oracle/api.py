@@ -724,7 +724,9 @@ async def cast(req: CastRequest):
             _goals = _sgm(res['houses']['cusps'])
             if _goals:
                 engine_json["sport_goals"] = [{"gol": n, "dakika": d, "kaynak": s} for n, d, s in _goals]
-                engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " SPOR GOL DAKİKALARI (kullanıcı taktiği: ASC derecesi=1.gol, 2.ev cusp derecesi ekle=2.gol, 3.ev cusp ekle=3.gol...): " + ", ".join([f"{n}.gol ~{d:.0f}' ({s})" for n,d,s in _goals]) + " — bu dakikaları aynen rapor et, kendi tahmininle karıştırma."
+                # bu soru tipinde SADECE gol dakikaları — sağlık/para/ilişki yorumu YASAK, LLM başka konuya sapmasın
+                engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " SPOR GOL DAKİKASI SORUSU — SADECE GOL DAKİKALARINI RAPOR ET. Sağlık/hastalık/para/ilişki yorumu YAPMA. Kullanıcı taktiği: ASC derecesi=1.gol, 2.ev cusp derecesi ekle=2.gol, 3.ev cusp ekle=3.gol...: " + ", ".join([f"{n}.gol ~{d:.0f}' ({s})" for n,d,s in _goals]) + " — bu dakikaları aynen rapor et, kendi tahmininle karıştırma, araya başka konu ekleme."
+                engine_json["tone_instruction"] = "SPOR GOL DAKİKASI: Kısa, net, sadece dakika listesi + 1 cümle özet. Sağlık/hastalık/para yorumu YASAK."
         except Exception as _e_sport:
             print(f"sport_goals hata: {_e_sport}")
     # --- HIRSIZLIK/KAYIP AYRIMI (Deneb Kaitos): 12. ev yöneticisinin açıları ---
