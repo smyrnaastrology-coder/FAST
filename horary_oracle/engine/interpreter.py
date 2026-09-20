@@ -247,6 +247,14 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     prompt = LOCKED_PROMPT.replace("{json}", j)
     # dil talimatını en başa ve en sona koy (LLM bazen sona bakıyor)
     prompt = f"LANGUAGE OVERRIDE: Respond ONLY in '{lang}'. The entire answer must be in {lang}, no Turkish mix.\n" + prompt
+    # gezegen burçlarını açıkça listele - halüsinasyonu kökten kes
+    try:
+        _planets = engine_json.get("planets", {})
+        if _planets:
+            _plist = ", ".join([f"{k} {v.get('sign','')} {v.get('deg','')}°" for k,v in _planets.items() if k in ("Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn")])
+            prompt += f"\n\nGERÇEK GEZEGEN BURÇLARI (SADECE BUNU KULLAN, ASLA UYDURMA): {_plist}"
+            prompt += "\nYUKARIDAKİ BURÇLAR DIŞINDA HİÇBİR GEZEGEN BURCU YAZMA. Venüs Akrep ise Terazi yazma, Satürn Koç ise Oğlak yazma."
+    except: pass
     if engine_json.get("tone_instruction"):
         prompt += f"\n\nTONE: {engine_json['tone_instruction']}"
     if engine_json.get("loc_instruction"):
@@ -260,6 +268,25 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     if engine_json.get("sport_goals"):
         prompt += f"\n\nSPORT GOALS: {engine_json['sport_goals']}"
     return prompt + ex_txt + f"\n\nFINAL LANGUAGE CHECK: Language={lang}. Answer in {lang} only."
+    # FINAL CHECK: Gezegen burçları yukarıdaki GERÇEK listeden alınacak, halüsinasyon yasaktır.
+
+def _correct_planet_hallucination(text: str, engine_json: dict) -> str:
+    """LLM gezegen burcunu halüsine ettiyse motor gerçeğiyle düzelt (Venüs Akrep→Terazi yazdıysa geri al)."""
+    try:
+        planets = engine_json.get("planets", {})
+        for p, info in planets.items():
+            real_sign = info.get("sign")
+            if not real_sign or p not in ("Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"):
+                continue
+            # eğer metinde p + yanlış burç varsa düzelt
+            import re
+            for wrong in ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık","Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]:
+                if wrong == real_sign: continue
+                # örn "Venüs Terazi" ama gerçek Akrep ise değiştir
+                text = re.sub(rf"\b{p}\s+{wrong}\b", f"{p} {real_sign}", text)
+                text = re.sub(rf"\b{p}\s+{wrong.lower()}\b", f"{p} {real_sign}", text, flags=re.IGNORECASE)
+        return text
+    except: return text
 
 def call_openai(engine_json: dict, lang="tr") -> str:
     import os, json
@@ -270,8 +297,11 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         from openai import OpenAI
         client = OpenAI(api_key=key)
         prompt = build_prompt(engine_json, lang)
-        resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role":"user","content":prompt}], temperature=0.7, max_tokens=800)
-        return resp.choices[0].message.content
+        resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
+        txt = resp.choices[0].message.content
+        # son doğrulama katmanı: gezegen burç halüsinasyonunu motorla düzelt
+        txt = _correct_planet_hallucination(txt, engine_json)
+        return txt
     except Exception as e:
         return mock_interpret(engine_json, lang) + f"\n[OpenAI hata: {e}]"
 
