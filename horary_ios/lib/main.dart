@@ -139,6 +139,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   bool _showDetails=false;
   bool _showLanding=true;
   int _daysLeft=365; String _expiryStr='';
+  String _ad='', _soyad='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
   bool get _showRadar {
@@ -156,7 +157,15 @@ class _HoraryHomeState extends State<HoraryHome> {
     }
   }
 
-  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _loadProfile(); }
+  Future<void> _loadProfile() async {
+    final p=await SharedPreferences.getInstance();
+    setState(()=> {_ad=p.getString('profile_ad')??'', _soyad=p.getString('profile_soyad')??''});
+  }
+  Future<void> _saveProfile() async {
+    final p=await SharedPreferences.getInstance();
+    await p.setString('profile_ad', _ad); await p.setString('profile_soyad', _soyad);
+  }
   Future<void> _loadExpiry() async {
     final p=await SharedPreferences.getInstance();
     final e=p.getString('expiry')??''; 
@@ -340,6 +349,18 @@ class _HoraryHomeState extends State<HoraryHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(backgroundColor: const Color(0xFF1A1423), child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Profil - ad soyad
+        Padding(padding: const EdgeInsets.all(16), child: Row(children: [
+          const Icon(Icons.person, color: Color(0xFFC9A96E), size:20),
+          const SizedBox(width:8),
+          Expanded(child: Text(_ad.isEmpty && _soyad.isEmpty ? 'Profil: Ad Soyad ekle' : '$_ad $_soyad', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:13))),
+          IconButton(icon: const Icon(Icons.edit, size:16, color: Color(0xFFC9A96E)), onPressed: () async {
+            final adCtrl=TextEditingController(text:_ad), soyCtrl=TextEditingController(text:_soyad);
+            final ok=await showDialog<bool>(context: context, builder: (_)=> AlertDialog(backgroundColor: const Color(0xFF2a1f38), title: const Text('Profil', style: TextStyle(color: Color(0xFFC9A96E))), content: Column(mainAxisSize: MainAxisSize.min, children: [TextField(controller: adCtrl, decoration: const InputDecoration(labelText:'Ad', labelStyle: TextStyle(color: Color(0xFFa898c0))), style: const TextStyle(color: Colors.white)), TextField(controller: soyCtrl, decoration: const InputDecoration(labelText:'Soyad', labelStyle: TextStyle(color: Color(0xFFa898c0))), style: const TextStyle(color: Colors.white))]), actions: [TextButton(onPressed: ()=> Navigator.pop(context,false), child: const Text('İptal')), ElevatedButton(onPressed: ()=> Navigator.pop(context,true), child: const Text('Kaydet'))]));
+            if(ok==true){ setState(()=> {_ad=adCtrl.text.trim(), _soyad=soyCtrl.text.trim()}); _saveProfile(); }
+          }),
+        ])),
+        const Divider(color: Color(0xFF3d2e50)),
         Padding(padding: const EdgeInsets.all(16), child: Text('Geçmiş Sorular', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize:18, fontWeight: FontWeight.bold))),
         const Divider(color: Color(0xFF3d2e50)),
         Expanded(child: _historyList.isEmpty ? const Padding(padding: EdgeInsets.all(16), child: Text('Henüz soru yok', style: TextStyle(color: Color(0xFFa898c0)))) : ListView.builder(itemCount: _historyList.length, itemBuilder: (_,i){
