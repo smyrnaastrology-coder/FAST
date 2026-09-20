@@ -405,14 +405,22 @@ async def cast(req: CastRequest):
             # nested/turned ev yöneticisi onu ezmesin (muazzezin abisi -> Mars, 8.ev Merkür değil)
             _natural_g = loc_info.get("_natural")
             _ghouse = actual_house
-            if _qn and not _natural_g:
+            # kardes icin dogal gosterime (Mars/Venus) ragmen ev mutlaka 3 olmali - esya (H2) degil
+            if _qc.get("type") == "sibling":
+                _ghouse = 3
+            elif _qn and not _natural_g:
                 _ghouse = _qn["derived"]
             elif _qc.get("house") and not _natural_g:
                 _ghouse = _qc["house"]
             elif _qd and _qd.get("derived") and not _natural_g:
                 _ghouse = _qd["derived"]
             _gplanet, _gsign, _guse = sig_planet, use_data['sign'], use_data
-            if _qn and not _natural_g:
+            if _qc.get("type") == "sibling":
+                _cusp_g = res['houses']['cusps'][2]
+                _gsign = _sfl_g(_cusp_g)
+                _gplanet = _DOMT3.get(_gsign, "Moon")
+                _guse = res['planets'].get(_gplanet, use_data)
+            elif _qn and not _natural_g:
                 _cusp_g = res['houses']['cusps'][_qn["derived"] - 1]
                 _gsign = _sfl_g(_cusp_g)
                 _gplanet = _DOMT3.get(_gsign, "Moon")
