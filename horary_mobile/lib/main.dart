@@ -147,7 +147,54 @@ class _HoraryHomeState extends State<HoraryHome> {
     }
   }
 
-  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _checkIntro(); }
+  Future<void> _checkIntro() async {
+    final p=await SharedPreferences.getInstance();
+    if(p.getBool('horary_intro_shown')==true) return;
+    WidgetsBinding.instance.addPostFrameCallback((_)=> _showIntro());
+  }
+  Future<void> _showIntro() async {
+    bool dontShow=false;
+    await showDialog(context: context, barrierDismissible:false, builder: (_)=> StatefulBuilder(builder: (ctx,setS)=> Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth:420),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Color(0xFF1A1423), Color(0xFF2a1f38)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.5)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius:20, offset: const Offset(0,8))],
+        ),
+        child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          Center(child: Container(width:56,height:56, decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFFC9A96E), Color(0xFF8a6d3b)]), shape: BoxShape.circle), child: const Icon(Icons.auto_awesome, color: Color(0xFF1A1423), size:28))),
+          const SizedBox(height:12),
+          Center(child: Text('Horary’de Doğru Soru Sormak', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize:20, fontWeight: FontWeight.bold, letterSpacing:1.2))),
+          const SizedBox(height:8),
+          Center(child: Text('Fal değil, anın dili', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFa898c0), fontSize:13, fontStyle: FontStyle.italic))),
+          const SizedBox(height:16),
+          Container(height:1, color: const Color(0xFF3d2e50).withOpacity(0.6)),
+          const SizedBox(height:16),
+          ...[
+            'Gerçekten ihtiyacın olduğunda sor — merak için değil, kalbin sıkıştığında. Aynı soruyu 2-3 günde bir tekrarlama.',
+            'Tek ve net sor — “İşe girecek miyim?” gibi bir cümle.',
+            'Radikalliği bekle — harita 0-1°/29° sınırda veya Ay boşlukta ise “şu an akmıyor” der, 1-2 gün sonra tekrar sor.',
+            'Zamanı ve yeri dürüst ver — soru aklına düştüğü an ve şehir.',
+            'Cevabı olduğu gibi dinle — “zor ama olur” da cevaptır, Satürn’ün geciktirmesi parçasıdır.',
+          ].asMap().entries.map((e)=> Padding(padding: const EdgeInsets.only(bottom:10), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(width:22,height:22, decoration: BoxDecoration(color: const Color(0xFFC9A96E).withOpacity(0.2), shape: BoxShape.circle, border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.4))), child: Center(child: Text('${e.key+1}', style: const TextStyle(color: Color(0xFFC9A96E), fontSize:11, fontWeight: FontWeight.bold)))),
+            const SizedBox(width:10),
+            Expanded(child: Text(e.value, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:13, height:1.4))),
+          ]))),
+          const SizedBox(height:8),
+          Center(child: Text('Hazırsan sor — gökyüzü dinliyor. ✨', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize:13, fontStyle: FontStyle.italic))),
+          const SizedBox(height:14),
+          Row(children: [Checkbox(value:dontShow, onChanged:(v)=> setS(()=> dontShow=v??false), activeColor: const Color(0xFFC9A96E), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))), const Text('Bir daha gösterme', style: TextStyle(color: Colors.white70, fontSize:13))]),
+          const SizedBox(height:8),
+          SizedBox(width:double.infinity, child: ElevatedButton(onPressed: () async { if(dontShow){ final p=await SharedPreferences.getInstance(); await p.setBool('horary_intro_shown', true);} Navigator.pop(ctx); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC9A96E), padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Anladım, Soruyu Sor ✨', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)))),
+        ]))),
+      ),
+    )));
+  }
   Future<void> _loadExpiry() async {
     final p=await SharedPreferences.getInstance();
     final e=p.getString('expiry')??''; 
