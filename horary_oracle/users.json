@@ -69,5 +69,17 @@
     "expiry": "2026-09-22T21:11:28.511767",
     "created": "2026-09-20T21:11:28.511767",
     "is_trial": true
+  },
+  "hilal@gmail.com": {
+    "pwd": "04e32fe593af8fb298986e166c9b21b15c008a5e63fe0c978b27bcfce5585496",
+    "expiry": "2026-09-22T21:14:17.006414",
+    "created": "2026-09-20T21:14:17.006414",
+    "is_trial": true
+  },
+  "hilal": {
+    "pwd": "04e32fe593af8fb298986e166c9b21b15c008a5e63fe0c978b27bcfce5585496",
+    "expiry": "2026-09-22T21:14:17.006414",
+    "created": "2026-09-20T21:14:17.006414",
+    "is_trial": true
   }
 }
