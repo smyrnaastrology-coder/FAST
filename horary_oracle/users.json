@@ -20,16 +20,18 @@
   },
   "cerenkahya@gmail.com": {
     "pwd": "e851f8ae80a34c0be7baed68d2294c269aaf7d7b1ce5cb65b33860938f03ba44",
-    "expiry": "2027-09-20T13:55:54.887922",
+    "expiry": "2026-09-22T20:41:17.380706",
     "created": "2026-09-20T13:55:54.887922",
     "device_ids": [],
-    "device_id": null
+    "device_id": null,
+    "is_trial": true
   },
   "cerenkahya": {
     "pwd": "e851f8ae80a34c0be7baed68d2294c269aaf7d7b1ce5cb65b33860938f03ba44",
-    "expiry": "2027-09-20T13:55:54.887922",
+    "expiry": "2026-09-22T20:41:17.380706",
     "created": "2026-09-20T13:55:54.887922",
     "device_ids": [],
-    "device_id": null
+    "device_id": null,
+    "is_trial": true
   }
 }
