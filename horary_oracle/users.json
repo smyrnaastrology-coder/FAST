@@ -117,5 +117,17 @@
     "expiry": "2026-09-22T21:27:22.727321",
     "created": "2026-09-20T21:27:22.727321",
     "is_trial": true
+  },
+  "ruksanmerga@gmail.com": {
+    "pwd": "b807c37042b8de0e337fec02ef12b1bc9d4ea3e6057edab0a2e553eebc0f63a1",
+    "expiry": "2026-09-22T21:28:29.019896",
+    "created": "2026-09-20T21:28:29.019896",
+    "is_trial": true
+  },
+  "ruksanmerga": {
+    "pwd": "b807c37042b8de0e337fec02ef12b1bc9d4ea3e6057edab0a2e553eebc0f63a1",
+    "expiry": "2026-09-22T21:28:29.019896",
+    "created": "2026-09-20T21:28:29.019896",
+    "is_trial": true
   }
 }
