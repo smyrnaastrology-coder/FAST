@@ -33,5 +33,17 @@
     "device_ids": [],
     "device_id": null,
     "is_trial": true
+  },
+  "ilayda@gmail.com": {
+    "pwd": "0da1c60627770652da6500e096e1547c9661888c1dc7dd048915b7afb2a3cb6b",
+    "expiry": "2026-09-22T21:10:02.180056",
+    "created": "2026-09-20T21:10:02.180056",
+    "is_trial": true
+  },
+  "ilayda": {
+    "pwd": "0da1c60627770652da6500e096e1547c9661888c1dc7dd048915b7afb2a3cb6b",
+    "expiry": "2026-09-22T21:10:02.180056",
+    "created": "2026-09-20T21:10:02.180056",
+    "is_trial": true
   }
 }
