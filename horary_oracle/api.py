@@ -662,8 +662,6 @@ async def cast(req: CastRequest):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
-    # tonlama: ChatGPT örneği tarzı sıcak, madde-madde, emoji/bold başlıklar (kullanıcı isteği) - Regiomontanus sabit
-    engine_json["tone_instruction"] = "Üslup: ChatGPT örneği gibi sıcak, yapılandırılmış ve öğretici. 1. Sen (Ay/ASC yöneticisi) 2. Quesited/Proje (evi ve yöneticisi, 5.ev=proje/spor, 2.ev=para vb.) 3. Ev/para göstergesi konumu 4. En önemli açı (Ay→... ) 5. Ay'ın evi/anlamı 6. Yönetici asaleti/yerleşimi 7. Zamanlama şeklinde 7 maddeyle ilerle, her maddeye emoji ve bold başlık koy, haritayı teknik terimlerle boğmadan ama Lilly/apse diliyle açıkla. Sonuç tek cümle özet + para/performans için net hüküm ver. House system: Regiomontanus (sabit)."
     # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
     if is_visitor_who or is_visitor_why or is_dream:
         hidden = []
