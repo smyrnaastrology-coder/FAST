@@ -1,0 +1,15 @@
+name: keep-alive
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # her 5 dakikada
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping horary-oracle-api
+        run: |
+          curl -f https://horary-oracle-api.onrender.com/health || curl -f https://horary-oracle-api.onrender.com/ || echo "ping failed but ignore"
+      - name: Ping fbst-api
+        run: |
+          curl -f https://fbst-api.onrender.com/health || curl -f https://fbst-api.onrender.com/ || echo "ping failed but ignore"
