@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'config/theme.dart';
 import 'services/horary_api.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +32,7 @@ class HoraryApp extends StatelessWidget {
     return MaterialApp(
       title: 'Horary Oracle',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF0F0A18)),
+      theme: FastTheme.dark,
       home: const AuthGate(),
     );
   }
@@ -55,13 +56,15 @@ class _AuthGateState extends State<AuthGate> {
       final ts = p.getInt('login_ts') ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
       final oneYear = 365*24*60*60*1000;
-      final expired = remember ? (now - ts > oneYear) : true;
+      final expired = remember ? (ts!=0 && now - ts > oneYear) : false;
       if(e!=null && pw!=null && !expired){
         final did = await _deviceId();
         final res = await HoraryApi.login(email:e, password:pw, deviceId: did);
-        if(res['ok']==true) setState(()=> _ok=true);
-        else if(remember && now - ts > oneYear){
-          // süresi doldu -> temizle
+        if(res['ok']==true){
+          await p.setString('expiry', res['expiry'] ?? '');
+          await p.setInt('days_left', res['days_left'] ?? 365);
+          setState(()=> _ok=true);
+        } else if(expired){
           await p.remove('email'); await p.remove('pass'); await p.remove('login_ts');
         }
       }
@@ -80,6 +83,7 @@ class _AuthGateState extends State<AuthGate> {
           await p.setString('email', email); await p.setString('pass', pass);
           await p.setBool('remember', remember);
           await p.setInt('login_ts', DateTime.now().millisecondsSinceEpoch);
+          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365);
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -123,16 +127,45 @@ class _HoraryHomeState extends State<HoraryHome> {
   bool _loading = false;
   double lat = 38.4237, lon = 27.1428;
   String lang = 'tr';
+  String _category = 'general';
+  String _asker = 'ben';
+  String _lastQuestion = '';
   Map<String,dynamic>? _lastChart;
   final SpeechToText _speech = SpeechToText();
   bool _listening=false;
   final FlutterTts _tts = FlutterTts();
+  final ScrollController _scroll = ScrollController();
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
+  bool _showLanding=true;
+  int _daysLeft=365; String _expiryStr='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
+  bool get _showRadar {
+    final q = _lastQuestion.toLowerCase();
+    return q.contains('nerede') || q.contains('nerde') || q.contains('nere') || q.contains('kayip') || q.contains('kayıp') || q.contains('tasin') || q.contains('taşın') || q.contains('nereye');
+  }
+  List<String> get _quickSuggestions {
+    switch(_category){
+      case 'relationship': return ['Beni seviyor mu?', 'Barışacak mıyız?', 'Evlenecek miyiz?'];
+      case 'job': return ['İşe girecek miyim?', 'Terfi alacak mıyım?', 'Bu iş olacak mı?'];
+      case 'money': return ['Para gelecek mi?', 'Borç ödenecek mi?', 'Ev alacak mıyım?'];
+      case 'lost_object': return ['Nerede?', 'Bulacak mıyım?', 'Kim aldı?'];
+      case 'health': return ['İyileşecek miyim?', 'Ameliyat olmalı mıyım?'];
+      default: return ['Bu işe girecek miyim?', 'Bana yazacak mı?', 'Evim olacak mı?'];
+    }
+  }
 
-  @override void initState(){ super.initState(); _loadHistory(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); }
+  Future<void> _loadExpiry() async {
+    final p=await SharedPreferences.getInstance();
+    final e=p.getString('expiry')??''; 
+    int d=365;
+    if(e.isNotEmpty){
+      try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
+    }
+    setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty});
+  }
 
   Future<void> _loadHistory() async {
     final p=await SharedPreferences.getInstance();
@@ -141,6 +174,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     lang=p.getString('lang')??'tr';
     setState((){});
   }
+  @override void dispose(){ _scroll.dispose(); _ctrl.dispose(); _speech.cancel(); _tts.stop(); super.dispose(); }
   Future<void> _saveHistory(String q) async {
     final p=await SharedPreferences.getInstance();
     final list=p.getStringList('chat_history')??[];
@@ -205,18 +239,95 @@ class _HoraryHomeState extends State<HoraryHome> {
     Future.delayed(const Duration(seconds:8), () async { if(_listening){ await _speech.stop(); setState(()=> _listening=false); }});
   }
 
+  void _scrollDown(){ WidgetsBinding.instance.addPostFrameCallback((_) { if(_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent+120, duration: const Duration(milliseconds:300), curve: Curves.easeOut); }); }
+  Widget _landingWidget(){
+    return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.auto_awesome, size:48, color: Color(0xFFC9A96E)),
+      const SizedBox(height:16),
+      const Text('Horary göksel uyum ile çalışır.\nCevabı veren gökyüzüdür.\nSoruda radikalliği yakalamak için gerçekten bir cevaba ihtiyacınız olduğunda soruyu sorun.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFe8e0f0), fontSize:14, height:1.6)),
+      const SizedBox(height:24),
+      ElevatedButton(onPressed: ()=> setState(()=> _showLanding=false), child: const Text('Soruyu Sor')),
+    ])));
+  }
+  Widget _fullLanding(){
+    // Gemini Android uygulaması formatında açılış: ortada yuvarlak kutu + soru ipucu
+    return SafeArea(
+      child: Column(
+        children: [
+          const Spacer(flex: 2),
+          Center(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 84, height: 84,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFFC9A96E), Color(0xFF8a6d3b)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(26),
+                  boxShadow: [BoxShadow(color: const Color(0xFFC9A96E).withOpacity(0.25), blurRadius: 24, offset: const Offset(0,8))],
+                ),
+                child: const Icon(Icons.auto_awesome, size: 44, color: Color(0xFF1A1423)),
+              ),
+              const SizedBox(height: 20),
+              Text(tr('title'), style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize: 26, letterSpacing: 3, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              const Text('Evrenle soru anının diliyle konuş.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFa898c0), fontSize: 13, letterSpacing: 0.5)),
+              const SizedBox(height: 28),
+              // Gemini tarzı soru başlık önerileri
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: Wrap(
+                spacing: 8, runSpacing: 8, alignment: WrapAlignment.center,
+                children: [
+                  for (final s in const ['Babam nerede?', 'Bu işe girecek miyim?', 'Beni seviyor mu?', 'Kaybolan kedim nerede?'])
+                    ActionChip(
+                      label: Text(s, style: const TextStyle(fontSize: 12, color: Color(0xFFe8e0f0))),
+                      backgroundColor: const Color(0xFF2a1f38),
+                      side: BorderSide(color: const Color(0xFFC9A96E).withOpacity(0.5)),
+                      onPressed: (){ setState(()=> _showLanding=false); _ctrl.text = s; _ask(); },
+                    ),
+                ],
+              )),
+            ]),
+          ),
+          const Spacer(flex: 3),
+          // alt kısımda Gemini gibi yuvarlak giriş görünümü (dokununca gerçek sohbet açılır)
+          Padding(padding: const EdgeInsets.fromLTRB(16,0,16,24), child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: GestureDetector(
+                onTap: ()=> setState(()=> _showLanding=false),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2a1f38),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.45)),
+                  ),
+                  child: Row(children: [
+                    const Expanded(child: Text('Sorunu yaz, gökyüzü cevaplasın…', style: TextStyle(color: Color(0xFF8a7f9c), fontSize: 15))),
+                    const Icon(Icons.mic_none, color: Color(0xFFa898c0), size: 22),
+                    const SizedBox(width: 12),
+                    Container(decoration: const BoxDecoration(color: Color(0xFFC9A96E), shape: BoxShape.circle), padding: const EdgeInsets.all(8), child: const Icon(Icons.arrow_upward, color: Color(0xFF1A1423), size: 20)),
+                  ]),
+                ),
+              ),
+            ),
+          )),
+        ],
+      ),
+    );
+  }
   Future<void> _ask() async {
     final q = _ctrl.text.trim();
     if (q.isEmpty) return;
-    setState(() { _chat.add({'role':'user','content':q}); _loading=true; _ctrl.clear(); });
+    setState(() { _chat.add({'role':'user','content':q}); _lastQuestion=q; _loading=true; _ctrl.clear(); });
+    _scrollDown();
     _saveHistory(q);
     try {
-      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang);
+      final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category, asker: _asker);
       final ans = res['answer'] as String? ?? '${res['verdict']}';
       setState(() {
         _lastChart = res;
         _chat.add({'role':'assistant','content': ans, 'meta': res});
       });
+      _scrollDown();
     } catch (e) {
       setState(() => _chat.add({'role':'assistant','content': 'Hata: $e'}));
     } finally { setState(()=> _loading=false); }
@@ -244,11 +355,17 @@ class _HoraryHomeState extends State<HoraryHome> {
           Text(tr('subtitle'), style: const TextStyle(color: Color(0xFFa898c0), fontSize: 9, letterSpacing: 2)),
         ]), centerTitle: true,
         actions: [
-          IconButton(onPressed: ()=> setState(()=> _chat.clear()), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
+          IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
-      body: Stack(children: [
-        Column(children: [
+      body: _showLanding && _chat.isEmpty ? _fullLanding() : Stack(children: [
+        // Tek liste: üst bilgiler + radar/harita + chat kabarcıkları aynı kaydırmada akar.
+        // Ayrı Flexible/Expanded hesabı olmadığı için taşma şeridi ve 'açıklamaya inememe' imkânsız.
+        ListView(
+          controller: _scroll,
+          padding: const EdgeInsets.fromLTRB(12,8,12,96),
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
           // top bar: lang + mini location chip
           Padding(padding: const EdgeInsets.fromLTRB(8,8,8,4), child: Row(children: [
             // language dropdown
@@ -268,6 +385,73 @@ class _HoraryHomeState extends State<HoraryHome> {
                 const SizedBox(width:4), const Icon(Icons.my_location, size:12, color: Color(0xFFC9A96E)),
               ]))),
           ])),
+          // lisans geri sayım - son 30 gün gün gün
+          if(_daysLeft <= 30) Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:4), child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), decoration: BoxDecoration(color: _daysLeft<=7 ? const Color(0xFFf87171).withOpacity(0.15) : const Color(0xFFfbbf24).withOpacity(0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24))),
+            child: Row(children: [
+              Icon(_daysLeft<=7 ? Icons.warning_amber_rounded : Icons.hourglass_bottom, size:16, color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24)),
+              const SizedBox(width:8),
+              Expanded(child: Text(_daysLeft<=0 ? 'Lisansınız doldu — yenileyin' : 'Lisansınız $_daysLeft gün sonra dolacak', style: TextStyle(color: _daysLeft<=7 ? const Color(0xFFf87171) : const Color(0xFFfbbf24), fontSize:11, fontWeight: FontWeight.bold))),
+              Text(_expiryStr.isNotEmpty ? _expiryStr.substring(0,10) : '', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10)),
+            ]))),
+          // soruyu soran kim? (5)
+          Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:4), child: Row(children: [
+            const Text('Soran:', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
+            const SizedBox(width:8),
+            ChoiceChip(label: const Text('Ben', style: TextStyle(fontSize:11)), selected: _asker=='ben', selectedColor: const Color(0xFFC9A96E), onSelected: (v){ if(v) setState(()=> _asker='ben'); }),
+            const SizedBox(width:6),
+            ChoiceChip(label: const Text('Başkası', style: TextStyle(fontSize:11)), selected: _asker=='baskasi', selectedColor: const Color(0xFFC9A96E), onSelected: (v){ if(v) setState(()=> _asker='baskasi'); }),
+            const SizedBox(width:8),
+            if(_asker=='baskasi') const Text('→ Yükselen soran kişidir', style: TextStyle(color: Color(0xFF6a9ae2), fontSize:10, fontStyle: FontStyle.italic)),
+          ])),
+          // konum uyarısı
+          Padding(padding: const EdgeInsets.symmetric(horizontal:12, vertical:2), child: Row(children: const [
+            Icon(Icons.location_on, size:14, color: Color(0xFFfbbf24)),
+            SizedBox(width:6),
+            Text('Soruyu sormadan önce konumunuzu seçin', style: TextStyle(color: Color(0xFFfbbf24), fontSize:11, fontStyle: FontStyle.italic)),
+          ])),
+          // kategori seçici (eski soru alanları geri)
+          Padding(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
+            for(final c in [
+              {'k':'general','l':'Otomatik'},
+              {'k':'relationship','l':'İlişki/Eş'},
+              {'k':'money','l':'Para'},
+              {'k':'job','l':'İş/Kariyer'},
+              {'k':'health','l':'Sağlık'},
+              {'k':'lost_object','l':'Kayıp Eşya'},
+              {'k':'missing_person','l':'Kayıp Kişi Nerede'},
+              {'k':'house_property','l':'Ev/Arsa'},
+              {'k':'child','l':'Çocuk'},
+              {'k':'pet','l':'Evcil'},
+            ]) Padding(padding: const EdgeInsets.only(right:6), child: ChoiceChip(
+              label: Text(c['l']!, style: TextStyle(fontSize:11, color: _category==c['k'] ? Colors.black : const Color(0xFFe8e0f0))),
+              selected: _category==c['k'],
+              selectedColor: const Color(0xFFC9A96E),
+              backgroundColor: const Color(0xFF2a1f38),
+              onSelected: (v){ if(v) setState(()=> _category=c['k']!); },
+            )),
+          ]))),
+          // 1) Zaman geri sayım widget'i
+          if(_lastChart!=null && _lastChart!['timing']!=null && _lastChart!['timing']['text']!=null && (_lastChart!['timing']['text'] as String).isNotEmpty && !_timingDate(_lastChart!['timing']).isEmpty) Padding(
+            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
+            child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.5))),
+              child: Row(children: [
+                const Icon(Icons.timer_outlined, size:16, color: Color(0xFFC9A96E)),
+                const SizedBox(width:8),
+                Expanded(child: Text('⏳ ${_lastChart!['timing']['text']} → ${_timingDate(_lastChart!['timing'])}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11, fontWeight: FontWeight.w600))),
+                Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
+              ])),
+          ),
+          // radar webde devre disi (flutter_map yok) - mobilde aktif
+          // 2) Derived ağaç görseli
+          if(_lastChart!=null && _lastChart!['derived_info']!=null) Padding(
+            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
+            child: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF1A1423), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF6a9ae2).withOpacity(0.4))),
+              child: Row(children: [
+                const Icon(Icons.account_tree, size:16, color: Color(0xFF6a9ae2)),
+                const SizedBox(width:8),
+                Expanded(child: Text('${_lastChart!['derived_info']['base_word']} (${_lastChart!['derived_info']['base_house']}.ev) → ${_lastChart!['derived_info']['topic']} (${_lastChart!['derived_info']['offset']}.ev) = ${_lastChart!['derived_info']['derived']}.ev  •  ${_lastChart!['derived_info']['formula']}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10))),
+              ])),
+          ),
           // mini SolarFire chart + timing geri sayım + strictures detay
           if(_lastChart!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
@@ -291,32 +475,38 @@ class _HoraryHomeState extends State<HoraryHome> {
               ]),
             ),
           ),
-          Expanded(child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(12,8,12,100),
-            itemCount: _chat.length,
-            itemBuilder: (_,i){
-              final m=_chat[i];
+          // ---- chat kabarcıkları (üst bilgilerle aynı listede) ----
+          ..._chat.map((_m){
+              final m=_m;
               final isUser=m['role']=='user';
               return Align(alignment: isUser? Alignment.centerRight:Alignment.centerLeft,
                 child: Container(margin: const EdgeInsets.symmetric(vertical:4), padding: const EdgeInsets.all(12),
                   constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.82),
-                  decoration: BoxDecoration(color: isUser? const Color(0xFF2a1f38):const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
+                  decoration: BoxDecoration(color: isUser? Colors.white :const Color(0xFF3d2e50), borderRadius: BorderRadius.circular(14), border: Border(left: BorderSide(color: const Color(0xFFC9A96E), width: isUser?0:3))),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(m['content']!, style: const TextStyle(color: Color(0xFFe8e0f0), height:1.45)),
+                    Text(m['content']!, style: TextStyle(color: isUser? Colors.black : const Color(0xFFe8e0f0), height:1.45, fontWeight: isUser? FontWeight.bold : FontWeight.normal)),
                     if(!isUser) Padding(padding: const EdgeInsets.only(top:6), child: Row(mainAxisSize: MainAxisSize.min, children: [
                       GestureDetector(onTap: ()=> _copy(m['content']!), child: Row(children: [const Icon(Icons.copy, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('copy'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
                       const SizedBox(width:12),
                       GestureDetector(onTap: ()=> _speak(m['content']!), child: Row(children: [const Icon(Icons.volume_up, size:14, color: Color(0xFFa898c0)), const SizedBox(width:4), Text(tr('listen'), style: const TextStyle(color: Color(0xFFa898c0), fontSize:11))])),
                     ])),
+                    if(!isUser) Padding(padding: const EdgeInsets.only(top:8), child: Wrap(spacing:6, runSpacing:4, children: [
+                      for(final s in _quickSuggestions) ActionChip(
+                        label: Text(s, style: const TextStyle(fontSize:11, color: Color(0xFFe8e0f0))),
+                        backgroundColor: const Color(0xFF2a1f38),
+                        side: const BorderSide(color: Color(0xFFC9A96E)),
+                        onPressed: (){ _ctrl.text = s; _ask(); },
+                      ),
+                    ])),
                   ])));
-            },
-          )),
-          if(_loading) const LinearProgressIndicator(color: Color(0xFFC9A96E)),
-          const SizedBox(height: 88),
-        ]),
-        // centered input floating slightly above bottom
+            }),
+          if(_loading) const Padding(padding: EdgeInsets.symmetric(vertical:6), child: LinearProgressIndicator(color: Color(0xFFC9A96E))),
+          const SizedBox(height: 12),
+          ],
+        ),
+        // centered input floating - Gemini gibi klavyenin hemen ustu
         Positioned(
-          left: 0, right: 0, bottom: 18,
+          left: 0, right: 0, bottom: 12,
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),
