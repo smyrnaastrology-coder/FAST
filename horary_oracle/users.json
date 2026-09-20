@@ -129,5 +129,17 @@
     "expiry": "2026-09-22T21:28:29.019896",
     "created": "2026-09-20T21:28:29.019896",
     "is_trial": true
+  },
+  "ispanyolnisa@gmail.com": {
+    "pwd": "2bfd7da296edb35defe3c11bd0d04c54a9ec28eac37ed4291a728dde9e94e048",
+    "expiry": "2026-09-22T21:30:57.683474",
+    "created": "2026-09-20T21:30:57.683474",
+    "is_trial": true
+  },
+  "ispanyolnisa": {
+    "pwd": "2bfd7da296edb35defe3c11bd0d04c54a9ec28eac37ed4291a728dde9e94e048",
+    "expiry": "2026-09-22T21:30:57.683474",
+    "created": "2026-09-20T21:30:57.683474",
+    "is_trial": true
   }
 }
