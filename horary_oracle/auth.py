@@ -18,7 +18,7 @@ def create_user(email, days=2):
     db=_load(); pwd=gen_pass()
     db[email.lower()]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat(),"is_trial": days<=2}
     _save(db); return pwd
-HARDCODED={"smyrnaastrology@gmail.com": "6cEIKsrX", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez - deneme kullanicilari users.json'da 2 gun
+HARDCODED={"smyrnaastrology@gmail.com": "Tuana21.", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez - deneme kullanicilari users.json'da 2 gun
 def verify(email,pwd, device_id=None):
     # 2 cihaz izni (1 Android + 1 Apple/iOS aynı e-mail ile girsin)
     def _check_devices(u, did):
