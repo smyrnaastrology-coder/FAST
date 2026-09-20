@@ -528,5 +528,34 @@
     "note": "19.09.2026 23:07 İzmir erkek kardes - gercek İstanbul 327.5km brg 28.1 (kayıp degil, konum)",
     "_id": 21,
     "ts": "2026-09-19T23:10:53"
+  },
+  {
+    "question_type": "sibling",
+    "origin": "38.4237,27.1428",
+    "destination": "Manavgat",
+    "house": 3,
+    "significator": "Sun",
+    "sign": "Aslan",
+    "sign_querent": null,
+    "degree": 9.44,
+    "querent_planet": "Sun",
+    "querent_degree": 0,
+    "angular_difference": 9.44,
+    "modality": "celestial_lat",
+    "modality_multiplier": 1.6503,
+    "celestial_lat": -0.0001,
+    "components": {
+      "house": 135,
+      "sign_corr": -5,
+      "planet_corr": 0,
+      "ang_adj": 1.87,
+      "angular": 101.23662300507499
+    },
+    "condition": 0.026,
+    "real_distance_km": 420.3,
+    "real_bearing": 114.3,
+    "note": "20.09 00:30 Izmir kiz kardes Manavgat 420.3km 114.3GD - H2->H3 fix sonrasi",
+    "_id": 22,
+    "ts": "2026-09-20T12:52:37"
   }
 ]
