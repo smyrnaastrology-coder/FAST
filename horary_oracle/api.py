@@ -956,4 +956,75 @@ async def cast(req: CastRequest):
         "meta": {"tz": tzname, "utc_offset": off, "local_dec": round(local_dec,2), "ms": round(dt,1)}
     }
 
+# --- ADMIN: sifre uretme paneli ---
+from fastapi import Header as _Header
+from fastapi.responses import HTMLResponse
+import auth as _auth
+
+@app.get("/admin", include_in_schema=False)
+def admin_page():
+    return HTMLResponse("""
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin - Sifre Uret</title><style>body{font-family:system-ui;background:#0F0A18;color:#e8e0f0;padding:24px}input,button{padding:10px;border-radius:8px;border:1px solid #3d2e50}input{background:#1A1423;color:#e8e0f0}button{background:#C9A96E;color:#000;font-weight:700;cursor:pointer}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #3d2e50;padding:8px;font-size:13px}th{background:#2a1f38}</style>
+<h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
+<div>Admin Key: <input id="key" type="password" value="Tuana21." style="width:200px"> <button onclick="load()">Listele</button></div>
+<div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="2" style="width:60px"> gün <button onclick="createUser()">Uret</button> <span id="out"></span></div>
+<table id="tbl"><thead><tr><th>Kullanici</th><th>Expiry</th><th>Trial</th><th>Cihaz</th></tr></thead><tbody></tbody></table>
+<script>
+async function load(){
+  const k=document.getElementById('key').value;
+  const r=await fetch('/admin/users',{headers:{'x-admin-key':k}});
+  const j=await r.json();
+  const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
+  (j.users||[]).forEach(u=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${u.user}</td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td>`;
+    tb.appendChild(tr);
+  });
+}
+async function createUser(){
+  const k=document.getElementById('key').value;
+  const email=document.getElementById('email').value.trim();
+  const days=parseInt(document.getElementById('days').value)||2;
+  const r=await fetch('/admin/create',{method:'POST', headers:{'Content-Type':'application/json','x-admin-key':k}, body:JSON.stringify({email,days})});
+  const j=await r.json();
+  document.getElementById('out').textContent=j.password ? `Sifre: ${j.password} (${j.user})` : (j.error||'hata');
+  load();
+}
+load();
+</script>
+""")
+
+@app.get("/admin/users")
+def admin_users(x_admin_key: str = _Header(None)):
+    if x_admin_key != os.getenv("ADMIN_KEY", "Tuana21."):
+        # fallback: smyrna sifresi de admin sayilir
+        if x_admin_key != "Tuana21.":
+            return {"error": "unauthorized"}
+    db=_auth._load()
+    out=[]
+    for k,v in db.items():
+        out.append({"user":k, "expiry":v.get("expiry"), "created":v.get("created"), "is_trial":v.get("is_trial",False), "devices": len(v.get("device_ids") or [])})
+    return {"users": out}
+
+@app.post("/admin/create")
+def admin_create(payload: dict, x_admin_key: str = _Header(None)):
+    if x_admin_key != os.getenv("ADMIN_KEY", "Tuana21."):
+        if x_admin_key != "Tuana21.":
+            return {"error": "unauthorized"}
+    email=(payload.get("email") or payload.get("user") or "").strip().lower()
+    if not email: return {"error": "email gerekli"}
+    days=int(payload.get("days",2))
+    pwd=_auth.create_user(email, days=days)
+    # also add bare username alias if email contains @
+    if "@" in email:
+        uname=email.split("@")[0]
+        # create alias with same pwd hash
+        db=_auth._load()
+        if uname not in db:
+            import hashlib as _hl
+            db[uname]={"pwd":hashlib.sha256(pwd.encode()).hexdigest(),"expiry":db[email]["expiry"],"created":db[email]["created"],"is_trial":db[email].get("is_trial",False)}
+            _auth._save(db)
+    return {"user": email, "password": pwd, "days": days, "expiry": _auth._load().get(email,{}).get("expiry")}
+
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
