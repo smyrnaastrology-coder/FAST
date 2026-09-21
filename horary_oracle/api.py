@@ -733,9 +733,9 @@ async def cast(req: CastRequest):
             _goals = _sgm(res['houses']['cusps'])
             if _goals:
                 engine_json["sport_goals"] = [{"gol": n, "dakika": d, "kaynak": s} for n, d, s in _goals]
-                # bu soru tipinde SADECE gol dakikaları — açıklama YASAK, sadece liste
-                engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " SPOR GOL DAKİKASI SORUSU — SADECE ŞU LİSTEYİ VER, AÇIKLAMA YAZMA. Format: '1.gol ~XX' 2.gol ~YY' ...' başka cümle ekleme, sağlık/para/ilişki yorumu YAPMA. Liste: " + ", ".join([f"{n}.gol ~{d:.0f}'" for n,d,s in _goals]) + " — aynen bu formatta, sadece liste."
-                engine_json["tone_instruction"] = "SPOR GOL DAKİKASI: SADECE dakika listesi. Açıklama, sağlık, para, ilişki yorumu YASAK. Sadece '1.gol ~XX' 2.gol ~YY' ...' yaz."
+                # bu soru tipinde SADECE gol ihtimal dakikaları — kesin değil, olası
+                engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " SPOR GOL DAKİKASI SORUSU — SADECE olası gol dakikalarını ‘gol olma ihtimali olan dakikalar’ olarak ver. Kesin ‘gol olacak’ deme. Format: 'Gol ihtimali olan dakikalar: ~XX', ~YY', ~ZZ' ...' başka cümle ekleme, sağlık/para/ilişki yorumu YAPMA. Liste: " + ", ".join([f"~{d:.0f}'" for n,d,s in _goals]) + " — bu dakikaları ‘ihtimal’ olarak sun."
+                engine_json["tone_instruction"] = "SPOR GOL DAKİKASI: Sadece ‘Gol ihtimali olan dakikalar: ~XX', ~YY' ...’ listesi. Kesin gol olacak deme, ‘ihtimal/olasılık’ de. Açıklama, sağlık, para, ilişki YASAK."
         except Exception as _e_sport:
             print(f"sport_goals hata: {_e_sport}")
     # --- HIRSIZLIK/KAYIP AYRIMI (Deneb Kaitos): 12. ev yöneticisinin açıları ---
