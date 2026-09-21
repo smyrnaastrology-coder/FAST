@@ -1539,5 +1539,21 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #15: 25 Jun 1985 10:28 PDT Coeur dAlene 47N41 116W46 Should we buy new trailer hitch? Querent Mercury 23 Cancer 11th + Moon 3 Libra 1st, hitch Venus 18 Taurus ruler 2nd in 9th. Mercury makes no aspect to Venus, Moon quincunxes Venus => little action, quincunx suggests intervening event. Shortly after he sold trailer and had no need for new hitch."
+  },
+  {
+    "id": "HARRISONS-1985-04-30",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Will the Harrisons buy the house for $205,000? 30 Apr 1985 11:45 PDT Coeur dAlene. Querent Sun 10 Taurus 10th 1st ruler, buyer Uranus 17 Sagittarius 5th 7th ruler, property Venus 6 Aries 4th ruler.",
+    "technique": "quincunx_price_adjustment_moon_square_buyer",
+    "verdict": "YES_WITH_ADJUSTMENT",
+    "tags": [
+      "1st_7th",
+      "4th_house",
+      "quincunx",
+      "square",
+      "trine",
+      "sextile"
+    ],
+    "explanation": "Example Chart #16: 30 Apr 1985 11:45 PDT Coeur dAlene 47N41 116W46 Will Harrisons buy house for $205k? Querent Sun 10 Taurus 10th ruler 1st, buyer Uranus 17 Sagittarius 5th ruler 7th. Sun quincunx Uranus => adjustments before sale. Moon 13 Virgo 2nd squares Uranus buyer => price too high. Venus 6 Aries ruler 4th property trines Uranus (buyer) and sextiles Jupiter 15 Aquarius 7th => advise lower price and negotiate terms. After haggling agreed lower price and better interest, house sold."
   }
 ]
