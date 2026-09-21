@@ -1616,5 +1616,18 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #20: 20 Sep 1985 23:50 PDT Los Angeles 34N04 118W15 Will biopsy show cancer? Querent Moon 26 Sagittarius 6th ruler, very fitting. 6th ruler Jupiter 7 Aquarius 8th house surgery (growths). Moon makes no aspect to Jupiter but squares both Mercury and Sun. Mercury rules 12th hospitalization => NO. Doctor 7th ruler Saturn square Jupiter => another NO. Mass benign. Note: squares/oppositions = NO, trines/sextiles = YES."
+  },
+  {
+    "id": "SHAMPOO-ALLERGY-1987-01-28",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Kullandigim sampuana alerjim mi var? 28 Jan 1987 10:46 PST Coeur dAlene. Asc + 6th ruler Venus 22 Sagittarius, Pluto 10 Scorpio 6th house allergy/shampoo significator.",
+    "technique": "6th_no_aspect_voc",
+    "verdict": "NO",
+    "tags": [
+      "6th_house",
+      "voc",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #21: 28 Jan 1987 10:46 PST Coeur dAlene 47N41 116W46 Shampoo allergy? Asc + 6th ruler Venus ~22 Sagittarius, Pluto ~10 Scorpio 6th (shampoo/chemical). No aspect Venus-Pluto, Moon void of course => all NO. Venus had conjunct Saturn few days before and allergy seemed less, week later rash completely gone, cause never learned. VOC + no aspect = NO."
   }
 ]
