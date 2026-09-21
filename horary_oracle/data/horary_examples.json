@@ -1483,5 +1483,18 @@
       "trine"
     ],
     "explanation": "Example Chart #11: 27 Nov 1985 09:08 PST Los Angeles 34N03 118W15 Will son be okay with father? Son not named my son => 5th house. Renumber houses starting 5th as 1 (or turn chart). Son Venus 22 Scorpio in his 7th (11th of chart) + co-ruler Moon 7 Gemini in his 1st (5th of chart). Father Uranus 17 Sagittarius ruler his 10th (2nd in chart) + Jupiter 11 Aquarius in that house. No aspect Venus-Uranus (son 1st vs 10th rulers) but Moon trines Jupiter => all will be well. It was."
+  },
+  {
+    "id": "STEVE-CANDY-1986-08-05",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Should Steve hire Candy? 5 Aug 1986 19:48 PDT Coeur dAlene. Querent 1st, Steve 7th Sun 13 Leo, Candy 7th from 7th = 1st Uranus 18 Sagittarius. Will he hire?",
+    "technique": "7th_from_7th_hire",
+    "verdict": "YES",
+    "tags": [
+      "7th_house",
+      "7th_from_7th",
+      "trine"
+    ],
+    "explanation": "Example Chart #12: 5 Aug 1986 19:48 PDT Coeur dAlene 47N41 116W46 Should Steve hire Candy? Neither Steve nor Candy asked, querent still 1st. Steve (first inquired) = 7th Sun 13 Leo, Candy = 7th from 7th = 1st Uranus 18 Sagittarius (customary for two people). Sun 13 Leo and Moon 17 Leo in Steve 1st both apply trine to Uranus 18 Sagittarius ruler Candy => YES. Steve hired Candy pleased. Note: wife asked question is 1st but has no bearing. If question Will Bob leave wife and marry me? querent 1st, Bob lover 5th, his wife 11th (7th from 5th), Moon co-ruler querent, check aspects among 1st,5th,11th."
   }
 ]
