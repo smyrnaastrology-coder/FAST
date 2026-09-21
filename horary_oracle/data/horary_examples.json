@@ -1660,5 +1660,19 @@
       "sextile"
     ],
     "explanation": "Example Chart #23: 21 Oct 1985 11:53 MST Phoenix 33N27 112W04 Will Mac walk again? 7th Mac, his 6th is 12th of chart. Moon 9 Aquarius his 8th shows Mac, his 6th ruler Jupiter 7 Aquarius also his 8th Moon past conjunction Jupiter => not positive. Mars action 26 Virgo his 3rd, 3rd ruler Mercury 16 Scorpio sextile Mars 10deg wide. Moon quincunx Mars and square Mercury, Moon in his 8th surgery no benefit. Mac traffic accident paralyzed waist down, mother asked, doctors small hope surgery weak, never operated still wheelchair."
+  },
+  {
+    "id": "SHENANIGAN-1990-03-06",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Shenanigans taki isi kabul etmeli miyim? 6 Mar 1990 20:47 PST Coeur dAlene. Querent Venus 2 Aquarius 4th, job Neptune 14 Capricorn 3rd ruler 6th house daily work.",
+    "technique": "6th_no_aspect_moon_opposite_mars",
+    "verdict": "NO",
+    "tags": [
+      "6th_house",
+      "3rd_house",
+      "opposition",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #24: 6 Mar 1990 20:47 PST Coeur dAlene 47N41 116W46 Should I take job at Shenanigans restaurant? Querent Venus 2 Aquarius 4th, job Neptune 14 Capricorn 3rd ruler 6th daily work. No aspect Venus-Neptune. Moon 25 Cancer only opposite Mars in 3rd. Answer NO dont take job. Very active 3rd house indicated need to spend all time studying."
   }
 ]
