@@ -1345,5 +1345,18 @@
       "voc"
     ],
     "explanation": "Example Chart 9 Sept 1987 21:20 PDT Coeur d'Alene ID 47N41 116W46 Will the NFL go on strike? NFL signified by 7th house ruled by Mars 11 Virgo in 5th of chart which is 11th of NFL (counting from 7th). Work stoppage is 6th house question, renumbered: Mars also rules their 6th (12th in chart). Moon 19 Aries ruler of their 10th (4th in chart) co-ruler makes no applying aspect to Mars. Saturn 14 Sagittarius in their 1st will conjunct Uranus ruler of strikes 22 Sagittarius. Since Saturn rules their 4th, staying home on strike (Saturn conjunct Uranus). 2nd house earnings ruler Jupiter in their 6th at 29 Aries Void of Course no action. Uranus and Saturn in their 2nd disruption of earning. They did strike ~3 weeks. Saturn also signifies safety for trips/children - positive Saturn aspects indicate safe return."
+  },
+  {
+    "id": "SF-1988-07-11",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Will I be safe if I go to San Francisco? 11 Jul 1988 21:58 PDT Coeur d'Alene. Wary solo traveler, trip challenge.",
+    "technique": "safety_saturn_conjunct_uranus",
+    "verdict": "YES",
+    "tags": [
+      "saturn_safety",
+      "9th_house",
+      "uranus_strike"
+    ],
+    "explanation": "Example Chart 2: 11 Jul 1988 21:58 PDT Coeur d'Alene 47N41 116W46 Will I be safe if I go to San Francisco? Querent ruled by Uranus retrograde 28 Sagittarius. 9th house long trip ruled by Mars and Pluto - Mars 29 Pisces past square to Uranus, Pluto 9 Scorpio makes no aspect to ruler. Question is safety, not should I go. Saturn retrograde 27 Sagittarius conjunct Uranus - Saturn signifies safety, positive conjunction indicates safe. She went and had uneventful safe journey. Saturn positive aspects = safe trip/child."
   }
 ]
