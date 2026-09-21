@@ -1269,11 +1269,11 @@ def sport_goal_minutes(cusps):
     # 1.gol ASC
     if 1 <= cur <= 90:
         out.append((1, round(cur, 1), f"ASC {asc_deg:.1f}°"))
-    # 2..6.gol için 2.-6.ev cusp'ları ekle
-    for i, cusp_idx in enumerate([1, 2, 3, 4, 5], start=2):
+    # 2..7.gol için 2.-7.ev cusp'ları ekle (7.ev rakip - ikinci yarı), 90+ uzatma dahil
+    for i, cusp_idx in enumerate([1, 2, 3, 4, 5, 6], start=2):
         deg = cusps[cusp_idx] % 30
         cur = cur + deg
-        if cur > 95:  # 90+ uzatma, kes
+        if cur > 105:  # 90+8 uzatma dahil
             break
         if cur >= 1:
             out.append((i, round(cur, 1), f"+{cusp_idx+1}.ev {deg:.1f}°"))
