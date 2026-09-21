@@ -1748,5 +1748,18 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #29: 2 Nov 1988 13:21 PST Coeur dAlene 47N41 116W46 Will school levy pass? Local election. Schools 3rd house Venus 4 Libra 8th ruler, public money 8th from 3rd is 10th ruler Jupiter 3 Gemini 3rd. Venus-Jupiter trine past, Moon 26 Leo makes no aspect to either. Very close but levy passed."
+  },
+  {
+    "id": "THESIS-DEFENSE-1985-11-06",
+    "source": "Only Way Learn Horary - Pullman 46N44 117W10",
+    "question": "22 Kasim tezimi savunmak icin uygun gun mu? 6 Nov 1985 15:10 PST Pullman. Querent Mars 6 Libra 6th, thesis Mercury 7 Sagittarius 8th ruler 3rd, Mercury retro 19 Nov.",
+    "technique": "3rd_exam_past_sextile_retro",
+    "verdict": "NO",
+    "tags": [
+      "3rd_house",
+      "sextile_past",
+      "retrograde"
+    ],
+    "explanation": "Example Chart #30: 6 Nov 1985 15:10 PST Pullman 46N44 117W10 Is 22 Nov good to defend thesis? Thesis exam is 3rd house. Querent Mars 6 Libra 6th, thesis Mercury 7 Sagittarius 8th ruler 3rd. Mercury past sextile to Mars by 1 degree => should have done a week earlier. Ephemeris Mercury retrograde 19 Nov => not good time for communication. Thesis defended a week earlier accepted PhD. No need to check Moon square Saturn, planets already gave answer, Moon aspect also confirms 22 Nov not correct."
   }
 ]
