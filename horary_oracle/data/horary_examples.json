@@ -1721,5 +1721,18 @@
       "jupiter_asc"
     ],
     "explanation": "Example Chart #27: 5 Apr 1980 13:48 PST Coeur dAlene 47N41 116W46 Will I pass real estate exam tomorrow? Sun 15 Aries ruler 1st in 9th, exam 3rd ruler Venus 1 Gemini 10th will sextile Sun => YES. Moon 2 Sagittarius opposite Venus past but trine Sun applying => another YES. Sun opposite Pluto 20 Libra 3rd => NO. Jupiter on Asc => YES confirms. 3 yes 1 no => told will pass but study until exam (Sun-Pluto opposition), did and passed with respectable score."
+  },
+  {
+    "id": "NEIGHBOR-MONEY-1986-12-10",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Parami bir komsum mu caldi? 10 Dec 1986 21:04 PST Coeur dAlene. Komsu Venus 9 Scorpio 3rd ruler, para Mercury 1 Sagittarius 2nd ruler.",
+    "technique": "3rd_2nd_no_aspect_moon_no_aspect",
+    "verdict": "NO",
+    "tags": [
+      "3rd_house",
+      "2nd_house",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #28: 10 Dec 1986 21:04 PST Coeur dAlene 47N41 116W46 Did neighbor steal money? Young man working from home large money lost, previous description matched neighbor so asked second question. Neighbor Venus 9 Scorpio ruler 3rd, money Mercury 1 Sagittarius ruler 2nd. No aspect Mercury-Venus, Moon 22 Aries makes no aspect to either => NO. Later money found taken by employee."
   }
 ]
