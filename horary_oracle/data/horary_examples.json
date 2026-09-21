@@ -1570,5 +1570,19 @@
       "8th_house"
     ],
     "explanation": "Example Chart #17: 5 Nov 1982 17:16 PST Coeur dAlene 47N41 116W46 Is Mr Moore going to buy business Monday? Buyer Jupiter 19 Scorpio 6th ruler 7th, Mercury ruler 1st 4 Scorpio conjunct Jupiter in 15 degrees => yes but not Monday (3 days away). Business 10th Uranus 3 Sagittarius receives no aspect from Jupiter buyer => no connection buyer-business, though buyer-seller connection exists. Moon 14 Cancer trines Jupiter buyer and his money (8th ruler) but answer still no. He might offer but she would not accept. Did not purchase Monday, made low offer 15 days later when Mercury conjunct Jupiter, rejected."
+  },
+  {
+    "id": "TRACTOR-1990-06-07",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Should I buy the tractor I looked at today? 7 Jun 1990 14:51 PDT Coeur dAlene. Querent Venus 9 Taurus 7th, tractor Mars ruler 2nd 5 Aries 6th, Pluto co-ruler 15 Scorpio 2nd.",
+    "technique": "2nd_house_no_aspect_opposition",
+    "verdict": "NO",
+    "tags": [
+      "2nd_house",
+      "opposition",
+      "past_aspect",
+      "machinery"
+    ],
+    "explanation": "Example Chart #18: 7 Jun 1990 14:51 PDT Coeur dAlene 47N41 116W46 Should I buy tractor looked at today? Querent Venus 9 Taurus 7th, tractor Mars ruler 2nd 5 Aries 6th machinery valid. No aspect Mars-Venus. Pluto co-rules tractor 15 Scorpio 2nd Venus opposes it. Moon 10 Sagittarius past trine Mars and quincunx Venus. Told not this tractor look further. Weeks later asked about different tractor answer clear yes satisfied."
   }
 ]
