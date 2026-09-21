@@ -1643,5 +1643,22 @@
       "asc_saturn"
     ],
     "explanation": "Example Chart #22: 20 Jun 1987 18:26 PDT Coeur dAlene 47N41 116W46 Breast implant should I? Querent Jupiter 24 Aries 5th, surgery 8th ruler Mercury 16 Cancer, Sun 29 Gemini, Mars 20 Cancer in 8th. Both Mercury and Mars (cut/surgery planet) square Jupiter => NO. Saturn on Ascendant confirms. Advised not to have surgery."
+  },
+  {
+    "id": "MAC-WALK-1985-10-21",
+    "source": "Only Way Learn Horary - Phoenix 33N27 112W04",
+    "question": "Mac yeniden yuruyebilecek mi? 21 Oct 1985 11:53 MST Phoenix. Mac 7th Moon 9 Aquarius his 8th, his 6th Jupiter 7 Aquarius, Mars 26 Virgo his 3rd, Mercury 16 Scorpio ruler 3rd. Will he walk again?",
+    "technique": "derived_7th_6th_12th_moon_quincunx",
+    "verdict": "NO",
+    "tags": [
+      "7th_house",
+      "6th_house",
+      "12th_house",
+      "8th_house",
+      "3rd_house",
+      "quincunx",
+      "sextile"
+    ],
+    "explanation": "Example Chart #23: 21 Oct 1985 11:53 MST Phoenix 33N27 112W04 Will Mac walk again? 7th Mac, his 6th is 12th of chart. Moon 9 Aquarius his 8th shows Mac, his 6th ruler Jupiter 7 Aquarius also his 8th Moon past conjunction Jupiter => not positive. Mars action 26 Virgo his 3rd, 3rd ruler Mercury 16 Scorpio sextile Mars 10deg wide. Moon quincunx Mars and square Mercury, Moon in his 8th surgery no benefit. Mac traffic accident paralyzed waist down, mother asked, doctors small hope surgery weak, never operated still wheelchair."
   }
 ]
