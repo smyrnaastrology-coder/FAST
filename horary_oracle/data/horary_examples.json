@@ -1358,5 +1358,22 @@
       "uranus_strike"
     ],
     "explanation": "Example Chart 2: 11 Jul 1988 21:58 PDT Coeur d'Alene 47N41 116W46 Will I be safe if I go to San Francisco? Querent ruled by Uranus retrograde 28 Sagittarius. 9th house long trip ruled by Mars and Pluto - Mars 29 Pisces past square to Uranus, Pluto 9 Scorpio makes no aspect to ruler. Question is safety, not should I go. Saturn retrograde 27 Sagittarius conjunct Uranus - Saturn signifies safety, positive conjunction indicates safe. She went and had uneventful safe journey. Saturn positive aspects = safe trip/child."
+  },
+  {
+    "id": "MILTON-1992-10-18",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene 47N41 116W46",
+    "question": "When will the Miltons buy my house? 18 Oct 1992 12:55 PDT Coeur d'Alene. Querent Saturn 11 Aquarius 1st, home Venus 28 Scorpio 4th cusp Taurus, buyer Moon 21 Cancer ruling 7th. When will sale occur?",
+    "technique": "timing_past_aspects_angular_cardinal",
+    "verdict": "YES",
+    "tags": [
+      "timing",
+      "past_aspects",
+      "cardinal_angular",
+      "7th_house",
+      "4th_house",
+      "8th_house",
+      "2nd_house"
+    ],
+    "explanation": "Example Chart 18 Oct 1992 12:55 PDT Coeur d'Alene 47N41 116W46 When will the Miltons buy my house? Querent Saturn 11 Aquarius 1st, home Venus 28 Scorpio (Taurus on 4th cusp), Miltons Moon 21 Cancer ruling 7th. Moon will trine Venus in ~7 degrees - candidate timing 7 hours/days/weeks. Moon cardinal angular (fastest), Venus fixed succedent (slowest) - discard years. Check buyer-seller connection: Moon makes no aspect to Saturn, need other planets in 1st/7th: Uranus/Neptune 14/16 Capricorn 1st, Moon/Mars 21/18 Cancer 7th - no applying aspects past. Check buyer money (8th) to seller (1st): Moon ruling buyer 2nd (8th) makes no aspect to seller planets, 8th has Virgo intercepted so Sun must be considered - Sun 25 Libra makes no applying aspect to seller. Timing is only time past aspects may be used to verify. Degrees: Saturn-Sun 14, Uranus-Mars 4, Uranus-Moon 7, Neptune-Mars 2, Neptune-Moon 5. Seven degrees Uranus-Moon reinforces Moon/Venus 7 trine. Both angular cardinal => 7 days. Miltons bought 7 days later Oct 25. NOTE: Past aspects only for timing verification. Also note: question must be possible and answerable - seller/property/buyer must have connection, Moon must aspect rulers, otherwise near future not promising. Validity 6 weeks to 3 months, unanswerable: Will I ever marry, When will war end, When will father die."
   }
 ]
