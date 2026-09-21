@@ -1425,5 +1425,19 @@
       "angular"
     ],
     "explanation": "Example Chart #6: 17 Aug 1979 20:49 PDT Coeur d'Alene 47N41 116W46 Will we get house Fernan Village? Querent Neptune 17 Sagittarius ruler Asc, house 4th Mercury 6 Leo. Mercury trines Neptune => will get house. Moon 4 Cancer will conjunct Mars in 4th in 2 degrees => expected 2 days (both cardinal angular fastest Hours). Asked 20:49, realtor called 22:40 same night => 2 hours not days. When you time, it does not matter whether planets applying or separating. This is first and last time you do not adhere to applying-only rule."
+  },
+  {
+    "id": "ATTORNEY-1991-10-03",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Should I use Connor as my attorney? 3 Oct 1991 10:58 PDT Coeur dAlene. Querent Mars 21 Libra 11th (Scorpio Asc ruler) + Pluto 18 Scorpio 12th + Moon 9th, Connor Venus 28 Leo 9th (7th ruler). Should I hire him?",
+    "technique": "7th_house_single_vs_two_options_9th",
+    "verdict": "YES",
+    "tags": [
+      "7th_house",
+      "lawyer",
+      "moon_conjunction",
+      "9th_house"
+    ],
+    "explanation": "Example 3 Oct 1991 10:58 PDT Coeur dAlene 47N41 116W46 Should I use Connor as attorney? Querent Mars 21 Libra 11th (Scorpio Asc main ruler) + Pluto 18 Scorpio 12th + Moon 9th co-ruler. Connor 7th ruler Venus 28 Leo 9th - legal theme. No applying aspect Venus-Mars, but Moon co-ruling querent will conjunct Venus in 9th => definite YES. She hired him, long case good. If question were Connor or Mathews? 7th still Connor (first lawyer), Mathews is 9th house (not 7th from 7th which would be 1st already querent). Write down approach before judging."
   }
 ]
