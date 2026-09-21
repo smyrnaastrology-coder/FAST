@@ -1469,5 +1469,19 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #10: 2 Jun 1991 09:46 PDT Coeur dAlene 47N41 116W46 Is relationship over? Querent Sun 11 Gemini 10th + Moon 8 Aquarius 6th (work together validation). Relationship 7th ruler Uranus 13 Capricorn in 5th (validates 5th use), 5th ruler Jupiter 9 Leo 12th. Sun quincunx Uranus => change. Moon makes no aspect to Uranus (major applying only). Jupiter ruler 5th Moon opposes Jupiter 9 Leo 12th. No Sun-Jupiter aspect (past sextile). Told over, pursued 2 more months until Sun/Uranus quincunx exact, then met someone else. Decide 7th vs 5th before looking, be objective, outline process."
+  },
+  {
+    "id": "SON-SAFETY-1985-11-27",
+    "source": "Only Way Learn Horary - Los Angeles 34N03 118W15",
+    "question": "Will my son be okay if I let him go with his father? 27 Nov 1985 09:08 PST Los Angeles. Son 5th Venus 22 Scorpio 7th (11th chart) + Moon 7 Gemini 1st (5th chart), father Uranus 17 Sagittarius ruler his 10th (2nd chart) + Jupiter 11 Aquarius.",
+    "technique": "derived_5th_turned_moon_trine_jupiter",
+    "verdict": "YES",
+    "tags": [
+      "5th_house",
+      "derived",
+      "turned_chart",
+      "trine"
+    ],
+    "explanation": "Example Chart #11: 27 Nov 1985 09:08 PST Los Angeles 34N03 118W15 Will son be okay with father? Son not named my son => 5th house. Renumber houses starting 5th as 1 (or turn chart). Son Venus 22 Scorpio in his 7th (11th of chart) + co-ruler Moon 7 Gemini in his 1st (5th of chart). Father Uranus 17 Sagittarius ruler his 10th (2nd in chart) + Jupiter 11 Aquarius in that house. No aspect Venus-Uranus (son 1st vs 10th rulers) but Moon trines Jupiter => all will be well. It was."
   }
 ]
