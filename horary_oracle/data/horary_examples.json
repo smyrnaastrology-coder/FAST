@@ -1454,5 +1454,20 @@
       "sextile_past"
     ],
     "explanation": "Example Chart #9: 31 May 1985 07:55 PDT Coeur dAlene 47N41 116W46 Should I go into business with my brother? Brother not named => 3rd house Mercury 1 Gemini (named Jim => 7th). Querent Moon 4 Scorpio Asc ruler. Moon past applying aspect to Mercury => no action between them. Neptune 2 Capricorn ruler 10th business significator. Moon past sextile to Neptune, Mercury applies quincunx to Neptune => brother wants changes, querent not. He ignored advice, took brother and wife in, within year they took share, moved in, left debts and family breach."
+  },
+  {
+    "id": "RELATIONSHIP-OVER-1991-06-02",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Is this relationship over? 2 Jun 1991 09:46 PDT Coeur dAlene. Querent Sun Gemini 10th + Moon Aquarius 6th (work together). Relationship 7th Uranus 13 Capricorn 5th vs lover 5th Jupiter 9 Leo 12th. Is it over?",
+    "technique": "7th_vs_5th_relationship_quincunx_opposition",
+    "verdict": "YES",
+    "tags": [
+      "7th_house",
+      "5th_house",
+      "quincunx",
+      "opposition",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #10: 2 Jun 1991 09:46 PDT Coeur dAlene 47N41 116W46 Is relationship over? Querent Sun 11 Gemini 10th + Moon 8 Aquarius 6th (work together validation). Relationship 7th ruler Uranus 13 Capricorn in 5th (validates 5th use), 5th ruler Jupiter 9 Leo 12th. Sun quincunx Uranus => change. Moon makes no aspect to Uranus (major applying only). Jupiter ruler 5th Moon opposes Jupiter 9 Leo 12th. No Sun-Jupiter aspect (past sextile). Told over, pursued 2 more months until Sun/Uranus quincunx exact, then met someone else. Decide 7th vs 5th before looking, be objective, outline process."
   }
 ]
