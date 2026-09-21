@@ -1555,5 +1555,20 @@
       "sextile"
     ],
     "explanation": "Example Chart #16: 30 Apr 1985 11:45 PDT Coeur dAlene 47N41 116W46 Will Harrisons buy house for $205k? Querent Sun 10 Taurus 10th ruler 1st, buyer Uranus 17 Sagittarius 5th ruler 7th. Sun quincunx Uranus => adjustments before sale. Moon 13 Virgo 2nd squares Uranus buyer => price too high. Venus 6 Aries ruler 4th property trines Uranus (buyer) and sextiles Jupiter 15 Aquarius 7th => advise lower price and negotiate terms. After haggling agreed lower price and better interest, house sold."
+  },
+  {
+    "id": "MOORE-BUSINESS-1982-11-05",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Is Mr. Moore going to buy the business Monday? 5 Nov 1982 17:16 PST Coeur dAlene. Buyer Jupiter 19 Scorpio 6th 7th ruler, seller Mercury 4 Scorpio 1st ruler conjunct 15deg, business 10th Uranus 3 Sagittarius.",
+    "technique": "buyer_seller_business_no_aspect",
+    "verdict": "NO",
+    "tags": [
+      "7th_house",
+      "10th_house",
+      "conjunction",
+      "trine",
+      "8th_house"
+    ],
+    "explanation": "Example Chart #17: 5 Nov 1982 17:16 PST Coeur dAlene 47N41 116W46 Is Mr Moore going to buy business Monday? Buyer Jupiter 19 Scorpio 6th ruler 7th, Mercury ruler 1st 4 Scorpio conjunct Jupiter in 15 degrees => yes but not Monday (3 days away). Business 10th Uranus 3 Sagittarius receives no aspect from Jupiter buyer => no connection buyer-business, though buyer-seller connection exists. Moon 14 Cancer trines Jupiter buyer and his money (8th ruler) but answer still no. He might offer but she would not accept. Did not purchase Monday, made low offer 15 days later when Mercury conjunct Jupiter, rejected."
   }
 ]
