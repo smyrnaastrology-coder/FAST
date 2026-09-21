@@ -1734,5 +1734,19 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #28: 10 Dec 1986 21:04 PST Coeur dAlene 47N41 116W46 Did neighbor steal money? Young man working from home large money lost, previous description matched neighbor so asked second question. Neighbor Venus 9 Scorpio ruler 3rd, money Mercury 1 Sagittarius ruler 2nd. No aspect Mercury-Venus, Moon 22 Aries makes no aspect to either => NO. Later money found taken by employee."
+  },
+  {
+    "id": "SCHOOL-LEVY-1988-11-02",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Okul vergisi/odenegi kabul edilecek mi? 2 Nov 1988 13:21 PST Coeur dAlene. Okullar Venus 4 Libra 8th ruler 3rd, kamu fonu Jupiter 3 Gemini 3rd (10th is 8th from 3rd).",
+    "technique": "3rd_8th_from_3rd_no_aspect",
+    "verdict": "YES",
+    "tags": [
+      "3rd_house",
+      "8th_house",
+      "past_aspect",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #29: 2 Nov 1988 13:21 PST Coeur dAlene 47N41 116W46 Will school levy pass? Local election. Schools 3rd house Venus 4 Libra 8th ruler, public money 8th from 3rd is 10th ruler Jupiter 3 Gemini 3rd. Venus-Jupiter trine past, Moon 26 Leo makes no aspect to either. Very close but levy passed."
   }
 ]
