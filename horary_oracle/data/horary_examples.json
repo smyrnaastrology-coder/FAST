@@ -1600,5 +1600,21 @@
       "conjunction_past"
     ],
     "explanation": "Example Chart #19: 23 Feb 1990 07:45 PST Coeur dAlene 47N41 116W46 Should I go to doctor about knee? Querent Mars 18 Capricorn (knees) 10th, doctor Venus 25 Capricorn 11th ruler 7th Venus past conjunction Mars. Sun ruler 6th 4 Pisces applies 14deg sextile to Mars => should go but long applying not immediate. Moon makes no contact to Mars/Venus/Sun but conjuncts Mercury ruler interception in 6th in 4 degrees => advise if still bothering in 4 days make appointment. Long Sun/Mars sextile not immediate, advised hot baths, knee fine in few days never went. Note: sometimes common sense answer not in chart, have faith, answer may make sense to querent not astrologer."
+  },
+  {
+    "id": "BIOPSY-CANCER-1985-09-20",
+    "source": "Only Way Learn Horary - Los Angeles 34N04 118W15",
+    "question": "Biyopsi sonucunda kanser cikar mi? 20 Sep 1985 23:50 PDT Los Angeles. Querent Moon 26 Sagittarius 6th, 6th ruler Jupiter 7 Aquarius 8th (surgery), lot? Will biopsy show cancer?",
+    "technique": "6th_8th_12th_7th_squares_no",
+    "verdict": "NO",
+    "tags": [
+      "6th_house",
+      "8th_house",
+      "12th_house",
+      "7th_house",
+      "square",
+      "no_aspect"
+    ],
+    "explanation": "Example Chart #20: 20 Sep 1985 23:50 PDT Los Angeles 34N04 118W15 Will biopsy show cancer? Querent Moon 26 Sagittarius 6th ruler, very fitting. 6th ruler Jupiter 7 Aquarius 8th house surgery (growths). Moon makes no aspect to Jupiter but squares both Mercury and Sun. Mercury rules 12th hospitalization => NO. Doctor 7th ruler Saturn square Jupiter => another NO. Mass benign. Note: squares/oppositions = NO, trines/sextiles = YES."
   }
 ]
