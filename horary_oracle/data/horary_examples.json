@@ -1706,5 +1706,20 @@
       "opposition"
     ],
     "explanation": "Example Chart #26: 28 Aug 1987 14:08 PDT Coeur dAlene 47N41 116W46 Will I get Washington DC job? Washington State professor applying Executive Director. Jupiter 29 Aries rules Asc 1st represents him, Saturn 14 Sag and Uranus 22 Sag 1st also significators. New job 11th house (6th from 6th) ruler Venus 6 Virgo. Moon and Pluto in 11th validates question, Venus 9th placement also validates distant Washington DC. Jupiter quincunx Venus 11th ruler, Venus squares Saturn Uranus 1st => not promising. Moon 24 Libra 11th opposite Jupiter primary ruler, Moon/Pluto make no aspect to Saturn/Uranus 1st, ascendant Saturn confirms. Not selected."
+  },
+  {
+    "id": "REAL-ESTATE-EXAM-1980-04-05",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Yarinki gayrimenkul sinavini gececek miyim? 5 Apr 1980 13:48 PST Coeur dAlene. Querent Sun 15 Aries 1st ruler 9th, exam 3rd Venus 1 Gemini 10th, Moon 2 Sagittarius.",
+    "technique": "3rd_exam_sextile_trine_opposition_jupiter_asc",
+    "verdict": "YES",
+    "tags": [
+      "3rd_house",
+      "sextile",
+      "trine",
+      "opposition",
+      "jupiter_asc"
+    ],
+    "explanation": "Example Chart #27: 5 Apr 1980 13:48 PST Coeur dAlene 47N41 116W46 Will I pass real estate exam tomorrow? Sun 15 Aries ruler 1st in 9th, exam 3rd ruler Venus 1 Gemini 10th will sextile Sun => YES. Moon 2 Sagittarius opposite Venus past but trine Sun applying => another YES. Sun opposite Pluto 20 Libra 3rd => NO. Jupiter on Asc => YES confirms. 3 yes 1 no => told will pass but study until exam (Sun-Pluto opposition), did and passed with respectable score."
   }
 ]
