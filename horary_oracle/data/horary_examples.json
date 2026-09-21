@@ -1629,5 +1629,19 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #21: 28 Jan 1987 10:46 PST Coeur dAlene 47N41 116W46 Shampoo allergy? Asc + 6th ruler Venus ~22 Sagittarius, Pluto ~10 Scorpio 6th (shampoo/chemical). No aspect Venus-Pluto, Moon void of course => all NO. Venus had conjunct Saturn few days before and allergy seemed less, week later rash completely gone, cause never learned. VOC + no aspect = NO."
+  },
+  {
+    "id": "BREAST-IMPLANT-1987-06-20",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Gogus implanti/silikonu yaptirmali miyim? 20 Jun 1987 18:26 PDT Coeur dAlene. Querent Jupiter 24 Aries 5th, surgery 8th Mercury 16 Cancer ruler, Sun 29 Gemini Mars 20 Cancer in 8th.",
+    "technique": "8th_house_surgery_squares",
+    "verdict": "NO",
+    "tags": [
+      "5th_house",
+      "8th_house",
+      "square",
+      "asc_saturn"
+    ],
+    "explanation": "Example Chart #22: 20 Jun 1987 18:26 PDT Coeur dAlene 47N41 116W46 Breast implant should I? Querent Jupiter 24 Aries 5th, surgery 8th ruler Mercury 16 Cancer, Sun 29 Gemini, Mars 20 Cancer in 8th. Both Mercury and Mars (cut/surgery planet) square Jupiter => NO. Saturn on Ascendant confirms. Advised not to have surgery."
   }
 ]
