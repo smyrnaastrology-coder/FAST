@@ -1375,5 +1375,22 @@
       "2nd_house"
     ],
     "explanation": "Example Chart 18 Oct 1992 12:55 PDT Coeur d'Alene 47N41 116W46 When will the Miltons buy my house? Querent Saturn 11 Aquarius 1st, home Venus 28 Scorpio (Taurus on 4th cusp), Miltons Moon 21 Cancer ruling 7th. Moon will trine Venus in ~7 degrees - candidate timing 7 hours/days/weeks. Moon cardinal angular (fastest), Venus fixed succedent (slowest) - discard years. Check buyer-seller connection: Moon makes no aspect to Saturn, need other planets in 1st/7th: Uranus/Neptune 14/16 Capricorn 1st, Moon/Mars 21/18 Cancer 7th - no applying aspects past. Check buyer money (8th) to seller (1st): Moon ruling buyer 2nd (8th) makes no aspect to seller planets, 8th has Virgo intercepted so Sun must be considered - Sun 25 Libra makes no applying aspect to seller. Timing is only time past aspects may be used to verify. Degrees: Saturn-Sun 14, Uranus-Mars 4, Uranus-Moon 7, Neptune-Mars 2, Neptune-Moon 5. Seven degrees Uranus-Moon reinforces Moon/Venus 7 trine. Both angular cardinal => 7 days. Miltons bought 7 days later Oct 25. NOTE: Past aspects only for timing verification. Also note: question must be possible and answerable - seller/property/buyer must have connection, Moon must aspect rulers, otherwise near future not promising. Validity 6 weeks to 3 months, unanswerable: Will I ever marry, When will war end, When will father die."
+  },
+  {
+    "id": "TOPANGA-1985-08-15",
+    "source": "Only Way Learn Horary - Los Angeles 34N01 118W15",
+    "question": "When will I sell the house in Topanga Canyon? 15 Aug 1985 15:19 PDT Los Angeles. Seller Jupiter 10 Aquarius 1st, buyer Mercury 14 Leo 7th, property 4th cusp 0 Aries.",
+    "technique": "timing_degrees_between_significators_fixed_succedent",
+    "verdict": "YES",
+    "tags": [
+      "timing",
+      "1st_7th",
+      "4th_house",
+      "trine",
+      "quincunx",
+      "fixed",
+      "succedent"
+    ],
+    "explanation": "Example Chart #4: 15 Aug 1985 15:19 PDT Los Angeles 34N01 118W15 When will I sell house Topanga? Seller Jupiter 10 Aquarius 1st, buyer Mercury 14 Leo 7th. Mercury just opposed Jupiter 10 Aquarius. Both fixed signs succedent houses => lengthy timeframe months not days/weeks. Confirmation: 4th cusp 0 Aries will trine Moon in 16 degrees => 16 weeks ~4 months. Also Mars ruler of 4th will quincunx 4th cusp in 16 degrees. Asked Aug 15, sold Nov 15 escrow Dec ~4 months. Note: count degrees relating from question to determine time, they do not have to be making aspect."
   }
 ]
