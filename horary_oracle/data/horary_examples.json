@@ -1674,5 +1674,22 @@
       "no_aspect"
     ],
     "explanation": "Example Chart #24: 6 Mar 1990 20:47 PST Coeur dAlene 47N41 116W46 Should I take job at Shenanigans restaurant? Querent Venus 2 Aquarius 4th, job Neptune 14 Capricorn 3rd ruler 6th daily work. No aspect Venus-Neptune. Moon 25 Cancer only opposite Mars in 3rd. Answer NO dont take job. Very active 3rd house indicated need to spend all time studying."
+  },
+  {
+    "id": "MIRANDA-PARTNERSHIP-1985-06-21",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Mevcut isimden ayrılıp Miranda ile ortak is kurmali miyim? 21 Jun 1985 12:15 PDT Coeur dAlene. Querent Mercury 16 Cancer 10th, current job Uranus 15 Sagittarius 3rd ruler 6th, new business also Mercury + Mars Sun 10th, Miranda Neptune 2 Capricorn 7th.",
+    "technique": "6th_vs_10th_no_aspect_moon_trine_uranus",
+    "verdict": "NO",
+    "tags": [
+      "6th_house",
+      "10th_house",
+      "7th_house",
+      "4th_house",
+      "no_aspect",
+      "trine",
+      "opposition"
+    ],
+    "explanation": "Example Chart #25: 21 Jun 1985 12:15 PDT Coeur dAlene 47N41 116W46 Leave current job and partner with Miranda? Querent Mercury 16 Cancer 10th, current job Uranus 15 Sagittarius 3rd ruler 6th. New business also Mercury + Mars Sun in 10th. Mercury-Uranus no applying, Mercury passed Mars Sun => no clear answer. Miranda 7th Neptune 2 Capricorn, Mercury makes no aspect to Neptune. Moon 9 Leo 11th trines Uranus current job => stay. Miranda business unlikely. Alternative: Miranda 7th ruler Neptune, her 10th is 4th of chart Jupiter ruler, Neptune in 4th shows desire but no aspect Neptune-Jupiter 16 Aquarius, Moon opposite Jupiter => NO. Always check second/third way to confirm, like natal need many confirmations."
   }
 ]
