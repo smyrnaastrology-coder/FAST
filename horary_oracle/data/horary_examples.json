@@ -1392,5 +1392,22 @@
       "succedent"
     ],
     "explanation": "Example Chart #4: 15 Aug 1985 15:19 PDT Los Angeles 34N01 118W15 When will I sell house Topanga? Seller Jupiter 10 Aquarius 1st, buyer Mercury 14 Leo 7th. Mercury just opposed Jupiter 10 Aquarius. Both fixed signs succedent houses => lengthy timeframe months not days/weeks. Confirmation: 4th cusp 0 Aries will trine Moon in 16 degrees => 16 weeks ~4 months. Also Mars ruler of 4th will quincunx 4th cusp in 16 degrees. Asked Aug 15, sold Nov 15 escrow Dec ~4 months. Note: count degrees relating from question to determine time, they do not have to be making aspect."
+  },
+  {
+    "id": "BUSINESS-1985-05-31",
+    "source": "Only Way Learn Horary - Coeur d'Alene 47N41 116W46",
+    "question": "When will my business improve? 31 May 1985 11:20 PDT Coeur d'Alene. Nail salon supply, business 10th Venus 25 Aries 9th, profit 11th (2nd from 10th) Moon 7 Scorpio.",
+    "technique": "timing_quincunx_18_degrees_moderately_fast",
+    "verdict": "YES",
+    "tags": [
+      "timing",
+      "10th_house",
+      "11th_house",
+      "quincunx",
+      "cardinal_cadent",
+      "fixed_cadent",
+      "MC_conjunction"
+    ],
+    "explanation": "Example Chart #5: 31 May 1985 11:20 PDT Coeur d'Alene 47N41 116W46 When will business improve? Business Venus 25 Aries 10th ruler in 9th (mail order distant). Profit 11th house (2nd from 10th) ruler Moon ~7 Scorpio will quincunx Venus in ~18 degrees => 18 days/weeks/months. Venus cardinal cadent (fast+moderately fast) Moon fixed cadent (slow+moderately fast) => moderately fast ~18 weeks. Quincunx indicates change, both positive. Confirmation: MC ~20 Taurus will conjunct Sun 10 Gemini in ~20 degrees => 20 weeks <5 months. Moon 4.5 degrees from Pluto confirmation. In that timeframe large out-of-state order, business picked up."
   }
 ]
