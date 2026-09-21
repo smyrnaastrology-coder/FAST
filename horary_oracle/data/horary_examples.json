@@ -1439,5 +1439,20 @@
       "9th_house"
     ],
     "explanation": "Example 3 Oct 1991 10:58 PDT Coeur dAlene 47N41 116W46 Should I use Connor as attorney? Querent Mars 21 Libra 11th (Scorpio Asc main ruler) + Pluto 18 Scorpio 12th + Moon 9th co-ruler. Connor 7th ruler Venus 28 Leo 9th - legal theme. No applying aspect Venus-Mars, but Moon co-ruling querent will conjunct Venus in 9th => definite YES. She hired him, long case good. If question were Connor or Mathews? 7th still Connor (first lawyer), Mathews is 9th house (not 7th from 7th which would be 1st already querent). Write down approach before judging."
+  },
+  {
+    "id": "BROTHER-BUSINESS-1985-05-31",
+    "source": "Only Way Learn Horary - Coeur dAlene 47N41 116W46",
+    "question": "Should I go into business with my brother? 31 May 1985 07:55 PDT Coeur dAlene. Brother not named => 3rd house Mercury 1 Gemini, querent Moon 4 Scorpio. Named Jim => 7th house.",
+    "technique": "3rd_vs_7th_brother_business_10th_neptune",
+    "verdict": "NO",
+    "tags": [
+      "3rd_house",
+      "7th_house",
+      "10th_house",
+      "quincunx",
+      "sextile_past"
+    ],
+    "explanation": "Example Chart #9: 31 May 1985 07:55 PDT Coeur dAlene 47N41 116W46 Should I go into business with my brother? Brother not named => 3rd house Mercury 1 Gemini (named Jim => 7th). Querent Moon 4 Scorpio Asc ruler. Moon past applying aspect to Mercury => no action between them. Neptune 2 Capricorn ruler 10th business significator. Moon past sextile to Neptune, Mercury applies quincunx to Neptune => brother wants changes, querent not. He ignored advice, took brother and wife in, within year they took share, moved in, left debts and family breach."
   }
 ]
