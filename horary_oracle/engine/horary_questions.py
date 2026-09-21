@@ -69,7 +69,7 @@ TYPE_KEYWORDS = [
     ("coworker", ("iş arkadaşım", "is arkadasim", "iş arkadaşı", "is arkadasi", "mesai arkadaşım", "mesai arkadasim", "çalışma arkadaşım", "calisma arkadasim")),
     ("friend", ("arkadaşım", "arkadasim", "arkadaşının", "arkadasinin", "dostum")),
     ("sibling", ("kardeşim", "kardesim", "erkek kardeşim", "erkek kardesim", "ablam", "abim", "ağabeyim", "agabeyim", "bacım", "bacim", "kardeşimin", "kardesimin")),
-    ("sport_fav", ("beşiktaş kazanacak", "besiktas kazanacak", "galatasaray kazanacak", "fenerbahçe kazanacak", "fenerbahce kazanacak", "trabzon kazanacak", "tuttuğum takım kazanacak", "tuttugum takim kazanacak", "takımım kazanacak", "takimim kazanacak", "maçı kazanacak", "maci kazanacak")),
+    ("sport_fav", ("beşiktaş kazanacak", "besiktas kazanacak", "galatasaray kazanacak", "fenerbahçe kazanacak", "fenerbahce kazanacak", "trabzon kazanacak", "diyarbakırspor", "diyarbakirspor", "tuttuğum takım kazanacak", "tuttugum takim kazanacak", "takımım kazanacak", "takimim kazanacak", "maçı kazanacak", "maci kazanacak", "maçı kim kazanacak", "maci kim kazanacak", "kim kazanır", "kim kazanacak")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
     ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
