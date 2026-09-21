@@ -917,10 +917,15 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         house_type="succedent"
     else:
         house_type="cadent"
+    # Kaynak: en zor kısım - açı evlerindeki burçlar (1,4,7,10) ve Ay burcu dikkate alınır
+    # CARDINAL en hızlı: Angular Saat / Succedent Gün / Cadent Hafta
+    # MUTABLE orta: Angular Gün / Succedent Hafta / Cadent Ay
+    # FIXED en yavaş: Angular Hafta / Succedent Ay / Cadent Yıl
+    # Evler de hesaba katılır: Angular ↔ Cardinal (en hızlı), Cadent ↔ Mutable (orta), Succedent ↔ Fixed (en yavaş)
     time_map = {
-        ("cardinal","angular"):"GÜN", ("cardinal","succedent"):"HAFTA", ("cardinal","cadent"):"AY",
-        ("mutable","angular"):"HAFTA", ("mutable","succedent"):"AY", ("mutable","cadent"):"YIL",
-        ("fixed","angular"):"AY", ("fixed","succedent"):"YIL", ("fixed","cadent"):"BELİRSİZ (1 hafta içinde tekrar sor)"
+        ("cardinal","angular"):"SAAT", ("cardinal","succedent"):"GÜN", ("cardinal","cadent"):"HAFTA",
+        ("mutable","angular"):"GÜN", ("mutable","succedent"):"HAFTA", ("mutable","cadent"):"AY",
+        ("fixed","angular"):"HAFTA", ("fixed","succedent"):"AY", ("fixed","cadent"):"YIL"
     }
     timing_unit = time_map.get((burc_type,house_type),"")
     # Ay ile belirleyici arası derece = süre sayısı
