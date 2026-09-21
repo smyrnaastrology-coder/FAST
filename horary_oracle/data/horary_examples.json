@@ -1409,5 +1409,21 @@
       "MC_conjunction"
     ],
     "explanation": "Example Chart #5: 31 May 1985 11:20 PDT Coeur d'Alene 47N41 116W46 When will business improve? Business Venus 25 Aries 10th ruler in 9th (mail order distant). Profit 11th house (2nd from 10th) ruler Moon ~7 Scorpio will quincunx Venus in ~18 degrees => 18 days/weeks/months. Venus cardinal cadent (fast+moderately fast) Moon fixed cadent (slow+moderately fast) => moderately fast ~18 weeks. Quincunx indicates change, both positive. Confirmation: MC ~20 Taurus will conjunct Sun 10 Gemini in ~20 degrees => 20 weeks <5 months. Moon 4.5 degrees from Pluto confirmation. In that timeframe large out-of-state order, business picked up."
+  },
+  {
+    "id": "FERNAN-1979-08-17",
+    "source": "Only Way Learn Horary - Coeur d'Alene 47N41 116W46",
+    "question": "Will we get the house in Fernan Village? When will we find out? 17 Aug 1979 20:49 PDT Coeur d'Alene. Querent Neptune 17 Sagittarius Asc ruler, house 4th Mercury 6 Leo, buyer-seller agreement.",
+    "technique": "timing_moon_conjunct_mars_cardinal_angular",
+    "verdict": "YES",
+    "tags": [
+      "timing",
+      "4th_house",
+      "trine",
+      "conjunction",
+      "cardinal",
+      "angular"
+    ],
+    "explanation": "Example Chart #6: 17 Aug 1979 20:49 PDT Coeur d'Alene 47N41 116W46 Will we get house Fernan Village? Querent Neptune 17 Sagittarius ruler Asc, house 4th Mercury 6 Leo. Mercury trines Neptune => will get house. Moon 4 Cancer will conjunct Mars in 4th in 2 degrees => expected 2 days (both cardinal angular fastest Hours). Asked 20:49, realtor called 22:40 same night => 2 hours not days. When you time, it does not matter whether planets applying or separating. This is first and last time you do not adhere to applying-only rule."
   }
 ]
