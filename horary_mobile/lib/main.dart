@@ -216,7 +216,8 @@ class _HoraryHomeState extends State<HoraryHome> {
   Future<void> _saveHistory(String q) async {
     final p=await SharedPreferences.getInstance();
     final list=p.getStringList('chat_history')??[];
-    list.add('${DateTime.now().toIso8601String().substring(0,10)} | $q');
+    final ts=DateTime.now().toIso8601String().substring(0,16).replace('T',' ');
+    list.add('$ts | $q | ${lat.toStringAsFixed(4)},${lon.toStringAsFixed(4)}');
     if(list.length>30) list.removeAt(0);
     await p.setStringList('chat_history', list);
     await p.setString('lang', lang);
