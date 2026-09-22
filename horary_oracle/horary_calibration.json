@@ -557,5 +557,34 @@
     "note": "20.09 00:30 Izmir kiz kardes Manavgat 420.3km 114.3GD - H2->H3 fix sonrasi",
     "_id": 22,
     "ts": "2026-09-20T12:52:37"
+  },
+  {
+    "question_type": "teacher",
+    "origin": "43.3623,-5.8448",
+    "destination": "Izmir",
+    "house": 9,
+    "significator": "Saturn",
+    "sign": "Oğlak",
+    "sign_querent": null,
+    "degree": 6.34,
+    "querent_planet": "Saturn",
+    "querent_degree": 0,
+    "angular_difference": 6.34,
+    "modality": "celestial_lat",
+    "modality_multiplier": 1.671,
+    "celestial_lat": -2.7036,
+    "components": {
+      "house": 315,
+      "sign_corr": -10,
+      "planet_corr": -5,
+      "ang_adj": 13.82,
+      "angular": 172.9188612086173
+    },
+    "condition": 0.911,
+    "real_distance_km": 2807.5,
+    "real_bearing": 89.9,
+    "note": "22.09.2026 21:01 Oviedo Fatih Hocam nerede? gercek Izmir 2807km 89.9D, tahmin 970km 129GD",
+    "_id": 23,
+    "ts": "2026-09-23T00:10:40"
   }
 ]
