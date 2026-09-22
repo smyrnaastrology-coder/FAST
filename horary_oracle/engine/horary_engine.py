@@ -928,15 +928,19 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         ("fixed","angular"):"HAFTA", ("fixed","succedent"):"AY", ("fixed","cadent"):"YIL"
     }
     timing_unit = time_map.get((burc_type,house_type),"")
-    # Ay ile belirleyici arası derece = süre sayısı
-    # belirleyici quesited, değilse querent
+    # Kullanıcı notu: arada kaç derece olduğu değil, ilk majör açıyı yapmaya kaç orb kaldığına bakılmalı
     target_lon = quesited["data"]["lon"]
     moon_lon2 = planets["Moon"]["lon"]
-    deg_diff = abs((target_lon - moon_lon2 + 360) % 360)
-    # 0-360 arası en kısa değil, direkt fark
-    if deg_diff > 180:
-        deg_diff = 360 - deg_diff
-    timing = {"unit":timing_unit,"degrees":round(deg_diff,1),"burc_type":burc_type,"house_type":house_type,"text":f"{round(deg_diff)} {timing_unit}"}
+    diff_forward = (target_lon - moon_lon2) % 360  # Moon'dan hedefe ileri yönde
+    # ilk majör açıya kalan orb (0,60,90,120,180) — uygulayan açı
+    aspects = [0,60,90,120,180,240,300,360]
+    orb_to_next = min(((ang - diff_forward) % 360) for ang in aspects)
+    # 0 ise zaten kavuşumda, 360 ise bir sonraki kavuşum
+    if orb_to_next == 360:
+        orb_to_next = 0
+    # sembolik derece = orb, toplam ayrım değil
+    deg_diff = orb_to_next
+    timing = {"unit":timing_unit,"degrees":round(deg_diff,1),"burc_type":burc_type,"house_type":house_type,"text":f"{round(deg_diff)} {timing_unit}", "orb_to_next": round(orb_to_next,1), "diff_forward": round(diff_forward,1)}
     # Ephemeris gerçek kavuşum tarihi (sembolik derece yerine)
     try:
         # Ay → quesited/Lot için gerçek aspect tarihi ara (0.25 gün adımla 365 gün)
