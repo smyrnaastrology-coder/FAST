@@ -586,5 +586,34 @@
     "note": "22.09.2026 21:01 Oviedo Fatih Hocam nerede? gercek Izmir 2807km 89.9D, tahmin 970km 129GD",
     "_id": 23,
     "ts": "2026-09-23T00:10:40"
+  },
+  {
+    "question_type": "student",
+    "origin": "38.4237,27.1428",
+    "destination": "Oviedo",
+    "house": 3,
+    "significator": "Sun",
+    "sign": "Aslan",
+    "sign_querent": null,
+    "degree": 7.81,
+    "querent_planet": "Sun",
+    "querent_degree": 0,
+    "angular_difference": 7.81,
+    "modality": "celestial_lat",
+    "modality_multiplier": 0.6626,
+    "celestial_lat": -0.0,
+    "components": {
+      "house": 135,
+      "sign_corr": -5,
+      "planet_corr": 0,
+      "ang_adj": 7.39,
+      "angular": 134.34097994504418
+    },
+    "condition": 0.121,
+    "real_distance_km": 2807.5,
+    "real_bearing": 291.9,
+    "note": "23.09 00:11 Izmir kiz ogrencim Nisa Oviedo 2807km 291.9 KB - tip bazli median ile diger tipler sapmaz",
+    "_id": 24,
+    "ts": "2026-09-23T00:16:55"
   }
 ]
