@@ -32,6 +32,7 @@ QUESTION_HOUSES = {
     "lost_object": 2,
     "job": 10,
     "home": 4,
+    "hidden_enemy": 12,  # şikayet eden / gizli düşman
     "sport_fav": 5,      # tuttuğun takım (oyun/spor) -> 5.ev; rakip onun 5.'si -> 11.ev (turned)
     "sport_rival": 11,
 }
@@ -44,7 +45,7 @@ LABEL_TR = {
     "teacher": "Hoca/Öğretmen", "university": "Üniversite", "student": "Öğrenci",
     "astrology_student": "Astroloji öğrencisi",
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
-    "home": "Ev/Ev dairesi", "partner": "Eş/Partner",
+    "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
     "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
 }
 
@@ -81,6 +82,7 @@ TYPE_KEYWORDS = [
     ("lost_object", ("bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim")),
     ("job", ("işim", "isim", "mesleğim", "meslegim", "kariyerim")),
     ("home", ("evim", "evimin", "dairem", "apartmanım", "apartmanim", "sitem")),
+    ("hidden_enemy", ("şikayet eden", "sikayet eden", "şikayetçi", "sikayetci", "ispiyonlayan", "gizli düşman", "gizli dusman")),
     ("university", ("üniversitem", "universitem", "okulum", "fakültem", "fakultem")),
     ("self", ("neredeyim", "nerdeyim", "ben nerede", "ben nerde")),
 ]
