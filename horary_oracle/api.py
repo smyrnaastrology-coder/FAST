@@ -672,7 +672,7 @@ async def cast(req: CastRequest):
     }
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
-        engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru."
+        engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
     # anlama öncesi özet - ne anladığını tek cümlede özetleyip onayla
     engine_json["pre_summary_instruction"] = "ÖNCE tek cümlede ne anladığını özetle: 'Anladığım: [kim] [ne] [nerede/ne zaman] — doğru mu?' diye sor, sonra hükme geç. Yanlış anladıysan düzeltme iste."
     # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
