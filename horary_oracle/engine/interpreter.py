@@ -257,6 +257,8 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     except: pass
     if engine_json.get("tone_instruction"):
         prompt += f"\n\nTONE: {engine_json['tone_instruction']}"
+    if engine_json.get("pre_summary_instruction"):
+        prompt += f"\n\nPRE-SUMMARY: {engine_json['pre_summary_instruction']}"
     if engine_json.get("loc_instruction"):
         prompt += f"\n\nSPECIAL INSTRUCTION: {engine_json['loc_instruction']}"
     if engine_json.get("theft_analysis"):
