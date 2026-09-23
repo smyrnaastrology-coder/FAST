@@ -63,6 +63,7 @@ class _AuthGateState extends State<AuthGate> {
         if(res['ok']==true){
           await p.setString('expiry', res['expiry'] ?? '');
           await p.setInt('days_left', res['days_left'] ?? 365);
+          await p.setString('plan', res['plan'] ?? '');
           setState(()=> _ok=true);
         } else if(expired){
           await p.remove('email'); await p.remove('pass'); await p.remove('login_ts');
@@ -83,7 +84,7 @@ class _AuthGateState extends State<AuthGate> {
           await p.setString('email', email); await p.setString('pass', pass);
           await p.setBool('remember', remember);
           await p.setInt('login_ts', DateTime.now().millisecondsSinceEpoch);
-          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365);
+          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365); await p.setString('plan', res['plan'] ?? '');
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -138,7 +139,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
   bool _showLanding=true;
-  int _daysLeft=365; String _expiryStr='';
+  int _daysLeft=365; String _expiryStr=''; String _plan='';
   String _ad='', _soyad='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
@@ -220,6 +221,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     if(e.isNotEmpty){
       try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
     }
+    _plan=p.getString('plan')??'';
     setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty});
   }
 
@@ -424,6 +426,7 @@ class _HoraryHomeState extends State<HoraryHome> {
           Text(tr('subtitle'), style: const TextStyle(color: Color(0xFFa898c0), fontSize: 9, letterSpacing: 2)),
         ]), centerTitle: true,
         actions: [
+          if(_plan.isNotEmpty) Padding(padding: const EdgeInsets.only(right:8, top:12), child: Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: _plan=='elite' ? const Color(0xFFD4AF37) : _plan=='premium' ? const Color(0xFFC9A96E) : const Color(0xFF6a9ae2), borderRadius: BorderRadius.circular(8)), child: Text(_plan.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize:10, fontWeight: FontWeight.bold)))),
           IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
