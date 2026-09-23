@@ -993,7 +993,7 @@ async function load(){
   const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
   (j.users||[]).forEach(u=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 8k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
+    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 10k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
     tb.appendChild(tr);
   });
 }
