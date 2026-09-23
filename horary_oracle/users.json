@@ -1,11 +1,12 @@
 {
   "smyrnaastrology@gmail.com": {
     "pwd": "b6389945655fb244ba632c9b883da9028145ec2a8d95b77f79c0a88cc7025dac",
-    "expiry": "2027-08-24T14:11:09.806600",
+    "expiry": "2027-09-23T13:30:27.433351",
     "created": "2026-08-24T14:11:09.807600",
     "device_ids": [
       "test123"
     ],
-    "device_id": "test123"
+    "device_id": "test123",
+    "plan": "elite"
   }
 }
