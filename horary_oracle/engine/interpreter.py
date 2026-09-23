@@ -299,7 +299,7 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         from openai import OpenAI
         client = OpenAI(api_key=key)
         prompt = build_prompt(engine_json, lang)
-        resp = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
+        resp = client.chat.completions.create(model="gpt-4o", messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
         txt = resp.choices[0].message.content
         # son doğrulama katmanı: gezegen burç halüsinasyonunu motorla düzelt
         txt = _correct_planet_hallucination(txt, engine_json)
