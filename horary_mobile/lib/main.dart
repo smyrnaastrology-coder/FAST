@@ -2,7 +2,6 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'config/theme.dart';
 import 'services/horary_api.dart';
-import 'widgets/lost_radar_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -53,13 +52,21 @@ class _AuthGateState extends State<AuthGate> {
     try{
       final p = await SharedPreferences.getInstance();
       final e=p.getString('email'), pw=p.getString('pass');
-      if(e!=null && pw!=null){
+      final remember = p.getBool('remember') ?? true;
+      final ts = p.getInt('login_ts') ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final oneYear = 365*24*60*60*1000;
+      final expired = remember ? (ts!=0 && now - ts > oneYear) : false;
+      if(e!=null && pw!=null && !expired){
         final did = await _deviceId();
         final res = await HoraryApi.login(email:e, password:pw, deviceId: did);
         if(res['ok']==true){
           await p.setString('expiry', res['expiry'] ?? '');
           await p.setInt('days_left', res['days_left'] ?? 365);
+          await p.setString('plan', res['plan'] ?? '');
           setState(()=> _ok=true);
+        } else if(expired){
+          await p.remove('email'); await p.remove('pass'); await p.remove('login_ts');
         }
       }
     }catch(_){}
@@ -68,14 +75,16 @@ class _AuthGateState extends State<AuthGate> {
   @override Widget build(BuildContext context) {
     if(_check) return const Scaffold(body: Center(child: CircularProgressIndicator(color: Color(0xFFC9A96E))));
     if(_ok) return const HoraryHome();
-    return LoginScreen(onLogin: (email, pass) async {
+    return LoginScreen(onLogin: (email, pass, remember) async {
       try {
         final did = await _deviceId();
         final res = await HoraryApi.login(email: email, password: pass, deviceId: did);
         if(res['ok']==true) {
           final p = await SharedPreferences.getInstance();
           await p.setString('email', email); await p.setString('pass', pass);
-          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365);
+          await p.setBool('remember', remember);
+          await p.setInt('login_ts', DateTime.now().millisecondsSinceEpoch);
+          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365); await p.setString('plan', res['plan'] ?? '');
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -85,12 +94,12 @@ class _AuthGateState extends State<AuthGate> {
 }
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onLogin});
-  final Future<bool> Function(String,String) onLogin;
+  final Future<bool> Function(String,String,bool) onLogin;
   @override State<LoginScreen> createState()=> _LoginScreenState();
 }
 class _LoginScreenState extends State<LoginScreen> {
   final _e=TextEditingController(), _p=TextEditingController();
-  bool _loading=false; String? _err;
+  bool _loading=false; String? _err; bool _remember=true;
   @override Widget build(BuildContext context) {
     return Scaffold(backgroundColor: const Color(0xFF0F0A18), body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth:400), child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
       const Text('ASARTEPE', style: TextStyle(color: Color(0xFFC9A96E), fontSize:28, letterSpacing:6, fontWeight: FontWeight.w700)),
@@ -99,10 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
       TextField(controller:_e, decoration: InputDecoration(labelText:'E-mail', filled:true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), style: const TextStyle(color:Colors.black)),
       const SizedBox(height:12),
       TextField(controller:_p, obscureText:true, decoration: InputDecoration(labelText:'Sifre', filled:true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), style: const TextStyle(color:Colors.black)),
+      Row(children: [Checkbox(value:_remember, onChanged:(v)=> setState(()=> _remember=v??true), activeColor: const Color(0xFFC9A96E)), const Text('Beni hatırla (1 yıl)', style: TextStyle(color: Colors.white70, fontSize:13))]),
       if(_err!=null) Padding(padding: const EdgeInsets.only(top:8), child: Text(_err!, style: const TextStyle(color:Colors.redAccent))),
       const SizedBox(height:20),
-      SizedBox(width:double.infinity, child: ElevatedButton(onPressed: _loading?null:() async { setState(()=> _loading=true); final ok=await widget.onLogin(_e.text.trim(), _p.text); if(!ok) setState(()=> _err='Giris basarisiz / suresi doldu'); setState(()=> _loading=false); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC9A96E), padding: const EdgeInsets.symmetric(vertical:16)), child: _loading? const SizedBox(height:20, child: CircularProgressIndicator(strokeWidth:2)): const Text('GIRIS', style: TextStyle(color:Colors.black, fontWeight: FontWeight.bold)))),
-      const SizedBox(height:12), const Text('TR kapali devre - 1 yil lisans', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
+      SizedBox(width:double.infinity, child: ElevatedButton(onPressed: _loading?null:() async { setState(()=> _loading=true); final ok=await widget.onLogin(_e.text.trim(), _p.text, _remember); if(!ok) setState(()=> _err='Giris basarisiz / suresi doldu'); setState(()=> _loading=false); }, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFC9A96E), padding: const EdgeInsets.symmetric(vertical:16)), child: _loading? const SizedBox(height:20, child: CircularProgressIndicator(strokeWidth:2)): const Text('GIRIS', style: TextStyle(color:Colors.black, fontWeight: FontWeight.bold)))),
+      const SizedBox(height:12), const Text('Kapalı devre - 1 yıl lisans (hatırla açıkken şifre sorulmaz)', style: TextStyle(color: Color(0xFFa898c0), fontSize:11)),
     ]))))); }
 }
 
@@ -129,7 +139,8 @@ class _HoraryHomeState extends State<HoraryHome> {
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
   bool _showLanding=true;
-  int _daysLeft=365; String _expiryStr='';
+  int _daysLeft=365; String _expiryStr=''; String _plan='';
+  String _ad='', _soyad='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
   bool get _showRadar {
@@ -147,7 +158,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     }
   }
 
-  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _checkIntro(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _loadProfile(); _checkIntro(); }
   Future<void> _checkIntro() async {
     final p=await SharedPreferences.getInstance();
     if(p.getBool('horary_intro_shown')==true) return;
@@ -195,6 +206,14 @@ class _HoraryHomeState extends State<HoraryHome> {
       ),
     )));
   }
+  Future<void> _loadProfile() async {
+    final p=await SharedPreferences.getInstance();
+    setState(()=> {_ad=p.getString('profile_ad')??'', _soyad=p.getString('profile_soyad')??''});
+  }
+  Future<void> _saveProfile() async {
+    final p=await SharedPreferences.getInstance();
+    await p.setString('profile_ad', _ad); await p.setString('profile_soyad', _soyad);
+  }
   Future<void> _loadExpiry() async {
     final p=await SharedPreferences.getInstance();
     final e=p.getString('expiry')??''; 
@@ -202,6 +221,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     if(e.isNotEmpty){
       try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
     }
+    _plan=p.getString('plan')??'';
     setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty});
   }
 
@@ -384,6 +404,18 @@ class _HoraryHomeState extends State<HoraryHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(backgroundColor: const Color(0xFF1A1423), child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Profil - ad soyad
+        Padding(padding: const EdgeInsets.all(16), child: Row(children: [
+          const Icon(Icons.person, color: Color(0xFFC9A96E), size:20),
+          const SizedBox(width:8),
+          Expanded(child: Text(_ad.isEmpty && _soyad.isEmpty ? 'Profil: Ad Soyad ekle' : '$_ad $_soyad', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:13))),
+          IconButton(icon: const Icon(Icons.edit, size:16, color: Color(0xFFC9A96E)), onPressed: () async {
+            final adCtrl=TextEditingController(text:_ad), soyCtrl=TextEditingController(text:_soyad);
+            final ok=await showDialog<bool>(context: context, builder: (_)=> AlertDialog(backgroundColor: const Color(0xFF2a1f38), title: const Text('Profil', style: TextStyle(color: Color(0xFFC9A96E))), content: Column(mainAxisSize: MainAxisSize.min, children: [TextField(controller: adCtrl, decoration: const InputDecoration(labelText:'Ad', labelStyle: TextStyle(color: Color(0xFFa898c0))), style: const TextStyle(color: Colors.white)), TextField(controller: soyCtrl, decoration: const InputDecoration(labelText:'Soyad', labelStyle: TextStyle(color: Color(0xFFa898c0))), style: const TextStyle(color: Colors.white))]), actions: [TextButton(onPressed: ()=> Navigator.pop(context,false), child: const Text('İptal')), ElevatedButton(onPressed: ()=> Navigator.pop(context,true), child: const Text('Kaydet'))]));
+            if(ok==true){ setState(()=> {_ad=adCtrl.text.trim(), _soyad=soyCtrl.text.trim()}); _saveProfile(); }
+          }),
+        ])),
+        const Divider(color: Color(0xFF3d2e50)),
         Padding(padding: const EdgeInsets.all(16), child: Text('Geçmiş Sorular', style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize:18, fontWeight: FontWeight.bold))),
         const Divider(color: Color(0xFF3d2e50)),
         Expanded(child: _historyList.isEmpty ? const Padding(padding: EdgeInsets.all(16), child: Text('Henüz soru yok', style: TextStyle(color: Color(0xFFa898c0)))) : ListView.builder(itemCount: _historyList.length, itemBuilder: (_,i){
@@ -400,6 +432,7 @@ class _HoraryHomeState extends State<HoraryHome> {
           Text(tr('subtitle'), style: const TextStyle(color: Color(0xFFa898c0), fontSize: 9, letterSpacing: 2)),
         ]), centerTitle: true,
         actions: [
+          if(_plan.isNotEmpty) Padding(padding: const EdgeInsets.only(right:8, top:10), child: Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:6), decoration: BoxDecoration(gradient: LinearGradient(colors: _plan=='elite' ? [Color(0xFFFFD700), Color(0xFFD4AF37)] : _plan=='premium' ? [Color(0xFFC9A96E), Color(0xFF8a6d3b)] : [Color(0xFF6a9ae2), Color(0xFF4a6fa5)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: (_plan=='elite' ? Color(0xFFFFD700) : Color(0xFFC9A96E)).withOpacity(0.5), blurRadius:8)], border: Border.all(color: Colors.white.withOpacity(0.3))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(_plan=='elite' ? Icons.star : Icons.workspace_premium, size:14, color: Colors.black), const SizedBox(width:4), Text(_plan.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold, letterSpacing:1))]))),
           IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
@@ -486,21 +519,7 @@ class _HoraryHomeState extends State<HoraryHome> {
                 Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
               ])),
           ),
-          // Kayıp radar - sadece nerede/kayıp/taşınma sorularında
-          if(_lastChart!=null && _showRadar && _lastChart!['location']!=null && _lastChart!['location']['direction']!=null) Padding(
-            padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
-            child: LostRadarMap(
-              lat: lat, lon: lon,
-              direction: _lastChart!['location']['direction'] ?? 'BATI',
-              distance: ((_lastChart!['location']['qq_distance_km'] ?? 0) != 0 && _lastChart!['location']['person'] != 'kedi' && _lastChart!['location']['person'] != 'köpek') ? '${((_lastChart!['location']['qq_distance_km'] as num).round())} km' : (_lastChart!['location']['distance'] ?? ''),
-              place: _lastChart!['location']['place'] ?? '',
-              house: _lastChart!['location']['house'] ?? 7,
-              deg: (_lastChart!['location']['deg'] is num) ? (_lastChart!['location']['deg'] as num).toDouble() : 15,
-              signDirection: _lastChart!['location']['sign_direction'] ?? '',
-              directionNote: _lastChart!['location']['direction_note'] ?? '',
-              directionOk: _lastChart!['location']['direction_ok'] ?? true,
-            ),
-          ),
+          // radar webde devre disi (flutter_map yok) - mobilde aktif
           // 2) Derived ağaç görseli
           if(_lastChart!=null && _lastChart!['derived_info']!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
