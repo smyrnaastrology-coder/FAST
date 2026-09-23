@@ -1089,4 +1089,22 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
     _auth4._save(db)
     return {"user": email, "credits": u["credits"], "plan": u.get("plan","")}
 
+@app.post("/admin/reset_devices")
+def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
+    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
+    if x_admin_key not in _allowed:
+        return {"error": "unauthorized"}
+    email=(payload.get("user") or payload.get("email") or "").strip().lower()
+    if not email:
+        return {"error": "user gerekli"}
+    import auth as _auth5
+    db=_auth5._load()
+    u=db.get(email)
+    if not u:
+        return {"error": "kullanici yok"}
+    u["device_ids"]=[]
+    u.pop("device_id",None)
+    _auth5._save(db)
+    return {"ok": True, "user": email}
+
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
