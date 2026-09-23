@@ -423,6 +423,7 @@ class _HoraryHomeState extends State<HoraryHome> {
           return ListTile(dense:true, title: Text(h, style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:12), maxLines:2, overflow: TextOverflow.ellipsis), leading: const Icon(Icons.history, size:16, color: Color(0xFFC9A96E)), onTap: (){ Navigator.pop(context); _ctrl.text = h.split('|').last.trim(); });
         })),
         Padding(padding: const EdgeInsets.all(12), child: OutlinedButton(onPressed: () async { final p=await SharedPreferences.getInstance(); await p.remove('chat_history'); setState(()=> _historyList=[]); }, child: Text(tr('clear'), style: const TextStyle(color: Color(0xFFa898c0))))),
+        Padding(padding: const EdgeInsets.symmetric(horizontal:12), child: OutlinedButton(onPressed: () async { final p=await SharedPreferences.getInstance(); await p.clear(); if(context.mounted) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_)=> const AuthGate()), (_)=> false); }, style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent, side: const BorderSide(color: Colors.redAccent)), child: const Text('''Çıkış Yap — Plan yenile''', style: TextStyle(color: Colors.redAccent, fontSize:12)))),
       ]))),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1423),
