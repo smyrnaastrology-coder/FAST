@@ -13,10 +13,10 @@ def _load():
 def _save(d): json.dump(d, open(DB,'w',encoding='utf-8'), ensure_ascii=False, indent=2)
 def hash_pass(p): return hashlib.sha256(p.encode()).hexdigest()
 def gen_pass(n=8): return ''.join(secrets.choice(string.ascii_letters+string.digits) for _ in range(n))
-def create_user(email, days=2):
+def create_user(email, days=365):
     """Yeni kayit: 2 gun deneme (trial). Suresiz degil, dolunca satın alma gerekir. 1 yil lisans icin extend() cagrilir."""
     db=_load(); pwd=gen_pass()
-    db[email.lower()]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat(),"is_trial": days<=2}
+    db[email.lower()]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat()}
     _save(db); return pwd
 HARDCODED={"smyrnaastrology@gmail.com": "Tuana21.", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez - deneme kullanicilari users.json'da 2 gun
 def verify(email,pwd, device_id=None):
