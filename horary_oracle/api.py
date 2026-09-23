@@ -670,6 +670,19 @@ async def cast(req: CastRequest):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
+    # kullanici plani -> model secimi (oracle 5k mini, premium 8k 4o, elite 15k o1)
+    try:
+        import auth as _auth2
+        _db=_auth2._load()
+        _email=getattr(req, 'email', None) or getattr(req, 'user', None) or ""
+        # horary_api.cast'da email req'de yoksa, location'dan da bak
+        if not _email:
+            _email=(req.dict().get("email") if hasattr(req,"dict") else "") or ""
+        if _email:
+            _u=_db.get(_email.lower())
+            if _u and _u.get("plan"):
+                engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
+    except: pass
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
@@ -971,7 +984,7 @@ def admin_page():
 <h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
 <div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="2" style="width:60px"> gün <button onclick="createUser()">Uret</button> <span id="out"></span></div>
-<table id="tbl"><thead><tr><th>Kullanici</th><th>Expiry</th><th>Trial</th><th>Cihaz</th></tr></thead><tbody></tbody></table>
+<table id="tbl"><thead><tr><th>Kullanici</th><th>Plan</th><th>Expiry</th><th>Trial</th><th>Cihaz</th><th>Islem</th></tr></thead><tbody></tbody></table>
 <script>
 async function load(){
   const k=document.getElementById('key').value;
@@ -980,10 +993,12 @@ async function load(){
   const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
   (j.users||[]).forEach(u=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${u.user}</td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td>`;
+    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 8k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
     tb.appendChild(tr);
   });
 }
+async function setPlan(user,plan){ const k=document.getElementById('key').value; await fetch('/admin/set_plan',{method:'POST', headers:{'Content-Type':'application/json','x-admin-key':k}, body:JSON.stringify({user,plan})}); load(); }
+async function resetDevices(user){ const k=document.getElementById('key').value; await fetch('/admin/reset_devices',{method:'POST', headers:{'Content-Type':'application/json','x-admin-key':k}, body:JSON.stringify({user})}); load(); }
 async function createUser(){
   const k=document.getElementById('key').value;
   const email=document.getElementById('email').value.trim();

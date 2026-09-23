@@ -299,7 +299,19 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         from openai import OpenAI
         client = OpenAI(api_key=key)
         prompt = build_prompt(engine_json, lang)
-        resp = client.chat.completions.create(model="gpt-4o", messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
+        # 3 kademe: oracle 5k -> mini, premium 8k -> 4o, elite 15k -> o1
+        plan = (engine_json.get("user_plan") or engine_json.get("plan") or "").lower()
+        if plan == "elite":
+            model = "o1"
+            # o1 temperature desteklemez, max_completion_tokens kullan
+            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], max_completion_tokens=1200)
+        elif plan == "premium":
+            model = "gpt-4o"
+            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
+        else:
+            # oracle 5k ve digerleri
+            model = "gpt-4o-mini"
+            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
         txt = resp.choices[0].message.content
         # son doğrulama katmanı: gezegen burç halüsinasyonunu motorla düzelt
         txt = _correct_planet_hallucination(txt, engine_json)
