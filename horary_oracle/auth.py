@@ -42,7 +42,8 @@ def verify(email,pwd, device_id=None):
             u["device_ids"]=[device_id]; u["device_id"]=device_id; _save(db)
         # elite icin plan bilgisi de dondur
         _plan = db.get(email.lower(),{}).get("plan") if db.get(email.lower()) else "elite" if email.lower()=="smyrnaastrology@gmail.com" else ""
-        return True, {"days_left":364,"warn":False,"expiry":(datetime.now()+timedelta(days=365)).isoformat(),"plan":_plan}
+        _cr = db.get(email.lower(),{}).get("credits", -1) if db.get(email.lower()) else -1
+        return True, {"days_left":364,"warn":False,"expiry":(datetime.now()+timedelta(days=365)).isoformat(),"plan":_plan,"credits":_cr}
     db=_load(); u=db.get(email.lower())
     if not u: return False, "kullanici yok"
     if u["pwd"]!=hash_pass(pwd): return False, "sifre yanlis"
@@ -54,7 +55,7 @@ def verify(email,pwd, device_id=None):
     if exp < datetime.now(): return False, "suresi doldu"
     days_left=(exp-datetime.now()).days
     warn = days_left<=30
-    return True, {"days_left":days_left,"warn":warn,"expiry":u["expiry"],"plan":u.get("plan","")}
+    return True, {"days_left":days_left,"warn":warn,"expiry":u["expiry"],"plan":u.get("plan",""),"credits":u.get("credits",-1)}
 def extend(email,days=365):
     db=_load(); u=db.get(email.lower())
     if not u: return False

@@ -79,7 +79,7 @@ TYPE_KEYWORDS = [
     ("mother", ("annem", "annemin", "anam", "anneciğim", "annecigim")),
     ("father", ("babam", "babamin", "babamın", "babacığım", "babacigim")),
     ("money", ("param", "maaşım", "maasim", "gelirim", "cüzdanım", "cuzdanim", "mücevherim", "mucevherim", "altınlarım", "altinlarim")),
-    ("lost_object", ("bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim")),
+    ("lost_object", ("kalemim", "kalem", "bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim")),
     ("job", ("işim", "isim", "mesleğim", "meslegim", "kariyerim")),
     ("home", ("evim", "evimin", "dairem", "apartmanım", "apartmanim", "sitem")),
     ("hidden_enemy", ("şikayet eden", "sikayet eden", "şikayetçi", "sikayetci", "ispiyonlayan", "gizli düşman", "gizli dusman")),
