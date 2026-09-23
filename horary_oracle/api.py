@@ -683,6 +683,28 @@ async def cast(req: CastRequest):
             if _u and _u.get("plan"):
                 engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
     except: pass
+    # kredi kontrolu (100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL)
+    try:
+        import auth as _auth3
+        _db3=_auth3._load()
+        _email3=getattr(req, '''email''', None) or ""
+        if not _email3:
+            try:
+                _email3=req.dict().get("email","")
+            except: pass
+        if _email3:
+            _u3=_db3.get(_email3.lower())
+            if _u3 is not None:
+                _credits=_u3.get("credits", None)
+                # None = sinirsiz (yillik), sayi = kredili
+                if _credits is not None:
+                    if _credits<=0:
+                        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
+                    _u3["credits"]=_credits-1
+                    _auth3._save(_db3)
+                    engine_json["credits_left"]=_u3["credits"]
+    except Exception as _e_cred:
+        print(f"kredi hata: {_e_cred}")
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
@@ -983,7 +1005,8 @@ def admin_page():
 <title>Admin - Sifre Uret</title><style>body{font-family:system-ui;background:#0F0A18;color:#e8e0f0;padding:24px}input,button{padding:10px;border-radius:8px;border:1px solid #3d2e50}input{background:#1A1423;color:#e8e0f0}button{background:#C9A96E;color:#000;font-weight:700;cursor:pointer}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #3d2e50;padding:8px;font-size:13px}th{background:#2a1f38}</style>
 <h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
 <div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
-<div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="2" style="width:60px"> gün <button onclick="createUser()">Uret</button> <span id="out"></span></div>
+<div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="365" style="width:60px"> gün <button onclick="createUser()">Uret (yillik)</button> <span id="out"></span></div>
+<div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''oracle''','''200''')" style="background:#6a9ae2">Oracle 100 - 200TL</button> <button onclick="addCredits('''premium''','''360''')" style="background:#C9A96E">Premium 100 - 360TL</button> <button onclick="addCredits('''elite''','''600''')" style="background:#D4AF37">Elite 100 - 600TL</button></div>
 <table id="tbl"><thead><tr><th>Kullanici</th><th>Plan</th><th>Expiry</th><th>Trial</th><th>Cihaz</th><th>Islem</th></tr></thead><tbody></tbody></table>
 <script>
 async function load(){
@@ -1042,5 +1065,28 @@ def admin_create(payload: dict, x_admin_key: str = _Header(None)):
             db[uname]={"pwd":hashlib.sha256(pwd.encode()).hexdigest(),"expiry":db[email]["expiry"],"created":db[email]["created"],"is_trial":db[email].get("is_trial",False)}
             _auth._save(db)
     return {"user": email, "password": pwd, "days": days, "expiry": _auth._load().get(email,{}).get("expiry")}
+
+
+@app.post("/admin/add_credits")
+def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
+    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
+    if x_admin_key not in _allowed:
+        return {"error": "unauthorized"}
+    email=(payload.get("email") or payload.get("user") or "").strip().lower()
+    if not email:
+        return {"error": "email gerekli"}
+    add=int(payload.get("credits", 100))
+    plan=payload.get("plan","")
+    import auth as _auth4
+    db=_auth4._load()
+    u=db.get(email)
+    if not u:
+        return {"error": "kullanici yok"}
+    # 100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL
+    u["credits"]= (u.get("credits") or 0) + add
+    if plan:
+        u["plan"]=plan
+    _auth4._save(db)
+    return {"user": email, "credits": u["credits"], "plan": u.get("plan","")}
 
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
