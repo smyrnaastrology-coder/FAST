@@ -381,6 +381,11 @@ class _HoraryHomeState extends State<HoraryHome> {
     _saveHistory(q);
     try {
       final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category, asker: _asker);
+      if(res['''verdict''']=='''NO_CREDITS'''){
+        setState(()=> _chat.add({'''role''':'''assistant''','''content''': '''Krediniz bitti. Lutfen kredi paketi alin.'''}));
+        if(context.mounted){ showDialog(context: context, builder: (_)=> AlertDialog(backgroundColor: const Color(0xFF1A1423), title: const Text('''Krediniz bitti''', style: TextStyle(color: Color(0xFFC9A96E))), content: const Text('''Krediniz bitti. Devam etmek icin lutfen kredi paketi satin alin.''', style: TextStyle(color: Colors.white70)), actions: [TextButton(onPressed: ()=> Navigator.pop(context), child: const Text('''Tamam'''))])) ; }
+        return;
+      }
       final ans = res['answer'] as String? ?? '${res['verdict']}';
       setState(() {
         _lastChart = res;
