@@ -728,18 +728,12 @@ async def cast(req: CastRequest):
             "Bu bir NEREDE/KONUM sorusu - HORARY UZAKLIK MOTORU ciktisini kullan, kendi km hesabi/carpim yapma.\n"
             "Panel (cevabinda bu blok gibi profesyonel sun):\n"
             + (f"- Soru kategorisi: {g['qtype_label']}{' | Zincir: ' + g['chain'] if g.get('chain') else ''}\n" if g.get("qtype") else "")
-            + f"- Sorulan evi: H{g['house']} | Significator: {g['significator']} {g['sign']} ({loc_info.get('deg','')}°) | Querent: {loc_info.get('_qr_ruler_klasik','')} | Ekliptik fark: {g['angular']}°\n"
-            + (f"- Gösterge gücü: {g['dignity']}\n" if g.get("dignity") else "")
-            + f"- Yon: {g['yon_label']} civari (model isabeti: {g.get('direction_confidence','belirsiz')} - kalibrasyon ort yon hatasi {g.get('direction_mean_err_deg','?')} derece) - ev {g['house']} temel + {g['sign']} burc + {g['significator']} gezegen duzeltmesi (ağırlıklar: ev .50 / burç .30 / gezegen .20, azimut yaklasik {g['azimut']} derece)\n"
+            else "")
+            + f"Açıklama: Mekanı 2-3 cümlede insancıl ve detaylı anlat, his ver, teknik detay (ev numarası, açı) yazma.\n"
             + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
             + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
             + f" | Kategori: {g['category']} | Guven: {g['confidence']} (kalibrasyon: {g['calibration_n']} vaka, olcek {g['calibration_scale']})\n"
-            + (f"- Coklu gosterge mesafe skoru ({g['multi_indicator_n']} gosterge, agirlikli ort): "
-               + "; ".join(
-                   f"{x['label']}({x['planet']}) Δθ{x['orb_deg']}°·M{x['modality_multiplier']}·w{x['weight']}={x['D_km']}km"
-                   for x in g.get('multi_indicators', [])
-               ) + "\n" if g.get('multi_indicators') else "")
-            + (f"- Olcek merdiveni (aynı Δθ farklı ölçekte farklı km demek — mentor kuralı): oda içi ~{g['scale_ladder'].get('oda içi','?')} m / şehir içi ~{g['scale_ladder'].get('şehir içi','?')} km / ülke içi ~{g['scale_ladder'].get('ülke içi','?')} km / kıtalararası ~{g['scale_ladder'].get('kıtalararası','?')} km. Şu an varsayılan katman: {g.get('likely_tier','şehir içi')}.\n" if g.get("scale_ladder") else "")
+            
             + ("- Doğrulama (kullanıcının verdiği gerçek konum): " + g['verification']['feedback'] + "\n" if g.get("verification") else "")
             # LILLY/LOUIS klasik konum katmanı: 8 gösterge çoğunluk yönü + element/modalite yükseklik + band
             + (f"- Lilly 8 gösterge çoğunluk yönü: {g.get('lilly', {}).get('majority_dir_label','belirsiz')}"
