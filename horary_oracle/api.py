@@ -670,7 +670,7 @@ async def cast(req: CastRequest):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
-    # kullanici plani -> model secimi (oracle 5k mini, premium 8k 4o, elite 15k o1)
+    # kullanici plani -> model secimi (oracle 5k mini, premium 8k 4o, elite 20k o1)
     try:
         import auth as _auth2
         _db=_auth2._load()
