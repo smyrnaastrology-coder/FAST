@@ -1964,5 +1964,26 @@
       "money"
     ],
     "explanation": "Ornek Harita #41: 1 Jul 1990 10:55 PDT Coeur d'Alene 47N41 116W46 Daha fazla sigir almak, mera kiralamak ve isimi buyutmek icin borc para almali miyim? South Dakota'li ciftlik sahibi büyük arazi ve et sigirciligi yapiyor, zamanlama dogruysa buyume dusunuyordu. 8 derece Yengec'teki Mercury onu yonetir (ASC Basak) ve kariyer/is evi 10. evdedir. Borc almak 8. evdir, yoneticisi 8. evde konumlanmis 22 derece Koc'taki Mars'tir. Mercury, Mars'a KARE aci yapar (derece bazinda 75.9; kaynak kare der - orb sinirinin disinda, not edildi) -> HAYIR. Yardimci yonetici Ay, onun 2. evinde (para) 29 derece Terazi 57 dakikada ve BOSLUKTADIR (VOC) -> para kazandiracak girisim olmayacak, surecten kayda deger sonuc cikmaz. Sonraki haberde yatirimi yapmadigina mutluydu, cunku kisa sure sonra et piyasasi COKTU. Dogrulama (Regiomontanus): ASC Basak 16.54, MC Ikizler 13.22, Mercury 8.44 Yengec 10. ev, Mars 22.54 Koc 8. ev, Ay 29.95 Terazi 2. ev VOC, Su 9.63 Yengec 10. ev, Saturns 22.97 Oglak 5. ev retro. Kural: borc para 8. ev, gelir 2. ev; 8. ev hakimi kare + Ay 2. evde VOC = karli olmayan girisim."
+  },
+  {
+    "id": "INSURANCE-SETTLEMENT-1990-03-15",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Esim sigorta sirketinin tazminat teklifini kabul etmeli mi? 15 Mar 1990 09:13 PST Coeur d'Alene 47N41 116W46. Evleri yeniden numarala (7. ev es = 1. ev). Jupiter 1 Yengec (7. ev kuspisi Yay hakimi) = es; Ay 12 Akrep (para); Sun 25 Balik (sirket).",
+    "technique": "derived_7th_husb_no_planet_2nd_8th_no_applying_moon_trine_sun_reject_demand",
+    "verdict": "NO",
+    "tags": [
+      "spouse",
+      "third_party",
+      "7th_house",
+      "2nd_house",
+      "8th_house",
+      "4th_house",
+      "derived_houses",
+      "trine",
+      "separating",
+      "no_applying",
+      "insurance"
+    ],
+    "explanation": "Ornek Harita #42: 15 Mar 1990 09:13 PST Coeur d'Alene 47N41 116W46 Esim sigorta sirketinin tazminat teklifini kabul etmeli mi? Ilk yapilacak sey evleri yeniden numaralamaktir: 7. evi (es/koca) 1. ev yaparak harita etrafinda ilerlenir veya harita 7. ev Asc'a gelecek sekilde turetilir/dondurulur. 1 derece Yengec'teki Jupiter esi temsil eder (7. ev kuspisi Yay'in hakimi; Jupiter Yengec'te konumlanir). Sigorta sirketinden gelecek para, esin 2. evinin (haritanin 8. evi) yoneticisi ile simgelenir; Ay 12 derece Akrep'tedir ve Jupiter'e yaptigi UCGENI TAMAMLAYIP GECMISTIR (130.9 derece, gecilen aci). Esin 1. veya 8. evinde (yeniden numaralanmis: haritanin 7. ve 2. evlerinde) HICBIR GEZEGEN YOKTUR; yoneticiler arasinda YAKLASAN (applying) aci olmadigindan yanit BULUNAMAZ ve bu su an icin EYLEMDE BULUNULMAMASINI onerir. Ancak 25 derece Balik'taki Sun sigorta sirketini yonetir (kaynak bunu 10. ev diye adlandirir; regiomontanus'ta 10. ev kuspisi Kova'dir, koca'nin cevrilmis 10.'su haritanin 4. evi = Leo = Sun; ayrinti not edilmistir) ve Ay, Sun'a UCGEN yapar (132.5 derece). Boylece kadina esinin TEKLIFI REDDETMESINI ve daha fazla para talep etmesini soyledim; cunku sirketin daha fazlasini odeyecegi gorunuyordu. Nitekim oyle yaptilar. Sonuc: HAYIR (kabul etme, pazarlik yap). Dogrulama (Regiomontanus): ASC Ikizler 12.83, MC Kova 12.37, 7. ev kuspisi Yay 12.8 (hakimi Jupiter, konumu Yengec 1.39 1. ev), Ay 12.33 Akrep 6. ev, Sun 24.86 Balik 11. ev, Mercury 21.63 Balik 11. ev, chart 2. evi Yengec 8.0-25.0 (bos), chart 7. evi Yay (bos). Kural: yakinlasmayan aci = cevap yok = simdi harekete gecme; uyelik/zamanlama sinyali Ay-Sun ucu ucuna ucgen + sirket uygulamada odemeye hazir."
   }
 ]
