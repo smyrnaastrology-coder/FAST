@@ -1890,5 +1890,24 @@
       "moon_secondary"
     ],
     "explanation": "Ornek Harita #37: 27 Jun 1980 19:44 PDT Coeur d'Alene 47N41 116W46 Yangini oglum mu cikardi? Kucuk oglu, komsunun garajini kule eden yangini baslatmakla suclaniyordu; cocuk suclamayi reddediyor, danisan da dogru soyleyip soylemediginden emin degildi. 17 derece Ikizler'deki Venus oglunu yonetmektedir (5. ev=Boga regio kuspinin hakimi). 21 derece Basak'taki Saturne onun 10. evini (haritanin 2. evi: oglunun 5'ten cevrilmis 10.'su) yonetmektedir. Venus, sorumluluk gezegeni Saturne ve yanginin yoneticisi 23 derece Basak'taki Mars ile KARE aci yapmaktadir (93.7 ve 95.6 derece); kare/karsit acilar hayir anlamina gelir -> yangini o cikarmadi. Kural: olayi simgelemek icin 10. ev kullanildi. Sorunun yardimci yoneticisi 3 derece Oglak'taki Ay, Venus'e genis bir kinkunks yaparken Saturne ve Mars'a UCGEN atiyor (burc bazli; derece bazinda 102/100) - bu ucgenler 'evet' sinyali olabilir; AMA tecrube kurali: Ay soruya ait evlerden birini yonetmedigi surece, gezegenler arasi acilar Ay'in acilarindan daha agir basar -> yanit HAYIR. Sonra failin baska bir cocuk oldugu kanitlandi. Dogrulama (Regiomontanus): ASC Yay 23.54, MC Terazi 22.58, 5. ev kuspisi Boga 14.3 (hakimi Venus, konumu Ikizler 17.58 6. ev), 2. ev kuspisi Oglak 28.1 (hakimi Saturne, konumu Basak 21.31 8. ev), Mars 23.16 Basak 8. ev, Ay 3.30 Oglak 1. ev, Sun 6.55 Yengec 7. ev. Kural: kare/opposition karsi taraf isaret eder; Ay'in ucgenleri mevcut evleri yonetmedigi icin gecerli degil."
+  },
+  {
+    "id": "TIM-CUSTODY-1973-08-07",
+    "source": "Corrected OCR - Only Way Learn Horary - Los Angeles 34N04 118W15",
+    "question": "Tim cocuklarinin velayetini alabilecek mi? 7 Aug 1973 10:01 PDT Los Angeles 34N04 118W15. Tim 7. ev (7. ev selcugu Koc -> Mars 27 Koc). Cocuklari onun 5.'si = haritanin 11. evi (kuspis Aslan -> Sun 15 Aslan). Onun 9.'su (yasal isler, velayet) -> Jupiter 6 Kova. Ay 4 Yay onun 9. evinde.",
+    "technique": "third_party_7th_derived_children_11th_sun_trine_mars_moon_trines_legal_9th",
+    "verdict": "YES",
+    "tags": [
+      "custody",
+      "third_party",
+      "7th_house",
+      "derived_houses",
+      "11th_house",
+      "9th_house",
+      "trine",
+      "sextile",
+      "legal"
+    ],
+    "explanation": "Ornek Harita #38: 7 Aug 1973 10:01 PDT Los Angeles 34N04 118W15 Tim cocuklarinin velayetini alabilecek mi? Soru Tim'in bir arkadasi tarafindan soruldu; Tim 7. ev ile temsil edilir, bu yuzden harita cevrilir (derived houses). Cocuklari, kendisinin 5. evi olan haritanin 11. evi ile simgelenir (11. ev kuspisi Aslan -> Sun). 27 derece Koc'taki Mars onu (7. ev kuspisi Koc) yonetmektedir; 15 derece Aslan'daki Sun cocuklarini gosterir. Sun'un Mars'a yaptigi UCGEN aci (burc bazli: Aslan-Koc) 'evet' yanitina isaret eder. 6 derece Kova'daki Jupiter, onun yasal konulari temsil eden 9. evini (haritadan: 7+9-1=15 -> haritanin 3. evi = Yay burcunun hakimi Jupiter) yonetmektedir ve bu vakada yasal velayeti simgeler. 4 derece Yay'daki Ay onun 9. evindedir (haritanin 3. evinde); Jupiter'e SEKSTIL (61.5 derece), hem Sun'a hem de Mars'a UCGEN aci yaparak 'evet'i dogrular. Sonuc: YES - uc hafta sonra mahkemeye gitti ve uc cocugunun da velayetini aldi. Dogrulama (Regiomontanus): ASC Terazi 2.56, MC Yengec 2.79, 7. ev kuspisi Koc 2.6 (hakimi Mars, konumu Koc 27.78 7. ev), 11. ev kuspisi Aslan 7.1 (hakimi Sun, konumu Aslan 15.03 11. ev), Jupiter 6.15 Kova 4. ev retro, Ay 4.66 Yay 3. ev (=Tim'in 9. evi), Saturns 0.62 Yengec 9. ev, Venus 16.41 Basak 12. ev. Kural: baskasini soran sorularda soru sahibi 1. ev, sorulan kisi 7. ev + cevrilmis evler; ucgen sekvensi 'evet' dogrular."
   }
 ]
