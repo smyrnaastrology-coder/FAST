@@ -2047,5 +2047,26 @@
       "compound_question"
     ],
     "explanation": "Ornek Harita #45: 16 Sep 1990 19:28 PDT Coeur d'Alene 47N41 116W46 Leon bana olan borcunu gonderecek mi? Beni gormeye gelecek mi? Benimle iletisime gececek mi? Bu, bir onceki haritanin (Leon) devamidir. Soru sahibi eve dondugunde Leon'dan haber, ziyaret ve odunc parsin geri odenmesini bekliyordu; iki haftadan fazla gecmis, endiseleniyordu. Leon, 7. evi yoneten 12 derece Basak'taki Venus ile temsil edilir (7. ev kuspisi Terazi); Venus 6. evde = onun 12. evinde (kendi icini kemiren/eylemsizlik). Hem soru sahibi (1. ev, ASC Koc) hem de Leon'un ona olan borcu (8. ev kuspisi Akrep) 7 derece Ikizler'deki Mars tarafindan yonetilir. Venus, Mars'a olan KARE ACIIYI GECMISTIR (94.7 derece, ayrilan aci) ve Mars, borc parasının (8. ev) yardimci yoneticisi 15 derece Akrep'teki Pluto'ya KINKUNKS aci yapar (158.3 derece) -> parayı geri almasi (kare gecilmis) ya da kayda deger gelisne (kinkunks) gorunmemektedir. 5 derece Aslan'daki Jupiter, Leon'un iletisim evini (onun 3.'su = haritanin 9. evi = Yay'in hakimi) yonetir ve soru sahibini yoneten Mars ile HICBIR ACI YAPMAZ (derece bazinda 58.5'te gecilmis sekstil, uygulanmayan) -> ondan haber almasi mumkun degil. Ay 0 derece Basak'tadir ve nihayetinde Leon'u yoneten Venus ile kavusacaktir (11.4 derece uygulanan); ancak ziyaret supheli (soru sahibinin 4. evinde sonuclanacak). Kural (onceki ornekte oldugu gibi): gezegenler Ay'in gostergelerini gecersiz kilar. Sonuc: HAYIR - bugune kadar Leon ne ortaya cikti ne de para geri geldi. Dogrulama (Regiomontanus): ASC Koc 12.91, MC Oglak 5.79, 7. ev kuspisi Terazi 12.9 (hakimi Venus, konumu Basak 12.08 6. ev), 8. ev kuspisi Akrep 28.4 (geleneksel hakimi Mars, konumu Ikizler 7.41 2. ev), Pluto 15.75 Akrep 7. ev, Jupiter 5.93 Aslan 5. ev, Ay 0.64 Basak 6. ev, Sun 23.95 Basak 6. ev, Saturn 18.74 Oglak 10. ev retro."
+  },
+  {
+    "id": "SWISS-BANK-TRANSFER-1990-09-27",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Parami bir Isvicre bankasina aktarmanin tam zamani mi? 27 Sep 1990 09:03 PDT Coeur d'Alene 47N41 116W46. ASC Terazi 29 (gec ASC), Mars 11 Ikizler 8. ev + Pluto 16 Akrep para (2. ev), Mercury 17 Basak güclu (9. ev = Isvicre), Venus 25 Basak, Moon 10 Oglak.",
+    "technique": "late_ascendent_money_2nd_rulers_mercury_9th_strong_applying_conjunction_venus_moon_trines_yes",
+    "verdict": "YES",
+    "tags": [
+      "money",
+      "2nd_house",
+      "late_ascendant",
+      "9th_house",
+      "8th_house",
+      "3rd_house",
+      "intercepted_sign",
+      "conjunction",
+      "trine",
+      "sextile",
+      "foreign"
+    ],
+    "explanation": "Ornek Harita #46: 27 Sep 1990 09:03 PDT Coeur d'Alene 47N41 116W46 Parami bir Isvicre bankasina aktarmanin tam zamani mi? Yukselen'de Terazi'nin 29 derecesi bulunmasi sebebiyle soru sahibi kararini coktan vermis gorunmektedir (gec ASC - asikar kararlilik). 8. evde 11 derece Ikizler'deki Mars ve 16 derece Akrep'teki Pluto onun parasini (2. ev kupisesi Akrep) yonetir; para yoneticilerinin 8. ev temasinda olmasi banka/yabanci para baglamini gosterir. Uzak bir ulke olan Isvicre'yi simgeleyen 9. ev (kuspis Ikizler 27.1) 17 derece Basak'ta asaleten güclu (kendi burcu) konumda bulunan Mercury tarafindan yonetilir. 25 derece Basak'taki Venus soru sahibini yonetir (ASC Terazi); Mercury, Venus ile KAVUSUM ACIINA DOGRU ILEKLENMEKTEDIR (8.05 derece uygulanan) -> para aktarma karari yes. Kisitirilmis (intercepted) Yengec burcunu yoneten 10 derece Oglak'taki Ay, Mercury ve Venus'e UCGEN (burc bazli; derece bazinda 113.5 ve 105.5), Pluto'ya SEKSTIL (54.6) aci yapar -> EVET. Kural: gec ASC kararin coktan verildigini; 9. ev hakiminin 1. ev hakimine uygulanan kavusumu = buyurun artik aktarın. Dogrulama (Regiomontanus): ASC Terazi 29.85, MC Aslan 8.05, 2. ev kupisesi Akrep 24.1 (hakimleri Mars + Pluto), Mars 10.99 Ikizler 8. ev, Pluto 16.06 Akrep 1. ev, 9. ev kupisesi Ikizler 27.1 (hakimi Mercury, konumu Basak 17.17 11. ev), Venus 25.22 Basak 11. ev, Ay 10.70 Oglak 3. ev, Yengec regio kuspislerde yok (kisitirilmis, 9-10. ev arasi)."
   }
 ]
