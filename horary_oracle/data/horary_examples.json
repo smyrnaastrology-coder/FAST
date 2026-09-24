@@ -1946,5 +1946,23 @@
       "moon_operator"
     ],
     "explanation": "Ornek Harita #40: 1 Oct 1986 13:07 PDT Coeur d'Alene 47N41 116W46 Krediyi isleme koymak icin ne kadar beklemeliyim? Danisan ev ipotek kredisine basvurmustu ve evraklari imzalamadan once faiz oranlarinin mumkun oldugunca dusmesini bekliyordu; faizler istikrarli dusuyordu, tekrar yukselme ihtimaline karsi uzun beklemekten korkuyordu. Danisan, sozlesmeler evi olan 3. evde 15 derece Balik'taki Yukselen yoneticisi Jupiter (ASC Yay) ile temsil edilir. Banka/kredi kurumundan alinan para 8. evin konusudur ve 8. evi Ay yonetir (tum-ev: Yay ustunden 8. ev = Yengec). Ay 9. evde 13 derece Basak'tadir ve 1.5 derece sonra (178.5 derece) Jupiter'e KARSIT aci yapacaktir. Karsi aci olumsuz sayilsa da danisan krediyi alip almayacagini DEGIL, ne ZAMAN almasi gerektigini sormustu. Jupiter ve Ay Degisken burclarda (Balik/Basak) ve Dusen (Cadent) evlerde (3. ve 9.) oldugundan bu 1.5 GUN veya 1.5 HAFTA zaman dilimine isaret eder. Kural: OncU/Kose evler en hizlisi, Degisken/Dusen evler orta hizli, Sabit/Halef evler en yavasidir. 1.5 gun veya 1.5 hafta aciklandi; bankayi arayip 1.5 HAFTA sonrasina escrow (kapanis/tapu devri) randevusu aldi ve kredisini guvenceye aldi. Dogrulama (Regiomontanus): ASC Yay 19.01, MC Terazi 16.86, Jupiter 15.23 Balik 3. ev retro, Ay 13.74 Basak 9. ev (Moon-Jupiter 178.51 derece uygulanan karsit orb 1.5), 8. ev kuspisi Basak 9.6 (Regiomontanus; kaynak Ay'i 8. ev hakimi sayiyor - tum ev Yengec sistemi; fark not edildi), Su 8.35 Terazi 9. ev."
+  },
+  {
+    "id": "RANCH-LOAN-CATTLE-1990-07-01",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46 (South Dakota ciftci)",
+    "question": "Daha fazla sigir almak, mera kiralamak ve isimi buyutmek icin borc para almali miyim? 1 Jul 1990 10:55 PDT Coeur d'Alene 47N41 116W46. Mercury 8 Yengec (ASC Basak hakimi) 10. ev; Mars 22 Koc 8. evde (borc/alacak); Ay 29 Terazi 57' 2. evde VOC.",
+    "technique": "loan_8th_mars_in_8th_square_mercury_moon_2nd_voc_no_profit",
+    "verdict": "NO",
+    "tags": [
+      "loan",
+      "8th_house",
+      "10th_house",
+      "2nd_house",
+      "square",
+      "voc",
+      "business",
+      "money"
+    ],
+    "explanation": "Ornek Harita #41: 1 Jul 1990 10:55 PDT Coeur d'Alene 47N41 116W46 Daha fazla sigir almak, mera kiralamak ve isimi buyutmek icin borc para almali miyim? South Dakota'li ciftlik sahibi büyük arazi ve et sigirciligi yapiyor, zamanlama dogruysa buyume dusunuyordu. 8 derece Yengec'teki Mercury onu yonetir (ASC Basak) ve kariyer/is evi 10. evdedir. Borc almak 8. evdir, yoneticisi 8. evde konumlanmis 22 derece Koc'taki Mars'tir. Mercury, Mars'a KARE aci yapar (derece bazinda 75.9; kaynak kare der - orb sinirinin disinda, not edildi) -> HAYIR. Yardimci yonetici Ay, onun 2. evinde (para) 29 derece Terazi 57 dakikada ve BOSLUKTADIR (VOC) -> para kazandiracak girisim olmayacak, surecten kayda deger sonuc cikmaz. Sonraki haberde yatirimi yapmadigina mutluydu, cunku kisa sure sonra et piyasasi COKTU. Dogrulama (Regiomontanus): ASC Basak 16.54, MC Ikizler 13.22, Mercury 8.44 Yengec 10. ev, Mars 22.54 Koc 8. ev, Ay 29.95 Terazi 2. ev VOC, Su 9.63 Yengec 10. ev, Saturns 22.97 Oglak 5. ev retro. Kural: borc para 8. ev, gelir 2. ev; 8. ev hakimi kare + Ay 2. evde VOC = karli olmayan girisim."
   }
 ]
