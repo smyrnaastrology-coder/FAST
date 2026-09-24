@@ -2025,5 +2025,27 @@
       "safety"
     ],
     "explanation": "Ornek Harita #44: 25 Aug 1990 08:49 PDT Coeur d'Alene 47N41 116W46 Leon ile cinsel iliskiye girmek guvenli mi? Asikar 8. ev sorusudur ama 7. ev (Leon) da dikkate alinir. Gemide tanişilan beyefendiyle ilgili soru; liman duraklarindan birinde ariyor. Soru sahibi, 11. evde 14 derece Aslan'daki Venus tarafindan yonetilir (ASC Terazi); 8. evin yoneticisi de Venus'tur (8. ev kuspisi Boga 25.8). Venus asaleten güclu degildir, zararda veya dusuk konumda da degildir (Aslan'da - kendi burcunda degil). Acilari Pluto'ya ve Mars'a KARE, Saturn'e 150'lik (quincunx) dir (derece bazinda Venus-Pluto 90.9, Venus-Mars 77.4 genis orb, Venus-Saturn 155.0); bunlarin hicbiri iliski icin guven verici degil. Ozellikle mars 27 derece Boga'da Leon'u (7. ev kuspisi Koc 3.3) yonetir ve Venus ona kare aci yapar -> yanit HAYIR. Yaklasik 3 derece Akrep'teki Ay, Venus'e kare ve Mars'a karsit aci yapar (burc bazli: Sabit/Su ve tersi) ve 15 derece Akrep'te Pluto ile KAVUSACAKTIR (Moon-Pluto uygulanan 12.25 derece) -> Ay/Pluto kavusumu olumlu gosterge degildir; Ay'in hareketi yaniti DOGRULAR. Not: bu, olay gerceklestikTEN SONRA sorulan soruydu; danisan geri aradiginda Leon ile zaten birlikte oldugu icin yanittan memnun kalmadi. Kurs yorumu: harita cikarip cevap verirsiniz; danisan dikkate alir ya da coktan harekete gecmis olup ic rahatlatma bekler; cogunlukla karariniz sonraki gelismelerle dogrulanir. Devam var: simdiye dek guvenli gorunse de 8. evin diger konulari pek iyi gitmedi (sonraki soru). Dogrulama (Regiomontanus): ASC Terazi 3.28, MC Yengec 4.07, Venus 14.37 Aslan 11. ev, Mars 27.01 Boga 9. ev, Ay 2.98 Akrep 2. ev, Pluto 15.23 Akrep 2. ev, Saturn 19.35 Oglak 4. ev retro, Sun 2.19 Basak 11. ev."
+  },
+  {
+    "id": "LEON-DEBT-FOLLOWUP-1990-09-16",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46 (Leon serisinin devami)",
+    "question": "Leon bana olan borcunu gonderecek mi? Beni gormeye gelecek mi? Benimle iletisime gececek mi? 16 Sep 1990 19:28 PDT Coeur d'Alene 47N41 116W46. Venus 12 Basak 6. ev (7. ev = Leon, onun 12.'si), Mars 7 Ikizler (1. ev = soru sahibi + 8. ev borc), Jupiter 5 Aslan (onun iletisim evi), Moon 0 Basak -> Venus.",
+    "technique": "debt_8th_mars_venus_passed_square_quincunx_pluto_jupiter_no_aspect_moon_eventual_conjunction_no",
+    "verdict": "NO",
+    "tags": [
+      "loan",
+      "debt_followup",
+      "7th_house",
+      "8th_house",
+      "6th_house",
+      "5th_house",
+      "3rd_house",
+      "square",
+      "quincunx",
+      "conjunction",
+      "planets_override_moon",
+      "compound_question"
+    ],
+    "explanation": "Ornek Harita #45: 16 Sep 1990 19:28 PDT Coeur d'Alene 47N41 116W46 Leon bana olan borcunu gonderecek mi? Beni gormeye gelecek mi? Benimle iletisime gececek mi? Bu, bir onceki haritanin (Leon) devamidir. Soru sahibi eve dondugunde Leon'dan haber, ziyaret ve odunc parsin geri odenmesini bekliyordu; iki haftadan fazla gecmis, endiseleniyordu. Leon, 7. evi yoneten 12 derece Basak'taki Venus ile temsil edilir (7. ev kuspisi Terazi); Venus 6. evde = onun 12. evinde (kendi icini kemiren/eylemsizlik). Hem soru sahibi (1. ev, ASC Koc) hem de Leon'un ona olan borcu (8. ev kuspisi Akrep) 7 derece Ikizler'deki Mars tarafindan yonetilir. Venus, Mars'a olan KARE ACIIYI GECMISTIR (94.7 derece, ayrilan aci) ve Mars, borc parasının (8. ev) yardimci yoneticisi 15 derece Akrep'teki Pluto'ya KINKUNKS aci yapar (158.3 derece) -> parayı geri almasi (kare gecilmis) ya da kayda deger gelisne (kinkunks) gorunmemektedir. 5 derece Aslan'daki Jupiter, Leon'un iletisim evini (onun 3.'su = haritanin 9. evi = Yay'in hakimi) yonetir ve soru sahibini yoneten Mars ile HICBIR ACI YAPMAZ (derece bazinda 58.5'te gecilmis sekstil, uygulanmayan) -> ondan haber almasi mumkun degil. Ay 0 derece Basak'tadir ve nihayetinde Leon'u yoneten Venus ile kavusacaktir (11.4 derece uygulanan); ancak ziyaret supheli (soru sahibinin 4. evinde sonuclanacak). Kural (onceki ornekte oldugu gibi): gezegenler Ay'in gostergelerini gecersiz kilar. Sonuc: HAYIR - bugune kadar Leon ne ortaya cikti ne de para geri geldi. Dogrulama (Regiomontanus): ASC Koc 12.91, MC Oglak 5.79, 7. ev kuspisi Terazi 12.9 (hakimi Venus, konumu Basak 12.08 6. ev), 8. ev kuspisi Akrep 28.4 (geleneksel hakimi Mars, konumu Ikizler 7.41 2. ev), Pluto 15.75 Akrep 7. ev, Jupiter 5.93 Aslan 5. ev, Ay 0.64 Basak 6. ev, Sun 23.95 Basak 6. ev, Saturn 18.74 Oglak 10. ev retro."
   }
 ]
