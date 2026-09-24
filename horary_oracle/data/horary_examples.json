@@ -2088,5 +2088,25 @@
       "visit"
     ],
     "explanation": "Ornek Harita #47: 18 Jun 1979 10:15 PDT Coeur d'Alene 47N41 116W46 Arkadasim bu yaz ziyarete gelecek mi? 1977'de Idaho'ya tasindiklarinda kizi Bridget'in kiz arkadasi yazi onlarla gecirmek icin gelmisti; iki yil sonra yine sabirsizlanilarak soruldu. Bridget'in arkadasi, 11. evin yoneticisi olan ve 8. evde 16 derece Koc'ta yer alan Moon ile temsil edilir (11. ev kuspisi Yengec, hakimi Moon). 4. ev bizim evimizi simgeler (kuspis Akrep) ve 10. evde 24 derece Boga'daki Mars ile 2. evdeki 16 derece Terazi'deki Pluto tarafindan yonetilir (ikisi de Akrep hakimi). Moon, Pluto ile TAM KARSIT ACIYA ILEKLEMEKTEDIR (16 Koc vs 16 Terazi = 179.9 derece uygulanan) ki bu HAYIR demektir. Ayrica 11. evde 17 derece Yengec'te bulunan Mercury de baska bir HAYIR yaniti verir (11. ev hakimine benzer sekilde olumsuzluk tasiyan konum). Briget yaz giempten once gidemeyeceginiz vardir; yine de Horary'nin netligi sayesinde baska planlar yapti. Sonuc: HAYIR - arkadas yaz gelmedi. Dogrulama (Regiomontanus): ASC Aslan 29.49 (gec), MC Boga 21.06, 11. ev kuspisi Yengec 2.1 (hakimi Moon, konumu Koc 16.35 8. ev), 4. ev kuspisi Akrep 21.1 (hakimleri Mars + Pluto), Mars 24.72 Boga 10. ev, Pluto 16.44 Terazi 3. ev (kuspis sınırında; kaynak 2. ev der - hemen sinirda, not edildi), Mercury 17.30 Yengec 11. ev, Moon-Pluto 179.91 uygulanan karsit. Kural: arkadas 11. ev; 4. ev hakimiyle uygulanan karsit acilis = ziyaret olmaz; 11. evde olumsuz konumlanmis gezegen pekistirir."
+  },
+  {
+    "id": "SWEATER-1992-12-20",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Suveterim nerede? 20 Dec 1992 11:15 PST Coeur d'Alene 47N41 116W46. Kayip esya = 2. ev (whole-sign Koc -> Mars RETRO); Mars Yengec'te (whole-sign 5. ev = eglence yerleri); POF Kova (whole-sign 11. ev) + dispozitoru Uranus Oglak 11. ev (arkadaslar, kulup, grup).",
+    "technique": "lost_object_2nd_dictator_retro_returns_pof_11th_uranus_dispositor_5th_fun",
+    "verdict": "FOUND",
+    "tags": [
+      "lost_object",
+      "2nd_house",
+      "5th_house",
+      "11th_house",
+      "retrograde",
+      "retro_returns",
+      "part_of_fortune",
+      "dispositor",
+      "whole_sign",
+      "friends_house"
+    ],
+    "explanation": "Ornek Harita #48: 20 Dec 1992 11:15 PST Coeur d'Alene 47N41 116W46 Suveterim nerede? Danisan en sevdigi suveterini almak icin dolaba gitti ama hicbir yerde yoktu, telasli bir telefon aldi. Kayip esyalarin tamami 2. evin burcundan ve evin yoneticisinden belirlenir (kurs kurali). Bilgisayar programi WHOLE-SIGN evler kullanmaktadir: 2. ev = Koc -> yonetici Mars ve Mars GERILEMEDE (retro) -> 'nesne geri donecek veya bulunacak' neredeyse hic sasmayan kural -> bulunacak. Mars'in Yengec'teki konumu whole-sign 5. evdir; danisanin cocugu olmadigi icin 5. ev eglence yerlerini gosterir: parti, erkek arkadas evi, restoran, tiyatro -> suveteri eglendigi bir yerde birakmis olabilir. Sans Noktasi (POF; gunduz haritasi ASC+Moon-Sun = Kova 3.89) ve onun dispozitoru olan Uranus (Kova'nin hakimi) Oglak'ta whole-sign 11. evde -> arkadaslariyla disarida oldugunu, bir kulupte, grup toplantisinda veya birinin evinde unutmus olabilir. Danisan bir arkadasinin evindeki gardiropta kaldigini hatirladi: ortam sicak oldugu icin cikarmis, kiyafetlerine ozen gosterdigi icin guvenli bir yere koymus. Kurallar: dispozitorler yanlis yere konmus esyayi ararken cok onemli; 2. ev yoneticisi + POF + dispozitorleri renk/yoni ipucu verir. Esyayi yoneten gezegen Basak/Balik burcunda veya 6/12 evdeyse genelde dogrudan gorunmez; cekmece/dolap/cep/kapali alan. Bu haritada POF ve dispozitörü arkadas/grup evini (11) gosterdi ve bulundu. Not (motor Regiomontanus): motor ASC Balik 12.77, MC Yay 22.29, 2. ev kuspisi Boga 7.8 (hakimi Venus) verir; kaynak whole-sign kullanir (2.ev=Koc->Mars). Whole-sign eslestirmesi: Mars 24.33 Yengec retro = 5. ev, Venus 14.00 Kova = 12. ev, POF Kova 3.89 = dispozitoru Uranus 17.02 Oglak whole-sign 11. ev, Neptune 17.94 Oglak 11. ev, Moon 20.30 Akrep 8. ev, ASC Balik 12.77."
   }
 ]

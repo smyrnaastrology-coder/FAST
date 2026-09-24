@@ -106,7 +106,8 @@ LOST_ITEM_WORDS = ("gözlüğü", "gozlugu", "gözlük", "gozluk", "çantası", 
                    "telefonu", "telefon", "anahtarı", "anahdari", "anahtar", "saati", "saat",
                    "yüzüğü", "yuzugu", "yüzük", "yuzuk", "cüzdanı", "cuzdani", "cüzdan", "cuzdan",
                    "küpesi", "kupesi", "bileziği", "bilezigi", "kolyesi", "kolyesi", "evrakı", "evraki",
-                   "kitabı", "kitabi", "kitabın", "taki", "takı", "mücevheri", "mucevheri")
+                   "kitabı", "kitabi", "kitabın", "taki", "takı", "mücevheri", "mucevheri",
+                   "süveteri", "suveteri", "süveter", "suveter", "kazak", "kazağı", "kazagi", "kazagı", "hırka", "hırkası", "hirkasi", "hirka", "mont", "montu", "palto", "paltosu")
 _NEREDE = ("nerede", "nerde", "nereye", "nere")
 
 
