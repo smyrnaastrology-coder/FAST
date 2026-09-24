@@ -1985,5 +1985,25 @@
       "insurance"
     ],
     "explanation": "Ornek Harita #42: 15 Mar 1990 09:13 PST Coeur d'Alene 47N41 116W46 Esim sigorta sirketinin tazminat teklifini kabul etmeli mi? Ilk yapilacak sey evleri yeniden numaralamaktir: 7. evi (es/koca) 1. ev yaparak harita etrafinda ilerlenir veya harita 7. ev Asc'a gelecek sekilde turetilir/dondurulur. 1 derece Yengec'teki Jupiter esi temsil eder (7. ev kuspisi Yay'in hakimi; Jupiter Yengec'te konumlanir). Sigorta sirketinden gelecek para, esin 2. evinin (haritanin 8. evi) yoneticisi ile simgelenir; Ay 12 derece Akrep'tedir ve Jupiter'e yaptigi UCGENI TAMAMLAYIP GECMISTIR (130.9 derece, gecilen aci). Esin 1. veya 8. evinde (yeniden numaralanmis: haritanin 7. ve 2. evlerinde) HICBIR GEZEGEN YOKTUR; yoneticiler arasinda YAKLASAN (applying) aci olmadigindan yanit BULUNAMAZ ve bu su an icin EYLEMDE BULUNULMAMASINI onerir. Ancak 25 derece Balik'taki Sun sigorta sirketini yonetir (kaynak bunu 10. ev diye adlandirir; regiomontanus'ta 10. ev kuspisi Kova'dir, koca'nin cevrilmis 10.'su haritanin 4. evi = Leo = Sun; ayrinti not edilmistir) ve Ay, Sun'a UCGEN yapar (132.5 derece). Boylece kadina esinin TEKLIFI REDDETMESINI ve daha fazla para talep etmesini soyledim; cunku sirketin daha fazlasini odeyecegi gorunuyordu. Nitekim oyle yaptilar. Sonuc: HAYIR (kabul etme, pazarlik yap). Dogrulama (Regiomontanus): ASC Ikizler 12.83, MC Kova 12.37, 7. ev kuspisi Yay 12.8 (hakimi Jupiter, konumu Yengec 1.39 1. ev), Ay 12.33 Akrep 6. ev, Sun 24.86 Balik 11. ev, Mercury 21.63 Balik 11. ev, chart 2. evi Yengec 8.0-25.0 (bos), chart 7. evi Yay (bos). Kural: yakinlasmayan aci = cevap yok = simdi harekete gecme; uyelik/zamanlama sinyali Ay-Sun ucu ucuna ucgen + sirket uygulamada odemeye hazir."
+  },
+  {
+    "id": "TIM-2ND-STREET-LOAN-1990-06-03",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46 (tarih duzeltmesi: metin 7 Haziran der, motor verisi 3 Haziran 1990 ile birebir eslesiyor)",
+    "question": "Tim, 2. Cadde'deki evi satin almak icin krediyi alabilecek mi? 3 Jun 1990 19:17 PDT Coeur d'Alene 47N41 116W46. Tim = 7. ev (kuspis Boga -> Venus 5 Boga, onun 12. evinde). Kredi = onun 8. evi (haritanin 2. evi, Yay kuspisi) -> Jupiter 13 Yengec. Ay 25 Terazi VOC.",
+    "technique": "third_party_7th_loan_8th_venus_sextile_jupiter_applying_moon_voc",
+    "verdict": "YES",
+    "tags": [
+      "loan",
+      "third_party",
+      "7th_house",
+      "8th_house",
+      "2nd_house",
+      "12th_house",
+      "sextile",
+      "voc",
+      "derived_houses",
+      "real_estate"
+    ],
+    "explanation": "Ornek Harita #43: 3 Jun 1990 19:17 PDT Coeur d'Alene 47N41 116W46 Tim, 2. Cadde'deki evi satin almak icin krediyi alabilecek mi? (Kaynak tarihi 7 Haziran 1990 yaziyor; motorun hesaplari Venues 5.43 Boga, Ay 25.49 Terazi, Jupiter 13.46 Yengec ile 3 Haziran 19:17 PDT'ye BIREBIR uyuyor - OCR 3/7 karistirmasi duzeltildi.) Tim 7. ev (7. ev kuspisi Boga 29.0) olur ve 5 derece Boga'daki Venus tarafindan yonetilir; kaynak onun 12. evinde der (regiomontanus'ta chart 5. ev sonu/6. ev basi sinirina yakin, fark not edildi). Kredi parasi onun 8. evi (haritanin 2. evi, kuspis Yay 26.3 -> hakimi Jupiter) ile simgelenir ve 13 derece Yengec'teki Jupiter tarafindan yonetilir. Venus, Jupiter'e SEKSTIL yapacak sekilde yaklasmaktadir (derece bazinda 68.03; kaynak 'uygulanan sekstil' der, yaklasik orb not edildi) -> EVET yaniti. 25 derece Terazi'deki Ay BOSLUKTADIR (VOC) -> endiselenecek bir sey yoktur. Soruyu soran Tim'in annesi cok endiselenmisti: Tim kil payi yeterlilik alabilmisti ve banka sureci agirdan aliyor gibi gorunuyordu. Ancak kredi ONAYLANDI, eve tasindi ve mutlu yasiyor. Kural: 7. ev hakimi ile onun 8. ev hakimi arasinda olumlu sekstil = kredi verilir; Ay VOC bu vakada endiseyi yatistirir. Dogrulama (Regiomontanus): ASC Akrep 29.02, MC Basak 19.18, 7. ev kuspisi Boga 29.0 (hakimi Venus, konumu Boga 5.43 chart 5. ev), 2. ev kuspisi Yay 26.3 (hakimi Jupiter, konumu Yengec 13.46 8. ev), Ay 25.49 Terazi 11. ev VOC, Sun 13.23 Ikizler 7. ev."
   }
 ]
