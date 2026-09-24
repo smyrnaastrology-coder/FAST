@@ -2068,5 +2068,25 @@
       "foreign"
     ],
     "explanation": "Ornek Harita #46: 27 Sep 1990 09:03 PDT Coeur d'Alene 47N41 116W46 Parami bir Isvicre bankasina aktarmanin tam zamani mi? Yukselen'de Terazi'nin 29 derecesi bulunmasi sebebiyle soru sahibi kararini coktan vermis gorunmektedir (gec ASC - asikar kararlilik). 8. evde 11 derece Ikizler'deki Mars ve 16 derece Akrep'teki Pluto onun parasini (2. ev kupisesi Akrep) yonetir; para yoneticilerinin 8. ev temasinda olmasi banka/yabanci para baglamini gosterir. Uzak bir ulke olan Isvicre'yi simgeleyen 9. ev (kuspis Ikizler 27.1) 17 derece Basak'ta asaleten güclu (kendi burcu) konumda bulunan Mercury tarafindan yonetilir. 25 derece Basak'taki Venus soru sahibini yonetir (ASC Terazi); Mercury, Venus ile KAVUSUM ACIINA DOGRU ILEKLENMEKTEDIR (8.05 derece uygulanan) -> para aktarma karari yes. Kisitirilmis (intercepted) Yengec burcunu yoneten 10 derece Oglak'taki Ay, Mercury ve Venus'e UCGEN (burc bazli; derece bazinda 113.5 ve 105.5), Pluto'ya SEKSTIL (54.6) aci yapar -> EVET. Kural: gec ASC kararin coktan verildigini; 9. ev hakiminin 1. ev hakimine uygulanan kavusumu = buyurun artik aktarın. Dogrulama (Regiomontanus): ASC Terazi 29.85, MC Aslan 8.05, 2. ev kupisesi Akrep 24.1 (hakimleri Mars + Pluto), Mars 10.99 Ikizler 8. ev, Pluto 16.06 Akrep 1. ev, 9. ev kupisesi Ikizler 27.1 (hakimi Mercury, konumu Basak 17.17 11. ev), Venus 25.22 Basak 11. ev, Ay 10.70 Oglak 3. ev, Yengec regio kuspislerde yok (kisitirilmis, 9-10. ev arasi)."
+  },
+  {
+    "id": "FRIEND-SUMMER-VISIT-1979-06-18",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Arkadasim bu yaz ziyarete gelecek mi? 18 Jun 1979 10:15 PDT Coeur d'Alene 47N41 116W46. Arkadas = 11. ev (kuspis Yengec) -> Moon 16 Koc 8. ev; evimiz 4. ev (kuspis Akrep) -> Mars 24 Boga 10. ev + Pluto 16 Terazi; Mercury 17 Yengec 11. ev.",
+    "technique": "friend_11th_moon_ruler_opposition_pluto_mercury_11th_second_no",
+    "verdict": "NO",
+    "tags": [
+      "friend",
+      "11th_house",
+      "8th_house",
+      "4th_house",
+      "10th_house",
+      "2nd_house",
+      "3rd_house",
+      "opposition",
+      "no_travel",
+      "visit"
+    ],
+    "explanation": "Ornek Harita #47: 18 Jun 1979 10:15 PDT Coeur d'Alene 47N41 116W46 Arkadasim bu yaz ziyarete gelecek mi? 1977'de Idaho'ya tasindiklarinda kizi Bridget'in kiz arkadasi yazi onlarla gecirmek icin gelmisti; iki yil sonra yine sabirsizlanilarak soruldu. Bridget'in arkadasi, 11. evin yoneticisi olan ve 8. evde 16 derece Koc'ta yer alan Moon ile temsil edilir (11. ev kuspisi Yengec, hakimi Moon). 4. ev bizim evimizi simgeler (kuspis Akrep) ve 10. evde 24 derece Boga'daki Mars ile 2. evdeki 16 derece Terazi'deki Pluto tarafindan yonetilir (ikisi de Akrep hakimi). Moon, Pluto ile TAM KARSIT ACIYA ILEKLEMEKTEDIR (16 Koc vs 16 Terazi = 179.9 derece uygulanan) ki bu HAYIR demektir. Ayrica 11. evde 17 derece Yengec'te bulunan Mercury de baska bir HAYIR yaniti verir (11. ev hakimine benzer sekilde olumsuzluk tasiyan konum). Briget yaz giempten once gidemeyeceginiz vardir; yine de Horary'nin netligi sayesinde baska planlar yapti. Sonuc: HAYIR - arkadas yaz gelmedi. Dogrulama (Regiomontanus): ASC Aslan 29.49 (gec), MC Boga 21.06, 11. ev kuspisi Yengec 2.1 (hakimi Moon, konumu Koc 16.35 8. ev), 4. ev kuspisi Akrep 21.1 (hakimleri Mars + Pluto), Mars 24.72 Boga 10. ev, Pluto 16.44 Terazi 3. ev (kuspis sınırında; kaynak 2. ev der - hemen sinirda, not edildi), Mercury 17.30 Yengec 11. ev, Moon-Pluto 179.91 uygulanan karsit. Kural: arkadas 11. ev; 4. ev hakimiyle uygulanan karsit acilis = ziyaret olmaz; 11. evde olumsuz konumlanmis gezegen pekistirir."
   }
 ]
