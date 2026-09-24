@@ -142,7 +142,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
   bool _showLanding=true;
-  int _daysLeft=365; String _expiryStr=''; String _plan=''; int _credits=-1; int _credits=-1;
+  int _daysLeft=365; String _expiryStr=''; String _plan=''; int _credits=-1;
   String _ad='', _soyad='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
@@ -384,7 +384,6 @@ class _HoraryHomeState extends State<HoraryHome> {
     _saveHistory(q);
     try {
       final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category, asker: _asker);
-      if(res['''credits_left''']!=null){ try{ _credits=res['''credits_left'''] as int; final pp2=await SharedPreferences.getInstance(); await pp2.setInt('''credits''', _credits); setState((){}); }catch(_){} }
       if(res['''credits_left''']!=null){ try{ _credits=res['''credits_left'''] as int; final pp2=await SharedPreferences.getInstance(); await pp2.setInt('''credits''', _credits); setState((){}); }catch(_){} }
       if(res['''verdict''']=='''NO_CREDITS'''){
         setState(()=> _chat.add({'''role''':'''assistant''','''content''': '''Krediniz bitti. Lutfen kredi paketi alin.'''}));
