@@ -304,9 +304,9 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         # 3 kademe: oracle 5k -> mini, premium 8k -> 4o, elite 15k -> o1
         plan = (engine_json.get("user_plan") or engine_json.get("plan") or "").lower()
         if plan == "elite":
-            model = "o1"
-            # o1 temperature desteklemez, max_completion_tokens kullan
-            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], max_completion_tokens=1200)
+            # o1 bos dondugu icin elite de gpt-4o kullan (15k yerine 1200 token)
+            model = "gpt-4o"
+            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=1200)
         elif plan == "premium":
             model = "gpt-4o"
             resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
@@ -314,7 +314,9 @@ def call_openai(engine_json: dict, lang="tr") -> str:
             # oracle 5k ve digerleri
             model = "gpt-4o-mini"
             resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
-        txt = resp.choices[0].message.content
+        txt = (resp.choices[0].message.content or "").strip()
+        if not txt:
+            raise ValueError("LLM bos dondu")
         # son doğrulama katmanı: gezegen burç halüsinasyonunu motorla düzelt
         txt = _correct_planet_hallucination(txt, engine_json)
         return txt
