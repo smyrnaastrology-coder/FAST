@@ -1812,5 +1812,24 @@
       "court"
     ],
     "explanation": "Ornek Harita #33: 24 Oct 1989 12:33 PDT Coeur d'Alene 47N41 116W46 Montana'daki evle ilgili yarinki mahkeme sureci nasil sonuclanacak? Ogrenci aradi: Montana'da yazlik ev vardi, evi sattiklari kisi ipotek/kredi sozlesmesinde gozden kacan bir husus iddiasiyla dava acmisti, dava ertesi gun mahkemeye cikmali. Soru sahibini yoneten Saturne 8 derece Oglak'tadır (endise/kaygiyi gosterir). Ay rakip/tarsi taraf (7. ev), Venus de mahkemeyi yonetmektedir. 9 derece Basak'taki Ay, 17 derece Yay'daki Venus'e kare aci yapmaktadir; bu rakip tarafin isinin iyi gitmeyecegini gosterir. Ay, Saturne yaptigi ucgen aciyi henuz gecmistir (Moon 8.75 Virgo - Saturn 8.81 Cap: 120.06 derece, 0.06 derece once tamamlanmis). Sonuc: 'bir kasik suda firtina', her sey yolunda gidecek. Yargic davayi reddedip dusurdu; yargici yoneten Mars (10. ev, MC Akrep) acisiz (VOC) idi, yani ozunde endiselenecek hicbir sey yoktu. Dogrulama (Regiomontanus): ASC Oglak 1.69, MC Akrep 2.15, Saturne 8.81 Oglak 1. ev (kurs metni 12. ev der), Ay 8.75 Basak 8. ev, Venus 17.79 Yay 12. ev, Mars 23.06 Terazi 9. ev (10. ev yoneticisi)."
+  },
+  {
+    "id": "SPORT-WIN-SATURDAY-1978-06-22",
+    "source": "Corrected OCR - Only Way Learn Horary - Los Angeles 34N04 118W15",
+    "question": "Cumartesi gunu kazanacak miyiz? 22 Jun 1978 17:28 PDT Los Angeles 34N04 118W15. Kiz softbol kocu, takimi Cumartesi sampiyonluk macina cikiyor. ASC Akrep 27.8, ev yoneticisi Mars 4 derece Basak, MC 7.9 Basak ile kavusum (elevated). Yardimci ASC yoneticisi Pluto 13 derece Terazi, Ay 2 derece Kova ile ucgen (burc bazli). Rakip 7. ev yoneticisi Venus 8 derece Aslan, Ay ile karsit ve kistirilmis (intercepted), Saturne kavusmaya gidiyor.",
+    "technique": "sport_1st_ruler_conjunct_mc_pluto_trine_moon_venus_opposed_intercepted",
+    "verdict": "YES",
+    "tags": [
+      "sport",
+      "1st_house",
+      "7th_house",
+      "10th_house",
+      "conjunction",
+      "trine",
+      "opposition",
+      "intercepted",
+      "moon_operator"
+    ],
+    "explanation": "Ornek Harita #34: 22 Jun 1978 17:28 PDT Los Angeles 34N04 118W15 Cumartesi gunu kazanacak miyiz? Kiz softbol antrenoru soruyor, takimi Cumartesi sampiyonluk macinda. Evin girisinde Akrep burcu var (kaynak metinde 'Koc' yazili ama 'Mars Akrep'i yonetir' gerekcesi ve Mars-MC kavusumu Akrep ASC gerektirir: Koc ASC olsaydi MC Kova olur, Virgo MC ile uyusmaz); ev yoneticisi Mars 4 derece Basak'ta onur/basari noktasi olan Tepe Noktasi (MC) ile kavusum yapmaktadir ve ayni zamanda kocu ve takimini tanimlayan Akrep burcunu yonetmektedir. Mars'in haritanin en ust konumunda (elevated) ve MC ile kavusumda olmasi EVET gostergesidir. 13 derece Terazi'deki Pluto, Yukselen'in ikincil yoneticisidir ve sorunun yardimci yoneticisi olan 2 derece Kova'daki Ay ile ucgen aci yapmaktadir (burc bazli ucgen; derece bazinda 108 derece) -> ikinci EVET. Yaklasik 8 derece Aslan'daki Venus rakipleri (7. ev) yonetmekte ve Ay ile karsit aci yapmaktadir; Venus ayni zamanda rakiplerin oyununu/macini temsil eden (7. evden itibaren 5. ev olan) 11. evi de yonetmektedir. Venus kistirilmis (intercepted) konumdadir ve zamanla Satume kavusacaktir (engelleme temsilcisi) -> rakiplerin isi kotu. Sonuc: takim kazanacak. Son devrede (inning) kil payi farkla maci kazandilar. Dogrulama (Regiomontanus): ASC Akrep 27.82, MC Basak 7.88, Mars 4.94 Basak (MC'ye 2.93 derece), Pluto 13.90 Terazi 11. ev, Ay 2.10 Kova 3. ev, Venus 7.94 Aslan 9. ev, Saturne 26.47 Aslan 9. ev."
   }
 ]
