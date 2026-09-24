@@ -974,6 +974,18 @@ async def cast(req: CastRequest):
         except Exception as e:
             engine_json["health_analysis"] = f"Sağlık analizi hesaplanamadı ({e})"
             engine_json["health_verdict"] = "belirsiz"
+    # --- BİLEŞİK/ÇOKLU SORULAR (tek harita, birden fazla alt soru) ---
+    # Kim/Nerede/Ne/Ne zaman/Neden/Nasıl — ayri ayri sorulari ayri paragraf cevaplar.
+    try:
+        from engine.multi_question import split_questions, sub_answers, multi_instruction_text
+        _mq_subs = split_questions(req.question)
+        if len(_mq_subs) > 1 and len(req.question) - len(_mq_subs[0]) > 3:
+            _mq_rows = sub_answers(engine_json, _mq_subs, res=r)
+            if len(_mq_rows) > 1:
+                engine_json["multi_questions"] = _mq_rows
+                engine_json["multi_instruction"] = multi_instruction_text(engine_json, _mq_rows)
+    except Exception:
+        pass
     answer = call_openai(engine_json, req.lang)
     if engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
