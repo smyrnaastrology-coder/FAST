@@ -728,7 +728,6 @@ async def cast(req: CastRequest):
             "Bu bir NEREDE/KONUM sorusu - HORARY UZAKLIK MOTORU ciktisini kullan, kendi km hesabi/carpim yapma.\n"
             "Panel (cevabinda bu blok gibi profesyonel sun):\n"
             + (f"- Soru kategorisi: {g['qtype_label']}{' | Zincir: ' + g['chain'] if g.get('chain') else ''}\n" if g.get("qtype") else "")
-            else "")
             + f"Açıklama: Mekanı 2-3 cümlede insancıl ve detaylı anlat, his ver, teknik detay (ev numarası, açı) yazma.\n"
             + f"- Mesafe: " + (g['band'] + " km" if g.get('band') else "kisa, su anki konumu")
             + (f" | Bolge: {g['km_category']} ({g['km_category_range']})" if g.get('km_category') else "")
