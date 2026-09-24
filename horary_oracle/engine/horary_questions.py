@@ -80,7 +80,7 @@ TYPE_KEYWORDS = [
     ("investment", ("hisse senedi", "hisse senedi almalı", "hisse senedi almali", "hisse", "borsa", "borsaya", "borsadan", "yatırım yapmalı", "yatirim yapmali", "yatırım yapmalıyım", "yatirim yapmaliyim", "para yatırmalı", "para yatirmali", "sermaye koymalı", "sermaye koymali")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
     ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
-    ("pregnancy", ("hamile miyim", "hamile miyim", "hamile mi", "hamilemiyim", "gebe miyim", "gebe mi", "hamile olduğumu", "hamile oldugumu", "hamilelik", "hamile kalacak", "hamile kalacağım", "hamile kalacagim", "çocuğum mu olacak", "cocugum mu olacak", "bebeğim mi var", "bebegim mi var")),
+    ("pregnancy", ("hamile miyim", "hamile miyim", "hamile mi", "hamilemiyim", "gebe miyim", "gebe mi", "hamile olduğumu", "hamile oldugumu", "hamilelik", "hamile kalacak", "hamile kalacağım", "hamile kalacagim", "çocuğum mu olacak", "cocugum mu olacak", "bebeğim mi var", "bebegim mi var", "doğum yapacak", "dogum yapacak", "doğum yapacağım", "dogum yapacagim", "doğumu ne zaman", "dogumu ne zaman", "doğuracağım", "doguracagim")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
     ("employee", ("çalışanım", "calisanim", "elemanım", "elemanim", "personelim", "işçim", "iscim")),
     ("uncle", ("dayım", "dayimin", "dayımın", "dayi", "amcam", "amcamin", "amcamın")),

@@ -1909,5 +1909,23 @@
       "legal"
     ],
     "explanation": "Ornek Harita #38: 7 Aug 1973 10:01 PDT Los Angeles 34N04 118W15 Tim cocuklarinin velayetini alabilecek mi? Soru Tim'in bir arkadasi tarafindan soruldu; Tim 7. ev ile temsil edilir, bu yuzden harita cevrilir (derived houses). Cocuklari, kendisinin 5. evi olan haritanin 11. evi ile simgelenir (11. ev kuspisi Aslan -> Sun). 27 derece Koc'taki Mars onu (7. ev kuspisi Koc) yonetmektedir; 15 derece Aslan'daki Sun cocuklarini gosterir. Sun'un Mars'a yaptigi UCGEN aci (burc bazli: Aslan-Koc) 'evet' yanitina isaret eder. 6 derece Kova'daki Jupiter, onun yasal konulari temsil eden 9. evini (haritadan: 7+9-1=15 -> haritanin 3. evi = Yay burcunun hakimi Jupiter) yonetmektedir ve bu vakada yasal velayeti simgeler. 4 derece Yay'daki Ay onun 9. evindedir (haritanin 3. evinde); Jupiter'e SEKSTIL (61.5 derece), hem Sun'a hem de Mars'a UCGEN aci yaparak 'evet'i dogrular. Sonuc: YES - uc hafta sonra mahkemeye gitti ve uc cocugunun da velayetini aldi. Dogrulama (Regiomontanus): ASC Terazi 2.56, MC Yengec 2.79, 7. ev kuspisi Koc 2.6 (hakimi Mars, konumu Koc 27.78 7. ev), 11. ev kuspisi Aslan 7.1 (hakimi Sun, konumu Aslan 15.03 11. ev), Jupiter 6.15 Kova 4. ev retro, Ay 4.66 Yay 3. ev (=Tim'in 9. evi), Saturns 0.62 Yengec 9. ev, Venus 16.41 Basak 12. ev. Kural: baskasini soran sorularda soru sahibi 1. ev, sorulan kisi 7. ev + cevrilmis evler; ucgen sekvensi 'evet' dogrular."
+  },
+  {
+    "id": "DAUGHTER-BIRTH-VACATION-1986-08-21",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Kizim, ben tatildeyken mi dogum yapacak? 21 Aug 1986 11:32 PDT Coeur d'Alene 47N41 116W46. Neptune 3 Oglak (5. ev hakimi = kizi), Mercury 14 Aslan (9. ev hakimi = torun), Ay 24 Balik 5. ev VOC, ASC Akrep (Pluto hakim).",
+    "technique": "timing_5th_neptune_9th_mercury_no_aspect_moon_voc_1deg_sextile_week",
+    "verdict": "NO",
+    "tags": [
+      "child",
+      "timing",
+      "5th_house",
+      "9th_house",
+      "derived_houses",
+      "no_aspect",
+      "voc",
+      "sextile"
+    ],
+    "explanation": "Ornek Harita #39: 21 Aug 1986 11:32 PDT Coeur d'Alene 47N41 116W46 Kizim, ben tatildeyken mi dogum yapacak? Kizin Eylul ortasinda dogum yapmasi bekleniyordu; tatil 1 Eylul'de baslayacakti ve torun dogdugunda uzakta olmak istenmiyordu. 3 derece Oglak'taki Neptune 5. evi (kizini) yonetir (5. ev kuspisi Balik); 14 derece Aslan'daki Mercury 9. evi (beklenen torunu = 5. evden itibaren 5. ev) yonetir. Mercury ile Neptune arasinda HICBIR ACI YOKTUR; bu nedenle dogumun beklenenden ERKEN gerceklesmesi ihtimali yok. 5. evde 24 derece Balik'taki Ay BOSLUKTA (VOC)'dir; bu da endiselenecek bir sey olmadiginin gostergesi. Danisan seyahatine cikti; kizi, danisan dondukten BIR HAFTA sonra dogum yapti. Neptune, soru sahibinin yoneticisi (ASC Akrep) Pluto'ya 1 derecelik orb ile SEKSTIL aci yapar (58.3 derece; bu vakada bir derece = bir hafta zaman sinyali). Kural: Merkür-torun ile Neptune-kiz arasinda acinin OLMAMASI = erken dogum yok; Ay VOC da karari destekler; sekstil orbiti zaman verir (1 derece = 1 hafta). Dogrulama (Regiomontanus): ASC Akrep 0.47, MC Aslan 8.88, 5. ev kuspisi Balik 13.6 (hakimi Neptune, konumu Oglak 3.19 3. ev retro), 9. ev kuspisi Aslan 8.9 (kaynak hakimi Mercury; gelenekselde Aslan'in hakimi Sun'dur - kaynak tutarsizligi not edildi; Mercury konumu Aslan 13.99 10. ev), Ay 23.92 Balik 5. ev VOC, Pluto 4.93 Akrep 1. ev, Sun 28.40 Aslan 10. ev."
   }
 ]
