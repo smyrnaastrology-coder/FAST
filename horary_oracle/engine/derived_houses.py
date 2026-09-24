@@ -255,12 +255,21 @@ def parse_multi(question: str):
         return None
     topics = []
     lo = lost_item_offset(q)
+    base_word = persons[0][1]
     if lo:
         topics.append((0, "kayıp eşya", lo))
     else:
+        cands = []
         for w, off in TOPIC_OFFSET.items():
             if _word_prefix_in(q, w):
-                topics.append((q.index(w), w, off))
+                cands.append((len(w), q.index(w), w, off))
+        # aynı köklerden uzunu tercih et (ev/evi, kedim/kedi gibi): kısa kök uzunun içinde ise atla
+        for i, (ln, pos, w, off) in enumerate(sorted(cands, reverse=True)):
+            if any(w in other for _, _, other, _ in sorted(cands, reverse=True) if other != w and len(other) > len(w)):
+                continue
+            if w == base_word or w in base_word or base_word in w:
+                continue
+            topics.append((pos, w, off))
     topics = sorted(topics)
     base = persons[0][2]
     chain = [base]
@@ -269,7 +278,7 @@ def parse_multi(question: str):
     house = chain[0]
     for off in chain[1:]:
         house = (house + off - 2) % 12 + 1
-    return {"chain":chain, "house":house, "base_word":persons[0][1], "topics":[t[1] for t in topics]}
+    return {"chain":chain, "house":house, "base_word":base_word, "topics":[t[1] for t in topics]}
 
 # Test
 if __name__=="__main__":
