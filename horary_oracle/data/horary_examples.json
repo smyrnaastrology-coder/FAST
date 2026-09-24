@@ -1831,5 +1831,24 @@
       "moon_operator"
     ],
     "explanation": "Ornek Harita #34: 22 Jun 1978 17:28 PDT Los Angeles 34N04 118W15 Cumartesi gunu kazanacak miyiz? Kiz softbol antrenoru soruyor, takimi Cumartesi sampiyonluk macinda. Evin girisinde Akrep burcu var (kaynak metinde 'Koc' yazili ama 'Mars Akrep'i yonetir' gerekcesi ve Mars-MC kavusumu Akrep ASC gerektirir: Koc ASC olsaydi MC Kova olur, Virgo MC ile uyusmaz); ev yoneticisi Mars 4 derece Basak'ta onur/basari noktasi olan Tepe Noktasi (MC) ile kavusum yapmaktadir ve ayni zamanda kocu ve takimini tanimlayan Akrep burcunu yonetmektedir. Mars'in haritanin en ust konumunda (elevated) ve MC ile kavusumda olmasi EVET gostergesidir. 13 derece Terazi'deki Pluto, Yukselen'in ikincil yoneticisidir ve sorunun yardimci yoneticisi olan 2 derece Kova'daki Ay ile ucgen aci yapmaktadir (burc bazli ucgen; derece bazinda 108 derece) -> ikinci EVET. Yaklasik 8 derece Aslan'daki Venus rakipleri (7. ev) yonetmekte ve Ay ile karsit aci yapmaktadir; Venus ayni zamanda rakiplerin oyununu/macini temsil eden (7. evden itibaren 5. ev olan) 11. evi de yonetmektedir. Venus kistirilmis (intercepted) konumdadir ve zamanla Satume kavusacaktir (engelleme temsilcisi) -> rakiplerin isi kotu. Sonuc: takim kazanacak. Son devrede (inning) kil payi farkla maci kazandilar. Dogrulama (Regiomontanus): ASC Akrep 27.82, MC Basak 7.88, Mars 4.94 Basak (MC'ye 2.93 derece), Pluto 13.90 Terazi 11. ev, Ay 2.10 Kova 3. ev, Venus 7.94 Aslan 9. ev, Saturne 26.47 Aslan 9. ev."
+  },
+  {
+    "id": "GOLD-CACHE-STOCK-1983-08-26",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Gold Cache hisse senedini almali miyiz? 26 Aug 1983 10:10 PDT Coeur d'Alene 47N41 116W46. Kusur adam: Venus 0 derece Basak 11. ev retro, Sun ile kavusum. Hisse alimi (5. ev) Uranüs 5 derece Yay. Kar (2. ev) Jupiter 2 derece Yay. Ay 7 derece Koc. Saturne 1. evde.",
+    "technique": "investment_5th_square_venus_retro_sun_conjunct_moon_past_saturn_1st",
+    "verdict": "NO",
+    "tags": [
+      "investment",
+      "5th_house",
+      "2nd_house",
+      "11th_house",
+      "1st_house",
+      "square",
+      "conjunction",
+      "retrograde",
+      "moon_past_aspects"
+    ],
+    "explanation": "Ornek Harita #35: 26 Aug 1983 10:10 PDT Coeur d'Alene 47N41 116W46 Gold Cache hisse senedini almali miyiz? Karli yatirim arayan kucuk bir sirketin baskani soruyor. Soru sahibini Venus yonetmekte (ASC Terazi), 11. evde 0 derece Basak'ta RETRO konumda. Venus'un Sun ile kavusumu bir EVET isaret etse de, hisse senedi alimlarinin 5. ev yoneticisi olan 5 derece Yay'daki Uranus'e KARE aci yapmaktadir. Venus ayrica soru sahibi icin potansiyel kari gosteren 2. evdeki 2 derece Yay'daki Jupiter'e de KARE aci yapmaktadir. Bir evet, iki hayir. 7 derece Koc'taki Ay Venus veya Uranus ile olan tum acilarini GECMIS durumda; bu da bu yatirimdan kar etmek icin gec kalindigini gosterir. 1. evdeki Saturne hayiri teyit eder. Sonuc: NO - almadilar, birkac hafta sonra hissenin degeri cakildi, soruyu sorduklarina cok memnunlar. Kural: gecilen acilar isi bitirmistir; evet icin UYGULANAN (applying) aci gerekir. Dogrulama (Regiomontanus): ASC Terazi 18.8, Venus 0.48 Basak 11. ev retro (Sun 2.89 Basak ile 2.42 derece kavusum), Uranus 5.14 Yay (94.66 derece kare, 5. ev Kova yoneticisi), Jupiter 2.27 Yay 2. ev (91.8 derece kare), Ay 7.11 Koc 6. ev, Saturne 0.18 Akrep 1. ev."
   }
 ]

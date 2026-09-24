@@ -36,6 +36,7 @@ QUESTION_HOUSES = {
     "hidden_enemy": 12,  # şikayet eden / gizli düşman
     "sport_fav": 5,      # tuttuğun takım (oyun/spor) -> 5.ev; rakip onun 5.'si -> 11.ev (turned)
     "sport_rival": 11,
+    "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
 LABEL_TR = {
@@ -48,6 +49,7 @@ LABEL_TR = {
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
     "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
+    "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
 
@@ -74,6 +76,7 @@ TYPE_KEYWORDS = [
     ("friend", ("arkadaşım", "arkadasim", "arkadaşının", "arkadasinin", "dostum")),
     ("sibling", ("kardeşim", "kardesim", "erkek kardeşim", "erkek kardesim", "ablam", "abim", "ağabeyim", "agabeyim", "bacım", "bacim", "kardeşimin", "kardesimin")),
     ("sport_fav", ("beşiktaş kazanacak", "besiktas kazanacak", "galatasaray kazanacak", "fenerbahçe kazanacak", "fenerbahce kazanacak", "trabzon kazanacak", "diyarbakırspor", "diyarbakirspor", "tuttuğum takım kazanacak", "tuttugum takim kazanacak", "takımım kazanacak", "takimim kazanacak", "maçı kazanacak", "maci kazanacak", "maçı kim kazanacak", "maci kim kazanacak", "kim kazanır", "kim kazanacak", "kazanacak mıyız", "kazanacak miyiz", "kazanır mıyız", "kazanir miyiz", "kazanacak mı", "kazanacak mi", "bizim takım", "bizim takim", "takımımız", "takimimiz")),
+    ("investment", ("hisse senedi", "hisse senedi almalı", "hisse senedi almali", "hisse", "borsa", "borsaya", "borsadan", "yatırım yapmalı", "yatirim yapmali", "yatırım yapmalıyım", "yatirim yapmaliyim", "para yatırmalı", "para yatirmali", "sermaye koymalı", "sermaye koymali")),
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
     ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
