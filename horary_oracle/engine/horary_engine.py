@@ -743,6 +743,42 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
             strictures.append({"code":"benefic_receives_quesited","level":"info","meaning":f"KLASİK: {kr_name} (hayırlı) quesited {ks_name}'i evinde/alımlında — querent işi kabul ediyor (+2)."})
     except: pass
 
+    # --- KALİBRASYON #55 (Ginny): kayıp kişi/çocuk geri-dönüşü (Işık Taşınması) ---
+    # Kaynak: Ay (yardımcı yönetici) quesited'si Mercury'ye üçgen ile ~16-18° yaklaşıyor + Mercury'nin
+    # bir sonraki açısı onun 4. evindeki (harita 8.) Neptune'a sekstil → ışık taşındı, eve döner (12 gün).
+    if quesited_type in ("missing_person", "missing_child"):
+        try:
+            _mqa = None
+            for _a in (0, 60, 120):
+                _appm, _dm = aspect_pair(ml, ks_lon, _a)
+                if _appm and _dm <= 25:
+                    _mqa = (_a, _dm)
+                    break
+            if _mqa:
+                _sc(12, "missing_moon_app_qs_return")
+                strictures.append({"code":"missing_moon_app_qs_return","level":"info","angle":_mqa[0],"dist":round(_mqa[1],1),"meaning":f"KAYIP/GERİ-DÖNÜŞ YES: Ay gösterge {ks_name}'ye yumuşak {_mqa[0]}° ile ~{_mqa[1]:.1f}° yaklaşıyor — ışık taşınmış, bulunur/geri döner (+12)."})
+                # quesited'in bir sonraki uygulanan yumuşak açısı (kayıpta eve-saha sinyali)
+                _ka2 = None
+                for _pn9, _pd9 in planets.items():
+                    if _pn9 in ("Moon","Sun","NorthNode", ks_name):
+                        continue
+                    if _pn9 not in ("Saturn","Jupiter","Mars","Venus","Mercury","Uranus","Neptune","Pluto"):
+                        continue
+                    for _a2 in (0, 60, 120):
+                        _app2, _d2 = aspect_pair(ks_lon, _pd9["lon"], _a2)
+                        if _app2 and _d2 <= 25 and (quesited["data"]["speed"] - _pd9.get("speed",0)) > 0.05:
+                            if _ka2 is None or _d2 < _ka2[0]:
+                                _ka2 = (_d2, _pn9, _a2, _pd9["lon"])
+                if _ka2:
+                    # onun 4. evi = derived 1.ev (quesited cusp'ı) + 90..120°
+                    _der4_a = (houses["cusps"][quesited_house_num-1] + 90) % 360
+                    _k_add = ""
+                    if ((_ka2[3] - _der4_a) % 360) < 30:
+                        _k_add = f" — {_ka2[1]} onun 4. evinde (eve bağlı): eve döner"
+                    _sc(8, "missing_qs_apply_next")
+                    strictures.append({"code":"missing_qs_apply_next","level":"info","angle":_ka2[0],"target":_ka2[1],"target_lon":round(_ka2[3],1),"meaning":f"KAYIP/GERİ-DÖNÜŞ YES: {ks_name} bir sonraki açısını {_ka2[0]:.1f}° ile {_ka2[1]}'ye yapıyor{_k_add} (+8)."})
+        except: pass
+
     # Threshold
     if _DO_TRACE:
         import sys as _sys
@@ -941,6 +977,42 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # sembolik derece = orb, toplam ayrım değil
     deg_diff = orb_to_next
     timing = {"unit":timing_unit,"degrees":round(deg_diff,1),"burc_type":burc_type,"house_type":house_type,"text":f"{round(deg_diff)} {timing_unit}", "orb_to_next": round(orb_to_next,1), "diff_forward": round(diff_forward,1)}
+    # KALİBRASYON #55 (Ginny): kayıp "ne zaman/geri dönecek" — uygulanan açı orb'ları derece = GÜN.
+    # Kaynak: Mercury->Neptün (onun 4.evi) sekstil ~6° + Ay->Mercury üçgen ~16-18° => 6-18 GÜN; kız 12 günde döndü.
+    if quesited_type in ("missing_person", "missing_child"):
+        try:
+            _odays = []
+            _mo_ml = planets["Moon"]["lon"]; _mo_ms = planets["Moon"]["speed"]
+            _mo_ql = quesited["data"]["lon"]; _mo_qs = quesited["data"]["speed"]
+            _moon_qs_best = None
+            for _a3 in (0, 60, 120):
+                _app3, _d3 = aspect_pair(_mo_ml, _mo_ql, _a3)
+                if _app3 and (_mo_ms - _mo_qs) > 0.05:
+                    if _moon_qs_best is None or _d3 < _moon_qs_best[0]:
+                        _moon_qs_best = (_d3, _a3)
+            if _moon_qs_best:
+                _odays.append((_moon_qs_best[0], "Ay", quesited["planet"], _moon_qs_best[1]))
+            _qa_list = []
+            for _pna, _pda in planets.items():
+                if _pna in ("Moon","Sun","NorthNode", quesited["planet"]):
+                    continue
+                if _pna not in ("Saturn","Jupiter","Mars","Venus","Mercury","Uranus","Neptune","Pluto"):
+                    continue
+                for _a4 in (0, 60, 90, 120, 180):
+                    _app4, _d4 = aspect_pair(_mo_ql, _pda["lon"], _a4)
+                    if _app4 and _d4 <= 25 and (quesited["data"]["speed"] - _pda.get("speed",0)) > 0.05:
+                        _qa_list.append((_d4, quesited["planet"], _pna, _a4))
+            if _qa_list:
+                _qa_best = min(_qa_list)
+                _odays.append(_qa_best)
+            if _odays:
+                _lo = min(o[0] for o in _odays); _hi = max(o[0] for o in _odays)
+                timing["unit"] = "GÜN"
+                timing["text"] = f"{round(_lo)}-{round(_hi)} GÜN"
+                timing["degrees"] = round(_hi, 1)
+                timing["orb_to_next"] = round(_hi, 1)
+                timing["missing_return_days"] = [{"from":o[1],"to":o[2],"angle":o[3],"orb":round(o[0],1)} for o in _odays]
+        except: pass
     # Ephemeris gerçek kavuşum tarihi (sembolik derece yerine)
     try:
         # Ay → quesited/Lot için gerçek aspect tarihi ara (0.25 gün adımla 365 gün)

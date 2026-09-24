@@ -269,6 +269,8 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
         prompt += f"\n\nHEALTH AXIS: {engine_json['health_axis']}"
     if engine_json.get("sport_goals"):
         prompt += f"\n\nSPORT GOALS: {engine_json['sport_goals']}"
+    if engine_json.get("multi_instruction"):
+        prompt += f"\n\nMULTI-QUESTION: {engine_json['multi_instruction']}"
     return prompt + ex_txt + f"\n\nFINAL LANGUAGE CHECK: Language={lang}. Answer in {lang} only."
     # FINAL CHECK: Gezegen burçları yukarıdaki GERÇEK listeden alınacak, halüsinasyon yasaktır.
 
@@ -341,6 +343,15 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
     followup_intro = ""
     if is_followup and history:
         followup_intro = "Az önce baktığımız haritanın üzerine... "
+
+    # Çoklu/bileşik soru: her alt soruya sırayla, aynı haritadan
+    mq = engine_json.get("multi_questions")
+    if mq:
+        lines = [f"{followup_intro}Bileşik soru: tek haritayla birden fazla alt soruyu yanıtlıyorum.", ""]
+        for r in mq:
+            lines.append(f"• {r.get('label','')}: {r.get('question')}")
+            lines.append(f"  ➜ {r.get('facts','')}")
+        return "\n".join(lines)
     
     # ne yapıyor - aktivite sorusu, YES/NO değil tarif
     if is_doing and loc:
@@ -371,6 +382,8 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         "via_combusta_asc": "ASC yanan yolda — soru sıkıntılı yerden geliyor.",
         "water_secrecy": "Ay/ASC su grubunda — gizli bilgi/manipülasyon olabilir.",
         "combustion_cazimi_like_0_2": "Güneş’le 0-2° — destek var ama gizli manipülasyon yok değil.",
+        "missing_moon_app_qs_return": "Ay, kayıp kişinin göstergesine yumuşak açıyla yaklaşıyor — ışık taşınmış, bulunur/geri döner.",
+        "missing_qs_apply_next": "Kayıp kişinin göstergesinin bir sonraki açısı eve bağlı — geri dönüş sinyali.",
         "combustion_combust_2_8_5": "Güneş’le 2-8.5° yanık — ağır manipülasyon, biri engelliyor.",
         "combustion_weakening_8_5_17": "Güneş’le 8.5-17° — etki hafifliyor.",
         "new_moon": "Yeni Ay (Güneş-Ay kavuşum) — çok feci kargaşa/bilinçli kötülük.",
