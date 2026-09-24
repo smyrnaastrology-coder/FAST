@@ -123,6 +123,47 @@ LOST_ITEM_WORDS = ("gözlüğü", "gozlugu", "gözlük", "gozluk", "çantası", 
 _NEREDE = ("nerede", "nerde", "nereye", "nere")
 _KAYIP_SIGNAL = ("kayboldu", "kaybolan", "kaybolmuş", "kaybolmus", "kaybettim", "kaybetti", "kayıp olan", "kayip olan", "kayıp", "kayip")
 _LOST_TRIGGER = _NEREDE + _KAYIP_SIGNAL
+_PERSON_GENERIC = ("insan", "kişi", "kisi", "adam", "kadın", "kadin", "kız", "kiz", "oğlan", "oglan",
+                   "bey", "hanım", "hanim", "genç", "genc", "akraba", "yakınım", "yakinim")
+_COMMON_BLOCK = ("nerede", "nerde", "nerden", "nerden", "nasıl", "nasil", "ne", "neden", "nicin", "niçin",
+                 "hangi", "bugün", "bugun", "yarın", "yarin", "şimdi", "simdi", "evim", "işim", "isim",
+                 "param", "saatim", "herkes", "birisi", "biri",
+                 # sehir/yer adlari kisi degildir
+                 "istanbul", "ankara", "izmir", "bursa", "antalya", "adana", "konya", "gaziantep",
+                 "paris", "londra", "berlin", "roma", "madrid", "moskova", "newyork", "tokyo",
+                 "turkiye", "turkiye", "almanya", "fransa", "ingiltere", "amerika", "avrupa", "asya")
+
+
+def unknown_name_token(q):
+    """'Karen nerede' tarzi: bilinmeyen ozel isim + nerede/kayip -> kayip kisi (7. ev).
+    Ilk token bilinen sozcuk degilse ve sorgu kayip/nerede tetikleyiciliyse isim sayilir."""
+    if not any(k in q for k in _LOST_TRIGGER):
+        return None
+    toks = q.split()
+    if not toks:
+        return None
+    first = toks[0].strip(".,!?'\"").split("'")[0]
+    known = set(BASE_PERSON) | set(TOPIC_OFFSET) | set(LOST_ITEM_WORDS) | set(_COMMON_BLOCK)
+    if first in known:
+        return None
+    if len(first) < 3 or first.isdigit():
+        return None
+    return first
+
+
+def _match_token_blocked(q, word):
+    """Kelimenin gectigi tam token _COMMON_BLOCK'taysa (sehir/yer) eslesme gecersiz.
+    'is' kelimesi 'istanbul' token'ini taramamali."""
+    pos = q.find(word)
+    while pos != -1:
+        start = q.rfind(' ', 0, pos) + 1
+        end = q.find(' ', pos)
+        end = len(q) if end == -1 else end
+        tok = q[start:end].strip(".,!?'\"").split("'")[0]
+        if tok in _COMMON_BLOCK:
+            return True
+        pos = q.find(word, pos+1)
+    return False
 
 
 def lost_item_offset(q):
@@ -172,6 +213,26 @@ def named_person_offset(q):
     return None
 
 
+def lost_person_base(q):
+    """KAYIP INSAN (kurs kurali): kayip insanlar kayip esyalarla ayni yontemle
+    bulunur, ANCAK 2. ev yerine 7. ev kullanilir. Kisinin tabii evi (anne 4,
+    oglum 5...) yerine 7. evden okunur; esya kelimesi karisirsa insan kurali
+    uygulanmaz (Ornek #53 Karen: 7. ev hakimi Merkur = Karen)."""
+    if lost_item_offset(q):
+        return None
+    if not any(k in q for k in _KAYIP_SIGNAL):
+        return None
+    # evcil hayvan kelimeleri insan degil (kedi/kopek 6. ev, Ornek #50)
+    pets = ("kedi", "kedim", "kedimin", "köpek", "kopek", "köpeğim", "kopegim", "evcil")
+    if any(_word_prefix_in(q, w) for w in BASE_PERSON if w not in ("ben", "kendim", "kendimin") and not any(p in w for p in pets)):
+        return 7
+    if any(k in q for k in _PERSON_GENERIC):
+        return 7
+    if unknown_name_token(q):
+        return 7
+    return None
+
+
 # Kuzen zinciri: hala/amca/dayı/teyze + (oğlu/kızı/çocuğu) = kuzen -> 3. ev (klasik horary kuralı)
 KUSEN_REL = ("hala", "amca", "dayı", "dayi", "teyze")
 KUSEN_KIND = ("oğlu", "oglu", "kızı", "kizi", "çocuğu", "cocugu", "oğluyla", "kızıyla")
@@ -195,17 +256,28 @@ def parse_derived(question: str):
         derived = derived_house(base, offset)
         return {"base_house":base, "base_word":"isimle çağrılan kişi", "offset":offset,
                 "topic":"kayıp eşya", "derived":derived, "formula":"isimle çağrılan kişi -> 7. ev, eşyası 2. evi = 8. ev"}
-    # 1) direkt kişi ilişkisi (üniversite/hastane vs. hariç)
-    matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0]) and m[0] not in DESCRIPTOR_WORDS]
+    # 1) direkt kişi ilişkisi (üniversite/hastane vs. hariç; sehir token'i engelli)
+    matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0]) and m[0] not in DESCRIPTOR_WORDS and not _match_token_blocked(q, m[0])]
     # 2) yoksa descriptor kendisi base olur (örn. "üniversite nerede")
     if not matched:
-        matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0])]
+        matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0]) and not _match_token_blocked(q, m[0])]
     # 3) kişi yok ama kayıp eşya sorusu varsa -> soranın kendisi (1. ev), eşyası 2. ev
     #    ("cüzdanım nerede", "gözlüğüm kayboldu" tarzı iyelikli 1. tekil sorgular)
     if not matched and lost_item_offset(q):
         return {"base_house":1, "base_word":"ben(kendi)", "offset":2, "topic":"kayıp eşya",
                 "derived":2, "formula":"ben -> kayıp eşya 2. ev"}
+    # 4) KAYIP INSAN (kurs, #53): kayıp kişi 2. ev yerine 7. evden okunur
+    #    (tabii evi geçersiz: "annem kayboldu" -> anne 4 degil 7)
+    lp = lost_person_base(q)
+    if lp:
+        return {"base_house":lp, "base_word":"kayıp kişi", "derived":lp, "topic":"kayıp insan",
+                "formula":"kayıp insanlar kayıp eşya yöntemiyle ama 2. ev yerine 7. evden bulunur"}
     if not matched:
+        # 5) bilinmeyen isim + nerede ("Karen nerede") -> kayıp kişi 7. ev
+        name = unknown_name_token(q)
+        if name:
+            return {"base_house":7, "base_word":name+" (isim, kayıp kişi)", "derived":7, "topic":"kayıp insan",
+                    "formula":"isimle çağrılan kayıp kişi -> 7. ev (kayıp insan kuralı)"}
         return None
     base_word, base = min(matched, key=lambda m: (_person_rank(m[0]), -len(m[0])))
     # İyelik (genitive) yoksa "arkadaşım ... üniversitede hoca nerede" gibi durumlarda
@@ -246,12 +318,19 @@ def parse_multi(question: str):
         return {"chain": [base, offset], "house": house, "base_word": "isimle çağrılan kişi", "topics": ["kayıp eşya"]}
     persons = []
     for w,h in BASE_PERSON.items():
-        if _word_prefix_in(q, w):
+        if _word_prefix_in(q, w) and not _match_token_blocked(q, w):
             persons.append((q.index(w), w, h))
     persons = sorted(persons)
+    # kayıp insan (kurs, #53): kişi 7. evden okunur (tabii evi geçersiz)
+    lp = lost_person_base(q)
+    if lp:
+        return {"chain": [lp], "house": lp, "base_word": "kayıp kişi", "topics": ["kayıp insan"]}
     if not persons and lost_item_offset(q):
         return {"chain": [1, 2], "house": 2, "base_word": "ben(kendi)", "topics": ["kayıp eşya"]}
     if not persons:
+        name = unknown_name_token(q)
+        if name:
+            return {"chain": [7], "house": 7, "base_word": name+" (isim, kayıp kişi)", "topics": ["kayıp insan"]}
         return None
     topics = []
     lo = lost_item_offset(q)

@@ -1101,6 +1101,17 @@
     "part_of_fortune": "Kayip esya haritasinda Sans Noktasi (POF) faydali ikincil gostergedir. HER ZAMAN ORIGINAL YUKSELENDEN hesaplanir (evleri cevirsem/baska numaralandirsam bile). POF'un burc ve ev konumu + dispozitoru = yon/renk/mesafe ipucu. Sadece kayip esya haritalarinda kullanir.",
 "retro_returns": "NEREDEYSE HIC SASMAYAN KURAL: kayip esya retro bir gezegenle simgeleniyorsa esya GERI DONECEK veya BULUNACAK. Retro kayip esya horarysinde cok daha anlamlidir (digertum haritalara gore)."
   },
+  "lost_person": {
+    "note": "Kayip insanlar dersi (Only Way Learn Horary) - tek cumlelik kural",
+    "rule": "Kayip insanlari, kayip esyalari buldugunuz yontemle AYNI sekilde bulursunuz; ANCAK 2. ev yerine 7. evi kullanirsiniz. Kisinin tabii evi (anne 4, oglum 5, arkadas 11...) GECERSIZDIR; kayip kisi 7. ev kuspisinin yoneticisi ile simgelenir (Ornek #53 Karen).",
+    "derived_houses": "Kisi 7. evde oldugundan evleri ONDAN turetilir: onun 3. evi = haritanin 9. evi (yakin cevre/bolge, yon), onun 12. evi = haritanin 6. evi (saklanma, bulunmak istememe), onun 4. evi = haritanin 10. evi (evi/kendine donusu), onun 5. evi = haritanin 11. evi (cocuklari/eglence).",
+    "alive_well": "Kisinin yoneticisi ile Ay (sorunun yardimci yoneticisi) arasinda aci varsa (ucgen/sekstil, burc bazli) hayatta ve iyi; yardimci yoneticinin kisinin yoneticisine uygulanan acisi bulunacagini gosterir.",
+    "hiding": "Ay kisinin 12. evindeyse (harita 6. evi) kisi SAKLANIYORDUR ve bulunmak istemiyordur; onun 12. evindeki gezegen = gizli kalma.",
+    "no_return": "Kisinin yoneticisi ile onun 4. evinin (harita 10. evinin) yoneticisi arasinda HICBIR aci yoksa kisi KENDI ARZUSUYLA geri donmez; baskasi onu bulup getirmelidir.",
+    "direction": "Yon kisinin 3. evindeki (harita 9. evi) yoneticiden okunur: 3. ev yakin cevreyi, burc araziyi verir (Terazi = tepelik/yuksek arazi). Kuzey-Dogu gibi yon + sehir/bolge tespitinde burc-terrain tablosu (lost_object_locations.signs) kullanilir.",
+    "safety": "Kisinin yoneticisi baska gezegenlere sekstil/ucgen yapiyorsa (burc bazli) kisi guvendedir (Ornek #53: Merkur Terazi, Yay'daki Uranus+Saturn'e burc-bazli sekstil).",
+    "timing_24h": "Reşit ve kayip suresi 24 saatten az olan kisilerde polis hemen islem yapmaz; horary haritasi ailenin arama yonunu verir (yakin cevre - 3. ev)."
+  },
   "lost_object_locations": {
     "note": "Kayip esya YER REFERANS TABLOSU (kurs). Esyayi simgeleyen gezegenin BURCU ve EVI yer tarif eder. Renk/yon/esya ipucu icin her ikisine de bakilir.",
     "sign_edge_rule": "Kayip esyanin yoneticisi bir burctan cikip digerine gecmek uzereyse (son derecelerde), nesnenin bir seyin ARKASINDA kalmis olma ihtimali yuksektir.",
