@@ -1156,5 +1156,34 @@
       "h12_dir": "Guneydogu"
     },
     "overlap_note": "Bazen belirli alanlar veya esyalar birden fazla ev tarafindan temsil edilir; orn. yatak odalari hem 2. hem de 5. evde bulunabilir."
+  },
+  "color_table": {
+    "note": "BURC VE GEZEGENLERIN RENKLERI (kurs referans tablosu). Kayip esya haritalarinda renk ipucu icin kullanilir: esyayi simgeleyen yoneticinin ve dispozitorunun burc/gezegen renkleri, esyanin uzerindeki veya yakiniitaki esyanin rengini verir. Orn. mavi-beyaz desenli bir atki arandiginda.",
+    "signs": {
+      "koc": "Beyaz + kirmizi (white w/red)",
+      "boga": "Beyaz + limon (white w/lemon)",
+      "ikizler": "Beyaz + turuncu (white w/orange)",
+      "yengec": "Yesil/rengarenk karisik (green/russet)",
+      "aslan": "Kirmizi veya yesil (red or green)",
+      "basak": "Siyah benekli (black speckled)",
+      "terazi": "Pastel renkler (pastel colors)",
+      "akrep": "Kahverengi (brown)",
+      "yay": "Sari/yesil (yellow/green)",
+      "oglak": "Siyah/koyu kahverengi (black/dark brown)",
+      "kova": "Gok mavisi (sky blue)",
+      "balik": "Turkuaz (turquoise)"
+    },
+    "planets": {
+      "moon": "Beyaz/krem/gumus (white/cream/silver)",
+      "mercury": "Acik mavi/gumru (light blue/dove)",
+      "venus": "Beyaz/mor (white/purple)",
+      "sun": "Sari/mor/altin (yellow/purple/gold)",
+      "mars": "Ates kirmizi (fiery red)",
+      "jupiter": "Kirmizi + yesil kul (red mixed w/green ash)",
+      "saturn": "Siyah/yesil (black/green)",
+      "uranus": "Ekose/cizgili/karisik desen (plaids/checks/mingled)",
+      "neptune": "Turkuaz/deniz renkleri (turquoise/sea colors)",
+      "pluto": "Koyu tonlar (dark hues)"
+    }
   }
 }
