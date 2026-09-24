@@ -31,6 +31,7 @@ QUESTION_HOUSES = {
     "student": 3,
     "astrology_student": 9,  # astroloji öğrencisi -> 9. ev (Yay/Jüpiter: yüksek öğrenim, felsefe, bilgelik)
     "money": 2,
+    "loan": 8,        # bankadan borç/kredi/ipotek (başkasının parası) -> 8. ev
     "lost_object": 2,
     "job": 10,
     "home": 4,
@@ -47,7 +48,7 @@ LABEL_TR = {
     "uncle": "Dayı/Amca",
     "teacher": "Hoca/Öğretmen", "university": "Üniversite", "student": "Öğrenci",
     "astrology_student": "Astroloji öğrencisi",
-    "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
+    "money": "Para/Değerli eşya", "loan": "Kredi/Borç/İpotek (8. ev)", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
     "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
@@ -87,6 +88,7 @@ TYPE_KEYWORDS = [
     ("mother", ("annem", "annemin", "anam", "anneciğim", "annecigim")),
     ("father", ("babam", "babamin", "babamın", "babacığım", "babacigim")),
     ("money", ("param", "maaşım", "maasim", "gelirim", "cüzdanım", "cuzdanim", "mücevherim", "mucevherim", "altınlarım", "altinlarim")),
+    ("loan", ("kredi", "krediyi", "kredim", "bankadan borç", "bankadan borc", "ipotek", "mortgage", "borç çekecek", "borc cekecek", "borç alacağım", "borc alacagim", "faizle borç", "faizle borc")),
     ("lost_object", ("kalemim", "kalem", "bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim")),
     ("job", ("işim", "isim", "mesleğim", "meslegim", "kariyerim")),
     ("home", ("evim", "evimin", "dairem", "apartmanım", "apartmanim", "sitem")),

@@ -1927,5 +1927,24 @@
       "sextile"
     ],
     "explanation": "Ornek Harita #39: 21 Aug 1986 11:32 PDT Coeur d'Alene 47N41 116W46 Kizim, ben tatildeyken mi dogum yapacak? Kizin Eylul ortasinda dogum yapmasi bekleniyordu; tatil 1 Eylul'de baslayacakti ve torun dogdugunda uzakta olmak istenmiyordu. 3 derece Oglak'taki Neptune 5. evi (kizini) yonetir (5. ev kuspisi Balik); 14 derece Aslan'daki Mercury 9. evi (beklenen torunu = 5. evden itibaren 5. ev) yonetir. Mercury ile Neptune arasinda HICBIR ACI YOKTUR; bu nedenle dogumun beklenenden ERKEN gerceklesmesi ihtimali yok. 5. evde 24 derece Balik'taki Ay BOSLUKTA (VOC)'dir; bu da endiselenecek bir sey olmadiginin gostergesi. Danisan seyahatine cikti; kizi, danisan dondukten BIR HAFTA sonra dogum yapti. Neptune, soru sahibinin yoneticisi (ASC Akrep) Pluto'ya 1 derecelik orb ile SEKSTIL aci yapar (58.3 derece; bu vakada bir derece = bir hafta zaman sinyali). Kural: Merkür-torun ile Neptune-kiz arasinda acinin OLMAMASI = erken dogum yok; Ay VOC da karari destekler; sekstil orbiti zaman verir (1 derece = 1 hafta). Dogrulama (Regiomontanus): ASC Akrep 0.47, MC Aslan 8.88, 5. ev kuspisi Balik 13.6 (hakimi Neptune, konumu Oglak 3.19 3. ev retro), 9. ev kuspisi Aslan 8.9 (kaynak hakimi Mercury; gelenekselde Aslan'in hakimi Sun'dur - kaynak tutarsizligi not edildi; Mercury konumu Aslan 13.99 10. ev), Ay 23.92 Balik 5. ev VOC, Pluto 4.93 Akrep 1. ev, Sun 28.40 Aslan 10. ev."
+  },
+  {
+    "id": "MORTGAGE-LOAN-TIMING-1986-10-01",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Krediyi isleme koymak icin ne kadar beklemeliyim? 1 Oct 1986 13:07 PDT Coeur d'Alene 47N41 116W46. ASC Yay, Jupiter 15 Balik 3. ev (sozlesmeler). Kredi/bankadan alinan para 8. ev; Ay 13 Basak 9. ev, Jupiter'e 1.5 derece karşit uygulamada.",
+    "technique": "timing_8th_moon_opposition_jupiter_mutable_cadent_1_5_weeks",
+    "verdict": "YES",
+    "tags": [
+      "timing",
+      "loan",
+      "8th_house",
+      "3rd_house",
+      "9th_house",
+      "opposition",
+      "cadent",
+      "mutable",
+      "moon_operator"
+    ],
+    "explanation": "Ornek Harita #40: 1 Oct 1986 13:07 PDT Coeur d'Alene 47N41 116W46 Krediyi isleme koymak icin ne kadar beklemeliyim? Danisan ev ipotek kredisine basvurmustu ve evraklari imzalamadan once faiz oranlarinin mumkun oldugunca dusmesini bekliyordu; faizler istikrarli dusuyordu, tekrar yukselme ihtimaline karsi uzun beklemekten korkuyordu. Danisan, sozlesmeler evi olan 3. evde 15 derece Balik'taki Yukselen yoneticisi Jupiter (ASC Yay) ile temsil edilir. Banka/kredi kurumundan alinan para 8. evin konusudur ve 8. evi Ay yonetir (tum-ev: Yay ustunden 8. ev = Yengec). Ay 9. evde 13 derece Basak'tadir ve 1.5 derece sonra (178.5 derece) Jupiter'e KARSIT aci yapacaktir. Karsi aci olumsuz sayilsa da danisan krediyi alip almayacagini DEGIL, ne ZAMAN almasi gerektigini sormustu. Jupiter ve Ay Degisken burclarda (Balik/Basak) ve Dusen (Cadent) evlerde (3. ve 9.) oldugundan bu 1.5 GUN veya 1.5 HAFTA zaman dilimine isaret eder. Kural: OncU/Kose evler en hizlisi, Degisken/Dusen evler orta hizli, Sabit/Halef evler en yavasidir. 1.5 gun veya 1.5 hafta aciklandi; bankayi arayip 1.5 HAFTA sonrasina escrow (kapanis/tapu devri) randevusu aldi ve kredisini guvenceye aldi. Dogrulama (Regiomontanus): ASC Yay 19.01, MC Terazi 16.86, Jupiter 15.23 Balik 3. ev retro, Ay 13.74 Basak 9. ev (Moon-Jupiter 178.51 derece uygulanan karsit orb 1.5), 8. ev kuspisi Basak 9.6 (Regiomontanus; kaynak Ay'i 8. ev hakimi sayiyor - tum ev Yengec sistemi; fark not edildi), Su 8.35 Terazi 9. ev."
   }
 ]
