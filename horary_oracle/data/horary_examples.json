@@ -2325,5 +2325,98 @@
       "1990"
     ],
     "explanation": "Ornek Harita #56 (Bilesik/Coklu Sorular - Only Way Learn Horary): Dogu Yakasi'ndaki danisanin 3 alt sorusu tek haritadan yanitlanir (12 Oca 1990 18:27 PST = 13 Oca 02:27 UTC CDA; ASC Aslan 17.65, MC Boga 4.57; Regiomontanus). (1) Pam ile is ortakligi: soru sahibi GUNES (ASC Aslan -> 1. ev hakimi; 6. evde 22.6 Oglak - calisma/is evinde, gecerli harita); Pam = 7. ev (Kova) yoneticisi URANUS 6.47 Oglak Ev5; is/sirket = 10. ev (Boga) yoneticisi VENUS 2.06 Kova Ev6. Gunes-Uranus ve Gunes-Venus arasinda HICBIR olumlu/uygulanan aci yok (en yakin majör kavusum orblari 16.2 ve 9.4) -> is fikrinin gerceklesme olasiligi dusuk: HAYIR. (2) Kaliforniya'ya tasinma: uzak yer degisikligi = 9. ev (Koc) yoneticisi MARS 18.2 Yay (4/5 ev kiriginda; kitap 4. ev sayar), mevcut ev = 4. ev (Akrep) icindeki PLUTO 17.38 Akrep; Mars-Pluto arasinda destekleyen aci yok (en yakin majör 60, orb 29.2) -> uzak tasinma ihtimal disi, cift yerinde kalir: HAYIR. (3) Finansal olarak mumkun mu: onceki ikisi HAYIR oldugundan finansal kisim GEREKSIZLESIR (moot): BAĞIMLI. KALIBRASYON: engine.multi_question.sub_verdict + sub_qtype — qtype 'business': querent(1L) <-> 7L (ortak) ve 10L (is) arasinda 0/60/120 <=6 derece uygulanan acida YES, edilemiyorsa NO; qtype 'relocation': 9L ile 4. ev anlamlilarina 0/60/90/120 <=6 derece olumlu aci arar, yoksa yerinde kalinir NO; qtype 'finance': oncekilere BAĞIMLI, hepsi NO ise moot. Book kural notu: hem Pam hem es 7. ev yonetimi altinda; Gunes ile (Uranus veya Venus) aci yok -> is dusuk olasilik; 9L(4. evde) Pluto ile acisiz -> tasinma yok."
+  },
+  {
+    "id": "BEN-ASKER-NIKKI-AT-BOISE-1985-08-15",
+    "source": "Only Way Learn Horary - Compound and Multiple Questions - Coeur d Alene ID 47N41 116W46",
+    "question": "Ben orduya / askere gitmeli mi? Nikki'yi (ati) satin almis olmali miyiz? Boise'ye tasinmali miyiz? 15 Ağu 1985 13:50 PDT = 15 Ağu 20:50 UTC Coeur d'Alene 47N41 116W46. Arkadasin kizi aradi; Ben 7. ev ile temsil edilir (turetimle sona birakilir). Mars 14 Aslan + Pluto 2 Akrep 1. evi yonetir (ASC Akrep), Venus 15 Yengec 12. evi (at) yonetir, Neptune 1 Oglak 4. evi (mevcut ev), Ay 15 Aslan 9. evi (uzak tasinma), Saturn ASC'de. Derivation: Ben = 7.ev Boga -> Venus; onun 6. evi (asker) = harita 12. ev, onun 10. evi = harita 4. ev; onun 7. evi = harita 1. ev (Mars/Pluto). Sonuc: 3 alt soru da HAYIR; at aliminin mali anlami da yok (2. evde Neptune); Ben ~3 ay sonra iyi bir is buldu, kalip ilerlediler.",
+    "technique": "compound_3_subquestions_army_derived_7th_horse_12th_relocation_4th_9th_saturn_rising_no_aspect",
+    "verdict": "NO / NO / NO",
+    "tags": [
+      "compound_question",
+      "multi_question",
+      "3_subquestions",
+      "army",
+      "military",
+      "6th_house",
+      "10th_house",
+      "derived_7th_house",
+      "horse",
+      "12th_house",
+      "animal_purchase",
+      "relocation",
+      "4th_house",
+      "9th_house",
+      "saturn_rising",
+      "saturn_1_7",
+      "no_aspect",
+      "pluto",
+      "neptune",
+      "venus",
+      "mars",
+      "aquarius",
+      "capricorn",
+      "balik_neptune_modern",
+      "translation_collection",
+      "late_separation_under_1",
+      "1985"
+    ],
+    "explanation": "Ornek Harita #57 (Bilesik/Coklu Sorular + turetim): 15 Ağu 1985 13:50 PDT = 20:50 UTC CDA; ASC Akrep 21.33, MC Basak 8.29 (Regiomontanus). Tum gezegen pozisyonlari kitapta birebir: Mars 13.95 Aslan Ev9, Pluto 2.26 Akrep Ev12, Venus 15.56 Yengec Ev8, Neptune 1.05 Oglak Ev2, Ay 15.81 Aslan Ev9, Uranus 13.98 Yay Ev1 retro, Saturn 21.82 Akrep Ev1 = ASC kavusumu (yükselede Satin, stricture saturn_1_7). (1) Ben orduya gitmeli mi (subject=7.ev, turetim): Ben = 7. ev kuspisi Boga -> VENUS; onun 6. evi (askerlik) = harita 12. ev (Akrep -> PLUTO); onun 10. evi (kariyer) = harita 4. ev (Balık -> NEPTUNE modern, DOMICILE Balık->Neptune düzeltmesi); onun 7. evi = harita 1. ev (Akreç -> Mars/Pluto). Venus-Pluto ve Venus-Neptune arasinda uygulanan/acisa: yok (60lik orb~13/180lik orb~14; >8) -> gidisat/davranis olasiligi dusuk, olmaz: HAYIR. (2) Nikki atini satin alalim mi: at = buyuk hayvan = 12. ev (Harita 12. ev Akrep -> PLUTO); soru sahibi 1. ev yoneticileri (Mars + Pluto); ayrica Saturn yukselede (saturn_1_7) negatif: HAYIR. (Kitap 12. evi Venus ile yonetiyordu — fark bizim quadrant kuspislerinde 12. evin Akrep olmasi; iki okumada da 1. ve 12. ev isaretcileri arasinda acisizlik + Saturn yukselede = HAYIR, sonuc degismez.) (3) Boise'ye tasinma: uzak = 9. ev (Yengec -> MOON), mevcut ev = 4. ev (Balık -> NEPTUNE); Ay-Neptune arasinda uygulanan aci yok (120lik orb~15) -> tasinma iyi zaman degil: HAYIR. At almaya para yok/kicik (2. ev Oglak 17.4..25.8 icinde Neptune 1.05 Oglak retro): 'Neptune 2. evde paraya mantikli bakilmasini zorlaştirir'. KALIBRASYON: multi_question.sub_qtype += army (asker/ordu), animal (at/hayvan token); sub_verdict army = subject 7. evden turetilmis evler (onun 6=e12, onun 10=e4) yoneticilerine uygulanan acilasi hukmu; animal = 12.ev(n) vs 1.ev isaretcileri + saturn_1_7 negatif agirlik; relocation'a 4. ev yoneticisi eklendi. Genel aci kurali (Kitap Diğer Hususlar): yalnizca UYGULANAN acilar is yapar; ama tam acidan <1.0 derece gecmis/ayrilan aci da kullanilabilir (_usable: orb<=8 + (applying veya dist<1) + yumusak 0/60/120). Ay zinciri (isi tasima/toplama, Kural 6) bilgi amaciyla facts'e eklenir (motorun genel perfection'inda zaten mevcut). Not: core DOMICILE'a Balık->Neptune modern eklendi (#54 modern programina uyum); Lilly 35 regresyonu degismedi (25/35 ayni baz)."
+  },
+  {
+    "id": "CHRIS-MAHKEME-KAZA-1987-03-20",
+    "question": "Chris mahkemeye giderse kazanacak mi?",
+    "qtype": "lawsuit",
+    "slot": "legal",
+    "turned": true,
+    "derived": {
+      "base_house": 7,
+      "subject": "Chris (kiz arkadasinin sevgilisi)",
+      "derived_9_from_7_is_chart_3": true
+    },
+    "chart": {
+      "date": "1987-03-20",
+      "time": "22:27",
+      "tz": "PST",
+      "lat": 47.6833,
+      "lon": -116.7667,
+      "place": "Coeur d Alene, ID"
+    },
+    "positions_book": {
+      "Venus": "21 Kova (Chris, 7.ev)",
+      "Saturn": "21 Yay",
+      "Uranus": "26 Yay",
+      "Moon": "11 Yay (kitapta) / 6.9 Yay motorda",
+      "Mars": "19 Boga",
+      "Pluto": "9 Akrep",
+      "Sun": "29 Balik ~0 Koc"
+    },
+    "positions_engine": {
+      "Venus": "20.77 Kova ev6",
+      "Saturn": "21.07 Yay ev4",
+      "Uranus": "26.67 Yay ev5",
+      "Moon": "6.91 Yay ev4",
+      "Mars": "19.37 Boga ev10",
+      "Pluto": "9.58 Akrep ev3",
+      "Sun": "29.77 Balik ev8",
+      "ASC": "Aslan",
+      "MC": "Boga"
+    },
+    "verdict": "YES",
+    "outcome": "Kazandi",
+    "explanation": "Turetilmis evler: Chris = 7.ev (Kova -> Venus 21 Kova). Onun 9.evi (mahkeme/hukuk) = haritanin 3.evi (Yay kuspisi -> Saturn 21 Yay + Uranus 26 Yay). Venus Saturn'e sekstil'i 5 dakika once gecmis (<1 derece gec-ayrilma) ve Uranus'e uygulanan sekstil yapacak. Ay Saturn ile kavusum yapip sonra Venus'e sekstil -> isigin tasinmasi/toplanmasi. Evet, mahkemeye gidecek. Rakip = Chris'in 7.evi = haritanin 1.evi (Aslan ASC; kitapta Akrep -> Mars/Pluto). Chris'in 9.ev yoneticileri ile Venus'un acilari rakibin 9.evine gore daha iyi; Ay Mars'a quincunx, Pluto'ya acisiz; Gunes Pluto'ya quincunx, Mars'a acisiz. Motor ham hukmu turetilmis hukuk karsilastirmasini kapsamadigi icin NO verir; kitap hukmu YES dogrudur.",
+    "tags": [
+      "lawsuit",
+      "court",
+      "derived_7th",
+      "legal",
+      "translation",
+      "collection",
+      "venus",
+      "saturn",
+      "uranus",
+      "moon"
+    ],
+    "source": "Kullanici ornegi #58 (20 Mart 1987 22:27 PST Coeur d'Alene) - kitap anlatimi"
   }
 ]
