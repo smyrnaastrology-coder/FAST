@@ -1777,5 +1777,22 @@
       "late_asc"
     ],
     "explanation": "Example Chart 5 Aug 1986 09:46 PDT Coeur dAlene 47N41 116W46 Queen Elizabeth cruise should I go, budget, fun? Young woman, Asc 29deg already decided (late degrees). Mercury 26 Cancer ruler 1st querent, Venus 27 Virgo ruler 9th travel. Mercury will sextile Venus => YES. Venus also rules 2nd budget => budget will allow. Mercury 10th, Moon 12 Leo ruler 5th (fun) trine Uranus 18 Sagittarius 5th ruler => will enjoy social activities. She already bought ticket wanted to know what will happen, went and had great time. Moon conjunct Sun is major natal aspect but irrelevant here as Sun has no role."
+  },
+  {
+    "id": "COURT-VISITATION-1989-01-16",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Mahkeme eski esimin kizimla olan gorusmelerine gozetim sarti getirecek mi? 16 Jan 1989 19:47 PST Coeur d'Alene 47N41 116W46. Soran: 6. evdeki 11 derece Kova Merkur (cocugun gelecegi = 5. evden sonra 2. ev). Eski es: 5. evde 10 derece Oglak Neptune (7. ev yoneticisi). Mahkeme: 9. ev, Venus 8 derece Oglak, Neptune'e kavusuma ilerliyor. Ay: 10. evde 29 derece Boga, kriz/kapanis derecesi, bos (VOC).",
+    "technique": "court_9th_venus_applying_neptune_voc_moon_critical",
+    "verdict": "YES",
+    "tags": [
+      "9th_house",
+      "7th_house",
+      "5th_house",
+      "derived",
+      "conjunction",
+      "voc",
+      "moon_critical_degree"
+    ],
+    "explanation": "Ornek Harita #32: 16 Jan 1989 19:47 PST Coeur d'Alene 47N41 116W46 Mahkeme eski esin kizla gorusmelerine gozetim sarti getirecek mi? Soran, 6. evdeki 11 derece Kova'daki Merkur ile temsil edilir (cocugun gelecegini gosteren, 5. evden sonraki 2. ev); eski es ise 5. evde 10 derece Oglak'taki 7. evin yoneticisi Neptun'dur. KURAL: nasil ki 12. ev veya bir onceki ev gecmisi temsil ediyorsa, 2. ev veya takip eden ev de gelecegi tanimlar. Mahkeme (9. ev), Neptun ile kavusuma ilerleyen 8 derece Oglak'taki Venus tarafindan temsil edilir; bu mahkemenin eski esle ilgili bir karar alacagini gosterir. VOC Ay'in soruya yanit vermede yardimci oldugu ornektir: Ay 10. evde 29 derece Boga'da, kriz/kapanis derecesinde. Bosta Ay ve Venus/Neptun acisi nedeniyle kaygilanacak bir sey yok. Mahkeme, adam'in ziyaretleri icin gozetim (supervizyon) gerektigine karar verdi. Kadin zaten velayete sahipti. Dogrulama: ASC Basak 5.5, MC Boga 29.1, Merkur 11.78 Kova 6. ev, Neptun 10.53 Oglak 5. ev, Venus 8.01 Oglak 4. ev (9. ev yoneticisi), Ay 29.91 Boga 10. ev."
   }
 ]

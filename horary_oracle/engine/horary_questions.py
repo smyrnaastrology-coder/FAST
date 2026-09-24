@@ -23,6 +23,7 @@ QUESTION_HOUSES = {
     "employee": 6,
     "sibling": 3,
     "uncle": 6,          # dayı/amca: annenin/babanın kardeşi -> 4/10'dan 3.ev = 6/12 (dayı 6)
+    "court": 9,       # mahkeme/dava/hakim/yargıç
     "teacher": 9,
     "hoca": 9,
     "university": 9,
@@ -47,6 +48,7 @@ LABEL_TR = {
     "money": "Para/Değerli eşya", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
     "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
+    "court": "Mahkeme/Dava (9. ev)",
 }
 
 # Nesne iyelikli ikinci kişi: "arkadaşımın EŞI" -> turned(base, nested)
@@ -65,6 +67,7 @@ NESTED_PERSON = {
 # Soru tipi -> anahtar kelimeler (özgülden genele)
 TYPE_KEYWORDS = [
     ("teacher", ("hoca", "öğretmen", "ogretmen", "profesör", "profesor", "öğretim", "ogretim", "akademisyen", "akademik", "üniversitede", "universitede")),
+    ("court", ("mahkeme", "mahkemeye", "mahkemede", "mahkemenin", "hakim karar", "karar verecek", "karar verecek mi", "yargıç", "yargic", "dava açacak", "dava acacak", "dava açtım", "dava actim", "gözetim şartı", "gozetim sarti", "velayet")),
     ("astrology_student", ("astroloji öğrencim", "astroloji ogrencim", "astroloji öğrencisi", "astroloji ogrencisi", "astroloji öğrenen", "astroloji ogrenen", "astroloji dersi alan", "astroloji dersi alan")),
     ("student", ("öğrencim", "ogrencim", "öğrencimin", "ogrencimin", "öğrencimle", "ogrencimle", "kayıtlı öğrenci", "ogrenci")),
     ("coworker", ("iş arkadaşım", "is arkadasim", "iş arkadaşı", "is arkadasi", "mesai arkadaşım", "mesai arkadasim", "çalışma arkadaşım", "calisma arkadasim")),
