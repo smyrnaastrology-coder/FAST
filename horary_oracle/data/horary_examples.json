@@ -2182,5 +2182,31 @@
       "drawer"
     ],
     "explanation": "Ornek Harita #51: 1 Mar 1981 20:00 PST Coeur d'Alene 47N41 116W46 Uçak biletlerim nerede? Bir arkadas biletleri guvenli bir yere kaldirmis ve ucusundan onceki aksam bulamayinca panik icinde aradi. Mars ve Pluto biletleri temsil eder (2. evin ortak yoneticileridir, kuspis Akrep). Mars 6. evde 18 derece Balik -> biletler goz onunde degil (Balik) ve bir dolapta veya cekmecede (6. ev). Pluto 1. evde 24 derece Terazi'de RETRO -> onlari geri alacak (retro Pluto) ve biletler yakinlardadir (1. ev), koydugu yerdedir. Mars'in dispozitoru Neptune 3. evde 24 derece Yay -> evraklar veya kitaplarin etrafinda olduklari. Sorunun ortak yoneticisi Ay 4. evde 17 derece Oglak -> mutfak aranmali. Sans Noktasi (POF) Aslan burcunda 11. evde, 6. evde Balik'taki Sun tarafindan yonetilir -> cekmece veya dolap ongorsu dogrulanir (6. ev + Sun Balik, goz onunde degil). Kisa sure sonra geri aradi: cocugunun biletleri mutfak masasinin cekmecesinde, telefonun (3. ev) yaninda buldugu soylendi. Dogrulama (Regiomontanus): ASC Terazi 9.66, MC Yengec 12.05, 2. ev kuspisi Akrep 3.09 (ortak yoneticiler Mars + Pluto), Mars 18.31 Balik ev 6, Pluto 24.01 Terazi ev 1 retro, Neptune 24.68 Yay ev 3, Ay 16.99 Oglak ev 4, POF gunduz = ASC+Moon-Sun = Aslan 15.17 ev 11 (dispozitoru Sun 11.49 Balik; regio ev 5 ama kaynak 6. ev der - whole-sign Balik = 6. ev, not edildi), Mercury 19.85 Kova ev 5 retro. Kural: esya birden fazla yoneticiyle simgelenirse gostergeler birlesir; retro Pluto + 1. ev yakinligi (koydugu yer) + 6. ev dolap/cekmecenesi + mutfak (4. ev) + evrak lokasyonu (3. ev) -> ayni cekmeceyi isaret etti ve bulundu."
+  },
+  {
+    "id": "PALTON-NEREDE-1982-03-12",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Paltom nerede? 12 Mar 1982 14:12 PST Coeur d'Alene 47N41 116W46. Palto = 2. ev (Basak -> Mercury), Mercury 7.evde 28 Kova; dispozitoru Uranus 4.evde 4 Yay RETRO; POF 8.evde 20 Balik, dispozitoru 5.evde.",
+    "technique": "coat_2nd_mercury_7th_kua_uranus_retro_4th_pof_8th_balik_dispositor_5th_husband_put_daughter",
+    "verdict": "FOUND",
+    "tags": [
+      "lost_object",
+      "2nd_house",
+      "mercury",
+      "7th_house",
+      "uranus",
+      "4th_house",
+      "8th_house",
+      "part_of_fortune",
+      "neptune",
+      "5th_house",
+      "retrograde",
+      "retro_returns",
+      "husband",
+      "daughter",
+      "closet",
+      "coat"
+    ],
+    "explanation": "Ornek Harita #52: 12 Mar 1982 14:12 PST Coeur d'Alene 47N41 116W46 Paltom nerede? Arkadas suet paltosunu en son arabasinin arka koltuuguna attigini sonra bir kac gun sonra ihtiyac oldugunda yerinde bulamadigini soyledi. Paltosu 2. ev tarafindan yonetilir (kuspis Basak, yonetici Mercury); Mercury 7. evde 28 derece Kova -> kocasi (7. ev) paltoyu bir yere koymus olabilir. Dispozitoru 4. evde 4 derece Yay'da RETRO Uranüs -> dispozitoru retro oldugu icin palto geri gelir (retro = bulunur). Sans Noktasi (POF) 8. evde 20 derece Balik ve dispozitoru 5. evde -> belki bir cocuk (5. ev) nerede oldugunu bilir. Kocasi is yerinde oglen yemegindeydi, kizi derste ve ulasilamiyordu; kocasi eve geldiginde paltoyu nereye koydugunu biliyordu - palto kizinin odasindaki DOLAPTAYDI, kocasi onu kizlarinin paltosu sanmisti. Dogrulama (Regiomontanus): ASC Aslan 13.37, MC Koc 28.48, 2. ev kuspisi Basak 4.2 (hakimi Mercury Kova 28.73 ev 7 regio), Uranus Yay 4.62 ev 4 retro, POF gunduz (Sun ev 9 ufuk ustu) = ASC+Moon-Sun = Balik 20.27 ev 8, POF dispozitoru Neptune Yay 26.97 ev 5. Kural: 2. ev yoneticisi 7. evdeyse esyayi es/ortak koymus olabilir; POF dispozitoru 5. evdeyse cocuk yerini bilir; retro yonetici/dispozitor esya geri doner; dolap = kapali alan (6. ev / Basak/Balik tipi gostergeler)."
   }
 ]
