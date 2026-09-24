@@ -1870,5 +1870,25 @@
       "surgery"
     ],
     "explanation": "Ornek Harita #36: 1 May 1974 21:40 PDT Los Angeles 34N04 118W15 Hamile miyim? Eger oyleyse kurtaj yaptiracak miyim? Doktor test yapti ve 'hamile degilsin' diye guvence verdi ama danisan huzursuzdu. Danisan, Yukselen yoneticisi 11 derece Balik'taki Jupiter ile temsil edilir (ASC Yay). 7 derece Yengec'teki Mars 5. evi (cocuk/gebelik) yonetmekte ve Jupiter'e UCGEN aci yapmaktadir (burc bazli; derece bazinda 115.6). Mars ayrica 5. evde 8 ve 11 derece Boga'daki Sun ve Mercury'ye SEKSTIL aci yapmaktadir. -> HAMILE. Kurtaj (cerrahi islemler) 8. evi Moon yonetir (tum evde Cancer = 8. ev, Moon Cancer'in hakimi); 19 derece Basak'taki Ay, 27 derece Balik'taki 6. evi yoneticisi (Boga = 6. ev, Venus hakimi) Venus'e KARSIT aci yapar (172 derece) -> kurtaj konusunda belirsizlik. Ameliyat gezegeni Mars 8. evde; 1. evde 7 ve 8 derece Yay'daki Yukselen'e ve Neptune'e KINKUNKS aci yapar -> degisiklikler olacagi gorunur. Mars ayrica danisanin yoneticisi Jupiter'e ucgen. Genel olarak evet cevaplari hayirdan fazla. Danisan tekrar doktora gitti, test POZITIF cikti. Bir hafta sonra kurtaj yaptirdi. Dogrulama (Regiomontanus): ASC Yay 7.7, Jupiter 11.50 Balik 3. ev, Mars 7.08 Yengec 8. ev, Sun 11.41 Boga 5. ev, Mercury 8.46 Boga 5. ev, Ay 19.04 Basak 9. ev, Venus 27.07 Balik 4. ev, Neptune 8.96 Yay 1. ev, Saturne 1.21 Yengec 7. ev. Kural: hastalik/doktor 6. ev, cerrahi 8. ev, cocuk/gebelik 5. ev; 5. eve uygulanan ucgen/sekstil EVET."
+  },
+  {
+    "id": "FIRE-SON-1980-06-27",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Yangini oglum mu cikardi? 27 Jun 1980 19:44 PDT Coeur d'Alene 47N41 116W46. Venus 17 Ikizler (5. ev yoneticisi = ogul), Saturne 21 Basak (oglunun 10. evi = haritanin 2. evi), Mars 23 Basak (yangin), Ay 3 Oglak, ASC Yay.",
+    "technique": "event_10th_turned_venus_square_saturn_mars_moon_trines_outweighed",
+    "verdict": "NO",
+    "tags": [
+      "child",
+      "5th_house",
+      "10th_house",
+      "2nd_house",
+      "event",
+      "fire",
+      "square",
+      "trine",
+      "quincunx",
+      "moon_secondary"
+    ],
+    "explanation": "Ornek Harita #37: 27 Jun 1980 19:44 PDT Coeur d'Alene 47N41 116W46 Yangini oglum mu cikardi? Kucuk oglu, komsunun garajini kule eden yangini baslatmakla suclaniyordu; cocuk suclamayi reddediyor, danisan da dogru soyleyip soylemediginden emin degildi. 17 derece Ikizler'deki Venus oglunu yonetmektedir (5. ev=Boga regio kuspinin hakimi). 21 derece Basak'taki Saturne onun 10. evini (haritanin 2. evi: oglunun 5'ten cevrilmis 10.'su) yonetmektedir. Venus, sorumluluk gezegeni Saturne ve yanginin yoneticisi 23 derece Basak'taki Mars ile KARE aci yapmaktadir (93.7 ve 95.6 derece); kare/karsit acilar hayir anlamina gelir -> yangini o cikarmadi. Kural: olayi simgelemek icin 10. ev kullanildi. Sorunun yardimci yoneticisi 3 derece Oglak'taki Ay, Venus'e genis bir kinkunks yaparken Saturne ve Mars'a UCGEN atiyor (burc bazli; derece bazinda 102/100) - bu ucgenler 'evet' sinyali olabilir; AMA tecrube kurali: Ay soruya ait evlerden birini yonetmedigi surece, gezegenler arasi acilar Ay'in acilarindan daha agir basar -> yanit HAYIR. Sonra failin baska bir cocuk oldugu kanitlandi. Dogrulama (Regiomontanus): ASC Yay 23.54, MC Terazi 22.58, 5. ev kuspisi Boga 14.3 (hakimi Venus, konumu Ikizler 17.58 6. ev), 2. ev kuspisi Oglak 28.1 (hakimi Saturne, konumu Basak 21.31 8. ev), Mars 23.16 Basak 8. ev, Ay 3.30 Oglak 1. ev, Sun 6.55 Yengec 7. ev. Kural: kare/opposition karsi taraf isaret eder; Ay'in ucgenleri mevcut evleri yonetmedigi icin gecerli degil."
   }
 ]
