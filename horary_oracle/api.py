@@ -997,6 +997,11 @@ def admin_page():
 <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin - Sifre Uret</title><style>body{font-family:system-ui;background:#0F0A18;color:#e8e0f0;padding:24px}input,button{padding:10px;border-radius:8px;border:1px solid #3d2e50}input{background:#1A1423;color:#e8e0f0}button{background:#C9A96E;color:#000;font-weight:700;cursor:pointer}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #3d2e50;padding:8px;font-size:13px}th{background:#2a1f38}</style>
 <h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
+<div style="margin:12px 0;padding:12px;background:#1A1423;border:1px solid #C9A96E;border-radius:8px;font-size:13px">
+<b style="color:#C9A96E">SATIS FIYATLARI</b><br>
+Kredili 100 soru: <b>Oracle 200 TL</b> &middot; <b>Premium 360 TL</b> &middot; <b>Elite 600 TL</b><br>
+Yillik Sinirsiz: <b>Oracle 5.000 TL</b> &middot; <b>Premium 10.000 TL</b> &middot; <b>Elite 20.000 TL</b>
+</div>
 <div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="365" style="width:60px"> gün <button onclick="createUser()">Uret (yillik)</button> <span id="out"></span></div>
 <div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''oracle''','''200''')" style="background:#6a9ae2">Oracle 100 - 200TL</button> <button onclick="addCredits('''premium''','''360''')" style="background:#C9A96E">Premium 100 - 360TL</button> <button onclick="addCredits('''elite''','''600''')" style="background:#D4AF37">Elite 100 - 600TL</button></div>
@@ -1009,7 +1014,7 @@ async function load(){
   const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
   (j.users||[]).forEach(u=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 10k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
+    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 10k</option><option value="elite" ${u.plan=='elite'?'selected':''}>Elite 20k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
     tb.appendChild(tr);
   });
 }
@@ -1036,7 +1041,7 @@ def admin_users(x_admin_key: str = _Header(None)):
     db=_auth._load()
     out=[]
     for k,v in db.items():
-        out.append({"user":k, "expiry":v.get("expiry"), "created":v.get("created"), "is_trial":v.get("is_trial",False), "devices": len(v.get("device_ids") or [])})
+        out.append({"user":k, "plan":v.get("plan",""), "expiry":v.get("expiry"), "created":v.get("created"), "is_trial":v.get("is_trial",False), "devices": len(v.get("device_ids") or [])})
     return {"users": out}
 
 @app.post("/admin/create")
@@ -1081,6 +1086,27 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
         u["plan"]=plan
     _auth4._save(db)
     return {"user": email, "credits": u["credits"], "plan": u.get("plan","")}
+
+@app.post("/admin/set_plan")
+def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
+    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
+    if x_admin_key not in _allowed:
+        return {"error": "unauthorized"}
+    email=(payload.get("user") or payload.get("email") or "").strip().lower()
+    plan=(payload.get("plan") or "").strip()
+    if not email:
+        return {"error": "user gerekli"}
+    if plan not in ("", "oracle", "premium", "elite"):
+        return {"error": "gecersiz plan"}
+    import auth as _auth6
+    db=_auth6._load()
+    u=db.get(email)
+    if not u:
+        return {"error": "kullanici yok"}
+    u["plan"]=plan
+    u["license"]=plan
+    _auth6._save(db)
+    return {"ok": True, "user": email, "plan": u["plan"]}
 
 @app.post("/admin/reset_devices")
 def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
