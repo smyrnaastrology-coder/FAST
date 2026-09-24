@@ -282,7 +282,7 @@ async def cast(req: CastRequest):
                 loc_info["_derived_house"] = derived_loc["derived"]
         elif derived_loc:
             cusp_lon = res['houses']['cusps'][derived_loc["derived"]-1]
-            from core.ephemeris import sign_from_lon as _sfl2, DOMICILE_TRADITIONAL as _DOM2
+            from core.ephemeris import sign_from_lon as _sfl2, DOMICILE as _DOM2
             dsign = _sfl2(cusp_lon)
             dplanet = _DOM2.get(dsign, "Moon")
             use_data = res['planets'].get(dplanet, res['quesited']['data'])
@@ -433,10 +433,21 @@ async def cast(req: CastRequest):
                 _gplanet = _DOMT3.get(_gsign, "Moon")
                 _guse = res['planets'].get(_gplanet, use_data)
             elif _qd and _qd.get("derived") and not _natural_g:
-                _cusp_g = res['houses']['cusps'][_qd["derived"] - 1]
-                _gsign = _sfl_g(_cusp_g)
-                _gplanet = _DOMT3.get(_gsign, "Moon")
-                _guse = res['planets'].get(_gplanet, use_data)
+                if _qd.get("topic") == "kayıp insan":
+                    # Kayıp kişi (kurs, #54): AÇISAL YÖN ORİJİNAL haritadan okunur.
+                    # Significator = 7. ev yöneticisi (modern: Kova -> Uranus). Türetilmiş
+                    # yeniden numaralama yalnızca kişinin tematik evleri içindir, yön için
+                    # KULLANILMAZ (kaynak dersi: türetilmiş 10. ev GÜNEY yanlıştı, orijinal
+                    # 4. ev KUZEY doğruydu - ev KD'sunda sığ nehirde bulundu).
+                    _gplanet = res['quesited']['planet']
+                    _guse = res['planets'].get(_gplanet, use_data)
+                    _gsign = _guse['sign']
+                    _ghouse = _guse['house']
+                else:
+                    _cusp_g = res['houses']['cusps'][_qd["derived"] - 1]
+                    _gsign = _sfl_g(_cusp_g)
+                    _gplanet = _DOMT3.get(_gsign, "Moon")
+                    _guse = res['planets'].get(_gplanet, use_data)
             # gezegen gücü (F3/F4): asalet + retro + combust -> mesafe katsayısı
             _cf = condition_factor(_gplanet, _gsign, lon=_guse.get('lon'),
                                    retro=_guse.get('retro', False),

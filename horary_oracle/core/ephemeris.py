@@ -41,7 +41,7 @@ DOMICILE = {
     "İkizler": "Mercury", "Başak": "Mercury",
     "Yengeç": "Moon", "Aslan": "Sun",
     "Yay": "Jupiter", "Balık": "Jupiter",
-    "Oğlak": "Saturn", "Kova": "Saturn",
+    "Oğlak": "Saturn", "Kova": "Uranus",
 }
 DOMICILE_TRADITIONAL = {
     "Koç": "Mars", "Akrep": "Mars",

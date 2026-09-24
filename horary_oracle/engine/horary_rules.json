@@ -1109,7 +1109,10 @@
     "hiding": "Ay kisinin 12. evindeyse (harita 6. evi) kisi SAKLANIYORDUR ve bulunmak istemiyordur; onun 12. evindeki gezegen = gizli kalma.",
     "no_return": "Kisinin yoneticisi ile onun 4. evinin (harita 10. evinin) yoneticisi arasinda HICBIR aci yoksa kisi KENDI ARZUSUYLA geri donmez; baskasi onu bulup getirmelidir.",
     "direction": "Yon kisinin 3. evindeki (harita 9. evi) yoneticiden okunur: 3. ev yakin cevreyi, burc araziyi verir (Terazi = tepelik/yuksek arazi). Kuzey-Dogu gibi yon + sehir/bolge tespitinde burc-terrain tablosu (lost_object_locations.signs) kullanilir.",
+    "direction_original_chart": "ACISAL YON ORIGINAL HARITADAN okunur: kayip kisinin yoneticisinin HARITA evi + POF (4. ev = KUZEY, 1. = DOGU, 10. = GUNEY, 7. = BATI). Turetilmis/cevrilmis ev numaralandirmasi SADECE kisinin tematikk evleri icindir (onun 3. evi = harita 9. = yakin cevre, onun 12. = harita 6. = saklanma, onun 4. = harita 10. = ev/geri donusu); ACISAL YON icin KULLANILMAZ. Derive yon yanlis sonuc verir (Ornek #54 Millicent: turetilmis haritada onun 4. evi = harita 10. evi GUNEY okunuyor ama dogru yon ORIGINAL harita 4. evi = KUZEY idi; ceset evin kuzeydogusundaki sig nehirde bulundu).",
+    "modern_rulership_kova": "KOVA burcunun da MODERN yoneticisi (URANUS) kullanilir; tpk Akrep'te Pluto gibi. 7. ev kuspisi Kova ise kayip kisi = Uranus, klasik Saturn DEGIL (Ornek #54: Uranus 29.89 Akrep Ev 4).",
     "safety": "Kisinin yoneticisi baska gezegenlere sekstil/ucgen yapiyorsa (burc bazli) kisi guvendedir (Ornek #53: Merkur Terazi, Yay'daki Uranus+Saturn'e burc-bazli sekstil).",
+    "death_water": "Onun 8. ev yoneticisi (olumu) ve 4. ev yoneticisi (sonu) su burclarinda (Balik/Akrep/Yengec) olup kayip kisi yoneticisine burc-bazli ucgen yapiyorsa olum SUDA/boğulmadir (Ornek #54: 8. ev Balik yoneticisi Mercury 4.37 Balik + 4. ev Koc yoneticisi Mars 3.21 Balik, ikisi de Uranus'e Akrep-Balik burc ucgeni; ceset sig nehirde).",
     "timing_24h": "Reşit ve kayip suresi 24 saatten az olan kisilerde polis hemen islem yapmaz; horary haritasi ailenin arama yonunu verir (yakin cevre - 3. ev)."
   },
   "lost_object_locations": {
