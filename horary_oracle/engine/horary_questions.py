@@ -91,7 +91,7 @@ TYPE_KEYWORDS = [
     ("father", ("babam", "babamin", "babamın", "babacığım", "babacigim")),
     ("money", ("param", "maaşım", "maasim", "gelirim", "cüzdanım", "cuzdanim", "mücevherim", "mucevherim", "altınlarım", "altinlarim")),
     ("loan", ("kredi", "krediyi", "kredim", "bankadan borç", "bankadan borc", "ipotek", "mortgage", "borç para", "borc para", "borçlanmalı", "borclanmali", "borçlanarak", "borclanarak", "borçlanacağım", "borclanacagim", "borçlanıp", "borclanip", "borç çekecek", "borc cekecek", "borç alacağım", "borc alacagim", "borçunu", "borcunu", "borçum", "borcum", "borçlar", "borclar", "faizle borç", "faizle borc")),
-    ("lost_object", ("kalemim", "kalem", "bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim", "süveterim", "suveterim", "süveter", "suveter", "kazak", "hırka", "hirka", "mont", "palto", "şal", "fular")),
+    ("lost_object", ("kalemim", "kalem", "bıçağım", "bicagim", "yüzüğüm", "yuzugum", "saatim", "kol saati", "evrakım", "evraklarım", "evraklarim", "gözlüğüm", "gozlugum", "anahtarım", "anahtarim", "çantam", "cantam", "telefonum", "bileziğim", "bilezigim", "süveterim", "suveterim", "süveter", "suveter", "kazak", "hırka", "hirka", "mont", "palto", "şal", "fular", "biletim", "biletlerim", "bilet", "biletleri", "uçak biletim", "ucak biletim")),
     ("job", ("işim", "isim", "mesleğim", "meslegim", "kariyerim")),
     ("home", ("evim", "evimin", "dairem", "apartmanım", "apartmanim", "sitem")),
     ("hidden_enemy", ("şikayet eden", "sikayet eden", "şikayetçi", "sikayetci", "ispiyonlayan", "gizli düşman", "gizli dusman")),

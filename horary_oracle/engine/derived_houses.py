@@ -119,7 +119,7 @@ LOST_ITEM_WORDS = ("gözlüğü", "gozlugu", "gözlük", "gozluk", "çantası", 
                    "yüzüğü", "yuzugu", "yüzük", "yuzuk", "cüzdanı", "cuzdani", "cüzdan", "cuzdan",
                    "küpesi", "kupesi", "bileziği", "bilezigi", "kolyesi", "kolyesi", "evrakı", "evraki",
                    "kitabı", "kitabi", "kitabın", "taki", "takı", "mücevheri", "mucevheri",
-                   "süveteri", "suveteri", "süveter", "suveter", "kazak", "kazağı", "kazagi", "kazagı", "hırka", "hırkası", "hirkasi", "hirka", "mont", "montu", "palto", "paltosu")
+                   "süveteri", "suveteri", "süveter", "suveter", "kazak", "kazağı", "kazagi", "kazagı", "hırka", "hırkası", "hirkasi", "hirka", "mont", "montu", "palto", "paltosu", "bilet", "bileti", "biletim", "biletimde", "biletleri")
 _NEREDE = ("nerede", "nerde", "nereye", "nere")
 _KAYIP_SIGNAL = ("kayboldu", "kaybolan", "kaybolmuş", "kaybolmus", "kaybettim", "kaybetti", "kayıp olan", "kayip olan", "kayıp", "kayip")
 _LOST_TRIGGER = _NEREDE + _KAYIP_SIGNAL
