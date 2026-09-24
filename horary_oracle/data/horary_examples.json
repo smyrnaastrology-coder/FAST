@@ -1850,5 +1850,25 @@
       "moon_past_aspects"
     ],
     "explanation": "Ornek Harita #35: 26 Aug 1983 10:10 PDT Coeur d'Alene 47N41 116W46 Gold Cache hisse senedini almali miyiz? Karli yatirim arayan kucuk bir sirketin baskani soruyor. Soru sahibini Venus yonetmekte (ASC Terazi), 11. evde 0 derece Basak'ta RETRO konumda. Venus'un Sun ile kavusumu bir EVET isaret etse de, hisse senedi alimlarinin 5. ev yoneticisi olan 5 derece Yay'daki Uranus'e KARE aci yapmaktadir. Venus ayrica soru sahibi icin potansiyel kari gosteren 2. evdeki 2 derece Yay'daki Jupiter'e de KARE aci yapmaktadir. Bir evet, iki hayir. 7 derece Koc'taki Ay Venus veya Uranus ile olan tum acilarini GECMIS durumda; bu da bu yatirimdan kar etmek icin gec kalindigini gosterir. 1. evdeki Saturne hayiri teyit eder. Sonuc: NO - almadilar, birkac hafta sonra hissenin degeri cakildi, soruyu sorduklarina cok memnunlar. Kural: gecilen acilar isi bitirmistir; evet icin UYGULANAN (applying) aci gerekir. Dogrulama (Regiomontanus): ASC Terazi 18.8, Venus 0.48 Basak 11. ev retro (Sun 2.89 Basak ile 2.42 derece kavusum), Uranus 5.14 Yay (94.66 derece kare, 5. ev Kova yoneticisi), Jupiter 2.27 Yay 2. ev (91.8 derece kare), Ay 7.11 Koc 6. ev, Saturne 0.18 Akrep 1. ev."
+  },
+  {
+    "id": "PREGNANCY-ABORTION-1974-05-01",
+    "source": "Corrected OCR - Only Way Learn Horary - Los Angeles 34N04 118W15",
+    "question": "Hamile miyim? Eger oyleyse kurtaj yaptiracak miyim? 1 May 1974 21:40 PDT Los Angeles 34N04 118W15. Doktor test yapti 'hamile degilsin' demisti ama danisan huzursuz. ASC Yay, Jupiter 11 Balik, Mars 7 Yengec 8. ev (5. ev yoneticisi), Sun 11 Boga + Mercury 8 Boga 5. ev, Ay 19 Basak, Venus 27 Balik, Neptune 9 Yay 1. ev.",
+    "technique": "pregnancy_5th_mars_trine_jupiter_sextile_sun_mercury_abortion_8th_moon_opposition_mars_quincunx",
+    "verdict": "YES",
+    "tags": [
+      "pregnancy",
+      "5th_house",
+      "8th_house",
+      "1st_house",
+      "6th_house",
+      "trine",
+      "sextile",
+      "opposition",
+      "quincunx",
+      "surgery"
+    ],
+    "explanation": "Ornek Harita #36: 1 May 1974 21:40 PDT Los Angeles 34N04 118W15 Hamile miyim? Eger oyleyse kurtaj yaptiracak miyim? Doktor test yapti ve 'hamile degilsin' diye guvence verdi ama danisan huzursuzdu. Danisan, Yukselen yoneticisi 11 derece Balik'taki Jupiter ile temsil edilir (ASC Yay). 7 derece Yengec'teki Mars 5. evi (cocuk/gebelik) yonetmekte ve Jupiter'e UCGEN aci yapmaktadir (burc bazli; derece bazinda 115.6). Mars ayrica 5. evde 8 ve 11 derece Boga'daki Sun ve Mercury'ye SEKSTIL aci yapmaktadir. -> HAMILE. Kurtaj (cerrahi islemler) 8. evi Moon yonetir (tum evde Cancer = 8. ev, Moon Cancer'in hakimi); 19 derece Basak'taki Ay, 27 derece Balik'taki 6. evi yoneticisi (Boga = 6. ev, Venus hakimi) Venus'e KARSIT aci yapar (172 derece) -> kurtaj konusunda belirsizlik. Ameliyat gezegeni Mars 8. evde; 1. evde 7 ve 8 derece Yay'daki Yukselen'e ve Neptune'e KINKUNKS aci yapar -> degisiklikler olacagi gorunur. Mars ayrica danisanin yoneticisi Jupiter'e ucgen. Genel olarak evet cevaplari hayirdan fazla. Danisan tekrar doktora gitti, test POZITIF cikti. Bir hafta sonra kurtaj yaptirdi. Dogrulama (Regiomontanus): ASC Yay 7.7, Jupiter 11.50 Balik 3. ev, Mars 7.08 Yengec 8. ev, Sun 11.41 Boga 5. ev, Mercury 8.46 Boga 5. ev, Ay 19.04 Basak 9. ev, Venus 27.07 Balik 4. ev, Neptune 8.96 Yay 1. ev, Saturne 1.21 Yengec 7. ev. Kural: hastalik/doktor 6. ev, cerrahi 8. ev, cocuk/gebelik 5. ev; 5. eve uygulanan ucgen/sekstil EVET."
   }
 ]
