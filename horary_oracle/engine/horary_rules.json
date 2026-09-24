@@ -1082,12 +1082,22 @@
     "insurance": "Sigorta 9.ev ve Jupiter; pollicie Merkur; 9/7 yoneticisi Ay/Merkur/1/2 yoneticisi ile kavusum/sekstil/ucgen/reception olmali; yoksa yararlanici degil",
     "career_rulership": "10.ev Gunes/Jupiter/Saturn/Mars = kendi isi/resmi; Ay = atanan/publika gecici; Venus = isbirligi/hizmet; Merkur = temsilci/satıcı"
   },
-  "goldstein_electional": {
+"goldstein_electional": {
     "note": "Goldstein-Jacobson Seçim tablosu kuralari (266-267) - yalnizca seçim/electional sorulari icin",
     "moon_fixed_asc_fixed": "Girisim yillarca sureceklerse Yükselen ve Ay Sabit burcta; Ortak = degisim sansi; Oncu = aninda ileri hareket",
     "malefics": "Saturn/S. Dugum asla 1.evde veya 1.yoneticiyle kavusumda; Saturn/Mars guvenli tek kose 10.ev (onur varsa ve soru evini yonetmiyorsa); 12.ev haric Fortune/Talisizlik noktasini 12.evde veya Balik kiyisinda tutma",
     "moon_publicity": "Tantitim/hizli hareket istenen konularda Ay ufkun ustunde ve isikta artmali; azalirsa/altta yavas hareket",
-    "new_moon_election": "Yeni Ay natal iyicille kavusumda veya iyi acida ise iyi; kotuculle ise kotu; 24 saat yaslanmasi beklenmeli (Gunes yakmasin); 24 Boga Caput Algol ile kullnma",
     "moon_less_aspects": "Ay ne kadar az aci yaparsa islem o kadar cabuk biter; sadece Fortuna paraleli varsa grafik basarilidir"
+  },
+  "lost_object": {
+    "note": "Kayip esya dersi (Only Way Learn Horary) - mentörun deneme-yanilmayla belirledigi metot",
+    "rule_2nd": "TUM kayip esyalarin yeri 2. evin kasp burcundan, evin yoneticisinden ve 2. evdeki gezegenlerden belirlenir (dispozitorler de kullanilir). 2. ev kisinin kisisel esyalarini gosterir.",
+    "derived_2nd": "Esyanin SAHIBINE gore turet: soran kaybettiyse 2; oglum kaybettiyse 5'ten 2 = 6; kocam kaybettiyse 7'den 2 = 8; ismen adi gecen baskasi kaybettiyse kisi 7, esyasi 8. Neyin kayboldugunu ve ONA KIMIN sahip oldugunu bilmek sart.",
+    "ruler_location": "2. ev yoneticisinin konumu ilk aranacak yerdir; burcu ve evi ipucu verir (ev ici/dis mekan, renk, yon). Ev yoneticisinin burcunun dispozitorunun konumu da ek bilgi.",
+    "sign_location": "2. ev yoneticisinin burcu da yer tanimlar (Ref. tablo): orn. Koc ise isi kaynagi yakininda/soba/sömine/firin/baca, tavana veya ust kisimlara yakin.",
+    "direction": "Yonler haritadaki gercek yonlerdir: ASC tarafi DOGU, DSC tarafi BATI, MC yakinlari GUNEY, 4. ev kasp yakinlari KUZEY. Orn. 2.ev yoneticisi 3.evdeyse kuzeydogu bolge; 8.evdeyse guneybati alan.",
+    "colors": "Renkler gezegen ve burcla iliskilidir: 2.ev yoneticisi Koc'taki Ay ise beyaz/krem/gumus (Ay) veya beyaz+kirmizi (Koc) sey yakininda.",
+    "part_of_fortune": "Kayip esya haritasinda Sans Noktasi (POF) faydali ikincil gostergedir. HER ZAMAN ORIGINAL YUKSELENDEN hesaplanir (evleri cevirsem/baska numaralandirsam bile). POF'un burc ve ev konumu + dispozitoru = yon/renk/mesafe ipucu. Sadece kayip esya haritalarinda kullanir.",
+"retro_returns": "NEREDEYSE HIC SASMAYAN KURAL: kayip esya retro bir gezegenle simgeleniyorsa esya GERI DONECEK veya BULUNACAK. Retro kayip esya horarysinde cok daha anlamlidir (digertum haritalara gore)."
   }
 }

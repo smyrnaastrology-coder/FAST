@@ -100,6 +100,26 @@ def _person_rank(word):
         return 1
     return 2
 
+# Kayıp eşya: "nerede/nerde" sorgusunda iyelikli eşya kelimesi varsa -> SAHİBİNİN 2. EVİ (kurs kuralı:
+# esya hep sahibine gore 2.ev; orn. arkadasimin telefonu nerede -> 11'den 2 = 12)
+LOST_ITEM_WORDS = ("gözlüğü", "gozlugu", "gözlük", "gozluk", "çantası", "cantasi", "çanta", "canta",
+                   "telefonu", "telefon", "anahtarı", "anahdari", "anahtar", "saati", "saat",
+                   "yüzüğü", "yuzugu", "yüzük", "yuzuk", "cüzdanı", "cuzdani", "cüzdan", "cuzdan",
+                   "küpesi", "kupesi", "bileziği", "bilezigi", "kolyesi", "kolyesi", "evrakı", "evraki",
+                   "kitabı", "kitabi", "kitabın", "taki", "takı", "mücevheri", "mucevheri")
+_NEREDE = ("nerede", "nerde", "nereye", "nere")
+
+
+def lost_item_offset(q):
+    """'arkadasimin telefonu nerede' gibi kayip esya sorgusu -> offset 2, yoksa None."""
+    if not any(k in q for k in _NEREDE):
+        return None
+    for w in sorted(LOST_ITEM_WORDS, key=len, reverse=True):
+        if w in q:
+            return 2
+    return None
+
+
 # Kuzen zinciri: hala/amca/dayı/teyze + (oğlu/kızı/çocuğu) = kuzen -> 3. ev (klasik horary kuralı)
 KUSEN_REL = ("hala", "amca", "dayı", "dayi", "teyze")
 KUSEN_KIND = ("oğlu", "oglu", "kızı", "kizi", "çocuğu", "cocugu", "oğluyla", "kızıyla")
@@ -135,10 +155,15 @@ def parse_derived(question: str):
     if not possession:
         return {"base_house": base, "base_word": base_word, "derived": base, "topic": "kişi kendisi"}
     offset = None; topic_word=""
-    for word, off in sorted(TOPIC_OFFSET.items(), key=lambda x: len(x[0]), reverse=True):
-        if word in q and word not in DESCRIPTOR_WORDS and word != base_word and word not in base_word and base_word not in word:
-            # aynı kökse (baba/babam) atla
-            offset = off; topic_word = word; break
+    # Kayıp eşya kuralı (kurs): nerede + iyelikli eşya -> HER ZAMAN sahibinin 2. evi
+    lo = lost_item_offset(q)
+    if lo:
+        offset = lo; topic_word = "kayıp eşya"
+    if not offset:
+        for word, off in sorted(TOPIC_OFFSET.items(), key=lambda x: len(x[0]), reverse=True):
+            if word in q and word not in DESCRIPTOR_WORDS and word != base_word and word not in base_word and base_word not in word:
+                # aynı kökse (baba/babam) atla
+                offset = off; topic_word = word; break
     if not offset:
         return {"base_house":base, "base_word":base_word, "derived":base, "topic":"kişi kendisi"}
     derived = derived_house(base, offset)
@@ -157,9 +182,13 @@ def parse_multi(question: str):
     if not persons:
         return None
     topics = []
-    for w,off in TOPIC_OFFSET.items():
-        if w in q:
-            topics.append((q.index(w), w, off))
+    lo = lost_item_offset(q)
+    if lo:
+        topics.append((0, "kayıp eşya", lo))
+    else:
+        for w, off in TOPIC_OFFSET.items():
+            if w in q:
+                topics.append((q.index(w), w, off))
     topics = sorted(topics)
     base = persons[0][2]
     chain = [base]
