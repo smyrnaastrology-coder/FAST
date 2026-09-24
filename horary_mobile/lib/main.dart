@@ -103,6 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading=false; String? _err; bool _remember=true;
   @override Widget build(BuildContext context) {
     return Scaffold(backgroundColor: const Color(0xFF0F0A18), body: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth:400), child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      ClipRRect(borderRadius: BorderRadius.circular(20), child: Image.asset('assets/logo.png', width:110, height:110, fit: BoxFit.cover)),
+      const SizedBox(height:16),
       const Text('ASARTEPE', style: TextStyle(color: Color(0xFFC9A96E), fontSize:28, letterSpacing:6, fontWeight: FontWeight.w700)),
       const Text('SINASTRI AKADEMISI', style: TextStyle(color: Color(0xFFa898c0), letterSpacing:2, fontSize:11)),
       const SizedBox(height:32),
@@ -319,13 +321,12 @@ class _HoraryHomeState extends State<HoraryHome> {
           Center(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                width: 84, height: 84,
+                width: 96, height: 96,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFFC9A96E), Color(0xFF8a6d3b)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(26),
+                  borderRadius: BorderRadius.circular(28),
                   boxShadow: [BoxShadow(color: const Color(0xFFC9A96E).withOpacity(0.25), blurRadius: 24, offset: const Offset(0,8))],
                 ),
-                child: const Icon(Icons.auto_awesome, size: 44, color: Color(0xFF1A1423)),
+                child: ClipRRect(borderRadius: BorderRadius.circular(28), child: Image.asset('assets/logo.png', fit: BoxFit.cover)),
               ),
               const SizedBox(height: 20),
               Text(tr('title'), style: GoogleFonts.cormorantGaramond(color: const Color(0xFFC9A96E), fontSize: 26, letterSpacing: 3, fontWeight: FontWeight.w700)),
@@ -407,6 +408,12 @@ class _HoraryHomeState extends State<HoraryHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: Drawer(backgroundColor: const Color(0xFF1A1423), child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(padding: const EdgeInsets.fromLTRB(16,16,16,8), child: Row(children: [
+          ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/logo.png', width:44, height:44, fit: BoxFit.cover)),
+          const SizedBox(width:10),
+          const Text('HORARY ORACLE', style: TextStyle(color: Color(0xFFC9A96E), letterSpacing:2, fontSize:13, fontWeight: FontWeight.bold)),
+        ])),
+        const Divider(color: Color(0xFF3d2e50)),
         // Profil - ad soyad
         Padding(padding: const EdgeInsets.all(16), child: Row(children: [
           const Icon(Icons.person, color: Color(0xFFC9A96E), size:20),
