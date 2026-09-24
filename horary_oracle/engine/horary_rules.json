@@ -1099,5 +1099,62 @@
     "colors": "Renkler gezegen ve burcla iliskilidir: 2.ev yoneticisi Koc'taki Ay ise beyaz/krem/gumus (Ay) veya beyaz+kirmizi (Koc) sey yakininda.",
     "part_of_fortune": "Kayip esya haritasinda Sans Noktasi (POF) faydali ikincil gostergedir. HER ZAMAN ORIGINAL YUKSELENDEN hesaplanir (evleri cevirsem/baska numaralandirsam bile). POF'un burc ve ev konumu + dispozitoru = yon/renk/mesafe ipucu. Sadece kayip esya haritalarinda kullanir.",
 "retro_returns": "NEREDEYSE HIC SASMAYAN KURAL: kayip esya retro bir gezegenle simgeleniyorsa esya GERI DONECEK veya BULUNACAK. Retro kayip esya horarysinde cok daha anlamlidir (digertum haritalara gore)."
+  },
+  "lost_object_locations": {
+    "note": "Kayip esya YER REFERANS TABLOSU (kurs). Esyayi simgeleyen gezegenin BURCU ve EVI yer tarif eder. Renk/yon/esya ipucu icin her ikisine de bakilir.",
+    "sign_edge_rule": "Kayip esyanin yoneticisi bir burctan cikip digerine gecmek uzereyse (son derecelerde), nesnenin bir seyin ARKASINDA kalmis olma ihtimali yuksektir.",
+    "signs": {
+      "fire": {
+        "note": "ATES burclari",
+        "koc": "Isi kaynagi yaninda: soba, firin, somine veya baca. Odanin ust/yuksek kisimlari.",
+        "aslan": "Kumlu veya tepelik alanlar yakininda, az ugranan yerlerde. Ev icinde tavana yakin yerlerde. Disarida: ahirlarin, parkin veya cimlerin yakininda/icinde.",
+        "yay": "Ahirlar, samanliklar, tepeler ve yuksek araziler. Kutuphaneler, evin ust katlari, ormanlar, parklar, bahceler."
+      },
+      "earth": {
+        "note": "TOPRAK burclari",
+        "boga": "Zemin veya kaldirim yakininda, bodrumda veya yer altinda. Ahirlar, calilar, bodrum kati veya evin ilk kati. Bankalar veya paranin saklandigi yerler.",
+        "basak": "Calisma odalari, kutuphaneler, giyinme odalari/dolaplar, bahceler, kilerler, ofisler. Genellikle dogrudan gorunmez; bir cekmecede veya dolapta.",
+        "oglak": "Is yerinde, ebeveyn evinde, cilalik, corak veya dikenli yerlerde. Yere yakin karanlik kosele, tarim alanlarinda veya madenlerde."
+      },
+      "air": {
+        "note": "HAVA burclari",
+        "ikizler": "Yuksekte, disarida camasir ipinde veya bir agacta. Duvar yakininda, ahsap lambride, bir sandikta veya bavulda. Yemek odasi, sinif veya diger ogrenim alanlarinda. Arabada, garajda veya cocuk odasinda.",
+        "terazi": "Cati katlari, yatak/nevresim takimlarinin arasi, dag tepeleri, tepeler, disarida acik ve temiz havada.",
+        "kova": "Tepelik, engebeli araziler. Baglar, catilar, pencereler. Konferans salonlari, ucaklar."
+      },
+      "water": {
+        "note": "SU burclari",
+        "yengec": "Su tesisati yakininda, mutfaklarda, gol, nehir, golet, cesme ve her turlu su kaynaginin yakininda. Dereler, su kaynaklari, lavabolar, mutfaklar, kuyular, deniz kiyilari, restoranlar, yemek pisirme alanlari. Arka bahce.",
+        "akrep": "Kirli su giderleri, batakliklar, cop kovalari, sulak alanlar, meyve bahceleri.",
+        "balik": "Su kaynaklari, nehirler veya baliklarin oldugu yerler. Eski evler, su sarniclari, kuyular, inziva yerleri veya gizli alanlar."
+      }
+    },
+    "houses": {
+      "h1": "Esya sahibinin onu koydugu yerdedir (yonetici zarar goruyorsa esya geri gelebilir). Sahibin en cok vakit gecirdigi yer, giris holu, on kapi, evin pencereleri.",
+      "h1_dir": "Dogu",
+      "h2": "Esyalarin saklandigi yerler; banka veya kiralik kasa, giyinme odasi, mobilyalar, cicek bahcesi, cilaliklar.",
+      "h2_dir": "Dogu-Kuzeydogu",
+      "h3": "Arabada veya garajda. Bir kardes veya komsu ona sahip olabilir veya nerede oldugunu bilebilir. Kitaplarin oldugu bir yerde, bir dukkan. TV odasi. Koridor ve merdivenler. Otobusler, trenler. Kardeslerin evleri, okullar.",
+      "h3_dir": "Kuzeydogu",
+      "h4": "Evde, mutfakta veya kilerde. Guvenli bir yerde. Bahcede veya avluda. Ebeveyn evinde. Bodrum, yemek odasi, lavabolar, su borulari. Su depolanan herhangi bir yer. Restoranlar. Plaj/sahil.",
+      "h4_dir": "Kuzey",
+      "h5": "Bir cocuk onu bir yere koymus olabilir veya nerede oldugunu bilebilir. Cocuk odasinda, barda, tiyatroda, oyun parkinda, eglence/oyun odasinda, keyif ve eglence sunan herhangi bir yerde. Hipodrom, kumarhane, borsa. Evdeki isitma sistemi, somine veya ocak basi.",
+      "h5_dir": "Kuzey-Kuzeybati",
+      "h6": "Is yerinde veya bir is arkadasi ona sahip olabilir/koydugunuz yeri gormus olabilir. Biri onu kaldirmistir. Kiyafetlerin tutuldugu bir dolap, kabin veya nevresim dolabi. Genellikle goz onunde degildir. Marketler, restoranlar, hayvanat bahceleri veya ofisler.",
+      "h6_dir": "Kuzeybati",
+      "h7": "Es veya ortak onu gormus ya da bir yere koymus olabilir. Yatak odasi, salon, resmi yemek odasi, veranda/patio. Genellikle acikca gorunen bir yerdedir. Esin/ortagin odasi, ofisi veya is yeri.",
+      "h7_dir": "Bati",
+      "h8": "Tamamen gozden uzak, siklikla geri getirilemez/bulunamaz durumdadir. Su tesisatinin oldugu herhangi bir yer; banyo, mutfak, bodrum. Mezarliklar, sigorta sirketleri, laboratuvarlar.",
+      "h8_dir": "Guney-Guneybati",
+      "h9": "Okulda, ucakta veya uzun bir seyahatte. Genellikle esyanin uzakta oldugunu gosterir. Lise, universite.",
+      "h9_dir": "Guneybati",
+      "h10": "Hol, calisma odasi, yemek odasi, kamu binasi, magaza veya is yeri. Bir ebeveyn veya patron nerede oldugunu bilebilir. Evin temeli, zeminler, kirisler, duvarlar, genel yapi.",
+      "h10_dir": "Guney",
+      "h11": "Bir arkadas veya tanidik ona sahip olabilir ya da bir yerde birakmis olabilir. Evdeki herhangi bir calisma alani.",
+      "h11_dir": "Guney-Guneydogu",
+      "h12": "Kayip esya her ne olursa olsun tamamen gozden uzaktir, iyice gizlenmistir ve siklikla tespit edilemez. Ofiste, hastanede, revirde veya gizli bir dolapta olabilir.",
+      "h12_dir": "Guneydogu"
+    },
+    "overlap_note": "Bazen belirli alanlar veya esyalar birden fazla ev tarafindan temsil edilir; orn. yatak odalari hem 2. hem de 5. evde bulunabilir."
   }
 }
