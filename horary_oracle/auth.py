@@ -43,6 +43,14 @@ def verify(email,pwd, device_id=None):
         # elite icin plan bilgisi de dondur
         _plan = db.get(email.lower(),{}).get("plan") if db.get(email.lower()) else "elite" if email.lower()=="smyrnaastrology@gmail.com" else ""
         _cr = db.get(email.lower(),{}).get("credits", -1) if db.get(email.lower()) else -1
+        # gerçek users.json expiry'sini yansıt (hardcoded 364 sabit değil)
+        _u = db.get(email.lower())
+        if _u and _u.get("expiry"):
+            try:
+                _exp = datetime.fromisoformat(_u["expiry"])
+                _dl = max(0, (_exp - datetime.now()).days)
+                return True, {"days_left": _dl, "warn": _dl <= 30, "expiry": _u["expiry"], "plan": _plan, "credits": _cr}
+            except: pass
         return True, {"days_left":364,"warn":False,"expiry":(datetime.now()+timedelta(days=365)).isoformat(),"plan":_plan,"credits":_cr}
     db=_load(); u=db.get(email.lower())
     if not u: return False, "kullanici yok"

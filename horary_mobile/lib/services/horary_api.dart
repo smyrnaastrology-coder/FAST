@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Horary Oracle API client - yüksek performans, cache backend'de
 class HoraryApi {
@@ -18,11 +19,14 @@ class HoraryApi {
   }) async {
     final uri = Uri.parse('$baseUrl/api/horary/cast');
     final now = DateTime.now(); // yerel saat - transit için kritik
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('email') ?? '';
     final payload = {
       'question': question, 'lat': lat, 'lon': lon, 'lang': lang,
       'quesited_type': category, 'asker': asker,
       'year': now.year, 'month': now.month, 'day': now.day,
       'hour': now.hour + now.minute/60 + now.second/3600,
+      if(email.isNotEmpty) 'email': email,
       if(history!=null) 'history': history,
     };
     http.Response? res;

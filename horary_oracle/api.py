@@ -38,6 +38,8 @@ class CastRequest(BaseModel):
     asker: str = Field("ben", description="ben / baskasi - yükselen kim?")
     # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
     history: Optional[list] = None
+    # kredi düşmek için kimlik (login'de kaydedilen email) - opsiyonel, yoksa düşülmez
+    email: Optional[str] = None
     # opsiyonel: client kendi zamanını gönderirse
     year: Optional[int] = None
     month: Optional[int] = None
@@ -983,6 +985,7 @@ async def cast(req: CastRequest):
         "location": loc_info,
         "derived_info": res.get("derived_info"),
         "answer": answer,
+        "credits_left": engine_json.get("credits_left"),
         "meta": {"tz": tzname, "utc_offset": off, "local_dec": round(local_dec,2), "ms": round(dt,1)}
     }
 

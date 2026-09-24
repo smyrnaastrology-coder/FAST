@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import 'dart:math' as math;
 
 void main() => runApp(const HoraryApp());
@@ -144,6 +145,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   bool _showLanding=true;
   int _daysLeft=365; String _expiryStr=''; String _plan=''; int _credits=-1;
   String _ad='', _soyad='';
+  Timer? _ticker;
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
   bool get _showRadar {
@@ -161,7 +163,13 @@ class _HoraryHomeState extends State<HoraryHome> {
     }
   }
 
-  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _loadProfile(); _checkIntro(); }
+  @override void initState(){ super.initState(); _loadHistory(); _loadExpiry(); _loadProfile(); _checkIntro(); _startTicker(); }
+  void _startTicker(){
+    _ticker?.cancel();
+    _ticker=Timer.periodic(const Duration(seconds:30), (_){
+      if(mounted && _timingTarget(_lastChart?['timing'])!=null) setState((){});
+    });
+  }
   Future<void> _checkIntro() async {
     final p=await SharedPreferences.getInstance();
     if(p.getBool('horary_intro_shown')==true) return;
@@ -236,7 +244,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     lang=p.getString('lang')??'tr';
     setState((){});
   }
-  @override void dispose(){ _scroll.dispose(); _ctrl.dispose(); _speech.cancel(); _tts.stop(); super.dispose(); }
+  @override void dispose(){ _ticker?.cancel(); _scroll.dispose(); _ctrl.dispose(); _speech.cancel(); _tts.stop(); super.dispose(); }
   Future<void> _saveHistory(String q) async {
     final p=await SharedPreferences.getInstance();
     final list=p.getStringList('chat_history')??[];
@@ -247,26 +255,43 @@ class _HoraryHomeState extends State<HoraryHome> {
     await p.setString('lang', lang);
     setState(()=> _historyList = list.reversed.take(20).map((e)=> {'q':e}).toList());
   }
-  String _timingDate(Map<String,dynamic>? timing){
-    if(timing==null) return '';
+  DateTime? _timingTarget(Map<String,dynamic>? timing){
+    if(timing==null) return null;
     final txt=timing['text']??'';
     final m=RegExp(r'(\d+)').firstMatch(txt);
-    if(m==null) return '';
+    if(m==null) return null;
     int n=int.parse(m.group(1)!);
     String unit=(timing['unit']??'').toString();
-    Duration d;
-    if(unit.contains('GÜN')) d=Duration(days:n);
-    else if(unit.contains('HAFTA')) d=Duration(days:n*7);
-    else if(unit.contains('AY')) d=Duration(days:n*30);
-    else if(unit.contains('YIL')) d=Duration(days:n*365);
-    else {
-      if(txt.contains('GÜN')) d=Duration(days:n);
-      else if(txt.contains('HAFTA')) d=Duration(days:n*7);
+    Duration? d;
+    bool has(String s)=> unit.contains(s);
+    if(has('DAKIKA')) d=Duration(minutes:n);
+    else if(has('SAAT')) d=Duration(hours:n);
+    else if(has('GÜN')) d=Duration(days:n);
+    else if(has('HAFTA')) d=Duration(days:n*7);
+    else if(has('YIL')) d=Duration(days:n*365);
+    else if(has('AY')) d=Duration(days:n*30);
+    if(d==null){
+      if(txt.contains('DAKIKA')||txt.contains('dakika')) d=Duration(minutes:n);
+      else if(txt.contains('SAAT')||txt.contains('saat')) d=Duration(hours:n);
+      else if(txt.contains('GÜN')||txt.contains('gun')) d=Duration(days:n);
+      else if(txt.contains('HAFTA')||txt.contains('hafta')) d=Duration(days:n*7);
+      else if(txt.contains('YIL')||txt.contains('yil')) d=Duration(days:n*365);
       else if(txt.contains('AY')) d=Duration(days:n*30);
-      else return '';
+      else return null;
     }
-    final target=DateTime.now().add(d);
-    return '${target.day.toString().padLeft(2,'0')}.${target.month.toString().padLeft(2,'0')}.${target.year}';
+    return DateTime.now().add(d);
+  }
+  String _timingDateStr(DateTime? t){
+    if(t==null) return '';
+    return '${t.day.toString().padLeft(2,'0')}.${t.month.toString().padLeft(2,'0')}.${t.year}';
+  }
+  String _timingRemainingStr(DateTime target){
+    final diff=target.difference(DateTime.now());
+    if(diff.isNegative) return 'hedef tarih geldi';
+    final d=diff.inDays,h=diff.inHours%24,m=diff.inMinutes%60;
+    if(d>0) return '$d gün $h sa $m dk';
+    if(h>0) return '$h sa $m dk';
+    return '$m dk';
   }
 
   final langs = const [
@@ -519,15 +544,15 @@ class _HoraryHomeState extends State<HoraryHome> {
               onSelected: (v){ if(v) setState(()=> _category=c['k']!); },
             )),
           ]))),
-          // 1) Zaman geri sayım widget'i
-          if(_lastChart!=null && _lastChart!['timing']!=null && _lastChart!['timing']['text']!=null && (_lastChart!['timing']['text'] as String).isNotEmpty && !_timingDate(_lastChart!['timing']).isEmpty) Padding(
+          // 1) Zaman geri sayım widget'i - canlı (her 30 sn güncellenir)
+          if(_lastChart!=null && _timingTarget(_lastChart!['timing'])!=null) Padding(
             padding: const EdgeInsets.symmetric(horizontal:12, vertical:4),
             child: Container(padding: const EdgeInsets.symmetric(horizontal:12, vertical:8), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.5))),
               child: Row(children: [
                 const Icon(Icons.timer_outlined, size:16, color: Color(0xFFC9A96E)),
                 const SizedBox(width:8),
-                Expanded(child: Text('⏳ ${_lastChart!['timing']['text']} → ${_timingDate(_lastChart!['timing'])}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11, fontWeight: FontWeight.w600))),
-                Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDate(_lastChart!['timing']), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
+                Expanded(child: Text('⏳ ${_lastChart!['timing']['text']} → ${_timingRemainingStr(_timingTarget(_lastChart!['timing'])!)}', style: const TextStyle(color: Color(0xFFe8e0f0), fontSize:11, fontWeight: FontWeight.w600))),
+                Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFFC9A96E), borderRadius: BorderRadius.circular(20)), child: Text(_timingDateStr(_timingTarget(_lastChart!['timing'])), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold))),
               ])),
           ),
           // radar webde devre disi (flutter_map yok) - mobilde aktif
@@ -554,7 +579,7 @@ class _HoraryHomeState extends State<HoraryHome> {
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('${tr('asc')}: ${_lastChart!['houses']?['asc_sign'] ?? ''} ${(_lastChart!['houses']?['asc']!=null? (_lastChart!['houses']['asc']%30).toStringAsFixed(1)+'°':'')}  •  ${tr('moon')}: ${_lastChart!['planets']?['Moon']?['sign'] ?? ''} ${_lastChart!['planets']?['Moon']?['deg']?.toStringAsFixed(1) ?? ''}°', style: const TextStyle(color: Color(0xFFC9A96E), fontSize:11)),
                     const SizedBox(height:2),
-                    Text('${_lastChart!['verdict'] ?? ''}  •  ${_lastChart!['timing']?['text'] ?? ''}${_timingDate(_lastChart!['timing']).isNotEmpty? ' → ${_timingDate(_lastChart!['timing'])}':''}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10), maxLines:2, overflow: TextOverflow.ellipsis),
+                    Text('${_lastChart!['verdict'] ?? ''}  •  ${_lastChart!['timing']?['text'] ?? ''}${_timingDateStr(_timingTarget(_lastChart!['timing'])).isNotEmpty? ' → ${_timingDateStr(_timingTarget(_lastChart!['timing']))}':''}', style: const TextStyle(color: Color(0xFFa898c0), fontSize:10), maxLines:2, overflow: TextOverflow.ellipsis),
                     if(_lastChart!['timing']?['ephemeris_text']!=null) Text('Ephemeris: ${_lastChart!['timing']['ephemeris_text']}', style: const TextStyle(color: Color(0xFF6a9ae2), fontSize:10)),
                   ])),
                 ]),
