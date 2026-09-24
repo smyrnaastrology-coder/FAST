@@ -64,6 +64,7 @@ class _AuthGateState extends State<AuthGate> {
           await p.setString('expiry', res['expiry'] ?? '');
           await p.setInt('days_left', res['days_left'] ?? 365);
           await p.setString('plan', res['plan'] ?? '');
+          if(res['credits']!=null) await p.setInt('credits', res['credits']);
           setState(()=> _ok=true);
         } else if(expired){
           await p.remove('email'); await p.remove('pass'); await p.remove('login_ts');
@@ -84,7 +85,7 @@ class _AuthGateState extends State<AuthGate> {
           await p.setString('email', email); await p.setString('pass', pass);
           await p.setBool('remember', remember);
           await p.setInt('login_ts', DateTime.now().millisecondsSinceEpoch);
-          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365); await p.setString('plan', res['plan'] ?? '');
+          await p.setString('expiry', res['expiry'] ?? ''); await p.setInt('days_left', res['days_left'] ?? 365); await p.setString('plan', res['plan'] ?? ''); if(res['credits']!=null) await p.setInt('credits', res['credits']);
           setState(()=> _ok=true); return true;
         }
       } catch(_){ }
@@ -139,7 +140,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   List<Map<String,dynamic>> _historyList = []; // kalıcı geçmiş
   bool _showDetails=false;
   bool _showLanding=true;
-  int _daysLeft=365; String _expiryStr=''; String _plan='';
+  int _daysLeft=365; String _expiryStr=''; String _plan=''; int _credits=-1;
   String _ad='', _soyad='';
 
   String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
@@ -222,7 +223,8 @@ class _HoraryHomeState extends State<HoraryHome> {
       try{ d=DateTime.parse(e).difference(DateTime.now()).inDays; }catch(_){ d=p.getInt('days_left')??365; }
     }
     _plan=p.getString('plan')??'';
-    setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty});
+    final c=p.getInt('credits');
+    setState(()=> {_daysLeft=d, _expiryStr=e, _showLanding=_chat.isEmpty, _credits=c??-1});
   }
 
   Future<void> _loadHistory() async {
@@ -381,6 +383,7 @@ class _HoraryHomeState extends State<HoraryHome> {
     _saveHistory(q);
     try {
       final res = await HoraryApi.cast(question: q, lat: lat, lon: lon, lang: lang, category: _category, asker: _asker);
+      if(res['''credits_left''']!=null){ try{ _credits=res['''credits_left'''] as int; final pp2=await SharedPreferences.getInstance(); await pp2.setInt('''credits''', _credits); setState((){}); }catch(_){} }
       if(res['''verdict''']=='''NO_CREDITS'''){
         setState(()=> _chat.add({'''role''':'''assistant''','''content''': '''Krediniz bitti. Lutfen kredi paketi alin.'''}));
         if(context.mounted){ showDialog(context: context, builder: (_)=> AlertDialog(backgroundColor: const Color(0xFF1A1423), title: const Text('''Krediniz bitti''', style: TextStyle(color: Color(0xFFC9A96E))), content: const Text('''Krediniz bitti. Devam etmek icin lutfen kredi paketi satin alin.''', style: TextStyle(color: Colors.white70)), actions: [TextButton(onPressed: ()=> Navigator.pop(context), child: const Text('''Tamam'''))])) ; }
@@ -432,6 +435,7 @@ class _HoraryHomeState extends State<HoraryHome> {
           Text(tr('subtitle'), style: const TextStyle(color: Color(0xFFa898c0), fontSize: 9, letterSpacing: 2)),
         ]), centerTitle: true,
         actions: [
+          if(_credits>=0) Padding(padding: const EdgeInsets.only(right:4, top:12), child: Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.4))), child: Center(child: Text("$_credits kredi", style: const TextStyle(color: Color(0xFFC9A96E), fontSize:10, fontWeight: FontWeight.bold))))),
           if(_plan.isNotEmpty) Padding(padding: const EdgeInsets.only(right:8, top:10), child: Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:6), decoration: BoxDecoration(gradient: LinearGradient(colors: _plan=='elite' ? [Color(0xFFFFD700), Color(0xFFD4AF37)] : _plan=='premium' ? [Color(0xFFC9A96E), Color(0xFF8a6d3b)] : [Color(0xFF6a9ae2), Color(0xFF4a6fa5)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: (_plan=='elite' ? Color(0xFFFFD700) : Color(0xFFC9A96E)).withOpacity(0.5), blurRadius:8)], border: Border.all(color: Colors.white.withOpacity(0.3))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(_plan=='elite' ? Icons.star : Icons.workspace_premium, size:14, color: Colors.black), const SizedBox(width:4), Text(_plan.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold, letterSpacing:1))]))),
           IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
