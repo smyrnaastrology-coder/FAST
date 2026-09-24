@@ -92,6 +92,18 @@ def derived_house(base_house, offset):
 # Yer-descriptor kelimeler (üniversite/hastane/hapishane) tek başına base olabilir ama
 # yanında gerçek kişi ilişkisi varsa base YAPILMAZ - kişinin kendisini tarif ederler.
 DESCRIPTOR_WORDS = ("üniversite", "universite", "hastane", "hapishane", "gizli")
+
+def _word_prefix_in(q, word):
+    """Kelime token başında geçiyor mu? (örn. 'arkadaşımın' içinde 'arkadaşım' var ama
+    'olabilir' içinde 'abi' yok). Çekim ekleriyle genişlemiş tokenlarda kök eşleşir."""
+    idx = 0
+    while True:
+        pos = q.find(word, idx)
+        if pos == -1:
+            return False
+        if pos == 0 or q[pos-1] == ' ':
+            return True
+        idx = pos + 1
 # İlişki önceliği: hoca/öğretmen en özgül; arkadaş ikinci; diğer akrabalık son.
 def _person_rank(word):
     if any(k in word for k in ("hoca", "öğretmen", "ogretmen", "profesör", "profesor", "hakim")):
@@ -109,15 +121,54 @@ LOST_ITEM_WORDS = ("gözlüğü", "gozlugu", "gözlük", "gozluk", "çantası", 
                    "kitabı", "kitabi", "kitabın", "taki", "takı", "mücevheri", "mucevheri",
                    "süveteri", "suveteri", "süveter", "suveter", "kazak", "kazağı", "kazagi", "kazagı", "hırka", "hırkası", "hirkasi", "hirka", "mont", "montu", "palto", "paltosu")
 _NEREDE = ("nerede", "nerde", "nereye", "nere")
+_KAYIP_SIGNAL = ("kayboldu", "kaybolan", "kaybolmuş", "kaybolmus", "kaybettim", "kaybetti", "kayıp olan", "kayip olan", "kayıp", "kayip")
+_LOST_TRIGGER = _NEREDE + _KAYIP_SIGNAL
 
 
 def lost_item_offset(q):
     """'arkadasimin telefonu nerede' gibi kayip esya sorgusu -> offset 2, yoksa None."""
-    if not any(k in q for k in _NEREDE):
+    if not any(k in q for k in _LOST_TRIGGER):
         return None
     for w in sorted(LOST_ITEM_WORDS, key=len, reverse=True):
         if w in q:
             return 2
+    return None
+
+
+# İsimen çağrılan kişi (kurs kuralı, Örnek #49): "Jim'in cüzdanı nerede" ->
+# ilişki kelimesi yoksa ve iyelikli isim varsa kişi 7. ev, eşyası 8. ev.
+# İlişkiyle çağrılırsa ("oğlumun cüzdanı") o ilişki evi kullanılır.
+_NAMELIKE = ("ın", "in", "un", "ün", "ının", "inin", "nın", "nin", "nun", "nun")
+
+
+def named_person_offset(q):
+    """Kayip esya sorgusunda BASE_PERSON'dan taninmamis iyelikli isim -> (7, 2)."""
+    lo = lost_item_offset(q)
+    if not lo:
+        return None
+    # eşya kelimesinin tam olarak nerede geçtiğini bul
+    item_pos = None
+    for w in sorted(LOST_ITEM_WORDS, key=len, reverse=True):
+        pos = q.find(w)
+        if pos != -1:
+            item_pos = pos
+            break
+    if item_pos is None:
+        return None
+    before = q[:item_pos]
+    # "benim" / "ben" veya başka kişi kelimesi varsa -> isim değil
+    if any(_word_prefix_in(before, k) for k in BASE_PERSON):
+        return None
+    # _GEN_SUF uyumlu iyelikli kelime: "Ssin" kısmı iyelik eki taşıyan son kelime
+    # "araba" gibi aqua isim değil; sadece iyelik ekiyle biten kelimeyi arıyoruz
+    import re
+    tokens = re.findall(r"[a-zçğıöşü]+", before)
+    # son token sitemiz: "jimin" gibi -> kökü "jim" + iyelik "in"
+    if not tokens:
+        return None
+    last = tokens[-1]
+    if any(s in last for s in _NAMELIKE):
+        return (7, 2)
     return None
 
 
@@ -137,11 +188,23 @@ def parse_derived(question: str):
     kc = _kusen_chain(q)
     if kc:
         return kc
+    # İsimen çağrılan kişi kuralı (kurs, #49): "jimin cüzdanı nerede" -> 7.evden 8.ev
+    np = named_person_offset(q)
+    if np:
+        base, offset = np
+        derived = derived_house(base, offset)
+        return {"base_house":base, "base_word":"isimle çağrılan kişi", "offset":offset,
+                "topic":"kayıp eşya", "derived":derived, "formula":"isimle çağrılan kişi -> 7. ev, eşyası 2. evi = 8. ev"}
     # 1) direkt kişi ilişkisi (üniversite/hastane vs. hariç)
-    matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if m[0] in q and m[0] not in DESCRIPTOR_WORDS]
+    matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0]) and m[0] not in DESCRIPTOR_WORDS]
     # 2) yoksa descriptor kendisi base olur (örn. "üniversite nerede")
     if not matched:
-        matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if m[0] in q]
+        matched = [m for m in sorted(BASE_PERSON.items(), key=lambda x: len(x[0]), reverse=True) if _word_prefix_in(q, m[0])]
+    # 3) kişi yok ama kayıp eşya sorusu varsa -> soranın kendisi (1. ev), eşyası 2. ev
+    #    ("cüzdanım nerede", "gözlüğüm kayboldu" tarzı iyelikli 1. tekil sorgular)
+    if not matched and lost_item_offset(q):
+        return {"base_house":1, "base_word":"ben(kendi)", "offset":2, "topic":"kayıp eşya",
+                "derived":2, "formula":"ben -> kayıp eşya 2. ev"}
     if not matched:
         return None
     base_word, base = min(matched, key=lambda m: (_person_rank(m[0]), -len(m[0])))
@@ -152,7 +215,8 @@ def parse_derived(question: str):
     # İyelik ünsüzü: "kuzenin" (onun) vs "kuzenimin" (benim) — 'im/ım/um/üm' araya girer.
     _GEN_SUF_IYELIK = [p + g for p in ("ım", "im", "um", "üm", "im") for g in _GEN_SUF]
     possession = any((w + s) in q for w in BASE_PERSON for s in _GEN_SUF) or \
-                 any((w + s) in q for w in BASE_PERSON for s in _GEN_SUF_IYELIK)
+                 any((w + s) in q for w in BASE_PERSON for s in _GEN_SUF_IYELIK) or \
+                 "benim" in q or "benimle" in q
     if not possession:
         return {"base_house": base, "base_word": base_word, "derived": base, "topic": "kişi kendisi"}
     offset = None; topic_word=""
@@ -162,7 +226,7 @@ def parse_derived(question: str):
         offset = lo; topic_word = "kayıp eşya"
     if not offset:
         for word, off in sorted(TOPIC_OFFSET.items(), key=lambda x: len(x[0]), reverse=True):
-            if word in q and word not in DESCRIPTOR_WORDS and word != base_word and word not in base_word and base_word not in word:
+            if _word_prefix_in(q, word) and word not in DESCRIPTOR_WORDS and word != base_word and word not in base_word and base_word not in word:
                 # aynı kökse (baba/babam) atla
                 offset = off; topic_word = word; break
     if not offset:
@@ -175,11 +239,18 @@ def parse_multi(question: str):
     kc = _kusen_chain(q)
     if kc:
         return {"chain": [3], "house": 3, "base_word": kc["base_word"], "topics": ["kuzen"]}
+    np = named_person_offset(q)
+    if np:
+        base, offset = np
+        house = derived_house(base, offset)
+        return {"chain": [base, offset], "house": house, "base_word": "isimle çağrılan kişi", "topics": ["kayıp eşya"]}
     persons = []
     for w,h in BASE_PERSON.items():
-        if w in q:
+        if _word_prefix_in(q, w):
             persons.append((q.index(w), w, h))
     persons = sorted(persons)
+    if not persons and lost_item_offset(q):
+        return {"chain": [1, 2], "house": 2, "base_word": "ben(kendi)", "topics": ["kayıp eşya"]}
     if not persons:
         return None
     topics = []
@@ -188,7 +259,7 @@ def parse_multi(question: str):
         topics.append((0, "kayıp eşya", lo))
     else:
         for w, off in TOPIC_OFFSET.items():
-            if w in q:
+            if _word_prefix_in(q, w):
                 topics.append((q.index(w), w, off))
     topics = sorted(topics)
     base = persons[0][2]

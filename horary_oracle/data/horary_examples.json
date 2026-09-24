@@ -2108,5 +2108,27 @@
       "friends_house"
     ],
     "explanation": "Ornek Harita #48: 20 Dec 1992 11:15 PST Coeur d'Alene 47N41 116W46 Suveterim nerede? Danisan en sevdigi suveterini almak icin dolaba gitti ama hicbir yerde yoktu, telasli bir telefon aldi. Kayip esyalarin tamami 2. evin burcundan ve evin yoneticisinden belirlenir (kurs kurali). Bilgisayar programi WHOLE-SIGN evler kullanmaktadir: 2. ev = Koc -> yonetici Mars ve Mars GERILEMEDE (retro) -> 'nesne geri donecek veya bulunacak' neredeyse hic sasmayan kural -> bulunacak. Mars'in Yengec'teki konumu whole-sign 5. evdir; danisanin cocugu olmadigi icin 5. ev eglence yerlerini gosterir: parti, erkek arkadas evi, restoran, tiyatro -> suveteri eglendigi bir yerde birakmis olabilir. Sans Noktasi (POF; gunduz haritasi ASC+Moon-Sun = Kova 3.89) ve onun dispozitoru olan Uranus (Kova'nin hakimi) Oglak'ta whole-sign 11. evde -> arkadaslariyla disarida oldugunu, bir kulupte, grup toplantisinda veya birinin evinde unutmus olabilir. Danisan bir arkadasinin evindeki gardiropta kaldigini hatirladi: ortam sicak oldugu icin cikarmis, kiyafetlerine ozen gosterdigi icin guvenli bir yere koymus. Kurallar: dispozitorler yanlis yere konmus esyayi ararken cok onemli; 2. ev yoneticisi + POF + dispozitorleri renk/yoni ipucu verir. Esyayi yoneten gezegen Basak/Balik burcunda veya 6/12 evdeyse genelde dogrudan gorunmez; cekmece/dolap/cep/kapali alan. Bu haritada POF ve dispozitörü arkadas/grup evini (11) gosterdi ve bulundu. Not (motor Regiomontanus): motor ASC Balik 12.77, MC Yay 22.29, 2. ev kuspisi Boga 7.8 (hakimi Venus) verir; kaynak whole-sign kullanir (2.ev=Koc->Mars). Whole-sign eslestirmesi: Mars 24.33 Yengec retro = 5. ev, Venus 14.00 Kova = 12. ev, POF Kova 3.89 = dispozitoru Uranus 17.02 Oglak whole-sign 11. ev, Neptune 17.94 Oglak 11. ev, Moon 20.30 Akrep 8. ev, ASC Balik 12.77."
+  },
+  {
+    "id": "JIM-WALLET-1984-08-26",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Jim'in cüzdanı nerede? 26 Aug 1984 15:25 PDT Coeur d'Alene 47N41 116W46. Jim ismiyle çağrıldı (oğlu ama ismiyle) -> 7. ev; kayıp eşya = Jim'in 2. evi = haritanın 8. evi. Mercury 7 Basak 7. ev hakimi; Moon 5 Basak = Jim'in 2. evi (8. ev).",
+    "technique": "named_person_7th_derived_wallet_8th_mercury_3rd_car_books_moon_apply_1.5_deg_hours",
+    "verdict": "FOUND",
+    "tags": [
+      "lost_object",
+      "named_person",
+      "7th_house",
+      "8th_house",
+      "derived_houses",
+      "3rd_house",
+      "mercury",
+      "moon",
+      "car",
+      "books",
+      "timing",
+      "virgo"
+    ],
+    "explanation": "Ornek Harita #49: 26 Aug 1984 15:25 PDT Coeur d'Alene 47N41 116W46 Jim'in cüzdanı nerede? Danisan aradi ve oglu Jim'in cüzdanini sordu; ismen bahsettigi icin kurs kurali geregi Jim 7. ev olur (esya sahibi olarak 7. ev). Sayfa 78-79 Kural 1: kisi ismiyle cagrildiginda 7. ev; 'oglumun cüzdani nerede' denseydi oglum 5. ev ve cüzdani 6. ev olurdu. Bu haritada 7 derece Basak'taki Mercury 7. evi (Il2ler) yonetiyor; 5 derece Basak'taki Moon oglunun 2. evini (haritanin 8. evi, Yengec) yonetiyor. Mercury oglunun 3. evindedir (7'den 3 = harita 9. evi) ve kayip cüzdan yoneticisinin bu yerlesimi cüzdanin arabada, garajda, kitaplarin veya kagitlarin yaninda oldugunu gosterir; ama Basak'ta oldugu icin gozden uzaktir. Sans Noktasi (POF) Yukseken ile kavusumdadir ve dispozitoru Jupiter haritanin 1. evindedir. Ay Mercury ile bir bucuk derece icinde kavusuma ilerliyordu (1.38 derece) + ASC POF'a 1 derece icinde -> gunler degil saatler. Oglu, calisma odasinda okudugu arabalarla ilgili bir kitabin altinda cüzdani buldu. Kurallar: ismen cagrilan kisi 7. ev; 7. ev hakiminin 3. evde olusu araba/garaj/kitap ipucu; Basak gozden uzak; yaklasan kavusum hiz. Dogrulama (Regiomontanus): ASC Yay 18.19, MC Terazi 16.1, 7. ev kuspisi Il2ler 18.19 (hakimi Mercury Basak 6.99 = harita ev 9 = oglunun 3. evi), 8. ev kuspisi Yengec 20.73 (hakimi Moon Basak 5.61), POF gunduz = ASC+Moon-Sun = Yay 19.96 (ASC'ye 1.77 derece), Jupiter Oglak 3.14 ev 1 (POF dispozitoru), Ay-Mercury 1.38 uygulanan. Motor derived_houses ile 'Jimin cüzdanı nerede' -> named person 7.evden offset 2 = 8. ev dogrulandi."
   }
 ]
