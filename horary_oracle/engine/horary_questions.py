@@ -16,6 +16,7 @@ QUESTION_HOUSES = {
     "spouse": 7,
     "child": 5,
     "pregnancy": 5,   # hamilelik/gebelik -> çocuk evi 5
+    "intimacy": 8,   # cinsel ilişki/birliktelik -> 8. ev (cinsellik)
     "mother": 4,
     "father": 10,
     "boss": 10,
@@ -43,7 +44,7 @@ QUESTION_HOUSES = {
 
 LABEL_TR = {
     "self": "Soranın kendisi", "friend": "Arkadaş", "spouse": "Eş/Partner",
-    "child": "Çocuk", "pregnancy": "Hamilelik (5. ev)", "mother": "Anne", "father": "Baba", "boss": "Patron/Amir",
+    "child": "Çocuk", "pregnancy": "Hamilelik (5. ev)", "intimacy": "Cinsel ilişki (8. ev)", "mother": "Anne", "father": "Baba", "boss": "Patron/Amir",
     "coworker": "İş arkadaşı", "employee": "Çalışan", "sibling": "Kardeş",
     "uncle": "Dayı/Amca",
     "teacher": "Hoca/Öğretmen", "university": "Üniversite", "student": "Öğrenci",
@@ -82,6 +83,7 @@ TYPE_KEYWORDS = [
     ("spouse", ("kocam", "karım", "karim", "eşim", "esim", "nişanlım", "nisanlim", "partnerim", "sevgilim", "eşimin", "esimin")),
     ("child", ("oğlum", "oglum", "oğullarım", "ogullarim", "kızım", "kizim", "kızlarım", "kizlarim", "çocuğum", "cocugum", "çocuklarım", "cocuklarim", "bebeğim", "bebegim")),
     ("pregnancy", ("hamile miyim", "hamile miyim", "hamile mi", "hamilemiyim", "gebe miyim", "gebe mi", "hamile olduğumu", "hamile oldugumu", "hamilelik", "hamile kalacak", "hamile kalacağım", "hamile kalacagim", "çocuğum mu olacak", "cocugum mu olacak", "bebeğim mi var", "bebegim mi var", "doğum yapacak", "dogum yapacak", "doğum yapacağım", "dogum yapacagim", "doğumu ne zaman", "dogumu ne zaman", "doğuracağım", "doguracagim")),
+    ("intimacy", ("cinsel ilişki", "cinsel iliski", "cinsel beraberlik", "cinsel birliktelik", "seks yapmalı", "seks yapmali", "seks ilişkisi", "seks iliskisi", "yatakta beraber", "cinsel hayat")),
     ("boss", ("patronum", "müdürüm", "mudurum", "amirim", "şefim", "sefim", "yöneticim", "yoneticim")),
     ("employee", ("çalışanım", "calisanim", "elemanım", "elemanim", "personelim", "işçim", "iscim")),
     ("uncle", ("dayım", "dayimin", "dayımın", "dayi", "amcam", "amcamin", "amcamın")),

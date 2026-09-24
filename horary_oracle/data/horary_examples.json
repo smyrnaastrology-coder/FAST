@@ -2005,5 +2005,25 @@
       "real_estate"
     ],
     "explanation": "Ornek Harita #43: 3 Jun 1990 19:17 PDT Coeur d'Alene 47N41 116W46 Tim, 2. Cadde'deki evi satin almak icin krediyi alabilecek mi? (Kaynak tarihi 7 Haziran 1990 yaziyor; motorun hesaplari Venues 5.43 Boga, Ay 25.49 Terazi, Jupiter 13.46 Yengec ile 3 Haziran 19:17 PDT'ye BIREBIR uyuyor - OCR 3/7 karistirmasi duzeltildi.) Tim 7. ev (7. ev kuspisi Boga 29.0) olur ve 5 derece Boga'daki Venus tarafindan yonetilir; kaynak onun 12. evinde der (regiomontanus'ta chart 5. ev sonu/6. ev basi sinirina yakin, fark not edildi). Kredi parasi onun 8. evi (haritanin 2. evi, kuspis Yay 26.3 -> hakimi Jupiter) ile simgelenir ve 13 derece Yengec'teki Jupiter tarafindan yonetilir. Venus, Jupiter'e SEKSTIL yapacak sekilde yaklasmaktadir (derece bazinda 68.03; kaynak 'uygulanan sekstil' der, yaklasik orb not edildi) -> EVET yaniti. 25 derece Terazi'deki Ay BOSLUKTADIR (VOC) -> endiselenecek bir sey yoktur. Soruyu soran Tim'in annesi cok endiselenmisti: Tim kil payi yeterlilik alabilmisti ve banka sureci agirdan aliyor gibi gorunuyordu. Ancak kredi ONAYLANDI, eve tasindi ve mutlu yasiyor. Kural: 7. ev hakimi ile onun 8. ev hakimi arasinda olumlu sekstil = kredi verilir; Ay VOC bu vakada endiseyi yatistirir. Dogrulama (Regiomontanus): ASC Akrep 29.02, MC Basak 19.18, 7. ev kuspisi Boga 29.0 (hakimi Venus, konumu Boga 5.43 chart 5. ev), 2. ev kuspisi Yay 26.3 (hakimi Jupiter, konumu Yengec 13.46 8. ev), Ay 25.49 Terazi 11. ev VOC, Sun 13.23 Ikizler 7. ev."
+  },
+  {
+    "id": "LEON-SEX-SAFETY-1990-08-25",
+    "source": "Corrected OCR - Only Way Learn Horary - Coeur d'Alene ID 47N41 116W46",
+    "question": "Leon ile cinsel iliskiye girmek guvenli mi? 25 Aug 1990 08:49 PDT Coeur d'Alene 47N41 116W46. Venus 14 Aslan 11. ev (soru sahibi + 8. ev hakimi), Mars 27 Boga (7. ev hakimi = Leon), Moon 3 Akrep -> Pluto kavusumu.",
+    "technique": "8th_sex_venus_squares_pluto_mars_quincunx_saturn_moon_pluto_conjunction_no",
+    "verdict": "NO",
+    "tags": [
+      "intimacy",
+      "8th_house",
+      "7th_house",
+      "11th_house",
+      "2nd_house",
+      "square",
+      "quincunx",
+      "conjunction",
+      "after_the_fact",
+      "safety"
+    ],
+    "explanation": "Ornek Harita #44: 25 Aug 1990 08:49 PDT Coeur d'Alene 47N41 116W46 Leon ile cinsel iliskiye girmek guvenli mi? Asikar 8. ev sorusudur ama 7. ev (Leon) da dikkate alinir. Gemide tanişilan beyefendiyle ilgili soru; liman duraklarindan birinde ariyor. Soru sahibi, 11. evde 14 derece Aslan'daki Venus tarafindan yonetilir (ASC Terazi); 8. evin yoneticisi de Venus'tur (8. ev kuspisi Boga 25.8). Venus asaleten güclu degildir, zararda veya dusuk konumda da degildir (Aslan'da - kendi burcunda degil). Acilari Pluto'ya ve Mars'a KARE, Saturn'e 150'lik (quincunx) dir (derece bazinda Venus-Pluto 90.9, Venus-Mars 77.4 genis orb, Venus-Saturn 155.0); bunlarin hicbiri iliski icin guven verici degil. Ozellikle mars 27 derece Boga'da Leon'u (7. ev kuspisi Koc 3.3) yonetir ve Venus ona kare aci yapar -> yanit HAYIR. Yaklasik 3 derece Akrep'teki Ay, Venus'e kare ve Mars'a karsit aci yapar (burc bazli: Sabit/Su ve tersi) ve 15 derece Akrep'te Pluto ile KAVUSACAKTIR (Moon-Pluto uygulanan 12.25 derece) -> Ay/Pluto kavusumu olumlu gosterge degildir; Ay'in hareketi yaniti DOGRULAR. Not: bu, olay gerceklestikTEN SONRA sorulan soruydu; danisan geri aradiginda Leon ile zaten birlikte oldugu icin yanittan memnun kalmadi. Kurs yorumu: harita cikarip cevap verirsiniz; danisan dikkate alir ya da coktan harekete gecmis olup ic rahatlatma bekler; cogunlukla karariniz sonraki gelismelerle dogrulanir. Devam var: simdiye dek guvenli gorunse de 8. evin diger konulari pek iyi gitmedi (sonraki soru). Dogrulama (Regiomontanus): ASC Terazi 3.28, MC Yengec 4.07, Venus 14.37 Aslan 11. ev, Mars 27.01 Boga 9. ev, Ay 2.98 Akrep 2. ev, Pluto 15.23 Akrep 2. ev, Saturn 19.35 Oglak 4. ev retro, Sun 2.19 Basak 11. ev."
   }
 ]
