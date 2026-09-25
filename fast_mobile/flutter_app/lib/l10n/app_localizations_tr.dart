@@ -959,6 +959,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get scoreFlowFraktal => 'Doğal Akış (Fraktal)';
 
   @override
+  String get scoreDetailTitle => 'SKOR ANALİZİ DETAYI';
+
+  @override
   String get progressionTitle => 'Secondary Progression';
 
   @override

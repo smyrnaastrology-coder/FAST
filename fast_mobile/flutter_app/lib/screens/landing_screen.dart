@@ -476,20 +476,20 @@ class _LandingScreenState extends State<LandingScreen> {
         spacing: 16,
         runSpacing: 16,
         children: _features(l10n).map((f) => Container(
-          width: 240,
-          padding: const EdgeInsets.all(20),
+          width: 300,
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: FastTheme.cardBg,
             border: Border.all(color: FastTheme.border),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
-              Text(f['icon'] as String, style: const TextStyle(fontSize: 32)),
+              Text(f['icon'] as String, style: const TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              Text(f['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
               const SizedBox(height: 8),
-              Text(f['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              const SizedBox(height: 6),
-              Text(f['desc'] as String, textAlign: TextAlign.center, style:  TextStyle(fontSize: 12, color: FastTheme.textMuted, height: 1.5)),
+              Text(f['desc'] as String, textAlign: TextAlign.center, style:  TextStyle(fontSize: 14, color: FastTheme.textMuted, height: 1.6)),
             ],
           ),
         )).toList(),
@@ -537,16 +537,16 @@ class _LandingScreenState extends State<LandingScreen> {
             children: [
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = false),
-                child: Text(l10n.pricingMonthly, style: TextStyle(fontSize: 13, color: _priceYearly ? FastTheme.textDim : FastTheme.accentGold, fontWeight: _priceYearly ? FontWeight.normal : FontWeight.w600)),
+                child: Text(l10n.pricingMonthly, style: TextStyle(fontSize: 15, color: _priceYearly ? FastTheme.textDim : FastTheme.accentGold, fontWeight: _priceYearly ? FontWeight.normal : FontWeight.w600)),
               ),
               const SizedBox(width: 12),
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = !_priceYearly),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: 48, height: 26,
+                  width: 52, height: 28,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(13),
+                    borderRadius: BorderRadius.circular(14),
                     color: _priceYearly ? FastTheme.accentGold : FastTheme.cardBg,
                     border: Border.all(color: _priceYearly ? FastTheme.accentGold : FastTheme.border),
                   ),
@@ -554,7 +554,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     duration: const Duration(milliseconds: 300),
                     alignment: _priceYearly ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      width: 20, height: 20, margin: const EdgeInsets.all(2),
+                      width: 22, height: 22, margin: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _priceYearly ? FastTheme.bg : FastTheme.text,
@@ -568,8 +568,8 @@ class _LandingScreenState extends State<LandingScreen> {
                 onTap: () => setState(() => _priceYearly = true),
                 child: Text.rich(TextSpan(
                   text: '${l10n.pricingYearly} ',
-                  style: TextStyle(fontSize: 13, color: _priceYearly ? FastTheme.accentGold : FastTheme.textDim, fontWeight: _priceYearly ? FontWeight.w600 : FontWeight.normal),
-                  children: [TextSpan(text: l10n.pricingDiscount, style:  TextStyle(color: FastTheme.success, fontSize: 10))],
+                  style: TextStyle(fontSize: 15, color: _priceYearly ? FastTheme.accentGold : FastTheme.textDim, fontWeight: _priceYearly ? FontWeight.w600 : FontWeight.normal),
+                  children: [TextSpan(text: l10n.pricingDiscount, style:  TextStyle(color: FastTheme.success, fontSize: 11))],
                 )),
               ),
             ],
@@ -611,60 +611,60 @@ class _LandingScreenState extends State<LandingScreen> {
     final interval = p['interval'] as String? ?? 'month';
     final perLabel = interval == 'year' ? l10n.planPerYear : l10n.planPerMonth;
     return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
+      width: 320,
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: highlight ?  LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [FastTheme.cardBgHover, FastTheme.cardBg]) : null,
         color: highlight ? null : FastTheme.cardBg,
-        border: Border.all(color: highlight ? FastTheme.accentGold : FastTheme.border),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: highlight ? [ BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)] : null,
+        border: Border.all(color: highlight ? FastTheme.accentGold : FastTheme.border, width: highlight ? 2 : 1),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: highlight ? [ BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 28)] : null,
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           if (p['badge'] != null && (p['badge'] as String).isNotEmpty)
             Positioned(top: -12, left: 0, right: 0, child: Center(child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
               decoration: BoxDecoration(
                 gradient:  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(p['badge'] as String, style:  TextStyle(color: FastTheme.bg, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
+              child: Text(p['badge'] as String, style:  TextStyle(color: FastTheme.bg, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
             ))),
           const SizedBox(height: 8),
           Column(
             children: [
               const SizedBox(height: 8),
-              Text(p['name'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              Text(p['desc'] as String, style:  TextStyle(fontSize: 11, color: FastTheme.textDim)),
-              const SizedBox(height: 16),
+              Text(p['name'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+              Text(p['desc'] as String, style:  TextStyle(fontSize: 13, color: FastTheme.textDim)),
+              const SizedBox(height: 20),
               price == 0
-                  ? Text(l10n.planFree, style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold))
+                  ? Text(l10n.planFree, style: GoogleFonts.cormorantGaramond(fontSize: 34, fontWeight: FontWeight.w700, color: FastTheme.accentGold))
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(rcPrice.isNotEmpty ? rcPrice : '\$${_fmt(price)}', style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                        Text(perLabel, style:  TextStyle(fontSize: 13, color: FastTheme.textDim)),
+                        Text(rcPrice.isNotEmpty ? rcPrice : '\$${_fmt(price)}', style: GoogleFonts.cormorantGaramond(fontSize: 38, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                        Text(perLabel, style:  TextStyle(fontSize: 15, color: FastTheme.textDim)),
                       ],
                     ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               ...((p['features'] as List).map((f) => _planFeat(f as String, true))),
               ...((p['disabled'] as List).map((f) => _planFeat(f as String, false))),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: highlight
-                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), () => _onPlanTap(p, l10n), height: 44, fontSize: 13)
+                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), () => _onPlanTap(p, l10n), height: 48, fontSize: 14)
                     : OutlinedButton(
                         onPressed: () => _onPlanTap(p, l10n),
                         style: OutlinedButton.styleFrom(
                           side:  BorderSide(color: FastTheme.border),
                           foregroundColor: FastTheme.text,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), style: const TextStyle(fontSize: 13)),
+                        child: Text(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), style: const TextStyle(fontSize: 14)),
                       ),
               ),
             ],
@@ -676,13 +676,13 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _planFeat(String text, bool included) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(included ? '✓' : '✗', style: TextStyle(fontSize: 12, color: included ? FastTheme.textMuted : FastTheme.textDim)),
-          const SizedBox(width: 6),
-          Text(text, style: TextStyle(fontSize: 12, color: included ? FastTheme.textMuted : FastTheme.textDim,
-              decoration: included ? null : TextDecoration.lineThrough)),
+          Text(included ? '✓' : '✗', style: TextStyle(fontSize: 14, color: included ? FastTheme.success : FastTheme.textDim, fontWeight: FontWeight.w700)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: included ? FastTheme.text : FastTheme.textDim,
+              decoration: included ? null : TextDecoration.lineThrough))),
         ],
       ),
     );
@@ -895,10 +895,10 @@ class _LandingScreenState extends State<LandingScreen> {
         constraints: const BoxConstraints(maxWidth: 1100),
         child: Column(
           children: [
-            Text(title, textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-            const SizedBox(height: 8),
-            Text(desc, textAlign: TextAlign.center, style:  TextStyle(fontSize: 14, color: FastTheme.textDim)),
-            const SizedBox(height: 40),
+            Text(title, textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 36, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+            const SizedBox(height: 10),
+            Text(desc, textAlign: TextAlign.center, style:  TextStyle(fontSize: 15, color: FastTheme.textDim, height: 1.5)),
+            const SizedBox(height: 44),
             child,
           ],
         ),

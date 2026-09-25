@@ -43,7 +43,7 @@ class FastTheme {
   static Color cardBgHover = darkCardBgHover;
   static Color text = const Color(0xFFFFFFFF);
   static Color textMuted = const Color(0xFFFFFFFF);
-  static Color textDim = const Color(0xFFE9E2F2);
+  static Color textDim = const Color(0xFFFFFFFF);
   static Color border = darkBorder;
   static Color success = const Color(0xFF4ade80);
   static Color warning = const Color(0xFFfbbf24);
@@ -72,7 +72,7 @@ class FastTheme {
       border = darkBorder;
       text = const Color(0xFFFFFFFF);
       textMuted = const Color(0xFFFFFFFF);
-      textDim = const Color(0xFFE9E2F2);
+      textDim = const Color(0xFFFFFFFF);
       success = const Color(0xFF4ade80);
       warning = const Color(0xFFfbbf24);
       danger = const Color(0xFFf87171);

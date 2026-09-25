@@ -7408,6 +7408,8 @@ def simulasyon_alternatif(input: AlternatifInput):
         "uyum_orani": uyum,
         "tork": tork,
         "fraktal": fraktal,
+        "tork_metin": motor2.tork_metin() if tork is not None else None,
+        "fraktal_metin": motor2.fraktal_metin() if fraktal is not None else None,
     }
 
 # ─── City image cache ───

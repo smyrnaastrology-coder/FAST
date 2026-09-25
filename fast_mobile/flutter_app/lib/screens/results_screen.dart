@@ -108,48 +108,54 @@ class _ResultsScreenState extends State<ResultsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Score cards - gizle bireysel/potansiyel modda
+          // Score cards (üçlü yan yana) - gizle bireysel/potansiyel modda
           if (!isSingle) ...[
-            if (uyum.isNotEmpty)
-              _scoreBlock(
-                icon: Icons.spa,
-                label: l10n.scoreGoldenSeal,
-                sub: l10n.scoreCompatibility,
-                iconColor: FastTheme.rose,
-                child: Text(uyum, style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
-              ),
-            if (tork.isNotEmpty)
-              _scoreBlock(
-                icon: Icons.bolt,
-                label: l10n.scoreVitalityTork,
-                sub: torkMetin.isNotEmpty ? torkMetin : _torkSub(tork, l10n),
-                iconColor: FastTheme.secondary,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(tork, style: GoogleFonts.cormorantGaramond(fontSize: 34, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                    const SizedBox(width: 4),
-                    Text('/10', style:  TextStyle(color: FastTheme.textMuted, fontSize: 14)),
-                  ],
-                ),
-              ),
-            if (fraktal.isNotEmpty)
-              _scoreBlock(
-                icon: Icons.waves,
-                label: l10n.scoreFlowFraktal,
-                sub: fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(fraktal, l10n),
-                iconColor: FastTheme.accent,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(fraktal, style: GoogleFonts.cormorantGaramond(fontSize: 34, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                    const SizedBox(width: 4),
-                    Text('%', style:  TextStyle(color: FastTheme.textMuted, fontSize: 14)),
-                  ],
-                ),
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (uyum.isNotEmpty)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _scoreCard(
+                        icon: Icons.spa,
+                        label: l10n.scoreGoldenSeal,
+                        sub: uyum,
+                        iconColor: FastTheme.rose,
+                        value: 'Φ',
+                        unit: '1.618',
+                      ),
+                    ),
+                  ),
+                if (tork.isNotEmpty)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(right: fraktal.isNotEmpty ? 8 : 0),
+                      child: _scoreCard(
+                        icon: Icons.bolt,
+                        label: l10n.scoreVitalityTork,
+                        sub: torkMetin.isNotEmpty ? torkMetin : _torkSub(tork, l10n),
+                        iconColor: FastTheme.secondary,
+                        value: tork,
+                        unit: '/10',
+                      ),
+                    ),
+                  ),
+                if (fraktal.isNotEmpty)
+                  Expanded(
+                    child: _scoreCard(
+                      icon: Icons.waves,
+                      label: l10n.scoreFlowFraktal,
+                      sub: fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(fraktal, l10n),
+                      iconColor: FastTheme.accent,
+                      value: fraktal,
+                      unit: '%',
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _scoreDetailCard(l10n, uyum, torkMetin, tork, fraktalMetin, fraktal),
             const SizedBox(height: 16),
           ],
 
@@ -1054,19 +1060,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
   }
 
-  // ---- Skor blokları (dikey, yanyana değil) ----
+  // ---- Skor kartları (yan yana kompakt) ----
 
-  Widget _scoreBlock({
+  Widget _scoreCard({
     required IconData icon,
     required String label,
     required String sub,
     required Color iconColor,
-    required Widget child,
+    required String value,
+    required String unit,
   }) {
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
         border: Border.all(color: FastTheme.border),
@@ -1077,22 +1082,95 @@ class _ResultsScreenState extends State<ResultsScreen> {
         children: [
           Row(
             children: [
-              Icon(icon, color: iconColor, size: 22),
-              const SizedBox(width: 8),
+              Icon(icon, color: iconColor, size: 18),
+              const SizedBox(width: 6),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label.toUpperCase(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10, letterSpacing: 1.2)),
-                    const SizedBox(height: 2),
-                    Text(sub, style:  TextStyle(color: FastTheme.textLight, fontSize: 12)),
-                  ],
-                ),
+                child: Text(label.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:  TextStyle(color: FastTheme.textDim, fontSize: 9, letterSpacing: 1)),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          child,
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(value, style: GoogleFonts.cormorantGaramond(fontSize: 30, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+              const SizedBox(width: 3),
+              Text(unit, style:  TextStyle(color: FastTheme.textMuted, fontSize: 12)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(sub, maxLines: 3, overflow: TextOverflow.ellipsis,
+              style:  TextStyle(color: FastTheme.textLight, fontSize: 10.5, height: 1.5)),
+        ],
+      ),
+    );
+  }
+
+  // ---- Skor kartlarının tam açıklamaları ----
+  Widget _scoreDetailCard(
+    AppLocalizations l10n,
+    String uyum,
+    String torkMetin,
+    String tork,
+    String fraktalMetin,
+    String fraktal,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.scoreDetailTitle, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+          const SizedBox(height: 8),
+          if (uyum.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.spa, color: FastTheme.rose, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(uyum, style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6))),
+                ],
+              ),
+            ),
+          if (tork.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.bolt, color: FastTheme.secondary, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('$tork/10 · ${torkMetin.isNotEmpty ? torkMetin : _torkSub(tork, l10n)}',
+                        style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                  ),
+                ],
+              ),
+            ),
+          if (fraktal.isNotEmpty)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.waves, color: FastTheme.accent, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('$fraktal% · ${fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(fraktal, l10n)}',
+                      style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                ),
+              ],
+            ),
         ],
       ),
     );

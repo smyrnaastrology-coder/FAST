@@ -978,6 +978,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get scoreFlowFraktal => 'Flujo Natural (Fractal)';
 
   @override
+  String get scoreDetailTitle => 'DETALLE DEL ANÁLISIS DE PUNTUACIÓN';
+
+  @override
   String get progressionTitle => 'Progresión Secundaria';
 
   @override

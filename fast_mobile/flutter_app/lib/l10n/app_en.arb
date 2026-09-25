@@ -291,6 +291,7 @@
   "analyzerPersonB": "Chart B",
   "scoreVitalityTork": "Relationship Vitality (Torque)",
   "scoreFlowFraktal": "Natural Flow (Fractal)",
+  "scoreDetailTitle": "SCORE ANALYSIS DETAILS",
   "progressionTitle": "Secondary Progression",
   "weatherTitle": "Sky Flow (3 Days)",
   "timeMachineTitle": "Celestial Time Flow (21 Years)",

@@ -1846,6 +1846,12 @@ abstract class AppLocalizations {
   /// **'Natural Flow (Fractal)'**
   String get scoreFlowFraktal;
 
+  /// No description provided for @scoreDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SCORE ANALYSIS DETAILS'**
+  String get scoreDetailTitle;
+
   /// No description provided for @progressionTitle.
   ///
   /// In en, this message translates to:

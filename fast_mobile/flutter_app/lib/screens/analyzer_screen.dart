@@ -1124,40 +1124,132 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   Widget _scoreCards(Map<String, dynamic> r, AppLocalizations l10n) {
-    final hideFlow = _tekKisiMod;
-    final isPy = _mode == 'potansiyel_yetenek';
-    if (hideFlow) {
+    if (_tekKisiMod) {
       // bireysel/potansiyel modda uyum kartlarını tamamen gizle
       return const SizedBox.shrink();
     }
-    // Skor blokları yanyana değil, dikey tam genişlikte gösterilir.
+    final uyum = r['uyum_orani']?.toString() ?? '';
+    final tork = r['tork']?.toString() ?? '';
+    final fraktal = r['fraktal']?.toString() ?? '';
+    final torkMetin = r['tork_metin']?.toString() ?? '';
+    final fraktalMetin = r['fraktal_metin']?.toString() ?? '';
+    // Skor üçlüsü yan yana kompakt kartlar halinde.
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _scoreCard(l10n.scoreCompatibility,
-          r['uyum_orani'] is String
-              ? Column(children: [
-                  Text(l10n.scoreGoldenSeal, style:  TextStyle(color: FastTheme.accentGold, fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'DM Sans')),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                      child: Text(r['uyum_orani'].toString(), style:  TextStyle(color: FastTheme.textMuted, fontSize: 11),),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (uyum.isNotEmpty)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _scoreCard(
+                    l10n.scoreGoldenSeal,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Φ', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                        const SizedBox(height: 4),
+                        Text('1.618', style:  TextStyle(color: FastTheme.textLight, fontSize: 11)),
+                      ],
                     ),
+                    compact: true,
                   ),
-                ])
-              : Text('${r['uyum_orani'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                ),
+              ),
+            if (tork.isNotEmpty)
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: fraktal.isNotEmpty ? 8 : 0),
+                  child: _scoreCard(
+                    l10n.scoreVitality,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('$tork', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                        const SizedBox(height: 4),
+                        Text('/10', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                      ],
+                    ),
+                    compact: true,
+                  ),
+                ),
+              ),
+            if (fraktal.isNotEmpty)
+              Expanded(
+                child: _scoreCard(
+                  l10n.scoreFlow,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('$fraktal', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                      const SizedBox(height: 4),
+                      Text('%', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                    ],
+                  ),
+                  compact: true,
+                ),
+              ),
+          ],
         ),
-        if (!isPy) _scoreCard(l10n.scoreVitality, Text('${r['tork'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-          sub: (r['tork_metin']?.toString() ?? '').isNotEmpty ? r['tork_metin'].toString() : _torkSub(r['tork'] ?? 0, l10n)),
-        if (!isPy) _scoreCard(l10n.scoreFlow, Text('${r['fraktal'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-          sub: (r['fraktal_metin']?.toString() ?? '').isNotEmpty ? r['fraktal_metin'].toString() : _fraktalSub(r['fraktal'] ?? 0, l10n)),
-        if (isPy) ...[
-          _scoreCard(l10n.scorePotentialArea, Text('${r['potansiyel_alan_sayisi'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-            sub: l10n.scoreDetectedArea),
-          _scoreCard(l10n.scoreAnalysisType, Text(l10n.scoreBirthChart, style:  TextStyle(color: FastTheme.accentGold, fontSize: 14, fontFamily: 'DM Sans')),
-            sub: l10n.scorePotentialTalent),
-        ],
+        const SizedBox(height: 8),
+        // Tam açıklamalar
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
+            border: Border.all(color: FastTheme.border),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.scoreDetailTitle, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+              const SizedBox(height: 8),
+              if (uyum.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.spa, color: FastTheme.rose, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(uyum, style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6))),
+                    ],
+                  ),
+                ),
+              if (tork.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.bolt, color: FastTheme.secondary, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text('$tork/10 · ${torkMetin.isNotEmpty ? torkMetin : _torkSub(r['tork'], l10n)}',
+                            style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                      ),
+                    ],
+                  ),
+                ),
+              if (fraktal.isNotEmpty)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.waves, color: FastTheme.accent, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('$fraktal% · ${fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(r['fraktal'], l10n)}',
+                          style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1176,17 +1268,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     return l10n.fraktalHigh;
   }
 
-  Widget _scoreCard(String label, Widget valueWidget, {String? sub}) {
+  Widget _scoreCard(String label, Widget valueWidget, {String? sub, bool compact = false}) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(compact ? 12 : 20),
       decoration: BoxDecoration(
         gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
         border: Border.all(color: FastTheme.border),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
+        crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
-          Text(label.toUpperCase(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10, letterSpacing: 1)),
+          Text(label.toUpperCase(), style:  TextStyle(color: FastTheme.textDim, fontSize: compact ? 9 : 10, letterSpacing: 1)),
           const SizedBox(height: 4),
           valueWidget,
           if (sub != null) ...[
