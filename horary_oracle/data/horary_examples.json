@@ -2418,5 +2418,71 @@
       "moon"
     ],
     "source": "Kullanici ornegi #58 (20 Mart 1987 22:27 PST Coeur d'Alene) - kitap anlatimi"
+  },
+  {
+    "id": "VANDALS-PLAYOFF-1982-03-09",
+    "question": "Vandals play-off macini kazanacak mi? 9 Mar 1982 19:38 PST Coeur d'Alene ID 47N41 116W46. Eşim ve oğlum spor taraftarı, yerel takımın playoff şansı iyi; 7. evde temsil edilen takım, onurun/zafere evi 4. ev, rakip takimin 7.si = sorgunun 1. evi.",
+    "qtype": "sport_fan",
+    "slot": "sport",
+    "turned": true,
+    "frame": {
+      "note": "TARAFTAR cercevesi (#59). Kendi takimi soruldugunda (#34 'kazanacak miyiz') qtype sport_fav kalir.",
+      "team": "7. ev (Vandals)",
+      "opponent": "takimin 7.si = sorgunun 1. evi",
+      "team_honour_victory": "4. ev (takimin 10.su)",
+      "rival_team": "11. ev",
+      "pof": "kitap: gun formulu ile 14 Koc = takimin 1. evi; motor gece formulu 7.66 Koc (6.ev) -> formul farki not edildi"
+    },
+    "chart": {
+      "date": "1982-03-09",
+      "time": "19:38",
+      "tz": "PST",
+      "utc": "1982-03-10 03:38",
+      "lat": 47.6833,
+      "lon": -116.7667,
+      "place": "Coeur d Alene, ID"
+    },
+    "positions_book": {
+      "Mars": "17.26 Terazi (7.ev yoneticisi = Vandals)",
+      "Saturn": "21.05 Terazi (4.ev Oglak yoneticisi = takimin 10.su/onur)",
+      "Venus": "5.15 Kova (sorgu 1.evinin = rakibin yoneticisi)",
+      "POF": "14 Koc (takimin 1.evi)"
+    },
+    "positions_engine": {
+      "ASC": "Terazi 11.23",
+      "MC": "Yengec 14.02",
+      "cusp7": "Koc 11.23",
+      "cusp4": "Oglak 14.02",
+      "cusp11": "Aslan 21.00",
+      "Mars": "17.26 Terazi ev1 R",
+      "Saturn": "21.05 Terazi ev1 R",
+      "Venus": "5.25 Kova ev4",
+      "Jupiter": "10.03 Akrep ev2 R (11.ev yoneticisi Aslan -> Gunes)",
+      "Moon": "22.81 Basak ev12",
+      "Sun": "19.24 Balik ev6"
+    },
+    "verdict": "YES",
+    "outcome": "Kazandi (69-67 uzatma)",
+    "margin": "dar (2 sayi, uzatma)",
+    "explanation": "Taraftar cercevesi: takim 7.ev (kuspisi Koc 11.23) yoneticisi MARS 17.26 Terazi; rakip = takimin 7.si = sorgunun 1. evi. Mars sorgu 1. evinde (kose) ve SATURN 21.05 Terazi ile 3.8 derece kavusum; Saturn 4.ev (Oglak) yoneticisi yani takimin 10. evi = onur/zafere. Kitap hu(k)mu: iki malefik (Mars+Saturn) rakibin 1. evinde -> rakip kazanamaz. VENUS 5.15 Kova hem sorgu 1.evinin (rakibin) hem de sorgu 4.evinin yoneticisi: rakibin gosteresi takimin onur/zafere evinde (sorgu 4.). Ay Basak 12.evde, hicbir gostereye uygulanan acisi yok; POF motorun gece formuluyle 6.evde (kitap gun formulu kullanmis, 14.80 Koc = takimin 1.evi). Bu yuzden cift tarafi gostereler takimda, uygulama/perfection yok -> EVET ama DAR; motor skoru 17 (esik 8). NOT: ayni harita sport_fav (kendi takimi cercevesi) ile sorulursa UNCERTAIN kalir; #34 'Cumartesi gunu kazanacak miyiz' de kendi takimi cercevesindedir.",
+    "tags": [
+      "sport",
+      "sport_fan",
+      "fan_frame",
+      "7th_house",
+      "turned_house",
+      "1st_house",
+      "4th_house",
+      "10th_house",
+      "11th_house",
+      "mars",
+      "saturn",
+      "venus",
+      "conjunction",
+      "narrow",
+      "overtime",
+      "r"
+    ],
+    "source": "Only Way to Learn Horary (kitap ornegi) - 9 Mar 1982 19:38 PST Coeur d'Alene ID 47N41 116W46; sonuc 69-67 uzatma"
   }
 ]

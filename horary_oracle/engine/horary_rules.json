@@ -185,6 +185,9 @@
       "sibling": 3,
       "missing_person": 7,
       "missing_child": 5,
+      "sport_fav": 7,
+      "sport_fan": 7,
+      "sport_rival": 11,
       "general": 7
     },
     "significators": {

@@ -467,8 +467,21 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
         elif qs_sign in ["İkizler","Terazi"]:
             his = " Karşı taraf kararsız, seçenekleri tartıyor."
         base = f"{harita} {bag}{his}{zaman}{not_txt}".strip()
+        # SPOR (#59): taraftar/maç sorularında gösterge evleri belirleyici -> net hüküm cümlesi
+        _sp_codes = [c for c in strict_codes if c.startswith("sport_")]
+        if _sp_codes:
+            _sp_narrow = "sport_narrow_win" in strict_codes
+            _sp_hdr = "Maç tarafı (taraftar çerçevesi): "
+            if v == "YES":
+                _sp_v = "EVET, ama DAR farkla — iki tarafın göstergeleri neredeyse aynı yerde, uzatma/son dakika mümkün." if _sp_narrow else "EVET, rakipten belirgin şekilde güçlü."
+            elif v == "NO":
+                _sp_v = "HAYIR — takımın göstergesi zayıf/kuşatılmış, rakip tutunuyor."
+            else:
+                _sp_v = "hüküm net değil, göstergeler birbirine baskın değil."
+            # jenerik "net akış yok" cümlesi spor hükmüyle çelişmesin -> harita+zamanla sınırlı
+            base = f"{_sp_hdr}{_sp_v} {harita}{zaman}{not_txt}".strip()
         # txt'den teknikler - öncelikli 5 kuralı insanca ekle (detayda da var)
-        prio = ["via_combusta","via_combusta_asc","voc","bonatus","vergilius","critical_degree","critical_degree_asc","combustion_combust_2_8_5","saturn_1_7","moon_roles"]
+        prio = ["sport_team_ruler_in_opponent_1st","sport_team_ruler_conj_honor_ruler","sport_opponent_ruler_in_honor","sport_narrow_win","sport_rival_ruler_fall","sport_moon_applies_team_ruler","via_combusta","via_combusta_asc","voc","bonatus","vergilius","critical_degree","critical_degree_asc","combustion_combust_2_8_5","saturn_1_7","moon_roles"]
         txt_lines=[]
         for code in prio:
             if code in strict_codes and len(txt_lines)<5:
