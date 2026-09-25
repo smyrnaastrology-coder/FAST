@@ -7,6 +7,8 @@ uyumlu). Mentör önerisi (anne=10, baba=4) kasıtlı değil çünkü mevcut
 parse_derived / horary_rules ile çelişir; bu ayrım kullanıcıya bildirildi.
 """
 import re
+import os
+import json
 
 QUESTION_HOUSES = {
     "self": 1,
@@ -134,15 +136,47 @@ _SPORT_OWN_RE = re.compile(r"\b(bizim|biz|miyiz|takımım|takimim|takımımız|t
 _SPORT_WHO_WINS_RE = re.compile(r"(maçı kim kazanacak|maci kim kazanacak|kim kazanır|kim kazanacak|kazanan kim|kim kazandı)", re.I)
 
 
+def _load_team_lexicon():
+    """horary_rules.json -> sport_team_lexicon (takım/lig adları). Sözlük dışı takım
+    adlarında tespit yapılamaz, o durumda eski davranış (maç kelimesi) korunur."""
+    fallback = ["vandals", "houston", "galatasaray", "fenerbahce", "fenerbahçe",
+                "besiktas", "beşiktaş", "real madrid", "barcelona"]
+    try:
+        path = os.path.join(os.path.dirname(__file__), "horary_rules.json")
+        with open(path, "r", encoding="utf-8") as f:
+            teams = json.load(f).get("sport_team_lexicon") or []
+        out = []
+        for t in teams:
+            if isinstance(t, str):
+                t = t.strip().lower()
+                if t:
+                    out.append(t)
+        return out or fallback
+    except Exception:
+        return fallback
+
+
+TEAM_LEXICON = _load_team_lexicon()
+_SPORT_TEAM_RE = None
+if TEAM_LEXICON:
+    _alt = "|".join(re.escape(t) for t in sorted(set(TEAM_LEXICON), key=len, reverse=True))
+    # #60 "Houston bu gece kazanacak mı?" -> takım adı + kazanma fiili (maç kelimesi yok)
+    _SPORT_TEAM_RE = re.compile(r"(?:" + _alt + r")\D{0,30}?(kazan|kazanır|kazanacak|kazanir)", re.I)
+
+
 def is_fan_sport_question(question: str) -> bool:
-    """Maç kazananı soran ÜÇÜNCÜ TARAF takım sorusu mu? (#59 çerçevesi)
-    Kendi takımı ('bizim/miyiz/takımımız') veya 'kim kazanacak' soruları KENDİ/çift taraf çerçevesinde kalır."""
+    """Maç kazananı soran ÜÇÜNCÜ TARAF takım sorusu mu? (#59/#60 çerçevesi)
+    Kendi takımı ('bizim/miyiz/takımımız') veya 'kim kazanacak' soruları KENDİ/çift taraf çerçevesinde kalır.
+    Tespit iki kanaldan olur: (1) maç/derbi/final kelimesi + kazanma fiili,
+    (2) sport_team_lexicon'daki takım adı + kazanma fiili ('Houston bu gece kazanacak mı?')."""
     if not question:
         return False
     q = question.lower()
     if _SPORT_OWN_RE.search(q) or _SPORT_WHO_WINS_RE.search(q):
         return False
-    return bool(_SPORT_MATCH_RE.search(q))
+    if _SPORT_MATCH_RE.search(q):
+        return True
+    return bool(_SPORT_TEAM_RE and _SPORT_TEAM_RE.search(q))
 
 
 def classify_question(question):

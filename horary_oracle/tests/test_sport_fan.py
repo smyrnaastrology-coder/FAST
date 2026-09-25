@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-"""SPOR/TARAFTAR çerçevesi testleri (kitap #59 + #34 koruması).
+"""SPOR/TARAFTAR çerçevesi testleri (kitap #59 + #60, #34 koruması).
 
 #59 Vandals: 9 Mar 1982 19:38 PST Coeur d'Alene -> EVET (69-67 uzatma), taraftar çerçevesi.
+#60 Houston: 4 Ara 1980 17:35 PST Coeur d'Alene -> EVET (kıl payı), taraftar çerçevesi.
+   'Maç' kelimesi yok -> takım adı (sport_team_lexicon) + kazanma fiili ile de tespit edilir.
 #34 softball: 22 Jun 1978 17:28 PDT Los Angeles -> EVET, KENDİ takım çerçevesi (bu kurala GİRMEMELİ).
 """
 import sys, os
@@ -64,9 +66,52 @@ def test_34_own_team_still_yes():
     print(f"OK #34 YES score={r['score']} perfection={r['perfection'].get('type')}")
 
 
+def test_60_houston_detected_without_match_word():
+    # #60: 'maç/derbi/final' kelimesi YOK; takım adı + kazanma fiili yeterli
+    assert is_fan_sport_question("Houston bu gece kazanacak mı?")
+    assert is_fan_sport_question("Houston bu gece kazanacak mi?")
+    assert (classify_question("Houston bu gece kazanacak mı?") or {}).get("type") == "sport_fan"
+    assert is_fan_sport_question("Galatasaray kazanır mı?")
+    assert is_fan_sport_question("Real Madrid kazanır mı?")
+    # 'kazan' fiili olmayan spor cümlesi taraftar çerçevesi DEĞİL
+    assert not is_fan_sport_question("Houston maçı ne zaman?")
+    # sınav/özel hayat: takım yok -> fan değil
+    assert not is_fan_sport_question("İş sınavını kazanacak mıyım?")
+    print("OK #60 tespit (maç kelimesiz)")
+
+
+def test_60_houston_yes():
+    r = cast_horary_chart(1980, 12, 5, 1 + 35 / 60.0, COEUR[0], COEUR[1], "sport_fan")
+    assert r["verdict"] == "YES", f"#60 verdict {r['verdict']} score={r['score']}"
+    assert r["score"] >= 8, r["score"]
+    codes = [s["code"] for s in r["strictures"]]
+    # takımın yöneticisi (Saturn) onur/zafere evinde + yücelmiş
+    assert "sport_team_ruler_in_own_honor" in codes, codes
+    # Jüpiter takım yöneticisine kavuşum uyguluyor
+    assert "sport_benefic_applies_team_ruler" in codes, codes
+    # rakibin gösteresi (Ay) düşüşte
+    assert "sport_opponent_ruler_fall" in codes, codes
+    # uygulama/perfection yok -> kitap "kıl payı"
+    assert r["perfection"].get("type") in (None, "none"), r["perfection"]
+    assert r["quesited"]["planet"] == "Saturn" and r["quesited"]["house"] == 7
+    assert r["houses"]["asc_sign"] == "Yengeç"
+    print(f"OK #60 YES score={r['score']} timing={r['timing'].get('text')}")
+
+
+def test_60_same_chart_own_team_frame_unchanged():
+    r = cast_horary_chart(1980, 12, 5, 1 + 35 / 60.0, COEUR[0], COEUR[1], "sport_fav")
+    codes = [s["code"] for s in r["strictures"]]
+    assert not any(c.startswith("sport_") for c in codes), codes
+    assert r["verdict"] == "UNCERTAIN", r["verdict"]
+    print("OK #60 kendi-takim kutusu degismedi:", r["verdict"])
+
+
 if __name__ == "__main__":
     test_fan_frame_detection()
     test_59_vandals_yes()
     test_59_same_chart_own_team_frame_unchanged()
     test_34_own_team_still_yes()
-    print("test_sport_fan: 4/4 OK")
+    test_60_houston_detected_without_match_word()
+    test_60_houston_yes()
+    test_60_same_chart_own_team_frame_unchanged()
+    print("test_sport_fan: 7/7 OK")

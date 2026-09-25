@@ -838,11 +838,40 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 _sc(5, "sport_moon_applies_team_ruler")
                 strictures.append({"code":"sport_moon_applies_team_ruler","level":"info",
                     "meaning":f"SPOR (#59) EVET: Ay takımın yöneticisi {_team_rn}'ye {_m_app[0]}° ile ~{_m_app[1]:.1f}° uyguluyor (+5)."})
-            # 6) PERFECTION/UYGULAMA YOKSA "DAR EVET" notu (aynı pozisyonlu iki taraf => az farkla kazanım)
+            # 6) Takımın yöneticisi KENDİ onur/zafere evinde (sorgu 4.) = doğrudan zafer evinde
+            #    (kitap #60 Houston: "Satürn onların onur/zafer evi olan 10. evindedir (haritanın 4. evi)")
+            if _team_h == 4:
+                _sc(6, "sport_team_ruler_in_own_honor")
+                _dom_ex = in_dom_ex(_team_rn, _team_rd.get("sign", ""))
+                strictures.append({"code":"sport_team_ruler_in_own_honor","level":"info","planet":_team_rn,
+                    "meaning":f"SPOR (#60) EVET: takımın yöneticisi {_team_rn} takımın onur/zafere evinde (sorgu 4.)"
+                              + (" ve burcunda yücelmiş/derece edinmiş" if _dom_ex else "") + " — zafer kapısında (+6)."})
+            # 7) Hayırsever (Jüpiter/Venüs) takımın yöneticisine açı UYGULARSA
+            #    (kitap #60: "Jüpiter Satürn ile kavuşum yapacak ki bu olumlu bir açıdır")
+            for _bn in ("Jupiter", "Venus"):
+                _bd = planets.get(_bn)
+                if not _bd or _bn == _team_rn:
+                    continue
+                _fast, _slow = ((_bn, _team_rn) if abs(_bd.get("speed", 0)) > abs(_team_rd.get("speed", 0)) else (_team_rn, _bn))
+                _orbs = {0: 8, 60: 6, 90: 7, 120: 6, 180: 8}
+                _ap = best_applying_major(planets[_fast]["lon"], planets[_slow]["lon"], _fast, _slow, _orbs)
+                if _ap:
+                    _sc(4, "sport_benefic_applies_team_ruler")
+                    _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}.get(_ap[0], f"{_ap[0]}°")
+                    strictures.append({"code":"sport_benefic_applies_team_ruler","level":"info","planet":_bn,"with":_team_rn,
+                        "meaning":f"SPOR (#60) EVET: hayırsever {_bn}, takımın yöneticisi {_team_rn}'ye {_anm} açıyı UYGULUYOR (~{_ap[1]:.1f}°) (+4)."})
+                    break
+            # 8) Rakibin gösteresi (sorgu 1. yöneticisi) düşüşte/zelilde = rakip zayıf
+            #    (kitap #60: "rakip takım ... düşüşte olan Ay tarafından yönetilmektedir")
+            if _opp_rd and in_det_fall(_opp_rn, _opp_rd.get("sign", "")):
+                _sc(4, "sport_opponent_ruler_fall")
+                strictures.append({"code":"sport_opponent_ruler_fall","level":"info","planet":_opp_rn,
+                    "meaning":f"SPOR (#60) EVET: rakibin yöneticisi {_opp_rn} düşüşte/zelilde ({_opp_rd.get('sign')}) — rakip zayıf (+4)."})
+            # 9) PERFECTION/UYGULAMA YOKSA "DAR EVET" notu (aynı pozisyonlu iki taraf => az farkla kazanım)
             _perf_t = (perfection or {}).get("type") if isinstance(perfection, dict) else None
-            if not _m_app and _perf_t in (None, "none"):
+            if score > 0 and not _m_app and _perf_t in (None, "none"):
                 strictures.append({"code":"sport_narrow_win","level":"warning",
-                    "meaning":"SPOR (#59) DAR EVET: iki tarafın göstergeleri neredeyse aynı evde/kavuşumda (rakip takımın yöneticisi takımın onur evinde) ve Ay ile uygulanan açı/perfection YOK => kazanım az farkla, uzatma/son dakika mümkün."})
+                    "meaning":"SPOR (#59/#60) DAR EVET: iki tarafın göstergeleri birbirine baskın ama Ay ile uygulanan açı/perfection YOK => kazanım az farkla (kıl payı), uzatma/son dakika mümkün."})
             # Spor bulguları API'nin ilk-12 kırpmasına takılmasın -> listenin başına taşı
             _sp = [s for s in strictures if str(s.get("code", "")).startswith("sport_")]
             if _sp:

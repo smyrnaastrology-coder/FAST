@@ -2484,5 +2484,79 @@
       "r"
     ],
     "source": "Only Way to Learn Horary (kitap ornegi) - 9 Mar 1982 19:38 PST Coeur d'Alene ID 47N41 116W46; sonuc 69-67 uzatma"
+  },
+  {
+    "id": "HOUSTON-NIGHT-1980-12-04",
+    "question": "Houston bu gece kazanacak mi? 4 Ara 1980 17:35 PST Coeur d'Alene ID 47N41 116W46. Taraftar sorusu: Houston 7. ev ile temsil edilir, evler cevrilir; takimin onur/zafere evi 10. ev = haritanin 4. evi; rakip takim 11. ev.",
+    "qtype": "sport_fan",
+    "slot": "sport",
+    "turned": true,
+    "frame": {
+      "note": "TARAFTAR cercevesi (#60). 'Maç' kelimesi geçmese de takim adi + kazanma fiili olan taraftar sorulari da bu cerceveye girer (sport_team_lexicon). Kendi takimi soruldugunda (#34 'kazanacak miyiz') qtype sport_fav kalir.",
+      "team": "7. ev (Houston) - kuspisi Oglak 8.31, yoneticisi SATURN",
+      "opponent": "takimin 7.si = sorgunun 1. evi (yani sorgu 1. yoneticisi AY = rakibin gosteresi)",
+      "team_honour_victory": "4. ev (takimin 10.su) - SATURN burada ve yucelmis",
+      "rival_team": "11. ev",
+      "pof": "kitap: POF 'onlarin 5. evine yeni girmis' diyor; motor gece formuluyle Aslan 6.68 (2.ev). Gun formulu (98.31+224.71-253.08) = Ikizler 9.94. Iki formul de kitap ifadesini birebir vermiyor -> POF kurali eklenmedi"
+    },
+    "chart": {
+      "date": "1980-12-04",
+      "time": "17:35",
+      "tz": "PST",
+      "utc": "1980-12-05 01:35",
+      "lat": 47.6833,
+      "lon": -116.7667,
+      "place": "Coeur d Alene, ID"
+    },
+    "positions_book": {
+      "Saturn": "8 Terazi (Houston'u yoneten, yucelmis, onur/zafere evi 10.)",
+      "Jupiter": "6 Terazi (Saturn ile kavusum yapacak)",
+      "Moon": "14 Akrep (rakip takimi yoneten, dususte, rakibin 5. evinde)",
+      "Venus": "takimin 5. evini (haritanin 11.) yonetiyor ama Akrep'te zararda ve rakibin 5. evinde",
+      "Mars": "~10 Oglak",
+      "Pluto": "23 Terazi",
+      "Uranus": "Akrep (rakibin 5. evinde)"
+    },
+    "positions_engine": {
+      "ASC": "Yengec 8.31",
+      "MC": "Balik 9.42",
+      "cusp7": "Oglak 8.31",
+      "cusp4": "Bakir 9.42",
+      "cusp5": "Terazi 15.62",
+      "cusp11": "Koc 15.62",
+      "Moon": "14.71 Akrep ev5",
+      "Saturn": "8.05 Terazi ev4",
+      "Jupiter": "6.61 Terazi ev4",
+      "Venus": "13.59 Akrep ev5",
+      "Mars": "9.91 Oglak ev7",
+      "Uranus": "26.91 Akrep ev5",
+      "Pluto": "23.55 Terazi ev5",
+      "Sun": "13.08 Yay ev6",
+      "Mercury": "28.85 Akrep ev5",
+      "POF": "Aslan 6.68 ev2 (gece formulu)"
+    },
+    "cusp_difference_note": "Kitabin kuspisleri motorunkinden farkli: kitapta 5. ev Akrep, 11. ev Boğa (Venus yoneticisi) burada 5. ev Terazi, 11. ev Koc. Kritik faktorler (7. kuspis Oglak->Saturn, Saturn'un 4. evde ve yucelmis olmasi, Jupiter'in kavusumu, Ay'in dususte olmasi) ayni kaldigi icin hukum degismiyor.",
+    "verdict": "YES",
+    "outcome": "Kazandi (kil payi - basaba bas maç)",
+    "margin": "cok dar (kıl payı)",
+    "explanation": "Taraftar cercevesi: takim 7. ev (kuspisi Oglak 8.31) yoneticisi SATURN 8.05 Terazi; SATURN Terazi'de yucelmis VE sorgu 4. evinde = takimin 10. evi = onur/zafere kapisi (+6). JUPITER 6.61 Terazi Saturn'a 1.4 derece kavusum UYGULUYOR (hayirsever takim yoneticisine, +4). Rakibin gosteresi = sorgu 1. evi = sorgu 1. yoneticisi AY 14.71 Akrep; Ay Akrep'te DUSUSTE ve rakibin 5. evinde -> rakip zayif (+4). Ay hicbir gostereye uygulanan aci yapmiyor, perfection yok -> kazanim kIL PAYI, basaba bas. Motor skoru 15 (esik 8). Kitap notlari: Venus takimin 5. evini yonetiyor ama rakibin 5. evinde ve zararda (yardimi yok); Mars rakibin 5. evindeki Uranus'e cok genis sekstil -> rekabet basaba bas; POF yeni girmis -> Houston avantajli gorunuyordu.",
+    "tags": [
+      "sport",
+      "sport_fan",
+      "fan_frame",
+      "7th_house",
+      "turned_house",
+      "1st_house",
+      "4th_house",
+      "10th_house",
+      "11th_house",
+      "saturn",
+      "jupiter",
+      "moon",
+      "conjunction",
+      "narrow",
+      "hair_breadth"
+    ],
+    "source": "Only Way to Learn Horary (kitap ornegi) - 4 Ara 1980 17:35 PST Coeur d'Alene ID 47N41 116W46; basaba bas maç, Houston kıl payı kazandi"
   }
 ]

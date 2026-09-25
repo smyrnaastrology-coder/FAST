@@ -481,7 +481,7 @@ def mock_interpret(engine_json: dict, lang="tr") -> str:
             # jenerik "net akış yok" cümlesi spor hükmüyle çelişmesin -> harita+zamanla sınırlı
             base = f"{_sp_hdr}{_sp_v} {harita}{zaman}{not_txt}".strip()
         # txt'den teknikler - öncelikli 5 kuralı insanca ekle (detayda da var)
-        prio = ["sport_team_ruler_in_opponent_1st","sport_team_ruler_conj_honor_ruler","sport_opponent_ruler_in_honor","sport_narrow_win","sport_rival_ruler_fall","sport_moon_applies_team_ruler","via_combusta","via_combusta_asc","voc","bonatus","vergilius","critical_degree","critical_degree_asc","combustion_combust_2_8_5","saturn_1_7","moon_roles"]
+        prio = ["sport_team_ruler_in_opponent_1st","sport_team_ruler_in_own_honor","sport_team_ruler_conj_honor_ruler","sport_benefic_applies_team_ruler","sport_opponent_ruler_in_honor","sport_opponent_ruler_fall","sport_narrow_win","sport_rival_ruler_fall","sport_moon_applies_team_ruler","via_combusta","via_combusta_asc","voc","bonatus","vergilius","critical_degree","critical_degree_asc","combustion_combust_2_8_5","saturn_1_7","moon_roles"]
         txt_lines=[]
         for code in prio:
             if code in strict_codes and len(txt_lines)<5:
