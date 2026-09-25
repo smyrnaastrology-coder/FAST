@@ -14,9 +14,9 @@ class LanguageSwitcher extends StatelessWidget {
       child: DropdownButton<String>(
         value: lp.locale.languageCode,
         dropdownColor: FastTheme.cardBg,
-        icon: const Icon(Icons.language, size: 18, color: FastTheme.accentGold),
-        style: const TextStyle(color: FastTheme.text, fontSize: 12),
-        items: const [
+        icon:  Icon(Icons.language, size: 18, color: FastTheme.accentGold),
+        style:  TextStyle(color: FastTheme.text, fontSize: 12),
+        items:  [
           DropdownMenuItem(value: 'tr', child: Text('Türkçe', style: TextStyle(color: FastTheme.text, fontSize: 12))),
           DropdownMenuItem(value: 'en', child: Text('English', style: TextStyle(color: FastTheme.text, fontSize: 12))),
           DropdownMenuItem(value: 'es', child: Text('Español', style: TextStyle(color: FastTheme.text, fontSize: 12))),

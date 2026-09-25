@@ -11,12 +11,15 @@ import '../config/country_labels.dart';
 import '../l10n/app_localizations.dart';
 import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import '../services/play_integrity_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart' as w;
+import 'auth_screen.dart';
 
 class AnalyzerScreen extends StatefulWidget {
   final String initialMode;
@@ -68,6 +71,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   bool _pdfLoading = false;
   Map<String, dynamic>? _prevSimData;
 
+  // Kayıtlı kişiler (Madde 5)
+  List<SavedPerson> _savedPeople = [];
+  bool _peopleLoading = false;
+
   String get _modKey {
     if (_mode == 'es_sevgili') return 'es_sevgili';
     if (_mode == 'ebeveyn_cocuk') return 'ebeveyn_cocuk';
@@ -91,6 +98,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     super.initState();
     _mode = widget.initialMode;
     _loadDB();
+    _loadPeople();
+  }
+
+  Future<void> _loadPeople() async {
+    if (_peopleLoading || !AuthService.isLoggedIn) return;
+    setState(() => _peopleLoading = true);
+    final r = await AuthService.listPeople();
+    if (!mounted) return;
+    setState(() {
+      _savedPeople = r;
+      _peopleLoading = false;
+    });
   }
 
   static const Map<String, dynamic> _fallbackDB = {
@@ -334,7 +353,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             ),
           ),
         ),
-        const VerticalDivider(width: 1, color: FastTheme.border),
+         VerticalDivider(width: 1, color: FastTheme.border),
         Expanded(
           child: _mainContent(provider, l10n),
         ),
@@ -360,7 +379,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 border: Border.all(color: FastTheme.danger),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(provider.error!, style: const TextStyle(color: FastTheme.danger, fontSize: 13)),
+              child: Text(provider.error!, style:  TextStyle(color: FastTheme.danger, fontSize: 13)),
             ),
           if (provider.status == AnalysisStatus.loading)
             _loadingSection(l10n),
@@ -383,12 +402,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(width: 32, height: 32, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 16)]),
-              child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
+            Container(width: 32, height: 32, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 16)]),
+              child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(l10n.appTitle, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              Text(l10n.analyzerSimulationSelect, style: const TextStyle(color: FastTheme.textDim, fontSize: 9)),
+              Text(l10n.analyzerSimulationSelect, style:  TextStyle(color: FastTheme.textDim, fontSize: 9)),
             ]),
           ]),
           const SizedBox(height: 8),
@@ -400,6 +419,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           if (_isNatal) _natalForm(l10n),
           const SizedBox(height: 4),
           _locationForm(l10n),
+          const SizedBox(height: 8),
+          _peopleSection(l10n),
           const SizedBox(height: 8),
           SizedBox(
             width: double.infinity,
@@ -442,18 +463,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         Center(
           child: Column(
             children: [
-              Container(width: 72, height: 72, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
-                child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
+              Container(width: 72, height: 72, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
+                child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
               const SizedBox(height: 8),
               Text(l10n.homeTitle, textAlign: TextAlign.center,
                 style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold, height: 1.3)),
-              Text(l10n.analyzerSidebarTagline, style: const TextStyle(color: FastTheme.textMuted, fontSize: 10, letterSpacing: 2)),
-              Text(l10n.analyzerSidebarVersion, style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+              Text(l10n.analyzerSidebarTagline, style:  TextStyle(color: FastTheme.textMuted, fontSize: 10, letterSpacing: 2)),
+              Text(l10n.analyzerSidebarVersion, style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        const Divider(color: FastTheme.border),
+         Divider(color: FastTheme.border),
         const SizedBox(height: 8),
 
         // Mode cards
@@ -471,6 +492,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
 
         // Location
         _locationForm(l10n),
+
+        // Kayıtlı kişiler (Madde 5)
+        _peopleSection(l10n),
 
         const SizedBox(height: 16),
 
@@ -519,7 +543,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             color: active ? FastTheme.cardBgHover : FastTheme.cardBg,
             border: Border.all(color: active ? FastTheme.accentGold : FastTheme.border),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: active ? [const BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 12)] : null,
+            boxShadow: active ? [ BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 12)] : null,
           ),
           child: Row(
             children: [
@@ -538,7 +562,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(m['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 13, fontWeight: FontWeight.w700, color: active ? FastTheme.accentGold : FastTheme.textMuted)),
-                    Text(m['desc'] as String, style: const TextStyle(fontSize: 10, color: FastTheme.textDim)),
+                    Text(m['desc'] as String, style:  TextStyle(fontSize: 10, color: FastTheme.textDim)),
                   ],
                 ),
               ),
@@ -562,10 +586,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       child: TextField(
         controller: ctrl,
         keyboardType: keyboardType,
-        style: const TextStyle(color: FastTheme.text, fontSize: 13),
+        style:  TextStyle(color: FastTheme.text, fontSize: 13),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+          labelStyle:  TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
           prefixIcon: icon != null ? Icon(icon, size: 18, color: FastTheme.accentGold) : null,
         ),
       ),
@@ -611,14 +635,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         controller: ctrl,
         readOnly: false,
         keyboardType: TextInputType.number,
-        style: const TextStyle(color: FastTheme.text, fontSize: 13),
+        style:  TextStyle(color: FastTheme.text, fontSize: 13),
         decoration: InputDecoration(
           labelText: zorunlu ? label : '$label (${l10n.analyzerOptional})',
           hintText: l10n.analyzerBirthDateHint,
-          hintStyle: const TextStyle(color: FastTheme.textDim, fontSize: 11),
-          labelStyle: const TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
-          prefixIcon: const Icon(Icons.calendar_today, size: 18, color: FastTheme.accentGold),
-          suffixIcon: IconButton(icon: const Icon(Icons.date_range, size: 18, color: FastTheme.accentGold), onPressed: () => _pickDate(ctrl)),
+          hintStyle:  TextStyle(color: FastTheme.textDim, fontSize: 11),
+          labelStyle:  TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+          prefixIcon:  Icon(Icons.calendar_today, size: 18, color: FastTheme.accentGold),
+          suffixIcon: IconButton(icon:  Icon(Icons.date_range, size: 18, color: FastTheme.accentGold), onPressed: () => _pickDate(ctrl)),
         ),
         onChanged: (_) => _applyDateMask(ctrl),
       ),
@@ -632,12 +656,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         controller: ctrl,
         readOnly: false,
         keyboardType: TextInputType.number,
-        style: const TextStyle(color: FastTheme.text, fontSize: 13),
+        style:  TextStyle(color: FastTheme.text, fontSize: 13),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
-          prefixIcon: const Icon(Icons.access_time, size: 18, color: FastTheme.accentGold),
-          suffixIcon: IconButton(icon: const Icon(Icons.schedule, size: 18, color: FastTheme.accentGold), onPressed: () => _pickTime(ctrl)),
+          labelStyle:  TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+          prefixIcon:  Icon(Icons.access_time, size: 18, color: FastTheme.accentGold),
+          suffixIcon: IconButton(icon:  Icon(Icons.schedule, size: 18, color: FastTheme.accentGold), onPressed: () => _pickTime(ctrl)),
         ),
         onTap: () => _pickTime(ctrl),
         onChanged: (_) => _applyTimeMask(ctrl),
@@ -652,10 +676,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         value: items.contains(value) ? value : (items.isNotEmpty ? items.first : null),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
+          labelStyle:  TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
         ),
         dropdownColor: FastTheme.cardBg,
-        style: const TextStyle(color: FastTheme.text, fontSize: 13),
+        style:  TextStyle(color: FastTheme.text, fontSize: 13),
         items: items.map((e) => DropdownMenuItem(value: e, child: Text(labels?[e] ?? e))).toList(),
         onChanged: onChanged,
       ),
@@ -737,7 +761,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             Expanded(child: _formField(l10n.analyzerLongitude, _lonCtrl, icon: Icons.explore, keyboardType: TextInputType.numberWithOptions(decimal: true))),
           ],
         ),
-        Text(_geoHint ?? l10n.analyzerSearchHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 9)),
+        Text(_geoHint ?? l10n.analyzerSearchHint, style:  TextStyle(color: FastTheme.textDim, fontSize: 9)),
         const SizedBox(height: 6),
         SizedBox(
           width: double.infinity,
@@ -746,7 +770,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             icon: const Icon(Icons.search, size: 16),
             label: Text(l10n.analyzerSearchLocation, style: const TextStyle(fontSize: 12)),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: FastTheme.border),
+              side:  BorderSide(color: FastTheme.border),
               foregroundColor: FastTheme.accentGold,
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
@@ -754,6 +778,153 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         ),
       ],
     );
+  }
+
+  // Kayıtlı kişiler: seçim çipleri + "Kişiyi Kaydet" (Madde 5)
+  Widget _peopleSection(AppLocalizations l10n) {
+    final ap = context.watch<AuthProvider>();
+    if (!ap.enabled) return const SizedBox.shrink();
+
+    Widget child;
+    if (!ap.isLoggedIn) {
+      child = OutlinedButton.icon(
+        onPressed: () async {
+          await Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
+          _loadPeople();
+        },
+        icon: const Icon(Icons.person_add, size: 16),
+        label: Text(l10n.loginNav, style: const TextStyle(fontSize: 12)),
+        style: OutlinedButton.styleFrom(
+          side:  BorderSide(color: FastTheme.border),
+          foregroundColor: FastTheme.accentGold,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+        ),
+      );
+    } else {
+      child = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_savedPeople.isNotEmpty) ...[
+            _sectionTitle(l10n.peopleSelect),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _savedPeople.map((p) => _personChip(p, l10n)).toList(),
+            ),
+            const SizedBox(height: 8),
+          ],
+          OutlinedButton.icon(
+            onPressed: () => _saveCurrentPerson(l10n),
+            icon: const Icon(Icons.bookmark_add, size: 16),
+            label: Text(l10n.peopleSave, style: const TextStyle(fontSize: 12)),
+            style: OutlinedButton.styleFrom(
+              side:  BorderSide(color: FastTheme.border),
+              foregroundColor: FastTheme.accentGold,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+          ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_peopleLoading)
+          const LinearProgressIndicator()
+        else
+          child,
+      ],
+    );
+  }
+
+  Widget _personChip(SavedPerson p, AppLocalizations l10n) {
+    final active = p.name == _p1IsimCtrl.text;
+    return GestureDetector(
+      onTap: () {
+        if (!_ikinciKisiGerekli || active) {
+          _p1IsimCtrl.text = p.name;
+          if (p.birthDate != null && p.birthDate!.isNotEmpty) _p1TarihCtrl.text = p.birthDate!;
+          if (p.birthTime != null && p.birthTime!.isNotEmpty) _p1SaatCtrl.text = p.birthTime!;
+          if (p.city != null && p.city!.isNotEmpty && _sehirler?.contains(p.city) == true) {
+            _seciliSehir = p.city!;
+          }
+          if (p.country != null && p.country!.isNotEmpty && _ulkeler?.contains(p.country) == true) {
+            _seciliUlke = p.country!;
+          }
+          if (p.lat != null) _latCtrl.text = p.lat!.toStringAsFixed(4);
+          if (p.lon != null) _lonCtrl.text = p.lon!.toStringAsFixed(4);
+          if (!active) _geoCode(_seciliSehir);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? FastTheme.accentGold.withValues(alpha: 0.15) : FastTheme.cardBg,
+          border: Border.all(color: active ? FastTheme.accentGold : FastTheme.border),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+             Icon(Icons.person, size: 14, color: FastTheme.accentGold),
+            const SizedBox(width: 4),
+            Text(p.name, style: TextStyle(fontSize: 11, color: active ? FastTheme.accentGold : FastTheme.textMuted)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveCurrentPerson(AppLocalizations l10n) async {
+    final ap = context.read<AuthProvider>();
+    if (!ap.isLoggedIn) {
+      await Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
+      _loadPeople();
+      return;
+    }
+    final isim = _p1IsimCtrl.text.trim();
+    if (isim.isEmpty) {
+      _snack(l10n.analyzerNameRequired);
+      return;
+    }
+    // Klasör seçimi
+    final folder = await showDialog<String>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        backgroundColor: FastTheme.cardBg,
+        title: Text(l10n.peopleFolderLabel, style:  TextStyle(color: FastTheme.accentGold, fontSize: 16)),
+        children: [
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(ctx).pop('ailem'),
+            child: Text(l10n.peopleFolderFamily, style:  TextStyle(color: FastTheme.text)),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(ctx).pop('arkadaslarim'),
+            child: Text(l10n.peopleFolderFriends, style:  TextStyle(color: FastTheme.text)),
+          ),
+        ],
+      ),
+    );
+    if (folder == null) return;
+    final p = SavedPerson(
+      id: 0,
+      name: isim,
+      birthDate: _p1TarihCtrl.text.isNotEmpty ? _normalizeDate(_p1TarihCtrl.text) : null,
+      birthTime: _p1SaatCtrl.text.isNotEmpty ? _p1SaatCtrl.text : null,
+      city: _seciliSehir.isNotEmpty ? _seciliSehir : null,
+      country: _seciliUlke.isNotEmpty ? _seciliUlke : null,
+      lat: double.tryParse(_latCtrl.text),
+      lon: double.tryParse(_lonCtrl.text),
+      folder: folder,
+    );
+    final created = await AuthService.createPerson(p);
+    if (!mounted) return;
+    if (created != null) {
+      _snack(l10n.peopleSaved);
+      setState(() => _savedPeople = [..._savedPeople, created]);
+    } else {
+      _snack(l10n.loginErrorGeneric);
+    }
   }
 
   // ========== MAIN CONTENT ==========
@@ -779,7 +950,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     border: Border.all(color: FastTheme.danger),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(provider.error!, style: const TextStyle(color: FastTheme.danger, fontSize: 13)),
+                  child: Text(provider.error!, style:  TextStyle(color: FastTheme.danger, fontSize: 13)),
                 ),
 
               // Before analysis
@@ -805,14 +976,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       margin: const EdgeInsets.only(bottom: 32),
       child: Column(
         children: [
-          Container(width: 72, height: 72, decoration: const BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
-            child: const Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
+          Container(width: 72, height: 72, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
+            child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
           const SizedBox(height: 12),
           Text(l10n.homeTitle.replaceAll('\n', ' '), style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-          Text('${l10n.appTitle} — ${l10n.appSlogan}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 13, letterSpacing: 2)),
+          Text('${l10n.appTitle} — ${l10n.appSlogan}', style:  TextStyle(color: FastTheme.textMuted, fontSize: 13, letterSpacing: 2)),
           const SizedBox(height: 8),
           Text(l10n.analyzerHeaderDesc,
-            style: const TextStyle(color: FastTheme.textDim, fontSize: 11), textAlign: TextAlign.center),
+            style:  TextStyle(color: FastTheme.textDim, fontSize: 11), textAlign: TextAlign.center),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(12),
@@ -822,7 +993,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(l10n.heroDisclaimer,
-              textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.textMuted, fontSize: 10, height: 1.5)),
+              textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.textMuted, fontSize: 10, height: 1.5)),
           ),
         ],
       ),
@@ -877,7 +1048,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          Expanded(child: Text(f, style: const TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6))),
+          Expanded(child: Text(f, style:  TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6))),
         ],
       ),
     )).toList();
@@ -888,9 +1059,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       padding: const EdgeInsets.symmetric(vertical: 60),
       child: Column(
         children: [
-          const SizedBox(width: 48, height: 48, child: CircularProgressIndicator(color: FastTheme.accentGold)),
+           SizedBox(width: 48, height: 48, child: CircularProgressIndicator(color: FastTheme.accentGold)),
           const SizedBox(height: 16),
-          Text(l10n.loadingSky, style: const TextStyle(color: FastTheme.textMuted, fontSize: 14)),
+          Text(l10n.loadingSky, style:  TextStyle(color: FastTheme.textMuted, fontSize: 14)),
         ],
       ),
     );
@@ -909,7 +1080,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.analyzerResultsTitle, style: const TextStyle(color: FastTheme.textMuted, fontSize: 14, letterSpacing: 1)),
+        Text(l10n.analyzerResultsTitle, style:  TextStyle(color: FastTheme.textMuted, fontSize: 14, letterSpacing: 1)),
         const SizedBox(height: 16),
 
         // Score cards
@@ -946,7 +1117,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(l10n.analyzerSimulationRenewed(r['sim_sehir'].toString()),
-              textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.accentGold, fontSize: 13)),
+              textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13)),
           ),
       ],
     );
@@ -959,40 +1130,35 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       // bireysel/potansiyel modda uyum kartlarını tamamen gizle
       return const SizedBox.shrink();
     }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cardWidth = (constraints.maxWidth - 12) / (isPy ? 2 : 3);
-        return Wrap(
-          spacing: 12, runSpacing: 12,
-          children: [
-            SizedBox(width: cardWidth, child: _scoreCard(l10n.scoreCompatibility,
-              r['uyum_orani'] is String
-                  ? Column(children: [
-                      Text(l10n.scoreGoldenSeal, style: const TextStyle(color: FastTheme.accentGold, fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'DM Sans')),
-                      const SizedBox(height: 4),
-                      SizedBox(
-                        width: cardWidth - 40,
-                        height: 150,
-                        child: SingleChildScrollView(
-                          child: Text(r['uyum_orani'].toString(), style: const TextStyle(color: FastTheme.textMuted, fontSize: 11),),
-                        ),
-                      ),
-                    ])
-                  : Text('${r['uyum_orani'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-            )),
-            if (!isPy) SizedBox(width: cardWidth, child: _scoreCard(l10n.scoreVitality, Text('${r['tork'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              sub: _torkSub(r['tork'] ?? 0, l10n))),
-            if (!isPy) SizedBox(width: cardWidth, child: _scoreCard(l10n.scoreFlow, Text('${r['fraktal'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              sub: _fraktalSub(r['fraktal'] ?? 0, l10n))),
-            if (isPy) ...[
-              SizedBox(width: cardWidth, child: _scoreCard(l10n.scorePotentialArea, Text('${r['potansiyel_alan_sayisi'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                sub: l10n.scoreDetectedArea)),
-              SizedBox(width: cardWidth, child: _scoreCard(l10n.scoreAnalysisType, Text(l10n.scoreBirthChart, style: const TextStyle(color: FastTheme.accentGold, fontSize: 14, fontFamily: 'DM Sans')),
-                sub: l10n.scorePotentialTalent)),
-            ],
-          ],
-        );
-      },
+    // Skor blokları yanyana değil, dikey tam genişlikte gösterilir.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _scoreCard(l10n.scoreCompatibility,
+          r['uyum_orani'] is String
+              ? Column(children: [
+                  Text(l10n.scoreGoldenSeal, style:  TextStyle(color: FastTheme.accentGold, fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'DM Sans')),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    width: double.infinity,
+                    child: SingleChildScrollView(
+                      child: Text(r['uyum_orani'].toString(), style:  TextStyle(color: FastTheme.textMuted, fontSize: 11),),
+                    ),
+                  ),
+                ])
+              : Text('${r['uyum_orani'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+        ),
+        if (!isPy) _scoreCard(l10n.scoreVitality, Text('${r['tork'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          sub: (r['tork_metin']?.toString() ?? '').isNotEmpty ? r['tork_metin'].toString() : _torkSub(r['tork'] ?? 0, l10n)),
+        if (!isPy) _scoreCard(l10n.scoreFlow, Text('${r['fraktal'] ?? 0}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          sub: (r['fraktal_metin']?.toString() ?? '').isNotEmpty ? r['fraktal_metin'].toString() : _fraktalSub(r['fraktal'] ?? 0, l10n)),
+        if (isPy) ...[
+          _scoreCard(l10n.scorePotentialArea, Text('${r['potansiyel_alan_sayisi'] ?? ''}', style: GoogleFonts.cormorantGaramond(fontSize: 24, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+            sub: l10n.scoreDetectedArea),
+          _scoreCard(l10n.scoreAnalysisType, Text(l10n.scoreBirthChart, style:  TextStyle(color: FastTheme.accentGold, fontSize: 14, fontFamily: 'DM Sans')),
+            sub: l10n.scorePotentialTalent),
+        ],
+      ],
     );
   }
 
@@ -1014,18 +1180,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
+        gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
         border: Border.all(color: FastTheme.border),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Text(label.toUpperCase(), style: const TextStyle(color: FastTheme.textDim, fontSize: 10, letterSpacing: 1)),
+          Text(label.toUpperCase(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10, letterSpacing: 1)),
           const SizedBox(height: 4),
           valueWidget,
           if (sub != null) ...[
             const SizedBox(height: 4),
-            Text(sub, style: const TextStyle(color: FastTheme.textMuted, fontSize: 11), textAlign: TextAlign.center),
+            Text(sub, style:  TextStyle(color: FastTheme.textMuted, fontSize: 11), textAlign: TextAlign.center),
           ],
         ],
       ),
@@ -1043,26 +1209,26 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(_isEb ? l10n.analyzerPotentialChildDesc : l10n.analyzerPotentialSelfDesc,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
                 Text(l10n.analyzerPotentialTop5Hint,
-                  style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                  style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['potansiyel_alanlar'] as List).take(5).map((p) => Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: FastTheme.border.withValues(alpha: 0.5)))),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('✨ ${p['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
+                      Text('✨ ${p['alan'] ?? ''}', style:  TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
                       Text(l10n.analyzerAspectOrb(p['aci'] ?? '', p['orb'] ?? '', p['aci_turu'] ?? ''),
-                        style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
-                      if (p['metin'] != null) Text(p['metin'].toString(), style: const TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.4)),
+                        style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                      if (p['metin'] != null) Text(p['metin'].toString(), style:  TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.4)),
                     ],
                   ),
                 ))),
                 const SizedBox(height: 8),
                 Text(l10n.analyzerPotentialAllPdf,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1073,9 +1239,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(_isEb ? l10n.analyzerProfessionChildDesc : l10n.analyzerProfessionSelfDesc,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                Text(l10n.analyzerProfessionFullRanking, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerProfessionFullRanking, style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['meslek_onerileri'] as List).map((m) => Container(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: FastTheme.border.withValues(alpha: 0.5)))),
@@ -1083,20 +1249,20 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('${(r['meslek_onerileri'] as List).indexOf(m) + 1}. ${m['alan'] ?? ''}',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
+                        style:  TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: FastTheme.text)),
                       Text(l10n.analyzerScorePoints(m['yuzde'] ?? '', m['puan']?.toStringAsFixed(1) ?? ''),
-                        style: const TextStyle(color: FastTheme.accentGold, fontSize: 11)),
+                        style:  TextStyle(color: FastTheme.accentGold, fontSize: 11)),
                       if (m['meslekler'] is List) ...((m['meslekler'] as List).map((j) => Padding(
                         padding: const EdgeInsets.only(left: 12, top: 2),
                         child: Text('🧑‍💼 ${j['meslek'] ?? ''} — ${j['aciklama'] ?? ''}',
-                          style: const TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                          style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
                       ))),
                     ],
                   ),
                 ))),
                 Text(l10n.analyzerProfessionScoringNote,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
-                Text(l10n.analyzerProfessionPdfHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                Text(l10n.analyzerProfessionPdfHint, style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1126,11 +1292,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (p['kisi'] != null || p['baslik'] != null)
-                      Text('${p['kisi'] ?? p['baslik'] ?? ''}', style: const TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
+                      Text('${p['kisi'] ?? p['baslik'] ?? ''}', style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
                     if ((p['ilerleme_yili'] ?? 0) > 0)
-                      Text(l10n.analyzerProgressionYear((p['ilerleme_yili'] as num).toStringAsFixed(1)), style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                      Text(l10n.analyzerProgressionYear((p['ilerleme_yili'] as num).toStringAsFixed(1)), style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                     if (p['ay_burcu'] != null)
-                      Text('${l10n.analyzerMoon}: ${p['ay_burcu']} | ${l10n.analyzerSun}: ${p['gunes_burcu'] ?? ''}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                      Text('${l10n.analyzerMoon}: ${p['ay_burcu']} | ${l10n.analyzerSun}: ${p['gunes_burcu'] ?? ''}', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
                     if (p['genel_yorum'] != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
@@ -1143,21 +1309,21 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                         decoration: BoxDecoration(
                           color: FastTheme.bg,
                           borderRadius: BorderRadius.circular(6),
-                          border: const Border(left: BorderSide(color: FastTheme.accentGold, width: 3)),
+                          border:  Border(left: BorderSide(color: FastTheme.accentGold, width: 3)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(aci['baslik'] ?? '', style: const TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600)),
-                            Text(aci['yorum'] ?? '', style: const TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
+                            Text(aci['baslik'] ?? '', style:  TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600)),
+                            Text(aci['yorum'] ?? '', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
                             Text('${aci['aci_turu'] ?? ''} · ${aci['etki'] ?? ''} · ${aci['donem'] ?? ''}',
-                              style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                              style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
                           ],
                         ),
                       ))),
                     if ((p['toplam_aci'] ?? 0) > 0)
                       Text(l10n.analyzerTotalAspects(p['toplam_aci']),
-                        style: const TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
+                        style:  TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
                   ],
                 ),
               )).toList(),
@@ -1174,11 +1340,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('🗓️ ${a['tarih'] ?? ''} (${a['gun_ad'] ?? ''})', style: const TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
+                    Text('🗓️ ${a['tarih'] ?? ''} (${a['gun_ad'] ?? ''})', style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
                     if (_isNatal && a['ortam'] != null) ...[
                       Text('🌙 Ay ${a['ay_burc'] ?? ''} — ${a['ay_ev'] ?? ''}. Ev (${a['ay_derece'] ?? ''}°)',
-                        style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
-                      Text(a['ortam'].toString(), style: const TextStyle(color: FastTheme.textDim, fontSize: 11, fontStyle: FontStyle.italic)),
+                        style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                      Text(a['ortam'].toString(), style:  TextStyle(color: FastTheme.textDim, fontSize: 11, fontStyle: FontStyle.italic)),
                       Padding(padding: const EdgeInsets.only(top: 4), child: w.HtmlRender(a['yorum'].toString())),
                     ] else if (a['mesajlar'] is List)
                       ...((a['mesajlar'] as List).map((m) => w.HtmlRender(m.toString()))),
@@ -1210,8 +1376,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(m['baslik'] ?? '', style: const TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
-                    Text(m['icerik'] ?? '', style: const TextStyle(color: FastTheme.textMuted, fontSize: 12)),
+                    Text(m['baslik'] ?? '', style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
+                    Text(m['icerik'] ?? '', style:  TextStyle(color: FastTheme.textMuted, fontSize: 12)),
                   ],
                 ),
               )).toList(),
@@ -1224,15 +1390,15 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerArabicIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                Text(l10n.analyzerArabicPdfHint, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerArabicPdfHint, style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 ...((r['arap_noktalari'] as Map).entries.map((e) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('🔮 ${e.key}', style: const TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
+                      Text('🔮 ${e.key}', style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
                       Wrap(
                         spacing: 4, runSpacing: 4,
                         children: (e.value as Map).entries.map((n) => Container(
@@ -1243,7 +1409,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text('${n.key}: ${(n.value['derece'] ?? 0).toStringAsFixed(1)}° ${n.value['burc'] ?? ''} (${n.value['ev'] ?? ''}. Ev)',
-                            style: const TextStyle(fontSize: 10, color: FastTheme.textMuted)),
+                            style:  TextStyle(fontSize: 10, color: FastTheme.textMuted)),
                         )).toList(),
                       ),
                     ],
@@ -1251,7 +1417,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 ))),
                 if (r['arap_sinastri'] is List && (r['arap_sinastri'] as List).isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text('🔗 ${l10n.analyzerSectionArabicBonds}', style: const TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
+                  Text('🔗 ${l10n.analyzerSectionArabicBonds}', style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
                   ...((r['arap_sinastri'] as List).take(6).map((b) => Container(
                     margin: const EdgeInsets.only(bottom: 4),
                     padding: const EdgeInsets.all(6),
@@ -1263,9 +1429,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                           b['tip'] == 'nokta_nokta' ? '🌙 ${b['nokta']}: ${b['fark']}° orb' :
                           b['tip'] == 'capraz_nokta' ? '🔄 ${b['nokta_a']} ↔ ${b['nokta_b']}: ${b['fark']}°' :
                           '⭐ ${b['nokta']} → ${b['gezegen']}: ${b['fark']}° (${b['kaynak']} → ${b['hedef']})',
-                          style: const TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                          style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
                         if (b['yorum'] != null)
-                          Text(b['yorum'].toString(), style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                          Text(b['yorum'].toString(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
                       ],
                     ),
                   ))),
@@ -1280,7 +1446,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerLifeAreasIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 12)),
                 const SizedBox(height: 12),
                 ...((r['hayat_alanlari'] as List).asMap().entries.map((entry) {
                   final i = entry.key;
@@ -1370,10 +1536,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('${h['icon'] ?? ''} ${h['etiket'] ?? ''}',
-                                    style: const TextStyle(color: FastTheme.accentGold, fontSize: 14, fontWeight: FontWeight.w500)),
+                                    style:  TextStyle(color: FastTheme.accentGold, fontSize: 14, fontWeight: FontWeight.w500)),
                                   const SizedBox(height: 8),
                                   if (h['yorum'] != null)
-                                    Text(h['yorum'].toString(), style: const TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6)),
+                                    Text(h['yorum'].toString(), style:  TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6)),
                                   if (h['oneriler'] is List && (h['oneriler'] as List).isNotEmpty) ...[
                                     const SizedBox(height: 8),
                                     Wrap(
@@ -1388,13 +1554,13 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                                             border: Border.all(color: FastTheme.border),
                                             borderRadius: BorderRadius.circular(14),
                                           ),
-                                          child: Text('💡 ${o['metin'] ?? ''}', style: const TextStyle(color: FastTheme.textMuted, fontSize: 10)),
+                                          child: Text('💡 ${o['metin'] ?? ''}', style:  TextStyle(color: FastTheme.textMuted, fontSize: 10)),
                                         );
                                       }).toList(),
                                     ),
                                   ],
                                   const SizedBox(height: 6),
-                                  Center(child: Text(l10n.analyzerCloseHint, style: const TextStyle(color: FastTheme.textDim, fontSize: 9))),
+                                  Center(child: Text(l10n.analyzerCloseHint, style:  TextStyle(color: FastTheme.textDim, fontSize: 9))),
                                 ],
                               ),
                             ),
@@ -1413,7 +1579,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerSabianIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 12)),
                 const SizedBox(height: 8),
                 ...((r['sabianlar'] as List).map((s) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
@@ -1421,14 +1587,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   decoration: BoxDecoration(
                     color: FastTheme.cardBg,
                     borderRadius: BorderRadius.circular(6),
-                    border: const Border(left: BorderSide(color: FastTheme.accentGold, width: 3)),
+                    border:  Border(left: BorderSide(color: FastTheme.accentGold, width: 3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('${s['gezegen'] ?? ''} (${s['derece_str'] ?? '${s['derece']}°'})',
-                        style: const TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text(s['sembol'] ?? '', style: const TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
+                        style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
+                      Text(s['sembol'] ?? '', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
                     ],
                   ),
                 ))),
@@ -1458,14 +1624,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 ${l10n.analyzerProgressionYear(p['yil'] ?? '')}',
-                        style: const TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
+                        style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
                       Text(l10n.analyzerMoonSunHouse(p['ay_ev'] ?? '', p['ay_burc'] ?? '', p['gunes_burc'] ?? ''),
-                        style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                        style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
                       if (p['ortam'] != null)
-                        Text(p['ortam'].toString(), style: const TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
+                        Text(p['ortam'].toString(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
                       if (p['yorumlar'] is List) ...((p['yorumlar'] as List).map((y) => Padding(
                         padding: const EdgeInsets.only(top: 2),
-                        child: Text('🔹 $y', style: const TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                        child: Text('🔹 $y', style:  TextStyle(color: FastTheme.textMuted, fontSize: 11)),
                       ))),
                     ],
                   ),
@@ -1479,7 +1645,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                       border: Border.all(color: FastTheme.accentGold, width: 1, style: BorderStyle.solid),
                     ),
                     child: Text(l10n.analyzerMinorProgress6Month,
-                      style: const TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
+                      style:  TextStyle(color: FastTheme.textDim, fontSize: 10, fontStyle: FontStyle.italic)),
                   ),
               ],
             )),
@@ -1491,9 +1657,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerChartCommentIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
-                Text(r['chart_yorumu'].toString(), style: const TextStyle(color: FastTheme.text, fontSize: 12, height: 1.8)),
+                Text(r['chart_yorumu'].toString(), style:  TextStyle(color: FastTheme.text, fontSize: 12, height: 1.8)),
               ],
             )),
 
@@ -1504,7 +1670,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerHealingIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
                 w.HtmlRender(r['sifa_receteleri'].toString()),
               ],
@@ -1517,13 +1683,13 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerHealingDetailIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
                 ...((r['sifa_receteleri_detay'] as List).map((rct) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(color: FastTheme.cardBg, border: Border.all(color: FastTheme.border), borderRadius: BorderRadius.circular(8)),
-                  child: Text(rct.toString(), style: const TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6)),
+                  child: Text(rct.toString(), style:  TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.6)),
                 ))),
               ],
             )),
@@ -1535,9 +1701,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerAsteroidsIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 4),
-                Text(l10n.analyzerAsteroidsOrbHint, style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                Text(l10n.analyzerAsteroidsOrbHint, style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 const SizedBox(height: 4),
                 ...((r['asteroitler'] as List).take(12).map((a) {
                   final etki = a['etki'] ?? '';
@@ -1562,14 +1728,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                             style: TextStyle(color: leftColor, fontSize: 11, fontWeight: FontWeight.w600)),
                         ),
                         if (a['yorum'] != null)
-                          Text(a['yorum'].toString(), style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                          Text(a['yorum'].toString(), style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
                       ],
                     ),
                   );
                 })),
                 const SizedBox(height: 4),
                 Text(l10n.analyzerAsteroidsAllPdf,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
               ],
             )),
 
@@ -1580,7 +1746,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerAstroHint,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
 
                 // Astro location selector
@@ -1630,7 +1796,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.analyzerAcgGlobalIntro,
-                  style: const TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  style:  TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 const SizedBox(height: 8),
 
                 // ACG Map
@@ -1645,7 +1811,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     ),
                   ),
                 if (provider.simLoading)
-                  const Center(child: Padding(
+                   Center(child: Padding(
                     padding: EdgeInsets.all(8),
                     child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: FastTheme.accentGold)),
                   )),
@@ -1662,7 +1828,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
 
                 const SizedBox(height: 8),
                 Text(l10n.analyzerSimulationScan,
-                  style: const TextStyle(color: FastTheme.accentGold, fontSize: 10)),
+                  style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                 const SizedBox(height: 8),
 
                 // Sim cards
@@ -1739,7 +1905,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                                     child: Column(
                                       children: [
                                         Text(sehirAdi.length > 28 ? '${sehirAdi.substring(0, 28)}...' : sehirAdi,
-                                          style: const TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600)),
+                                          style:  TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600)),
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
@@ -1788,7 +1954,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text('🔄 ${l10n.analyzerSimulationRenewed(r['sim_sehir'])}',
-              textAlign: TextAlign.center, style: const TextStyle(color: FastTheme.accentGold, fontSize: 13)),
+              textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13)),
           ),
       ],
     );
@@ -1842,7 +2008,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
             children: [
-              SizedBox(width: 80, child: Text(c['l'] as String, style: const TextStyle(fontSize: 12, color: FastTheme.textMuted))),
+              SizedBox(width: 80, child: Text(c['l'] as String, style:  TextStyle(fontSize: 12, color: FastTheme.textMuted))),
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
@@ -1855,14 +2021,14 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              SizedBox(width: 24, child: Text('${skor[c['k']] ?? 0}', style: const TextStyle(color: FastTheme.text, fontSize: 12, fontWeight: FontWeight.w600))),
+              SizedBox(width: 24, child: Text('${skor[c['k']] ?? 0}', style:  TextStyle(color: FastTheme.text, fontSize: 12, fontWeight: FontWeight.w600))),
             ],
           ),
         )),
         if (skor['etkiler'] is List && (skor['etkiler'] as List).isNotEmpty)
           ...((skor['etkiler'] as List).map((e) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 1),
-            child: Text('• $e', style: const TextStyle(color: FastTheme.textDim, fontSize: 10)),
+            child: Text('• $e', style:  TextStyle(color: FastTheme.textDim, fontSize: 10)),
           ))),
       ],
     );
@@ -1891,7 +2057,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      gradient: active ? const LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]) : null,
+                      gradient: active ?  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]) : null,
                       color: active ? null : FastTheme.cardBg,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: active ? FastTheme.accentGold : FastTheme.border),
@@ -1916,12 +2082,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               fit: BoxFit.contain,
               loadingBuilder: (_, child, progress) {
                 if (progress == null) return child;
-                return const SizedBox(height: 300, child: Center(child: CircularProgressIndicator(color: FastTheme.accentGold)));
+                return  SizedBox(height: 300, child: Center(child: CircularProgressIndicator(color: FastTheme.accentGold)));
               },
               errorBuilder: (_, __, ___) => Container(
                 height: 100,
                 decoration: BoxDecoration(color: FastTheme.cardBg, borderRadius: BorderRadius.circular(12)),
-                child: Center(child: Text(l10n.analyzerChartNotReady, style: const TextStyle(color: FastTheme.textDim, fontSize: 13))),
+                child: Center(child: Text(l10n.analyzerChartNotReady, style:  TextStyle(color: FastTheme.textDim, fontSize: 13))),
               ),
             ),
           ),
@@ -1949,7 +2115,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
-                    icon: _pdfLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: FastTheme.bg)) : const Icon(Icons.download, size: 20),
+                    icon: _pdfLoading ?  SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: FastTheme.bg)) : const Icon(Icons.download, size: 20),
                     label: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : '📥 ${link['label']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
@@ -2053,7 +2219,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           OutlinedButton(
             onPressed: _submit,
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: FastTheme.border),
+              side:  BorderSide(color: FastTheme.border),
               foregroundColor: FastTheme.text,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

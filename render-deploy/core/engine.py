@@ -1625,21 +1625,61 @@ class FBST_Engine:
         uyum_sapmasi = ks_yil % phi
         fibonacci_sayilari = [1, 2, 3, 5, 8, 13, 21, 34, 55]
         en_yakin_fib = min(fibonacci_sayilari, key=lambda x: abs(x - ks_yil))
-        
-        if self.mod == "ebeveyn_cocuk":
-            if abs(ks_yil - en_yakin_fib) < 0.3: 
-                return (f"The {ks_yil:.2f}-year time difference between parent and child is in cosmic harmony. Even in the heaviest crises this bond repairs itself automatically. Almost nothing can sever it; the universe has placed this bond under protection." if _EN else (f"La diferencia de tiempo de {ks_yil:.2f} años entre padre/madre e hijo está en armonía cósmica. Incluso en las crisis más graves este vínculo se repara a sí mismo automáticamente. Casi nada puede romperlo; el universo ha puesto este vínculo bajo protección." if _ES else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık zaman farkı, kozmik bir harmoni içinde. En ağır krizlerde bile bu bağ kendini otomatik olarak onarır. Birbirinden kopma neredeyse imkansız; evren bu bağı koruma altına almış."))
-            elif uyum_sapmasi < 0.2 or uyum_sapmasi > 1.4: 
-                return (f"The {ks_yil:.2f}-year difference carries a natural rhythm and harmony wave. Many problems can be solved intuitively, without speaking. There is a quiet telepathy, a flow between you." if _EN else (f"La diferencia de {ks_yil:.2f} años lleva un ritmo natural y una onda de armonía. Muchos problemas pueden resolverse intuitivamente, sin hablar. Hay una telepatía silenciosa, un flujo entre ustedes." if _ES else f"{ks_yil:.2f} yıllık fark, doğal bir ritim ve uyum dalgasına sahip. Birçok sorun konuşulmadan, sezgisel bir şekilde çözülebilir. Arada sessiz bir telepati, bir akış var."))
-            else: 
-                return (f"The {ks_yil:.2f}-year difference has not created a natural protective shield. This is not a deficiency; quite the opposite, it means whatever is planted in the relationship will be reaped. The universe will not save you with a fated shortcut, but it will not punish you unfairly either. The architecture of the relationship is entirely yours." if _EN else (f"La diferencia de {ks_yil:.2f} años no ha creado un escudo protector natural. Esto no es una deficiencia; todo lo contrario, significa que lo que se siembra en la relación se cosecha. El universo no le salvará con un atajo del destino, pero tampoco le castigará injustamente. La arquitectura de la relación es enteramente suya." if _ES else f"{ks_yil:.2f} yıllık fark, doğal bir koruma kalkanı oluşturmamış. Bu bir eksiklik değil; tam tersine, ilişkide ne ekilirse aynısının biçileceği anlamına gelir. Evren kadersel bir torpille kurtarmaz ama haksız yere de cezalandırmaz. İlişkinin mimarisi tamamen size ait."))
-        else:
-            if abs(ks_yil - en_yakin_fib) < 0.3: 
-                return (f"Your {ks_yil:.2f}-year vectorial age difference between you is in cosmic harmony. Even in the heaviest crises this bond repairs itself automatically. Almost nothing can separate you; the universe has placed this relationship under protection." if _EN else (f"Su diferencia de edad vectorial de {ks_yil:.2f} años está en armonía cósmica. Incluso en las crisis más graves este vínculo se repara por sí solo. Casi nada puede separarles; el universo ha puesto esta relación bajo protección." if _ES else f"Aranizdaki {ks_yil:.2f} yillik vektorsel yas farki, kozmik bir harmoni icinde. En agir krizlerde bile bu bag kendini otomatik olarak onarir. Birbirinizden kopmaniz neredeyse imkansiz; evren bu iliskiyi koruma altina almis."))
-            elif uyum_sapmasi < 0.2 or uyum_sapmasi > 1.4: 
-                return (f"Your {ks_yil:.2f}-year age difference carries a natural rhythm and harmony wave. You can resolve many problems intuitively, without speaking. There is a quiet telepathy, a flow between you." if _EN else (f"Su diferencia de edad de {ks_yil:.2f} años lleva un ritmo natural y una onda de armonía. Pueden resolver muchos problemas intuitivamente, sin hablar. Hay una telepatía silenciosa, un flujo entre ustedes." if _ES else f"{ks_yil:.2f} yillik yas farkiniz, dogal bir ritim ve uyum dalgasina sahip. Bir cok sorunu konusmadan, sezgisel bir sekilde cozmeniz mumkun. Aranizda sessiz bir telepati, bir akis var."))
-            else: 
-                return (f"Your {ks_yil:.2f}-year age difference has not created a natural protective shield. This is not a deficiency; quite the opposite, it means whatever you plant in your relationship, you will reap the same. The universe will not save you with a fated shortcut, but it will not punish you unfairly either. The relationship's architecture is entirely yours." if _EN else (f"Su diferencia de edad de {ks_yil:.2f} años no ha creado un escudo protector natural. Esto no es una deficiencia; todo lo contrario, significa que lo que siembran en su relación, lo cosecharán. El universo no les salvará con un atajo del destino, pero tampoco les castigará injustamente. La arquitectura de la relación es enteramente suya." if _ES else f"{ks_yil:.2f} yillik yas farkiniz, dogal bir koruma kalkani olusturmamis. Bu bir eksiklik degil; tam tersine, iliskinizde ne ekerseniz aynisini bieceginiz anlamina gelir. Evren sizi kadersel bir torpille kurtarmaz ama haksiz yere de cezalandirmaz. Iliskinin mimari tamamen size ait."))
+        eb = self.mod == "ebeveyn_cocuk"
+
+        def _writer(tr, en, es):
+            return en if _EN else (es if _ES else tr)
+
+        # 10 varyant: fibonacci yakınlığı (0-1) + sapma bandları (2-9)
+        if abs(ks_yil - en_yakin_fib) < 0.15:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, Fibonacci dizisine adeta dokunan kozmik bir sıfır noktası. Bu ilişki, en ağır krizlerde bile kendini otomatik olarak yeniden kurar; birbirinizden kopmanız neredeyse imkansızdır. Evren bu bağı özel bir koruma yasasıyla sarmıştır." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık zaman farkı, Fibonacci dizisine adeta dokunan kozmik bir sıfır noktası. Bu bağ, en ağır krizlerde bile kendini otomatik olarak yeniden kurar; birbirinden kopma neredeyse imkansızdır. Evren bu bağı özel bir koruma yasasıyla sarmıştır.",
+                f"Your {ks_yil:.2f}-year vectorial age difference touches the Fibonacci sequence — a cosmic zero point. Even in the heaviest crises this bond rebuilds itself automatically; separation is almost impossible. The universe has wrapped this relationship in a special law of protection." if not eb else f"The {ks_yil:.2f}-year time difference between parent and child touches the Fibonacci sequence — a cosmic zero point. Even in the heaviest crises this bond rebuilds itself automatically; separation is almost impossible. The universe has wrapped this bond in a special law of protection.",
+                f"Su diferencia de edad vectorial de {ks_yil:.2f} años toca la secuencia de Fibonacci — un punto cero cósmico. Incluso en las crisis más graves este vínculo se reconstruye solo; la separación es casi imposible. El universo ha envuelto esta relación en una ley especial de protección." if not eb else f"La diferencia de tiempo de {ks_yil:.2f} años entre padre/madre e hijo toca la secuencia de Fibonacci — un punto cero cósmico. Incluso en las crisis más graves este vínculo se reconstruye solo; la separación es casi imposible. El universo ha envuelto este vínculo en una ley especial de protección.")
+        if abs(ks_yil - en_yakin_fib) < 0.3:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı kozmik bir harmoninin tam göbeğinde. En ağır krizlerde bile bu bağ kendini otomatik olarak onarır; birbirinizden kopmanız neredeyse imkansızdır. Evren bu ilişkiyi koruma altına almıştır." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık zaman farkı, kozmik bir harmoninin tam göbeğinde. En ağır krizlerde bile bu bağ kendini otomatik olarak onarır; birbirinden kopma neredeyse imkansızdır. Evren bu bağı koruma altına almıştır.",
+                f"Your {ks_yil:.2f}-year vectorial age difference sits at the very heart of cosmic harmony. Even in the heaviest crises this bond repairs itself automatically; separation is almost impossible. The universe has placed this relationship under its protection." if not eb else f"The {ks_yil:.2f}-year difference between parent and child sits at the very heart of cosmic harmony. Even in the heaviest crises this bond repairs itself automatically; separation is almost impossible. The universe has placed this bond under its protection.",
+                f"Su diferencia de edad vectorial de {ks_yil:.2f} años está en el corazón mismo de la armonía cósmica. Incluso en las crisis más graves este vínculo se repara solo; la separación es casi imposible. El universo ha puesto esta relación bajo su protección." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo está en el corazón mismo de la armonía cósmica. Incluso en las crisis más graves este vínculo se repara solo; la separación es casi imposible. El universo ha puesto este vínculo bajo su protección.")
+        if uyum_sapmasi < 0.2:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, altın oranın zarif başlangıç ritmini taşıyor. Sorunlarınızı çoğunlukla konuşmadan, sezgisel olarak çözersiniz; aranızda sessiz bir telepati, doğal bir akış oluşur." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık fark, altın oranın zarif başlangıç ritmini taşıyor. Sorunların çoğu konuşulmadan, sezgisel bir biçimde çözülür; aralarında sessiz bir telepati, doğal bir akış oluşur.",
+                f"Your {ks_yil:.2f}-year difference carries the elegant opening rhythm of the golden ratio. Most problems are solved intuitively, without words; a quiet telepathy and a natural flow settle between you." if not eb else f"The {ks_yil:.2f}-year difference between parent and child carries the elegant opening rhythm of the golden ratio. Most problems are solved intuitively, without words; a quiet telepathy and a natural flow settle between them.",
+                f"Su diferencia de {ks_yil:.2f} años lleva el elegante ritmo inicial de la proporción áurea. La mayoría de los problemas se resuelven intuitivamente, sin palabras; una telepatía silenciosa y un flujo natural se instalan entre ustedes." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo lleva el elegante ritmo inicial de la proporción áurea. La mayoría de los problemas se resuelven intuitivamente, sin palabras; una telepatía silenciosa y un flujo natural se instalan entre ellos.")
+        if uyum_sapmasi < 0.4:
+            return _writer(
+                f"{ks_yil:.2f} yıllık vektörel yaş farkınız, doğal bir ritim dalgası üzerinde yükseliyor. Konuşmadan da anlaştığınız pek çok alan var; sessiz bir telepatinin etkisiyle ilişkiniz akıcı bir zeminde ilerliyor." if not eb else f"{ks_yil:.2f} yıllık fark, doğal bir ritim dalgası üzerinde yükseliyor. Konuşmadan da anlaşılan pek çok alan var; sessiz bir telepatinin etkisiyle bağ akıcı bir zeminde ilerliyor.",
+                f"Your {ks_yil:.2f}-year difference rises on a wave of natural rhythm. There are many areas where you agree without speaking; guided by a quiet telepathy, the relationship advances on smooth ground." if not eb else f"The {ks_yil:.2f}-year difference rises on a wave of natural rhythm. There are many areas understood without speaking; guided by a quiet telepathy, the bond advances on smooth ground.",
+                f"Su diferencia de {ks_yil:.2f} años se eleva sobre una onda de ritmo natural. Hay muchas áreas en las que se entienden sin hablar; guiados por una telepatía silenciosa, la relación avanza en terreno fluido." if not eb else f"La diferencia de {ks_yil:.2f} años se eleva sobre una onda de ritmo natural. Hay muchas áreas entendidas sin hablar; guiada por una telepatía silenciosa, el vínculo avanza en terreno fluido.")
+        if uyum_sapmasi < 0.6:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, dengeli bir uyum frekansı üretiyor. İlişkinin ritmi tutarlıdır; küçük pürüzler büyük çalkantılara dönüşmeden, sevgi ile yumuşatılır." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık fark, dengeli bir uyum frekansı üretiyor. Bağın ritmi tutarlıdır; küçük pürüzler büyük çalkantılara dönüşmeden sevgiyle yumuşatılır.",
+                f"Your {ks_yil:.2f}-year difference produces a balanced harmony frequency. The rhythm of the relationship is consistent; small frictions are softened with affection before turning into turbulence." if not eb else f"The {ks_yil:.2f}-year difference between parent and child produces a balanced harmony frequency. The rhythm of the bond is consistent; small frictions are softened with affection before turning into turbulence.",
+                f"Su diferencia de {ks_yil:.2f} años produce una frecuencia de armonía equilibrada. El ritmo de la relación es constante; las pequeñas fricciones se suavizan con cariño antes de convertirse en turbulencia." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo produce una frecuencia de armonía equilibrada. El ritmo del vínculo es constante; las pequeñas fricciones se suavizan con cariño antes de convertirse en turbulencia.")
+        if uyum_sapmasi < 0.8:
+            return _writer(
+                f"{ks_yil:.2f} yıllık vektörel yaş farkınızda, ritmik bir uyum dalgası hissediliyor. Duygusal dalgalanmalar olsa da temel akış korunur; zamanla harmoninin oturduğu bir çizgi yakalanır." if not eb else f"{ks_yil:.2f} yıllık farkta, ritmik bir uyum dalgası hissediliyor. Duygusal dalgalanmalar olsa da temel akış korunur; zamanla harmoninin oturduğu bir çizgi yakalanır.",
+                f"Your {ks_yil:.2f}-year difference carries a rhythmic harmony wave. Even when emotions fluctuate, the core flow is preserved; over time a settled line of harmony is reached." if not eb else f"The {ks_yil:.2f}-year difference carries a rhythmic harmony wave. Even when emotions fluctuate, the core flow is preserved; over time a settled line of harmony is reached.",
+                f"Su diferencia de {ks_yil:.2f} años lleva una onda de armonía rítmica. Aunque las emociones fluctúan, el flujo central se conserva; con el tiempo se alcanza una línea de armonía estable." if not eb else f"La diferencia de {ks_yil:.2f} años lleva una onda de armonía rítmica. Aunque las emociones fluctúan, el flujo central se conserva; con el tiempo se alcanza una línea de armonía estable.")
+        if uyum_sapmasi < 1.0:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, uyumun kurulmasının emek istediği bir frekansta. Bu bir eksiklik değil; bilinçli olarak kurduğunuz bağ, kaderden devralınmış bağlardan daha kalıcı olur." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık fark, uyumun kurulmasının emek istediği bir frekansta. Bu bir eksiklik değil; bilinçli olarak kurulan bağ, kaderden devralınmış bağlardan daha kalıcı olur.",
+                f"Your {ks_yil:.2f}-year difference sits on a frequency where harmony must be built with effort. This is not a flaw; a bond built consciously outlasts a bond inherited from fate." if not eb else f"The {ks_yil:.2f}-year difference between parent and child sits on a frequency where harmony must be built with effort. This is not a flaw; a bond built consciously outlasts a bond inherited from fate.",
+                f"Su diferencia de {ks_yil:.2f} años se asienta en una frecuencia donde la armonía debe construirse con esfuerzo. Esto no es un defecto; un vínculo construido conscientemente supera a uno heredado del destino." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo se asienta en una frecuencia donde la armonía debe construirse con esfuerzo. Esto no es un defecto; un vínculo construido conscientemente supera a uno heredado del destino.")
+        if uyum_sapmasi < 1.2:
+            return _writer(
+                f"{ks_yil:.2f} yıllık vektörel yaş farkınız, kendine özgü bir sınav karakteri taşıyor. İlişkide engelleri aşmak emek ister; fakat her aşılan engel bağı görünmez biçimde güçlendirir ve kaliteyi derinleştirir." if not eb else f"{ks_yil:.2f} yıllık fark, kendine özgü bir sınav karakteri taşıyor. Engelleri aşmak emek ister; fakat her aşılan engel bağı görünmez biçimde güçlendirir ve kaliteyi derinleştirir.",
+                f"Your {ks_yil:.2f}-year difference carries a distinctive trial quality. Overcoming obstacles takes effort; yet every obstacle crossed invisibly strengthens the bond and deepens its quality." if not eb else f"The {ks_yil:.2f}-year difference carries a distinctive trial quality. Overcoming obstacles takes effort; yet every obstacle crossed invisibly strengthens the bond and deepens its quality.",
+                f"Su diferencia de {ks_yil:.2f} años lleva un carácter de prueba distintivo. Superar obstáculos requiere esfuerzo; sin embargo, cada obstáculo cruzado fortalece invisiblemente el vínculo y profundiza su calidad." if not eb else f"La diferencia de {ks_yil:.2f} años lleva un carácter de prueba distintivo. Superar obstáculos requiere esfuerzo; sin embargo, cada obstáculo cruzado fortalece invisiblemente el vínculo y profundiza su calidad.")
+        if uyum_sapmasi < 1.4:
+            return _writer(
+                f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, doğal bir koruma kalkanı oluşturmamış. Ne var ki bu, ilişkinin işleyişini tamamen kendi çabanıza bırakmış demektir; kurduğunuz mimari, kaderin sunduğundan daha özgündür." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık fark, doğal bir koruma kalkanı oluşturmamış. Ne var ki bu, bağın işleyişini tamamen emeğe bırakmış demektir; kurulan mimari, kaderin sunduğundan daha özgündür.",
+                f"Your {ks_yil:.2f}-year difference has not created a natural protective shield. Yet that only means the relationship's architecture is entirely yours — more original than anything fate would hand you." if not eb else f"The {ks_yil:.2f}-year difference between parent and child has not created a natural protective shield. Yet that only means the bond's architecture is built by effort — more original than anything fate would hand you.",
+                f"Su diferencia de {ks_yil:.2f} años no ha creado un escudo protector natural. Pero eso solo significa que la arquitectura de la relación es enteramente suya — más original que lo que el destino les daría." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo no ha creado un escudo protector natural. Pero eso solo significa que la arquitectura del vínculo se construye con esfuerzo — más original que lo que el destino les daría.")
+        return _writer(
+            f"Aranızdaki {ks_yil:.2f} yıllık vektörel yaş farkı, altın oranın derin son bölgesinde dinleniyor: ilişkinin kuralları tamamen size ait. Evren sizi kadersel bir torpille kurtarmaz ama haksız yere de cezalandırmaz; ne ekerseniz onu biçersiniz." if not eb else f"Ebeveyn ve çocuk arasındaki {ks_yil:.2f} yıllık fark, altın oranın derin son bölgesinde dinleniyor: bağın kuralları tamamen size ait. Evren sizi kadersel bir torpille kurtarmaz ama haksız yere de cezalandırmaz; ne ekerseniz onu biçersiniz.",
+            f"Your {ks_yil:.2f}-year difference rests in the deep final zone of the golden ratio: the relationship's rules are entirely yours. The universe will not save you with a fated shortcut, nor punish you unfairly; you reap what you sow." if not eb else f"The {ks_yil:.2f}-year difference between parent and child rests in the deep final zone of the golden ratio: the bond's rules are entirely yours. The universe will not save you with a fated shortcut, nor punish you unfairly; you reap what you sow.",
+            f"Su diferencia de {ks_yil:.2f} años descansa en la zona final profunda de la proporción áurea: las reglas de la relación son enteramente suyas. El universo no les salvará con un atajo del destino, ni les castigará injustamente; cosechan lo que siembran." if not eb else f"La diferencia de {ks_yil:.2f} años entre padre/madre e hijo descansa en la zona final profunda de la proporción áurea: las reglas del vínculo son enteramente suyas. El universo no les salvará con un atajo del destino, ni les castigará injustamente; cosechan lo que siembran.")
 
     def gezegen_konumu_bul(self, julian_gun, gezegen_id):
         try:
@@ -12152,6 +12192,96 @@ class FBST_Engine:
             skor += 0.5
 
         return max(0.0, min(10.0, round(skor, 1)))
+
+    def tork_metin(self):
+        """0-10 arası tork skorunu 10 farklı sınıfa ayırıp dile uygun açıklama üretir."""
+        v = self.calculate_tork_skoru()
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
+        if v < 1:
+            return ("Very weak energy — the bond is nearly dormant; a conscious restart and fresh shared goals are essential." if _EN else
+                    ("Energía muy débil — el vínculo está casi dormido; se necesitan un reinicio consciente y nuevos objetivos compartidos." if _ES else
+                     "Çok zayıf enerji — bağ neredeyse uyku halinde; bilinçli bir yeniden başlangıç ve yeni ortak hedefler şart."))
+        if v < 2:
+            return ("Low energy — the relationship is passive; joint projects and routine-breaking activities will revive it." if _EN else
+                    ("Energía baja — la relación es pasiva; proyectos conjuntos y actividades fuera de la rutina la reactivarán." if _ES else
+                     "Düşük enerji — ilişki pasif; ortak projeler ve rutini kıran aktiviteler onu canlandıracaktır."))
+        if v < 3:
+            return ("Low-moderate energy — there is a spark but it flickers; consistent attention and time together are needed." if _EN else
+                    ("Energía media-baja — hay una chispa pero parpadea; se necesitan atención constante y tiempo juntos." if _ES else
+                     "Orta-düşük enerji — bir kıvılcım var ama sönmeye yüz tutuyor; sürekli ilgi ve birlikte zaman gerekli."))
+        if v < 4:
+            return ("Moderate energy — the bond is alive but gets tired easily; sincere communication sustains the momentum." if _EN else
+                    ("Energía moderada — el vínculo está vivo pero se cansa fácilmente; la comunicación sincera mantiene el impulso." if _ES else
+                     "Orta enerji — bağ canlı ama çabuk yoruluyor; samimi iletişim ivmeyi koruyor."))
+        if v < 5:
+            return ("Balanced energy — the relationship flows, yet intense moments are still needed to reach real depth." if _EN else
+                    ("Energía equilibrada — la relación fluye, pero aún se necesitan momentos intensos para alcanzar verdadera profundidad." if _ES else
+                     "Dengeli enerji — ilişki akıyor; ancak gerçek derinlik için hâlâ yoğun anlar gerekiyor."))
+        if v < 6:
+            return ("Good vitality — the bond carries a steady drive; minor ruts are quickly overcome with joint effort." if _EN else
+                    ("Buena vitalidad — el vínculo lleva un impulso constante; los pequeños altibajos se superan con esfuerzo conjunto." if _ES else
+                     "İyi canlılık — bağ istikrarlı bir itki taşıyor; küçük sıkışmalar ortak çabayla hızla aşılıyor."))
+        if v < 7:
+            return ("Strong vitality — the relationship actively regenerates; conflicts transform into shared motivation quickly." if _EN else
+                    ("Fuerte vitalidad — la relación se regenera activamente; los conflictos se convierten rápido en motivación compartida." if _ES else
+                     "Güçlü canlılık — ilişki aktif olarak kendini yeniliyor; çatışmalar hızla ortak motivasyona dönüşüyor."))
+        if v < 8:
+            return ("High energy — passion and dynamism dominate; the bond rarely stands still and constantly seeks growth." if _EN else
+                    ("Alta energía — dominan la pasión y el dinamismo; el vínculo rara vez se detiene y busca crecer constantemente." if _ES else
+                     "Yüksek enerji — tutku ve dinamizm hâkim; bağ nadiren durur, sürekli büyümeyi arar."))
+        if v < 9:
+            return ("Very high vitality — an intense magnetic field between you; renewal fuels the bond on its own." if _EN else
+                    ("Vitalidad muy alta — un campo magnético intenso entre ustedes; la renovación alimenta el vínculo por sí sola." if _ES else
+                     "Çok yüksek canlılık — aranızda yoğun bir çekim alanı; yenilenme bağı kendi başına besliyor."))
+        return ("Exceptional vitality — the relationship generates uninterrupted energy; life together never loses its charge." if _EN else
+                ("Vitalidad excepcional — la relación genera energía ininterrumpida; la vida en común nunca pierde su carga." if _ES else
+                 "Olağanüstü canlılık — ilişki kesintisiz enerji üretiyor; birlikte geçen hayat şarjını asla kaybetmiyor."))
+
+    def fraktal_metin(self):
+        """0-100 arası fraktal uyum skorunu 10 farklı sınıfa ayırıp dile uygun açıklama üretir."""
+        f = self.calculate_fraktal_uyum()
+        _EN = _core_get_lang() == "en"
+        _ES = _core_get_lang() == "es"
+        if f < 10:
+            return ("No natural resonance — fundamental differences prevail; deliberate effort alone builds the bridge." if _EN else
+                    ("Sin resonancia natural — predominan diferencias fundamentales; solo el esfuerzo deliberado tiende el puente." if _ES else
+                     "Doğal rezonans yok — temel farklılıklar baskın; köprüyü yalnızca bilinçli çaba kuruyor."))
+        if f < 20:
+            return ("Very weak resonance — harmony requires constant work; patience and acceptance are the key." if _EN else
+                    ("Resonancia muy débil — la armonía exige trabajo constante; la paciencia y la aceptación son la clave." if _ES else
+                     "Çok zayıf rezonans — uyum sürekli emek istiyor; sabır ve kabullenme anahtar."))
+        if f < 30:
+            return ("Weak resonance — differences dominate; shared rituals will slowly soften the rough edges." if _EN else
+                    ("Resonancia débil — dominan las diferencias; los rituales compartidos suavizarán poco a poco las asperezas." if _ES else
+                     "Zayıf rezonans — farklılıklar baskın; ortak ritüeller pürüzleri yavaşça yumuşatacak."))
+        if f < 40:
+            return ("Low resonance — harmony is sporadic; mutual adjustments open the door to a more stable flow." if _EN else
+                    ("Resonancia baja — la armonía es esporádica; los ajustes mutuos abren la puerta a un flujo más estable." if _ES else
+                     "Düşük rezonans — uyum kesintili; karşılıklı ayarlamalar daha istikrarlı bir akışın kapısını açıyor."))
+        if f < 50:
+            return ("Partial resonance — you harmonize in certain areas; a conscious effort turns the rest into an advantage." if _EN else
+                    ("Resonancia parcial — armonizan en ciertas áreas; un esfuerzo consciente convierte el resto en ventaja." if _ES else
+                     "Kısmi rezonans — belirli alanlarda uyumlu; bilinçli çaba kalanı avantaja çeviriyor."))
+        if f < 60:
+            return ("Moderate resonance — the flow exists but fluctuates; shared direction steadies the wave." if _EN else
+                    ("Resonancia moderada — el flujo existe pero fluctúa; una dirección compartida estabiliza la onda." if _ES else
+                     "Orta rezonans — akış var ama dalgalanıyor; ortak yön dalgayı dengeliyor."))
+        if f < 70:
+            return ("Good resonance — the natural rhythm coexists with occasional friction; mutual respect keeps it soft." if _EN else
+                    ("Buena resonancia — el ritmo natural convive con fricciones ocasionales; el respeto mutuo lo mantiene suave." if _ES else
+                     "İyi rezonans — doğal ritim ara sıra oluşan sürtünmeyle bir arada; karşılıklı saygı onu yumuşak tutuyor."))
+        if f < 80:
+            return ("Strong resonance — the bond synchronizes easily; disagreements resolve with intuitive understanding." if _EN else
+                    ("Resonancia fuerte — el vínculo se sincroniza con facilidad; los desacuerdos se resuelven con comprensión intuitiva." if _ES else
+                     "Güçlü rezonans — bağ kolayca eşgüdümleniyor; anlaşmazlıklar sezgisel kavrayışla çözülüyor."))
+        if f < 90:
+            return ("Very high resonance — an intuitive heart-connection; you complete one another's frequencies with ease." if _EN else
+                    ("Resonancia muy alta — una conexión intuitiva del corazón; completan las frecuencias del otro con facilidad." if _ES else
+                     "Çok yüksek rezonans — sezgisel bir gönül bağı; birbirinizin frekanslarını kolayca tamamlıyorsunuz."))
+        return ("Pure resonance — a rare natural harmony; the relationship flows as if written by a single star." if _EN else
+                ("Resonancia pura — una armonía natural poco común; la relación fluye como escrita por una sola estrella." if _ES else
+                 "Saf rezonans — ender bir doğal uyum; ilişki sanki tek bir yıldız tarafından yazılmış gibi akıyor."))
 
     def calculate_fraktal_uyum(self):
         """

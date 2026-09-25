@@ -1152,4 +1152,139 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scoreBondLabel => 'Puntuación del Vínculo';
+
+  @override
+  String get warningTitle => 'Aviso Importante';
+
+  @override
+  String get warningBody =>
+      'Los estudios de sinastría de esta aplicación se realizan con el método de transferencia vectorial desarrollado por el Astrólogo del Karma Fatih ASARTEPE y con la calibración de la fecha de encuentro. Esta es la razón por la que se pide la fecha de encuentro o matrimonio en lugar de las horas de nacimiento de las personas, y el lugar de encuentro o matrimonio en lugar de sus lugares de nacimiento. Las cartas resultantes serán diferentes de las cartas natales, pero le darán resultados increíbles para su vida y su relación.';
+
+  @override
+  String get warningAcknowledge => 'Entendido';
+
+  @override
+  String get warningBack => 'Atrás';
+
+  @override
+  String get loginNav => 'Iniciar Sesión';
+
+  @override
+  String get loginTitle => 'Iniciar Sesión';
+
+  @override
+  String get loginSubtitle =>
+      'Inicie sesión y acceda a sus personas guardadas desde cualquier dispositivo.';
+
+  @override
+  String get loginEmailLabel => 'Correo electrónico';
+
+  @override
+  String get loginPasswordLabel => 'Contraseña';
+
+  @override
+  String get loginRemember => 'Recordarme';
+
+  @override
+  String get loginForgot => '¿Olvidó su contraseña?';
+
+  @override
+  String get loginButton => 'Iniciar Sesión';
+
+  @override
+  String get signupButton => 'Crear Cuenta';
+
+  @override
+  String get loginOr => 'o';
+
+  @override
+  String get loginGoogle => 'Continuar con Google';
+
+  @override
+  String get loginFacebook => 'Continuar con Facebook';
+
+  @override
+  String get loginNoAccount => '¿No tiene cuenta? Regístrese';
+
+  @override
+  String get loginHaveAccount => '¿Ya tiene cuenta? Inicie sesión';
+
+  @override
+  String get loginGuest => 'Continuar como invitado';
+
+  @override
+  String get loginErrorGeneric => 'Algo salió mal. Inténtelo de nuevo.';
+
+  @override
+  String get loginErrorInvalid => 'Correo o contraseña incorrectos.';
+
+  @override
+  String get loginErrorExists => 'Este correo ya está registrado.';
+
+  @override
+  String get loginErrorDisabled => 'La membresía aún no está configurada.';
+
+  @override
+  String get loginSuccess => '¡Sesión iniciada con éxito!';
+
+  @override
+  String get logoutButton => 'Cerrar Sesión';
+
+  @override
+  String get profileTitle => 'Perfil';
+
+  @override
+  String get profileEmailLabel => 'Correo electrónico';
+
+  @override
+  String get profileNameLabel => 'Nombre Completo';
+
+  @override
+  String get profileSave => 'Guardar';
+
+  @override
+  String get profileChangePassword => 'Cambiar Contraseña';
+
+  @override
+  String get profileNewPassword => 'Nueva Contraseña';
+
+  @override
+  String get profilePasswordChanged => 'Contraseña actualizada.';
+
+  @override
+  String get profileSaved => 'Perfil actualizado.';
+
+  @override
+  String get peopleTitle => 'Personas Guardadas';
+
+  @override
+  String get peopleEmpty =>
+      'Aún no tiene personas guardadas. Puede guardar una persona desde el formulario de análisis.';
+
+  @override
+  String get peopleFolderLabel => 'Carpeta';
+
+  @override
+  String get peopleFolderFamily => 'Mi Familia';
+
+  @override
+  String get peopleFolderFriends => 'Mis Amigos';
+
+  @override
+  String get peopleSave => 'Guardar Persona';
+
+  @override
+  String get peopleSaved => 'Persona guardada.';
+
+  @override
+  String get peopleDeleted => 'Persona eliminada.';
+
+  @override
+  String get peopleDelete => 'Eliminar';
+
+  @override
+  String get peopleSelect => 'Seleccionar persona guardada';
+
+  @override
+  String get peopleLoginRequired => 'Inicie sesión para guardar una persona.';
 }

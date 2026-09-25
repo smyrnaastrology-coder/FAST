@@ -1137,4 +1137,139 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scoreBondLabel => 'Bond Score';
+
+  @override
+  String get warningTitle => 'Important Notice';
+
+  @override
+  String get warningBody =>
+      'The synastry work in this app is carried out with the vectorial transfer method developed by Karma Astrologer Fatih ASARTEPE and with meeting-date calibration. This is why the meeting or marriage date is requested instead of the birth times of the people, and the meeting or marriage place is requested instead of their birth places. The resulting charts will differ from natal charts, but they will give you incredible results for your life and your relationship.';
+
+  @override
+  String get warningAcknowledge => 'I Understand';
+
+  @override
+  String get warningBack => 'Back';
+
+  @override
+  String get loginNav => 'Sign In';
+
+  @override
+  String get loginTitle => 'Sign In';
+
+  @override
+  String get loginSubtitle =>
+      'Sign in to your account and access your saved people from any device.';
+
+  @override
+  String get loginEmailLabel => 'Email';
+
+  @override
+  String get loginPasswordLabel => 'Password';
+
+  @override
+  String get loginRemember => 'Remember me';
+
+  @override
+  String get loginForgot => 'Forgot password?';
+
+  @override
+  String get loginButton => 'Sign In';
+
+  @override
+  String get signupButton => 'Create Account';
+
+  @override
+  String get loginOr => 'or';
+
+  @override
+  String get loginGoogle => 'Continue with Google';
+
+  @override
+  String get loginFacebook => 'Continue with Facebook';
+
+  @override
+  String get loginNoAccount => 'Don\'t have an account? Sign up';
+
+  @override
+  String get loginHaveAccount => 'Already have an account? Sign in';
+
+  @override
+  String get loginGuest => 'Continue as guest';
+
+  @override
+  String get loginErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
+  String get loginErrorInvalid => 'Incorrect email or password.';
+
+  @override
+  String get loginErrorExists => 'This email is already registered.';
+
+  @override
+  String get loginErrorDisabled => 'Membership is not configured yet.';
+
+  @override
+  String get loginSuccess => 'Signed in successfully!';
+
+  @override
+  String get logoutButton => 'Log Out';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileEmailLabel => 'Email';
+
+  @override
+  String get profileNameLabel => 'Full Name';
+
+  @override
+  String get profileSave => 'Save';
+
+  @override
+  String get profileChangePassword => 'Change Password';
+
+  @override
+  String get profileNewPassword => 'New Password';
+
+  @override
+  String get profilePasswordChanged => 'Password updated.';
+
+  @override
+  String get profileSaved => 'Profile updated.';
+
+  @override
+  String get peopleTitle => 'Saved People';
+
+  @override
+  String get peopleEmpty =>
+      'You have no saved people yet. You can save a person from the analysis form.';
+
+  @override
+  String get peopleFolderLabel => 'Folder';
+
+  @override
+  String get peopleFolderFamily => 'My Family';
+
+  @override
+  String get peopleFolderFriends => 'My Friends';
+
+  @override
+  String get peopleSave => 'Save Person';
+
+  @override
+  String get peopleSaved => 'Person saved.';
+
+  @override
+  String get peopleDeleted => 'Person deleted.';
+
+  @override
+  String get peopleDelete => 'Delete';
+
+  @override
+  String get peopleSelect => 'Select saved person';
+
+  @override
+  String get peopleLoginRequired => 'Sign in to save a person.';
 }

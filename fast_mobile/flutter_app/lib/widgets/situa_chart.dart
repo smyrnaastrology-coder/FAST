@@ -23,7 +23,7 @@ class SituaChart extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: CustomPaint(
             painter: _SituaPainter(gezegenler, yukselen, mc),
-            child: const Center(child: Text('Fast Synastry', style: TextStyle(fontSize: 11, color: FastTheme.textLight))),
+            child:  Center(child: Text('Fast Synastry', style: TextStyle(fontSize: 11, color: FastTheme.textLight))),
           ),
         ),
       ),

@@ -1133,4 +1133,139 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get scoreBondLabel => 'Bağ Skoru';
+
+  @override
+  String get warningTitle => 'Önemli Bilgilendirme';
+
+  @override
+  String get warningBody =>
+      'Bu uygulamadaki sinastri çalışmaları Karma Astrolog Fatih ASARTEPE tarafından geliştirilmiş olan vektörel taşıma yöntemiyle ve tanışma tarihi çapalamasıyla yapılmıştır. Kişilerin doğum saatlerinin yerine tanışma veya evlilik tarihi istenmesinin, kişilerin doğum yerleri yerine tanışma veya evlilik yeri istenmesinin sebebi budur. Çıkan haritalar natal haritalardan farklı çıkacak fakat hayatınız ve ilişkiniz adına size inanılmaz sonuçlar verecektir.';
+
+  @override
+  String get warningAcknowledge => 'Anladım';
+
+  @override
+  String get warningBack => 'Geri';
+
+  @override
+  String get loginNav => 'Giriş Yap';
+
+  @override
+  String get loginTitle => 'Giriş Yap';
+
+  @override
+  String get loginSubtitle =>
+      'Hesabınıza giriş yapın; kayıtlı kişilerinize her cihazdan ulaşın.';
+
+  @override
+  String get loginEmailLabel => 'E-posta';
+
+  @override
+  String get loginPasswordLabel => 'Şifre';
+
+  @override
+  String get loginRemember => 'Beni hatırla';
+
+  @override
+  String get loginForgot => 'Şifremi unuttum?';
+
+  @override
+  String get loginButton => 'Giriş Yap';
+
+  @override
+  String get signupButton => 'Hesap Oluştur';
+
+  @override
+  String get loginOr => 'veya';
+
+  @override
+  String get loginGoogle => 'Google ile devam et';
+
+  @override
+  String get loginFacebook => 'Facebook ile devam et';
+
+  @override
+  String get loginNoAccount => 'Hesabınız yok mu? Kayıt olun';
+
+  @override
+  String get loginHaveAccount => 'Zaten hesabınız var mı? Giriş yapın';
+
+  @override
+  String get loginGuest => 'Misafir olarak devam et';
+
+  @override
+  String get loginErrorGeneric => 'Bir hata oluştu. Lütfen tekrar deneyin.';
+
+  @override
+  String get loginErrorInvalid => 'E-posta veya şifre hatalı.';
+
+  @override
+  String get loginErrorExists => 'Bu e-posta zaten kayıtlı.';
+
+  @override
+  String get loginErrorDisabled => 'Üyelik şu anda yapılandırılmadı.';
+
+  @override
+  String get loginSuccess => 'Giriş başarılı!';
+
+  @override
+  String get logoutButton => 'Çıkış Yap';
+
+  @override
+  String get profileTitle => 'Profil';
+
+  @override
+  String get profileEmailLabel => 'E-posta';
+
+  @override
+  String get profileNameLabel => 'Ad Soyad';
+
+  @override
+  String get profileSave => 'Kaydet';
+
+  @override
+  String get profileChangePassword => 'Şifreyi Değiştir';
+
+  @override
+  String get profileNewPassword => 'Yeni Şifre';
+
+  @override
+  String get profilePasswordChanged => 'Şifre güncellendi.';
+
+  @override
+  String get profileSaved => 'Profil güncellendi.';
+
+  @override
+  String get peopleTitle => 'Kayıtlı Kişiler';
+
+  @override
+  String get peopleEmpty =>
+      'Henüz kayıtlı kişiniz yok. Analiz formundan kişi kaydedebilirsiniz.';
+
+  @override
+  String get peopleFolderLabel => 'Klasör';
+
+  @override
+  String get peopleFolderFamily => 'Ailem';
+
+  @override
+  String get peopleFolderFriends => 'Arkadaşlarım';
+
+  @override
+  String get peopleSave => 'Kişiyi Kaydet';
+
+  @override
+  String get peopleSaved => 'Kişi kaydedildi.';
+
+  @override
+  String get peopleDeleted => 'Kişi silindi.';
+
+  @override
+  String get peopleDelete => 'Sil';
+
+  @override
+  String get peopleSelect => 'Kayıtlı kişi seç';
+
+  @override
+  String get peopleLoginRequired => 'Kişi kaydetmek için giriş yapın.';
 }

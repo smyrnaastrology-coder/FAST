@@ -7,7 +7,7 @@ class SplashLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return  Scaffold(
       backgroundColor: FastTheme.bg,
       body: Center(
         child: Column(
