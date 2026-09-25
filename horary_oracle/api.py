@@ -38,7 +38,7 @@ class CastRequest(BaseModel):
     asker: str = Field("ben", description="ben / baskasi - yükselen kim?")
     # sohbet hafızası: önceki sorular (horary_app.py:96 ile aynı)
     history: Optional[list] = None
-    # kredi düşmek için kimlik (login'de kaydedilen email) - opsiyonel, yoksa düşülmez
+    # kredi düşmek için kimlik (login'de kaydedilen email) - ZORUNLU
     email: Optional[str] = None
     # opsiyonel: client kendi zamanını gönderirse
     year: Optional[int] = None
@@ -127,12 +127,8 @@ async def admin_list(key: str = ""):
     # Env set ise key zorunlu, yoksa geçici açık (ama logla)
     if admin_key and key != admin_key:
         raise HTTPException(403, "forbidden: admin key required")
-    db_path = os.path.join(os.path.dirname(__file__), "users.json")
-    if os.path.exists(db_path):
-        return json.load(open(db_path,encoding='utf-8'))
-    if os.path.exists("horary_oracle/users.json"):
-        return json.load(open("horary_oracle/users.json",encoding='utf-8'))
-    return {}
+    import auth as _adm
+    return _adm._load()
 
 @app.post("/admin/create")
 async def admin_create(email: str, key: str = ""):
@@ -144,8 +140,26 @@ async def admin_create(email: str, key: str = ""):
     pwd = create_user(email)
     return {"email":email, "password":pwd, "expiry": "1 yil"}
 
+def _require_account(email):
+    """cast icin kimlik kapisi: email yoksa/kayitlis degilse 401.
+    Selif: kredisi olan kayitli kullanici dict'i (credits None ise varsayilana cekilir)."""
+    import auth as _a
+    e = (email or "").strip().lower()
+    if not e:
+        raise HTTPException(401, "login gerekli - once uygulamadan giris yap")
+    u = _a.get_user(e)
+    if u is None:
+        raise HTTPException(401, "kayitli kullanici degil - once giris yap")
+    if u.get("credits") is None:
+        u["credits"] = _a.DEFAULT_CREDITS
+    return u
+
 @app.post("/api/horary/cast")
 async def cast(req: CastRequest):
+    # --- Kimlik kapisi (ucuz, motor/LLM calismadan once) ---
+    # Once email gondermeden veya kayitli olmayan e-posta ile cast denenebiliyordu
+    # => kredi kontrolu hic girmiyor, sınırsız bedava soru. Artık 401.
+    _acct = _require_account(req.email)
     # --- Sohbet modülü (horary_app.py:118 ile birebir) ---
     qlow = req.question.strip().lower()
     # Sohbet sürekliliği: takip mi yeni soru mu?
@@ -697,27 +711,18 @@ async def cast(req: CastRequest):
                 engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
     except: pass
     # kredi kontrolu (100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL)
-    try:
-        import auth as _auth3
-        _db3=_auth3._load()
-        _email3=getattr(req, '''email''', None) or ""
-        if not _email3:
-            try:
-                _email3=req.dict().get("email","")
-            except: pass
-        if _email3:
-            _u3=_db3.get(_email3.lower())
-            if _u3 is not None:
-                _credits=_u3.get("credits", None)
-                # None = sinirsiz (yillik), sayi = kredili
-                if _credits is not None:
-                    if _credits<=0:
-                        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
-                    _u3["credits"]=_credits-1
-                    _auth3._save(_db3)
-                    engine_json["credits_left"]=_u3["credits"]
-    except Exception as _e_cred:
-        print(f"kredi hata: {_e_cred}")
+    # Kimlik zaten cast basinda zorunlu; burada sadece dusen var (sohbet/selam bedava).
+    import auth as _auth3
+    _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
+    _u3 = _auth3.get_user(_email3) or _acct
+    _credits = _u3.get("credits")
+    if _credits is None: _credits = _auth3.DEFAULT_CREDITS
+    if _credits <= 0:
+        # 200 + NO_CREDITS: eski APK bunu yakalayip guzel "kredi bitti" dialogu gosteriyor
+        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
+    _left = _auth3.spend_credit(_email3)
+    if _left is not None:
+        engine_json["credits_left"] = _left
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
@@ -1086,7 +1091,8 @@ def admin_create(payload: dict, x_admin_key: str = _Header(None)):
         db=_auth._load()
         if uname not in db:
             import hashlib as _hl
-            db[uname]={"pwd":hashlib.sha256(pwd.encode()).hexdigest(),"expiry":db[email]["expiry"],"created":db[email]["created"],"is_trial":db[email].get("is_trial",False)}
+            # alias AYNI bakiyeyi paylasir (once kredisi olmayinca sınırsız sayılıyordu)
+            db[uname]={"pwd":hashlib.sha256(pwd.encode()).hexdigest(),"expiry":db[email]["expiry"],"created":db[email]["created"],"is_trial":db[email].get("is_trial",False),"credits":db[email].get("credits"),"plan":db[email].get("plan",""),"alias_of":email}
             _auth._save(db)
     return {"user": email, "password": pwd, "days": days, "expiry": _auth._load().get(email,{}).get("expiry")}
 
