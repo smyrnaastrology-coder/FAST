@@ -11,17 +11,7 @@ services:
         value: "true"
       - key: PYTHON_VERSION
         value: "3.12.8"
-  - type: web
-    name: horary-oracle-web
-    runtime: python
-    plan: free
-    buildCommand: pip install -r horary_oracle/requirements.txt
-    startCommand: streamlit run horary_oracle/horary_app.py --server.port $PORT --server.address 0.0.0.0
-    healthCheckPath: /_stcore/health
-    envVars:
-      - key: PYTHONUNBUFFERED
-        value: "true"
-      - key: MPLBACKEND
-        value: "Agg"
-      - key: PYTHON_VERSION
-        value: "3.12.8"
+# horary-oracle-web (streamlit) KALDIRILDI 2026-09-25: API kredisini tamamen atliyordu
+# (horary_app.py dogrudan cast_horary_chart + call_openai cagiriyor, login/kredi yok)
+# => herkes login'siz sınırsız soru sorabiliyordu. Servis Render'da durdurulmali/silinmeli.
+
