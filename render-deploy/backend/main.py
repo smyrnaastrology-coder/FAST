@@ -6499,6 +6499,21 @@ class PersonUpdate(BaseModel):
     utc_offset: Optional[str] = None
     folder: Optional[str] = None
 
+@app_fast.get("/api/env_diag")
+def env_diag():
+    import os as _os
+    supa = _os.getenv("SUPABASE_URL", "")
+    key = _os.getenv("SUPABASE_ANON_KEY", "")
+    return {
+        "supabase_url_set": bool(supa),
+        "supabase_url_prefix": (supa[:25] + "...") if supa else "",
+        "anon_key_set": bool(key),
+        "anon_key_len": len(key),
+        "anon_key_prefix": (key[:12] + "...") if key else "",
+        "database_url_set": bool(_os.getenv("DATABASE_URL", "")),
+    }
+
+
 @app_fast.get("/api/auth/me")
 def auth_me(request: Request):
     user = _require_user(request)
