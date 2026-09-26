@@ -125,9 +125,11 @@ def verify_token(authorization: str) -> dict | None:
     gecerli kabul etmez -> None (guvenli).
     """
     if not supabase_enabled():
+        print(f"[auth] verify_token: SUPABASE_URL BOS -> token dogrulanamiyor")
         return None
     token = (authorization or "").replace("Bearer ", "").strip()
     if not token:
+        print("[auth] verify_token: Authorization header YOK/boş")
         return None
     try:
         headers = {
@@ -135,11 +137,13 @@ def verify_token(authorization: str) -> dict | None:
             "Authorization": f"Bearer {token}",
         }
         r = requests.get(f"{SUPABASE_URL}/auth/v1/user", headers=headers, timeout=10)
+        print(f"[auth] verify_token: supabase /auth/v1/user -> {r.status_code} | apikey_uzunluk={len(SUPABASE_ANON_KEY)} | url={SUPABASE_URL[:20]}...")
         if r.status_code != 200:
             return None
         data = r.json()
         uid = (data or {}).get("id") or (data or {}).get("sub")
         if not uid:
+            print(f"[auth] verify_token: supabase 200 ama uid yok: {str(data)[:120]}")
             return None
         return {
             "id": uid,
