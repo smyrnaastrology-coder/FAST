@@ -72,6 +72,9 @@ class AuthService {
   static Map<String, String> _customFolders = {};
   static const _rememberKey = 'auth_remember_me';
 
+  /// OAuth (Google/Facebook) deep-link dönüşünde session değişince çağrılır.
+  static void Function()? onSessionChanged;
+
   static bool get enabled => ApiConfig.supabaseEnabled;
 
   static bool get isLoggedIn => _sessionToken != null && _sessionToken!.isNotEmpty;
@@ -87,6 +90,10 @@ class AuthService {
   static Future<void> init() async {
     if (!enabled) return;
     try {
+      Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        _applySession(data.session);
+        onSessionChanged?.call();
+      });
       final prefs = await SharedPreferences.getInstance();
       final remember = prefs.getBool(_rememberKey) ?? false;
       if (remember) {
@@ -148,8 +155,6 @@ class AuthService {
     await prefs.setBool(_rememberKey, true);
     await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google,
         redirectTo: _redirectUri);
-    final session = Supabase.instance.client.auth.currentSession;
-    _applySession(session);
   }
 
   /// Facebook ile giriş (Supabase OAuth).
@@ -159,8 +164,6 @@ class AuthService {
     await prefs.setBool(_rememberKey, true);
     await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.facebook,
         redirectTo: _redirectUri);
-    final session = Supabase.instance.client.auth.currentSession;
-    _applySession(session);
   }
 
   static Future<void> signOut() async {

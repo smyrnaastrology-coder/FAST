@@ -31,6 +31,14 @@ SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "").strip()
 _DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
+# PostgreSQL erişilemezse (şema/bağlantı hatası) bir kez kapatıp dosya deposuna düşeriz.
+_PG_DISABLED = False
+
+
+def _disable_pg():
+    global _PG_DISABLED
+    _PG_DISABLED = True
+
 
 def _pg_connect():
     import psycopg2
@@ -39,7 +47,7 @@ def _pg_connect():
 
 
 def _use_pg():
-    return bool(_DATABASE_URL)
+    return bool(_DATABASE_URL) and not _PG_DISABLED
 
 
 # ─────────────────────────── File store (billing deseni) ───────────────────────────
@@ -64,7 +72,12 @@ def _file_people() -> dict:
 def _pg_ensure_schema():
     if not _use_pg():
         return
-    conn = _pg_connect()
+    try:
+        conn = _pg_connect()
+    except Exception as e:
+        print(f"[auth] pg baglanti hatasi, dosya deposuna dusuluyor: {e}")
+        _disable_pg()
+        return
     try:
         with conn.cursor() as cur:
             cur.execute("""
@@ -93,6 +106,9 @@ def _pg_ensure_schema():
                 CREATE INDEX IF NOT EXISTS idx_auth_people_owner ON auth_people(owner_id);
             """)
         conn.commit()
+    except Exception as e:
+        print(f"[auth] pg schema hatasi, dosya deposuna dusuluyor: {e}")
+        _disable_pg()
     finally:
         conn.close()
 
@@ -115,6 +131,7 @@ def verify_token(authorization: str) -> dict | None:
         return None
     try:
         headers = {
+            "apikey": SUPABASE_ANON_KEY or SUPABASE_URL,
             "Authorization": f"Bearer {token}",
         }
         r = requests.get(f"{SUPABASE_URL}/auth/v1/user", headers=headers, timeout=10)

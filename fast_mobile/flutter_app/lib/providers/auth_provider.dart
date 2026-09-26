@@ -22,6 +22,10 @@ class AuthProvider extends ChangeNotifier {
 
   /// Uygulama açılışında çağrılır.
   Future<void> restore() async {
+    AuthService.onSessionChanged = () {
+      _status = AuthService.isLoggedIn ? AuthStatus.signedIn : AuthStatus.signedOut;
+      notifyListeners();
+    };
     await AuthService.init();
     _status = AuthService.isLoggedIn ? AuthStatus.signedIn : AuthStatus.signedOut;
     notifyListeners();

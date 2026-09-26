@@ -27,16 +27,13 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        <!-- Supabase OAuth geri dönüşü (deep link com.fastastrology.fast://login-callback) -->
-        <activity
-            android:name="com.linusu.flutter_web_auth.CallbackActivity"
-            android:exported="true">
+            <!-- Supabase OAuth geri dönüşü (deep link com.fastastrology.fast://login-callback) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="com.fastastrology.fast"/>
+                <data android:scheme="com.fastastrology.fast"
+                      android:host="login-callback"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
