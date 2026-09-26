@@ -862,10 +862,46 @@ class AppLocalizationsTr extends AppLocalizations {
   String get analyzerChartsTitle => 'Haritalar';
 
   @override
+  String get themePickerTitle => 'Tema Seç';
+
+  @override
+  String get themePaletteDark => 'Mor (Koyu)';
+
+  @override
+  String get themePaletteLight => 'Krem (Açık)';
+
+  @override
+  String get themePaletteSpain => 'İspanya (Koyu)';
+
+  @override
+  String get themePaletteArgentina => 'Arjantin (Açık)';
+
+  @override
+  String get chartTabSituaA => 'Oturan A';
+
+  @override
+  String get chartTabSituaB => 'Oturan B';
+
+  @override
+  String get chartTabFrekans => 'Frekans Haritası';
+
+  @override
+  String get chartTabComposite => 'Composite Haritası';
+
+  @override
+  String get chartTabAciGridi => 'Açı Gridi';
+
+  @override
+  String get chartTabArapNoktalari => 'Arap Noktaları';
+
+  @override
   String get analyzerReportTitle => 'Rapor';
 
   @override
   String get exitToMenu => 'Menüye Dön';
+
+  @override
+  String get exitFromAnalysis => 'Analizden Çık';
 
   @override
   String get newAnalysis => 'Yeni Analiz';

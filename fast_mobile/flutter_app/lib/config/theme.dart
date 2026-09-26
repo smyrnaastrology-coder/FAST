@@ -31,6 +31,30 @@ class FastTheme {
   static const Color lightCardBgHover = Color(0xFFF7F1E8);
   static const Color lightBorder = Color(0xFFE6DCCF);
 
+  // ── Spain (koyu, İspanya bayrağı: kırmızı + altın sarısı) ──
+  static const Color spainPrimary = Color(0xFF7A1218);
+  static const Color spainPrimaryLight = Color(0xFFA81C24);
+  static const Color spainAccentGold = Color(0xFFE8B23A);
+  static const Color spainAccentGoldLight = Color(0xFFF7D060);
+  static const Color spainAccentGoldGlow = Color(0x4DE8B23A);
+  static const Color spainBg = Color(0xFF160A0C);
+  static const Color spainBgSecondary = Color(0xFF221013);
+  static const Color spainCardBg = Color(0xFF2C1618);
+  static const Color spainCardBgHover = Color(0xFF3A1C1F);
+  static const Color spainBorder = Color(0xFF5A2126);
+
+  // ── Argentina (açık, Arjantin bayrağı: gök mavisi + siyah yazı) ──
+  static const Color argPrimary = Color(0xFF2E6DA4);
+  static const Color argPrimaryLight = Color(0xFF4A90D9);
+  static const Color argAccentGold = Color(0xFF1E5F94);
+  static const Color argAccentGoldLight = Color(0xFF5FA8DC);
+  static const Color argAccentGoldGlow = Color(0x334A90D9);
+  static const Color argBg = Color(0xFFF4F9FD);
+  static const Color argBgSecondary = Color(0xFFE3EFF9);
+  static const Color argCardBg = Color(0xFFFFFFFF);
+  static const Color argCardBgHover = Color(0xFFEAF3FB);
+  static const Color argBorder = Color(0xFFBFD6E9);
+
   // ── Aktif renkler (dark varsayılan) ──
   static Color primary = darkPrimary;
   static Color primaryLight = darkPrimaryLight;
@@ -51,25 +75,29 @@ class FastTheme {
   static Color error = const Color(0xFFe57373);
   static Color textLight = const Color(0xFFFFFFFF);
 
-  static bool get isDark => bg == darkBg;
+  static bool get isDark => mode == ThemeMode.dark;
 
   /// İsteğe bağlı: widget'ların aktif paleti izleyip rebuild edebilmesi.
   static ThemeMode mode = ThemeMode.dark;
+
+  /// Aktif palet kimliği ('dark' | 'light' | 'spain' | 'argentina').
+  static String palette = 'dark';
 
   /// Aktif paleti değiştirir. Tüm statik renkler güncellenir.
   static void apply(ThemeMode newMode) {
     mode = newMode;
     if (newMode == ThemeMode.dark) {
-      primary = darkPrimary;
-      primaryLight = darkPrimaryLight;
-      accentGold = darkAccentGold;
-      accentGoldLight = darkAccentGoldLight;
-      accentGoldGlow = darkAccentGoldGlow;
-      bg = darkBg;
-      bgSecondary = darkBgSecondary;
-      cardBg = darkCardBg;
-      cardBgHover = darkCardBgHover;
-      border = darkBorder;
+      final isSpain = palette == 'spain';
+      primary = isSpain ? spainPrimary : darkPrimary;
+      primaryLight = isSpain ? spainPrimaryLight : darkPrimaryLight;
+      accentGold = isSpain ? spainAccentGold : darkAccentGold;
+      accentGoldLight = isSpain ? spainAccentGoldLight : darkAccentGoldLight;
+      accentGoldGlow = isSpain ? spainAccentGoldGlow : darkAccentGoldGlow;
+      bg = isSpain ? spainBg : darkBg;
+      bgSecondary = isSpain ? spainBgSecondary : darkBgSecondary;
+      cardBg = isSpain ? spainCardBg : darkCardBg;
+      cardBgHover = isSpain ? spainCardBgHover : darkCardBgHover;
+      border = isSpain ? spainBorder : darkBorder;
       text = const Color(0xFFFFFFFF);
       textMuted = const Color(0xFFFFFFFF);
       textDim = const Color(0xFFFFFFFF);
@@ -79,24 +107,25 @@ class FastTheme {
       error = const Color(0xFFe57373);
       textLight = const Color(0xFFFFFFFF);
     } else {
-      primary = lightPrimary;
-      primaryLight = lightPrimaryLight;
-      accentGold = lightAccentGold;
-      accentGoldLight = lightAccentGoldLight;
-      accentGoldGlow = lightAccentGoldGlow;
-      bg = lightBg;
-      bgSecondary = lightBgSecondary;
-      cardBg = lightCardBg;
-      cardBgHover = lightCardBgHover;
-      border = lightBorder;
-      text = const Color(0xFF2D2440);
-      textMuted = const Color(0xFF4A3B5C);
-      textDim = const Color(0xFF8A7A9A);
+      final isArg = palette == 'argentina';
+      primary = isArg ? argPrimary : lightPrimary;
+      primaryLight = isArg ? argPrimaryLight : lightPrimaryLight;
+      accentGold = isArg ? argAccentGold : lightAccentGold;
+      accentGoldLight = isArg ? argAccentGoldLight : lightAccentGoldLight;
+      accentGoldGlow = isArg ? argAccentGoldGlow : lightAccentGoldGlow;
+      bg = isArg ? argBg : lightBg;
+      bgSecondary = isArg ? argBgSecondary : lightBgSecondary;
+      cardBg = isArg ? argCardBg : lightCardBg;
+      cardBgHover = isArg ? argCardBgHover : lightCardBgHover;
+      border = isArg ? argBorder : lightBorder;
+      text = isArg ? const Color(0xFF101820) : const Color(0xFF2D2440);
+      textMuted = isArg ? const Color(0xFF1E2A35) : const Color(0xFF4A3B5C);
+      textDim = isArg ? const Color(0xFF5B6C7A) : const Color(0xFF8A7A9A);
       success = const Color(0xFF16a34a);
       warning = const Color(0xFFb45309);
       danger = const Color(0xFFdc2626);
       error = const Color(0xFFdc2626);
-      textLight = const Color(0xFF2D2440);
+      textLight = isArg ? const Color(0xFF101820) : const Color(0xFF2D2440);
     }
   }
 

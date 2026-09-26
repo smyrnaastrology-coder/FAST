@@ -866,10 +866,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyzerChartsTitle => 'Charts';
 
   @override
+  String get themePickerTitle => 'Select Theme';
+
+  @override
+  String get themePaletteDark => 'Purple (Dark)';
+
+  @override
+  String get themePaletteLight => 'Cream (Light)';
+
+  @override
+  String get themePaletteSpain => 'Spain (Dark)';
+
+  @override
+  String get themePaletteArgentina => 'Argentina (Light)';
+
+  @override
+  String get chartTabSituaA => 'Chart A';
+
+  @override
+  String get chartTabSituaB => 'Chart B';
+
+  @override
+  String get chartTabFrekans => 'Frequency Map';
+
+  @override
+  String get chartTabComposite => 'Composite Map';
+
+  @override
+  String get chartTabAciGridi => 'Aspect Grid';
+
+  @override
+  String get chartTabArapNoktalari => 'Arabic Parts';
+
+  @override
   String get analyzerReportTitle => 'Report';
 
   @override
   String get exitToMenu => 'Back to Menu';
+
+  @override
+  String get exitFromAnalysis => 'Exit Analysis';
 
   @override
   String get newAnalysis => 'New Analysis';

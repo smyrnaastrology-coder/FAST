@@ -35,7 +35,10 @@ class _SectionCardState extends State<SectionCard> {
                     const SizedBox(width: 10),
                   ],
                   Expanded(
-                    child: Text(widget.title, style:  TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.text)),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(widget.title, style:  TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                    ),
                   ),
                   Icon(_open ? Icons.expand_less : Icons.expand_more, color: FastTheme.textLight),
                 ],

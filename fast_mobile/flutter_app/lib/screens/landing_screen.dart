@@ -259,7 +259,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _themeToggle(ThemeProvider tp) {
     return GestureDetector(
-      onTap: () => tp.toggle(),
+      onTap: () => _showThemeSheet(context, tp),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
@@ -278,6 +278,99 @@ class _LandingScreenState extends State<LandingScreen> {
         ),
       ),
     );
+  }
+
+  void _showThemeSheet(BuildContext context, ThemeProvider tp) {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: FastTheme.cardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.themePickerTitle,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.text)),
+              const SizedBox(height: 12),
+              ...ThemeProvider.palettes.map((p) {
+                final selected = tp.palette == p.key;
+                final colors = _palettePreview(p.key);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      tp.setPalette(p.key);
+                      Navigator.of(ctx).pop();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: selected ? FastTheme.cardBgHover : FastTheme.bg,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: selected ? FastTheme.accentGold : FastTheme.border, width: selected ? 2 : 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Row(
+                            children: colors
+                                .map((c) => Container(
+                                      width: 18,
+                                      height: 18,
+                                      margin: const EdgeInsets.only(right: 4),
+                                      decoration:
+                                          BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: FastTheme.border)),
+                                    ))
+                                .toList(),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(_paletteLabel(p.key, l10n),
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                    color: FastTheme.text)),
+                          ),
+                          if (selected) Icon(Icons.check_circle, size: 18, color: FastTheme.accentGold),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _paletteLabel(String id, AppLocalizations l10n) {
+    switch (id) {
+      case 'spain': return l10n.themePaletteSpain;
+      case 'argentina': return l10n.themePaletteArgentina;
+      case 'light': return l10n.themePaletteLight;
+      default: return l10n.themePaletteDark;
+    }
+  }
+
+  List<Color> _palettePreview(String id) {
+    switch (id) {
+      case 'spain':
+        return [FastTheme.spainBg, FastTheme.spainCardBg, FastTheme.spainAccentGold];
+      case 'argentina':
+        return [FastTheme.argBg, FastTheme.argCardBg, FastTheme.argPrimary];
+      case 'light':
+        return [FastTheme.lightBg, FastTheme.lightCardBg, FastTheme.lightAccentGold];
+      default:
+        return [FastTheme.darkBg, FastTheme.darkCardBg, FastTheme.darkAccentGold];
+    }
   }
 
   Widget _languageDropdown(LocaleProvider lp) {

@@ -1605,10 +1605,15 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 padding: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(border: Border(bottom: BorderSide(color: FastTheme.border.withValues(alpha: 0.5)))),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('🗓️ ${a['tarih'] ?? ''} (${a['gun_ad'] ?? ''})', style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
-                    if (_isNatal && a['ortam'] != null) ...[
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   mainAxisAlignment: MainAxisAlignment.start,
+                   children: [
+                     Align(
+                       alignment: Alignment.centerLeft,
+                       child: Text('🗓️ ${a['tarih'] ?? ''} (${a['gun_ad'] ?? ''})',
+                           style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
+                     ),
+                     if (_isNatal && a['ortam'] != null) ...[
                       Text('🌙 Ay ${a['ay_burc'] ?? ''} — ${a['ay_ev'] ?? ''}. Ev (${a['ay_derece'] ?? ''}°)',
                         style:  TextStyle(color: FastTheme.accentGold, fontSize: 10)),
                       Text(a['ortam'].toString(), style:  TextStyle(color: FastTheme.textDim, fontSize: 11, fontStyle: FontStyle.italic)),
@@ -2329,10 +2334,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: active ? FastTheme.accentGold : FastTheme.border),
                     ),
-                    child: Text(t, style: TextStyle(
-                      fontSize: 11, fontWeight: FontWeight.w600,
-                      color: active ? FastTheme.bg : FastTheme.textMuted,
-                    )),
+                     child: Text(_chartTabLabel(t.toString(), l10n), style: TextStyle(
+                       fontSize: 11, fontWeight: FontWeight.w600,
+                       color: active ? FastTheme.bg : FastTheme.textMuted,
+                     )),
                   ),
                 ),
               );
@@ -2483,18 +2488,20 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: _submit,
-            style: OutlinedButton.styleFrom(
-              side:  BorderSide(color: FastTheme.border),
-              foregroundColor: FastTheme.text,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Text(l10n.newAnalysis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            ),
-          ),
+           OutlinedButton(
+             onPressed: () {
+               Navigator.of(context, rootNavigator: true).popUntil((r) => r.isFirst);
+             },
+             style: OutlinedButton.styleFrom(
+               side:  BorderSide(color: FastTheme.border),
+               foregroundColor: FastTheme.text,
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+             ),
+             child: Padding(
+               padding: const EdgeInsets.symmetric(vertical: 10),
+               child: Text(l10n.exitFromAnalysis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+             ),
+           ),
         ],
       ),
     );
@@ -2503,6 +2510,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // ========== HELPERS ==========
   Widget _sectionCard(String icon, String title, {required Widget child, bool defaultOpen = false}) {
     return w.SectionCard(icon: Icons.star, title: '$icon $title', child: child);
+  }
+
+  String _chartTabLabel(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'situa_a': return l10n.chartTabSituaA;
+      case 'situa_b': return l10n.chartTabSituaB;
+      case 'frekans': return l10n.chartTabFrekans;
+      case 'composite': return l10n.chartTabComposite;
+      case 'aci_gridi': return l10n.chartTabAciGridi;
+      case 'arap_noktalari': return l10n.chartTabArapNoktalari;
+      default: return key;
+    }
   }
 
   void _showFullImage(String url) {

@@ -1672,6 +1672,72 @@ abstract class AppLocalizations {
   /// **'Charts'**
   String get analyzerChartsTitle;
 
+  /// No description provided for @themePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Theme'**
+  String get themePickerTitle;
+
+  /// No description provided for @themePaletteDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple (Dark)'**
+  String get themePaletteDark;
+
+  /// No description provided for @themePaletteLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Cream (Light)'**
+  String get themePaletteLight;
+
+  /// No description provided for @themePaletteSpain.
+  ///
+  /// In en, this message translates to:
+  /// **'Spain (Dark)'**
+  String get themePaletteSpain;
+
+  /// No description provided for @themePaletteArgentina.
+  ///
+  /// In en, this message translates to:
+  /// **'Argentina (Light)'**
+  String get themePaletteArgentina;
+
+  /// No description provided for @chartTabSituaA.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart A'**
+  String get chartTabSituaA;
+
+  /// No description provided for @chartTabSituaB.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart B'**
+  String get chartTabSituaB;
+
+  /// No description provided for @chartTabFrekans.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency Map'**
+  String get chartTabFrekans;
+
+  /// No description provided for @chartTabComposite.
+  ///
+  /// In en, this message translates to:
+  /// **'Composite Map'**
+  String get chartTabComposite;
+
+  /// No description provided for @chartTabAciGridi.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspect Grid'**
+  String get chartTabAciGridi;
+
+  /// No description provided for @chartTabArapNoktalari.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Parts'**
+  String get chartTabArapNoktalari;
+
   /// No description provided for @analyzerReportTitle.
   ///
   /// In en, this message translates to:
@@ -1683,6 +1749,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Menu'**
   String get exitToMenu;
+
+  /// No description provided for @exitFromAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Analysis'**
+  String get exitFromAnalysis;
 
   /// No description provided for @newAnalysis.
   ///
