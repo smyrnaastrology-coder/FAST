@@ -382,5 +382,17 @@
   "peopleDeleted": "Person deleted.",
   "peopleDelete": "Delete",
   "peopleSelect": "Select saved person",
-  "peopleLoginRequired": "Sign in to save a person."
+  "peopleLoginRequired": "Sign in to save a person.",
+  "peopleSave1": "Save Person 1",
+  "peopleSave2": "Save Person 2",
+  "peopleNewFolder": "New Folder",
+  "peopleFolderNameHint": "New folder name",
+  "peopleCancel": "Cancel",
+  "peopleNameRequired": "Enter a name",
+  "peopleBirthDateRequired": "Enter birth date",
+  "peopleBirthTimeRequired": "Enter birth time",
+  "peopleFolderRequired": "Enter a folder name",
+  "peopleApplyTo": "Apply person to",
+  "peopleApplyPerson1": "Person 1",
+  "peopleApplyPerson2": "Person 2"
 }

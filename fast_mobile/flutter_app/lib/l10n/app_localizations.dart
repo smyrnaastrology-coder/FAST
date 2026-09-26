@@ -2397,6 +2397,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in to save a person.'**
   String get peopleLoginRequired;
+
+  /// No description provided for @peopleSave1.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Person 1'**
+  String get peopleSave1;
+
+  /// No description provided for @peopleSave2.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Person 2'**
+  String get peopleSave2;
+
+  /// No description provided for @peopleNewFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'New Folder'**
+  String get peopleNewFolder;
+
+  /// No description provided for @peopleFolderNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder name'**
+  String get peopleFolderNameHint;
+
+  /// No description provided for @peopleCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get peopleCancel;
+
+  /// No description provided for @peopleNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get peopleNameRequired;
+
+  /// No description provided for @peopleBirthDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter birth date'**
+  String get peopleBirthDateRequired;
+
+  /// No description provided for @peopleBirthTimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter birth time'**
+  String get peopleBirthTimeRequired;
+
+  /// No description provided for @peopleFolderRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a folder name'**
+  String get peopleFolderRequired;
+
+  /// No description provided for @peopleApplyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply person to'**
+  String get peopleApplyTo;
+
+  /// No description provided for @peopleApplyPerson1.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 1'**
+  String get peopleApplyPerson1;
+
+  /// No description provided for @peopleApplyPerson2.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 2'**
+  String get peopleApplyPerson2;
 }
 
 class _AppLocalizationsDelegate

@@ -795,12 +795,17 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         icon: const Icon(Icons.person_add, size: 16),
         label: Text(l10n.loginNav, style: const TextStyle(fontSize: 12)),
         style: OutlinedButton.styleFrom(
-          side:  BorderSide(color: FastTheme.border),
+          side: BorderSide(color: FastTheme.border),
           foregroundColor: FastTheme.accentGold,
           padding: const EdgeInsets.symmetric(vertical: 10),
         ),
       );
     } else {
+      final saveCls = OutlinedButton.styleFrom(
+        side: BorderSide(color: FastTheme.border),
+        foregroundColor: FastTheme.accentGold,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+      );
       child = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -813,16 +818,35 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             ),
             const SizedBox(height: 8),
           ],
-          OutlinedButton.icon(
-            onPressed: () => _saveCurrentPerson(l10n),
-            icon: const Icon(Icons.bookmark_add, size: 16),
-            label: Text(l10n.peopleSave, style: const TextStyle(fontSize: 12)),
-            style: OutlinedButton.styleFrom(
-              side:  BorderSide(color: FastTheme.border),
-              foregroundColor: FastTheme.accentGold,
-              padding: const EdgeInsets.symmetric(vertical: 10),
+          if (_ikinciKisiGerekli)
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _saveCurrentPerson(l10n, slot: 1),
+                    icon: const Icon(Icons.bookmark_add, size: 16),
+                    label: Text(l10n.peopleSave1, style: const TextStyle(fontSize: 12)),
+                    style: saveCls,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _saveCurrentPerson(l10n, slot: 2),
+                    icon: const Icon(Icons.bookmark_add, size: 16),
+                    label: Text(l10n.peopleSave2, style: const TextStyle(fontSize: 12)),
+                    style: saveCls,
+                  ),
+                ),
+              ],
+            )
+          else
+            OutlinedButton.icon(
+              onPressed: () => _saveCurrentPerson(l10n, slot: 1),
+              icon: const Icon(Icons.bookmark_add, size: 16),
+              label: Text(l10n.peopleSave, style: const TextStyle(fontSize: 12)),
+              style: saveCls,
             ),
-          ),
         ],
       );
     }
@@ -838,23 +862,33 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   Widget _personChip(SavedPerson p, AppLocalizations l10n) {
-    final active = p.name == _p1IsimCtrl.text;
+    final active = p.name == _p1IsimCtrl.text || (_ikinciKisiGerekli && p.name == _p2IsimCtrl.text);
     return GestureDetector(
-      onTap: () {
-        if (!_ikinciKisiGerekli || active) {
-          _p1IsimCtrl.text = p.name;
-          if (p.birthDate != null && p.birthDate!.isNotEmpty) _p1TarihCtrl.text = p.birthDate!;
-          if (p.birthTime != null && p.birthTime!.isNotEmpty) _p1SaatCtrl.text = p.birthTime!;
-          if (p.city != null && p.city!.isNotEmpty && _sehirler?.contains(p.city) == true) {
-            _seciliSehir = p.city!;
-          }
-          if (p.country != null && p.country!.isNotEmpty && _ulkeler?.contains(p.country) == true) {
-            _seciliUlke = p.country!;
-          }
-          if (p.lat != null) _latCtrl.text = p.lat!.toStringAsFixed(4);
-          if (p.lon != null) _lonCtrl.text = p.lon!.toStringAsFixed(4);
-          if (!active) _geoCode(_seciliSehir);
+      onTap: () async {
+        if (!_ikinciKisiGerekli) {
+          _applyPerson(p, 1);
+          return;
         }
+        // İki kişilik modda kişinin 1. ya da 2. alana uygulanacağını sor.
+        final secim = await showDialog<int>(
+          context: context,
+          builder: (ctx) => SimpleDialog(
+            backgroundColor: FastTheme.cardBg,
+            title: Text(l10n.peopleApplyTo, style: TextStyle(color: FastTheme.accentGold, fontSize: 16)),
+            children: [
+              SimpleDialogOption(
+                onPressed: () => Navigator.of(ctx).pop(1),
+                child: Text(l10n.peopleApplyPerson1, style: TextStyle(color: FastTheme.text)),
+              ),
+              SimpleDialogOption(
+                onPressed: () => Navigator.of(ctx).pop(2),
+                child: Text(l10n.peopleApplyPerson2, style: TextStyle(color: FastTheme.text)),
+              ),
+            ],
+          ),
+        );
+        if (secim == null || !mounted) return;
+        _applyPerson(p, secim);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -875,56 +909,196 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     );
   }
 
-  Future<void> _saveCurrentPerson(AppLocalizations l10n) async {
+  Future<void> _saveCurrentPerson(AppLocalizations l10n, {int slot = 1}) async {
     final ap = context.read<AuthProvider>();
     if (!ap.isLoggedIn) {
       await Navigator.push(context, MaterialPageRoute(builder: (_) => const AuthScreen()));
       _loadPeople();
       return;
     }
-    final isim = _p1IsimCtrl.text.trim();
-    if (isim.isEmpty) {
-      _snack(l10n.analyzerNameRequired);
-      return;
+
+    final isimCtrl = TextEditingController(text: slot == 2 ? _p2IsimCtrl.text : _p1IsimCtrl.text);
+    final tarihCtrl = TextEditingController(text: slot == 2 ? _p2TarihCtrl.text : _p1TarihCtrl.text);
+    final saatCtrl = TextEditingController(
+        text: (slot == 2 ? _p2SaatCtrl.text : _p1SaatCtrl.text).isEmpty ? '12:00' : (slot == 2 ? _p2SaatCtrl.text : _p1SaatCtrl.text));
+    final latCtrl = TextEditingController(text: _latCtrl.text);
+    final lonCtrl = TextEditingController(text: _lonCtrl.text);
+    final yeniKlasorCtrl = TextEditingController();
+    var ulke = (_ulkeler?.contains(_seciliUlke) ?? false) ? _seciliUlke
+        : (_ulkeler?.isNotEmpty == true ? _ulkeler!.first : '');
+    var sehir = (_sehirler?.contains(_seciliSehir) ?? false) ? _seciliSehir
+        : (_sehirler?.isNotEmpty == true ? _sehirler!.first : '');
+    var folderKey = 'ailem';
+    var yeniKlasorModu = false;
+
+    void geo(sehirAdi) {
+      _api.geocode(sehirAdi).then((g) {
+        if (!context.mounted) return;
+        setState(() {
+          latCtrl.text = g['lat'].toStringAsFixed(4);
+          lonCtrl.text = g['lon'].toStringAsFixed(4);
+        });
+      }).catchError((_) {});
     }
-    // Klasör seçimi
-    final folder = await showDialog<String>(
+
+    final saved = await showDialog<SavedPerson>(
       context: context,
-      builder: (ctx) => SimpleDialog(
-        backgroundColor: FastTheme.cardBg,
-        title: Text(l10n.peopleFolderLabel, style:  TextStyle(color: FastTheme.accentGold, fontSize: 16)),
-        children: [
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(ctx).pop('ailem'),
-            child: Text(l10n.peopleFolderFamily, style:  TextStyle(color: FastTheme.text)),
-          ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(ctx).pop('arkadaslarim'),
-            child: Text(l10n.peopleFolderFriends, style:  TextStyle(color: FastTheme.text)),
-          ),
-        ],
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDlg) {
+          final sehirListesi = ulke.isNotEmpty
+              ? ((_lokasyonDB?['sehirler']?[ulke] as List?)?.cast<String>() ?? <String>[])
+              : <String>[];
+          final formFieldStyle = TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1);
+          return AlertDialog(
+            backgroundColor: FastTheme.cardBg,
+            title: Text(slot == 2 ? l10n.peopleSave2 : l10n.peopleSave,
+                style: TextStyle(color: FastTheme.accentGold, fontSize: 17, fontWeight: FontWeight.w600)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: isimCtrl,
+                    style: TextStyle(color: FastTheme.text, fontSize: 13),
+                    decoration: InputDecoration(
+                      labelText: l10n.analyzerName,
+                      labelStyle: formFieldStyle,
+                      prefixIcon: Icon(Icons.person, size: 18, color: FastTheme.accentGold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _dateField(l10n.analyzerBirthDate, tarihCtrl, l10n),
+                  _timeField(l10n.analyzerBirthTime, saatCtrl),
+                  _dropdownField(l10n.analyzerCountry, _ulkeler ?? [], ulke, (v) {
+                    setDlg(() { ulke = v!; sehir = sehirListesi.isNotEmpty ? sehirListesi.first : ''; });
+                  }),
+                  _dropdownField(l10n.analyzerCity, sehirListesi, sehir, (v) {
+                    setDlg(() { sehir = v!; });
+                    geo(v);
+                  }),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: latCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: TextStyle(color: FastTheme.text, fontSize: 13),
+                          decoration: InputDecoration(
+                            labelText: l10n.analyzerLatitude,
+                            labelStyle: formFieldStyle,
+                            prefixIcon: Icon(Icons.explore, size: 18, color: FastTheme.accentGold),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: lonCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: TextStyle(color: FastTheme.text, fontSize: 13),
+                          decoration: InputDecoration(
+                            labelText: l10n.analyzerLongitude,
+                            labelStyle: formFieldStyle,
+                            prefixIcon: Icon(Icons.explore, size: 18, color: FastTheme.accentGold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _dropdownField(
+                    l10n.peopleFolderLabel,
+                    ['ailem', 'arkadaslarim', '__yeni__'],
+                    folderKey,
+                    (v) => setDlg(() { folderKey = v!; yeniKlasorModu = v == '__yeni__'; }),
+                    labels: {
+                      'ailem': l10n.peopleFolderFamily,
+                      'arkadaslarim': l10n.peopleFolderFriends,
+                      '__yeni__': l10n.peopleNewFolder,
+                    },
+                  ),
+                  if (yeniKlasorModu)
+                    TextField(
+                      controller: yeniKlasorCtrl,
+                      style: TextStyle(color: FastTheme.text, fontSize: 13),
+                      decoration: InputDecoration(
+                        labelText: l10n.peopleFolderNameHint,
+                        labelStyle: formFieldStyle,
+                        prefixIcon: Icon(Icons.create_new_folder, size: 18, color: FastTheme.accentGold),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.peopleCancel, style: TextStyle(color: FastTheme.textMuted)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold, foregroundColor: FastTheme.bg),
+                onPressed: () async {
+                  final isim = isimCtrl.text.trim();
+                  if (isim.isEmpty) { _snack(l10n.peopleNameRequired); return; }
+                  if (tarihCtrl.text.trim().isEmpty) { _snack(l10n.peopleBirthDateRequired); return; }
+                  if (saatCtrl.text.trim().isEmpty) { _snack(l10n.peopleBirthTimeRequired); return; }
+                  String? folder;
+                  if (yeniKlasorModu) {
+                    folder = yeniKlasorCtrl.text.trim();
+                    if (folder.isEmpty) { _snack(l10n.peopleFolderRequired); return; }
+                  } else {
+                    folder = folderKey;
+                  }
+                  final p = SavedPerson(
+                    id: 0,
+                    name: isim,
+                    birthDate: tarihCtrl.text.isNotEmpty ? _normalizeDate(tarihCtrl.text) : null,
+                    birthTime: saatCtrl.text.trim(),
+                    city: sehir.isNotEmpty ? sehir : null,
+                    country: ulke.isNotEmpty ? ulke : null,
+                    lat: double.tryParse(latCtrl.text),
+                    lon: double.tryParse(lonCtrl.text),
+                    folder: folder,
+                  );
+                  final created = await AuthService.createPerson(p);
+                  if (!context.mounted) return;
+                  if (created != null) {
+                    Navigator.of(ctx).pop(created);
+                  } else {
+                    _snack(l10n.loginErrorGeneric);
+                  }
+                },
+                child: Text(l10n.peopleSave),
+              ),
+            ],
+          );
+        },
       ),
     );
-    if (folder == null) return;
-    final p = SavedPerson(
-      id: 0,
-      name: isim,
-      birthDate: _p1TarihCtrl.text.isNotEmpty ? _normalizeDate(_p1TarihCtrl.text) : null,
-      birthTime: _p1SaatCtrl.text.isNotEmpty ? _p1SaatCtrl.text : null,
-      city: _seciliSehir.isNotEmpty ? _seciliSehir : null,
-      country: _seciliUlke.isNotEmpty ? _seciliUlke : null,
-      lat: double.tryParse(_latCtrl.text),
-      lon: double.tryParse(_lonCtrl.text),
-      folder: folder,
-    );
-    final created = await AuthService.createPerson(p);
-    if (!mounted) return;
-    if (created != null) {
-      _snack(l10n.peopleSaved);
-      setState(() => _savedPeople = [..._savedPeople, created]);
-    } else {
-      _snack(l10n.loginErrorGeneric);
-    }
+    if (saved == null || !mounted) return;
+    _snack(l10n.peopleSaved);
+    setState(() => _savedPeople = [..._savedPeople, saved]);
+    _applyPerson(saved, slot);
+  }
+
+  void _applyPerson(SavedPerson p, int slot) {
+    setState(() {
+      if (slot == 2) {
+        _p2IsimCtrl.text = p.name;
+        if (p.birthDate != null && p.birthDate!.isNotEmpty) _p2TarihCtrl.text = p.birthDate!;
+        if (p.birthTime != null && p.birthTime!.isNotEmpty) _p2SaatCtrl.text = p.birthTime!;
+      } else {
+        _p1IsimCtrl.text = p.name;
+        if (p.birthDate != null && p.birthDate!.isNotEmpty) _p1TarihCtrl.text = p.birthDate!;
+        if (p.birthTime != null && p.birthTime!.isNotEmpty) _p1SaatCtrl.text = p.birthTime!;
+      }
+      if (p.city != null && p.city!.isNotEmpty && _sehirler?.contains(p.city) == true) _seciliSehir = p.city!;
+      if (p.country != null && p.country!.isNotEmpty && _ulkeler?.contains(p.country) == true) _seciliUlke = p.country!;
+      if (p.lat != null) _latCtrl.text = p.lat!.toStringAsFixed(4);
+      if (p.lon != null) _lonCtrl.text = p.lon!.toStringAsFixed(4);
+    });
+    if (p.city != null && p.city!.isNotEmpty) _geoCode(p.city!);
   }
 
   // ========== MAIN CONTENT ==========

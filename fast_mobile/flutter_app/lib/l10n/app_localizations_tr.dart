@@ -1271,4 +1271,40 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get peopleLoginRequired => 'Kişi kaydetmek için giriş yapın.';
+
+  @override
+  String get peopleSave1 => '1. Kişiyi Kaydet';
+
+  @override
+  String get peopleSave2 => '2. Kişiyi Kaydet';
+
+  @override
+  String get peopleNewFolder => 'Yeni Klasör';
+
+  @override
+  String get peopleFolderNameHint => 'Yeni klasör adı';
+
+  @override
+  String get peopleCancel => 'Vazgeç';
+
+  @override
+  String get peopleNameRequired => 'İsim girin';
+
+  @override
+  String get peopleBirthDateRequired => 'Doğum tarihi girin';
+
+  @override
+  String get peopleBirthTimeRequired => 'Doğum saati girin';
+
+  @override
+  String get peopleFolderRequired => 'Klasör adı girin';
+
+  @override
+  String get peopleApplyTo => 'Kişiyi şuraya uygula';
+
+  @override
+  String get peopleApplyPerson1 => '1. Kişi';
+
+  @override
+  String get peopleApplyPerson2 => '2. Kişi';
 }

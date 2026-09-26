@@ -1275,4 +1275,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get peopleLoginRequired => 'Sign in to save a person.';
+
+  @override
+  String get peopleSave1 => 'Save Person 1';
+
+  @override
+  String get peopleSave2 => 'Save Person 2';
+
+  @override
+  String get peopleNewFolder => 'New Folder';
+
+  @override
+  String get peopleFolderNameHint => 'New folder name';
+
+  @override
+  String get peopleCancel => 'Cancel';
+
+  @override
+  String get peopleNameRequired => 'Enter a name';
+
+  @override
+  String get peopleBirthDateRequired => 'Enter birth date';
+
+  @override
+  String get peopleBirthTimeRequired => 'Enter birth time';
+
+  @override
+  String get peopleFolderRequired => 'Enter a folder name';
+
+  @override
+  String get peopleApplyTo => 'Apply person to';
+
+  @override
+  String get peopleApplyPerson1 => 'Person 1';
+
+  @override
+  String get peopleApplyPerson2 => 'Person 2';
 }

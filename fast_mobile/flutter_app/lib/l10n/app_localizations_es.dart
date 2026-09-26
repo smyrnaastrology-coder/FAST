@@ -1290,4 +1290,40 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get peopleLoginRequired => 'Inicie sesión para guardar una persona.';
+
+  @override
+  String get peopleSave1 => 'Guardar Persona 1';
+
+  @override
+  String get peopleSave2 => 'Guardar Persona 2';
+
+  @override
+  String get peopleNewFolder => 'Nueva Carpeta';
+
+  @override
+  String get peopleFolderNameHint => 'Nombre de la nueva carpeta';
+
+  @override
+  String get peopleCancel => 'Cancelar';
+
+  @override
+  String get peopleNameRequired => 'Ingrese un nombre';
+
+  @override
+  String get peopleBirthDateRequired => 'Ingrese la fecha de nacimiento';
+
+  @override
+  String get peopleBirthTimeRequired => 'Ingrese la hora de nacimiento';
+
+  @override
+  String get peopleFolderRequired => 'Ingrese un nombre de carpeta';
+
+  @override
+  String get peopleApplyTo => 'Aplicar persona a';
+
+  @override
+  String get peopleApplyPerson1 => 'Persona 1';
+
+  @override
+  String get peopleApplyPerson2 => 'Persona 2';
 }

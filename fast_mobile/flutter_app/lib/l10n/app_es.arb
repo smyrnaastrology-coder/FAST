@@ -382,5 +382,17 @@
   "peopleDeleted": "Persona eliminada.",
   "peopleDelete": "Eliminar",
   "peopleSelect": "Seleccionar persona guardada",
-  "peopleLoginRequired": "Inicie sesión para guardar una persona."
+  "peopleLoginRequired": "Inicie sesión para guardar una persona.",
+  "peopleSave1": "Guardar Persona 1",
+  "peopleSave2": "Guardar Persona 2",
+  "peopleNewFolder": "Nueva Carpeta",
+  "peopleFolderNameHint": "Nombre de la nueva carpeta",
+  "peopleCancel": "Cancelar",
+  "peopleNameRequired": "Ingrese un nombre",
+  "peopleBirthDateRequired": "Ingrese la fecha de nacimiento",
+  "peopleBirthTimeRequired": "Ingrese la hora de nacimiento",
+  "peopleFolderRequired": "Ingrese un nombre de carpeta",
+  "peopleApplyTo": "Aplicar persona a",
+  "peopleApplyPerson1": "Persona 1",
+  "peopleApplyPerson2": "Persona 2"
 }

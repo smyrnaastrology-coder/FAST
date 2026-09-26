@@ -382,5 +382,17 @@
   "peopleDeleted": "Kişi silindi.",
   "peopleDelete": "Sil",
   "peopleSelect": "Kayıtlı kişi seç",
-  "peopleLoginRequired": "Kişi kaydetmek için giriş yapın."
+  "peopleLoginRequired": "Kişi kaydetmek için giriş yapın.",
+  "peopleSave1": "1. Kişiyi Kaydet",
+  "peopleSave2": "2. Kişiyi Kaydet",
+  "peopleNewFolder": "Yeni Klasör",
+  "peopleFolderNameHint": "Yeni klasör adı",
+  "peopleCancel": "Vazgeç",
+  "peopleNameRequired": "İsim girin",
+  "peopleBirthDateRequired": "Doğum tarihi girin",
+  "peopleBirthTimeRequired": "Doğum saati girin",
+  "peopleFolderRequired": "Klasör adı girin",
+  "peopleApplyTo": "Kişiyi şuraya uygula",
+  "peopleApplyPerson1": "1. Kişi",
+  "peopleApplyPerson2": "2. Kişi"
 }

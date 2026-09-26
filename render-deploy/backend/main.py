@@ -6520,7 +6520,13 @@ def auth_me_update(request: Request, body: ProfilUpdate):
 def people_folders(request: Request):
     user = _require_user(request)
     lang = (get_profile(user["id"]) or {}).get("lang") or "tr"
-    return {"folders": folder_labels(lang)}
+    f = folder_labels(lang, user["id"])
+    # PG deposundaki özel klasörleri de mevcut kişilerden birleştir.
+    for p in list_people(user["id"]):
+        pf = (p.get("folder") or "").strip()
+        if pf and pf not in f:
+            f[pf] = pf
+    return {"folders": f}
 
 @app_fast.get("/api/people")
 def people_list(request: Request):
