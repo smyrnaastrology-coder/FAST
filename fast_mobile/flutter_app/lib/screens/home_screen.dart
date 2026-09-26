@@ -40,10 +40,10 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(l10n.homeSubtitle,
-                  style: const TextStyle(fontSize: 13, color: FastTheme.textLight, letterSpacing: 2),
+                  style:  TextStyle(fontSize: 13, color: FastTheme.textLight, letterSpacing: 2),
                 ),
                 const SizedBox(height: 6),
-                Text(l10n.homeVersion, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                Text(l10n.homeVersion, style:  TextStyle(fontSize: 12, color: FastTheme.textLight)),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                   child: Text(
                     l10n.heroDisclaimer,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 11, color: FastTheme.textMuted, height: 1.5),
+                    style:  TextStyle(fontSize: 11, color: FastTheme.textMuted, height: 1.5),
                   ),
                 ),
                 const SizedBox(height: 24),

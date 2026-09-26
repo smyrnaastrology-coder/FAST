@@ -1846,6 +1846,12 @@ abstract class AppLocalizations {
   /// **'Natural Flow (Fractal)'**
   String get scoreFlowFraktal;
 
+  /// No description provided for @scoreDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SCORE ANALYSIS DETAILS'**
+  String get scoreDetailTitle;
+
   /// No description provided for @progressionTitle.
   ///
   /// In en, this message translates to:
@@ -2127,6 +2133,342 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bond Score'**
   String get scoreBondLabel;
+
+  /// No description provided for @warningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Important Notice'**
+  String get warningTitle;
+
+  /// No description provided for @warningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The synastry work in this app is carried out with the vectorial transfer method developed by Karma Astrologer Fatih ASARTEPE and with meeting-date calibration. This is why the meeting or marriage date is requested instead of the birth times of the people, and the meeting or marriage place is requested instead of their birth places. The resulting charts will differ from natal charts, but they will give you incredible results for your life and your relationship.'**
+  String get warningBody;
+
+  /// No description provided for @warningAcknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'I Understand'**
+  String get warningAcknowledge;
+
+  /// No description provided for @warningBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get warningBack;
+
+  /// No description provided for @loginNav.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get loginNav;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get loginTitle;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to your account and access your saved people from any device.'**
+  String get loginSubtitle;
+
+  /// No description provided for @loginEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get loginEmailLabel;
+
+  /// No description provided for @loginPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginPasswordLabel;
+
+  /// No description provided for @loginRemember.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember me'**
+  String get loginRemember;
+
+  /// No description provided for @loginForgot.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get loginForgot;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get loginButton;
+
+  /// No description provided for @signupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get signupButton;
+
+  /// No description provided for @loginOr.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get loginOr;
+
+  /// No description provided for @loginGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get loginGoogle;
+
+  /// No description provided for @loginFacebook.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Facebook'**
+  String get loginFacebook;
+
+  /// No description provided for @loginNoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Sign up'**
+  String get loginNoAccount;
+
+  /// No description provided for @loginHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get loginHaveAccount;
+
+  /// No description provided for @loginGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as guest'**
+  String get loginGuest;
+
+  /// No description provided for @loginErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get loginErrorGeneric;
+
+  /// No description provided for @loginErrorInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password.'**
+  String get loginErrorInvalid;
+
+  /// No description provided for @loginErrorExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered.'**
+  String get loginErrorExists;
+
+  /// No description provided for @loginErrorDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership is not configured yet.'**
+  String get loginErrorDisabled;
+
+  /// No description provided for @loginSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in successfully!'**
+  String get loginSuccess;
+
+  /// No description provided for @logoutButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Log Out'**
+  String get logoutButton;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @profileEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmailLabel;
+
+  /// No description provided for @profileNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get profileNameLabel;
+
+  /// No description provided for @profileSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get profileSave;
+
+  /// No description provided for @profileChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get profileChangePassword;
+
+  /// No description provided for @profileNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get profileNewPassword;
+
+  /// No description provided for @profilePasswordChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated.'**
+  String get profilePasswordChanged;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated.'**
+  String get profileSaved;
+
+  /// No description provided for @peopleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved People'**
+  String get peopleTitle;
+
+  /// No description provided for @peopleEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no saved people yet. You can save a person from the analysis form.'**
+  String get peopleEmpty;
+
+  /// No description provided for @peopleFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get peopleFolderLabel;
+
+  /// No description provided for @peopleFolderFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'My Family'**
+  String get peopleFolderFamily;
+
+  /// No description provided for @peopleFolderFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'My Friends'**
+  String get peopleFolderFriends;
+
+  /// No description provided for @peopleSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Person'**
+  String get peopleSave;
+
+  /// No description provided for @peopleSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Person saved.'**
+  String get peopleSaved;
+
+  /// No description provided for @peopleDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Person deleted.'**
+  String get peopleDeleted;
+
+  /// No description provided for @peopleDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get peopleDelete;
+
+  /// No description provided for @peopleSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select saved person'**
+  String get peopleSelect;
+
+  /// No description provided for @peopleLoginRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to save a person.'**
+  String get peopleLoginRequired;
+
+  /// No description provided for @peopleSave1.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Person 1'**
+  String get peopleSave1;
+
+  /// No description provided for @peopleSave2.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Person 2'**
+  String get peopleSave2;
+
+  /// No description provided for @peopleNewFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'New Folder'**
+  String get peopleNewFolder;
+
+  /// No description provided for @peopleFolderNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder name'**
+  String get peopleFolderNameHint;
+
+  /// No description provided for @peopleCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get peopleCancel;
+
+  /// No description provided for @peopleNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get peopleNameRequired;
+
+  /// No description provided for @peopleBirthDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter birth date'**
+  String get peopleBirthDateRequired;
+
+  /// No description provided for @peopleBirthTimeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter birth time'**
+  String get peopleBirthTimeRequired;
+
+  /// No description provided for @peopleFolderRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a folder name'**
+  String get peopleFolderRequired;
+
+  /// No description provided for @peopleApplyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply person to'**
+  String get peopleApplyTo;
+
+  /// No description provided for @peopleApplyPerson1.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 1'**
+  String get peopleApplyPerson1;
+
+  /// No description provided for @peopleApplyPerson2.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 2'**
+  String get peopleApplyPerson2;
 }
 
 class _AppLocalizationsDelegate

@@ -205,6 +205,17 @@ async def cast(req: CastRequest):
 
     # quesited auto - UI kategori varsa onu kullan, yoksa genel + derived override
     qtype = req.quesited_type if req.quesited_type and req.quesited_type != "general" else "general"
+    # SPOR ÇERÇEVESİ (#59/#60): takım adı geçen ÜÇÜNCÜ TARAF takım sorusu (taraftar)
+    # -> sport_fan (takım 7.ev, rakip sorgu 1., onur 4., rakip takım 11).
+    # "Maç" kelimesi olmasa da takım adı + kazanma fiili yeterlidir ("Houston bu gece kazanacak mı?").
+    # Kendi takımı ("bizim/miyiz") ve "kim kazanacak" soruları sport_fav'da kalır (#34).
+    if qtype in ("sport_fav", "sport_rival", "general"):
+        try:
+            from engine.horary_questions import is_fan_sport_question
+            if is_fan_sport_question(req.question):
+                qtype = "sport_fan"
+        except Exception:
+            pass
     try:
         res = copy.deepcopy(cached_chart(y, mo, da, utc_dec, req.lat, req.lon, qtype))
     except Exception as e:

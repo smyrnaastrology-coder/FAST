@@ -7,6 +7,8 @@ uyumlu). Mentör önerisi (anne=10, baba=4) kasıtlı değil çünkü mevcut
 parse_derived / horary_rules ile çelişir; bu ayrım kullanıcıya bildirildi.
 """
 import re
+import os
+import json
 
 QUESTION_HOUSES = {
     "self": 1,
@@ -37,8 +39,9 @@ QUESTION_HOUSES = {
     "job": 10,
     "home": 4,
     "hidden_enemy": 12,  # şikayet eden / gizli düşman
-    "sport_fav": 5,      # tuttuğun takım (oyun/spor) -> 5.ev; rakip onun 5.'si -> 11.ev (turned)
+    "sport_fav": 5,      # KENDİ takımın (katılımcı/antrenör çerçevesi, kitap #34) -> 5.ev; rakip onun 7.'si
     "sport_rival": 11,
+    "sport_fan": 7,      # TARAFTAR çerçevesi (kitap #59): takım 7.ev, rakip takımın 7.'si = sorgu 1., onur 4., rakip takım 11.
     "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
@@ -51,7 +54,8 @@ LABEL_TR = {
     "astrology_student": "Astroloji öğrencisi",
     "money": "Para/Değerli eşya", "loan": "Kredi/Borç/İpotek (8. ev)", "lost_object": "Kayıp eşya", "job": "İş",
     "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
-    "sport_fav": "Tuttuğun takım (5.ev spor)", "sport_rival": "Rakip takım (11.ev)",
+    "sport_fav": "Kendi takımın (katılımcı çerçevesi, #34)", "sport_rival": "Rakip takım (11.ev)",
+    "sport_fan": "Taraftar: üçüncü taraf takım (7.ev) — rakip 1., onur 4., rakip takım 11.",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
@@ -123,11 +127,65 @@ def _strip_nested(q):
     return q
 
 
+# --- SPOR ÇERÇEVESİ AYRIMI (kitap #34 vs #59) ---------------------------------
+# #34 "Cumartesi gunu kazanacak miyiz?" -> KENDİ takımımız (katılımcı/antrenör): takım 1.ev, rakip 7.ev
+# #59 "Vandals play-off maçını kazanacak mı?" -> ÜÇÜNCÜ TARAF takım (taraftar): takım 7.ev,
+#      rakip = takımın 7.si = sorgu 1.ev, takımın onuru 4.ev, rakip takım 11.ev
+_SPORT_MATCH_RE = re.compile(r"(play[-\s]?off|play[-\s]?offs|maç|mac|derbi|final|şampiyonluk|sampiyonluk)\D{0,40}?(kazan|kazanır|kazanacak|kazanir)", re.I)
+_SPORT_OWN_RE = re.compile(r"\b(bizim|biz|miyiz|takımım|takimim|takımımız|takimimiz|maçımız|macimiz|my team|our team|will we|we win)\b", re.I)
+_SPORT_WHO_WINS_RE = re.compile(r"(maçı kim kazanacak|maci kim kazanacak|kim kazanır|kim kazanacak|kazanan kim|kim kazandı)", re.I)
+
+
+def _load_team_lexicon():
+    """horary_rules.json -> sport_team_lexicon (takım/lig adları). Sözlük dışı takım
+    adlarında tespit yapılamaz, o durumda eski davranış (maç kelimesi) korunur."""
+    fallback = ["vandals", "houston", "galatasaray", "fenerbahce", "fenerbahçe",
+                "besiktas", "beşiktaş", "real madrid", "barcelona"]
+    try:
+        path = os.path.join(os.path.dirname(__file__), "horary_rules.json")
+        with open(path, "r", encoding="utf-8") as f:
+            teams = json.load(f).get("sport_team_lexicon") or []
+        out = []
+        for t in teams:
+            if isinstance(t, str):
+                t = t.strip().lower()
+                if t:
+                    out.append(t)
+        return out or fallback
+    except Exception:
+        return fallback
+
+
+TEAM_LEXICON = _load_team_lexicon()
+_SPORT_TEAM_RE = None
+if TEAM_LEXICON:
+    _alt = "|".join(re.escape(t) for t in sorted(set(TEAM_LEXICON), key=len, reverse=True))
+    # #60 "Houston bu gece kazanacak mı?" -> takım adı + kazanma fiili (maç kelimesi yok)
+    _SPORT_TEAM_RE = re.compile(r"(?:" + _alt + r")\D{0,30}?(kazan|kazanır|kazanacak|kazanir)", re.I)
+
+
+def is_fan_sport_question(question: str) -> bool:
+    """Maç kazananı soran ÜÇÜNCÜ TARAF takım sorusu mu? (#59/#60 çerçevesi)
+    Kendi takımı ('bizim/miyiz/takımımız') veya 'kim kazanacak' soruları KENDİ/çift taraf çerçevesinde kalır.
+    Tespit iki kanaldan olur: (1) maç/derbi/final kelimesi + kazanma fiili,
+    (2) sport_team_lexicon'daki takım adı + kazanma fiili ('Houston bu gece kazanacak mı?')."""
+    if not question:
+        return False
+    q = question.lower()
+    if _SPORT_OWN_RE.search(q) or _SPORT_WHO_WINS_RE.search(q):
+        return False
+    if _SPORT_MATCH_RE.search(q):
+        return True
+    return bool(_SPORT_TEAM_RE and _SPORT_TEAM_RE.search(q))
+
+
 def classify_question(question):
     """Soru tipini tahmin et. → {"type","house","label"} (eşleşme yoksa None).
     Nested (iyelikli ikinci kişi) kelimesi ana tipi kirletmeden tespit edilir.
     """
     q = _strip_nested(question.lower())
+    if is_fan_sport_question(q):
+        return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}
     for t, kws in TYPE_KEYWORDS:
         for kw in kws:
             if kw in q:

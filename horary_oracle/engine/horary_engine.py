@@ -779,6 +779,106 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                     strictures.append({"code":"missing_qs_apply_next","level":"info","angle":_ka2[0],"target":_ka2[1],"target_lon":round(_ka2[3],1),"meaning":f"KAYIP/GERİ-DÖNÜŞ YES: {ks_name} bir sonraki açısını {_ka2[0]:.1f}° ile {_ka2[1]}'ye yapıyor{_k_add} (+8)."})
         except: pass
 
+    # --- KALİBRASYON #59 (Vandals, 9 Mar 1982 19:38 PST Coeur d'Alene 47N41 116W46: YES 69-67 uzatma) ---
+    # TARAFTAR ÇERÇEVESİ (kitap #59) — sadece qtype="sport_fan" (üçüncü taraf takım, "Vandals ... kazanacak mı").
+    # KENDİ takım çerçevesi (#34 "Cumartesi gunu kazanacak miyiz?") sport_fav'da kalır, buraya girmez.
+    # Çerçeve: takım 7.ev | rakip = takımın 7.si = sorgu 1.ev | takımın onuru/zafere evi 4.ev | rakip takım 11.ev
+    # Gerçek harita: ASC Terazi 11.23 -> 7.ev kuspisi Koç 11.23 (yöneten MARS 17.26 Terazi, sorgu 1.evi, retro)
+    # SATURN 21.05 Terazi (4.ev Oğlak yöneticisi = takımın 10.su/onur) kavuşum; VENUS 5.15 Kova (sorgu 1.evinin
+    # yani rakibin gösteresi, sorgu 4.evesinde = takımın onur evinde). Kitap: "Mars ve Satürn rakibin 1. evinde
+    # => rakip kazanamaz, Vandals kazanır" (gerçekte bu ev sorgu 1.evi) + Ay uygulaması yok = DAR EVET.
+    if quesited_type == "sport_fan":
+        try:
+            _team_r = quesited                                  # 7.ev yöneticisi = takım
+            _team_rn = _team_r["planet"]
+            _team_rd = _team_r.get("data") or {}
+            _team_h = _team_rd.get("house")
+            # rakibin gösteresi = sorgu 1.evinin yöneticisi; onur evi = 4.ev; rakip takım = 11.ev
+            _opp_rn = DOMICILE.get(asc_sign, "Venus")
+            _opp_rd = planets.get(_opp_rn, {})
+            _opp_h = _opp_rd.get("house")
+            _hon_sign = sign_from_lon(houses["cusps"][3])
+            _hon_rn = DOMICILE.get(_hon_sign, "Saturn")
+            _riv_sign = sign_from_lon(houses["cusps"][10])
+            _riv_rn = DOMICILE.get(_riv_sign, "Jupiter")
+            _riv_rd = planets.get(_riv_rn, {})
+
+            # 1) Takımın yöneticisi RAKİBİN 1.evesinde (sorgu 1., köşe) = rakip tutunamaz -> EVET
+            #    (aynı zamanda "iki malefik rakibin evinde" kitap hükmünün motor karşılığı)
+            if _team_h == 1:
+                _sc(6, "sport_team_ruler_in_opponent_1st")
+                if is_besieged(_team_rd.get("lon", 0), planets):
+                    _sc(4, "sport_besiege_reversed")   # kuşatma cezası geri alınır: kuşatanlar rakibin evinde
+                strictures.append({"code":"sport_team_ruler_in_opponent_1st","level":"info","planet":_team_rn,
+                    "meaning":f"SPOR (#59) EVET: takımın yöneticisi {_team_rn} rakibin 1.evesinde (sorgu 1., köşe) — rakipten daha güçlü, rakip kazanamaz (+6)."})
+            # 2) Takımın yöneticisi, takımın onur/zafere evinin (4.) yöneticisiyle kavuşum
+            if _hon_rn in planets and _hon_rn != _team_rn:
+                _a2, _d2 = aspect_pair(_team_rd.get("lon", 0), planets[_hon_rn]["lon"], 0)
+                if _d2 <= 8:
+                    _sc(5, "sport_team_ruler_conj_honor_ruler")
+                    strictures.append({"code":"sport_team_ruler_conj_honor_ruler","level":"info","planet":_team_rn,"with":_hon_rn,
+                        "meaning":f"SPOR (#59) EVET: takımın yöneticisi {_team_rn}, takımın onur/zafere evi yöneticisi {_hon_rn} ile {_d2:.1f}° kavuşum (+5)."})
+            # 3) Rakibin gösteresi (sorgu 1. yöneticisi) takımın onur evinde (4.) = rakip takımın evinde
+            if _opp_h == 4:
+                _sc(4, "sport_opponent_ruler_in_honor")
+                strictures.append({"code":"sport_opponent_ruler_in_honor","level":"info","planet":_opp_rn,
+                    "meaning":f"SPOR (#59) EVET: rakibin yöneticisi {_opp_rn} takımın onur/zafere evinde (sorgu 4.) (+4)."})
+            # 4) Rakip takımın (11.ev) yöneticisi düşüş/zelilde = rakip zayıf
+            if _riv_rd and in_det_fall(_riv_rn, _riv_rd.get("sign","")):
+                _sc(4, "sport_rival_ruler_fall")
+                strictures.append({"code":"sport_rival_ruler_fall","level":"info","planet":_riv_rn,
+                    "meaning":f"SPOR (#59) EVET: rakip takımın (11.ev) yöneticisi {_riv_rn} düşüşte/zelilde ({_riv_rd.get('sign')}) — rakip zayıf (+4)."})
+            # 5) Ay takımın yöneticisine yumuşak açı UYGULARSA = akış takımda (#59'da Ay 12.evde, uygulama yok)
+            _m_app = None
+            for _a3 in (0, 60, 120):
+                _ap3, _dd3 = aspect_pair(planets["Moon"]["lon"], _team_rd.get("lon", 0), _a3)
+                if _ap3 and _dd3 <= 12:
+                    _m_app = (_a3, _dd3); break
+            if _m_app:
+                _sc(5, "sport_moon_applies_team_ruler")
+                strictures.append({"code":"sport_moon_applies_team_ruler","level":"info",
+                    "meaning":f"SPOR (#59) EVET: Ay takımın yöneticisi {_team_rn}'ye {_m_app[0]}° ile ~{_m_app[1]:.1f}° uyguluyor (+5)."})
+            # 6) Takımın yöneticisi KENDİ onur/zafere evinde (sorgu 4.) = doğrudan zafer evinde
+            #    (kitap #60 Houston: "Satürn onların onur/zafer evi olan 10. evindedir (haritanın 4. evi)")
+            if _team_h == 4:
+                _sc(6, "sport_team_ruler_in_own_honor")
+                _dom_ex = in_dom_ex(_team_rn, _team_rd.get("sign", ""))
+                strictures.append({"code":"sport_team_ruler_in_own_honor","level":"info","planet":_team_rn,
+                    "meaning":f"SPOR (#60) EVET: takımın yöneticisi {_team_rn} takımın onur/zafere evinde (sorgu 4.)"
+                              + (" ve burcunda yücelmiş/derece edinmiş" if _dom_ex else "") + " — zafer kapısında (+6)."})
+            # 7) Hayırsever (Jüpiter/Venüs) takımın yöneticisine açı UYGULARSA
+            #    (kitap #60: "Jüpiter Satürn ile kavuşum yapacak ki bu olumlu bir açıdır")
+            for _bn in ("Jupiter", "Venus"):
+                _bd = planets.get(_bn)
+                if not _bd or _bn == _team_rn:
+                    continue
+                _fast, _slow = ((_bn, _team_rn) if abs(_bd.get("speed", 0)) > abs(_team_rd.get("speed", 0)) else (_team_rn, _bn))
+                _orbs = {0: 8, 60: 6, 90: 7, 120: 6, 180: 8}
+                _ap = best_applying_major(planets[_fast]["lon"], planets[_slow]["lon"], _fast, _slow, _orbs)
+                if _ap:
+                    _sc(4, "sport_benefic_applies_team_ruler")
+                    _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}.get(_ap[0], f"{_ap[0]}°")
+                    strictures.append({"code":"sport_benefic_applies_team_ruler","level":"info","planet":_bn,"with":_team_rn,
+                        "meaning":f"SPOR (#60) EVET: hayırsever {_bn}, takımın yöneticisi {_team_rn}'ye {_anm} açıyı UYGULUYOR (~{_ap[1]:.1f}°) (+4)."})
+                    break
+            # 8) Rakibin gösteresi (sorgu 1. yöneticisi) düşüşte/zelilde = rakip zayıf
+            #    (kitap #60: "rakip takım ... düşüşte olan Ay tarafından yönetilmektedir")
+            if _opp_rd and in_det_fall(_opp_rn, _opp_rd.get("sign", "")):
+                _sc(4, "sport_opponent_ruler_fall")
+                strictures.append({"code":"sport_opponent_ruler_fall","level":"info","planet":_opp_rn,
+                    "meaning":f"SPOR (#60) EVET: rakibin yöneticisi {_opp_rn} düşüşte/zelilde ({_opp_rd.get('sign')}) — rakip zayıf (+4)."})
+            # 9) PERFECTION/UYGULAMA YOKSA "DAR EVET" notu (aynı pozisyonlu iki taraf => az farkla kazanım)
+            _perf_t = (perfection or {}).get("type") if isinstance(perfection, dict) else None
+            if score > 0 and not _m_app and _perf_t in (None, "none"):
+                strictures.append({"code":"sport_narrow_win","level":"warning",
+                    "meaning":"SPOR (#59/#60) DAR EVET: iki tarafın göstergeleri birbirine baskın ama Ay ile uygulanan açı/perfection YOK => kazanım az farkla (kıl payı), uzatma/son dakika mümkün."})
+            # Spor bulguları API'nin ilk-12 kırpmasına takılmasın -> listenin başına taşı
+            _sp = [s for s in strictures if str(s.get("code", "")).startswith("sport_")]
+            if _sp:
+                strictures[:] = _sp + [s for s in strictures if not str(s.get("code", "")).startswith("sport_")]
+        except Exception:
+            pass
+
     # Threshold
     if _DO_TRACE:
         import sys as _sys

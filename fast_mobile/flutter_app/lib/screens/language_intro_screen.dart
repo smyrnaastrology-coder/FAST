@@ -20,7 +20,7 @@ class LanguageIntroScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(
+               SizedBox(
                 width: 72,
                 height: 72,
                 child: DecoratedBox(
@@ -31,10 +31,10 @@ class LanguageIntroScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Fast Synastry', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
+               Text('Fast Synastry', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
               const SizedBox(height: 40),
-              Text(l10n.chooseLanguage, style: const TextStyle(color: FastTheme.text, fontSize: 18)),
-              Text(l10n.chooseLanguageSub, style: const TextStyle(color: FastTheme.textMuted, fontSize: 14)),
+              Text(l10n.chooseLanguage, style:  TextStyle(color: FastTheme.text, fontSize: 18)),
+              Text(l10n.chooseLanguageSub, style:  TextStyle(color: FastTheme.textMuted, fontSize: 14)),
               const SizedBox(height: 24),
               _langBtn(lp, 'tr', 'Türkçe'),
               const SizedBox(height: 12),
@@ -54,7 +54,7 @@ class LanguageIntroScreen extends StatelessWidget {
       height: 52,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: FastTheme.accentGold),
+          side:  BorderSide(color: FastTheme.accentGold),
           foregroundColor: FastTheme.accentGold,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),

@@ -24,7 +24,7 @@ _SLOT_LABEL_TR = {
 }
 _QTYPE_SLOT_TR = {
     "business": "İŞ ORTAKLIĞI", "relocation": "TAŞINMA", "finance": "FİNANS",
-    None: "GENEL",
+    "army": "ASKERLİK", "animal": "HAYVAN SATIN ALMA", None: "GENEL",
 }
 
 
@@ -100,6 +100,14 @@ def sub_qtype(sub):
                             "imkân", "karşılay", "karsilay", "mumkun", "mümkün",
                             "para olarak", "finansman"]):
         return "finance"
+    if any(k in s for k in ["ordu", "asker", "askerlik", "askere", "military", "army",
+                            "nefer", "cephe", "askeriyeye", "er olarak"]):
+        return "army"
+    toks = {w.strip(".,!?;:()[]'’\"").lstrip("'’") for w in s.split()}
+    if toks & {"at", "ati", "atin", "atinizi", "atimizi", "atlar", "atlarini",
+               "beygir", "kisrak", "hayvan", "hayvanlar", "hayvancilik",
+               "horse", "equine", "nikk", "nikki", "pony"}:
+        return "animal"
     return None
 
 
@@ -120,8 +128,65 @@ def _ruler(cusp_lon, modern=True):
     return s, tbl.get(s, "Venus")
 
 
+def _derived_house(base, n):
+    """'base' evindeki kisinin n. evi = harita kacinci evi olur (turetim)."""
+    return ((base - 1) + (n - 1)) % 12 + 1
+
+
+def _sat_asc_flag(res):
+    return any(str(s.get("code", "")) in ("saturn_1_7", "saturn_asc_conjunction")
+               for s in res.get("strictures", []))
+
+
+def _fuzzy_pair(pl, a, b, orb=8):
+    """a,b (boylam+hiz) arasi en yakin majör aci; uygulayan mi bilgisi.
+    Sondaki parantez: ayrilan ama tam acidan <1.0 derece sapmaliysa kullanilabilir (kitap)."""
+    try:
+        from horary_engine import next_aspect_distance
+    except Exception:
+        return None
+    pa, pb = pl.get(a, {}), pl.get(b, {})
+    if not pa or not pb:
+        return None
+    la, sa = pa.get("lon", 0.0), pa.get("speed", 1.0)
+    lb, sb = pb.get("lon", 0.0), pb.get("speed", 1.0)
+    if sa < sb:                    # hizli olani 'a' yap
+        la, sa, lb, sb = lb, sb, la, sa
+        a, b = b, a
+    r = next_aspect_distance(la, sa, lb, sb, 0, orb)
+    return {"a": a, "b": b, "angle": r["target"], "orb": round(r["dist"], 1),
+            "applying": r["applying"], "dist": r["dist"]}
+
+
+def _usable(v):
+    """Kullanilabilir: orb <=8 VE (uygulanan VEYA geç-ayrilma <1.0) VE yumusak aci (0/60/120)."""
+    return v is not None and v["dist"] <= 8 and (v["applying"] or v["dist"] < 1.0) and v["angle"] in (0, 60, 120)
+
+
+def _moon_chain(pl, a, b):
+    """Ay once a'ya sonra b'ye (veya tersi) apply veya geç-acı yapiyorsa 'iyik tasıma/toplama'.
+    Sadece bilgi amacli: IŞIĞIN TAŞINMASI/TOPLANMASI."""
+    try:
+        from horary_engine import next_aspect_distance
+    except Exception:
+        return ""
+    m = pl.get("Moon", {})
+    if not m:
+        return ""
+    va = _fuzzy_pair(pl, "Moon", a)
+    vb = _fuzzy_pair(pl, "Moon", b)
+    ok_a = va is not None and (va["applying"] or va["dist"] < 1.0)
+    ok_b = vb is not None and (vb["applying"] or vb["dist"] < 1.0)
+    if ok_a and ok_b:
+        order = a if va["dist"] <= vb["dist"] else b
+        return (f"Ay {a}'ya {va['angle']}° (orb {va['orb']}°) ve {b}'ye {vb['angle']}° "
+                f"(orb {vb['orb']}°) açı yapacak — önce {order} → IŞIĞIN TAŞINMASI/TOPLANMASI ihtimali; "
+                f"revizyon/erteli TRUE eğilim (bkz. Kural 6).")
+    return ""
+
+
 def sub_verdict(res, sub):
-    """Alt soruya ozel HUCM (#56 kalibrasyonu). res: ham chart (cusps+planets).
+    """Alt soruya ozel HUCM (#56/#57 kalibrasyonu). res: ham chart (cusps+planets).
     Doner: dict {qtype, verdict, facts} — qtype yoksa genel motor hukumu kullanilir."""
     try:
         qt = sub_qtype(sub)
@@ -135,48 +200,123 @@ def sub_verdict(res, sub):
             qs = res["quesited"].get("planet")
         else:
             qs = res.get("quesited", "")
+        sat = _sat_asc_flag(res)
+
+        def _soft_found(pairs):
+            for a, b in pairs:
+                if a == b:
+                    continue
+                v = _fuzzy_pair(pl, a, b)
+                if _usable(v):
+                    return v
+            return None
+
+        def _flag_verdict(name, soft, reason, detail):
+            if soft:
+                v = "BELİRSİZ" if sat else "YES"
+                tail = "Satürn yükselede (saturn_1_7) negatif ağırlık — en güçlü açı olsa bile hayır eğilimi." if sat else "olumlu uygulanan açı var -> EVET"
+            else:
+                v = "NO"
+                tail = reason
+            return {"qtype": qt, "verdict": v, "facts": f"{detail} {tail}"}
 
         if qt == "business":
-            qs_sign9, r7 = _ruler(cusps[6])      # 7. ev: ortak
-            qs_sign10, r10 = _ruler(cusps[9])    # 10. ev: is/sirket
-            a1, o1 = _nearest_aspect(lon(qr), lon(r7))
-            a2, o2 = _nearest_aspect(lon(qr), lon(r10))
-            soft1 = a1 in (0, 60, 120) and o1 <= 6
-            soft2 = a2 in (0, 60, 120) and o2 <= 6
-            verdict = "YES" if (soft1 or soft2) else "NO"
+            qs7, r7 = _ruler(cusps[6])      # 7. ev: ortak
+            qs10, r10 = _ruler(cusps[9])    # 10. ev: is/sirket
+            vv = _soft_found([(qr, r7), (qr, r10)])
             p7 = pl.get(r7, {}); p10 = pl.get(r10, {}); pq = pl.get(qr, {})
-            facts = (f"Ortak hüküm: querent {qr} {pq.get('sign','')} Ev{pq.get('house','?')}; "
-                     f"ortak(7.ev {qs_sign9})={r7} {p7.get('sign','')} {p7.get('deg','?')}° Ev{p7.get('house','?')}; "
-                     f"iş(10.ev {qs_sign10})={r10} {p10.get('sign','')} {p10.get('deg','?')}° Ev{p10.get('house','?')}. "
-                     f"Açılar: {qr}-{r7} en yakın {a1}° (orb {o1}°), {qr}-{r10} en yakın {a2}° (orb {o2}°). "
-                     f"{'olumlu uygulanan açı var -> EVET' if (soft1 or soft2) else 'olumlu açı yok -> HAYIR'}.")
-            return {"qtype": qt, "verdict": verdict, "facts": facts}
+            av_txt = ""
+            for a, b in ((qr, r7), (qr, r10)):
+                f = _fuzzy_pair(pl, a, b)
+                if f:
+                    av_txt += f"{a}-{b} {f['angle']}° (orb {f['orb']}°, {'uygulanan' if f['applying'] else 'ayrılan'}) "
+            if not av_txt:
+                av_txt = "açı yakınlığı yok"
+            detail = (f"Ortak hüküm: querent {qr} {pq.get('sign','')} Ev{pq.get('house','?')}; "
+                      f"ortak(7.ev {qs7})={r7} {p7.get('sign','')} {p7.get('deg','?')}° Ev{p7.get('house','?')}; "
+                      f"iş(10.ev {qs10})={r10} {p10.get('sign','')} {p10.get('deg','?')}° Ev{p10.get('house','?')}. "
+                      f"Açılar: {av_txt.strip()}. ")
+            reason = "olumlu uygulanan açı yok (ve/veya Satürn yükselen) -> HAYIR"
+            return _flag_verdict("business", vv is not None, reason, detail)
+
+        if qt == "army":
+            # Kitap #57: subject 7. ev (partner) -> turetimle onun 1/6/7/10 evleri
+            base = 7
+            qsn, r_self = _ruler(cusps[base - 1])             # onun 1. evi (harita 7.)
+            h6 = _derived_house(base, 6); qs6, r6 = _ruler(cusps[h6 - 1])   # onun 6. evi (asker)
+            h10 = _derived_house(base, 10); qs10, r10 = _ruler(cusps[h10 - 1])  # onun 10. evi (kariyer)
+            h7 = _derived_house(base, 7); qs7, r7a = _ruler(cusps[h7 - 1])   # onun 7. evi
+            vv = _soft_found([(r_self, r6), (r_self, r10)])
+            pself = pl.get(r_self, {}); p6 = pl.get(r6, {}); p10 = pl.get(r10, {})
+            ps7 = pl.get(qs, {}) if qs != r_self else {}
+            chain = _moon_chain(pl, r_self, r6) + _moon_chain(pl, r_self, r10)
+            av_txt = ""
+            for a, b in ((r_self, r6), (r_self, r10)):
+                f = _fuzzy_pair(pl, a, b)
+                if f:
+                    av_txt += f"{a}-{b} {f['angle']}° (orb {f['orb']}°, {'uygulanan' if f['applying'] else 'ayrılan'}) "
+            if not av_txt:
+                av_txt = "uygulanan açı yakınlığı yok"
+            detail = (f"Askerlik hüküm (türetilmiş, subject=7.ev): {r_self} ({pself.get('sign','')} "
+                      f"{pself.get('deg','?')}° Ev{pself.get('house','?')}) onun 1.evi ({qsn}); "
+                      f"onun 6.evi={h6} ({qs6}) yöneticisi {r6} {p6.get('sign','')} {p6.get('deg','?')}°, "
+                      f"onun 10.evi={h10} ({qs10}) yöneticisi {r10} {p10.get('sign','')} {p10.get('deg','?')}°. "
+                      f"Açılar: {av_txt.strip()}. ")
+            if chain:
+                detail += chain + " "
+            reason = "onun 1. yöneticisi ile askerlik/kariyer evleri arasında olumlu uygulanan açı yok -> olma olasılığı düşük (HAYIR)"
+            return _flag_verdict("army", vv is not None, reason, detail)
+
+        if qt == "animal":
+            # Buyuk hayvan = 12. ev; soru sahibi = 1. ev yoneticileri (+ yukselen Saturn agirligi)
+            qs12, r12 = _ruler(cusps[11])             # 12. ev yoneticisi
+            in12 = [n for n in pl if pl.get(n, {}).get("house") == 12 and n not in ("NorthNode", "SouthNode")]
+            sig12 = list(dict.fromkeys([r12] + in12))
+            qs1, r1a = _ruler(cusps[0])               # 1. ev yoneticisi (tek)
+            sig_q = list(dict.fromkeys([qr, r1a]))
+            pairs = [(a, b) for a in sig_q for b in sig12]
+            vv = _soft_found(pairs)
+            p12 = pl.get(r12, {}); pq = pl.get(qr, {})
+            av_txt = ""
+            for a, b in pairs:
+                f = _fuzzy_pair(pl, a, b)
+                if f:
+                    av_txt += f"{a}-{b} {f['angle']}° (orb {f['orb']}°, {'uygulanan' if f['applying'] else 'ayrılan'}) "
+            if not av_txt:
+                av_txt = "uygulanan açı yakınlığı yok"
+            detail = (f"Hayvan hüküm: hayvan=12.ev ({qs12}) yöneticisi {r12} {p12.get('sign','')} "
+                      f"{p12.get('deg','?')}° Ev{p12.get('house','?')}; 12. ev içindekiler: {', '.join(in12) if in12 else 'yok'}. "
+                      f"Soru sahibi={qr} {pq.get('sign','')} Ev{pq.get('house','?')} (1.ev {qs1} yöneticisi {r1a}). "
+                      f"Açılar: {av_txt.strip()}. ")
+            reason = "1. ev ve 12. ev göstergecileri arasında olumlu uygulanan açı yok; Satürn yükselede (saturn_1_7) hayır işareti -> HAYIR"
+            return _flag_verdict("animal", vv is not None, reason, detail)
 
         if qt == "relocation":
-            _, r9 = _ruler(cusps[8])             # 9. ev: uzak yolculuk/tasinma
-            _, r4 = _ruler(cusps[3])             # 4. ev: mevcut ev
+            qs9, r9 = _ruler(cusps[8])             # 9. ev: uzak yolculuk/tasinma
+            qs4, r4 = _ruler(cusps[3])             # 4. ev: mevcut ev
             p9 = pl.get(r9, {})
-            in4 = [n for n in pl if pl.get(n, {}).get("house") == 4]
+            in4 = [n for n in pl if pl.get(n, {}).get("house") == 4 and n != r9]
+            cand = list(dict.fromkeys([r4] + in4))
+            vv = None
             asp_pairs = []
-            for n in in4:
-                if n in ("NorthNode", "SouthNode") and n != r9:
+            for n in cand:
+                if n == r9 or n in ("NorthNode", "SouthNode"):
                     continue
-                if n == r9:
-                    continue
-                a, o = _nearest_aspect(lon(r9), lon(n))
-                asp_pairs.append((n, a, o))
-            soft = [(n, a, o) for (n, a, o) in asp_pairs if a in (0, 60, 120, 90) and o <= 6]
-            verdict = "YES" if soft else "NO"
-            as_txt = "; ".join(f"{r9}-{n} {a}° (orb {o}°)" for (n, a, o) in asp_pairs) or "4. evde acı yapacak gösterge yok"
-            facts = (f"Taşınma hüküm: 9.ev ({_ruler(cusps[8])[0]}) yöneticisi {r9} "
-                     f"{p9.get('sign','')} {p9.get('deg','?')}° Ev{p9.get('house','?')} (mevcut ev bölgesi: 4.ev {_ruler(cusps[3])[0]}); "
-                     f"4. ev anlamlıları: {', '.join(in4) if in4 else 'yok'}. Açılar: {as_txt}. "
-                     f"{'yaklaşan/olumlu açı var -> uzak taşınma olabilir (EVET)' if soft else 'taşınmayı destekleyen açı yok -> yerinde kalınır (HAYIR)'}.")
-            return {"qtype": qt, "verdict": verdict, "facts": facts}
+                f = _fuzzy_pair(pl, r9, n)
+                if f:
+                    asp_pairs.append((n, f))
+                    if _usable(f):
+                        vv = f   # son yumusak uygulanani kabul et
+            as_txt = "; ".join(f"{r9}-{n} {f['angle']}° (orb {f['orb']}°, {'uygulanan' if f['applying'] else 'ayrılan'})" for (n, f) in asp_pairs) or "4. ev anlamlılarına uygulanan açı yok"
+            detail = (f"Taşınma hüküm: 9.ev ({qs9}) yöneticisi {r9} {p9.get('sign','')} {p9.get('deg','?')}° "
+                      f"Ev{p9.get('house','?')}; mevcut evi 4.ev ({qs4}) yöneticisi {r4} + 4. evdeki: {', '.join(in4) if in4 else 'yok'}. "
+                      f"Açılar: {as_txt}. ")
+            return _flag_verdict("relocation", vv is not None,
+                                 "9. ev yöneticisi ile 4. evi (mevcut ev) destekleyen uygulanan açı yok -> yerinde kalınır (HAYIR)", detail)
 
         if qt == "finance":
             return {"qtype": qt, "verdict": "BAĞIMLI",
-                    "facts": "Finansal mümkünlük önceki alt sorulara BAĞIMLIDIR: iş ortağı ve/veya taşınma HAYIR ise finansal konu gereksizleşir/moot olur. İkisi de HAYIR -> finansal hesap yapma, kısa 'gereksiz' notu düş."}
+                    "facts": "Finansal mümkünlük önceki alt sorulara BAĞIMLIDIR: iş ortağı ve/veya taşınma/askerlik/at gibi eylemler HAYIR ise finansal konu gereksizleşir/moot olur. Hepsinde HAYIR -> finansal hesap yapma, kısa 'gereksiz' notu düş. (2. evdeki Neptune paraya mantıklı bakmayı zorlaştırır — bkz. Kural: 'Neptune 2. evde' şüpheli finans.)"}
         return {"qtype": qt}
     except Exception:
         return {"qtype": None}

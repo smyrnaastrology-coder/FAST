@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -99,26 +100,62 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final uyum = r['uyum_orani']?.toString() ?? '';
     final tork = r['tork']?.toString() ?? '';
     final fraktal = r['fraktal']?.toString() ?? '';
+    final torkMetin = r['tork_metin']?.toString() ?? '';
+    final fraktalMetin = r['fraktal_metin']?.toString() ?? '';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Score cards - gizle bireysel/potansiyel modda
+          // Score cards (üçlü yan yana) - gizle bireysel/potansiyel modda
           if (!isSingle) ...[
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (uyum.isNotEmpty)
-                  ScoreCard(label: l10n.scoreCompatibility, value: uyum.length > 40 ? '${uyum.substring(0, 40)}...' : uyum, color: FastTheme.rose),
-                if (tork.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreVitalityTork, value: tork, color: FastTheme.secondary)],
-                if (fraktal.isNotEmpty) ...[const SizedBox(width: 8), ScoreCard(label: l10n.scoreFlowFraktal, value: fraktal, color: FastTheme.accent)],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _scoreCard(
+                        icon: Icons.spa,
+                        label: l10n.scoreGoldenSeal,
+                        sub: uyum,
+                        iconColor: FastTheme.rose,
+                        value: 'Φ',
+                        unit: '1.618',
+                      ),
+                    ),
+                  ),
+                if (tork.isNotEmpty)
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(right: fraktal.isNotEmpty ? 8 : 0),
+                      child: _scoreCard(
+                        icon: Icons.bolt,
+                        label: l10n.scoreVitalityTork,
+                        sub: torkMetin.isNotEmpty ? torkMetin : _torkSub(tork, l10n),
+                        iconColor: FastTheme.secondary,
+                        value: tork,
+                        unit: '/10',
+                      ),
+                    ),
+                  ),
+                if (fraktal.isNotEmpty)
+                  Expanded(
+                    child: _scoreCard(
+                      icon: Icons.waves,
+                      label: l10n.scoreFlowFraktal,
+                      sub: fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(fraktal, l10n),
+                      iconColor: FastTheme.accent,
+                      value: fraktal,
+                      unit: '%',
+                    ),
+                  ),
               ],
             ),
-            if (uyum.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(uyum, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
-            ],
+            const SizedBox(height: 8),
+            _scoreDetailCard(l10n, uyum, torkMetin, tork, fraktalMetin, fraktal),
             const SizedBox(height: 16),
           ],
 
@@ -319,13 +356,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           Text(aci['baslik'] ?? '', style: const TextStyle(fontWeight: FontWeight.w600)),
                           Text(aci['yorum'] ?? ''),
                           Text('${aci['aci_turu'] ?? ''} · ${aci['etki'] ?? ''} · ${aci['donem'] ?? ''}',
-                            style: const TextStyle(fontSize: 11, color: FastTheme.textLight)),
+                            style:  TextStyle(fontSize: 11, color: FastTheme.textLight)),
                         ],
                       ),
                     ))),
                   if ((item['toplam_aci'] ?? 0) > 0)
                     Text(l10n.analyzerTotalAspects(item['toplam_aci']),
-                      style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                      style:  TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                 ],
               ),
             );
@@ -354,10 +391,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                   if (item['ay_burc'] != null)
                     Text(l10n.analyzerMoonTransitLine(item['ay_derece'] ?? '', item['ay_ev'] ?? '', item['ay_burc']),
-                      style: const TextStyle(fontSize: 11, color: FastTheme.accent)),
+                      style:  TextStyle(fontSize: 11, color: FastTheme.accent)),
                   if (item['ortam'] != null)
                     Text(item['ortam'].toString(),
-                      style: const TextStyle(fontSize: 12, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                      style:  TextStyle(fontSize: 12, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                   if (item['yorum'] != null) HtmlRender(item['yorum']),
                   if (item['mesajlar'] is List)
                     ...((item['mesajlar'] as List).map((m) => HtmlRender(m.toString()))),
@@ -416,7 +453,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item['baslik']?.toString() ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: FastTheme.accent)),
+                  Text(item['baslik']?.toString() ?? '', style:  TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: FastTheme.accent)),
                   if (item['icerik'] != null)
                     Padding(padding: const EdgeInsets.only(top: 4), child: Text(item['icerik'].toString(), style: const TextStyle(fontSize: 12))),
                 ],
@@ -456,7 +493,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     TextSpan(text: ' (${item['fark'] ?? ''}°)'),
                   ]), style: const TextStyle(fontSize: 12)),
                   if (item['yorum'] != null)
-                    Padding(padding: const EdgeInsets.only(top: 2), child: Text(item['yorum'].toString(), style: const TextStyle(fontSize: 11, color: FastTheme.textLight))),
+                    Padding(padding: const EdgeInsets.only(top: 2), child: Text(item['yorum'].toString(), style:  TextStyle(fontSize: 11, color: FastTheme.textLight))),
                 ],
               ),
             );
@@ -484,7 +521,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   Text('✨ ${p['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                   if (p['aci'] != null || p['aci_turu'] != null)
                     Text(l10n.analyzerAspectOrb(p['aci'] ?? '', p['orb'] ?? '', p['aci_turu'] ?? ''),
-                      style: const TextStyle(fontSize: 11, color: FastTheme.textLight)),
+                      style:  TextStyle(fontSize: 11, color: FastTheme.textLight)),
                   if (p['metin'] != null)
                     Padding(padding: const EdgeInsets.only(top: 4), child: Text(p['metin'].toString(), style: const TextStyle(fontSize: 12, height: 1.4))),
                 ],
@@ -513,12 +550,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 children: [
                   Text('${data.indexOf(m) + 1}. ${m['alan'] ?? ''}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
                   Text(l10n.analyzerScorePoints(m['yuzde'] ?? '', m['puan'] is num ? (m['puan'] as num).toStringAsFixed(1) : m['puan']),
-                    style: const TextStyle(fontSize: 11, color: FastTheme.accent)),
+                    style:  TextStyle(fontSize: 11, color: FastTheme.accent)),
                   if (m['meslekler'] is List)
                     ...((m['meslekler'] as List).map((j) => Padding(
                       padding: const EdgeInsets.only(left: 12, top: 2),
                       child: Text('🧑‍💼 ${j['meslek'] ?? ''} — ${j['aciklama'] ?? ''}',
-                        style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                        style:  TextStyle(fontSize: 12, color: FastTheme.textLight)),
                     ))),
                 ],
               ),
@@ -546,7 +583,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('🔮 ${e.key}', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
+                    Text('🔮 ${e.key}', style:  TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
                     const SizedBox(height: 4),
                     Wrap(
                       spacing: 4, runSpacing: 4,
@@ -578,7 +615,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           }),
           if (arapSinastri is List && arapSinastri.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text('🔗 ${l10n.analyzerSectionArabicBonds}', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
+            Text('🔗 ${l10n.analyzerSectionArabicBonds}', style:  TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: FastTheme.accent)),
             const SizedBox(height: 4),
             ...arapSinastri.take(6).map((b) => Container(
               padding: const EdgeInsets.all(6),
@@ -598,7 +635,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     style: const TextStyle(fontSize: 12),
                   ),
                   if (b['yorum'] != null)
-                    Padding(padding: const EdgeInsets.only(top: 2), child: Text(b['yorum'].toString(), style: const TextStyle(fontSize: 11, color: FastTheme.textLight))),
+                    Padding(padding: const EdgeInsets.only(top: 2), child: Text(b['yorum'].toString(), style:  TextStyle(fontSize: 11, color: FastTheme.textLight))),
                 ],
               ),
             )),
@@ -629,7 +666,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 children: [
                   if (item['gezegen'] != null) Text(item['gezegen'].toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   if (item['derece_str'] != null || item['derece'] != null)
-                    Text(item['derece_str']?.toString() ?? '${item['derece']}°', style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                    Text(item['derece_str']?.toString() ?? '${item['derece']}°', style:  TextStyle(fontSize: 12, color: FastTheme.textLight)),
                   if (item['sembol'] != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(item['sembol'].toString(), style: const TextStyle(fontSize: 12))),
                 ],
               ),
@@ -669,7 +706,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         children: (item['oneriler'] as List).map((o) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(color: FastTheme.bg, border: Border.all(color: FastTheme.border), borderRadius: BorderRadius.circular(14)),
-                          child: Text('💡 ${o['metin'] ?? ''}', style: const TextStyle(fontSize: 10, color: FastTheme.textLight)),
+                          child: Text('💡 ${o['metin'] ?? ''}', style:  TextStyle(fontSize: 10, color: FastTheme.textLight)),
                         )).toList(),
                       ),
                   ],
@@ -699,12 +736,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(p['tarih'] != null ? '📅 ${p['tarih']} (${p['gun_ad'] ?? ''})' : '📅 ${l10n.analyzerProgressionYear(p['yil'] ?? '')}',
-                    style: const TextStyle(color: FastTheme.accent, fontWeight: FontWeight.w600)),
+                    style:  TextStyle(color: FastTheme.accent, fontWeight: FontWeight.w600)),
                   if (p['ay_burc'] != null)
                     Text(l10n.analyzerMoonSunHouse(p['ay_ev'] ?? '', p['ay_burc'], p['gunes_burc'] ?? ''),
-                      style: const TextStyle(fontSize: 11, color: FastTheme.textLight)),
+                      style:  TextStyle(fontSize: 11, color: FastTheme.textLight)),
                   if (p['ortam'] != null)
-                    Text(p['ortam'].toString(), style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                    Text(p['ortam'].toString(), style:  TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                   if (p['yorumlar'] is List)
                     ...((p['yorumlar'] as List).map((y) => Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -771,15 +808,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   decoration: BoxDecoration(color: FastTheme.bg, borderRadius: BorderRadius.circular(8), border: Border.all(color: FastTheme.border)),
                   child: Column(
                     children: [
-                      const Icon(Icons.lock, size: 36, color: FastTheme.accentGold),
+                       Icon(Icons.lock, size: 36, color: FastTheme.accentGold),
                       const SizedBox(height: 8),
                       Text(l10n.analyzerSectionChartComment, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      Text('🔒 ${l10n.analyzerLoadWorldMap}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, color: FastTheme.textLight)),
+                      Text('🔒 ${l10n.analyzerLoadWorldMap}', textAlign: TextAlign.center, style:  TextStyle(fontSize: 12, color: FastTheme.textLight)),
                       const SizedBox(height: 12),
                       SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.star, size: 16), label: Text(l10n.astrokartografiSubscribe), style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold), onPressed: () => _subscribe(l10n))),
                       const SizedBox(height: 8),
-                      Text(l10n.astrokartografiHint, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
+                      Text(l10n.astrokartografiHint, textAlign: TextAlign.center, style:  TextStyle(fontSize: 11, color: FastTheme.textLight, fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ),
@@ -847,7 +884,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             if (effects.isNotEmpty && cat == categories.first)
               Padding(
                 padding: const EdgeInsets.only(left: 130, top: 2),
-                child: Text(effects.join(', '), style: const TextStyle(fontSize: 10, color: FastTheme.textLight)),
+                child: Text(effects.join(', '), style:  TextStyle(fontSize: 10, color: FastTheme.textLight)),
               ),
           ],
         ),
@@ -894,7 +931,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           if (s['sehir'] != null)
                             InkWell(
                               onTap: () => _onCityTap(provider, s),
-                              child: const Icon(Icons.refresh, size: 16, color: FastTheme.primary),
+                              child:  Icon(Icons.refresh, size: 16, color: FastTheme.primary),
                             ),
                         ],
                       ),
@@ -1021,5 +1058,135 @@ class _ResultsScreenState extends State<ResultsScreen> {
       setState(() => _pdfLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
+  }
+
+  // ---- Skor kartları (yan yana kompakt) ----
+
+  Widget _scoreCard({
+    required IconData icon,
+    required String label,
+    required String sub,
+    required Color iconColor,
+    required String value,
+    required String unit,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(label.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:  TextStyle(color: FastTheme.textDim, fontSize: 9, letterSpacing: 1)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(value, style: GoogleFonts.cormorantGaramond(fontSize: 30, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+              const SizedBox(width: 3),
+              Text(unit, style:  TextStyle(color: FastTheme.textMuted, fontSize: 12)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(sub, maxLines: 3, overflow: TextOverflow.ellipsis,
+              style:  TextStyle(color: FastTheme.textLight, fontSize: 10.5, height: 1.5)),
+        ],
+      ),
+    );
+  }
+
+  // ---- Skor kartlarının tam açıklamaları ----
+  Widget _scoreDetailCard(
+    AppLocalizations l10n,
+    String uyum,
+    String torkMetin,
+    String tork,
+    String fraktalMetin,
+    String fraktal,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient:  LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [FastTheme.cardBg, FastTheme.bgSecondary]),
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.scoreDetailTitle, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1)),
+          const SizedBox(height: 8),
+          if (uyum.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.spa, color: FastTheme.rose, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(uyum, style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6))),
+                ],
+              ),
+            ),
+          if (tork.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.bolt, color: FastTheme.secondary, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('$tork/10 · ${torkMetin.isNotEmpty ? torkMetin : _torkSub(tork, l10n)}',
+                        style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                  ),
+                ],
+              ),
+            ),
+          if (fraktal.isNotEmpty)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.waves, color: FastTheme.accent, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('$fraktal% · ${fraktalMetin.isNotEmpty ? fraktalMetin : _fraktalSub(fraktal, l10n)}',
+                      style:  TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _torkSub(dynamic t, AppLocalizations l10n) {
+    final v = (t is num) ? t.toDouble() : double.tryParse('$t') ?? 0;
+    if (v < 3) return l10n.torkLow;
+    if (v < 6) return l10n.torkMid;
+    return l10n.torkHigh;
+  }
+
+  String _fraktalSub(dynamic f, AppLocalizations l10n) {
+    final v = (f is num) ? f.toDouble() : double.tryParse('$f') ?? 0;
+    if (v < 3) return l10n.fraktalLow;
+    if (v < 6) return l10n.fraktalMid;
+    return l10n.fraktalHigh;
   }
 }

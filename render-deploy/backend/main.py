@@ -6460,6 +6460,103 @@ try:
 except Exception:
     from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single
 
+try:
+    from backend.auth import verify_token, get_profile, upsert_profile, list_people, create_person, update_person, delete_person, folder_labels, supabase_enabled
+except Exception:
+    from auth import verify_token, get_profile, upsert_profile, list_people, create_person, update_person, delete_person, folder_labels, supabase_enabled
+
+def _require_user(request: Request) -> dict:
+    """Authorization: Bearer <supabase_jwt> -> suer kaydini doner; gecersizse 401."""
+    auth_header = request.headers.get("Authorization") or ""
+    user = verify_token(auth_header)
+    if not user:
+        raise HTTPException(status_code=401, detail={"code": "UNAUTHORIZED", "msg": "Giriş gereklidir"})
+    return user
+
+class ProfilUpdate(BaseModel):
+    display_name: Optional[str] = None
+    lang: Optional[str] = None
+
+class PersonCreate(BaseModel):
+    name: str
+    birth_date: Optional[str] = None
+    birth_time: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    utc_offset: Optional[str] = None
+    folder: Optional[str] = None
+
+class PersonUpdate(BaseModel):
+    name: Optional[str] = None
+    birth_date: Optional[str] = None
+    birth_time: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    utc_offset: Optional[str] = None
+    folder: Optional[str] = None
+
+@app_fast.get("/api/auth/me")
+def auth_me(request: Request):
+    user = _require_user(request)
+    prof = get_profile(user["id"])
+    upsert_profile(user["id"], email=user.get("email", ""), display_name=user.get("display_name", ""))
+    return {"user": {"id": user["id"], "email": user.get("email", ""), "display_name": user.get("display_name", "")},
+            "profile": prof}
+
+@app_fast.put("/api/auth/me")
+def auth_me_update(request: Request, body: ProfilUpdate):
+    user = _require_user(request)
+    prof = get_profile(user["id"])
+    upsert_profile(user["id"], email=user.get("email", ""),
+                   display_name=body.display_name or prof.get("display_name") or user.get("display_name", ""),
+                   lang=body.lang or prof.get("lang") or "tr")
+    return {"ok": True, "profile": get_profile(user["id"])}
+
+@app_fast.get("/api/people/folders")
+def people_folders(request: Request):
+    user = _require_user(request)
+    lang = (get_profile(user["id"]) or {}).get("lang") or "tr"
+    f = folder_labels(lang, user["id"])
+    # PG deposundaki özel klasörleri de mevcut kişilerden birleştir.
+    for p in list_people(user["id"]):
+        pf = (p.get("folder") or "").strip()
+        if pf and pf not in f:
+            f[pf] = pf
+    return {"folders": f}
+
+@app_fast.get("/api/people")
+def people_list(request: Request):
+    user = _require_user(request)
+    return {"people": list_people(user["id"])}
+
+@app_fast.post("/api/people")
+def people_create(request: Request, body: PersonCreate):
+    user = _require_user(request)
+    p = create_person(user["id"], body.model_dump())
+    if not p:
+        raise HTTPException(status_code=400, detail={"code": "CREATE_FAILED", "msg": "Kişi oluşturulamadı"})
+    return {"person": p}
+
+@app_fast.put("/api/people/{person_id}")
+def people_update(request: Request, person_id: int, body: PersonUpdate):
+    user = _require_user(request)
+    p = update_person(user["id"], person_id, body.model_dump())
+    if not p:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "msg": "Kişi bulunamadı"})
+    return {"person": p}
+
+@app_fast.delete("/api/people/{person_id}")
+def people_delete(request: Request, person_id: int):
+    user = _require_user(request)
+    ok = delete_person(user["id"], person_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND", "msg": "Kişi bulunamadı"})
+    return {"ok": True}
+
 class FreeClaim(BaseModel):
     uid: str
     device_token: Optional[str] = None
@@ -6777,6 +6874,8 @@ def analiz_es(input: EsSevgiliInput):
             "uyum_orani": uyum,
             "tork": tork,
             "fraktal": fraktal,
+            "tork_metin": motor.tork_metin(),
+            "fraktal_metin": motor.fraktal_metin(),
             "mod": "es_sevgili",
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
@@ -6807,6 +6906,8 @@ def analiz_eb(input: EbeveynCocukInput):
             "uyum_orani": uyum,
             "tork": tork,
             "fraktal": fraktal,
+            "tork_metin": motor.tork_metin(),
+            "fraktal_metin": motor.fraktal_metin(),
             "mod": "ebeveyn_cocuk",
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
@@ -6846,6 +6947,8 @@ def analiz_eb_detayli(input: EbeveynCocukInput):
             "uyum_orani": uyum,
             "tork": tork,
             "fraktal": fraktal,
+            "tork_metin": motor.tork_metin(),
+            "fraktal_metin": motor.fraktal_metin(),
             "mod": "ebeveyn_cocuk",
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
@@ -6914,6 +7017,8 @@ def analiz_bireysel_natal(input: BireyselNatalInput):
             "uyum_orani": uyum,
             "tork": tork,
             "fraktal": fraktal,
+            "tork_metin": motor.tork_metin(),
+            "fraktal_metin": motor.fraktal_metin(),
             "mod": "bireysel_natal",
             "chartlar": ["situa_a", "frekans", "aci_gridi", "arap_noktalari"],
         }
@@ -7076,6 +7181,8 @@ def analiz_es_detayli(input: EsSevgiliInput):
             "uyum_orani": uyum,
             "tork": tork,
             "fraktal": fraktal,
+            "tork_metin": motor.tork_metin(),
+            "fraktal_metin": motor.fraktal_metin(),
             "mod": "es_sevgili",
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
@@ -7307,6 +7414,8 @@ def simulasyon_alternatif(input: AlternatifInput):
         "uyum_orani": uyum,
         "tork": tork,
         "fraktal": fraktal,
+        "tork_metin": motor2.tork_metin() if tork is not None else None,
+        "fraktal_metin": motor2.fraktal_metin() if fraktal is not None else None,
     }
 
 # ─── City image cache ───

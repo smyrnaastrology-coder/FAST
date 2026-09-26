@@ -3,6 +3,12 @@ class ApiConfig {
   // Not: Billing/ödeme vb. tüm istekler aynı ana backend'e gider.
   static const String baseUrl = 'https://fbst-api-mzum.onrender.com';
 
+  // Supabase (üyelik) — --dart-define ile verilir; boşsa üyelik modu pasiftir.
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: '');
+  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+
+  static bool get supabaseEnabled => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+
   // Health
   static const String health = '$baseUrl/api/health';
 

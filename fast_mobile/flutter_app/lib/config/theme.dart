@@ -1,34 +1,112 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Tema renk paleti.
+///
+/// Renkler mutable static'tir: [FastTheme.apply] ile koyu/açık palet arasında
+/// geçilir ve tüm widget'lar (eski `FastTheme.bg` vs. okumaları) yeni değerleri
+/// görür. Varsayılan: koyu tema (dark).
 class FastTheme {
-  // CSS :root değişkenleriyle birebir uyumlu
-  static const Color primary = Color(0xFF3D2E50);
-  static const Color primaryLight = Color(0xFF5a4470);
-  static const Color accentGold = Color(0xFFC9A96E);
-  static const Color accentGoldLight = Color(0xFFe0c68a);
-  static const Color accentGoldGlow = Color(0x4DC9A96E);
-  static const Color bg = Color(0xFF1a1423);
-  static const Color bgSecondary = Color(0xFF221a30);
-  static const Color cardBg = Color(0xFF2a1f38);
-  static const Color cardBgHover = Color(0xFF34284a);
-  static const Color text = Color(0xFFe8e0f0);
-  static const Color textMuted = Color(0xFFa898c0);
-  static const Color textDim = Color(0xFF7a6a92);
-  static const Color border = Color(0xFF3d2e50);
-  static const Color success = Color(0xFF4ade80);
-  static const Color warning = Color(0xFFfbbf24);
-  static const Color danger = Color(0xFFf87171);
-  static const Color error = Color(0xFFe57373);
+  // ── Dark (varsayılan) ──
+  static const Color darkPrimary = Color(0xFF3D2E50);
+  static const Color darkPrimaryLight = Color(0xFF5a4470);
+  static const Color darkAccentGold = Color(0xFFC9A96E);
+  static const Color darkAccentGoldLight = Color(0xFFe0c68a);
+  static const Color darkAccentGoldGlow = Color(0x4DC9A96E);
+  static const Color darkBg = Color(0xFF1a1423);
+  static const Color darkBgSecondary = Color(0xFF221a30);
+  static const Color darkCardBg = Color(0xFF2a1f38);
+  static const Color darkCardBgHover = Color(0xFF34284a);
+  static const Color darkBorder = Color(0xFF3d2e50);
 
-  // Legacy aliases (old light theme names) — kept for backward compat
-  static const Color rose = ltRose;
-  static const Color accent = ltAccent;
-  static const Color secondary = ltSecondary;
-  static const Color textDark = ltTextDark;
-  static const Color textLight = ltTextLight;
+  // ── Light (açık renkler) ──
+  static const Color lightPrimary = Color(0xFF5a4470);
+  static const Color lightPrimaryLight = Color(0xFF7a6490);
+  static const Color lightAccentGold = Color(0xFFb08d3f);
+  static const Color lightAccentGoldLight = Color(0xFFcfa96a);
+  static const Color lightAccentGoldGlow = Color(0x33C9A96E);
+  static const Color lightBg = Color(0xFFFDFAF6);
+  static const Color lightBgSecondary = Color(0xFFF5EFE7);
+  static const Color lightCardBg = Color(0xFFFFFFFF);
+  static const Color lightCardBgHover = Color(0xFFF7F1E8);
+  static const Color lightBorder = Color(0xFFE6DCCF);
 
-  // Light theme (original)
+  // ── Aktif renkler (dark varsayılan) ──
+  static Color primary = darkPrimary;
+  static Color primaryLight = darkPrimaryLight;
+  static Color accentGold = darkAccentGold;
+  static Color accentGoldLight = darkAccentGoldLight;
+  static Color accentGoldGlow = darkAccentGoldGlow;
+  static Color bg = darkBg;
+  static Color bgSecondary = darkBgSecondary;
+  static Color cardBg = darkCardBg;
+  static Color cardBgHover = darkCardBgHover;
+  static Color text = const Color(0xFFFFFFFF);
+  static Color textMuted = const Color(0xFFFFFFFF);
+  static Color textDim = const Color(0xFFFFFFFF);
+  static Color border = darkBorder;
+  static Color success = const Color(0xFF4ade80);
+  static Color warning = const Color(0xFFfbbf24);
+  static Color danger = const Color(0xFFf87171);
+  static Color error = const Color(0xFFe57373);
+  static Color textLight = const Color(0xFFFFFFFF);
+
+  static bool get isDark => bg == darkBg;
+
+  /// İsteğe bağlı: widget'ların aktif paleti izleyip rebuild edebilmesi.
+  static ThemeMode mode = ThemeMode.dark;
+
+  /// Aktif paleti değiştirir. Tüm statik renkler güncellenir.
+  static void apply(ThemeMode newMode) {
+    mode = newMode;
+    if (newMode == ThemeMode.dark) {
+      primary = darkPrimary;
+      primaryLight = darkPrimaryLight;
+      accentGold = darkAccentGold;
+      accentGoldLight = darkAccentGoldLight;
+      accentGoldGlow = darkAccentGoldGlow;
+      bg = darkBg;
+      bgSecondary = darkBgSecondary;
+      cardBg = darkCardBg;
+      cardBgHover = darkCardBgHover;
+      border = darkBorder;
+      text = const Color(0xFFFFFFFF);
+      textMuted = const Color(0xFFFFFFFF);
+      textDim = const Color(0xFFFFFFFF);
+      success = const Color(0xFF4ade80);
+      warning = const Color(0xFFfbbf24);
+      danger = const Color(0xFFf87171);
+      error = const Color(0xFFe57373);
+      textLight = const Color(0xFFFFFFFF);
+    } else {
+      primary = lightPrimary;
+      primaryLight = lightPrimaryLight;
+      accentGold = lightAccentGold;
+      accentGoldLight = lightAccentGoldLight;
+      accentGoldGlow = lightAccentGoldGlow;
+      bg = lightBg;
+      bgSecondary = lightBgSecondary;
+      cardBg = lightCardBg;
+      cardBgHover = lightCardBgHover;
+      border = lightBorder;
+      text = const Color(0xFF2D2440);
+      textMuted = const Color(0xFF4A3B5C);
+      textDim = const Color(0xFF8A7A9A);
+      success = const Color(0xFF16a34a);
+      warning = const Color(0xFFb45309);
+      danger = const Color(0xFFdc2626);
+      error = const Color(0xFFdc2626);
+      textLight = const Color(0xFF2D2440);
+    }
+  }
+
+  // Legacy aliases (eski isimler) — uyumluluk için; aktif paletten okur.
+  static Color get rose => accentGoldLight;
+  static Color get accent => accentGold;
+  static Color get secondary => primaryLight;
+  static Color get textDark => text;
+
+  // Light theme (original, legacy sabitler)
   static const Color ltPrimary = Color(0xFFB8A9C9);
   static const Color ltSecondary = Color(0xFF8FB8CA);
   static const Color ltAccent = Color(0xFFC9A96E);
@@ -48,6 +126,7 @@ class FastTheme {
 
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.dark,
       scaffoldBackgroundColor: bg,
       colorScheme: colorScheme,
       appBarTheme: AppBarTheme(
@@ -57,7 +136,7 @@ class FastTheme {
         titleTextStyle: GoogleFonts.cormorantGaramond(
           fontSize: 20, fontWeight: FontWeight.w700, color: accentGold,
         ),
-        iconTheme: const IconThemeData(color: text),
+        iconTheme:  IconThemeData(color: FastTheme.text),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -73,18 +152,18 @@ class FastTheme {
         fillColor: bg,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: border),
+          borderSide:  BorderSide(color: FastTheme.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: border),
+          borderSide:  BorderSide(color: FastTheme.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: accentGold, width: 2),
+          borderSide: BorderSide(color: accentGold, width: 2),
         ),
-        labelStyle: const TextStyle(color: accentGold, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1),
-        hintStyle: const TextStyle(color: textDim),
+        labelStyle: TextStyle(color: accentGold, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1),
+        hintStyle:  TextStyle(color: FastTheme.textDim),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
       cardTheme: CardThemeData(
@@ -92,72 +171,93 @@ class FastTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: border),
+          side:  BorderSide(color: FastTheme.border),
         ),
       ),
       textTheme: GoogleFonts.dmSansTextTheme(ThemeData.dark().textTheme).apply(
         bodyColor: text,
         displayColor: accentGold,
       ),
-      dividerTheme: const DividerThemeData(color: border),
+      dividerTheme:  DividerThemeData(color: FastTheme.border),
       dropdownMenuTheme: DropdownMenuThemeData(
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: bg,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: border)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide:  BorderSide(color: FastTheme.border)),
         ),
       ),
     );
   }
 
   static ThemeData get light {
+    final colorScheme = ColorScheme.light(
+      primary: primary,
+      secondary: primaryLight,
+      surface: bg,
+      error: error,
+    );
+
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: ltBg,
-      colorScheme: ColorScheme.light(
-        primary: ltPrimary,
-        secondary: ltSecondary,
-        surface: ltBg,
-      ),
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: bg,
+      colorScheme: colorScheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.white,
+        backgroundColor: bgSecondary,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.cormorantGaramond(
-          fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF3D2E50),
+          fontSize: 20, fontWeight: FontWeight.w700, color: accentGold,
         ),
-        iconTheme: const IconThemeData(color: ltTextDark),
+        iconTheme:  IconThemeData(color: FastTheme.text),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: ltPrimary,
-          foregroundColor: Colors.white,
+          backgroundColor: accentGold,
+          foregroundColor: const Color(0xFFFFFFFF),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'DM Sans'),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: cardBg,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ltBorder),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ltBorder),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ltPrimary, width: 2),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: accentGold, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        labelStyle: TextStyle(color: accentGold, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1),
+        hintStyle: TextStyle(color: textDim),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: cardBg,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: border),
+        ),
+      ),
+      textTheme: GoogleFonts.dmSansTextTheme(ThemeData.light().textTheme).apply(
+        bodyColor: text,
+        displayColor: accentGold,
+      ),
+      dividerTheme: DividerThemeData(color: border),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: cardBg,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: border)),
+        ),
       ),
     );
   }

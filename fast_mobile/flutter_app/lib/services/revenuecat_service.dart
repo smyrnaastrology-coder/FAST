@@ -117,4 +117,28 @@ class RevenueCatService {
       return false;
     }
   }
+
+  /// Giriş yapan kullanıcıyı RevenueCat'te kimliklendir (app_user_id = Supabase userId).
+  /// Böylece abonelik hesaba bağlanır, cihaz değişse de kaybolmaz.
+  static Future<void> identify(String userId) async {
+    if (!_inited || userId.isEmpty) return;
+    try {
+      await Purchases.logIn(userId);
+      if (kDebugMode) print('[RC] identified $userId');
+    } catch (e) {
+      if (kDebugMode) print('[RC] identify err $e');
+    }
+  }
+
+  /// Çıkış yapınca RevenueCat'i anonim uid'e döndür.
+  static Future<void> reset() async {
+    if (!_inited) return;
+    try {
+      await Purchases.logOut();
+      final uid = await BillingService.getUid();
+      await Purchases.logIn(uid);
+    } catch (e) {
+      if (kDebugMode) print('[RC] reset err $e');
+    }
+  }
 }

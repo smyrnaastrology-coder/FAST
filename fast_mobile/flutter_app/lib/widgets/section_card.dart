@@ -35,7 +35,7 @@ class _SectionCardState extends State<SectionCard> {
                     const SizedBox(width: 10),
                   ],
                   Expanded(
-                    child: Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.text)),
+                    child: Text(widget.title, style:  TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: FastTheme.text)),
                   ),
                   Icon(_open ? Icons.expand_less : Icons.expand_more, color: FastTheme.textLight),
                 ],
@@ -59,17 +59,42 @@ class HtmlRender extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Basic HTML to text conversion
+    // HTML işleme: <br> -> yeni satır, <b>..</b> -> başlık (altın), diğer etiketler temizlenir.
     final text = html
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'<[^>]*>'), '')
         .replaceAll('&nbsp;', ' ')
         .replaceAll('&amp;', '&')
         .replaceAll('&lt;', '<')
         .replaceAll('&gt;', '>')
         .trim();
     if (text.isEmpty) return const SizedBox.shrink();
-    return Text(text, style: const TextStyle(fontSize: 14, height: 1.5, color: FastTheme.text));
+
+    final spans = <InlineSpan>[];
+    final parcalar = text.split(RegExp(r'(<b>.*?</b>)', caseSensitive: false, dotAll: true));
+    for (final parca in parcalar) {
+      if (parca.isEmpty) continue;
+      if (parca.startsWith('<b>') && parca.endsWith('</b>')) {
+        final baslik = parca.substring(3, parca.length - 4).trim();
+        if (baslik.isEmpty) continue;
+        spans.add(TextSpan(
+          text: '$baslik ',
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            fontWeight: FontWeight.w700,
+            color: FastTheme.accentGold,
+          ),
+        ));
+      } else {
+        final temiz = parca.replaceAll(RegExp(r'<[^>]*>'), '');
+        if (temiz.isEmpty) continue;
+        spans.add(TextSpan(
+          text: temiz,
+          style: TextStyle(fontSize: 14, height: 1.5, color: FastTheme.text),
+        ));
+      }
+    }
+    return Text.rich(TextSpan(children: spans));
   }
 }
 
@@ -89,7 +114,7 @@ class ScoreCard extends StatelessWidget {
             children: [
               Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
               const SizedBox(height: 4),
-              Text(label, style: const TextStyle(fontSize: 11, color: FastTheme.textLight), textAlign: TextAlign.center),
+              Text(label, style:  TextStyle(fontSize: 11, color: FastTheme.textLight), textAlign: TextAlign.center),
             ],
           ),
         ),

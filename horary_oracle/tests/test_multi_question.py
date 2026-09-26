@@ -102,6 +102,36 @@ def test_sub_answers_56_full_multi():
     assert "İŞ ORTAKLIĞI" in txt and "TAŞINMA" in txt and "FİNANS" in txt and "(NO)" in txt and "(BAĞIMLI)" in txt
 
 
+def test_sub_verdict_57_ben_nikki_boise():
+    from engine.horary_engine import cast_horary_chart
+    from engine.multi_question import sub_qtype, sub_verdict
+    r = cast_horary_chart(1985, 8, 15, 20.8333, 47.6833, -116.7667, "general")
+    s1 = "Ben orduya gitmeli mi"
+    s2 = "Nikki'yi (ati) satin almis olmali miyiz"
+    s3 = "Boise'ye tasinmali miyiz"
+    assert sub_qtype(s1) == "army"
+    assert sub_qtype(s2) == "animal"
+    assert sub_qtype(s3) == "relocation"
+    v1 = sub_verdict(r, s1)
+    v2 = sub_verdict(r, s2)
+    v3 = sub_verdict(r, s3)
+    assert v1["qtype"] == "army" and v1["verdict"] == "NO", v1
+    assert v2["qtype"] == "animal" and v2["verdict"] == "NO", v2
+    assert v3["qtype"] == "relocation" and v3["verdict"] == "NO", v3
+    assert "Neptune" in v1["facts"], v1   # onun 10. evi (harita 4) BalIk -> Neptune modern
+    assert "Satürn" in v2["facts"] or "Saturn" in v2["facts"], v2
+    assert "Moon" in v3["facts"] and "Neptune" in v3["facts"], v3
+
+
+def test_sub_answers_57_domicile_pisces_neptune():
+    from engine.horary_engine import cast_horary_chart
+    from engine.multi_question import _ruler
+    from core.ephemeris import DOMICILE
+    assert DOMICILE["Balık"] == "Neptune"
+    s, rul = _ruler(338.29)   # BalIk 8.29
+    assert s == "Balık" and rul == "Neptune", (s, rul)
+
+
 if __name__ == "__main__":
     test_split_questions_multi()
     test_split_questions_single()
@@ -109,4 +139,6 @@ if __name__ == "__main__":
     test_sub_answers_on_real_chart()
     test_sub_verdict_56_pam_california()
     test_sub_answers_56_full_multi()
-    print("test_multi_question: 6/6 OK")
+    test_sub_verdict_57_ben_nikki_boise()
+    test_sub_answers_57_domicile_pisces_neptune()
+    print("test_multi_question: 8/8 OK")
