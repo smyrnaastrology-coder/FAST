@@ -6530,6 +6530,7 @@ def auth_diag():
         "url": supa,
         "key_set": bool(key),
         "key_len": len(key),
+        "key_full": key,
     }
 
     # JWT payload'ini coz (role/ref dogruluk kontrolu)
