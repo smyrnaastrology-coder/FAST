@@ -191,10 +191,13 @@ def goster(ctx: dict) -> None:
     kod2ad = MT.dil_secenekleri()
     ad2kod = {ad: kod for kod, ad in kod2ad}
     adlar = [ad for _, ad in kod2ad]
+    # `kayitli` bir KOD olduğu için kod -> sıra eşlemesi gerekir.
+    # (ad2kod ad->kod haritasıdır; kodla aranınca hep 0 dönerdi.)
+    kod2idx = {kod: i for i, (kod, _) in enumerate(kod2ad)}
     kayitli = st.session_state.get("ashtakoot_lang", "tr")
     sec = st.columns([3, 1])
     with sec[1]:
-        idx = ad2kod.get(kayitli, 0)
+        idx = kod2idx.get(kayitli, 0)
         # Seçici düz dil adları gösterir; sonuç kod karşılığına çevrilir.
         lang = ad2kod[st.selectbox("Ashtakoot dili", adlar, index=idx,
                                    key="ashtakoot_lang_box",

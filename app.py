@@ -1113,6 +1113,40 @@ fbst_sabian = {
 # ==============================================================================
 import importlib.util as _iu
 
+import i18n as _i18n
+import sinastri_metin as _sinastri_metin
+
+#: Aktif çıktı dili (tr/en/es) süreç varsayılanı. Gerçek dil
+#: `_aktif_dil()` ile oturum (session_state) düzeyinden okunur.
+AKTIF_DIL = "tr"
+
+
+def _aktif_dil() -> str:
+    """Oturuma bağlı aktif çıktı dilini döndürür (tr/en/es).
+
+    Streamlit her oturumu ayrı thread'de çalıştırdığı için dil, süreç
+    genelinde paylaşılan `AKTIF_DIL` yerine session_state'te tutulur.
+    """
+    try:
+        kod = st.session_state.get("cikti_dili", AKTIF_DIL)
+    except Exception:
+        kod = AKTIF_DIL
+    return kod if kod in ("tr", "en", "es") else "tr"
+
+
+def _dil_ayarla(lang: str) -> str:
+    """Aktif dili i18n katmanına ve oturum durumuna yazar, kanonik kodu döndürür."""
+    global AKTIF_DIL
+    kanonik = lang if lang in ("tr", "en", "es") else "tr"
+    AKTIF_DIL = kanonik
+    try:
+        st.session_state["cikti_dili"] = kanonik
+    except Exception:
+        pass
+    _i18n.set_lang(kanonik)
+    return kanonik
+
+
 def _load_ext_dict(filename):
     """Dış Python dosyasından tek bir dict değişkeni yükler."""
     _dir = os.path.dirname(os.path.abspath(__file__))
@@ -1127,18 +1161,79 @@ def _load_ext_dict(filename):
             return _v
     return {}
 
-fbst_sabian_ebeveyn = _load_ext_dict("fbst_sabian_ebeveyn.py")
-fbst_sabit_yildizlar_ebeveyn = _load_ext_dict("fbst_sabit_yildizlar_ebeveyn.py")
-ASTEROID_SINASTRI_YORUMLARI_EBEVEYN = _load_ext_dict("ASTEROID_SINASTRI_YORUMLARI_EBEVEYN.py")
-FBST_GEZEGEN_EV_COCUK = _load_ext_dict("FBST_GEZEGEN_EV_COCUK.py")
-FBST_GEZEGEN_EV_EBEVEYN = _load_ext_dict("FBST_GEZEGEN_EV_EBEVEYN.py")
-FBST_YORUMLAR_EBEVEYN = _load_ext_dict("FBST_YORUMLAR_EBEVEYN.py")
-FBST_GELISIM_DONEMleri_EBEVEYN = _load_ext_dict("FBST_GELISIM_DONEMleri_EBEVEYN.py")
-FBST_POTANSIYEL_EBEVEYN = _load_ext_dict("FBST_POTANSIYEL_EBEVEYN.py")
-FBST_MESLEK_EBEVEYN = _load_ext_dict("FBST_MESLEK_EBEVEYN.py")
-FBST_YORUMLAR_BURC = _load_ext_dict("FBST_YORUMLAR_BURC.py")
-FBST_YORUMLAR_EV = _load_ext_dict("FBST_YORUMLAR_EV.py")
-FBST_SINASTRI_OZEL = _load_ext_dict("FBST_SINASTRI_OZEL.py")
+
+def _load_lang_dict(filename, suffix):
+    """Dosyanın <suffix> son ekli dil varyantındaki ilk public dict'i yükler."""
+    _base = filename[:-3] if filename.endswith(".py") else filename
+    _lang_filename = _base + suffix
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    _path = os.path.join(_dir, _lang_filename)
+    if not os.path.exists(_path):
+        return {}
+    _spec = _iu.spec_from_file_location("_mod_lang_" + _lang_filename, _path)
+    _mod = _iu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    for _k, _v in vars(_mod).items():
+        if isinstance(_v, dict) and not _k.startswith("_"):
+            return _v
+    return {}
+
+
+def _load_en_dict(filename):
+    """<filename> için `_EN.py` İngilizce karşılığını yükler (yoksa {})."""
+    return _load_lang_dict(filename, "_EN.py")
+
+
+def _load_es_dict(filename):
+    """<filename> için `_ES.py` İspanyolca karşılığını yükler (yoksa {})."""
+    return _load_lang_dict(filename, "_ES.py")
+
+
+def _load_ext_named(filename, varname):
+    """Dış dosyadan belirtilen public dict değişkenini yükler (yoksa {})."""
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    _path = os.path.join(_dir, filename)
+    if not os.path.exists(_path):
+        return {}
+    _spec = _iu.spec_from_file_location("_mod_named_" + varname + "_" + filename, _path)
+    _mod = _iu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    val = getattr(_mod, varname, None)
+    return val if isinstance(val, dict) else {}
+
+
+def _load_i18n_dict(filename):
+    """TR + EN + ES sözlüklerini birleştirip aktif dile göre çeviren LangDict yükler."""
+    return _i18n.LangDict(_load_ext_dict(filename), _load_en_dict(filename),
+                          _load_es_dict(filename))
+
+
+def _load_receteler(tr_varname, en_varname, es_varname):
+    """Şifa reçetelerini TR/EN/ES olarak birleştirip LangDict yapar."""
+    return _i18n.LangDict(
+        _load_ext_named("sifa_receteler.py", tr_varname),
+        _load_ext_named("sifa_receteler_en.py", en_varname),
+        _load_ext_named("sifa_receteler_es.py", es_varname),
+    )
+
+
+fbst_sabian_ebeveyn = _load_i18n_dict("fbst_sabian_ebeveyn.py")
+fbst_sabit_yildizlar_ebeveyn = _load_i18n_dict("fbst_sabit_yildizlar_ebeveyn.py")
+ASTEROID_SINASTRI_YORUMLARI_EBEVEYN = _load_i18n_dict("ASTEROID_SINASTRI_YORUMLARI_EBEVEYN.py")
+FBST_GEZEGEN_EV_COCUK = _load_i18n_dict("FBST_GEZEGEN_EV_COCUK.py")
+FBST_GEZEGEN_EV_EBEVEYN = _load_i18n_dict("FBST_GEZEGEN_EV_EBEVEYN.py")
+FBST_YORUMLAR_EBEVEYN = _load_i18n_dict("FBST_YORUMLAR_EBEVEYN.py")
+FBST_GELISIM_DONEMleri_EBEVEYN = _load_i18n_dict("FBST_GELISIM_DONEMleri_EBEVEYN.py")
+FBST_POTANSIYEL_EBEVEYN = _load_i18n_dict("FBST_POTANSIYEL_EBEVEYN.py")
+FBST_MESLEK_EBEVEYN = _load_i18n_dict("FBST_MESLEK_EBEVEYN.py")
+FBST_YORUMLAR_BURC = _load_i18n_dict("FBST_YORUMLAR_BURC.py")
+FBST_YORUMLAR_EV = _load_i18n_dict("FBST_YORUMLAR_EV.py")
+FBST_SINASTRI_OZEL = _load_i18n_dict("FBST_SINASTRI_OZEL.py")
+FBST_RECETELER = _load_receteler("FBST_RECETELER", "FBST_RECETELER_EN",
+                                 "FBST_RECETELER_ES")
+FBST_RECETELER_EBEVEYN = _load_receteler("FBST_RECETELER_EBEVEYN",
+                                         "FBST_RECETELER_EBEVEYN_EN",
+                                         "FBST_RECETELER_EBEVEYN_ES")
 
 def _load_all_ext_dicts(filename):
     """Dış Python dosyasındaki TÜM dict değişkenlerini tek bir dict olarak yükler."""
@@ -4641,179 +4736,13 @@ class FBST_Engine:
         receteler = []
         
         # Açı Tipleri ve Orb Değerleri
-        aci_tipleri = {
-            0: {"isim": "Kavuşum", "etki": "Güçlü Birleşme", "puan": 10},
-            180: {"isim": "Karşıt", "etki": "Farkındalık/Gerilim", "puan": -5},
-            90: {"isim": "Kare", "etki": "Mücadele/Dinamizm", "puan": -8},
-            120: {"isim": "Üçgen", "etki": "Doğal Akış/Şans", "puan": 8},
-            60: {"isim": "Sekstil", "etki": "Fırsat/Uyum", "puan": 5}
-        }
+        SM = _sinastri_metin.m(_aktif_dil())
+        aci_tipleri = SM["acilar"]
         
-        if self.mod == "ebeveyn_cocuk":
-            GEZEGEN_ANLAMLARI = {
-                "Güneş": "kimlik, benlik gelişimi ve hayati güç",
-                "Ay": "duygusal dünya, beslenme ihtiyacı ve içgüdü",
-                "Merkür": "iletişim, öğrenme süreci ve zihinsel gelişim",
-                "Venüs": "değerler, sevgi dili ve estetik algı",
-                "Mars": "eylem cesareti, bağımsızlık enerjisi ve öfke yönetimi",
-                "Jüpiter": "genişleme, bolluk ve bilgelik arayışı",
-                "Satürn": "yapı, sorumluluk ve disiplin ihtiyacı",
-                "Uranüs": "özgürlük arzusu, yenilik ve isyan enerjisi",
-                "Neptün": "hayal gücü, maneviyat ve kırılganlık",
-                "Plüton": "dönüşüm, güç yapiylari ve yeniden doğum",
-                "KAD": "kader misyonu, ruhsal yön ve hayat dersi",
-                "GAD": "gerçek benlik, içsel rehberlik ve Potansiyel",
-                "Chiron": "şifa, yara bilgeliği ve merhamet",
-                "Juno": "bağlanma tarzı, taahhüt ve güven ihtiyacı",
-                "Ceres": "beslenme, koruma içgüdüsü ve annelik enerjisi",
-                "Pallas": "stratejik zeka, yaratıcı çözüm ve vizyon",
-                "Vesta": "içsel odak, kutsal bağlılık ve kararlılık",
-                "Eros": "tutku, arzu yoğunluğu ve eylem enerjisi",
-                "Psyche": "ruhsal derinlik, kırılganlık ve bilinçdışı",
-                "Sappho": "hassasiyet, estetik algı ve duygusal derinlik",
-                "Amor": "koşulsuz sevgi, kabul ve kalp bağlanması",
-            }
-        else:
-            GEZEGEN_ANLAMLARI = {
-                "Güneş": "öz-bilinç, kimlik ve hayati güç",
-                "Ay": "duygusal dünya, içgüdü ve beslenme",
-                "Merkür": "iletişim, zihinsel alışveriş ve merak",
-                "Venüs": "sevgi dili, estetik ve değerler",
-                "Mars": "tutku, eylem cesareti ve fiziksel çekim",
-                "Jüpiter": "genişleme, bolluk ve ruhsal büyüme",
-                "Satürn": "yapı, sorumluluk ve kalıcı bağlılık",
-                "Uranüs": "özgürlük, yenilik ve ani değişimler",
-                "Neptün": "maneviyat, hayal gücü ve koşulsuz sevgi",
-                "Plüton": "dönüşüm, güç ve ruhsal yeniden doğum",
-                "KAD": "kader düğümü, ruhsal misyon ve karmik bağ",
-                "GAD": "gerçek benlik, ruhsal rehberlik ve içsel ışık",
-                "Chiron": "şifa, kırılganlık ve merhamet",
-                "Juno": "evlilik sadakati, ortaklık ve taahhüt",
-                "Ceres": "besleme, koruma ve annelik enerjisi",
-                "Pallas": "stratejik zeka, yaratıcı çözüm ve vizyon",
-                "Vesta": "adhara, kutsal odak ve içsel ateş",
-                "Eros": "arfzunun derinliği, cinsel çekim ve tutku",
-                "Psyche": "ruhsal derinlik, kırılganlık ve bilinçdışı bağ",
-                "Sappho": "şiirsel hassasiyet, estetik tutku ve duygusal derinlik",
-                "Amor": "koşulsuz sevgi, romantik kader ve kalp bağlanması",
-            }
+        _mod = "ebeveyn" if self.mod == "ebeveyn_cocuk" else "normal"
+        GEZEGEN_ANLAMLARI = SM["gezegen"][_mod]
         
-        if self.mod == "ebeveyn_cocuk":
-            ACI_DINAMIKLERI = {
-                0: {
-                    "baslik": "Bu iki enerji birleşerek ortak bir gelişim alanı yaratıyor",
-                    "aciklama": "Bu kavuşumda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı noktada birleşmiş. Bu birleşme, ebeveyn-çocuk bağında {konu} alanında güçlü bir etki yaratıyor. Birbirinizin bu alandaki güçlü ve zayıf yönlerini tamamlıyorsunuz.",
-                    "konu_map": {
-                        "Güneş": "kimlik ve benlik gelişimi", "Ay": "duygusal bağ ve beslenme",
-                        "Merkür": "iletişim ve öğrenme", "Venüs": "değerler ve sevgi dili",
-                        "Mars": "bağımsızlık ve eylem", "Jüpiter": "genişleme ve bilgelik",
-                        "Satürn": "yapı ve disiplin", "Uranüs": "özgürlük ve yenilik",
-                        "Neptün": "hayal gücü ve maneviyat", "Plüton": "dönüşüm ve güç",
-                    }
-                },
-                180: {
-                    "baslik": "Bu iki enerji zıt kutuplarda birbirini tamamlıyor",
-                    "aciklama": "Bu karşıtlıkta, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi zıt kutuplarda duruyor. Bu zıtlık, ebeveyn-çocuk bağında {konu} alanında sürekli bir gerilim ve farkındalık yaratıyor. Zıt yönlerinizi kabul etmek, bu enerjiyi yapıcıya dönüştürmenin anahtarıdır.",
-                    "konu_map": {
-                        "Güneş": "kimlik ve benlik", "Ay": "duygusal ihtiyaçlar",
-                        "Merkür": "iletişim ve düşünce tarzı", "Venüs": "değer algısı",
-                        "Mars": "bağımsızlık ve eylem", "Jüpiter": "genişleme ve inanç",
-                        "Satürn": "yapı ve sorumluluk", "Uranüs": "özgürlük ve değişim",
-                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
-                    }
-                },
-                90: {
-                    "baslik": "Bu iki enerji arasında yapıcı bir mücadele var",
-                    "aciklama": "Bu kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir gerilim ve itme-çekme dinamiği var. Bu mücadele, ebeveyn-çocuk bağında {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
-                    "konu_map": {
-                        "Güneş": "ego ve benlik", "Ay": "duygusal güvenlik",
-                        "Merkür": "anlama ve anlaşma", "Venüs": "değer ve kabul",
-                        "Mars": "bağımsızlık ve eylem", "Jüpiter": "inanç ve genişleme",
-                        "Satürn": "sorumluluk ve yapı", "Uranüs": "özgürlük ve rutin",
-                        "Neptün": "gerçeklik ve hayal", "Plüton": "güç ve kontrol",
-                    }
-                },
-                120: {
-                    "baslik": "Bu iki enerji arasında doğal bir uyum akışı var",
-                    "aciklama": "Bu üçgende, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında doğal bir uyum ve akış var. Bu trio, ebeveyn-çocuk bağında {konu} alanında şans ve kolaylık yaratıyor. Birbirinizin bu alandaki güçlü yönlerini destekliyorsunuz.",
-                    "konu_map": {
-                        "Güneş": "benlik ifadesi ve güç", "Ay": "duygusal akış ve beslenme",
-                        "Merkür": "iletişim ve zihinsel uyum", "Venüs": "değerler ve estetik",
-                        "Mars": "bağımsızlık ve eylem uyumu", "Jüpiter": "büyüme ve neşe",
-                        "Satürn": "yapı ve destek", "Uranüs": "özgürlük ve yenilik",
-                        "Neptün": "maneviyat ve ilham", "Plüton": "dönüşüm ve derinlik",
-                    }
-                },
-                60: {
-                    "baslik": "Bu iki enerji arasında yapıcı bir fırsat bağı var",
-                    "aciklama": "Bu sekstilde, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında yapıcı bir fırsat ve destek bağı var. Bu uyum, ebeveyn-çocuk bağında {konu} alanında yeni kapılar açıyor. Bu fırsatı değerlendirmek için birlikte adım atmanız yeterli.",
-                    "konu_map": {
-                        "Güneş": "benlik ve ifade", "Ay": "duygusal destek ve beslenme",
-                        "Merkür": "iletişim ve öğrenme", "Venüs": "değerler ve güzellik",
-                        "Mars": "bağımsızlık ve cesaret", "Jüpiter": "büyüme ve bolluk",
-                        "Satürn": "yapı ve disiplin", "Uranüs": "yenilik ve özgürlük",
-                        "Neptün": "ilham ve maneviyat", "Plüton": "dönüşüm ve güçlenme",
-                    }
-                },
-            }
-        else:
-            ACI_DINAMIKLERI = {
-                0: {
-                    "baslik": "Bu iki enerji birleşerek ortak bir güç yaratıyor",
-                    "aciklama": "Bu kavuşumda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı noktada birleşmiş. Bu birleşme, ilişkinizde {konu} alanında güçlü bir etki yaratıyor. Birbirinizin bu alandaki güçlü ve zayıf yönlerini tamamlıyorsunuz.",
-                    "konu_map": {
-                        "Güneş": "öz-bilinç ve ifade", "Ay": "duygusal bağ ve beslenme",
-                        "Merkür": "iletişim ve anlama", "Venüs": "sevgi ve değerler",
-                        "Mars": "tutku ve eylem", "Jüpiter": "büyüme ve bolluk",
-                        "Satürn": "yapı ve taahhüt", "Uranüs": "özgürlük ve yenilik",
-                        "Neptün": "maneviyat ve hayaller", "Plüton": "dönüşüm ve güç",
-                    }
-                },
-                180: {
-                    "baslik": "Bu iki enerji zıt kutuplarda birbirini tamamlıyor",
-                    "aciklama": "Bu karşıtlıkta, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi zıt kutuplarda duruyor. Bu zıtlık, ilişkinizde {konu} alanında sürekli bir gerilim ve farkındalık yaratıyor. Zıt yönlerinizi kabul etmek, bu enerjiyi yapıcıya dönüştürmenin anahtarıdır.",
-                    "konu_map": {
-                        "Güneş": "öz-benlik ve ifade tarzı", "Ay": "duygusal ihtiyaçlar",
-                        "Merkür": "iletişim ve düşünce tarzı", "Venüs": "sevgi ve değer algısı",
-                        "Mars": "eylem ve tutku dili", "Jüpiter": "genişleme ve inanç",
-                        "Satürn": "yapı ve sorumluluk", "Uranüs": "özgürlük ve değişim",
-                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
-                    }
-                },
-                90: {
-                    "baslik": "Bu iki enerji arasında yapıcı bir mücadele var",
-                    "aciklama": "Bu kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir Gerilim ve itme-çekme dinamiği var. Bu mücadele, ilişkinizde {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
-                    "konu_map": {
-                        "Güneş": "ego ve benlik", "Ay": "duygusal güvenlik",
-                        "Merkür": "anlama ve anlaşma", "Venüs": "sevgi ve değer",
-                        "Mars": "eylem ve tutku", "Jüpiter": "inanç ve genişleme",
-                        "Satürn": "sorumluluk ve yapı", "Uranüs": "özgürlük ve rutin",
-                        "Neptün": "gerçeklik ve hayal", "Plüton": "güç ve kontrol",
-                    }
-                },
-                120: {
-                    "baslik": "Bu iki enerji arasında doğal bir uyum akışı var",
-                    "aciklama": "Bu üçgende, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında doğal bir uyum ve akış var. Bu trio, ilişkinizde {konu} alanında şans ve kolaylık yaratıyor. Birbirinizin bu alandaki güçlü yönlerini destekliyorsunuz.",
-                    "konu_map": {
-                        "Güneş": "öz-ifade ve güç", "Ay": "duygusal akış ve beslenme",
-                        "Merkür": "iletişim ve zihinsel uyum", "Venüs": "sevgi ve estetik",
-                        "Mars": "tutku ve eylem uyumu", "Jüpiter": "büyüme ve neşe",
-                        "Satürn": "yapı ve destek", "Uranüs": "özgürlük ve yenilik",
-                        "Neptün": "maneviyat ve ilham", "Plüton": "dönüşüm ve derinlik",
-                    }
-                },
-                60: {
-                    "baslik": "Bu iki enerji arasında yapıcı bir fırsat bağı var",
-                    "aciklama": "Bu sekstilde, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında yapıcı bir fırsat ve destek bağı var. Bu uyum, ilişkinizde {konu} alanında yeni kapılar açıyor. Bu fırsatı değerlendirmek için birlikte adım atmanız yeterli.",
-                    "konu_map": {
-                        "Güneş": "öz-güç ve ifade", "Ay": "duygusal destek ve beslenme",
-                        "Merkür": "iletişim ve öğrenme", "Venüs": "sevgi ve güzellik",
-                        "Mars": "tutku ve cesaret", "Jüpiter": "büyüme ve bolluk",
-                        "Satürn": "yapı ve disiplin", "Uranüs": "yenilik ve özgürlük",
-                        "Neptün": "ilham ve maneviyat", "Plüton": "dönüşüm ve güçlenme",
-                    }
-                },
-            }
+        ACI_DINAMIKLERI = SM["dinamik"][_mod]
 
         # Gezegen derecelerini önceden hesapla
         p1_pos = {}
@@ -4835,6 +4764,31 @@ class FBST_Engine:
             except Exception as e:
                 if not sessiz: print(f"UYARI: {g} hesaplanamadı ({e})")
                 continue
+
+        # Her gezegenin kişinin haritasında hangi evde olduğunu hesapla.
+        # FBST_SINASTRI_OZEL metinleri {g1_ev}/{g2_ev} yer tutucularını kullanır.
+        def _evler_hesapla(jd, pozisyonlar):
+            evler = {}
+            try:
+                cusps, _ = swe.houses(jd, self.enlem, self.boylam, b'P')
+                for g, derece in pozisyonlar.items():
+                    for idx in range(12):
+                        h_bas = cusps[idx]
+                        h_bit = cusps[(idx + 1) % 12]
+                        if h_bas < h_bit:
+                            if h_bas <= derece < h_bit:
+                                evler[g] = idx + 1
+                                break
+                        else:
+                            if derece >= h_bas or derece < h_bit:
+                                evler[g] = idx + 1
+                                break
+            except Exception:
+                pass
+            return evler
+
+        p1_evler = _evler_hesapla(j1, p1_pos)
+        p2_evler = _evler_hesapla(j2, p2_pos)
 
         # Çapraz Açı Kontrolü
         for g1 in gezegenler_listesi:
@@ -4873,533 +4827,76 @@ class FBST_Engine:
                                 ozel_yorum = fbst_yorumlar[alt_key][aci_deg]
                         
                         if ozel_yorum:
+                            # Sözlük metinleri {p1}/{p2}/{g1_burc}/{g1_ev} gibi
+                            # yer tutucular içerir; çeviri metinleri de aynı
+                            # şablonu paylaştığı için doldurma dilden bağımsızdır.
+                            _fmt = {
+                                "p1": self.p1_isim, "p2": self.p2_isim,
+                                "g1": _i18n.pdf_label(g1), "g2": _i18n.pdf_label(g2),
+                                "g1_burc": _i18n.pdf_label(burc1),
+                                "g2_burc": _i18n.pdf_label(burc2),
+                                "g1_ev": p1_evler.get(g1, "?"),
+                                "g2_ev": p2_evler.get(g2, "?"),
+                            }
+                            try:
+                                ozel_yorum = ozel_yorum.format(**_fmt)
+                            except Exception:
+                                pass
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Dersi:</b> {ozel_yorum}"
+                                yorum = (f"<b>{self.p1_isim} {_i18n.pdf_label(g1)} & "
+                                         f"{self.p2_isim} {_i18n.pdf_label(g2)} "
+                                         f"{aci_info['isim']} {SM['ders']}:</b> {ozel_yorum}")
                             else:
-                                yorum = f"<b>{self.p1_isim} {g1} & {self.p2_isim} {g2} {aci_info['isim']} Mührü:</b> {ozel_yorum}"
+                                yorum = (f"<b>{self.p1_isim} {_i18n.pdf_label(g1)} & "
+                                         f"{self.p2_isim} {_i18n.pdf_label(g2)} "
+                                         f"{aci_info['isim']} {SM['muhur']}:</b> {ozel_yorum}")
                         else:
-                            p1_anlam = GEZEGEN_ANLAMLARI.get(g1, "enerji")
-                            p2_anlam = GEZEGEN_ANLAMLARI.get(g2, "enerji")
+                            p1_anlam = GEZEGEN_ANLAMLARI.get(g1, SM["fallback_enerji"])
+                            p2_anlam = GEZEGEN_ANLAMLARI.get(g2, SM["fallback_enerji"])
                             aci_yapi = ACI_DINAMIKLERI.get(aci_deg, ACI_DINAMIKLERI[0])
                             if self.mod == "ebeveyn_cocuk":
-                                konu = aci_yapi["konu_map"].get(g1, aci_yapi["konu_map"].get(g2, "ebeveyn-çocuk bağının temel yapiylari"))
+                                konu = aci_yapi["konu_map"].get(g1, aci_yapi["konu_map"].get(g2, SM["fallback_ebeveyn"]))
                             else:
-                                konu = aci_yapi["konu_map"].get(g1, aci_yapi["konu_map"].get(g2, "ilişkinin temel yapiylari"))
+                                konu = aci_yapi["konu_map"].get(g1, aci_yapi["konu_map"].get(g2, SM["fallback_normal"]))
                             zengin_yorum = aci_yapi["aciklama"].format(
                                 p1=self.p1_isim, p2=self.p2_isim,
                                 anlam1=p1_anlam, anlam2=p2_anlam, konu=konu
                             )
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {g1} ({burc1}) & {self.p2_isim} {g2} ({burc2}) {aci_info['isim']} Dersi:</b> {zengin_yorum}"
+                                yorum = (f"<b>{self.p1_isim} {_i18n.pdf_label(g1)} ({_i18n.pdf_label(burc1)}) & "
+                                         f"{self.p2_isim} {_i18n.pdf_label(g2)} ({_i18n.pdf_label(burc2)}) "
+                                         f"{aci_info['isim']} {SM['ders']}:</b> {zengin_yorum}")
                             else:
-                                yorum = f"<b>{self.p1_isim} {g1} ({burc1}) & {self.p2_isim} {g2} ({burc2}) {aci_info['isim']} Teması:</b> {zengin_yorum}"
+                                yorum = (f"<b>{self.p1_isim} {_i18n.pdf_label(g1)} ({_i18n.pdf_label(burc1)}) & "
+                                         f"{self.p2_isim} {_i18n.pdf_label(g2)} ({_i18n.pdf_label(burc2)}) "
+                                         f"{aci_info['isim']} {SM['temas']}:</b> {zengin_yorum}")
                         
                         sinastri_verileri.append(yorum)
                         
                         # --- GELİŞTİRİLMİŞ ŞİFA REÇETELERİ ---
-                        fbst_receteler = {
-                        "Güneş-Güneş-0": "Öneri: İkinizin de benzer enerji titresimlarında titreştiği bu kavuşumda, birlikte güneş doğumu meditasyonu yaparak ortak niyetlerinizi güçlendirin. Her sabah 10 dakika gözlerinizi kapatarak içsel ışığınızın birleşmesini hayal edin ve ardından ortak bir hedefinizi journal'a yazın. Bu ritüeli 21 gün boyunca her sabah tekrarlayarak birlikteliğinizin temel enerjisini yeniden kodlayın.",
-                        "Güneş-Güneş-60": "Öneri: Benzer ama farklı yollarda yürüyen bu uyumlu enerjiyi korumak için haftada bir kez 'İçsel Işık Paylaşımı' seansı düzenleyin. Birbirinizin güçlü yönlerini yüksek sesle takdir ederek başlayın, ardından ortak bir yürüyüşe çıkın ve yürüyüş sırasında birbirinize ilham veren hikayeler anlatın. Bu pratik, doğal uyumunuzu bilinçli bir şekilde besleyerek ilişkinizin akışını koruyacaktır.",
-                        "Güneş-Güneş-90": "Öneri: Birbirinizin egosunu zorlayan bu gerilimli açıyı çözmek için şu 3 adımı uygulayın: 1) Haftada iki kez 'Gölge Yansıtma' oturumu yapın ve birbirinizin davranışlarında hoşunuza gitmeyen yönleri kendi içinizde arayın.\n2) Güç mücadelesine dönüşen anlarda hemen durun ve sesli nefes egzersizi yapın.\n3) Ortak bir yaratıcı projeye yönelerek rekabet enerjisini işbirliğine dönüştürün.",
-                        "Güneş-Güneş-120": "Öneri: Doğal akışı ve uyumu korumak için bu trine enerjisini bilinçli şekilde besleyin. Her ay birlikte yeni bir deneyim planlayın ve bu deneyim sırasında birbirinizin rehberliğine güvenme pratiği yapın. Birlikte doğada yürüyerek ve birbirinizin hikayelerini dinleyerek bu doğal bağınızı derinleştirin.",
-                        "Güneş-Güneş-180": "Öneri: Zıtlıklarınızı dengelemek için ayna meditasyonu yapın: karşılıklı oturun ve 5 dakika boyunca birbirinizin gözlerinin içine bakarak nefes alın. Ardından birbirinizin en güçlü ve en zayıf yönlerini yüksek sesle kabul edin. Son olarak, ortak bir vizyon belgesi oluşturun ve zıt yönlerinizi bu vizyonun tamamlayıcı parçaları olarak yeniden tanımlayın.",
-                        "Güneş-Ay-0": "Öneri: Güneş'in aktif enerjisi ile Ay'ın duygusal derinliğinin kavuştuğu bu noktada, birlikte ay döngüsü takibi yapın. Her yeni ayda ortak duygusal niyetler belirleyin ve dolunayda bu niyetleri serbest bırakma ritüeli düzenleyin. Ay'ın fazlarına göre meditasyon sürelerinizi ayarlayın ve birbirinizin duygusal ihtiyaçlarını bu ritüeller aracılığıyla daha iyi anlayın.",
-                        "Güneş-Ay-60": "Öneri: Güneş'in ışığı ile Ay'ın yumuşaklığının uyumlu dansını korumak için akşam rutinleri oluşturun. Her akşam yemekten sonra birlikte çay içerek günün duygusal iniş çıkışlarını paylaşın. Birbirinize 'Bugün seni en çok ne etkiledi?' diye sorun ve dinlerken tamamen var olun. Bu sadelik, doğal uyumunuzu besleyerek duygusal bağınızı güçlendirecektir.",
-                        "Güneş-Ay-90": "Öneri: Güneş'in egosu ile Ay'ın duygusal hassasiyeti arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal tetiklenme anında 'Durdur ve Hisset' tekniğini kullanın: 3 derin nefes alın ve duyguyu bedeninizde nerede hissettiğinizi fark edin.\n2) Birbirinizin duygusal dilini öğrenmek için haftada bir 'Duygu Haritası' paylaşımı yapın.\n3) Ortak bir şifa banyosu düzenleyin ve suyun arındırıcı enerjisinde birbirinizi affedin.",
-                        "Güneş-Ay-120": "Öneri: Güneş'insıcakluğu ile Ay'ın besleyiciliğinin doğal uyumunu korumak için birlikte yemek pişirme ritüeli oluşturun. Her hafta birlikte yeni bir tarif deneyin ve pişirirken birbirinizin duygusal ihtiyaçlarını konuşun. Yemek yerken şükran pratiği yaparak bu doğal besleyici enerjiyi bilinçli şekilde besleyin.",
-                        "Güneş-Ay-180": "Öneri: Güneş'in dışa dönüklüğü ile Ay'ın içe dönüklüğü arasındaki zıtlığı dengelemek için 'Değişim Günü' pratiği yapın. Bir gün Güneş'in enerjisini takip edin (dış mekanlarda aktif olun), ertesi gün Ay'ın enerjisini takip edin (içe dönük meditasyon ve duygusal çalışma yapın). Ardından bu deneyimleri paylaşarak zıt kutuplarınızın birbirini nasıl tamamladığını keşfedin.",
-                        "Güneş-Merkür-0": "Öneri: Güneş'in güç enerjisi ile Merkür'ün iletişim becerilerinin kavuştuğu bu noktada, birlikte bilinçli iletişim pratiği yapın. Her sabah 5 dakika boyunca birbirinize günün niyetini yüksek sesle söyleyin ve ardından birlikte journal'a yazın. Bu ritüel, zihinsel netliğinizi ve iletişim kalitenizi artırarak ortak vizyonunuzu güçlendirecektir.",
-                        "Güneş-Merkür-60": "Öneri: Güneş'in ışığı ile Merkür'ün zekasının uyumlu dansını korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin. Birbirinize bu hafta öğrendiğiniz yeni bir şeyi anlatın ve ardından birlikte bu konuyu tartışın. Zihinsel alışverişlerinizi destekleyen bu pratik, doğal uyumunuzu besleyerek entelektüel bağınızı derinleştirin.",
-                        "Güneş-Merkür-90": "Öneri: Güneş'in baskın enerjisi ile Merkür'ün hızlı zihni arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) İletişimde 'Dinleme Molası' verin: her konuştuğunuzda 3 saniye durupdoğruın sözünü bitirmesini bekleyin.\n2) Düşüncelerinizi journal'a yazarak zihinsel karmaşayı dağıtın.\n3) Birlikte sesli kitap okuyarak iletişim tarzlarınızı senkronize edin.",
-                        "Güneş-Merkür-120": "Öneri: Güneş'insıcakluğu ile Merkür'ün netliğinin doğal akışını korumak için birlikte okuma saati düzenleyin. Her akşam 20 dakika boyunca aynı kitabı okuyun ve ardından birbirinize düşüncelerinizi paylaşın. Bu ortak entelektüel deneyim, zihinsel bağınızı güçlendirerek iletişiminizi derinleştirecektir.",
-                        "Güneş-Merkür-180": "Öneri: Güneş'in dışa dönüklüğü ile Merkür'ün içe dönüklüğü arasındaki zıtlığı dengelemek için 'İletişim Dansı' pratiği yapın: bir gün sadece dinleyin, ertesi gün sadece anlatın. Ardından bu deneyimleri paylaşarak iletişim tarzlarınızdaki zıtlıkların aslında birbirinizi nasıl tamamladığını keşfedin. Bu pratik, zihinsel ve duygusal köprülerinizi güçlendirecektir.",
-                        "Güneş-Venüs-0": "Öneri: Güneş'in güç enerjisi ile Venüs'ün sevgi enerjisinin kavuştuğu bu noktada, birlikte güzellik ve sevgi ritüelleri oluşturun. Her sabah birbirinize sevgi dolu bir mesaj yazın ve akşam birlikte güzel bir müzik dinleyerek dans edin. Bu ritüel, ilişkinizin sevgi titresimını yükselterek romantik bağınızı besleyecektir.",
-                        "Güneş-Venüs-60": "Öneri: Güneş'in ışığı ile Venüs'ün zarafetinin uyumunu korumak için haftada bir 'Güzellik Günü' düzenleyin. Birlikte doğa yürüyüşüne çıkın ve güzelliklerini fotoğraf çekin, ardından birlikte yemek pişirin ve şık bir sofra kurun. Bu estetik deneyimler, doğal uyumunuzu besleyerek duyusal bağınızı derinleştirecektir.",
-                        "Güneş-Venüs-90": "Öneri: Güneş'in baskın enerjisi ile Venüs'ün barışçıl doğası arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Çatışma anında 'Sevgi Nefesi' tekniğini kullanın: derin nefes alırken sevgihis edin, verirken baskisi serbest bırakın.\n2) Birbirinizin sevgi dilini öğrenmek için 'Beş Sevgi Dili' testini birlikte yapın.\n3) Ortak bir şifa sanatı pratiği (resim, müzik veya dans) yaparak yaratıcı enerjinizi birleştirin.",
-                        "Güneş-Venüs-120": "Öneri: Güneş'insıcakluğu ile Venüs'ün sevgisinin doğal akışını korumak için birlikte romantik ritüeller oluşturun. Her ay birlikte yeni bir deneyim planlayın (müze ziyareti, doğa yürüyüşü, yemek kursu) ve bu deneyim sırasında birbirinize olan minnettarlığınızı ifade edin. Bu ritüel, sevgi enerjinizi canlı tutarak ilişkinizi besleyecektir.",
-                        "Güneş-Venüs-180": "Öneri: Güneş'in bireyselliği ile Venüs'ün birleştiriciliği arasındaki zıtlığı dengelemek için 'Bireysel Birlik' pratiği yapın: her gün 30 dakika bireysel aktivite yapın, ardından birlikte zaman geçirerek bu deneyimleri paylaşın. Bu denge, hem bireysel kimliğinizi hem de ilişkinizi güçlendirecektir.",
-                        "Güneş-Mars-0": "Öneri: Güneş'in güç enerjisi ile Mars'ın savaşçı enerjisinin kavuştuğu bu noktada, birlikte fiziksel aktivite ve macera ritüelleri oluşturun. Her hafta birlikte yeni bir spor deneyin veya doğa macerasına çıkın. Bu aktif enerji, ilişkinizin canlılığını ve tutkusunu koruyarak fiziksel bağınızı güçlendirecektir.",
-                        "Güneş-Mars-60": "Öneri: Güneş'in ışığı ile Mars'ın cesaretinin uyumunu korumak için haftada bir 'Maceracı Çift' etkinliği planlayın. Birlikte yeni bir yer keşfedin, adrenal aktiviteler yapın veya birlikte bir hedefe ulaşmak için strateji geliştirin. Bu enerji paylaşımı, doğal uyumunuzu besleyerek cesaret ve macera ruhunuzu canlı tutacaktır.",
-                        "Güneş-Mars-90": "Öneri: Güneş'in ego enerjisi ile Mars'ın öfke enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Öfke anında 'Savaşçı Meditasyonu' yapın: 5 dakika boyunca derin nefes alarak enerjinizi sakinleştirin.\n2) Fiziksel egzersiz birlikte yaparak saldırgan enerjiyi yapıcıya dönüştürün.\n3) Ortak bir hedef belirleyin ve rekabet enerjisini işbirliğine çevirin.",
-                        "Güneş-Mars-120": "Öneri: Güneş'insıcakluğu ile Mars'ın cesaretinin doğal akışını korumak için birlikte aktif meditasyon pratiği yapın. Yoga, tai chi veya dans meditasyonu gibi fiziksel aktiviteleri meditasyonla birleştirin. Bu pratik, cesaret ve enerji akışınızı dengede tutarak hem bedensel hem de ruhsal bağınızı güçlendirecektir.",
-                        "Güneş-Mars-180": "Öneri: Güneş'in bireyselliği ile Mars'ın savaşçılığı arasındaki zıtlığı dengelemek için 'Dengeli Savaşçı' pratiği yapın: bir gün pasif olun, ertesi gün aktif olun. Ardından bu deneyimleri paylaşarak zıt yönlerinizi nasıl dengeleyebileceğinizi keşfedin. Bu pratik, hem bireysel güç hem de ilişkisel denge sağlayacaktır.",
-                        "Güneş-Jüpiter-0": "Öneri: Güneş'in güç enerjisi ile Jüpiter'in genişletici enerjisinin kavuştuğu bu noktada, birlikte büyüme ve bolluk ritüelleri oluşturun. Her sabah şükran journal'ı tutun ve birlikte büyük hayaller kurun. Bu enerji, bolluk bilincinizi ve ortak vizyonunuzu güçlendirecektir.",
-                        "Güneş-Jüpiter-60": "Öneri: Güneş'in ışığı ile Jüpiter'in bereketinin uyumunu korumak için haftada bir 'Bereket Paylaşımı' oturumu düzenleyin. Birbirinize bu hafta yaşadığınız olumlu deneyimleri anlatın ve birlikte şükran meditasyonu yapın. Bu pratik, doğal bolluk akışınızı besleyerek ortak bereketinizi artıracaktır.",
-                        "Güneş-Jüpiter-90": "Öneri: Güneş'in bireysel gücü ile Jüpiter'in aşırı genişleme enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Bolluk ve paylaşım dengesini korumak için ortak bir bütçe planı oluşturun.\n2) Fazla harcama veya aşırı iyimserlik anında durup gerçekçi bir değerlendirme yapın.\n3) Birlikte sosyal sorumluluk projelerine katılarak bolluk enerjisini paylaşıma dönüştürün.",
-                        "Güneş-Jüpiter-120": "Öneri: Güneş'insıcakluğu ile Jüpiter'in bereketinin doğal akışını korumak için birlikte bolluk meditasyonu yapın. Her sabah 10 dakika boyunca bolluk ve refah imgeleri canlandırın ve ardından birlikte şükran duaları edin. Bu ritüel, bolluk bilincinizi ve bereket akışınızı sürekli canlı tutacaktır.",
-                        "Güneş-Jüpiter-180": "Öneri: Güneş'in bireyselliği ile Jüpiter'in genişleticiliği arasındaki zıtlığı dengelemek için 'Ölçülü Büyüme' pratiği yapın: bireysel hedeflerinizi ve ortak hedeflerinizi dengeleyerek biroluşum planı oluşturun. Bu denge, hem bireysel gelişiminizi hem de ortak vizyonunuzu besleyecektir.",
-                        "Güneş-Satürn-0": "Öneri: Güneş'in güç enerjisi ile Satürn'ün disiplin enerjisinin kavuştuğu bu noktada, birlikte yapı ve sorumluluk ritüelleri oluşturun. Haftalık bir planlama oturumu düzenleyin ve birbirinize hesap verin. Bu disiplin, ortak hedeflerinize ulaşmanızı sağlayarak ilişkinizin temelini güçlendirecektir.",
-                        "Güneş-Satürn-60": "Öneri: Güneş'in ışığı ile Satürn'ün disiplininin uyumunu korumak için haftada bir 'Yapı ve Planlama' oturumu yapın. Birlikte hedeflerinizi belirleyin ve bunlara ulaşmak için somut adımlar planlayın. Bu pratik, doğal disiplininizi besleyerek ortak sorumluluk duygunuzu güçlendirecektir.",
-                        "Güneş-Satürn-90": "Öneri: Güneş'in bireysel gücü ile Satürn'ün sınırlayıcı enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Sınırları kabul etmeyi ve aynı anda yaratıcı olmayı öğrenmek için birlikte Mindfulness pratiği yapın.\n2) Sorumlulukları adil bir şekilde paylaşmak için açık iletişim kurun.\n3) Ortak bir miras veya uzun vadeli proje oluşturarak kısıtlamaları yapısal güce dönüştürün.",
-                        "Güneş-Satürn-120": "Öneri: Güneş'insıcakluğu ile Satürn'ün disiplininin doğal akışını korumak için birlikte uzun vadeli bir plan oluşturun ve bu plana sadık kalın. Her ay ilerlemenizi değerlendirin ve birbirinizi teşvik edin. Bu yapı, hedeflerinize ulaşmanızı sağlayarak ortak başarınızı ve güveninizi pekiştirecektir.",
-                        "Güneş-Satürn-180": "Öneri: Güneş'in bireyselliği ile Satürn'ün kısıtlaması arasındaki zıtlığı dengelemek için 'Özgürlük ve Sorumluluk Dansı' pratiği yapın: bireysel alanlarınızın ve ortak sorumluluklarınızın dengesini bulun. Her hafta birbirinize alan tanıyın ve aynı zamanda ortak yükümlülüklerinizi yerine getirin. Bu denge, hem bireysel özgürlüğünüzü hem de ilişkisel güveninizi koruyacaktır.",
-                        "Güneş-Uranüs-0": "Öneri: Güneş'in güç enerjisi ile Uranüs'ün devrim enerjisinin kavuştuğu bu noktada, birlikte yenilik ve değişim ritüelleri oluşturun. Her ay birlikte yeni bir şey deneyin (teknoloji, sanat, felsefe) ve bu deneyimleri tartışın. Bu enerji, ilişkize yeni soluklar getirerek yaratıcı ve devrimci bağınızı canlı tutacaktır.",
-                        "Güneş-Uranüs-60": "Öneri: Güneş'in ışığı ile Uranüs'ün yenilikçiliğinin uyumunu korumak için haftada bir 'Yenilikçi Buluşma' düzenleyin. Birlikte farklı bir aktivite yapın veya farklı bir yer keşfedin. Bu deneyimler, doğal yaratıcılığınızı besleyerek ilişkize taze enerji katacaktır.",
-                        "Güneş-Uranüs-90": "Öneri: Güneş'in bireysel gücü ile Uranüs'ün ani değişim enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Değişim anında 'Dur ve Al' tekniğini kullanın: ani bir karar almadan önce 24 saat bekleyin.\n2) Birbirinizin bağımsızlığına saygı duyun ve aynı anda bağlantıda kalın.\n3) Ortak bir vizyon oluşturarak bireysel özgürlüğü ve ilişkisel bağlılığı dengeleyin.",
-                        "Güneş-Uranüs-120": "Öneri: Güneş'insıcakluğu ile Uranüs'ün devrim enerjisinin doğal akışını korumak için birlikte vizyoner bir proje oluşturun. Geleceğe yönelik yaratıcı planlar yapın ve bu planları somutlaştırmak için birlikte çalışın. Bu pratik, yaratıcı potansiyelinizi ve ortak vizyonunuzu güçlendirecektir.",
-                        "Güneş-Uranüs-180": "Öneri: Güneş'in bireyselliği ile Uranüs'ün kolektif devrimi arasındaki zıtlığı dengelemek için 'Bireysel Devrim' pratiği yapın: hem bireysel değişim hem de ortak dönüşüm için zaman ayırın. Her hafta birlikte yeni bir perspektif keşfedin ve bu perspektifi ilişkinize nasıl uygulayacağınızı tartışın. Bu denge, hem bireysel özgürlüğünüzü hem de ilişkisel dönüşümünüzü destekleyecektir.",
-                        "Güneş-Neptün-0": "Öneri: Güneş'in güç enerjisi ile Neptün'ün manevi enerjisinin kavuştuğu bu noktada, birlikte manevi ritüeller ve meditasyon pratiği oluşturun. Her sabah birlikte dua edin veya meditasyon yapın ve manevi vizyonlarınızı paylaşın. Bu enerji, ruhsal bağınızı derinleştirerek ilişkinizi manevi bir boyuta taşıyacaktır.",
-                        "Güneş-Neptün-60": "Öneri: Güneş'in ışığı ile Neptün'ün manevi flöwsunun uyumunu korumak için haftada bir 'Manevi Paylaşım' oturumu düzenleyin. Birlikte müzik dinleyin, sanat eserlerini inceleyin veya doğada yürüyüş yaparak manevi deneyimlerinizi paylaşın. Bu pratik, manevi hassasiyetinizi ve yaratıcı ilhamınızı besleyecektir.",
-                        "Güneş-Neptün-90": "Öneri: Güneş'in net gücü ile Neptün'ün bulanık enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Rüya günlüğü tutarak bilinçaltınızı keşfedin ve bu deneyimleri birbirinizle paylaşın.\n2) Manevi pratiğinizi somutlaştırarak illüzyonları ve gerçekleri dengeleyin.\n3) Birlikte gönüllülük yaparak manevi enerjinizi somut eylemlere dönüştürün.",
-                        "Güneş-Neptün-120": "Öneri: Güneş'insıcakluğu ile Neptün'ün manevi akışının doğal uyumunu korumak için birlikte manevi bir yolculuk planlayın. Manevi mekanları ziyaret edin, meditasyon kamplarına katılın veya birlikte yaratıcı sanat pratiği yapın. Bu deneyim, manevi bilinçliliğinizi ve ruhsal bağınızı derinleştirecektir.",
-                        "Güneş-Neptün-180": "Öneri: Güneş'in bireyselliği ile Neptün'ün evrenselliği arasındaki zıtlığı dengelemek için 'Bireysel Maneviyat' pratiği yapın: her biriniz kendi manevi yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir manevi vizyon oluşturun. Bu denge, hem bireysel ruhsal gelişimi hem de ortak manevi bağı besleyecektir.",
-                        "Güneş-Plüton-0": "Öneri: Güneş'in güç enerjisi ile Plüton'un dönüştürücü enerjisinin kavuştuğu bu noktada, birlikte derin dönüşüm ve yeniden doğum ritüelleri oluşturun. Her ay birlikte eski alışkanlıklarınızı bırakın ve yeni başlangıçlar yapın. Bu enerji, derin dönüşümünüzü ve yeniden doğuşunuzu hızlandırarak ilişkinizi yeniden yapılandıracaktır.",
-                        "Güneş-Plüton-60": "Öneri: Güneş'in ışığı ile Plüton'un derin transformasyonunun uyumunu korumak için haftada bir 'Dönüşüm Paylaşımı' oturumu düzenleyin. Birlikte eski yaralarınızı iyileştirin ve yeni bir kimlik oluşturun. Bu pratik, derin dönüşümünüzü destekleyerek ilişkinizi yeniden yapılandıracaktır.",
-                        "Güneş-Plüton-90": "Öneri: Güneş'in ego enerjisi ile Plüton'un power struggle enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Güç mücadelelerini fark edin ve bunları derin birkendi analizine dönüştürün.\n2) Birbirinizin gölgelerini kabul edin ve bu gölgelerle birlikte çalışın.\n3) Ortak bir dönüşüm pratiği yaparak power struggle'ı ortak güce dönüştürün.",
-                        "Güneş-Plüton-120": "Öneri: Güneş'insıcakluğu ile Plüton'un derin dönüşümünün doğal akışını korumak için birlikte derin bir şifa çalışması yapın. Psikolojik astroloji, enerji çalışması veya derin meditasyon pratiği yaparak içsel dönüşümlerinizi destekleyin. Bu pratik, derin dönüşümünüzü ve ruhsal yenilenmenizi hızlandıracaktır.",
-                        "Güneş-Plüton-180": "Öneri: Güneş'in bireyselliği ile Plüton'un transformasyonu arasındaki zıtlığı dengelemek için 'Bireysel Dönüşüm' pratiği yapın: her biriniz kendi derin dönüşümünüzü takip edin, ardından bu dönüşümleri birlikte paylaşarak ortak bir yeniden doğum süreci geçirin. Bu denge, hem bireysel hem de ilişkisel dönüşümü destekleyecektir.",
-                        "Güneş-KAD-0": "Öneri: Güneş'in güç enerjisi ile Kuzey Ay Düğümü'nün kadersel yolunun kavuştuğu bu noktada, birlikte kaderinizi bilinçli şekilde yönlendirme pratiği yapın. Her sabah kadersel niyetlerinizi yüksek sesle söyleyin ve birlikte kaderinizi şekillendiren adımlar atın. Bu enerji, kadersel yolunuzu ve ortak amacınızı güçlendirecektir.",
-                        "Güneş-KAD-60": "Öneri: Güneş'in ışığı ile Kuzey Ay Düğümü'nün kadersel akışının uyumunu korumak için haftada bir 'Kader Paylaşımı' oturumu düzenleyin. Birbirinize kadersel deneyimlerinizi anlatın ve birlikte geleceğinizi planlayın. Bu pratik, kadersel yola bağlılığınızı ve ortak amacınızı besleyecektir.",
-                        "Güneş-KAD-90": "Öneri: Güneş'in bireysel gücü ile Kuzey Ay Düğümü'nün kadersel zorlukları arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Kadersel engelleri fırsat olarak yeniden çerçeveleyin.\n2) Birbirinize hesap vererek kadersel yolunuzda ilerleyin.\n3) Ortak bir kader vizyonu oluşturarak zorlukları birlikte aşın.",
-                        "Güneş-KAD-120": "Öneri: Güneş'insıcakluğu ile Kuzey Ay Düğümü'nün kadersel akışının doğal uyumunu korumak için birlikte kadersel bir proje başlatın. Bu proje, bireysel ve ortak kaderinizi birleştirecek şekilde tasarlanmalıdır. Bu pracık, kadersel potansiyelinizi ve ortak amacınızı gerçekleştirmenizi sağlayacaktır.",
-                        "Güneş-KAD-180": "Öneri: Güneş'in bireyselliği ile Kuzey Ay Düğümü'nün kolektif kaderi arasındaki zıtlığı dengelemek için 'Bireysel Kader' pratiği yapın: her biriniz kendi kadersel yolunuzu keşfedin, ardından bu deneyimleri birlikte paylaşarak ortak bir kader vizyonu oluşturun. Bu denge, hem bireysel kadersel potansiyeli hem de ortak amacın gerçekleşmesini destekleyecektir.",
-                        "Güneş-Chiron-0": "Öneri: Güneş'in güç enerjisi ile Chiron'un şifacı yarasının kavuştuğu bu noktada, birlikte derin şifa ve iyileşme ritüelleri oluşturun. Her sabah birlikte şifa meditasyonu yapın ve birbirinizin yaralarını şifalandırma niyetinde bulunun. Bu enerji, derin şifa sürecinizi ve birbirinize olan şifa kapasitenizi güçlendirecektir.",
-                        "Güneş-Chiron-60": "Öneri: Güneş'in ışığı ile Chiron'un şifa enerjisinin uyumunu korumak için haftada bir 'Şifa Paylaşımı' oturumu düzenleyin. Birbirinize yaralarınızı anlatın ve birlikte şifa pratiği yapın. Bu pratik, şifa sürecinizi destekleyerek derin iyileşmenizi hızlandıracaktır.",
-                        "Güneş-Chiron-90": "Öneri: Güneş'in ego enerjisi ile Chiron'un kırılgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Kırılganlık anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Yaralarınızı şifalandırmak için profesyonel destek alın.\n3) Birlikte şifa projeleri başlatarak yaralarınızı dönüştürücü güce dönüştürün.",
-                        "Güneş-Chiron-120": "Öneri: Güneş'insıcakluğu ile Chiron'un şifa akışının doğal uyumunu korumak için birlikte şifa banyosu veya enerji çalışması yapın. Doğanın iyileştirici gücünden faydalanarak birlikte şifa deneyimleri yaşayın. Bu pratik, derin şifa sürecinizi ve ruhsal iyileşmenizi destekleyecektir.",
-                        "Güneş-Chiron-180": "Öneri: Güneş'in bireyselliği ile Chiron'un evrensel şifası arasındaki zıtlığı dengelemek için 'Bireysel Şifa' pratiği yapın: her biriniz kendi şifa yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir şifa vizyonu oluşturun. Bu denge, hem bireysel şifayı hem de ortak iyileşmeyi destekleyecektir.",
-                        "Ay-Ay-0": "Öneri: İkinizin de benzer duygusal titresimlarda titreştiği bu kavuşumda, birlikte duygusal ritim ritüelleri oluşturun. Her yeni ayda ortak duygusal niyetler belirleyin ve dolunayda bu niyetleri serbest bırakma pratiği yapın. Bu ritüel, duygusal senkronizasyonunuzu derinleştirerek ortak içsel dünyanızı besleyecektir.",
-                        "Ay-Ay-60": "Öneri: Duygusal hassasiyetinizin doğal uyumunu korumak için haftada bir 'Duygu Paylaşımı' oturumu düzenleyin. Birbirinize duygusal deneyimlerinizi anlatın ve birlikte meditasyon yaparak duygusal berraklık elde edin. Bu pratik, duygusal bağınızı güçlendirerek derin bir anlayış oluşturacaktır.",
-                        "Ay-Ay-90": "Öneri: Duygusal hassasiyetiniz arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal tetiklenme anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Duygusal ihtiyaçlarınızı açıkça ifade edin ve birbirinizin ihtiyaçlarını öğrenin.\n3) Birlikte duygusal şifa meditasyonu yaparak duygusal dengenizi yeniden kurun.",
-                        "Ay-Ay-120": "Öneri: Duygusal hassasiyetinizin doğal akışını korumak için birlikte duygusal deneyimler planlayın. Birlikte doğa yürüyüşü yapın, müzik dinleyin veya sanat eserlerini inceleyerek duygusal deneyimlerinizi paylaşın. Bu pratik, duygusal derinliğinizi ve ortak duygusal dünyanızı besleyecektir.",
-                        "Ay-Ay-180": "Öneri: Duygusal hassasiyetinizin zıtlıklarını dengelemek için 'Ayna Meditasyonu' yapın: karşılıklı oturun ve 5 dakika boyunca birbirinizin gözlerinin içine bakarak nefes alın. Ardından birbirinizin duygusal dilini yüksek sesle onaylayın. Bu pratik, duygusal zıtlıklarınızı birbirinizi tamamlayan güçlere dönüştürecektir.",
-                        "Ay-Merkür-0": "Öneri: Ay'ın duygusal derinliği ile Merkür'ün iletişim becerilerinin kavuştuğu bu noktada, birlikte duygusal iletişim ritüelleri oluşturun. Her akşam birbirinize duygularınızı yüksek sesle ifade edin ve birlikte journal'a yazın. Bu ritüel, duygusal iletişiminizi derinleştirerek anlayış köprülerinizi güçlendirecektir.",
-                        "Ay-Merkür-60": "Öneri: Ay'ın yumuşaklığı ile Merkür'ün zekasının uyumunu korumak için haftada bir 'Duygusal Zeka' oturumu düzenleyin. Birbirinize duygusal deneyimlerinizi anlatın ve birlikte bu deneyimleri analiz edin. Bu pratik, duygusal zekanızı ve iletişim kalitenizi artıracaktır.",
-                        "Ay-Merkür-90": "Öneri: Ay'ın duygusal dalgalanmaları ile Merkür'ün hızlı zihni arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal konuşmalar sırasında zihinsel analizi bırakarak sadece duygulara odaklanın.\n2) Mantıksal tartışmalar sırasında duygusal hassasiyeti unutmayın.\n3) Birlikte hem duygusal hem de zihinsel denge pratiği yapın.",
-                        "Ay-Merkür-120": "Öneri: Ay'ın duygusal akışı ile Merkür'ün netliğinin doğal uyumunu korumak için birlikte hikaye anlatımı pratiği yapın. Birbirinize duygusal hikayeler anlatın ve bu hikayeleri birlikte yazın. Bu pratik, duygusal ve zihinsel bağınızı derinleştirerek yaratıcı iletişiminizi besleyecektir.",
-                        "Ay-Merkür-180": "Öneri: Ay'ın duygusallığı ile Merkür'ün rasyonelliği arasındaki zıtlığı dengelemek için 'Denge Konuşması' pratiği yapın: her konuşmada hem duygusal hem de mantıksal perspektifleri birleştirin. Bu denge, hem duygusal derinliğinizi hem de zihinsel netliğinizi koruyarak iletişiminizi güçlendirecektir.",
-                        "Ay-Venüs-0": "Öneri: Ay'ın duygusal derinliği ile Venüs'ün sevgi enerjisinin kavuştuğu bu noktada, birlikte sevgi ve şefkat ritüelleri oluşturun. Her sabah birbirinize sevgi dolu dokunuşlar ve sözlerle yaklaşın ve birlikte güzellik deneyimleri yaşayın. Bu enerji, sevgi bağınızı derinleştirerek romantik ve duygusal ilişkinizi besleyecektir.",
-                        "Ay-Venüs-60": "Öneri: Ay'ın yumuşaklığı ile Venüs'ün zarafetinin uyumunu korumak için haftada bir 'Güzellik ve Sevgi' oturumu düzenleyin. Birlikte sanat eserlerini inceleyin, doğa yürüyüşü yapın veya birlikte yemek pişirerek duygusal ve estetik deneyimlerinizi paylaşın. Bu pratik,gök uyumunuzu besleyerek duygusal ve duysal bağınızı derinleştirecektir.",
-                        "Ay-Venüs-90": "Öneri: Ay'ın duygusal hassasiyeti ile Venüs'ün barışçıl doğası arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal çatışma anında 'Sevgi Nefesi' tekniğini kullanın: derin nefes alırken sevgihis edin, verirken baskisi serbest bırakın.\n2) Birbirinizin sevgi dilini öğrenmek için 'Beş Sevgi Dili' testini birlikte yapın.\n3) Ortak bir şifa sanatı pratiği yaparak yaratıcı enerjinizi birleştirin.",
-                        "Ay-Venüs-120": "Öneri: Ay'ın duygusal akışı ile Venüs'ün sevgisinin doğal uyumunu korumak için birlikte romantik ritüeller oluşturun. Her ay birlikte yeni bir deneyim planlayın (müze ziyareti, doğa yürüyüşü, yemek kursu) ve bu deneyim sırasında birbirinize olan minnettarlığınızı ifade edin. Bu ritüel, sevgi enerjinizi canlı tutarak ilişkinizi besleyecektir.",
-                        "Ay-Venüs-180": "Öneri: Ay'ın içe dönüklüğü ile Venüs'ün dışa dönüklüğü arasındaki zıtlığı dengelemek için 'İç Dış Dansı' pratiği yapın: bir gün içe dönük aktiviteler yapın (meditasyon, journal yazma), ertesi gün dışa dönük aktiviteler yapın (sosyal etkinlikler, sanat deneyimleri). Bu denge, hem içsel duygusal dünyanızı hem de dışsal sevgigösterimlerinizi besleyecektir.",
-                        "Ay-Mars-0": "Öneri: Ay'ın duygusal derinliği ile Mars'ın savaşçı enerjisinin kavuştuğu bu noktada, birlikte duygusal güç ritüelleri oluşturun. Her sabah birlikte fiziksel aktivite yaparak duygusal enerjinizi serbest bırakın ve ardından birlikte meditasyon yaparak dengeyi bulun. Bu enerji, duygusal cesaretinizi ve fiziksel sağlığınızı güçlendirecektir.",
-                        "Ay-Mars-60": "Öneri: Ay'ın yumuşaklığı ile Mars'ın cesaretinin uyumunu korumak için haftada bir 'Aktif Duygusal' etkinliği planlayın. Birlikte doğa yürüyüşüne çıkın, spor yapın veya adrenal aktiviteler yaparak duygusal ve fiziksel enerjinizi birleştirin. Bu pratik, doğal uyumunuzu besleyerek duygusal ve bedensel bağınızı derinleştirecektir.",
-                        "Ay-Mars-90": "Öneri: Ay'ın duygusal hassasiyeti ile Mars'ın saldırgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Öfke anında 'Sakin Nefes' tekniğini kullanın: 10 kez derin nefes alarak duygusal dalgalanmaları sakinleştirin.\n2) Fiziksel egzersiz birlikte yaparak saldırgan enerjiyi yapıcıya dönüştürün.\n3) Birlikte duygusal şifa meditasyonu yaparak duygusal dengenizi yeniden kurun.",
-                        "Ay-Mars-120": "Öneri: Ay'ın duygusal akışı ile Mars'ın cesaretinin doğal uyumunu korumak için birlikte aktif meditasyon pratiği yapın. Yoga, tai chi veya dans meditasyonu gibi fiziksel aktiviteleri meditasyonla birleştirin. Bu pratik, cesaret ve enerji akışınızı dengede tutarak hem bedensel hem de ruhsal bağınızı güçlendirecektir.",
-                        "Ay-Mars-180": "Öneri: Ay'ın içe dönüklüğü ile Mars'ın dışa dönüklüğü arasındaki zıtlığı dengelemek için 'Dengeli Savaşçı' pratiği yapın: bir gün pasif ve duygusal olun, ertesi gün aktif ve savaşçı olun. Ardından bu deneyimleri paylaşarak zıt yönlerinizi nasıl dengeleyebileceğinizi keşfedin. Bu pratik, hem duygusal derinliğinizi hem de fiziksel cesaretinizi besleyecektir.",
-                        "Ay-Jüpiter-0": "Öneri: Ay'ın duygusal derinliği ile Jüpiter'in genişletici enerjisinin kavuştuğu bu noktada, birlikte duygusal bolluk ve büyüme ritüelleri oluşturun. Her sabah şükran journal'ı tutun ve birlikte büyük duygusal hayaller kurun. Bu enerji, duygusal bolluk bilincinizi ve ortak vizyonunuzu güçlendirecektir.",
-                        "Ay-Jüpiter-60": "Öneri: Ay'ın yumuşaklığı ile Jüpiter'in bereketinin uyumunu korumak için haftada bir 'Duygusal Bereket' oturumu düzenleyin. Birbirinize bu hafta yaşadığınız olumlu duygusal deneyimleri anlatın ve birlikte şükran meditasyonu yapın. Bu pratik, doğal duygusal akışınızı besleyerek ortak bereketinizi artıracaktır.",
-                        "Ay-Jüpiter-90": "Öneri: Ay'ın duygusal hassasiyeti ile Jüpiter'in aşırı genişleme enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal aşırılıkları dengelemek için düzenli meditasyon pratiği yapın.\n2) Fazla iyimserlik veya aşırı duygusallık anında gerçekçi bir değerlendirme yapın.\n3) Birlikte sosyal sorumluluk projelerine katılarak duygusal enerjinizi paylaşıma dönüştürün.",
-                        "Ay-Jüpiter-120": "Öneri: Ay'ın duygusal akışı ile Jüpiter'in bereketinin doğal uyumunu korumak için birlikte duygusal bolluk meditasyonu yapın. Her sabah 10 dakika boyunca duygusal bolluk ve refah imgeleri canlandırın ve ardından birlikte şükran duaları edin. Bu ritüel, duygusal bolluk bilincinizi ve bereket akışınızı sürekli canlı tutacaktır.",
-                        "Ay-Jüpiter-180": "Öneri: Ay'ın içe dönüklüğü ile Jüpiter'in genişleticiliği arasındaki zıtlığı dengelemek için 'Ölçülü Duygusal Büyüme' pratiği yapın: bireysel duygusal ihtiyaçlarınızı ve ortak duygusal hedeflerinizi dengeleyerek biroluşum planı oluşturun. Bu denge, hem bireysel duygusal gelişiminizi hem de ortak duygusal vizyonunuzu besleyecektir.",
-                        "Ay-Satürn-0": "Öneri: Ay'ın duygusal derinliği ile Satürn'ün disiplin enerjisinin kavuştuğu bu noktada, birlikte duygusal yapı ve sorumluluk ritüelleri oluşturun. Haftalık bir duygusal planlama oturumu düzenleyin ve birbirinize duygusal hesap verin. Bu disiplin, duygusal dengenizi koruyarak ilişkinizin temelini güçlendirecektir.",
-                        "Ay-Satürn-60": "Öneri: Ay'ın yumuşaklığı ile Satürn'ün disiplininin uyumunu korumak için haftada bir 'Duygusal Yapı' oturumu yapın. Birlikte duygusal hedeflerinizi belirleyin ve bunlara ulaşmak için somut adımlar planlayın. Bu pratik, doğal disiplininizi besleyerek duygusal sorumluluk duygunuzu güçlendirecektir.",
-                        "Ay-Satürn-90": "Öneri: Ay'ın duygusal dalgalanmaları ile Satürn'ün sınırlayıcı enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal sınırları kabul etmeyi ve aynı anda duygusal olmayı öğrenmek için birlikte Mindfulness pratiği yapın.\n2) Duygusal sorumlulukları adil bir şekilde paylaşmak için açık iletişim kurun.\n3) Ortak bir duygusal yapı oluşturarak duygusal dalgalanmaları yapısal güce dönüştürün.",
-                        "Ay-Satürn-120": "Öneri: Ay'ın duygusal akışı ile Satürn'ün disiplininin doğal uyumunu korumak için birlikte uzun vadeli bir duygusal plan oluşturun ve bu plana sadık kalın. Her ay ilerlemenizi değerlendirin ve birbirinizi teşvik edin. Bu yapı, duygusal hedeflerinize ulaşmanızı sağlayarak ortak güveninizi ve derinliğinizi pekiştirecektir.",
-                        "Ay-Satürn-180": "Öneri: Ay'ın içe dönüklüğü ile Satürn'ün kısıtlaması arasındaki zıtlığı dengelemek için 'Duygusal Özgürlük ve Sorumluluk Dansı' pratiği yapın: duygusal alanlarınızın ve ortak sorumluluklarınızın dengesini bulun. Her hafta birbirinize duygusal alan tanıyın ve aynı zamanda ortak duygusal yükümlülüklerinizi yerine getirin. Bu denge, hem duygusal özgürlüğünüzü hem de ilişkisel güveninizi koruyacaktır.",
-                        "Ay-Uranüs-0": "Öneri: Ay'ın duygusal derinliği ile Uranüs'ün devrim enerjisinin kavuştuğu bu noktada, birlikte duygusal yenilik ve değişim ritüelleri oluşturun. Her ay birlikte yeni bir duygusal deneyim yaşayın ve bu deneyimleri tartışın. Bu enerji, ilişkize yeni duygusal soluklar getirerek yaratıcı ve devrimci duygusal bağınızı canlı tutacaktır.",
-                        "Ay-Uranüs-60": "Öneri: Ay'ın yumuşaklığı ile Uranüs'ün yenilikçiliğinin uyumunu korumak için haftada bir 'Duygusal Yenilik' oturumu düzenleyin. Birlikte farklı bir duygusal aktivite yapın veya farklı bir duygusal deneyim yaşayın. Bu deneyimler, doğal duygusal yaratıcılığınızı besleyerek ilişkize taze duygusal enerji katacaktır.",
-                        "Ay-Uranüs-90": "Öneri: Ay'ın duygusal hassasiyeti ile Uranüs'ün ani değişim enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal değişim anında 'Dur ve Hisset' tekniğini kullanın: ani bir duygusal tepki vermeden önce 24 saat bekleyin.\n2) Birbirinizin duygusal bağımsızlığına saygı duyun ve aynı anda bağlantıda kalın.\n3) Ortak bir duygusal vizyon oluşturarak bireysel duygusal özgürlüğü ve ilişkisel bağlılığı dengeleyin.",
-                        "Ay-Uranüs-120": "Öneri: Ay'ın duygusal akışı ile Uranüs'ün devrim enerjisinin doğal uyumunu korumak için birlikte vizyoner bir duygusal proje oluşturun. Geleceğe yönelik yaratıcı duygusal planlar yapın ve bu planları somutlaştırmak için birlikte çalışın. Bu pratik, yaratıcı duygusal potansiyelinizi ve ortak duygusal vizyonunuzu güçlendirecektir.",
-                        "Ay-Uranüs-180": "Öneri: Ay'ın içe dönüklüğü ile Uranüs'ün kolektif devrimi arasındaki zıtlığı dengelemek için 'Bireysel Duygusal Devrim' pratiği yapın: hem bireysel duygusal değişim hem de ortak duygusal dönüşüm için zaman ayırın. Her hafta birlikte yeni bir duygusal perspektif keşfedin ve bu perspektifi ilişkinize nasıl uygulayacağınızı tartışın. Bu denge, hem bireysel duygusal özgürlüğünüzü hem de ilişkisel duygusal dönüşümünüzü destekleyecektir.",
-                        "Ay-Neptün-0": "Öneri: Ay'ın duygusal derinliği ile Neptün'ün manevi enerjisinin kavuştuğu bu noktada, birlikte manevi ve duygusal ritüeller oluşturun. Her sabah birlikte dua edin veya meditasyon yapın ve manevi ve duygusal vizyonlarınızı paylaşın. Bu enerji, ruhsal ve duygusal bağınızı derinleştirerek ilişkinizi manevi ve duygusal bir boyuta taşıyacaktır.",
-                        "Ay-Neptün-60": "Öneri: Ay'ın yumuşaklığı ile Neptün'ün manevi flöwsunun uyumunu korumak için haftada bir 'Manevi ve Duygusal Paylaşım' oturumu düzenleyin. Birlikte müzik dinleyin, sanat eserlerini inceleyin veya doğada yürüyüş yaparak manevi ve duygusal deneyimlerinizi paylaşın. Bu pratik, manevi ve duygusal hassasiyetinizi ve yaratıcı ilhamınızı besleyecektir.",
-                        "Ay-Neptün-90": "Öneri: Ay'ın duygusal dalgalanmaları ile Neptün'ün bulanık enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Rüya günlüğü tutarak bilinçaltınızı keşfedin ve bu deneyimleri birbirinizle paylaşın.\n2) Manevi pratiğinizi somutlaştırarak illüzyonları ve gerçekleri dengeleyin.\n3) Birlikte gönüllülük yaparak manevi ve duygusal enerjinizi somut eylemlere dönüştürün.",
-                        "Ay-Neptün-120": "Öneri: Ay'ın duygusal akışı ile Neptün'ün manevi akışının doğal uyumunu korumak için birlikte manevi ve duygusal bir yolculuk planlayın. Manevi mekanları ziyaret edin, meditasyon kamplarına katılın veya birlikte yaratıcı sanat pratiği yapın. Bu deneyim, manevi ve duygusal bilinçliliğinizi ve ruhsal bağınızı derinleştirecektir.",
-                        "Ay-Neptün-180": "Öneri: Ay'ın içe dönüklüğü ile Neptün'ün evrenselliği arasındaki zıtlığı dengelemek için 'Bireysel Manevi Duygusallık' pratiği yapın: her biriniz kendi manevi ve duygusal yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir manevi ve duygusal vizyon oluşturun. Bu denge, hem bireysel ruhsal ve duygusal gelişimi hem de ortak manevi ve duygusal bağı besleyecektir.",
-                        "Ay-Plüton-0": "Öneri: Ay'ın duygusal derinliği ile Plüton'un dönüştürücü enerjisinin kavuştuğu bu noktada, birlikte derin duygusal dönüşüm ve yeniden doğum ritüelleri oluşturun. Her ay birlikte eski duygusal alışkanlıklarınızı bırakın ve yeni başlangıçlar yapın. Bu enerji, derin duygusal dönüşümünüzü ve yeniden doğuşunuzu hızlandırarak ilişkinizi yeniden yapılandıracaktır.",
-                        "Ay-Plüton-60": "Öneri: Ay'ın yumuşaklığı ile Plüton'un derin transformasyonunun uyumunu korumak için haftada bir 'Duygusal Dönüşüm Paylaşımı' oturumu düzenleyin. Birlikte eski duygusal yaralarınızı iyileştirin ve yeni bir duygusal kimlik oluşturun. Bu pratik, derin duygusal dönüşümünüzü destekleyerek ilişkinizi yeniden yapılandıracaktır.",
-                        "Ay-Plüton-90": "Öneri: Ay'ın duygusal hassasiyeti ile Plüton'un power struggle enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal güç mücadelelerini fark edin ve bunları derin bir duygusal analizine dönüştürün.\n2) Birbirinizin duygusal gölgelerini kabul edin ve bu gölgelerle birlikte çalışın.\n3) Ortak bir duygusal dönüşüm pratiği yaparak power struggle'ı ortak duygusal güce dönüştürün.",
-                        "Ay-Plüton-120": "Öneri: Ay'ın duygusal akışı ile Plüton'un derin dönüşümünün doğal uyumunu korumak için birlikte derin bir duygusal şifa çalışması yapın. Psikolojik astroloji, enerji çalışması veya derin meditasyon pratiği yaparak içsel duygusal dönüşümlerinizi destekleyin. Bu pratik, derin duygusal dönüşümünüzü ve ruhsal yenilenmenizi hızlandıracaktır.",
-                        "Ay-Plüton-180": "Öneri: Ay'ın içe dönüklüğü ile Plüton'un transformasyonu arasındaki zıtlığı dengelemek için 'Bireysel Duygusal Dönüşüm' pratiği yapın: her biriniz kendi derin duygusal dönüşümünüzü takip edin, ardından bu dönüşümleri birlikte paylaşarak ortak bir duygusal yeniden doğum süreci geçirin. Bu denge, hem bireysel hem de ilişkisel duygusal dönüşümü destekleyecektir.",
-                        "Ay-KAD-0": "Öneri: Ay'ın duygusal derinliği ile Kuzey Ay Düğümü'nün kadersel yolunun kavuştuğu bu noktada, birlikte duygusal kaderinizi bilinçli şekilde yönlendirme pratiği yapın. Her sabah duygusal kadersel niyetlerinizi yüksek sesle söyleyin ve birlikte kaderinizi şekillendiren duygusal adımlar atın. Bu enerji, duygusal kadersel yolunuzu ve ortak amacınızı güçlendirecektir.",
-                        "Ay-KAD-60": "Öneri: Ay'ın yumuşaklığı ile Kuzey Ay Düğümü'nün kadersel akışının uyumunu korumak için haftada bir 'Duygusal Kader Paylaşımı' oturumu düzenleyin. Birbirinize duygusal kadersel deneyimlerinizi anlatın ve birlikte duygusal geleceğinizi planlayın. Bu pratik, duygusal yola bağlılığınızı ve ortak amacınızı besleyecektir.",
-                        "Ay-KAD-90": "Öneri: Ay'ın duygusal dalgalanmaları ile Kuzey Ay Düğümü'nün kadersel zorlukları arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal kadersel engelleri fırsat olarak yeniden çerçeveleyin.\n2) Birbirinize duygusal hesap vererek kadersel yolunuzda ilerleyin.\n3) Ortak bir duygusal kader vizyonu oluşturarak zorlukları birlikte aşın.",
-                        "Ay-KAD-120": "Öneri: Ay'ın duygusal akışı ile Kuzey Ay Düğümü'nün kadersel akışının doğal uyumunu korumak için birlikte duygusal kadersel bir proje başlatın. Bu proje, bireysel ve ortak duygusal kaderinizi birleştirecek şekilde tasarlanmalıdır. Bu pratik, duygusal kadersel potansiyelinizi ve ortak amacınızı gerçekleştirmenizi sağlayacaktır.",
-                        "Ay-KAD-180": "Öneri: Ay'ın içe dönüklüğü ile Kuzey Ay Düğümü'nün kolektif kaderi arasındaki zıtlığı dengelemek için 'Bireysel Duygusal Kader' pratiği yapın: her biriniz kendi duygusal kadersel yolunuzu keşfedin, ardından bu deneyimleri birlikte paylaşarak ortak bir duygusal kader vizyonu oluşturun. Bu denge, hem bireysel duygusal kadersel potansiyeli hem de ortak amacın gerçekleşmesini destekleyecektir.",
-                        "Ay-Chiron-0": "Öneri: Ay'ın duygusal derinliği ile Chiron'un şifacı yarasının kavuştuğu bu noktada, birlikte derin duygusal şifa ve iyileşme ritüelleri oluşturun. Her sabah birlikte duygusal şifa meditasyonu yapın ve birbirinizin duygusal yaralarını şifalandırma niyetinde bulunun. Bu enerji, derin duygusal şifa sürecinizi ve birbirinize olan duygusal şifa kapasitenizi güçlendirecektir.",
-                        "Ay-Chiron-60": "Öneri: Ay'ın yumuşaklığı ile Chiron'un şifa enerjisinin uyumunu korumak için haftada bir 'Duygusal Şifa Paylaşımı' oturumu düzenleyin. Birbirinize duygusal yaralarınızı anlatın ve birlikte duygusal şifa pratiği yapın. Bu pratik, duygusal şifa sürecinizi destekleyerek derin iyileşmenizi hızlandıracaktır.",
-                        "Ay-Chiron-90": "Öneri: Ay'ın duygusal hassasiyeti ile Chiron'un kırılgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Duygusal kırılganlık anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Duygusal yaralarınızı şifalandırmak için profesyonel destek alın.\n3) Birlikte duygusal şifa projeleri başlatarak yaralarınızı dönüştürücü güce dönüştürün.",
-                        "Ay-Chiron-120": "Öneri: Ay'ın duygusal akışı ile Chiron'un şifa akışının doğal uyumunu korumak için birlikte duygusal şifa banyosu veya enerji çalışması yapın. Doğanın iyileştirici gücünden faydalanarak birlikte duygusal şifa deneyimleri yaşayın. Bu pratik, derin duygusal şifa sürecinizi ve ruhsal iyileşmenizi destekleyecektir.",
-                        "Ay-Chiron-180": "Öneri: Ay'ın içe dönüklüğü ile Chiron'un evrensel şifası arasındaki zıtlığı dengelemek için 'Bireysel Duygusal Şifa' pratiği yapın: her biriniz kendi duygusal şifa yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir duygusal şifa vizyonu oluşturun. Bu denge, hem bireysel duygusal şifayı hem de ortak iyileşmeyi destekleyecektir.",
-                        "Merkür-Merkür-0": "Öneri: İkinizin de benzer zihinsel titresimlarda titreştiği bu kavuşumda, birlikte zihinsel senkronizasyon ritüelleri oluşturun. Her sabah birlikte journal'a yazın ve düşüncelerinizi yüksek sesle paylaşın. Bu ritüel, zihinsel senkronizasyonunuzu derinleştirerek ortak entelektüel dünyanızı besleyecektir.",
-                        "Merkür-Merkür-60": "Öneri: Zihinsel uyumunuzu korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin. Birbirinize bu hafta öğrendiğiniz yeni bir şeyi anlatın ve ardından birlikte bu konuyu tartışın. Zihinsel alışverişlerinizi destekleyen bu pratik, doğal uyumunuzu besleyerek entelektüel bağınızı derinleştirecektir.",
-                        "Merkür-Merkür-90": "Öneri: Zihinsel iletişim tarzlarınız arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) İletişimde 'Dinleme Molası' verin: her konuştuğunuzda 3 saniye durupdoğruın sözünü bitirmesini bekleyin.\n2) Düşüncelerinizi journal'a yazarak zihinsel karmaşayı dağıtın.\n3) Birlikte sesli kitap okuyarak iletişim tarzlarınızı senkronize edin.",
-                        "Merkür-Merkür-120": "Öneri: Zihinsel doğal akışınızı korumak için birlikte okuma saati düzenleyin. Her akşam 20 dakika boyunca aynı kitabı okuyun ve ardından birbirinize düşüncelerinizi paylaşın. Bu ortak entelektüel deneyim, zihinsel bağınızı güçlendirerek iletişiminizi derinleştirecektir.",
-                        "Merkür-Merkür-180": "Öneri: Zihinsel iletişim tarzlarınızdaki zıtlıkları dengelemek için 'İletişim Dansı' pratiği yapın: bir gün sadece dinleyin, ertesi gün sadece anlatın. Ardından bu deneyimleri paylaşarak iletişim tarzlarınızdaki zıtlıkların aslında birbirinizi nasıl tamamladığını keşfedin. Bu pratik, zihinsel ve duygusal köprülerinizi güçlendirecektir.",
-                        "Merkür-Venüs-0": "Öneri: Merkür'ün zekası ile Venüs'ün sevgi dilinin kavuştuğu bu noktada, birlikte sevgi dolu iletişim ritüelleri oluşturun. Her akşam birbirinize sevgi dolu sözlerle hitap edin ve birlikte güzel müzik dinleyerek duygusal ve zihinsel deneyimlerinizi paylaşın. Bu enerji, iletişim ve sevgi bağınızı derinleştirerek romantik ve entelektüel ilişkinizi besleyecektir.",
-                        "Merkür-Venüs-60": "Öneri: Merkür'ün zekası ile Venüs'ün zarafetinin uyumunu korumak için haftada bir 'Güzel İletişim' oturumu düzenleyin. Birlikte şiir okuyun, şarkı sözleri analiz edin veya birlikte güzel bir mektup yazın. Bu pratik,gök uyumunuzu besleyerek zihinsel ve estetik bağınızı derinleştirecektir.",
-                        "Merkür-Venüs-90": "Öneri: Merkür'ün rasyonelliği ile Venüs'ün duygusallığı arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Sevgi konuşmalarında mantıksal analizi bırakarak sadece duygulara odaklanın.\n2) Mantıksal tartışmalar sırasında sevgi dilini unutmayın.\n3) Birlikte hem duygusal hem de zihinsel denge pratiği yaparak iletişiminizi zenginleştirin.",
-                        "Merkür-Venüs-120": "Öneri: Merkür'ün netliği ile Venüs'ün sevgisinin doğal uyumunu korumak için birlikte romantik yazma pratiği yapın. Birbirinize sevgi mektupları yazın veya birlikte romantik hikayeler oluşturun. Bu pratik, zihinsel ve duygusal bağınızı derinleştirerek yaratıcı iletişiminizi besleyecektir.",
-                        "Merkür-Venüs-180": "Öneri: Merkür'ün rasyonelliği ile Venüs'ün duygusallığı arasındaki zıtlığı dengelemek için 'Denge Konuşması' pratiği yapın: her konuşmada hem mantıksal hem de duygusal perspektifleri birleştirin. Bu denge, hem zihinsel netliğinizi hem de duygusal derinliğinizi koruyarak iletişiminizi güçlendirecektir.",
-                        "Merkür-Mars-0": "Öneri: Merkür'ün zekası ile Mars'ın savaşçı enerjisinin kavuştuğu bu noktada, birlikte tartışmalı ve aktif iletişim ritüelleri oluşturun. Her hafta birlikte güncel bir konuyu tartışın ve bu tartışmada zihinsel ve fiziksel enerjinizi birleştirin. Bu enerji, zihinsel cesaretinizi ve iletişim hızınızı güçlendirecektir.",
-                        "Merkür-Mars-60": "Öneri: Merkür'ün zekası ile Mars'ın cesaretinin uyumunu korumak için haftada bir 'Aktif Zihin' etkinliği planlayın. Birlikte bulmaca çözün, strateji oyunları oynayın veya birlikte yeni bir konuda hızlı bir öğrenme pratiği yapın. Bu pratik, doğal uyumunuzu besleyerek zihinsel ve fiziksel bağınızı derinleştirecektir.",
-                        "Merkür-Mars-90": "Öneri: Merkür'ün iletişim hızı ile Mars'ın saldırgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Tartışma anında 'Durdur ve Düşün' tekniğini kullanın: öfkeli bir cevap vermeden önce 10 saniye bekleyin.\n2) Fiziksel egzersiz birlikte yaparak saldırgan enerjiyi yapıcıya dönüştürün.\n3) Birlikte zihinsel şifa meditasyonu yaparak zihinsel dengenizi yeniden kurun.",
-                        "Merkür-Mars-120": "Öneri: Merkür'ün netliği ile Mars'ın cesaretinin doğal uyumunu korumak için birlikte aktif zihinsel pratiği yapın. Hızlı okuma, zihinsel haritalama veya beyin fırtınası seansları yaparak zihinsel ve fiziksel enerjinizi birleştirin. Bu pratik, zihinsel cesaretinizi ve iletişim hızınızı besleyecektir.",
-                        "Merkür-Mars-180": "Öneri: Merkür'ün içe dönüklüğü ile Mars'ın dışa dönüklüğü arasındaki zıtlığı dengelemek için 'Dengeli Zihin Savaşı' pratiği yapın: bir gün içe dönük zihinsel aktiviteler yapın (okuma, yazma), ertesi gün dışa dönük zihinsel aktiviteler yapın (tartışma, sunum). Bu denge, hem zihinsel derinliğinizi hem de iletişim cesaretinizi besleyecektir.",
-                        "Merkür-Jüpiter-0": "Öneri: Merkür'ün zekası ile Jüpiter'in genişletici enerjisinin kavuştuğu bu noktada, birlikte bilgi ve bolluk ritüelleri oluşturun. Her sabah büyük düşüncelerinizi yüksek sesle paylaşın ve birlikte geniş vizyonlar geliştirin. Bu enerji, zihinsel bolluk bilincinizi ve ortak vizyonunuzu güçlendirecektir.",
-                        "Merkür-Jüpiter-60": "Öneri: Merkür'ün zekası ile Jüpiter'in bereketinin uyumunu korumak için haftada bir 'Bilgi Bereketi' oturumu düzenleyin. Birbirinize bu hafta öğrendiğinizbereketli bilgileri anlatın ve birlikte şükran meditasyonu yapın. Bu pratik, doğal zihinsel bolluğunuzu besleyerek ortak bereketinizi artıracaktır.",
-                        "Merkür-Jüpiter-90": "Öneri: Merkür'ün detaycılığı ile Jüpiter'in aşırı genişleme enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Fazla bilgi veya aşırı iyimserlik anında gerçekçi bir değerlendirme yapın.\n2) Detaylar ve geniş perspektifler arasında denge kurmak için strateji geliştirin.\n3) Birlikte sosyal sorumluluk projelerine katılarak zihinsel enerjinizi paylaşıma dönüştürün.",
-                        "Merkür-Jüpiter-120": "Öneri: Merkür'ün netliği ile Jüpiter'in bereketinin doğal uyumunu korumak için birlikte bolluk meditasyonu yapın. Her sabah 10 dakika boyunca zihinsel bolluk ve refah imgeleri canlandırın ve ardından birlikte şükran duaları edin. Bu ritüel, zihinsel bolluk bilincinizi ve bereket akışınızı sürekli canlı tutacaktır.",
-                        "Merkür-Jüpiter-180": "Öneri: Merkür'ün detaycılığı ile Jüpiter'in genişleticiliği arasındaki zıtlığı dengelemek için 'Ölçülü Bilgi Büyümesi' pratiği yapın: bireysel zihinsel hedeflerinizi ve ortak zihinsel hedeflerinizi dengeleyerek biroluşum planı oluşturun. Bu denge, hem bireysel zihinsel gelişiminizi hem de ortak zihinsel vizyonunuzu besleyecektir.",
-                        "Merkür-Satürn-0": "Öneri: Merkür'ün zekası ile Satürn'ün disiplin enerjisinin kavuştuğu bu noktada, birlikte yapı ve öğrenme ritüelleri oluşturun. Haftalık bir çalışma planı oluşturun ve birbirinize hesap verin. Bu disiplin, zihinsel hedeflerinize ulaşmanızı sağlayarak ilişkinizin temelini güçlendirecektir.",
-                        "Merkür-Satürn-60": "Öneri: Merkür'ün zekası ile Satürn'ün disiplininin uyumunu korumak için haftada bir 'Zihinsel Yapı' oturumu yapın. Birlikte zihinsel hedeflerinizi belirleyin ve bunlara ulaşmak için somut adımlar planlayın. Bu pratik, doğal disiplininizi besleyerek zihinsel sorumluluk duygunuzu güçlendirecektir.",
-                        "Merkür-Satürn-90": "Öneri: Merkür'ün hızı ile Satürn'ün sınırlayıcı enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Zihinsel sınırları kabul etmeyi ve aynı anda yaratıcı olmayı öğrenmek için birlikte Mindfulness pratiği yapın.\n2) Zihinsel sorumlulukları adil bir şekilde paylaşmak için açık iletişim kurun.\n3) Ortak bir zihinsel yapı oluşturarak zihinsel karmaşayı yapısal güce dönüştürün.",
-                        "Merkür-Satürn-120": "Öneri: Merkür'ün netliği ile Satürn'ün disiplininin doğal uyumunu korumak için birlikte uzun vadeli bir öğrenme planı oluşturun ve bu plana sadık kalın. Her ay ilerlemenizi değerlendirin ve birbirinizi teşvik edin. Bu yapı, zihinsel hedeflerinize ulaşmanızı sağlayarak ortak başarınızı ve güveninizi pekiştirecektir.",
-                        "Merkür-Satürn-180": "Öneri: Merkür'ün hızı ile Satürn'ün kısıtlaması arasındaki zıtlığı dengelemek için 'Zihinsel Özgürlük ve Sorumluluk Dansı' pratiği yapın: zihinsel alanlarınızın ve ortak sorumluluklarınızın dengesini bulun. Her hafta birbirinize zihinsel alan tanıyın ve aynı zamanda ortak zihinsel yükümlülüklerinizi yerine getirin. Bu denge, hem zihinsel özgürlüğünüzü hem de ilişkisel güveninizi koruyacaktır.",
-                        "Merkür-Uranüs-0": "Öneri: Merkür'ün zekası ile Uranüs'ün devrim enerjisinin kavuştuğu bu noktada, birlikte zihinsel yenilik ve değişim ritüelleri oluşturun. Her ay birlikte yeni bir teknoloji veya felsefi konu öğrenin ve bu deneyimleri tartışın. Bu enerji, ilişkize yeni zihinsel soluklar getirerek yaratıcı ve devrimci zihinsel bağınızı canlı tutacaktır.",
-                        "Merkür-Uranüs-60": "Öneri: Merkür'ün zekası ile Uranüs'ün yenilikçiliğinin uyumunu korumak için haftada bir 'Zihinsel Yenilik' oturumu düzenleyin. Birlikte farklı bir konu hakkında araştırma yapın veya farklı bir zihinsel aktivite deneyin. Bu deneyimler, doğal yaratıcılığınızı besleyerek ilişkize taze zihinsel enerji katacaktır.",
-                        "Merkür-Uranüs-90": "Öneri: Merkür'ün hızı ile Uranüs'ün ani değişim enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Zihinsel değişim anında 'Dur ve Al' tekniğini kullanın: ani bir fikir değişikliği yapmadan önce 24 saat bekleyin.\n2) Birbirinizin zihinsel bağımsızlığına saygı duyun ve aynı anda bağlantıda kalın.\n3) Ortak bir zihinsel vizyon oluşturarak bireysel zihinsel özgürlüğü ve ilişkisel bağlılığı dengeleyin.",
-                        "Merkür-Uranüs-120": "Öneri: Merkür'ün netliği ile Uranüs'ün devrim enerjisinin doğal uyumunu korumak için birlikte vizyoner bir zihinsel proje oluşturun. Geleceğe yönelik yaratıcı zihinsel planlar yapın ve bu planları somutlaştırmak için birlikte çalışın. Bu pratik, yaratıcı zihinsel potansiyelinizi ve ortak vizyonunuzu güçlendirecektir.",
-                        "Merkür-Uranüs-180": "Öneri: Merkür'ün içe dönüklüğü ile Uranüs'ün kolektif devrimi arasındaki zıtlığı dengelemek için 'Bireysel Zihinsel Devrim' pratiği yapın: hem bireysel zihinsel değişim hem de ortak zihinsel dönüşüm için zaman ayırın. Her hafta birlikte yeni bir zihinsel perspektif keşfedin ve bu perspektifi ilişkinize nasıl uygulayacağınızı tartışın. Bu denge, hem bireysel zihinsel özgürlüğünüzü hem de ilişkisel zihinsel dönüşümünüzü destekleyecektir.",
-                        "Merkür-Neptün-0": "Öneri: Merkür'ün zekası ile Neptün'ün manevi enerjisinin kavuştuğu bu noktada, birlikte manevi ve zihinsel ritüeller oluşturun. Her sabah birlikte dua edin veya meditasyon yapın ve manevi ve zihinsel vizyonlarınızı paylaşın. Bu enerji, ruhsal ve zihinsel bağınızı derinleştirerek ilişkinizi manevi bir boyuta taşıyacaktır.",
-                        "Merkür-Neptün-60": "Öneri: Merkür'ün zekası ile Neptün'ün manevi flöwsunun uyumunu korumak için haftada bir 'Manevi Zihin' oturumu düzenleyin. Birlikte müzik dinleyin, sanat eserlerini inceleyin veya doğada yürüyüş yaparak manevi ve zihinsel deneyimlerinizi paylaşın. Bu pratik, manevi ve zihinsel hassasiyetinizi ve yaratıcı ilhamınızı besleyecektir.",
-                        "Merkür-Neptün-90": "Öneri: Merkür'ün netliği ile Neptün'ün bulanık enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Rüya günlüğü tutarak bilinçaltınızı keşfedin ve bu deneyimleri birbirinizle paylaşın.\n2) Manevi pratiğinizi somutlaştırarak illüzyonları ve gerçekleri dengeleyin.\n3) Birlikte gönüllülük yaparak manevi ve zihinsel enerjinizi somut eylemlere dönüştürün.",
-                        "Merkür-Neptün-120": "Öneri: Merkür'ün netliği ile Neptün'ün manevi akışının doğal uyumunu korumak için birlikte manevi ve zihinsel bir yolculuk planlayın. Manevi mekanları ziyaret edin, meditasyon kamplarına katılın veya birlikte yaratıcı sanat pratiği yapın. Bu deneyim, manevi ve zihinsel bilinçliliğinizi ve ruhsal bağınızı derinleştirecektir.",
-                        "Merkür-Neptün-180": "Öneri: Merkür'ün rasyonelliği ile Neptün'ün evrenselliği arasındaki zıtlığı dengelemek için 'Bireysel Manevi Zihin' pratiği yapın: her biriniz kendi manevi ve zihinsel yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir manevi ve zihinsel vizyon oluşturun. Bu denge, hem bireysel ruhsal ve zihinsel gelişimi hem de ortak manevi ve zihinsel bağı besleyecektir.",
-                        "Merkür-Plüton-0": "Öneri: Merkür'ün zekası ile Plüton'un dönüştürücü enerjisinin kavuştuğu bu noktada, birlikte derin zihinsel dönüşüm ve yeniden doğum ritüelleri oluşturun. Her ay birlikte eski zihinsel kalıplarınızı bırakın ve yeni başlangıçlar yapın. Bu enerji, derin zihinsel dönüşümünüzü ve yeniden doğuşunuzu hızlandırarak ilişkinizi yeniden yapılandıracaktır.",
-                        "Merkür-Plüton-60": "Öneri: Merkür'ün zekası ile Plüton'un derin transformasyonunun uyumunu korumak için haftada bir 'Zihinsel Dönüşüm Paylaşımı' oturumu düzenleyin. Birlikte eski zihinsel yaralarınızı iyileştirin ve yeni bir zihinsel kimlik oluşturun. Bu pratik, derin zihinsel dönüşümünüzü destekleyerek ilişkinizi yeniden yapılandıracaktır.",
-                        "Merkür-Plüton-90": "Öneri: Merkür'ün hızı ile Plüton'un power struggle enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Zihinsel güç mücadelelerini fark edin ve bunları derin bir zihinsel analizine dönüştürün.\n2) Birbirinizin zihinsel gölgelerini kabul edin ve bu gölgelerle birlikte çalışın.\n3) Ortak bir zihinsel dönüşüm pratiği yaparak power struggle'ı ortak zihinsel güce dönüştürün.",
-                        "Merkür-Plüton-120": "Öneri: Merkür'ün netliği ile Plüton'un derin dönüşümünün doğal uyumunu korumak için birlikte derin bir zihinsel şifa çalışması yapın. Psikolojik astroloji, enerji çalışması veya derin meditasyon pratiği yaparak içsel zihinsel dönüşümlerinizi destekleyin. Bu pratik, derin zihinsel dönüşümünüzü ve ruhsal yenilenmenizi hızlandıracaktır.",
-                        "Merkür-Plüton-180": "Öneri: Merkür'ün rasyonelliği ile Plüton'un transformasyonu arasındaki zıtlığı dengelemek için 'Bireysel Zihinsel Dönüşüm' pratiği yapın: her biriniz kendi derin zihinsel dönüşümünüzü takip edin, ardından bu dönüşümleri birlikte paylaşarak ortak bir zihinsel yeniden doğum süreci geçirin. Bu denge, hem bireysel hem de ilişkisel zihinsel dönüşümü destekleyecektir.",
-                        "Merkür-KAD-0": "Öneri: Merkür'ün zekası ile Kuzey Ay Düğümü'nün kadersel yolunun kavuştuğu bu noktada, birlikte zihinsel kaderinizi bilinçli şekilde yönlendirme pratiği yapın. Her sabah zihinsel kadersel niyetlerinizi yüksek sesle söyleyin ve birlikte kaderinizi şekillendiren zihinsel adımlar atın. Bu enerji, zihinsel kadersel yolunuzu ve ortak amacınızı güçlendirecektir.",
-                        "Merkür-KAD-60": "Öneri: Merkür'ün zekası ile Kuzey Ay Düğümü'nün kadersel akışının uyumunu korumak için haftada bir 'Zihinsel Kader Paylaşımı' oturumu düzenleyin. Birbirinize zihinsel kadersel deneyimlerinizi anlatın ve birlikte zihinsel geleceğinizi planlayın. Bu pratik, zihinsel yola bağlılığınızı ve ortak amacınızı besleyecektir.",
-                        "Merkür-KAD-90": "Öneri: Merkür'ün hızı ile Kuzey Ay Düğümü'nün kadersel zorlukları arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Zihinsel kadersel engelleri fırsat olarak yeniden çerçeveleyin.\n2) Birbirinize zihinsel hesap vererek kadersel yolunuzda ilerleyin.\n3) Ortak bir zihinsel kader vizyonu oluşturarak zorlukları birlikte aşın.",
-                        "Merkür-KAD-120": "Öneri: Merkür'ün netliği ile Kuzey Ay Düğümü'nün kadersel akışının doğal uyumunu korumak için birlikte zihinsel kadersel bir proje başlatın. Bu proje, bireysel ve ortak zihinsel kaderinizi birleştirecek şekilde tasarlanmalıdır. Bu pratik, zihinsel kadersel potansiyelinizi ve ortak amacınızı gerçekleştirmenizi sağlayacaktır.",
-                        "Merkür-KAD-180": "Öneri: Merkür'ün rasyonelliği ile Kuzey Ay Düğümü'nün kolektif kaderi arasındaki zıtlığı dengelemek için 'Bireysel Zihinsel Kader' pratiği yapın: her biriniz kendi zihinsel kadersel yolunuzu keşfedin, ardından bu deneyimleri birlikte paylaşarak ortak bir zihinsel kader vizyonu oluşturun. Bu denge, hem bireysel zihinsel kadersel potansiyeli hem de ortak amacın gerçekleşmesini destekleyecektir.",
-                        "Merkür-Chiron-0": "Öneri: Merkür'ün zekası ile Chiron'un şifacı yarasının kavuştuğu bu noktada, birlikte derin zihinsel şifa ve iyileşme ritüelleri oluşturun. Her sabah birlikte zihinsel şifa meditasyonu yapın ve birbirinizin zihinsel yaralarını şifalandırma niyetinde bulunun. Bu enerji, derin zihinsel şifa sürecinizi ve birbirinize olan zihinsel şifa kapasitenizi güçlendirecektir.",
-                        "Merkür-Chiron-60": "Öneri: Merkür'ün zekası ile Chiron'un şifa enerjisinin uyumunu korumak için haftada bir 'Zihinsel Şifa Paylaşımı' oturumu düzenleyin. Birbirinize zihinsel yaralarınızı anlatın ve birlikte zihinsel şifa pratiği yapın. Bu pratik, zihinsel şifa sürecinizi destekleyerek derin iyileşmenizi hızlandıracaktır.",
-                        "Merkür-Chiron-90": "Öneri: Merkür'ün hızı ile Chiron'un kırılgan enerjisi arasındaki baskisi çözmek için şu 3 adımı uygulayın: 1) Zihinsel kırılganlık anında birbirinize alan tanıyın ve aynı anda destek olun.\n2) Zihinsel yaralarınızı şifalandırmak için profesyonel destek alın.\n3) Birlikte zihinsel şifa projeleri başlatarak yaralarınızı dönüştürücü güce dönüştürün.",
-                        "Merkür-Chiron-120": "Öneri: Merkür'ün netliği ile Chiron'un şifa akışının doğal uyumunu korumak için birlikte zihinsel şifa banyosu veya enerji çalışması yapın. Doğanın iyileştirici gücünden faydalanarak birlikte zihinsel şifa deneyimleri yaşayın. Bu pratik, derin zihinsel şifa sürecinizi ve ruhsal iyileşmenizi destekleyecektir.",
-                        "Merkür-Chiron-180": "Öneri: Merkür'ün rasyonelliği ile Chiron'un evrensel şifası arasındaki zıtlığı dengelemek için 'Bireysel Zihinsel Şifa' pratiği yapın: her biriniz kendi zihinsel şifa yolunuzu takip edin, ardından bu deneyimleri birlikte paylaşarak ortak bir zihinsel şifa vizyonu oluşturun. Bu denge, hem bireysel zihinsel şifayı hem de ortak iyileşmeyi destekleyecektir.",
-                        "Venüs-Venüs-0": "Aşk dilinizdeki benzerlikleri kutlayın: 1. Aynı sevgi dilini keşfetmek için birlikte test yapın 2. Haftada bir minnettarlık günlüğü tutun 3. Birbirinize küçük hediyeler verme ritüeli oluşturun",
-                        "Venüs-Venüs-60": "Uyumlu enerjinizi sanatsal projelere yönlendirin: 1. Birlikte resim, müzik veya dans aktivitesi planlayın 2. Aynı estetik zevklerinizi paylaşan bir alan yaratın 3. Ortak bir güzellik ritüeli geliştirin",
-                        "Venüs-Venüs-90": "Değer çatışmalarını-dialogla aşın: 1. Para ve sevgi hakkındaki inançlarınızı birlikte yazın 2. Farklı zevkleri dengelemek için alternatif planlar yapın 3. Haftada bir duygusal ihtiyaçlarınızı paylaşın",
-                        "Venüs-Venüs-120": "Aşkınızın bolluğunu başkalarıyla paylaşın: 1. Birlikte hayırseverlik projelerine katılın 2. Çevrenizdeki çiftlere ilham verin 3. Sevgi dolu bir ev atmosferi yaratmak için birlikte çalışın",
-                        "Venüs-Venüs-180": "Zıt çekimlerinizi dengelemenin yollarını bulun: 1. Farklı sosyal ihtiyaçlarınızı kabul edin ve takvim oluşturun 2. Birbirinizin bağımsızlığına alan tanıyın 3. Ortak değerlerinizi güçlendirmek için meditasyon yapın",
-                        "Venüs-Mars-0": "Tutku ve şefkati birleştirin: 1. Fiziksel yakınlığı duygusal bağla harmanlayan ritüeller geliştirin 2. Birlikte spor veya dans yapın 3. Romantik anları planlı oluşturun",
-                        "Venüs-Mars-60": "Yaratıcı enerjinizi birlikte kanalize edin: 1. Ortak bir sanat projesi başlatın 2. Birlikte outdoor aktiviteler planlayın 3. Flörtöz enerjinizi oyunlara dönüştürün",
-                        "Venüs-Mars-90": "Tutkuyu fiziksel aktivitelere yönlendirin: 1. Spor veya dans ile baskisi boşaltın 2. Tartışma anında 10 dakika mola verin 3. Ortak bir tutku projesi geliştirin",
-                        "Venüs-Mars-120": "Aşk ve eylemi uyumlu hale getirin: 1. Birlikte hedefler belirleyin ve plan yapın 2. Romantik maceralar organize edin 3. Fiziksel ve duygusal yakınlığı dengeleyin",
-                        "Venüs-Mars-180": "Çekim ve reddediş döngüsünü kırın: 1. İlişkideki oyunları fark edin ve iletişime geçin 2. Tutku ile bağımsızlık arasındaki dengeyi bulun 3. Birbirinize alan tanırken bağ kurun",
-                        "Venüs-Jüpiter-0": "Bolluk ve sevgiyi birlikte genişletin: 1. Birlikte hayal kurun ve büyük planlar yapın 2. Şükran günlükleri tutun 3. Birlikte öğrenme ve büyüme fırsatları yaratın",
-                        "Venüs-Jüpiter-60": "Sevginizi felsefi bir boyutla derinleştirin: 1. Birlikte kitap okuyun ve tartışın 2. Manevi pratikler geliştirin 3. Farklı kültürleri birlikte keşfedin",
-                        "Venüs-Jüpiter-90": "Aşırılıkların farkında olun: 1. Harcama alışkanlıklarınızı birlikte gözden geçirin 2. Büyüme hevesinizi gerçekçi hedeflerle dengeleyin 3. Farklı beklentileri açıkça konuşun",
-                        "Venüs-Jüpiter-120": "Sevgi ve bolluğu cömertçe paylaşın: 1. Birlikte hayırseverlik yapın 2. Misafirperverlik ritüelleri geliştirin 3. Birbirinizin büyümesini destekleyin",
-                        "Venüs-Jüpiter-180": "Farklı değer sistemlerini uzlaştırın: 1. Para ve inanç konularında açık diyalog kurun 2. Birbirinizin felsefi perspektiflerine saygı gösterin 3. Ortak bir yaşam felsefesi oluşturun",
-                        "Venüs-Satürn-0": "Sevgiye yapı ve sorumluluk katın: 1. İlişkiniz için net sınırlar belirleyin 2. Uzun vadeli hedefler için birlikte çalışın 3. Sadakatinizi somut eylemlerle gösterin",
-                        "Venüs-Satürn-60": "Sevgi ve disiplini dengeleyin: 1. Düzenli ilişki bakımı ritüelleri oluşturun 2. Birbirinize karşı sabırlı olmayı öğrenin 3. Ortak sorumlulukları adaletle paylaşın",
-                        "Venüs-Satürn-90": "Sevgideki sınırlamaları aşın: 1. İlişkideki korkularınızı birlikte yazın 2. Duygusal duvarları yıkmak için cesaret_pratikleri yapın 3. Güven inşası için küçük adımlar atın",
-                        "Venüs-Satürn-120": "Sevgi ve olgunluğu harmanlayın: 1. Birlikte olgunluk yolculuğunu kutlayın 2. Uzun vadeli bağlılığınızı güçlendirin 3. Bilgelik ve şefkati ilişkiye taşıyın",
-                        "Venüs-Satürn-180": "Sevgi ve kısıtlama arasındaki baskisi azaltın: 1. Özgürlük ve güvenlik ihtiyaçlarınızı dengeleyin 2. İlişkideki rolleri yeniden tanımlayın 3. Birbirinize alan tanırken sorumluluk alın",
-                        "Venüs-Uranüs-0": "Sevgide yenilikçiliği kucaklayın: 1. İlişkinize spontane sürprizler ekleyin 2. Birbirinizin özgürlüğüne değer verin 3. Farklı ilişki modellerini keşfedin",
-                        "Venüs-Uranüs-60": "Sevgi ve özgürlüğü uyumlu hale getirin: 1. Birlikte yeni deneyimler yaşayın 2. İlişkide esneklik ve yenilik geliştirin 3. Birbirinizin bireyselliğini kutlayın",
-                        "Venüs-Uranüs-90": "Tutku ve bağımsızlık arasındaki baskisi yönetin: 1. Ani değişimlere karşı esnek olun 2. İlişkideki rutinleri kırın 3. Birbirinize alan tanırken bağ kurun",
-                        "Venüs-Uranüs-120": "Sevgi ve devrimi birleştirin: 1. Toplumsal değişim için birlikte çalışın 2. İlişkinizi yenilikçi değerlerle besleyin 3. Birbirinizin vizyonunu destekleyin",
-                        "Venüs-Uranüs-180": "Özgürlük ve yakınlık arasındaki dengeyi bulun: 1. Bağımsızlık ve birliktelik ihtiyaçlarınızı açıkça konuşun 2. İlişkide esnek sınırlar belirleyin 3. Birbirinize alan tanırken connected kalın",
-                        "Venüs-Neptün-0": "Sevgiyi manevi boyutla derinleştirin: 1. Birlikte meditasyon veya dua yapın 2. Romantik hayallerinizi paylaşın 3. Sevginizi sanatsal ifadelerle besleyin",
-                        "Venüs-Neptün-60": "Sevgi ve merhameti harmanlayın: 1. Birlikte hayırseverlik yapın 2. Birbirinize şefkatle bakın 3. Manevi bağlarınızı güçlendirmek için ritüeller geliştirin",
-                        "Venüs-Neptün-90": "Illüzyon ve gerçeklik dengeleyin: 1. İlişkideki beklentilerinizi netleştirin 2. Duygusal bulanıklığı gidermek için iletişim kurun 3. Gerçekçi olmayan beklentileri bırakın",
-                        "Venüs-Neptün-120": "Sevgiyi ilahi bir boyutta yaşayın: 1. Birlikte ruhani pratikler geliştirin 2. Sevginizi evrensel sevgiyle hizalayın 3. Birbirinizin ruhsal gelişimini destekleyin",
-                        "Venüs-Neptün-180": "Sevgi ve kurbanlık arasındaki döngüyü kırın: 1. İlişkideki aldatma kalıplarını fark edin 2. Sınırlarınızı koruyarak sevgi verin 3. Kendinizi ve partnerinizi gerçekçi sevin",
-                        "Venüs-Plüton-0": "Sevgiyi derinlemesine dönüştürün: 1. İlişkideki güç yapiylarini araştırın 2. Duygusal derinliklere inmek için güvenli alanlar yaratın 3. Birlikte gölge çalışmalar yapın",
-                        "Venüs-Plüton-60": "Sevgi ve transformasyonu entegre edin: 1. Birlikte kişisel gelişim çalışın 2. İlişkideki eski kalıpları serbest bırakın 3. Yeniden doğuş ritüelleri geliştirin",
-                        "Venüs-Plüton-90": "Tutku ve takıntı arasındaki çizgiyi belirleyin: 1. İlişkideki kontrol sorunlarını konuşun 2. Kıskançlık duygularınızı işleyin 3. Güven ve bağımsızlık dengeleyin",
-                        "Venüs-Plüton-120": "Sevginin dönüştürücü gücünü kucaklayın: 1. Birlikte derin dönüşüm süreçlerinden geçin 2. İlişkinizi yeniden icat edin 3. Sevginizi güçlendirmek için.shadow work yapın",
-                        "Venüs-Plüton-180": "Sevgi ve power mücadelelerini aşın: 1. İlişkideki manipulation fark edin 2. Güç dengesizliklerini düzeltmek için adımlar atın 3. Şeffaf ve dürüst iletişim kurun",
-                        "Venüs-KAD-0": "Karmik derslerinizi sevgiyle öğrenin: 1. İlişkideki tekrar eden kalıpları analiz edin 2. Geçmiş yaşam inançlarınızı keşfedin 3. Karmik borçları affetme ritüelleriyle çözün",
-                        "Venüs-KAD-60": "Sevgi ve karmik dengeyi uyumlu hale getirin: 1. Birlikte meditasyon yaparak karmik bağlantıları keşfedin 2. Affetme pratikleri geliştirin 3. Geçmiş derslerinizi sevgiyle entegre edin",
-                        "Venüs-KAD-90": "Karmik derslerinizi sevgiyle aşın: 1. İlişkideki zorlukların karmik kökenlerini anlayın 2. Sabır ve kabul Pratikleri yapın 3. Döngüleri kırmak için bilinçli seçimler yapın",
-                        "Venüs-KAD-120": "Karmik sevgi bağlarını kutlayın: 1. Birlikte karmik yolculuğunuzu kutlayın 2. Geçmiş derslerinizi minnetle karşılayın 3. Sevginizi karmik bilgelikle besleyin",
-                        "Venüs-KAD-180": "Karmik çatışmaları sevgiyle dönüştürün: 1. İlişkideki karmik döngüleri tanıyın 2. Zıt karmik enerjileri dengelemek için çalışın 3. Affetme ve bırakma ritüelleri yapın",
-                        "Venüs-Chiron-0": "Şifalı sevgi yaralarınızı birlikte iyileştirin: 1. İlişkideki hassas noktaları şefkatle ele alın 2. Birbirinizin yaralarını iyileştirmek için alan yaratın 3. Şifa meditasyonları yapın",
-                        "Venüs-Chiron-60": "Sevgi ve şifayı doğal bir şekilde harmanlayın: 1. Birlikte şifa çalışmaları yapın 2. Birbirinize şefkatle dinleyin 3. İyileşme süreçlerinizi destekleyin",
-                        "Venüs-Chiron-90": "Sevgideki yaraları şifaya dönüştürün: 1. İlişkideki acı verici tetikleyicileri belirleyin 2. Güvenli iletişim teknikleri öğrenin 3. Profesyonel destek almaktan çekinmeyin",
-                        "Venüs-Chiron-120": "Sevgi ve şifa birleşimini kutlayın: 1. Birlikte şifa yolculuğunuzu kutlayın 2. İyileşme hikayelerinizi paylaşın 3. Şifalı sevgi pratiğinizi derinleştirin",
-                        "Venüs-Chiron-180": "Sevgi ve yaralanma arasındaki baskisi azaltın: 1. İlişkideki yaraları inkar etmeyin 2. Şifa için sabırlı olun 3. Birbirinize destek olurken sınırlarınızı koruyun",
-                        "Mars-Mars-0": "Enerjinizi birlikte kanalize edin: 1. Birlikte spor veya rekabetçi aktiviteler yapın 2. Ortak hedefler için birlikte çalışın 3. Enerji fazlalığını yaratıcı projelere yönlendirin",
-                        "Mars-Mars-60": "Enerji ve aksiyonu uyumlu hale getirin: 1. Birlikte macera planları yapın 2. Ortak fiziksel hedefler belirleyin 3. Enerjinizi pozitif rekabetle besleyin",
-                        "Mars-Mars-90": "Enerji çatışmalarını yapıcıya dönüştürün: 1. Rekabet duygularını fark edin ve yönetin 2. Birlikte spor yaparak baskisi boşaltın 3. Ortak bir hedef için birleşin",
-                        "Mars-Mars-120": "Enerji ve aksiyonun gücünü birleştirin: 1. Birlikte büyük projeler başlatın 2. Fiziksel hedefler için birlikte çalışın 3. Enerjinizi toplumsal fayda için kullanın",
-                        "Mars-Mars-180": "Zıt enerji yönlendirmelerini dengeleyin: 1. Farklı enerji seviyelerinizi kabul edin 2. Birbirinize alan tanırken birlikte çalışın 3. Enerji akışını iletişimle koordine edin",
-                        "Mars-Jüpiter-0": "Enerjinizi büyük vizyonlara yönlendirin: 1. Birlikte cesur planlar yapın 2. Fiziksel ve zihinsel enerjinizi birleştirin 3. Macera ve büyüme için fırsatlar yaratın",
-                        "Mars-Jüpiter-60": "Enerji ve bolluğu uyumlu hale getirin: 1. Birlikte yeni deneyimler yaşayın 2. Enerjinizi öğrenme ve keşif için kullanın 3. Fiziksel aktiviteleri manevi pratiklerle harmanlayın",
-                        "Mars-Jüpiter-90": "Aşırılıkların ve inatçılığın farkında olun: 1. Enerji fazlalığını yapıcı kanallara yönlendirin 2. Büyüme hevesinizi sabırla dengeleyin 3. Farklı inançları saygıyla karşılayın",
-                        "Mars-Jüpiter-120": "Enerji ve bolluğu cömertçe paylaşın: 1. Birlikte hayırseverlik yapın 2. Fiziksel enerjinizle topluma hizmet edin 3. Büyüme ve genişleme için birlikte çalışın",
-                        "Mars-Jüpiter-180": "Enerji ve inanç arasındaki baskisi azaltın: 1. Fiziksel enerji ve ruhsal gelişimi dengeleyin 2. Farklı yaşam felsefelerini saygıyla karşılayın 3. Ortak bir vizyon oluşturmak için çalışın",
-                        "Mars-Satürn-0": "Enerji ve disiplini birleştirin: 1. Hedeflerinizi netleştirin ve plan yapın 2. Sabırlı ve kararlı olun 3. Fiziksel enerjinizi yapılandırılmış aktivitelerle kullanın",
-                        "Mars-Satürn-60": "Enerji ve olgunluğu dengeleyin: 1. Sabır ve kararlılığı birlikte pratiğe dökün 2. Uzun vadeli hedefler için çalışın 3. Enerjinizi sorumluluklarınızla harmanlayın",
-                        "Mars-Satürn-90": "Enerji ve kısıtlama arasındaki baskisi yönetin: 1. Sabırsızlık duygularını fark edin 2. Enerji fazlalığını fiziksel aktivitelerle boşaltın 3. Sınırlamaları kabul ederken harekete geçin",
-                        "Mars-Satürn-120": "Enerji ve yapıyı güçlü bir şekilde birleştirin: 1. Disiplinli bir egzersiz rutini oluşturun 2. Hedeflerinize sistemli bir şekilde ilerleyin 3. Enerjinizi uzun vadeli başarı için kullanın",
-                        "Mars-Satürn-180": "Enerji ve kısıtlama arasındaki dengeyi bulun: 1. Fiziksel enerji ve yapısal sınırları dengeleyin 2. Farklı enerji seviyelerinizi kabul edin 3. Birlikte esnek bir plan oluşturun",
-                        "Mars-Uranüs-0": "Enerjinizi devrimci enerji için kullanın: 1. Birlikte yenilikçi projeler başlatın 2. Spontane enerjiyi yapıcı kanallara yönlendirin 3. Özgürlüğünüzü birlikte kutlayın",
-                        "Mars-Uranüs-60": "Enerji ve yeniliği uyumlu hale getirin: 1. Birlikte yeni deneyimler yaşayın 2. Enerjinizi yaratıcı projeler için kullanın 3. Değişime açık olun ve birbirinizi destekleyin",
-                        "Mars-Uranüs-90": "Ani enerji değişimlerini yönetin: 1. Ani tepkiler vermekten kaçının 2. Enerji fazlığını fiziksel aktivitelerle boşaltın 3. Değişime esnek bir şekilde yaklaşın",
-                        "Mars-Uranüs-120": "Enerji ve devrimi güçlü bir şekilde birleştirin: 1. Birlikte toplumsal değişim için çalışın 2. Enerjinizi yenilikçi projeler için kullanın 3. Birbirinizin vizyonunu destekleyin",
-                        "Mars-Uranüs-180": "Enerji ve özgürlük arasındaki baskisi azaltın: 1. Fiziksel enerji ve bağımsızlık ihtiyaçlarını dengeleyin 2. Farklı enerji yönlendirmelerini kabul edin 3. Birlikte esnek bir plan oluşturun",
-                        "Mars-Neptün-0": "Enerjinizi manevi amaçlar için kullanın: 1. Birlikte meditasyon veya dua yapın 2. Fiziksel enerjinizi ruhsal pratiklerle harmanlayın 3. Hayallerinizi eyleme dönüştürün",
-                        "Mars-Neptün-60": "Enerji ve maneviyatı uyumlu hale getirin: 1. Birlikte şifa çalışmaları yapın 2. Fiziksel aktiviteleri ruhsal pratiklerle birleştirin 3. Hayallerinizi birlikte gerçekleştirin",
-                        "Mars-Neptün-90": "Enerji ve belirsizlik arasındaki baskisi yönetin: 1. Enerji fazlığını yaratıcı aktivitelerle boşaltın 2. Net hedefler belirleyerek belirsizliği azaltın 3. Manevi rehberlik için meditasyon yapın",
-                        "Mars-Neptün-120": "Enerji ve ilhamı güçlü bir şekilde birleştirin: 1. Birlikte sanatsal projeler geliştirin 2. Fiziksel enerjinizi ilham verici amaçlar için kullanın 3. Manevi vizyonunuzu eyleme dönüştürün",
-                        "Mars-Neptün-180": "Enerji ve hayal kırıklığı arasındaki dengeyi bulun: 1. Gerçekçi hedefler belirleyin 2. Enerji fazlığını yapıcı kanallara yönlendirin 3. Manevi pratiklerle enerjinizi yenileyin",
-                        "Mars-Plüton-0": "Enerjinizi derin transformasyon için kullanın: 1. Birlikte gölge çalışmalar yapın 2. Fiziksel enerjinizi dönüşüm projeleri için kullanın 3. Güç yapiylarini sağlıklı bir şekilde yönetin",
-                        "Mars-Plüton-60": "Enerji ve gücü uyumlu hale getirin: 1. Birlikte güçlü projeler başlatın 2. Fiziksel enerjinizi kişisel gelişim için kullanın 3. Güçlü bir birliktelik oluşturun",
-                        "Mars-Plüton-90": "Enerji ve power mücadelelerini yönetin: 1. Kontrol sorunlarını fark edin 2. Enerji fazlığını fiziksel aktivitelerle boşaltın 3. Güç dengesizliklerini iletişimle düzeltin",
-                        "Mars-Plüton-120": "Enerji ve dönüştürücü gücü birleştirin: 1. Birlikte büyük değişimler için çalışın 2. Fiziksel enerjinizi toplumsal dönüşüm için kullanın 3. Güçlü bir vizyon oluşturun",
-                        "Mars-Plüton-180": "Enerji ve yıkıcı güç arasındaki dengeyi bulun: 1. Enerji fazlını yapıcı kanallara yönlendirin 2. Güç mücadelelerini barışçıl diyalogla çözün 3. Transformasyon için sabırlı olun",
-                        "Mars-KAD-0": "Karmik enerjilerinizi eyleme dönüştürün: 1. İlişkideki karmik döngüleri fark edin 2. Fiziksel enerjinizi karmik dersleri öğrenmek için kullanın 3. Geçmiş kalıplarını kırmak için harekete geçin",
-                        "Mars-KAD-60": "Enerji ve karmik dengeyi uyumlu hale getirin: 1. Birlikte karmik meditasyonlar yapın 2. Fiziksel enerjinizi karmik denge için kullanın 3. Geçmiş derslerinizi eyleme dönüştürün",
-                        "Mars-KAD-90": "Karmik enerjiler ve kısıtlamalar arasındaki baskisi yönetin: 1. Karmik döngüleri kırmak için sabırlı olun 2. Enerji fazlığını fiziksel aktivitelerle boşaltın 3. Karmik dersleri öğrenmek için çaba gösterin",
-                        "Mars-KAD-120": "Karmik enerji ve eylemi güçlü bir şekilde birleştirin: 1. Birlikte karmik hedefler için çalışın 2. Fiziksel enerjinizi karmik denge için kullanın 3. Karmik derslerinizi uygulamaya dökün",
-                        "Mars-KAD-180": "Karmik enerji ve kısıtlama arasındaki dengeyi bulun: 1. Karmik döngüleri kabul edin ve çalışın 2. Fiziksel enerji ve yapısal sınırları dengeleyin 3. Birlikte esnek bir karmik plan oluşturun",
-                        "Mars-Chiron-0": "Enerjinizi şifa için kullanın: 1. Birlikte şifa çalışmaları yapın 2. Fiziksel enerjinizi iyileşme süreçleri için kullanın 3. Yaralarınızı birlikte şifaya dönüştürün",
-                        "Mars-Chiron-60": "Enerji ve şifayı uyumlu hale getirin: 1. Birlikte şifa meditasyonları yapın 2. Fiziksel aktiviteleri şifa pratikleriyle birleştirin 3. Birbirinizi iyileşme süreçlerinde destekleyin",
-                        "Mars-Chiron-90": "Enerji ve yaralanma arasındaki baskisi yönetin: 1. Enerji fazlığını fiziksel aktivitelerle boşaltın 2. Yaralarınızı şifaya dönüştürmek için çaba gösterin 3. Profesyonel destek almaktan çekinmeyin",
-                        "Mars-Chiron-120": "Enerji ve şifa gücünü güçlü bir şekilde birleştirin: 1. Birlikte büyük şifa projeleri başlatın 2. Fiziksel enerjinizi toplumsal şifa için kullanın 3. Şifalı bir birliktelik oluşturun",
-                        "Mars-Chiron-180": "Enerji ve yaralanma arasındaki dengeyi bulun: 1. Enerji fazlını yapıcı kanallara yönlendirin 2. Yaralarınızı şifaya dönüştürmek için sabırlı olun 3. Birlikte şifa yolculuğunda yürüyün",
-                        "Jüpiter-Jüpiter-0": "Büyüme ve bolluğu birlikte genişletin: 1. Birlikte büyük hayaller kurun 2. Fırsatları birlikte değerlendirin 3. Genişleme ve öğrenme için birlikte çalışın",
-                        "Jüpiter-Jüpiter-60": "Büyüme ve bolluğu uyumlu hale getirin: 1. Birlikte yeni öğrenme fırsatları keşfedin 2. Felsefi tartışmalar yapın 3. Manevi pratikler geliştirin",
-                        "Jüpiter-Jüpiter-90": "Aşırılıklar ve farklı inançlar arasındaki baskisi yönetin: 1. Farklı bakış açılarını saygıyla karşılayın 2. Büyüme hevesinizi gerçekçi hedeflerle dengeleyin 3. Açık ve yapıcı iletişim kurun",
-                        "Jüpiter-Jüpiter-120": "Büyüme ve bolluğu cömertçe paylaşın: 1. Birlikte hayırseverlik yapın 2. Öğrenme ve öğretme fırsatları yaratın 3. Toplumsal fayda için birlikte çalışın",
-                        "Jüpiter-Jüpiter-180": "Farklı inanç ve değer sistemleri arasındaki dengeyi bulun: 1. Felsefi farklılıkları saygıyla karşılayın 2. Ortak değerlerinizi keşfedin 3. Birlikte kapsamlı bir dünya görüşü oluşturun",
-                        "Jüpiter-Satürn-0": "Büyüme ve yapıyı dengeleyin: 1. Uzun vadeli hedefler belirleyin 2. Büyüme için yapılandırılmış planlar yapın 3. Sabırlı ve kararlı olun",
-                        "Jüpiter-Satürn-60": "Büyüme ve disiplini uyumlu hale getirin: 1. Öğrenme için düzenli bir program oluşturun 2. Fırsatları gerçekçi bir şekilde değerlendirin 3. Büyüme ve yapıyı birlikte pratiğe dökün",
-                        "Jüpiter-Satürn-90": "Büyüme ve kısıtlama arasındaki baskisi yönetin: 1. Büyük hayaller ve gerçekçi planlar arasında denge kurun 2. Sabırsızlık duygularını fark edin 3. Büyüme için sabırlı ve kararlı olun",
-                        "Jüpiter-Satürn-120": "Büyüme ve yapıyı güçlü bir şekilde birleştirin: 1. Uzun vadeli başarı için yapılandırılmış planlar yapın 2. Bilgelik ve disiplini birlikte kullanın 3. Büyüme ve olgunluğu harmanlayın",
-                        "Jüpiter-Satürn-180": "Büyüme ve kısıtlama arasındaki dengeyi bulun: 1. Farklı enerji seviyelerinizi kabul edin 2. Birlikte esnek bir plan oluşturun 3. Büyüme ve yapıyı dengelemek için iletişim kurun",
-                        "Jüpiter-Uranüs-0": "Büyüme ve devrimi birlikte kucaklayın: 1. Birlikte yenilikçi projeler başlatın 2. Fırsatları spontane bir şekilde değerlendirin 3. Özgürlük ve genişleme için birlikte çalışın",
-                        "Jüpiter-Uranüs-60": "Büyüme ve yeniliği uyumlu hale getirin: 1. Birlikte yeni deneyimler yaşayın 2. Fırsatları yaratıcı bir şekilde değerlendirin 3. Değişime açık ve maceracı olun",
-                        "Jüpiter-Uranüs-90": "Büyüme ve ani değişimler arasındaki baskisi yönetin: 1. Ani fırsatlara karşı esnek olun 2. Büyüme hevesinizi gerçekçi hedeflerle dengeleyin 3. Değişime adaptasyon becerilerinizi geliştirin",
-                        "Jüpiter-Uranüs-120": "Büyüme ve devrimi güçlü bir şekilde birleştirin: 1. Birlikte toplumsal değişim için çalışın 2. Fırsatları yenilikçi bir şekilde değerlendirin 3. Vizyoner projeler başlatın",
-                        "Jüpiter-Uranüs-180": "Büyüme ve özgürlük arasındaki baskisi azaltın: 1. Farklı vizyonları saygıyla karşılayın 2. Ortak bir hedef için birleşin 3. Birlikte esnek bir plan oluşturun",
-                        "Jüpiter-Neptün-0": "Büyüme ve maneviyatı derinleştirin: 1. Birlikte ruhani pratikler geliştirin 2. Fırsatları manevi değerlerinizle hizalayın 3. Hayallerinizi birlikte gerçekleştirin",
-                        "Jüpiter-Neptün-60": "Büyüme ve ilhamı uyumlu hale getirin: 1. Birlikte sanatsal projeler geliştirin 2. Manevi fırsatları değerlendirin 3. Hayallerinizi eyleme dönüştürmek için çalışın",
-                        "Jüpiter-Neptün-90": "Büyüme ve hayal kırıklığı arasındaki baskisi yönetin: 1. Gerçekçi hedefler belirleyerek hayal kırıklığını azaltın 2. Manevi rehberlik için meditasyon yapın 3. Fırsatları gerçekçi bir şekilde değerlendirin",
-                        "Jüpiter-Neptün-120": "Büyüme ve ilhamı güçlü bir şekilde birleştirin: 1. Birlikte vizyoner projeler başlatın 2. Manevi fırsatları eyleme dönüştürün 3. Hayallerinizi gerçekleştirmek için birlikte çalışın",
-                        "Jüpiter-Neptün-180": "Büyüme ve hayal kırıklığı arasındaki dengeyi bulun: 1. Farklı vizyonları saygıyla karşılayın 2. Gerçekçi ve manevi hedefler belirleyin 3. Birlikte dengeli bir plan oluşturun",
-                        "Jüpiter-Plüton-0": "Büyüme ve dönüşümü derinleştirin: 1. Birlikte derin dönüşüm süreçlerinden geçin 2. Fırsatları dönüştürücü bir şekilde değerlendirin 3. Güçlü bir vizyon oluşturun",
-                        "Jüpiter-Plüton-60": "Büyüme ve transformasyonu uyumlu hale getirin: 1. Birlikte güçlü projeler başlatın 2. Fırsatları kişisel gelişim için kullanın 3. Dönüşüm ve genişlemeyi harmanlayın",
-                        "Jüpiter-Plüton-90": "Büyüme ve güç mücadeleleri arasındaki baskisi yönetin: 1. Kontrol sorunlarını fark edin 2. Fırsatları adil ve eşit bir şekilde değerlendirin 3. Güç dengesizliklerini iletişimle düzeltin",
-                        "Jüpiter-Plüton-120": "Büyüme ve dönüştürücü gücü güçlü bir şekilde birleştirin: 1. Birlikte büyük değişimler için çalışın 2. Fırsatları toplumsal dönüşüm için kullanın 3. Güçlü bir vizyon oluşturun",
-                        "Jüpiter-Plüton-180": "Büyüme ve yıkıcı güç arasındaki dengeyi bulun: 1. Fırsatları yapıcı kanallara yönlendirin 2. Güç mücadelelerini barışçıl diyalogla çözün 3. Dönüşüm için sabırlı olun",
-                        "Jüpiter-KAD-0": "Karmik büyüme fırsatlarını değerlendirin: 1. İlişkideki karmik döngüleri fark edin 2. Büyüme için karmik dersleri öğrenin 3. Geçmiş kalıplarını kırmak için genişleme enerjisini kullanın",
-                        "Jüpiter-KAD-60": "Büyüme ve karmik dengeyi uyumlu hale getirin: 1. Birlikte karmik meditasyonlar yapın 2. Büyüme fırsatlarını karmik denge için kullanın 3. Geçmiş derslerinizi genişleme enerjisiyle entegre edin",
-                        "Jüpiter-KAD-90": "Karmik büyüme ve kısıtlamalar arasındaki baskisi yönetin: 1. Karmik döngüleri kırmak için sabırlı olun 2. Büyüme fırsatlarını gerçekçi bir şekilde değerlendirin 3. Karmik dersleri öğrenmek için çaba gösterin",
-                        "Jüpiter-KAD-120": "Karmik büyüme ve genişlemeyi güçlü bir şekilde birleştirin: 1. Birlikte karmik hedefler için çalışın 2. Büyüme fırsatlarını karmik denge için kullanın 3. Karmik derslerinizi uygulamaya dökün",
-                        "Jüpiter-KAD-180": "Karmik büyüme ve kısıtlama arasındaki dengeyi bulun: 1. Karmik döngüleri kabul edin ve çalışın 2. Büyüme ve yapısal sınırları dengeleyin 3. Birlikte esnek bir karmik plan oluşturun",
-                        "Jüpiter-Chiron-0": "Büyüme ve şifayı derinleştirin: 1. Birlikte şifa çalışmaları yapın 2. Büyüme fırsatlarını iyileşme süreçleri için kullanın 3. Yaralarınızı birlikte şifaya dönüştürün",
-                        "Jüpiter-Chiron-60": "Büyüme ve şifayı uyumlu hale getirin: 1. Birlikte şifa meditasyonları yapın 2. Büyüme fırsatlarını şifa pratikleriyle birleştirin 3. Birbirinizi iyileşme süreçlerinde destekleyin",
-                        "Jüpiter-Chiron-90": "Büyüme ve yaralanma arasındaki baskisi yönetin: 1. Büyüme fırsatlarını yaralarınızı şifaya dönüştürmek için kullanın 2. Gerçekçi hedefler belirleyerek hayal kırıklığını azaltın 3. Profesyonel destek almaktan çekinmeyin",
-                        "Jüpiter-Chiron-120": "Büyüme ve şifa gücünü güçlü bir şekilde birleştirin: 1. Birlikte büyük şifa projeleri başlatın 2. Büyüme fırsatlarını toplumsal şifa için kullanın 3. Şifalı bir genişleme yolculuğu oluşturun",
-                        "Jüpiter-Chiron-180": "Büyüme ve yaralanma arasındaki dengeyi bulun: 1. Farklı vizyonları saygıyla karşılayın 2. Gerçekçi ve şifalı hedefler belirleyin 3. Birlikte dengeli bir şifa planı oluşturun",
-                        "Satürn-Satürn-0": "Öneri: İkinizdeki disiplin ve sorumluluk enerjisini birleştirmek için ortak bir yaşam planı oluşturun. Her sabah birlikte kısa bir meditasyon yaparak günün yüklerini paylaşın. Birbirinizin sınırlarına saygı duyarak güçlü bir temel inşa edin.",
-                        "Satürn-Satürn-60": "Öneri: Ortak sorumluluklarınızı yapıcı bir şekilde düzenleyin. Birlikte küçük hedefler koyarak adım adım ilerleyin. Haftalık kontrol noktaları belirleyin ve birbirinize destek olun.",
-                        "Satürn-Satürn-90": "Öneri: Disiplin ve korku kalıplarını birlikte aşmak için bireysel terapiye başlayın. Birbirinize karşı sabırlı olmayı öğrenmek için iletişimi açık tutun. Ortak sorumlulukları adil bir şekilde paylaşarak baskisi azaltın.",
-                        "Satürn-Satürn-120": "Öneri: Uyumlu disiplin enerjinizi birleştirerek uzun vadeli projeler geliştirin. Birlikte bir mentorluk programına katılın. Sorumluluk paylaşımı yaparak birbirinize destek olun.",
-                        "Satürn-Satürn-180": "Öneri: Zıt disiplin anlayışlarınızı dengelemek için esnek kurallar koyun. Birinizin güçlü olduğu alanlarda diğerine destek olun. Kontrol ihtiyacı ve özgürlük isteği arasındaki dengeyi konuşarak bulun.",
-                        "Satürn-Uranüs-0": "Öneri: Güvenlik ve değişim ihtiyacınızı birleştirmek için esnek bir yapı oluşturun. Her ay birlikte yeni bir deneyim yaşayın. Değişimi tehdit değil, büyüme fırsatı olarak görün.",
-                        "Satürn-Uranüs-60": "Öneri: Yapıyı esneklikle dengelemek için birlikte yaratıcı projeler geliştirin. Geleneksel yöntemleri yenilikçi yaklaşımlarla harmanlayın. Değişimi desteklerken güvenli bir alan yaratın.",
-                        "Satürn-Uranüs-90": "Öneri: Güvenlik ve özgürlük arasındaki baskisi çözmek için bireysel alan sınırlarını netleştirin. Her hafta birlikte yeni bir aktivite deneyerek değişime open olun. Kontrol ihtiyacınızı bırakarak birbirinize güvenmeyi öğrenin.",
-                        "Satürn-Uranüs-120": "Öneri: Yapıyı yenilikle birleştirerek yaratıcı çözümler üretin. Birlikte gelecek planları yaparken esnek kalın. Değişimi yapı içinde nasıl entegre edeceğinizi birlikte öğrenin.",
-                        "Satürn-Uranüs-180": "Öneri: Geleneksel ve devrimci yaklaşımlarınız arasındaki dengeyi bulun. Birbirinizin farklılıklarını kabul ederek ortak bir yol oluşturun. Özgürlük ve sorumluluk arasındaki dengeyi birlikte test edin.",
-                        "Satürn-Neptün-0": "Öneri: Gerçekçilik ve idealizm enerjinizi birleştirmek için net sınırlar koyun. Birlikte manevi bir pratiğe başlayın ama günlük hayatı da ihmal etmeyin. Hayallerinizi somut adımlara dönüştürmek için bir plan yapın.",
-                        "Satürn-Neptün-60": "Öneri: Disiplini sezgiyle harmanlayarak yaratıcı projeler geliştirin. Birlikte sanatsal aktivitelere katılın ama düzenli bir program da oluşturun. Manevi pratiğinizi günlük yaşamınıza entegre edin.",
-                        "Satürn-Neptün-90": "Öneri: Korku ve hayal kırıklığı arasındaki baskisi çözmek için net iletişim kurun. Birbirinize karşı şeffaf olun ve gerçekçi beklentiler belirleyin. Hayalperestlik ve katı gerçekçilik arasındaki dengeyi bulun.",
-                        "Satürn-Neptün-120": "Öneri: Yapıyı maneviyatla birleştirerek anlamlı bir yaşam oluşturun. Birlikte meditasyon veya yoga yaparak iç huzuru bulun. Hayallerinizi somut hedeflere dönüştürmek için adım adım ilerleyin.",
-                        "Satürn-Neptün-180": "Öneri: Gerçekçilik ve idealizm arasındaki dengeyi bulmak için birbirinizi anlamaya çalışın. Birinizin güçlü olduğu alanlarda diğerine destek olun. Hayal kırıklıklarını birlikte aşmak için şefkatli iletişim kurun.",
-                        "Satürn-Plüton-0": "Öneri: Güç ve kontrol enerjinizi birleştirmek için ortak bir misyon belirleyin. Birlikte derin bir dönüşüm pratiği yapın. Eski kalıpları kırmak için cesur adımlar atın ama destek sistemini de koruyun.",
-                        "Satürn-Plüton-60": "Öneri: Disiplini güçlendirerek derin değişimler yaratın. Birlikte zorlu projeleri tamamlama konusunda birbirinize destek olun. Kontrolü bırakarak güvenli bir dönüşüm alanı yaratın.",
-                        "Satürn-Plüton-90": "Öneri: Kontrol ve güç mücadelelerini çözmek için bireysel güç kaynaklarınızı keşfedin. Birbirinize karşı manipüle etmeden açık iletişim kurun. Güç dengesizliklerini kabul ederek ortak bir çözüm bulun.",
-                        "Satürn-Plüton-120": "Öneri: Yapı ve dönüşüm enerjinizi birleştirerek güçlü bir ortaklık kurun. Birlikte uzun vadeli bir değişim planı yapın. Güçlü yanlarınızı birleştirerek ortak hedeflere ulaşın.",
-                        "Satürn-Plüton-180": "Öneri: Kontrol ve güç arasındaki dengeyi bulmak için bireysel gölgelerinizi kabul edin. Birbirinizin güç kaynaklarını tanıyarak saygı gösterin. Güç mücadelelerini yapıcı diyaloğa dönüştürmek için çaba gösterin.",
-                        "Satürn-KAD-0": "Öneri: Disiplininiz ve kadersel yolunuz birleşirken sorumluluklarınızı netleştirin. Birlikte gelecek planları yaparak somut hedefler belirleyin. Eski alışkanlıkları bırakarak yeni bir yaşam tarzı oluşturun.",
-                        "Satürn-KAD-60": "Öneri: Yapınızı kadersel yönünüzle harmanlayarak anlamlı bir yolculuk başlatın. Birlikte bir mentorluk programına katılın. Sorumluluklarınızı yerine getirerek ruhsal gelişiminizi destekleyin.",
-                        "Satürn-KAD-90": "Öneri: Korkularınız ve kadersel yolunuz arasındaki baskisi çözmek için cesaret toplayın. Birlikte zorlu deneyimlerden dersler çıkarın. Eski kalıpları kırmak için bireysel çalışma yapın.",
-                        "Satürn-KAD-120": "Öneri: Disiplininiz ve kadersel yönünüz uyum içinde ilerlerken birlikte projeler geliştirin. Sorumluluklarınızı yerine getirerek ruhsal hedeflerinize ulaşın. Destekleyici bir ortam yaratın.",
-                        "Satürn-KAD-180": "Öneri: Güvenlik ihtiyacınız ve kadersel yolunuz arasındaki dengeyi bulun. Birbirinizin farklı yollarını anlayarak destek olun. Korkularınızı aşarak cesur adımlar atın.",
-                        "Satürn-Chiron-0": "Öneri: Disiplininiz ve yaralarınız birleşirken şifa sürecinizi yapılandırın. Birlikte bireysel terapiye katılın. Eski yaraları kabul ederek yeni bir başlangıç yapın.",
-                        "Satürn-Chiron-60": "Öneri: Yapınızı şifa enerjisiyle harmanlayarak iyileşme süreçleri başlatın. Birlikte şifa pratiği yapın. Yaralarınızı kabul ederek başkalarına da yardım edin.",
-                        "Satürn-Chiron-90": "Öneri: Korku ve acı arasındaki baskisi çözmek için şefkatli iletişim kurun. Birbirinize karşı sabırlı olun. Eski yaraları iyileştirmek için profesyonel destek alın.",
-                        "Satürn-Chiron-120": "Öneri: Disiplininiz ve şifa enerjiniz uyum içinde çalışırken birlikte derin bir iyileşme pratiği yapın. Yaralarınızı kabul ederek güçlü bir şifacı olun. Destekleyici bir ortam yaratın.",
-                        "Satürn-Chiron-180": "Öneri: Kontrol ihtiyacı ve acı arasındaki dengeyi bulmak için bireysel çalışmalara katılın. Birbirinizin yaralarını anlayarak şefkat gösterin. Güçlü ve kırılgan yanlarınızı birlikte kucaklayın.",
-                        "Uranüs-Uranüs-0": "Öneri: Özgürlük ve yenilik enerjinizi birleştirmek için birlikte devrimci projeler başlatın. Değişimi kucaklayarak sınırları zorlayın. Birbirinize destek olarak yaratıcılığınızı besleyin.",
-                        "Uranüs-Uranüs-60": "Öneri: Yenilikçiliğinizi birleştirerek yaratıcı çözümler üretin. Birlikte teknoloji veya sanat projeleri geliştirin. Özgünlüğünüzü destekleyerek ortak değerler oluşturun.",
-                        "Uranüs-Uranüs-90": "Öneri: Özgürlük ve bağımsızlık arasındaki baskisi çözmek içinadet alan sınırlarını netleştirin. Birbirinize karşı şeffaf olun. Değişimi desteklerken ortak bir vizyon oluşturun.",
-                        "Uranüs-Uranüs-120": "Öneri: Yenilik enerjiniz uyum içinde çalışırken birlikte gelecek planları yapın. Değişimi destekleyerek yaratıcı projeler geliştirin. Birbirinize ilham vererek büyümeye devam edin.",
-                        "Uranüs-Uranüs-180": "Öneri: Farklı yenilikçi yaklaşımlarınızı dengelemek için açık iletişim kurun. Birbirinizin özgünlüğünü kabul ederek ortak bir yol bulun. Bağımsızlık ve bağlantı arasındaki dengeyi test edin.",
-                        "Uranüs-Neptün-0": "Öneri: Devrim ve sezgi enerjinizi birleştirmek için yaratıcı projeler başlatın. Birlikte meditasyon veya sanat pratiği yapın. Değişimi manevi bir perspektiften kucaklayın.",
-                        "Uranüs-Neptün-60": "Öneri: Yenilikçiliğinizi sezgiyle harmanlayarak ilham verici projeler geliştirin. Birlikte bilinç genişletme aktivitelerine katılın. Değişimi sezgisel olarak yönlendirin.",
-                        "Uranüs-Neptün-90": "Öneri: Devrim ve hayalperestlik arasındaki baskisi çözmek için net sınırlar koyun. Birbirinize karşı gerçekçi olun. Değişimi somut adımlara dönüştürmek için plan yapın.",
-                        "Uranüs-Neptün-120": "Öneri: Yenilik ve maneviyat enerjiniz uyum içinde çalışırken birlikte derin bir keşif yolculuğuna çıkın. Değişimi sezgisel olarak yönlendirin. Birbirinize ilham vererek yaratıcılığınızı besleyin.",
-                        "Uranüs-Neptün-180": "Öneri: Devrim ve idealizm arasındaki dengeyi bulmak için bireysel vizyonlarınızı paylaşın. Birbirinizin farklılıklarını anlayarak ortak bir yol bulun. Özgürlük ve maneviyat arasındaki dengeyi test edin.",
-                        "Uranüs-Plüton-0": "Öneri: Devrim ve dönüşüm enerjinizi birleştirmek için güçlü bir ortaklık kurun. Birlikte toplumsal değişim projeleri başlatın. Eski sistemleri kırmak için cesur adımlar atın.",
-                        "Uranüs-Plüton-60": "Öneri: Yenilikçiliğinizi güçlendirerek derin değişimler yaratın. Birlikte yenilikçi projeleri tamamlama konusunda birbirinize destek olun. Değişimi destekleyerek toplumsal etki yaratın.",
-                        "Uranüs-Plüton-90": "Öneri: Devrim ve güç arasındaki baskisi çözmek için bireysel güç kaynaklarınızı keşfedin. Birbirinize karşı manipüle etmeden açık iletişim kurun. Güç dengesizliklerini kabul ederek ortak bir çözüm bulun.",
-                        "Uranüs-Plüton-120": "Öneri: Yenilik ve dönüşüm enerjiniz uyum içinde çalışırken birlikte güçlü projeler geliştirin. Değişimi destekleyerek toplumsal etki yaratın. Birbirinize ilham vererek büyümeye devam edin.",
-                        "Uranüs-Plüton-180": "Öneri: Devrim ve güç arasındaki dengeyi bulmak için bireysel gölgelerinizi kabul edin. Birbirinizin güç kaynaklarını tanıyarak saygı gösterin. Güç mücadelelerini yapıcı diyaloğa dönüştürmek için çaba gösterin.",
-                        "Uranüs-KAD-0": "Öneri: Özgürlük ve kadersel yolunuz birleşirken yenilikçi adımlar atın. Birlikte gelecek planları yaparak cesur hedefler belirleyin. Eski kalıpları bırakarak yeni bir yaşam tarzı oluşturun.",
-                        "Uranüs-KAD-60": "Öneri: Yenilikçiliğinizi kadersel yönünüzle harmanlayarak anlamlı bir yolculuk başlatın. Birlikte yenilikçi projeler geliştirin. Değişimi destekleyerek ruhsal gelişiminizi hızlandırın.",
-                        "Uranüs-KAD-90": "Öneri: Özgürlük ve kadersel yönünüz arasındaki baskisi çözmek için cesaret toplayın. Birlikte zorlu deneyimlerden dersler çıkarın. Eski kalıpları kırmak için bireysel çalışma yapın.",
-                        "Uranüs-KAD-120": "Öneri: Yenilik ve kadersel yönünüz uyum içinde ilerlerken birlikte projeler geliştirin. Değişimi destekleyerek ruhsal hedeflerinize ulaşın. Destekleyici bir ortam yaratın.",
-                        "Uranüs-KAD-180": "Öneri: Özgürlük ve kadersel yolunuz arasındaki dengeyi bulun. Birbirinizin farklı yollarını anlayarak destek olun. Korkularınızı aşarak cesur adımlar atın.",
-                        "Uranüs-Chiron-0": "Öneri: Yenilik ve şifa enerjiniz birleşirken yaratıcı iyileşme süreçleri başlatın. Birlikte yenilikçi terapi yöntemleri deneyin. Eski yaraları kabul ederek yeni bir başlangıç yapın.",
-                        "Uranüs-Chiron-60": "Öneri: Yenilikçiliğinizi şifa enerjisiyle harmanlayarak yaratıcı projeler geliştirin. Birlikte şifa pratiği yapın. Yaralarınızı kabul ederek başkalarına da yardım edin.",
-                        "Uranüs-Chiron-90": "Öneri: Özgürlük ve acı arasındaki baskisi çözmek için şefkatli iletişim kurun. Birbirinize karşı sabırlı olun. Eski yaraları iyileştirmek için yenilikçi yöntemler deneyin.",
-                        "Uranüs-Chiron-120": "Öneri: Yenilik ve şifa enerjiniz uyum içinde çalışırken birlikte derin bir iyileşme pratiği yapın. Yaralarınızı kabul ederek güçlü bir şifacı olun. Destekleyici bir ortam yaratın.",
-                        "Uranüs-Chiron-180": "Öneri: Özgürlük ve acı arasındaki dengeyi bulmak için bireysel çalışmalara katılın. Birbirinizin yaralarını anlayarak şefkat gösterin. Güçlü ve kırılgan yanlarınızı birlikte kucaklayın.",
-                        "Neptün-Neptün-0": "Öneri: Sezgi ve maneviyat enerjinizi birleştirmek için birlikte derin bir meditasyon pratiğine başlayın. Birbirinize ilham vererek yaratıcılığınızı besleyin. Hayallerinizi paylaşarak ortak bir vizyon oluşturun.",
-                        "Neptün-Neptün-60": "Öneri: Sezgilerinizi birleştirerek yaratıcı projeler geliştirin. Birlikte sanatsal aktivitelere katılın. Manevi pratiğinizi birlikte derinleştirin.",
-                        "Neptün-Neptün-90": "Öneri: Hayalperestlik ve gerçekçilik arasındaki baskisi çözmek için net sınırlar koyun. Birbirinize karşı şeffaf olun. Hayallerinizi somut adımlara dönüştürmek için plan yapın.",
-                        "Neptün-Neptün-120": "Öneri: Sezgi ve maneviyat enerjiniz uyum içinde çalışırken birlikte derin bir ruhsal yolculuğa çıkın. Birbirinize ilham vererek yaratıcılığınızı besleyin. Hayallerinizi paylaşarak ortak bir vizyon oluşturun.",
-                        "Neptün-Neptün-180": "Öneri: Farklı manevi yaklaşımlarınızı dengelemek için açık iletişim kurun. Birbirinizin sezgisel dilini anlayarak ortak bir yol bulun. Hayalperestlik ve gerçekçilik arasındaki dengeyi test edin.",
-                        "Neptün-Plüton-0": "Öneri: Sezgi ve dönüşüm enerjinizi birleştirmek için derin bir ruhsal çalışma başlatın. Birlikte bilinç genişletme aktivitelerine katılın. Manevi güçlerinizi birleştirerek derin bir etki yaratın.",
-                        "Neptün-Plüton-60": "Öneri: Sezgilerinizi güçlendirerek derin değişimler yaratın. Birlikte manevi projeleri tamamlama konusunda birbirinize destek olun. Değişimi sezgisel olarak yönlendirin.",
-                        "Neptün-Plüton-90": "Öneri: Sezgi ve güç arasındaki baskisi çözmek için bireysel güç kaynaklarınızı keşfedin. Birbirinize karşı manipüle etmeden açık iletişim kurun. Manevi güç dengesizliklerini kabul ederek ortak bir çözüm bulun.",
-                        "Neptün-Plüton-120": "Öneri: Sezgi ve dönüşüm enerjiniz uyum içinde çalışırken birlikte güçlü projeler geliştirin. Değişimi sezgisel olarak yönlendirin. Birbirinize ilham vererek ruhsal gelişiminizi derinleştirin.",
-                        "Neptün-Plüton-180": "Öneri: Sezgi ve güç arasındaki dengeyi bulmak için bireysel gölgelerinizi kabul edin. Birbirinizin manevi güçlerini tanıyarak saygı gösterin. Manevi güç mücadelelerini yapıcı diyaloğa dönüştürmek için çaba gösterin.",
-                        "Neptün-KAD-0": "Öneri: Sezgi ve kadersel yolunuz birleşirken manevi rehberliğinizi netleştirin. Birlikte meditasyon veya dua pratiği yapın. Eski kalıpları bırakarak yeni bir ruhsal yolculuk başlatın.",
-                        "Neptün-KAD-60": "Öneri: Sezgilerinizi kadersel yönünüzle harmanlayarak anlamlı bir yolculuk başlatın. Birlikte manevi projeler geliştirin. Değişimi sezgisel olarak destekleyerek ruhsal gelişiminizi hızlandırın.",
-                        "Neptün-KAD-90": "Öneri: Sezgi ve kadersel yönünüz arasındaki baskisi çözmek için cesaret toplayın. Birlikte zorlu deneyimlerden dersler çıkarın. Eski kalıpları kırmak için bireysel çalışma yapın.",
-                        "Neptün-KAD-120": "Öneri: Sezgi ve kadersel yönünüz uyum içinde ilerlerken birlikte projeler geliştirin. Değişimi sezgisel olarak destekleyerek ruhsal hedeflerinize ulaşın. Destekleyici bir ortam yaratın.",
-                        "Neptün-KAD-180": "Öneri: Sezgi ve kadersel yolunuz arasındaki dengeyi bulun. Birbirinizin farklı yollarını anlayarak destek olun. Korkularınızı aşarak sezgisel rehberliğinize güvenin.",
-                        "Neptün-Chiron-0": "Öneri: Sezgi ve şifa enerjiniz birleşirken manevi iyileşme süreçleri başlatın. Birlikte meditasyon veya enerji iyileşmesi pratiği yapın. Eski yaraları kabul ederek yeni bir başlangıç yapın.",
-                        "Neptün-Chiron-60": "Öneri: Sezgilerinizi şifa enerjisiyle harmanlayarak yaratıcı projeler geliştirin. Birlikte şifa pratiği yapın. Yaralarınızı kabul ederek başkalarına da yardım edin.",
-                        "Neptün-Chiron-90": "Öneri: Sezgi ve acı arasındaki baskisi çözmek için şefkatli iletişim kurun. Birbirinize karşı sabırlı olun. Eski yaraları iyileştirmek için manevi yöntemler deneyin.",
-                        "Neptün-Chiron-120": "Öneri: Sezgi ve şifa enerjiniz uyum içinde çalışırken birlikte derin bir iyileşme pratiği yapın. Yaralarınızı kabul ederek güçlü bir şifacı olun. Destekleyici bir ortam yaratın.",
-                        "Neptün-Chiron-180": "Öneri: Sezgi ve acı arasındaki dengeyi bulmak için bireysel çalışmalara katılın. Birbirinizin yaralarını anlayarak şefkat gösterin. Güçlü ve kırılgan yanlarınızı birlikte kucaklayın.",
-                        "Plüton-Plüton-0": "Öneri: Dönüşüm ve güç enerjinizi birleştirmek için güçlü bir ortaklık kurun. Birlikte derin bir değişim pratiği yapın. Eski güç yapılarını kırmak için cesur adımlar atın.",
-                        "Plüton-Plüton-60": "Öneri: Dönüşüm enerjinizi birleştirerek derin değişimler yaratın. Birlikte güçlü projeleri tamamlama konusunda birbirinize destek olun. Değişimi destekleyerek derin bir etki yaratın.",
-                        "Plüton-Plüton-90": "Öneri: Güç ve kontrol arasındaki baskisi çözmek için bireysel güç kaynaklarınızı keşfedin. Birbirinize karşı manipüle etmeden açık iletişim kurun. Güç dengesizliklerini kabul ederek ortak bir çözüm bulun.",
-                        "Plüton-Plüton-120": "Öneri: Dönüşüm ve güç enerjiniz uyum içinde çalışırken birlikte güçlü projeler geliştirin. Değişimi destekleyerek derin bir etki yaratın. Birbirinize ilham vererek ruhsal gelişiminizi derinleştirin.",
-                        "Plüton-Plüton-180": "Öneri: Farklı güç yaklaşımlarınızı dengelemek için açık iletişim kurun. Birbirinizin güç kaynaklarını tanıyarak saygı gösterin. Güç mücadelelerini yapıcı diyaloğa dönüştürmek için çaba gösterin.",
-                        "Plüton-KAD-0": "Öneri: Dönüşüm ve kadersel yolunuz birleşirken derin bir değişim başlatın. Birlikte gelecek planları yaparak güçlü hedefler belirleyin. Eski kalıpları bırakarak yeni bir yaşam tarzı oluşturun.",
-                        "Plüton-KAD-60": "Öneri: Dönüşüm enerjinizi kadersel yönünüzle harmanlayarak anlamlı bir yolculuk başlatın. Birlikte güçlü projeler geliştirin. Değişimi destekleyerek ruhsal gelişiminizi hızlandırın.",
-                        "Plüton-KAD-90": "Öneri: Dönüşüm ve kadersel yönünüz arasındaki baskisi çözmek için cesaret toplayın. Birlikte zorlu deneyimlerden dersler çıkarın. Eski kalıpları kırmak için bireysel çalışma yapın.",
-                        "Plüton-KAD-120": "Öneri: Dönüşüm ve kadersel yönünüz uyum içinde ilerlerken birlikte projeler geliştirin. Değişimi destekleyerek ruhsal hedeflerinize ulaşın. Destekleyici bir ortam yaratın.",
-                        "Plüton-KAD-180": "Öneri: Dönüşüm ve kadersel yolunuz arasındaki dengeyi bulun. Birbirinizin farklı yollarını anlayarak destek olun. Korkularınızı aşarak cesur adımlar atın.",
-                        "Plüton-Chiron-0": "Öneri: Dönüşüm ve şifa enerjiniz birleşirken derin iyileşme süreçleri başlatın. Birlikte derin terapi seansları yapın. Eski yaraları kabul ederek yeni bir başlangıç yapın.",
-                        "Plüton-Chiron-60": "Öneri: Dönüşüm enerjinizi şifa enerjisiyle harmanlayarak yaratıcı projeler geliştirin. Birlikte şifa pratiği yapın. Yaralarınızı kabul ederek başkalarına da yardım edin.",
-                        "Plüton-Chiron-90": "Öneri: Dönüşüm ve acı arasındaki baskisi çözmek için şefkatli iletişim kurun. Birbirinize karşı sabırlı olun. Eski yaraları iyileştirmek için derin çalışmalar yapın.",
-                        "Plüton-Chiron-120": "Öneri: Dönüşüm ve şifa enerjiniz uyum içinde çalışırken birlikte derin bir iyileşme pratiği yapın. Yaralarınızı kabul ederek güçlü bir şifacı olun. Destekleyici bir ortam yaratın.",
-                        "Plüton-Chiron-180": "Öneri: Dönüşüm ve acı arasındaki dengeyi bulmak için bireysel çalışmalara katılın. Birbirinizin yaralarını anlayarak şefkat gösterin. Güçlü ve kırılgan yanlarınızı birlikte kucaklayın.",
-                        "KAD-Chiron-0": "Öneri: Kadersel yolunuz ve şifa enerjiniz birleşirken yaralarınızı şifaya dönüştürmek için çalışın. Birlikte derin bir şifa pratiği başlatın. Eski yaraları kabul ederek yeni bir başlangıç yapın.",
-                        "KAD-Chiron-60": "Öneri: Kadersel yönünüzü şifa enerjisiyle harmanlayarak yaratıcı projeler geliştirin. Birlikte şifa pratiği yapın. Yaralarınızı kabul ederek başkalarına da yardım edin.",
-                        "KAD-Chiron-90": "Öneri: Kadersel yolunuz ve acı arasındaki baskisi çözmek için şefkatli iletişim kurun. Birbirinize karşı sabırlı olun. Eski yaraları iyileştirmek için cesur adımlar atın.",
-                        "KAD-Chiron-120": "Öneri: Kadersel yönünüz ve şifa enerjiniz uyum içinde çalışırken birlikte derin bir iyileşme pratiği yapın. Yaralarınızı kabul ederek güçlü bir şifacı olun. Destekleyici bir ortam yaratın.",
-                        "KAD-Chiron-180": "Öneri: Kadersel yolunuz ve acı arasındaki dengeyi bulmak için bireysel çalışmalara katılın. Birbirinizin yaralarını anlayarak şefkat gösterin. Güçlü ve kırılgan yanlarınızı birlikte kucaklayın.",
-                        }
+                        fbst_receteler = FBST_RECETELER
 
                         r_key = f"{g1}-{g2}-{aci_deg}"
                         r_alt_key = f"{g2}-{g1}-{aci_deg}"
                         
                         if self.mod == "ebeveyn_cocuk":
-                            fbst_receteler_ebeveyn = {
-                                "Güneş-Güneş-0": "Pedagojik Protokol: Ebeveyn ve çocuk arasındaki benzer enerji titresimlarını güçlendirmek için birlikte sabah ritüelleri oluşturun. Her sabah 5 dakika boyunca birlikte niyet belirleyin ve günün hedefini konuşun. Bu ritüel, ortak vizyonunuzu ve birliktelik duygusunu güçlendirecektir.",
-                                "Güneş-Güneş-60": "Pedagojik Protokol: Benzer ama farklı yeteneklerdeki bu uyumlu enerjiyi korumak için haftada bir 'Güçlü Yan Paylaşımı' oturumu düzenleyin. Birbirinizin güçlü yönlerini yüksek sesle takdir edin ve birlikte yeni beceriler keşfedin.",
-                                "Güneş-Güneş-90": "Pedagojik Protokol: Ego çatışmalarını çözmek için şu adımları uygulayın: 1) Tartışma anında 'Dur ve Dinle' tekniğini kullanın. 2) Her iki taraf da kendi açısını yüksek sesle ifade etsin. 3) Ortak bir çözüm yolu birlikte belirlensin.",
-                                "Güneş-Güneş-120": "Pedagojik Protokol: Doğal uyumu korumak için birlikte yeni deneyimler planlayın. Ayda bir yeni bir aktivite deneyin ve bu deneyim sırasında birbirinizin rehberliğine güvenme pratiği yapın.",
-                                "Güneş-Güneş-180": "Pedagojik Protokol: Zıtlıkları dengelemek için ayna pratiği yapın: karşılıklı oturun ve birbirinizin güçlü ve zayıf yönlerini yüksek sesle kabul edin. Ardından bu zıtlıkların sizi nasıl tamamladığını tartışın.",
-                                "Güneş-Ay-0": "Pedagojik Protokol: Ebeveynin bilinçli enerjisi ile çocuğun duygusal derinliğinin uyumu için birlikte ay döngüsü takibi yapın. Her yeni ayda ortak niyetler belirleyin ve duygusal ihtiyaçlarınızı paylaşın.",
-                                "Güneş-Ay-60": "Pedagojik Protokol: Işık ve duygusallığın uyumunu korumak için akşam rutinleri oluşturun. Her akşam birlikte çay içerek günün duygusal iniş çıkışlarını paylaşın ve birbirinizi dinleyin.",
-                                "Güneş-Ay-90": "Pedagojik Protokol: Ego ile duygusal hassasiyet arasındaki baskisi çözmek için: 1) Duygusal tetiklenme anında 'Durdur ve Hisset' tekniğini kullanın. 2) Birbirinizin duygusal dilini öğrenin. 3) Ortak bir şifa ritüeli oluşturun.",
-                                "Güneş-Ay-120": "Pedagojik Protokol: Doğal besleyici uyumu korumak için birlikte yemek pişirme ritüeli oluşturun. Pişirirken birbirinizin duygusal ihtiyaçlarını konuşun.",
-                                "Güneş-Ay-180": "Pedagojik Protokol: Dışa dönüklük ile içe dönüklük arasındaki dengeyi bulmak için 'Değişim Günü' pratiği yapın: bir gün aktif, ertesi gün sakin aktiviteler yapın.",
-                                "Güneş-Merkür-0": "Pedagojik Protokol: Güç ve iletişimin kavuştuğu bu noktada, birlikte bilinçli iletişim pratiği yapın. Her sabah günün niyetini yüksek sesle paylaşın.",
-                                "Güneş-Merkür-60": "Pedagojik Protokol: Işık ve zeka uyumunu korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin. Birbirinize bu hafta öğrendiğiniz yeni bir şeyi anlatın.",
-                                "Güneş-Merkür-90": "Pedagojik Protokol: İletişim baskisini çözmek için: 1) 'Dinleme Molası' verin: her konuştuğunuzda 3 saniye durup sözünü bitirmesini bekleyin. 2) Düşüncelerinizi yazarak paylaşın. 3) Birlikte sesli kitap okuyun.",
-                                "Güneş-Merkür-120": "Pedagojik Protokol: Doğal iletişim akışını korumak için birlikte okuma saati düzenleyin. Aynı kitabı okuyup ardından düşüncelerinizi paylaşın.",
-                                "Güneş-Venüs-0": "Pedagojik Protokol: Güç ve sevginin buluştuğu bu noktada, birlikte sevgi ritüelleri oluşturun. Her sabah birbirinize sevgi dolu bir mesaj yazın.",
-                                "Güneş-Venüs-60": "Pedagojik Protokol: Işık ve zarafet uyumunu korumak için haftada bir 'Güzellik Günü' düzenleyin. Birlikte doğa yürüyüşü yapın veya sanatsal bir aktivite planlayın.",
-                                "Güneş-Venüs-90": "Pedagojik Protokol: Enerji ile sevgi arasındaki baskisi çözmek için: 1) Çatışma anında 'Sevgi Nefesi' tekniğini kullanın. 2) Birbirinizin sevgi dilini öğrenin. 3) Ortak bir şifa sanatı pratiği yapın.",
-                                "Güneş-Venüs-120": "Pedagojik Protokol: Doğal sevgi akışını korumak için birlikte romantik ritüeller oluşturun. Ayda bir yeni deneyim planlayın ve minnettarlığınızı ifade edin.",
-                                "Güneş-Mars-0": "Pedagojik Protokol: Güç ve eylemin kavuştuğu bu noktada, birlikte fiziksel aktivite ritüelleri oluşturun. Her hafta birlikte yeni bir spor deneyin.",
-                                "Güneş-Mars-60": "Pedagojik Protokol: Işık ve cesaret uyumunu korumak için haftada bir 'Maceracı Gün' planlayın. Birlikte yeni bir yer keşfedin.",
-                                "Güneş-Mars-90": "Pedagojik Protokol: Ego ile saldırganlık arasındaki baskisi çözmek için: 1) Öfke anında derin nefes egzersizi yapın. 2) Fiziksel egzersiz birlikte yaparak enerjiyi yapıcıya dönüştürün. 3) Ortak bir hedef belirleyin.",
-                                "Güneş-Mars-120": "Pedagojik Protokol: Doğal eylem akışını korumak için birlikte aktif meditasyon pratiği yapın. Yoga veya dans meditasyonu ile enerjinizi dengeleyin.",
-                                "Güneş-Jüpiter-0": "Pedagojik Protokol: Güç ve genişlemenin kavuştuğu bu noktada, birlikte büyüme ritüelleri oluşturun. Her sabah şükran journal'ı tutun.",
-                                "Güneş-Jüpiter-60": "Pedagojik Protokol: Işık ve bolluk uyumunu korumak için haftada bir 'Bereket Paylaşımı' oturumu düzenleyin.",
-                                "Güneş-Jüpiter-90": "Pedagojik Protokol: Bireysel güç ile aşırı genişleme arasındaki baskisi çözmek için: 1) Gerçekçi hedefler belirleyin. 2) Fazla iyimserlik anında değerlendirme yapın. 3) Sosyal sorumluluk projelerine katılın.",
-                                "Güneş-Jüpiter-120": "Pedagojik Protokol: Doğal bolluk akışını korumak için birlikte bolluk meditasyonu yapın.",
-                                "Güneş-Satürn-0": "Pedagojik Protokol: Güç ve disiplinin kavuştuğu bu noktada, birlikte yapı ve sorumluluk ritüelleri oluşturun. Haftalık planlama oturumu düzenleyin.",
-                                "Güneş-Satürn-60": "Pedagojik Protokol: Işık ve disiplin uyumunu korumak için haftada bir 'Yapı ve Planlama' oturumu yapın.",
-                                "Güneş-Satürn-90": "Pedagojik Protokol: Bireysel güç ile sınırlayıcı enerji arasındaki baskisi çözmek için: 1) Mindfulness pratiği yapın. 2) Sorumlulukları adil paylaşın. 3) Uzun vadeli proje oluşturun.",
-                                "Güneş-Satürn-120": "Pedagojik Protokol: Doğal disiplin akışını korumak için birlikte uzun vadeli bir plan oluşturun.",
-                                "Güneş-Uranüs-0": "Pedagojik Protokol: Güç ve devrimin kavuştuğu bu noktada, birlikte yenilik ritüelleri oluşturun. Her ay yeni bir şey deneyin.",
-                                "Güneş-Uranüs-60": "Pedagojik Protokol: Işık ve yenilikçilik uyumunu korumak için haftada bir 'Yenilikçi Buluşma' düzenleyin.",
-                                "Güneş-Uranüs-90": "Pedagojik Protokol: Bireysel güç ile ani değişim arasındaki baskisi çözmek için: 1) Ani kararlar almadan önce 24 saat bekleyin. 2) Bağımsızlığa saygı gösterin. 3) Ortak bir vizyon oluşturun.",
-                                "Güneş-Neptün-0": "Pedagojik Protokol: Güç ve maneviyatın kavuştuğu bu noktada, birlikte manevi ritüeller oluşturun. Meditasyon veya dua pratiği yapın.",
-                                "Güneş-Neptün-60": "Pedagojik Protokol: Işık ve maneviyat uyumunu korumak için haftada bir 'Manevi Paylaşım' oturumu düzenleyin.",
-                                "Güneş-Neptün-90": "Pedagojik Protokol: Net güç ile bulanık enerji arasındaki baskisi çözmek için: 1) Rüya günlüğü tutun. 2) Manevi pratiğinizi somutlaştırın. 3) Gönüllülük yapın.",
-                                "Güneş-Plüton-0": "Pedagojik Protokol: Güç ve transformasyonun kavuştuğu bu noktada, birlikte derin dönüşüm ritüelleri oluşturun.",
-                                "Güneş-Plüton-60": "Pedagojik Protokol: Işık ve derin dönüşüm uyumunu korumak için haftada bir 'Dönüşüm Paylaşımı' oturumu düzenleyin.",
-                                "Güneş-Plüton-90": "Pedagojik Protokol: Ego ile güç mücadelesi arasındaki baskisi çözmek için: 1) Güç mücadelelerini fark edin. 2) Gölgeleri kabul edin. 3) Ortak dönüşüm pratiği yapın.",
-                                "Güneş-KAD-0": "Pedagojik Protokol: Güç ve kadersel misyonun kavuştuğu bu noktada, birlikte kadersel niyetler belirleyin.",
-                                "Güneş-KAD-60": "Pedagojik Protokol: Işık ve kadersel akış uyumunu korumak için haftada bir 'Kader Paylaşımı' oturumu düzenleyin.",
-                                "Güneş-KAD-90": "Pedagojik Protokol: Bireysel güç ile kadersel zorluklar arasındaki baskisi çözmek için engelleri fırsat olarak yeniden çerçeveleyin.",
-                                "Güneş-Chiron-0": "Pedagojik Protokol: Güç ve şifacı yaranın kavuştuğu bu noktada, birlikte derin şifa ritüelleri oluşturun. Birlikte şifa meditasyonu yapın.",
-                                "Güneş-Chiron-60": "Pedagojik Protokol: Işık ve şifa enerjisi uyumunu korumak için haftada bir 'Şifa Paylaşımı' oturumu düzenleyin.",
-                                "Güneş-Chiron-90": "Pedagojik Protokol: Ego ile kırılganlık arasındaki baskisi çözmek için: 1) Kırılganlık anında alan tanıyın. 2) Profesyonel destek alın. 3) Şifa projeleri başlatın.",
-                                "Güneş-Chiron-120": "Pedagojik Protokol: Doğal şifa akışını korumak için birlikte doğada yürüyüş yapın ve şifa enerjisini hissedin.",
-                                "Güneş-Chiron-180": "Pedagojik Protokol: Bireysel şifa ile evrensel şifa arasındaki dengeyi bulmak için her biriniz kendi şifa yolunuzu takip edin, ardından paylaşın.",
-                                "Ay-Ay-0": "Pedagojik Protokol: Benzer duygusal titresimlar için birlikte ay döngüsü takibi yapın. Yeni ay ve dolunay ritüelleri oluşturun.",
-                                "Ay-Ay-60": "Pedagojik Protokol: Duygusal uyumu korumak için haftada bir 'Duygu Paylaşımı' oturumu düzenleyin.",
-                                "Ay-Ay-90": "Pedagojik Protokol: Duygusal hassasiyet arasındaki baskisi çözmek için: 1) Alan tanıyın. 2) İhtiyaçlarınızı açıkça ifade edin. 3) Duygusal şifa meditasyonu yapın.",
-                                "Ay-Ay-120": "Pedagojik Protokol: Doğal duygusal akışı korumak için birlikte doğa yürüyüşü yapın ve müzik dinleyin.",
-                                "Ay-Ay-180": "Pedagojik Protokol: Duygusal zıtlıkları dengelemek için ayna meditasyonu yapın.",
-                                "Ay-Venüs-0": "Pedagojik Protokol: Duygusal derinlik ve sevginin kavuştuğu bu noktada, birlikte sevgi ve şefkat ritüelleri oluşturun.",
-                                "Ay-Venüs-60": "Pedagojik Protokol: Yumuşaklık ve zarafet uyumunu korumak için haftada bir 'Güzellik ve Sevgi' oturumu düzenleyin.",
-                                "Ay-Venüs-90": "Pedagojik Protokol: Duygusal hassasiyet ile barışçıl doğa arasındaki baskisi çözmek için 'Sevgi Nefesi' tekniğini kullanın.",
-                                "Ay-Mars-0": "Pedagojik Protokol: Duygusal derinlik ve eylemin kavuştuğu bu noktada, birlikte fiziksel aktivite yaparak duygusal enerjinizi serbest bırakın.",
-                                "Ay-Mars-60": "Pedagojik Protokol: Yumuşaklık ve cesaret uyumunu korumak için haftada bir 'Aktif Duygusal' etkinliği planlayın.",
-                                "Ay-Mars-90": "Pedagojik Protokol: Duygusal hassasiyet ile saldırganlık arasındaki baskisi çözmek için 'Sakin Nefes' tekniğini kullanın.",
-                                "Ay-Satürn-0": "Pedagojik Protokol: Duygusal derinlik ve disiplinin kavuştuğu bu noktada, birlikte duygusal yapı ritüelleri oluşturun.",
-                                "Ay-Satürn-60": "Pedagojik Protokol: Yumuşaklık ve disiplin uyumunu korumak için haftada bir 'Duygusal Yapı' oturumu yapın.",
-                                "Ay-Satürn-90": "Pedagojik Protokol: Duygusal dalgalanmalar ile sınırlayıcı enerji arasındaki baskisi çözmek için Mindfulness pratiği yapın.",
-                                "Ay-Plüton-0": "Pedagojik Protokol: Duygusal derinlik ve transformasyonun kavuştuğu bu noktada, birlikte derin duygusal dönüşüm ritüelleri oluşturun.",
-                                "Ay-Plüton-60": "Pedagojik Protokol: Yumuşaklık ve derin dönüşüm uyumunu korumak için haftada bir 'Duygusal Dönüşüm Paylaşımı' düzenleyin.",
-                                "Ay-Plüton-90": "Pedagojik Protokol: Duygusal hassasiyet ile güç mücadelesi arasındaki baskisi çözmek için gölgeleri kabul edin.",
-                                "Ay-Chiron-0": "Pedagojik Protokol: Duygusal derinlik ve şifacı yaranın kavuştuğu bu noktada, birlikte duygusal şifa ritüelleri oluşturun.",
-                                "Ay-Chiron-60": "Pedagojik Protokol: Yumuşaklık ve şifa enerjisi uyumunu korumak için haftada bir 'Duygusal Şifa Paylaşımı' düzenleyin.",
-                                "Ay-Chiron-90": "Pedagojik Protokol: Duygusal hassasiyet ile kırılganlık arasındaki baskisi çözmek için alan tanıyın ve destek olun.",
-                                "Merkür-Merkür-0": "Pedagojik Protokol: Benzer zihinsel titresimlar için birlikte iletişim ritüelleri oluşturun. Her sabah journal'a yazın.",
-                                "Merkür-Merkür-60": "Pedagojik Protokol: Zihinsel uyumu korumak için haftada bir 'Bilgi Paylaşımı' oturumu düzenleyin.",
-                                "Merkür-Merkür-90": "Pedagojik Protokol: İletişim tarzlarındaki baskisi çözmek için 'Dinleme Molası' verin.",
-                                "Merkür-Venüs-0": "Pedagojik Protokol: Zeka ve sevgi dilinin kavuştuğu bu noktada, birlikte sevgi dolu iletişim ritüelleri oluşturun.",
-                                "Merkür-Venüs-60": "Pedagojik Protokol: Zeka ve zarafet uyumunu korumak için haftada bir 'Güzel İletişim' oturumu düzenleyin.",
-                                "Merkür-Venüs-90": "Pedagojik Protokol: Rasyonellik ile duygusallık arasındaki baskisi çözmek için hem mantıksal hem duygusal perspektifleri birleştirin.",
-                                "Merkür-Mars-0": "Pedagojik Protokol: Zeka ve eylemin kavuştuğu bu noktada, birlikte tartışmalı ve aktif iletişim ritüelleri oluşturun.",
-                                "Merkür-Mars-60": "Pedagojik Protokol: Zeka ve cesaret uyumunu korumak için haftada bir 'Aktif Zihin' etkinliği planlayın.",
-                                "Merkür-Mars-90": "Pedagojik Protokol: İletişim hızı ile saldırganlık arasındaki baskisi çözmek için 'Durdur ve Düşün' tekniğini kullanın.",
-                                "Merkür-Satürn-0": "Pedagojik Protokol: Zeka ve disiplinin kavuştuğu bu noktada, birlikte yapı ve öğrenme ritüelleri oluşturun.",
-                                "Merkür-Satürn-60": "Pedagojik Protokol: Zeka ve disiplin uyumunu korumak için haftada bir 'Zihinsel Yapı' oturumu yapın.",
-                                "Merkür-Satürn-90": "Pedagojik Protokol: Hız ile sınırlayıcı enerji arasındaki baskisi çözmek için Mindfulness pratiği yapın.",
-                                "Venüs-Venüs-0": "Pedagojik Protokol: Benzer sevgi dilleri için birlikte test yapın ve minnettarlık günlüğü tutun.",
-                                "Venüs-Venüs-60": "Pedagojik Protokol: Uyumlu enerjinizi sanatsal projelere yönlendirin. Birlikte resim veya müzik aktivitesi planlayın.",
-                                "Venüs-Venüs-90": "Pedagojik Protokol: Değer çatışmalarını dialogla aşın. Para ve sevgi hakkındaki inançlarınızı birlikte yazın.",
-                                "Venüs-Mars-0": "Pedagojik Protokol: Tutku ve şefkati birleştirin. Fiziksel yakınlığı duygusal bağla harmanlayan ritüeller geliştirin.",
-                                "Venüs-Mars-60": "Pedagojik Protokol: Yaratıcı enerjinizi birlikte kanalize edin. Ortak bir sanat projesi başlatın.",
-                                "Venüs-Mars-90": "Pedagojik Protokol: Tutkuyu fiziksel aktivitelere yönlendirin. Spor veya dans ile baskisi boşaltın.",
-                                "Venüs-Jüpiter-0": "Pedagojik Protokol: Bolluk ve sevgiyi birlikte genişletin. Birlikte hayal kurun ve büyük planlar yapın.",
-                                "Venüs-Jüpiter-60": "Pedagojik Protokol: Sevginizi felsefi bir boyutla derinleştirin. Birlikte kitap okuyun ve tartışın.",
-                                "Venüs-Satürn-0": "Pedagojik Protokol: Sevgiye yapı ve sorumluluk katın. Net sınırlar belirleyin.",
-                                "Venüs-Satürn-60": "Pedagojik Protokol: Sevgi ve disiplini dengeleyin. Düzenli ilişki bakımı ritüelleri oluşturun.",
-                                "Mars-Mars-0": "Pedagojik Protokol: Benzer eylem enerjileri için birlikte fiziksel aktivite planları yapın.",
-                                "Mars-Mars-60": "Pedagojik Protokol: Enerji uyumunuzu korumak için birlikte outdoor aktiviteler planlayın.",
-                                "Mars-Mars-90": "Pedagojik Protokol: Enerji çatışmalarını yapıcıya dönüştürmek için rekabetçi oyunlar oynayın.",
-                                "Jüpiter-Jüpiter-0": "Pedagojik Protokol: Benzer büyüme enerjileri için birlikte öğrenme planları yapın.",
-                                "Jüpiter-Satürn-0": "Pedagojik Protokol: Genişleme ve disiplin dengesini bulmak için uzun vadeli hedefler belirleyin.",
-                                "Satürn-Satürn-0": "Pedagojik Protokol: Benzer yapı ve disiplin enerjileri için birlikte kurallar oluşturun.",
-                                "Plüton-Plüton-0": "Pedagojik Protokol: Benzer dönüşüm enerjileri için birlikte derin çalışmalar yapın.",
-                                "KAD-KAD-0": "Pedagojik Protokol: Benzer kadersel yollar için birlikte misyonunuzu keşfedin.",
-                                "Chiron-Chiron-0": "Pedagojik Protokol: Benzer şifa enerjileri için birlikte şifa pratiği yapın.",
-                            }
+                            fbst_receteler_ebeveyn = FBST_RECETELER_EBEVEYN
                             if r_key in fbst_receteler_ebeveyn:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Dersi:</b> {fbst_receteler_ebeveyn[r_key]}")
+                                receteler.append(f"<b>{_i18n.pdf_label(g1)}-{_i18n.pdf_label(g2)} {aci_info['isim']} {SM['ders']}:</b> {fbst_receteler_ebeveyn[r_key]}")
                             elif r_alt_key in fbst_receteler_ebeveyn:
-                                receteler.append(f"<b>{g2}-{g1} {aci_info['isim']} Dersi:</b> {fbst_receteler_ebeveyn[r_alt_key]}")
+                                receteler.append(f"<b>{_i18n.pdf_label(g2)}-{_i18n.pdf_label(g1)} {aci_info['isim']} {SM['ders']}:</b> {fbst_receteler_ebeveyn[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Dersi:</b> Ortak bir aktivite belirleyin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.")
+                                receteler.append(f"<b>{_i18n.pdf_label(g1)}-{_i18n.pdf_label(g2)} {aci_info['isim']} {SM['ders']}:</b> {SM['aktivite']}")
                         else:
                             if r_key in fbst_receteler:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Şifası:</b> {fbst_receteler[r_key]}")
+                                receteler.append(f"<b>{_i18n.pdf_label(g1)}-{_i18n.pdf_label(g2)} {aci_info['isim']} {SM['sifa']}:</b> {fbst_receteler[r_key]}")
                             elif r_alt_key in fbst_receteler:
-                                receteler.append(f"<b>{g2}-{g1} {aci_info['isim']} Şifası:</b> {fbst_receteler[r_alt_key]}")
+                                receteler.append(f"<b>{_i18n.pdf_label(g2)}-{_i18n.pdf_label(g1)} {aci_info['isim']} {SM['sifa']}:</b> {fbst_receteler[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{g1}-{g2} {aci_info['isim']} Şifası:</b> Ortak bir hobi edinin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.")
+                                receteler.append(f"<b>{_i18n.pdf_label(g1)}-{_i18n.pdf_label(g2)} {aci_info['isim']} {SM['sifa']}:</b> {SM['hobi']}")
 
         if not sinastri_verileri:
-            sinastri_verileri = ["Majör bir sinastri etkileşimi saptanmadı."]
+            sinastri_verileri = [SM["bos_mesaj"]]
 
         html_cikti = """<div style="background-color: #FBF7F4; padding: 15px; border-radius: 8px; border-left: 5px solid #B8A9C9; margin-bottom: 20px;">"""
         
@@ -5409,9 +4906,11 @@ class FBST_Engine:
         html_cikti += """</div><div style="background-color: #FFF0ED; padding: 15px; border-radius: 8px; border-left: 5px solid #D4878F;">"""
         
         if self.mod == "ebeveyn_cocuk":
-            html_cikti += """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL DERSLER VE ŞİFA ÖNERİLERİ</h4>"""
+            html_cikti += ('<h4 style="color: #C47A82; margin-top: 0;">'
+                           + SM["baslik_dersler"] + "</h4>")
         else:
-            html_cikti += """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL ŞİFA REÇETELERİ</h4>"""
+            html_cikti += ('<h4 style="color: #C47A82; margin-top: 0;">'
+                           + SM["baslik_receteler"] + "</h4>")
         
         # Reçeteleri Bas
         if receteler:
@@ -5421,7 +4920,7 @@ class FBST_Engine:
                 recete_html = re.sub(r'^<br/>', '', recete_html)
                 html_cikti += f"<p style='font-size:13px; line-height:2.0; margin-bottom:14px; padding: 8px 0; border-bottom: 1px solid #E8DDD5;'>🌿 {recete_html}</p>"
         else:
-            html_cikti += "<p style='font-size:13px;'>Mevcut kadersel temaslarınız akut bir şifa reçetesi gerektirmemektedir. Doğal akışınızda kalın.</p>"
+            html_cikti += (f"<p style='font-size:13px;'>{SM['recete_yok']}</p>")
             
         html_cikti += "</div>"
         
@@ -10168,7 +9667,8 @@ class FBST_Engine:
         story.append(Spacer(1, 15))
         
         # --- YENİ SİNASTRİ VE ŞİFA REÇETELERİ ENTEGRASYONU ---
-        story.append(Paragraph("GEZEGEN ETKİLEŞİMLERİ", styles['TurkishHeading']))
+        story.append(Paragraph(_sinastri_metin.m(_aktif_dil())["baslik_planet_etkilesimleri"],
+                             styles['TurkishHeading']))
         
         # Yeni motorumuzdan tek parça HTML dönen veriyi alıyoruz
         sinastri_html = self.sinastri_hesapla(sessiz=True)
@@ -10926,11 +10426,19 @@ class FBST_Engine:
             # Sinastri istatistikleri
             sinastri_html = self.sinastri_hesapla(sessiz=True)
             import re
-            toplam_kavusum = len(re.findall(r'Kavuşum|Birleşme', sinastri_html))
-            toplam_kare = len(re.findall(r'Kare', sinastri_html))
-            toplam_3gen = len(re.findall(r'Üçgen', sinastri_html))
-            toplam_karsit = len(re.findall(r'Karşıt', sinastri_html))
-            toplam_sextil = len(re.findall(r'Sekstil', sinastri_html))
+            # Açı sayıları dile göre adlandırıldığı için Türkçe metin
+            # aranmaz; aktif dildeki açı adları üzerinden sayılır.
+            _SM_PDF = _sinastri_metin.m(_aktif_dil())
+
+            def _aci_say(aci):
+                return len(re.findall(re.escape(_SM_PDF["acilar"][aci]["isim"]),
+                                      sinastri_html))
+
+            toplam_kavusum = _aci_say(0)
+            toplam_kare = _aci_say(90)
+            toplam_3gen = _aci_say(120)
+            toplam_karsit = _aci_say(180)
+            toplam_sextil = _aci_say(60)
             toplam_aci = toplam_kavusum + toplam_kare + toplam_3gen + toplam_karsit + toplam_sextil
 
             guclu_acilar_text = []
@@ -12336,6 +11844,29 @@ st.sidebar.markdown(f"""
     <img src="data:image/png;base64,{_logo_b64}" style="width:160px; filter:drop-shadow(0 2px 8px rgba(201,169,110,0.3));" />
 </div>
 """, unsafe_allow_html=True)
+
+# --- ÇIKTI DİLİ (TR / EN / ES) ---
+# Sinastri yorumları, şifa reçeteleri ve Ashtakoot bölümü bu seçiciye göre
+# üretilir. Dil oturum düzeyinde tutulur; i18n katmanı thread-local'dir.
+_DIL_SECENEK = [("tr", "🇹🇷 Türkçe"), ("en", "🇬🇧 English"), ("es", "🇪🇸 Español")]
+_AD2KOD = {ad: kod for kod, ad in _DIL_SECENEK}
+_KODLAR = [kod for kod, _ in _DIL_SECENEK]
+_secilen_dil = _AD2KOD.get(
+    st.sidebar.selectbox(
+        "🌐 Çıktı Dili",
+        [ad for _, ad in _DIL_SECENEK],
+        index=_KODLAR.index(_aktif_dil()),
+        key="cikti_dili_kutu",
+    ), _aktif_dil())
+if _secilen_dil != _aktif_dil():
+    _dil_ayarla(_secilen_dil)
+    st.rerun()
+# Seçilen dil her koşuda oturum durumuna yazılır; böylece `cikti_dili`
+# ilk açılışta da tanımlı olur (yalnızca değişimde yazılırsa boş kalır).
+st.session_state["cikti_dili"] = _secilen_dil
+# Ashtakoot paneli dil kodunu session_state'ten okur; aynı kodla hizalanır.
+st.session_state["ashtakoot_lang"] = _secilen_dil
+_i18n.set_lang(_secilen_dil)
 
 st.sidebar.markdown("""
 <style>
