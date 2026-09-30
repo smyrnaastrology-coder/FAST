@@ -6514,62 +6514,6 @@ def env_diag():
     }
 
 
-@app_fast.get("/api/auth_diag")
-def auth_diag():
-    """Giris akisi teshisi: Render'daki GERCEK anahtarla Supabase'a canli test."""
-    import os as _os
-    import json as _json
-    import base64
-    import urllib.request as _rq
-    import urllib.error as _re
-
-    supa = (_os.getenv("SUPABASE_URL", "") or "").strip().rstrip("/")
-    key = (_os.getenv("SUPABASE_ANON_KEY", "") or "").strip()
-    out = {
-        "url_set": bool(supa),
-        "url": supa,
-        "key_set": bool(key),
-        "key_len": len(key),
-        "key_full": key,
-    }
-
-    # JWT payload'ini coz (role/ref dogruluk kontrolu)
-    try:
-        seg = key.split(".")[1]
-        seg += "=" * (-len(seg) % 4)
-        out["key_payload"] = _json.loads(base64.urlsafe_b64decode(seg).decode("utf-8"))
-    except Exception as _e:
-        out["key_payload"] = f"decode_error: {_e}"
-
-    # Canli Supabase testi
-    out["settings_status"] = "skipped"
-    if supa and key:
-        for _path, _label in (("/auth/v1/settings", "settings"),):
-            try:
-                _req = _rq.Request(
-                    f"{supa}{_path}",
-                    headers={"apikey": key, "Authorization": f"Bearer {key}"},
-                )
-                with _rq.urlopen(_req, timeout=20) as _resp:
-                    out["settings_status"] = f"{_resp.status} OK"
-                    body = _resp.read().decode("utf-8")[:400]
-                    try:
-                        _d = _json.loads(body)
-                        out["settings_keys"] = list(_d.keys())[:12]
-                    except Exception:
-                        out["settings_body"] = body
-            except _re.HTTPError as _he:
-                _b = ""
-                try:
-                    _b = _he.read().decode("utf-8")[:300]
-                except Exception:
-                    pass
-                out["settings_status"] = f"HTTP {_he.code}: {_b}"
-            except Exception as _e:
-                out["settings_status"] = f"error: {type(_e).__name__}: {_e}"
-    return out
-
-
 @app_fast.get("/api/auth/me")
 def auth_me(request: Request):
     user = _require_user(request)

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../config/api_config.dart';
 import 'revenuecat_service.dart';
 
@@ -149,21 +150,35 @@ class AuthService {
   }
 
   /// Google ile giriş (Supabase OAuth — deep link dönüşü).
-  static Future<void> signInWithGoogle() async {
-    if (!enabled) throw StateError('supabase_disabled');
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_rememberKey, true);
-    await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google,
-        redirectTo: _redirectUri);
-  }
+  static Future<void> signInWithGoogle() => _oauthLogin(OAuthProvider.google);
 
-  /// Facebook ile giriş (Supabase OAuth).
-  static Future<void> signInWithFacebook() async {
+  /// Facebook ile giriş (Supabase OAuth — deep link dönüşü).
+  static Future<void> signInWithFacebook() => _oauthLogin(OAuthProvider.facebook);
+
+  /// OAuth akışı (PKCE): yetkilendirme URL'si al → tarayıcı → deep link dönüşü.
+  static Future<void> _oauthLogin(OAuthProvider provider) async {
     if (!enabled) throw StateError('supabase_disabled');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_rememberKey, true);
-    await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.facebook,
-        redirectTo: _redirectUri);
+
+    // 1) Yetkilendirme URL'sini al (tarayıcıyı kendimiz açacağız)
+    final oauthRes = await Supabase.instance.client.auth.getOAuthSignInUrl(
+      provider: provider,
+      redirectTo: _redirectUri,
+    );
+    final authUrl = oauthRes.url;
+    if (authUrl.isEmpty) throw StateError('oauth_url_null');
+
+    // 2) Tarayıcıyı aç, deep link dönüşünü bekle
+    final callbackUrl = await FlutterWebAuth2.authenticate(
+      url: authUrl,
+      callbackUrlScheme: _callbackScheme,
+    );
+
+    // 3) Dönüş URL'inden session'ı al
+    final sessionRes = await Supabase.instance.client.auth
+        .getSessionFromUrl(Uri.parse(callbackUrl));
+    _applySession(sessionRes.session);
   }
 
   static Future<void> signOut() async {
@@ -310,7 +325,8 @@ class AuthService {
 
   static String get _redirectUri {
     // Android deep link — applicationId scheme.
-    const scheme = 'com.fastastrology.fast';
-    return '$scheme://login-callback';
+    return '$_callbackScheme://login-callback';
   }
+
+  static const _callbackScheme = 'com.fastastrology.fast';
 }
