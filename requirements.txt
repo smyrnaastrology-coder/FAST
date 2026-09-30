@@ -1,6 +1,7 @@
 # FBST Project Requirements
 # Ana uygulama
-streamlit>=1.28.0
+# st.fragment (Alternatif Evren parca tabanli akis) icin >=1.37 gerekli
+streamlit>=1.37.0
 pyswisseph>=2.10.0
 
 # Backend API

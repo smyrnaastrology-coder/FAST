@@ -4,6 +4,7 @@ import re
 import json
 import uuid
 import base64
+import unicodedata
 import numpy as np
 import random
 import matplotlib
@@ -50,10 +51,53 @@ import swisseph as swe
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 
+# Ashtakoot modulleri (36 puanlik yorum motoru, metinler, panel)
+try:
+    import ashtakoot_motoru
+    import ashtakoot_metin
+    import ashtakoot_ui
+    import ashtakoot_panel
+    import ashtakoot_pdf
+    _ASHT_KOTAMAZ = None
+except Exception as _asht_exc:                      # pragma: no cover
+    ashtakoot_motoru = ashtakoot_metin = ashtakoot_ui = ashtakoot_panel = None
+    ashtakoot_pdf = None
+    _ASHT_KOTAMAZ = str(_asht_exc)
+
+# st.fragment (Streamlit >=1.37) yoksa eski surumde experimental_fragment'a duser.
+# NOT: 'st' import edildikten SONRA tanimlanmalidir.
+_st_fragment = getattr(st, "fragment", None) or getattr(st, "experimental_fragment", None)
+
+
+def _parca(fn):
+    """Streamlit parca (fragment) dekoratoru; surum desteklemiyorsa dekoratorsuz gecer."""
+    if _st_fragment is None:
+        return fn
+    return _st_fragment(fn)
+
+
 # Logo base64 yükleme (favicon ve sidebar için)
-_logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logo.png')
-with open(_logo_path, 'rb') as _f:
-    _logo_b64 = base64.b64encode(_f.read()).decode()
+# Eksik logo uygulamayı düşürmemeli: aday dosyalar sırayla denenir, hiçbiri
+# yoksa boş string kullanılır ve sidebar logosu sessizce atlanır.
+_LOGO_ADAY = ("logo.png", "logo.jpeg", "Asartepe_Logo.jpeg",
+              "Asartepe_Logo.png", "kapak1.png", "kapak.png", "cift.png")
+def _logo_base64_yukle():
+    kok = os.path.dirname(os.path.abspath(__file__))
+    for ad in _LOGO_ADAY:
+        yol = os.path.join(kok, ad)
+        if os.path.exists(yol):
+            try:
+                with open(yol, 'rb') as f:
+                    return base64.b64encode(f.read()).decode(), yol
+            except OSError:
+                continue
+    return "", None
+
+_logo_b64, _logo_yol = _logo_base64_yukle()
+if not _logo_b64:
+    import warnings as _warnings
+    _warnings.warn(
+        f"Logo bulunamadı ({', '.join(_LOGO_ADAY)}). Sidebar logosu atlanacak.")
 
 # Mod görselleri base64 yükleme
 from PIL import Image
@@ -86,25 +130,197 @@ def _get_geolocator():
     from geopy.geocoders import Nominatim
     return Nominatim(user_agent="fbst_kadersel_navigasyon_v2", timeout=10)
 
-def sehir_bul(arama_metni):
-    """Dünyanın herhangi bir şehrini enlem/boylam olarak çözer."""
-    geo = _get_geolocator()
+
+def _metin_normalize(s):
+    """Sehir/ulke adlarini karsilastirmak icin normalize eder (diakritik duyarsiz)."""
+    s = unicodedata.normalize("NFKD", str(s or ""))
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    for a, b in (("ı", "i"), ("İ", "i"), ("ş", "s"), ("Ş", "s"),
+                 ("ğ", "g"), ("Ğ", "g"), ("ç", "c"), ("Ç", "c"),
+                 ("ö", "o"), ("Ö", "o"), ("ü", "u"), ("Ü", "u")):
+        s = s.replace(a, b)
+    s = re.sub(r"[^a-z0-9]+", " ", s.lower())
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _koord_al(koord):
+    """cities_db.json kaydinin lat/lon degerlerini guvenle dondurur."""
+    if isinstance(koord, dict) and "lat" in koord and "lon" in koord:
+        try:
+            return float(koord["lat"]), float(koord["lon"])
+        except (TypeError, ValueError):
+            return None, None
+    if isinstance(koord, (list, tuple)) and len(koord) >= 2:
+        try:
+            return float(koord[0]), float(koord[1])
+        except (TypeError, ValueError):
+            return None, None
+    return None, None
+
+
+SEHIR_DB_KAYNAKLARI = ("cities_db.json", os.path.join("render-deploy", "core", "cities_db.json"))
+
+# Yerel DB'de bulunmayan ama ULKE_SEHIR_DB'de sunulan sehirler: (norm_ulke, norm_sehir) -> (lat, lon)
+SEHIR_TAMAMLAYICI = {
+    ("ispanya", "barcelona"): (41.3874, 2.1686),
+    ("ispanya", "granada"): (37.1773, -3.5986),
+    ("ispanya", "san sebastian"): (43.3183, -1.9812),
+    ("abd", "san francisco"): (37.7749, -122.4194),
+    ("abd", "boston"): (42.3601, -71.0589),
+    ("abd", "houston"): (29.7604, -95.3698),
+    ("arjantin", "buenos aires"): (-34.6037, -58.3816),
+    ("arjantin", "cordoba"): (-31.4201, -64.1888),
+    ("almanya", "berlin"): (52.5200, 13.4050),
+    ("bulgaristan", "ruse"): (43.8564, 25.9712),
+    ("kolombiya", "cartagena"): (10.3910, -75.4794),
+    ("israil", "olu deniz"): (31.5000, 35.5000),
+    ("suudi arabistan", "riyad"): (24.7136, 46.6753),
+    ("liechtenstein", "vaduz"): (47.1410, 9.5209),
+    ("paraguay", "asuncion"): (-25.2637, -57.5759),
+}
+
+
+@st.cache_resource
+def _sehir_koordinat_indeksi():
+    """Butun yerel sehir veritabanlarini birlestirip normalize indeks kurar.
+
+    Doner: (ulke_indeksi, sehir_indeksi)
+      ulke_indeksi : norm_ulke -> {norm_sehir: (lat, lon, ulke_adi, sehir_adi)}
+      sehir_indeksi: norm_sehir -> [(norm_ulke, ulke_adi, lat, lon, sehir_adi), ...]
+    """
+    ulke_indeks, sehir_indeks = {}, {}
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    for rel in SEHIR_DB_KAYNAKLARI:
+        yol = os.path.join(script_dir, rel)
+        if not os.path.exists(yol):
+            continue
+        try:
+            with open(yol, "r", encoding="utf-8") as f:
+                db = json.load(f)
+        except Exception:
+            continue
+        if not isinstance(db, dict):
+            continue
+        for ulke, sehirler in db.items():
+            if not isinstance(sehirler, dict):
+                continue
+            cu = _metin_normalize(ulke)
+            for sehir, koord in sehirler.items():
+                lat, lon = _koord_al(koord)
+                if lat is None:
+                    continue
+                cs = _metin_normalize(sehir)
+                if not cs:
+                    continue
+                # Ayni anahtar icinde ilk kayit kazanir (bir sonraki DB doldurur)
+                ulke_indeks.setdefault(cu, {}).setdefault(cs, (lat, lon, ulke, sehir))
+                sehir_indeks.setdefault(cs, []).append((cu, ulke, lat, lon, sehir))
+    return ulke_indeks, sehir_indeks
+
+
+def _arama_parcalari(arama_metni):
+    """'Bali (Denpasar), Endonezya' gibi metni sehir/ulke aday listelerine boler."""
+    metin = str(arama_metni or "").strip()
+    if not metin:
+        return [], ""
+    parcalar = [p.strip() for p in metin.split(",")]
+    ulke = parcalar[-1] if len(parcalar) > 1 else ""
+    sehir_kismi = ", ".join(parcalar[:-1]).strip() if len(parcalar) > 1 else parcalar[0]
+    adaylar = [sehir_kismi]
+    parantez = re.findall(r"\(([^)]+)\)", sehir_kismi)
+    temel = re.sub(r"\([^)]*\)", "", sehir_kismi).strip()
+    if temel and temel != sehir_kismi:
+        adaylar.append(temel)
+    for p in parantez:
+        if p.strip() and p.strip() not in adaylar:
+            adaylar.append(p.strip())
+    if not ulke:
+        # "Bali (Denpasar)" gibi tek parca girdilerde parantez icini ulke sanma
+        ulke = ""
+    return [a for a in adaylar if a], _metin_normalize(ulke), ulke
+
+
+@st.cache_data(show_spinner=False)
+def _sehir_bul_yerel(arama_metni):
+    """Yerel cities_db.json indeksinden cozer. Ag kullanmaz."""
+    ulke_indeks, sehir_indeks = _sehir_koordinat_indeksi()
+    sehir_adaylari, cu, ulke_ham = _arama_parcalari(arama_metni)
+    if not sehir_adaylari:
+        return None
+
+    def _paket(lat, lon, ulke_adi, sehir_adi):
+        return {"lat": lat, "lon": lon, "sehir": sehir_adi or arama_metni,
+                "ulke": ulke_adi or "", "tam_ad": f"{sehir_adi}, {ulke_adi}".strip(", ")}
+
+    # 0) Elle dogrulanmis tamamlayici tablo (en hizli ve en guvenilir yol)
+    if cu:
+        for aday in sehir_adaylari:
+            kayit = SEHIR_TAMAMLAYICI.get((cu, _metin_normalize(aday)))
+            if kayit:
+                return {"lat": kayit[0], "lon": kayit[1], "sehir": aday,
+                        "ulke": ulke_ham,
+                        "tam_ad": f"{aday}, {ulke_ham}".strip(", ")}
+
+    # 1) Sehir + ulke birlikte tam eslesiyor
+    if cu and cu in ulke_indeks:
+        for aday in sehir_adaylari:
+            kayit = ulke_indeks[cu].get(_metin_normalize(aday))
+            if kayit:
+                return _paket(kayit[0], kayit[1], kayit[2], kayit[3])
+
+    # 2) Ulke adi farkli yazilmis olabilir: sehir listesinden ulkeye eslesen kaydi sec
+    for aday in sehir_adaylari:
+        cn = _metin_normalize(aday)
+        for n_ulke, ulke_adi, lat, lon, sehir_adi in sehir_indeks.get(cn, ()):
+            if cu and (n_ulke == cu or n_ulke in cu or cu in n_ulke):
+                return _paket(lat, lon, ulke_adi, sehir_adi)
+
+    # 3) Sadece sehir: tek karsilik varsa kesin, birden fazlasa ulke ipucuyla en uygun
+    if not cu:
+        for aday in sehir_adaylari:
+            karsiliklar = sehir_indeks.get(_metin_normalize(aday), ())
+            if len(karsiliklar) == 1:
+                _, ulke_adi, lat, lon, sehir_adi = karsiliklar[0]
+                return _paket(lat, lon, ulke_adi, sehir_adi)
+            for _, ulke_adi, lat, lon, sehir_adi in karsiliklar:
+                if ulke_adi == "Türkiye":
+                    return _paket(lat, lon, ulke_adi, sehir_adi)
+    return None
+
+
+@st.cache_data(show_spinner=False, ttl=86400)
+def _sehir_bul_ag(arama_metni):
+    """Nominatim ile cozer. 24 saat cache'lenir, hatalar yutulur."""
     try:
+        geo = _get_geolocator()
         konum = geo.geocode(arama_metni, language="tr", exactly_one=True)
         if konum:
-            ulke = konum.raw.get("address", {}).get("country", "")
-            sehir = konum.raw.get("address", {}).get("city",
-                     konum.raw.get("address", {}).get("town",
-                     konum.raw.get("address", {}).get("village",
-                     konum.raw.get("address", {}).get("state", ""))))
+            adres = konum.raw.get("address", {}) or {}
+            ulke = adres.get("country", "")
+            sehir = (adres.get("city") or adres.get("town") or adres.get("village")
+                     or adres.get("state") or "")
             return {
                 "lat": konum.latitude, "lon": konum.longitude,
                 "sehir": sehir or arama_metni, "ulke": ulke,
-                "tam_ad": konum.address
+                "tam_ad": konum.address,
             }
     except Exception:
         pass
     return None
+
+
+def sehir_bul(arama_metni):
+    """Dunyadaki herhangi bir sehri enlem/boylam olarak cozer.
+
+    Once yerel cities_db.json (hizli, cevrimdisi), bulunamazsa Nominatim.
+    Boylece her Streamlit rerun'unda ag istegi yapilmaz.
+    """
+    if not arama_metni:
+        return None
+    sonuc = _sehir_bul_yerel(arama_metni)
+    if sonuc:
+        return sonuc
+    return _sehir_bul_ag(arama_metni)
 
 ULKE_SEHIR_DB = {
     "Türkiye": ["Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya",
@@ -9218,6 +9434,13 @@ class FBST_Engine:
         story.append(Paragraph("© 2026 Fatih Asartepe — Bu çalışmaya ait tüm haklar saklıdır. izinsiz kopyalanması, yayılması veya ticari amaçla kullanılması yasaktır.", styles['CoverFooter']))
         story.append(PageBreak())
 
+        # 🪷 1b. ASHTAKOOT · 36 — kapak 1. sayfada kalır, tablo 2. sayfada
+        try:
+            if ashtakoot_pdf is not None:
+                ashtakoot_pdf.ekle(story, styles)
+        except Exception as _pdf_ash_exc:
+            print(f"[Ashtakoot PDF atlandi] {_pdf_ash_exc}")
+
         # 🗺️ 3. BÖLÜM: TEKNİK VE GEOMETRİK KOORDİNATLAR
         if self.mod == "ebeveyn_cocuk":
             baslik_karti_ekle("EBEVEYN-ÇOCUK İLİŞKİ RAPORU", alt_baslik=f"{self.p1_isim} & {self.p2_isim} | {self.city}", emoji="📋")
@@ -11033,6 +11256,13 @@ class FBST_Engine:
                 story.append(Spacer(1, 30))
                 story.append(Paragraph(f"<b>{self.p1_isim}</b>", styles['CoverSub']))
             story.append(PageBreak())
+
+        # 🪷 ASHTAKOOT · 36 — kapak 1. sayfada kalır, tablo 2. sayfada
+        try:
+            if ashtakoot_pdf is not None:
+                ashtakoot_pdf.ekle(story, styles)
+        except Exception as _pdf_ash_py_exc:
+            print(f"[Ashtakoot PDF atlandi] {_pdf_ash_py_exc}")
 
         # ═══ BİLGİ SAYFASI ═══
         baslik_karti_ekle("KİŞİ BİLGİLERİ", alt_baslik="Doğum haritası ve potansiyel analiz özeti", emoji="📋")
@@ -12854,283 +13084,328 @@ with col_result:
                                     for e in v['etkiler'][:1]:
                                         st.caption(f"  • {e}")
 
-                st.divider()
-
-                st.divider()
-
-                st.divider()
-
-                st.divider()
-
                 # =========================================================================
                 # 🌍 ALTERNATİF EVREN (ASTROKARTOGRAFİ TABANLI)
                 # =========================================================================
-                st.markdown("### 🌍 Alternatif Evren (Astrokartografi Lokasyon Analizi)")
-                st.markdown("<p style='color:#4A4A4A; font-size:14px;'>Bu analiz, seçtiğiniz şehirdeki gökyüzünde hangi gezegenlerin hangi açısal pozisyonda olduğunu (Yükselen, MC, Alçalan, IC) hesaplar. Astrokartografi, bir olay anında dünyanın farklı noktalarında gezegenlerin ev konumlarını haritalandıran bilimsel bir astroloji tekniğidir.</p>", unsafe_allow_html=True)
+                @_parca
+                def _alternatif_evren_parcasi():
+                    st.markdown("### 🌍 Alternatif Evren (Astrokartografi Lokasyon Analizi)")
+                    st.markdown("<p style='color:#4A4A4A; font-size:14px;'>Bu analiz, seçtiğiniz şehirdeki gökyüzünde hangi gezegenlerin hangi açısal pozisyonda olduğunu (Yükselen, MC, Alçalan, IC) hesaplar. Astrokartografi, bir olay anında dünyanın farklı noktalarında gezegenlerin ev konumlarını haritalandıran bilimsel bir astroloji tekniğidir.</p>", unsafe_allow_html=True)
 
-                alt_ulke_listesi = sorted(ULKE_SEHIR_DB.keys())
-                alt_secili_ulke = st.selectbox("Ülke:", alt_ulke_listesi, key="alt_ulke_sec")
+                    alt_ulke_listesi = sorted(ULKE_SEHIR_DB.keys())
+                    alt_secili_ulke = st.selectbox("Ülke:", alt_ulke_listesi, key="alt_ulke_sec")
 
-                alt_sehirler = ULKE_SEHIR_DB[alt_secili_ulke]
+                    alt_sehirler = ULKE_SEHIR_DB[alt_secili_ulke]
 
-                if alt_sehirler:
-                    alt_secili_sehir = st.selectbox("Şehir:", alt_sehirler, key="alt_sehir_sec")
-                    alt_geo = sehir_bul(f"{alt_secili_sehir}, {alt_secili_ulke}")
-                else:
-                    alt_serbest_sehir = st.text_input("Şehir adı yazın:", key="alt_serbest_sehir", placeholder="Örn: Bali, Muscat, Havana...")
-                    alt_secili_sehir = alt_serbest_sehir
-                    alt_geo = sehir_bul(f"{alt_serbest_sehir}, {alt_secili_ulke}") if alt_serbest_sehir else None
-
-                if alt_geo and st.button(f"🔍 {alt_geo['sehir']} İçin Astrokartografi Analizi Yap", key="btn_alternatif_evren", use_container_width=True):
-                    alt_lat, alt_lon = alt_geo["lat"], alt_geo["lon"]
-                    alt_city = alt_geo["sehir"]
-                    alt_country = alt_geo["ulke"] or alt_secili_ulke
-
-                    tarih = datetime.strptime(f"{event_date.strftime('%Y-%m-%d')} {event_time}", "%Y-%m-%d %H:%M")
-                    jd_event = swe.julday(tarih.year, tarih.month, tarih.day, tarih.hour + tarih.minute / 60.0)
-
-                    acg_sonuc = astro_kartografi_skor(jd_event, alt_lat, alt_lon)
-
-                    st.markdown(f"#### 📊 {alt_city} ({alt_country}) Astrokartografi Raporu")
-                    st.caption(f"Olay Tarihi: {event_date.strftime('%d.%m.%Y')} {event_time} | Enlem: {alt_lat:.4f} | Boylam: {alt_lon:.4f}")
-
-                    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
-                    m_col1.metric("🕊️ Huzur & Mutluluk", f"%{int(acg_sonuc['huzur'])}")
-                    m_col2.metric("💳 Finansal Güç", f"%{int(acg_sonuc['para'])}")
-                    m_col3.metric("🔥 Tutku & Çekim", f"%{int(acg_sonuc['tutku'])}")
-                    m_col4.metric("🌋 Kriz Potansiyeli", f"%{int(acg_sonuc['kriz'])}", delta_color="inverse")
-
-                    if acg_sonuc['etkiler']:
-                        st.markdown("##### 🔭 Bu Noktada Aktif olan Astrokartografi Hatları:")
-                        for etki in acg_sonuc['etkiler']:
-                            st.caption(f"• {etki}")
-
-                    st.markdown("##### 📌 Gezegen Bazlı Yorum:")
-                    en_guclu_gezegen = max(acg_sonuc['acg'].items(), key=lambda x: max(0, 5 - x[1]['aci_farki']))
-                    g_adi, g_veri = en_guclu_gezegen
-                    if g_veri['aci_farki'] < 5:
-                        aci_isim = {"AC": "Yükselen (ASC)", "DC": "Alçalan (DSC)", "MC": "Gökyüzü Ortası (MC)", "IC": "Yeraltı (IC)"}
-                        deger = GEZEGEN_ANLAMLARI.get(g_adi, {})
-                        st.success(f"**{g_adi}** bu noktada **{aci_isim.get(g_veri['en_yakin_aci'], g_veri['en_yakin_aci'])}** hattı üzerinde (Orb: {g_veri['aci_farki']:.1f}°). {deger.get('parlaklik', '')}")
-
-                    if acg_sonuc['para'] >= 75:
-                        st.info("💰 **Finansal Potansiyel Yüksek:** Jüpiter veya Venüs bu noktada güçlü açılar yapıyor. Ortak finansal girişimler için destekleyici bir enerji alanı.")
-                    if acg_sonuc['tutku'] >= 75:
-                        st.warning("🔥 **Yüksek Tutku Alanı:** Mars veya Venüs bu koordinatta aktif. İlişkisel çekim ve enerji seviyesi yüksek.")
-                    if acg_sonuc['huzur'] >= 75:
-                        st.info("🕊️ **Duygusal Güvenlik Limanı:** Ay veya Venüs bu noktada huzurlu bir hatta. Duygusal bağ ve iç huzur için destekleyici.")
-                    if acg_sonuc['kriz'] >= 60:
-                        st.error("⚠️ **Satürn/Plüto Etkisi:** Bu noktada yapısal sınavlar ve derin dönüşüm enerjileri aktif. Sabır ve olgunluk gerektiren bir alan.")
-
-                    if st.session_state.sim_modu == "ebeveyn_cocuk":
-                        _uo_sim = otomatik_utc_offset(alt_lat, alt_lon, cocuk_date.year, cocuk_date.month, cocuk_date.day, int(event_time.split(":")[0]))
-                        sim_motor = FBST_Engine(
-                            p1=cocuk_date.strftime("%Y-%m-%d"),
-                            p2=ebeveyn_date.strftime("%Y-%m-%d"),
-                            event_date=cocuk_date.strftime("%Y-%m-%d"),
-                            event_time=event_time,
-                            city=alt_city, country=alt_country, lat=alt_lat, lon=alt_lon,
-                            p1_isim=cocuk_isim, p2_isim=ebeveyn_isim,
-                            mod="ebeveyn_cocuk", ebeveyn_rolu=ebeveyn_rolu,
-                            utc_offset=_uo_sim
-                        )
+                    if alt_sehirler:
+                        alt_secili_sehir = st.selectbox("Şehir:", alt_sehirler, key="alt_sehir_sec")
+                        alt_geo = sehir_bul(f"{alt_secili_sehir}, {alt_secili_ulke}")
                     else:
-                        _uo_sim = otomatik_utc_offset(alt_lat, alt_lon, event_date.year, event_date.month, event_date.day, int(event_time.split(":")[0]))
-                        sim_motor = FBST_Engine(
-                            p1=p1_date.strftime("%Y-%m-%d"),
-                            p2=p2_date.strftime("%Y-%m-%d"),
-                            event_date=event_date.strftime("%Y-%m-%d"),
-                            event_time=event_time,
-                            city=alt_city, country=alt_country, lat=alt_lat, lon=alt_lon,
-                            p1_isim=p1_isim, p2_isim=p2_isim,
-                            utc_offset=_uo_sim
-                        )
-                    j_ileri, j_geri = sim_motor.get_julian_dates()
-                    yeni_asc_A = sim_motor.yukselen_bul(j_ileri)
-                    yeni_asc_B = sim_motor.yukselen_bul(j_geri)
+                        alt_serbest_sehir = st.text_input("Şehir adı yazın:", key="alt_serbest_sehir", placeholder="Örn: Bali, Muscat, Havana...")
+                        alt_secili_sehir = alt_serbest_sehir
+                        alt_geo = sehir_bul(f"{alt_serbest_sehir}, {alt_secili_ulke}") if alt_serbest_sehir else None
 
-                    st.markdown("<br>##### 🔮 Bu Konumdaki Yükselen Değişimleri", unsafe_allow_html=True)
-                    col_sim_res1, col_sim_res2 = st.columns(2)
-                    with col_sim_res1:
-                        _yukselen_soze = fbst_yukselenler_ebeveyn.get(yeni_asc_A, '') if sim_motor.mod == "ebeveyn_cocuk" else fbst_yukselenler.get(yeni_asc_A, '')
-                        st.markdown(f"<div style='background-color:#F0FAF8; padding:15px; border-top:4px solid #8FB8CA; border-radius:5px;'>"
-                                    f"<h4 style='color:#5A9BAD; margin-bottom:5px;'>{sim_motor.p1_isim} → {yeni_asc_A}</h4>"
-                                    f"<p style='color:#4A4A4A; font-size:14px;'>{_yukselen_soze}</p>"
-                                    f"</div>", unsafe_allow_html=True)
-                    with col_sim_res2:
-                        _yukselen_soze2 = fbst_yukselenler_ebeveyn.get(yeni_asc_B, '') if sim_motor.mod == "ebeveyn_cocuk" else fbst_yukselenler.get(yeni_asc_B, '')
-                        st.markdown(f"<div style='background-color:#FFF0ED; padding:15px; border-top:4px solid #D4878F; border-radius:5px;'>"
-                                    f"<h4 style='color:#C47A82; margin-bottom:5px;'>{sim_motor.p2_isim} → {yeni_asc_B}</h4>"
-                                    f"<p style='color:#4A4A4A; font-size:14px;'>{_yukselen_soze2}</p>"
-                                    f"</div>", unsafe_allow_html=True)
+                    # Konum bulunamazsa da buton kaybolmasin: uyari ver ve manuel koordinat iste.
+                    if alt_geo:
+                        alt_lat_onay, alt_lon_onay = alt_geo["lat"], alt_geo["lon"]
+                        alt_sehir_etiket = alt_geo["sehir"]
+                        alt_ulke_etiket = alt_geo["ulke"] or alt_secili_ulke
+                    else:
+                        st.warning(f"'{alt_secili_sehir or '—'}' için konum bulunamadı. Koordinatı elle girebilirsiniz.")
+                        _ky, _kx = st.columns(2)
+                        with _ky:
+                            alt_lat_onay = st.number_input("Enlem", -90.0, 90.0, 0.0, 0.0001, key="alt_lat Manuel")
+                        with _kx:
+                            alt_lon_onay = st.number_input("Boylam", -180.0, 180.0, 0.0, 0.0001, key="alt_lon_manuel")
+                        alt_sehir_etiket = alt_secili_sehir or "Belirtilen konum"
+                        alt_ulke_etiket = alt_secili_ulke
 
-                st.divider()
+                    if st.button(f"🔍 {alt_sehir_etiket} İçin Astrokartografi Analizi Yap", key="btn_alternatif_evren", use_container_width=True):
+                        alt_lat, alt_lon = alt_lat_onay, alt_lon_onay
+                        alt_city = alt_sehir_etiket
+                        alt_country = alt_ulke_etiket
 
-                # =========================================================================
-                # 🌟 YILDIZ MÜHÜRLERİ (SABİT YILDIZ TEMASLARI)
-                # =========================================================================
-                st.markdown("### 🌟 Kadersel Yıldız Mühürleri (Sabit Yıldız Temasları)")
+                        tarih = datetime.strptime(f"{event_date.strftime('%Y-%m-%d')} {event_time}", "%Y-%m-%d %H:%M")
+                        _uo_alt = otomatik_utc_offset(alt_lat, alt_lon, tarih.year, tarih.month, tarih.day, tarih.hour)
+                        jd_event = swe.julday(tarih.year, tarih.month, tarih.day,
+                                              tarih.hour + tarih.minute / 60.0 - _uo_alt)
 
-                p1_jd = swe.julday(motor.p1.year, motor.p1.month, motor.p1.day, motor.p1.hour + motor.p1.minute / 60.0)
-                p2_jd = swe.julday(motor.p2.year, motor.p2.month, motor.p2.day, motor.p2.hour + motor.p2.minute / 60.0)
-                ekran_haritalari = [
-                    {"isim": motor.p1_isim, "jd": p1_jd},
-                    {"isim": motor.p2_isim, "jd": p2_jd}
-                ]
+                        acg_sonuc = astro_kartografi_skor(jd_event, alt_lat, alt_lon)
 
-                bulunan_ekran_muhurleri = False
-                gosterilen_muhur = 0
-                MAKS_EKRAN_MUHUR = 3
+                        st.markdown(f"#### 📊 {alt_city} ({alt_country}) Astrokartografi Raporu")
+                        st.caption(f"Olay Tarihi: {event_date.strftime('%d.%m.%Y')} {event_time} (UTC{_uo_alt:+g}) | Enlem: {alt_lat:.4f} | Boylam: {alt_lon:.4f}")
 
-                for harita in ekran_haritalari:
-                    for gezegen_adi, gezegen_id in GEZEGENLER.items():
+                        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+                        m_col1.metric("🕊️ Huzur & Mutluluk", f"%{int(acg_sonuc['huzur'])}")
+                        m_col2.metric("💳 Finansal Güç", f"%{int(acg_sonuc['para'])}")
+                        m_col3.metric("🔥 Tutku & Çekim", f"%{int(acg_sonuc['tutku'])}")
+                        m_col4.metric("🌋 Kriz Potansiyeli", f"%{int(acg_sonuc['kriz'])}", delta_color="inverse")
+
+                        if acg_sonuc['etkiler']:
+                            st.markdown("##### 🔭 Bu Noktada Aktif olan Astrokartografi Hatları:")
+                            for etki in acg_sonuc['etkiler']:
+                                st.caption(f"• {etki}")
+
+                        st.markdown("##### 📌 Gezegen Bazlı Yorum:")
+                        en_guclu_gezegen = max(acg_sonuc['acg'].items(), key=lambda x: max(0, 5 - x[1]['aci_farki']))
+                        g_adi, g_veri = en_guclu_gezegen
+                        if g_veri['aci_farki'] < 5:
+                            aci_isim = {"AC": "Yükselen (ASC)", "DC": "Alçalan (DSC)", "MC": "Gökyüzü Ortası (MC)", "IC": "Yeraltı (IC)"}
+                            deger = GEZEGEN_ANLAMLARI.get(g_adi, {})
+                            st.success(f"**{g_adi}** bu noktada **{aci_isim.get(g_veri['en_yakin_aci'], g_veri['en_yakin_aci'])}** hattı üzerinde (Orb: {g_veri['aci_farki']:.1f}°). {deger.get('parlaklik', '')}")
+
+                        if acg_sonuc['para'] >= 75:
+                            st.info("💰 **Finansal Potansiyel Yüksek:** Jüpiter veya Venüs bu noktada güçlü açılar yapıyor. Ortak finansal girişimler için destekleyici bir enerji alanı.")
+                        if acg_sonuc['tutku'] >= 75:
+                            st.warning("🔥 **Yüksek Tutku Alanı:** Mars veya Venüs bu koordinatta aktif. İlişkisel çekim ve enerji seviyesi yüksek.")
+                        if acg_sonuc['huzur'] >= 75:
+                            st.info("🕊️ **Duygusal Güvenlik Limanı:** Ay veya Venüs bu noktada huzurlu bir hatta. Duygusal bağ ve iç huzur için destekleyici.")
+                        if acg_sonuc['kriz'] >= 60:
+                            st.error("⚠️ **Satürn/Plüto Etkisi:** Bu noktada yapısal sınavlar ve derin dönüşüm enerjileri aktif. Sabır ve olgunluk gerektiren bir alan.")
+
+                        if st.session_state.sim_modu == "ebeveyn_cocuk":
+                            _uo_sim = otomatik_utc_offset(alt_lat, alt_lon, cocuk_date.year, cocuk_date.month, cocuk_date.day, int(event_time.split(":")[0]))
+                            sim_motor = FBST_Engine(
+                                p1=cocuk_date.strftime("%Y-%m-%d"),
+                                p2=ebeveyn_date.strftime("%Y-%m-%d"),
+                                event_date=cocuk_date.strftime("%Y-%m-%d"),
+                                event_time=event_time,
+                                city=alt_city, country=alt_country, lat=alt_lat, lon=alt_lon,
+                                p1_isim=cocuk_isim, p2_isim=ebeveyn_isim,
+                                mod="ebeveyn_cocuk", ebeveyn_rolu=ebeveyn_rolu,
+                                utc_offset=_uo_sim
+                            )
+                        else:
+                            _uo_sim = otomatik_utc_offset(alt_lat, alt_lon, event_date.year, event_date.month, event_date.day, int(event_time.split(":")[0]))
+                            sim_motor = FBST_Engine(
+                                p1=p1_date.strftime("%Y-%m-%d"),
+                                p2=p2_date.strftime("%Y-%m-%d"),
+                                event_date=event_date.strftime("%Y-%m-%d"),
+                                event_time=event_time,
+                                city=alt_city, country=alt_country, lat=alt_lat, lon=alt_lon,
+                                p1_isim=p1_isim, p2_isim=p2_isim,
+                                mod="es_sevgili",
+                                utc_offset=_uo_sim
+                            )
+                        j_ileri, j_geri = sim_motor.get_julian_dates()
+                        yeni_asc_A = sim_motor.yukselen_bul(j_ileri)
+                        yeni_asc_B = sim_motor.yukselen_bul(j_geri)
+
+                        st.markdown("<br>##### 🔮 Bu Konumdaki Yükselen Değişimleri", unsafe_allow_html=True)
+                        col_sim_res1, col_sim_res2 = st.columns(2)
+                        with col_sim_res1:
+                            _yukselen_soze = fbst_yukselenler_ebeveyn.get(yeni_asc_A, '') if sim_motor.mod == "ebeveyn_cocuk" else fbst_yukselenler.get(yeni_asc_A, '')
+                            st.markdown(f"<div style='background-color:#F0FAF8; padding:15px; border-top:4px solid #8FB8CA; border-radius:5px;'>"
+                                        f"<h4 style='color:#5A9BAD; margin-bottom:5px;'>{sim_motor.p1_isim} → {yeni_asc_A}</h4>"
+                                        f"<p style='color:#4A4A4A; font-size:14px;'>{_yukselen_soze}</p>"
+                                        f"</div>", unsafe_allow_html=True)
+                        with col_sim_res2:
+                            _yukselen_soze2 = fbst_yukselenler_ebeveyn.get(yeni_asc_B, '') if sim_motor.mod == "ebeveyn_cocuk" else fbst_yukselenler.get(yeni_asc_B, '')
+                            st.markdown(f"<div style='background-color:#FFF0ED; padding:15px; border-top:4px solid #D4878F; border-radius:5px;'>"
+                                        f"<h4 style='color:#C47A82; margin-bottom:5px;'>{sim_motor.p2_isim} → {yeni_asc_B}</h4>"
+                                        f"<p style='color:#4A4A4A; font-size:14px;'>{_yukselen_soze2}</p>"
+                                        f"</div>", unsafe_allow_html=True)
+
+                    st.divider()
+
+                    # =========================================================================
+                    # 🌟 YILDIZ MÜHÜRLERİ (SABİT YILDIZ TEMASLARI)
+                    # =========================================================================
+                    st.markdown("### 🌟 Kadersel Yıldız Mühürleri (Sabit Yıldız Temasları)")
+
+                    p1_jd = swe.julday(motor.p1.year, motor.p1.month, motor.p1.day, motor.p1.hour + motor.p1.minute / 60.0)
+                    p2_jd = swe.julday(motor.p2.year, motor.p2.month, motor.p2.day, motor.p2.hour + motor.p2.minute / 60.0)
+                    ekran_haritalari = [
+                        {"isim": motor.p1_isim, "jd": p1_jd},
+                        {"isim": motor.p2_isim, "jd": p2_jd}
+                    ]
+
+                    bulunan_ekran_muhurleri = False
+                    gosterilen_muhur = 0
+                    MAKS_EKRAN_MUHUR = 3
+
+                    for harita in ekran_haritalari:
+                        for gezegen_adi, gezegen_id in GEZEGENLER.items():
+                            if gosterilen_muhur >= MAKS_EKRAN_MUHUR:
+                                break
+                            try:
+                                if gezegen_adi == "GAD":
+                                    k_derece = get_planetary_position(harita["jd"], swe.MEAN_NODE)
+                                    g_derecesi = (k_derece + 180.0) % 360.0
+                                else:
+                                    g_derecesi = get_planetary_position(harita["jd"], gezegen_id)
+
+                                sonuclar = kadersel_yildiz_taramasi(gezegen_adi, g_derecesi, orb_siniri=2.0)
+
+                                if sonuclar:
+                                    bulunan_ekran_muhurleri = True
+                                    for sonuc in sonuclar:
+                                        if gosterilen_muhur >= MAKS_EKRAN_MUHUR:
+                                            break
+                                        satirlar = sonuc.split('\n')
+                                        baslik = satirlar[0].replace("Kavuşumu", f"Kavuşumu ({harita['isim']})").strip()
+                                        icerik = "\n\n".join([s.replace("   👉 ", "• ").replace(" 👉 ", "• ").strip() for s in satirlar[1:] if s.strip()])
+                                        with st.expander(f"{baslik}"):
+                                            st.markdown(icerik)
+                                        gosterilen_muhur += 1
+                            except Exception:
+                                continue
                         if gosterilen_muhur >= MAKS_EKRAN_MUHUR:
                             break
-                        try:
-                            if gezegen_adi == "GAD":
-                                k_derece = get_planetary_position(harita["jd"], swe.MEAN_NODE)
-                                g_derecesi = (k_derece + 180.0) % 360.0
-                            else:
-                                g_derecesi = get_planetary_position(harita["jd"], gezegen_id)
 
-                            sonuclar = kadersel_yildiz_taramasi(gezegen_adi, g_derecesi, orb_siniri=2.0)
-
-                            if sonuclar:
-                                bulunan_ekran_muhurleri = True
-                                for sonuc in sonuclar:
-                                    if gosterilen_muhur >= MAKS_EKRAN_MUHUR:
-                                        break
-                                    satirlar = sonuc.split('\n')
-                                    baslik = satirlar[0].replace("Kavuşumu", f"Kavuşumu ({harita['isim']})").strip()
-                                    icerik = "\n\n".join([s.replace("   👉 ", "• ").replace(" 👉 ", "• ").strip() for s in satirlar[1:] if s.strip()])
-                                    with st.expander(f"{baslik}"):
-                                        st.markdown(icerik)
-                                    gosterilen_muhur += 1
-                        except Exception:
-                            continue
-                    if gosterilen_muhur >= MAKS_EKRAN_MUHUR:
-                        break
-
-                if not bulunan_ekran_muhurleri:
-                    st.info("Bu kadersel kontratta (2.0° orb sınırı içinde) aktif bir sabit yıldız mührü tespit edilemedi.")
-                else:
-                    st.warning("🌟 **Ekran sadece 3 sabit yıldız mührü için sınırlıdır** — Sadece ilk 3 mühür gösterilmektedir. **Tüm sabit yıldız tarama sonuçlarını** ve detaylı yorumlarını PDF raporunuzda bulabilirsiniz. PDF indirmek için sayfanın en altına kaydırın.")
-
-                st.divider()
-
-                st.divider()
-
-                # =========================================================================
-                # 📊 GELİŞİM DÖNEMLERİ (Sadece Ebeveyn-Çocuk)
-                # =========================================================================
-                if motor.mod == "ebeveyn_cocuk":
-                    st.markdown("### 📊 Çocuğun Gelişim Dönemleri ve Ebeveyn Tutum Analizi")
-                    st.markdown("<p style='color:#8A7F96; font-size:13px;'>Çocuğunuzun doğum tarihine göre aktif gelişim dönemleri ve bu dönemdeki ebeveyn-çocuk etkileşim yapıları.</p>", unsafe_allow_html=True)
-
-                    try:
-                        gelisim_sonuclari = motor.gelisim_donemleri_hesapla()
-                        if gelisim_sonuclari:
-                            for satir in gelisim_sonuclari:
-                                with st.expander(f"🪐 {satir['gezegen']} — {satir['donem']}"):
-                                    st.markdown(satir['metin'])
-                            st.caption("Tüm gezegen gelişim dönemleri PDF raporunuzda detaylı şekilde yer almaktadır.")
-                        else:
-                            st.info("Gelişim dönemi verisi hesaplanamadı.")
-                    except Exception as e:
-                        st.error(f"Gelişim dönemi analizinde hata: {str(e)}")
-
-                    st.divider()
-
-                if motor.mod == "ebeveyn_cocuk":
-                    # =========================================================================
-                    # 3. POTANSİYEL VE YETENEK SİMÜLASYONU (Sadece Ebeveyn-Çocuk)
-                    # =========================================================================
-                    st.subheader("3. Potansiyel ve Yetenek Simülasyonu")
-                    st.markdown("<p style='color:#8A7F96; font-size:13px;'>Haritanızdaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.</p>", unsafe_allow_html=True)
-
-                    st.markdown("### 💡 Potansiyel ve Yetenek Alanları")
-                    st.markdown("<p style='color:#8A7F96; font-size:13px;'>Doğal yetenek ve potansiyel alanları açısal analizle belirlenmiştir.</p>", unsafe_allow_html=True)
-                    st.caption("Tarayıcıda sadece ilk 3 yetenek alanı gösterilmektedir. Tüm alanlar PDF raporundadır.")
-
-                    try:
-                        potansiyel_sonuclari = motor.potansiyel_hesapla()
-                        if potansiyel_sonuclari:
-                            gorulen_alanlar = set()
-                            alan_sayaci = 0
-                            for satir in potansiyel_sonuclari:
-                                if satir['alan'] not in gorulen_alanlar:
-                                    gorulen_alanlar.add(satir['alan'])
-                                    alan_sayaci += 1
-                                    if alan_sayaci > 3:
-                                        continue
-                                    with st.expander(f"✨ {satir['alan']} ({satir['aci']} — {satir['aci_turu']} Açısı)"):
-                                        st.markdown(satir['metin'])
-                            st.caption("Tüm potansiyel ve yetenek alanları PDF raporunuzda detaylı şekilde yer almaktadır.")
-                        else:
-                            st.info("Belirgin bir potansiyel alanı tespit edilemedi.")
-                    except Exception as e:
-                        st.error(f"Potansiyel analizinde hata: {str(e)}")
-
-                    st.divider()
-
-                    # --- MESLEK YÖNLENDİRME ÖNERİLERİ ---
-                    st.markdown("### 🎯 Meslek Yönlendirme Önerileri")
-                    if st.session_state.sim_modu == "ebeveyn_cocuk":
-                        st.markdown("<p style='color:#8A7F96; font-size:13px;'>Çocuğun potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğu meslek dalları.</p>", unsafe_allow_html=True)
+                    if not bulunan_ekran_muhurleri:
+                        st.info("Bu kadersel kontratta (2.0° orb sınırı içinde) aktif bir sabit yıldız mührü tespit edilemedi.")
                     else:
-                        st.markdown("<p style='color:#8A7F96; font-size:13px;'>Potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğunuz meslek dalları.</p>", unsafe_allow_html=True)
-                    st.caption("Tarayıcıda sadece 5., 6. ve 7. sıralar gösterilmektedir. Tam sıralama PDF raporundadır.")
+                        st.warning("🌟 **Ekran sadece 3 sabit yıldız mührü için sınırlıdır** — Sadece ilk 3 mühür gösterilmektedir. **Tüm sabit yıldız tarama sonuçlarını** ve detaylı yorumlarını PDF raporunuzda bulabilirsiniz. PDF indirmek için sayfanın en altına kaydırın.")
 
-                    try:
-                        konumlar = motor.gezegen_konum_analizi()
-                        meslek_onerileri = motor.meslek_onerileri()
-                        if meslek_onerileri:
-                            sirali = sorted(meslek_onerileri, key=lambda x: x['puan'], reverse=True)
-                            st.markdown("**Potansiyel Alanları Sıralaması:**")
-                            for j, r in enumerate(sirali[4:7]):
-                                st.markdown(f"**{j+5}. {r['alan']}** — {r['puan']:.1f} puan (%{r['yuzde']})")
-                            st.markdown("")
-                            st.caption("Puanlama: Gezegen-burç eşleşmesi, açı türü, orb yakınlığı, efsane boost, MC bonusu ve asteroid desteği ile hesaplanmıştır.")
-                            st.caption("Detaylı açıklama için PDF raporunuzu inceleyin.")
+                    st.divider()
+
+                    st.divider()
+
+                    # =========================================================================
+                    # 📊 GELİŞİM DÖNEMLERİ (Sadece Ebeveyn-Çocuk)
+                    # =========================================================================
+                    if motor.mod == "ebeveyn_cocuk":
+                        st.markdown("### 📊 Çocuğun Gelişim Dönemleri ve Ebeveyn Tutum Analizi")
+                        st.markdown("<p style='color:#8A7F96; font-size:13px;'>Çocuğunuzun doğum tarihine göre aktif gelişim dönemleri ve bu dönemdeki ebeveyn-çocuk etkileşim yapıları.</p>", unsafe_allow_html=True)
+
+                        try:
+                            gelisim_sonuclari = motor.gelisim_donemleri_hesapla()
+                            if gelisim_sonuclari:
+                                for satir in gelisim_sonuclari:
+                                    with st.expander(f"🪐 {satir['gezegen']} — {satir['donem']}"):
+                                        st.markdown(satir['metin'])
+                                st.caption("Tüm gezegen gelişim dönemleri PDF raporunuzda detaylı şekilde yer almaktadır.")
+                            else:
+                                st.info("Gelişim dönemi verisi hesaplanamadı.")
+                        except Exception as e:
+                            st.error(f"Gelişim dönemi analizinde hata: {str(e)}")
+
+                        st.divider()
+
+                    if motor.mod == "ebeveyn_cocuk":
+                        # =========================================================================
+                        # 3. POTANSİYEL VE YETENEK SİMÜLASYONU (Sadece Ebeveyn-Çocuk)
+                        # =========================================================================
+                        st.subheader("3. Potansiyel ve Yetenek Simülasyonu")
+                        st.markdown("<p style='color:#8A7F96; font-size:13px;'>Haritanızdaki gezegen açılarından tespit edilen doğal yetenek, potansiyel alanları ve meslek yönlendirmeleri.</p>", unsafe_allow_html=True)
+
+                        st.markdown("### 💡 Potansiyel ve Yetenek Alanları")
+                        st.markdown("<p style='color:#8A7F96; font-size:13px;'>Doğal yetenek ve potansiyel alanları açısal analizle belirlenmiştir.</p>", unsafe_allow_html=True)
+                        st.caption("Tarayıcıda sadece ilk 3 yetenek alanı gösterilmektedir. Tüm alanlar PDF raporundadır.")
+
+                        try:
+                            potansiyel_sonuclari = motor.potansiyel_hesapla()
+                            if potansiyel_sonuclari:
+                                gorulen_alanlar = set()
+                                alan_sayaci = 0
+                                for satir in potansiyel_sonuclari:
+                                    if satir['alan'] not in gorulen_alanlar:
+                                        gorulen_alanlar.add(satir['alan'])
+                                        alan_sayaci += 1
+                                        if alan_sayaci > 3:
+                                            continue
+                                        with st.expander(f"✨ {satir['alan']} ({satir['aci']} — {satir['aci_turu']} Açısı)"):
+                                            st.markdown(satir['metin'])
+                                st.caption("Tüm potansiyel ve yetenek alanları PDF raporunuzda detaylı şekilde yer almaktadır.")
+                            else:
+                                st.info("Belirgin bir potansiyel alanı tespit edilemedi.")
+                        except Exception as e:
+                            st.error(f"Potansiyel analizinde hata: {str(e)}")
+
+                        st.divider()
+
+                        # --- MESLEK YÖNLENDİRME ÖNERİLERİ ---
+                        st.markdown("### 🎯 Meslek Yönlendirme Önerileri")
+                        if st.session_state.sim_modu == "ebeveyn_cocuk":
+                            st.markdown("<p style='color:#8A7F96; font-size:13px;'>Çocuğun potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğu meslek dalları.</p>", unsafe_allow_html=True)
                         else:
-                            st.info("Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi.")
-                    except Exception as e:
-                        st.error(f"Meslek yönlendirme analizinde hata: {str(e)}")
+                            st.markdown("<p style='color:#8A7F96; font-size:13px;'>Potansiyel ve yetenek alanlarının senteziyle belirlenen, yatkın olduğunuz meslek dalları.</p>", unsafe_allow_html=True)
+                        st.caption("Tarayıcıda sadece 5., 6. ve 7. sıralar gösterilmektedir. Tam sıralama PDF raporundadır.")
 
-                st.divider()
+                        try:
+                            konumlar = motor.gezegen_konum_analizi()
+                            meslek_onerileri = motor.meslek_onerileri()
+                            if meslek_onerileri:
+                                sirali = sorted(meslek_onerileri, key=lambda x: x['puan'], reverse=True)
+                                st.markdown("**Potansiyel Alanları Sıralaması:**")
+                                for j, r in enumerate(sirali[4:7]):
+                                    st.markdown(f"**{j+5}. {r['alan']}** — {r['puan']:.1f} puan (%{r['yuzde']})")
+                                st.markdown("")
+                                st.caption("Puanlama: Gezegen-burç eşleşmesi, açı türü, orb yakınlığı, efsane boost, MC bonusu ve asteroid desteği ile hesaplanmıştır.")
+                                st.caption("Detaylı açıklama için PDF raporunuzu inceleyin.")
+                            else:
+                                st.info("Meslek yönlendirme için yeterli potansiyel alanı tespit edilemedi.")
+                        except Exception as e:
+                            st.error(f"Meslek yönlendirme analizinde hata: {str(e)}")
 
-                # --- PDF ÜRETİMİ VE İNDİRME BUTONU ---
-                st.divider()
-                st.markdown("### 📄 Fatih Asartepe Sinastri Tekniği - FAST (Full PDF Raporu)")
+                    st.divider()
+
+                    # --- PDF ÜRETİMİ VE İNDİRME BUTONU ---
+                    st.divider()
+                    st.markdown("### 📄 Fatih Asartepe Sinastri Tekniği - FAST (Full PDF Raporu)")
             
-                # PDF'in hazır olup olmadığını state'te tutuyoruz
-                if "pdf_hazir" not in st.session_state:
-                    st.session_state.pdf_hazir = False
+                    # PDF'in hazır olup olmadığını state'te tutuyoruz
+                    if "pdf_hazir" not in st.session_state:
+                        st.session_state.pdf_hazir = False
 
-                # 1. AŞAMA: PDF ÜRETİM TETİKLEYİCİSİ
-                if st.button("⚙️ Çift Taraflı PDF Raporunu Hazırla (Matbaayı Çalıştır)", key="btn_pdf_hazirla", use_container_width=True):
-                    with st.spinner("Kadersel mühürler altın sularla PDF'e işleniyor, lütfen bekleyin..."):
+                    # 1. AŞAMA: PDF ÜRETİM TETİKLEYİCİSİ
+                    if st.button("⚙️ Çift Taraflı PDF Raporunu Hazırla (Matbaayı Çalıştır)", key="btn_pdf_hazirla", use_container_width=True):
+                        with st.spinner("Kadersel mühürler altın sularla PDF'e işleniyor, lütfen bekleyin..."):
+                            rapor_adi = f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf"
+                            motor.pdf_rapor_uret(rapor_adi)
+                            st.session_state.pdf_hazir = True
+                            st.success("PDF Raporu başarıyla mühürlendi! Aşağıdaki butondan indirebilirsiniz.")
+
+                    # 2. AŞAMA: İNDİRME BUTONU (Sadece PDF hazırsa görünür)
+                    if st.session_state.pdf_hazir:
                         rapor_adi = f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf"
-                        motor.pdf_rapor_uret(rapor_adi)
-                        st.session_state.pdf_hazir = True
-                        st.success("PDF Raporu başarıyla mühürlendi! Aşağıdaki butondan indirebilirsiniz.")
+                        if os.path.exists(rapor_adi):
+                            with open(rapor_adi, "rb") as pdf_file:
+                                dl_col1, dl_col2, dl_col3 = st.columns([1,2,1])
+                                with dl_col2:
+                                    st.download_button(
+                                        label="📥 Hazırlanan PDF Raporunu İndir", 
+                                        data=pdf_file, 
+                                        file_name=f"FBST_{city}_Kontrati.pdf", 
+                                        mime="application/pdf", 
+                                        key="btn_pdf_indir_son",
+                                        use_container_width=True,
+                                        type="primary" # Butonu belirgin (kırmızı/ana renk) yapar
+                                    )
 
-                # 2. AŞAMA: İNDİRME BUTONU (Sadece PDF hazırsa görünür)
-                if st.session_state.pdf_hazir:
-                    rapor_adi = f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf"
-                    if os.path.exists(rapor_adi):
-                        with open(rapor_adi, "rb") as pdf_file:
-                            dl_col1, dl_col2, dl_col3 = st.columns([1,2,1])
-                            with dl_col2:
-                                st.download_button(
-                                    label="📥 Hazırlanan PDF Raporunu İndir", 
-                                    data=pdf_file, 
-                                    file_name=f"FBST_{city}_Kontrati.pdf", 
-                                    mime="application/pdf", 
-                                    key="btn_pdf_indir_son",
-                                    use_container_width=True,
-                                    type="primary" # Butonu belirgin (kırmızı/ana renk) yapar
-                                )
+                _alternatif_evren_parcasi()
 
+        # --- ASHTAKOOT · 36 (üç modda ortak) ---
+        # Mode dallarının DIŞINDA: her üç modda da görünür.
+        if ashtakoot_panel is not None:
+            try:
+                _ash_t1 = datetime(1990, 1, 1).date()
+                _ash_t2 = datetime(1985, 4, 15).date()
+                for _g in ("p1_date", "ebeveyn_date", "py_date", "cocuk_date"):
+                    _v = locals().get(_g)
+                    if isinstance(_v, date):
+                        _ash_t1 = _v
+                        break
+                _v = locals().get("p2_date")
+                if isinstance(_v, date):
+                    _ash_t2 = _v
+                if st.session_state.sim_modu == "ebeveyn_cocuk":
+                    _v = locals().get("cocuk_date")
+                    if isinstance(_v, date):
+                        _ash_t2 = _v
+                ashtakoot_panel.goster({
+                    "ULKE_SEHIR_DB": ULKE_SEHIR_DB,
+                    "sehir_bul": sehir_bul,
+                    "otomatik_utc_offset": otomatik_utc_offset,
+                    "min_tarih": min_tarih,
+                    "max_tarih": max_tarih,
+                    "varsayilan_tarih_1": _ash_t1,
+                    "varsayilan_tarih_2": _ash_t2,
+                })
+            except Exception as _ash_exc:
+                st.warning(f"Ashtakoot bölümü yüklenemedi: {_ash_exc}")
+        elif _ASHT_KOTAMAZ:
+            st.warning(f"Ashtakoot modülü kullanılamıyor: {_ASHT_KOTAMAZ}")
     else:
         st.info("👈 Sol panelden isim, tarih, saat ve lokasyon bilgilerini girdikten sonra 'Çift Taraflı Kontratı Ateşle' butonuna basın.")
