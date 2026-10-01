@@ -7608,7 +7608,7 @@ def privacy_policy():
 <p>Uygulama 13 yas alti cocuklara yonelik degildir.</p>
 <h2>6. Iletisim</h2>
 <p>Gizlilik sorulariniz icin: <b>smyrnaastrology@gmail.com</b></p>
-<hr><p><a href="/privacy-en">English version</a></p>
+<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a> &middot; <a href="/privacy-en">English version</a></p>
 </body></html>"""
 
 @app_fast.get("/delete", response_class=HTMLResponse)
@@ -7656,6 +7656,160 @@ def privacy_policy_en():
 <p>The app is not directed at children under 13.</p>
 <h2>6. Contact</h2>
 <p>For privacy questions: <b>smyrnaastrology@gmail.com</b></p>
+<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a></p>
+</body></html>"""
+
+@app_fast.get("/standards", response_class=HTMLResponse)
+def published_standards_tr():
+    """Yayinlanmis standartlar: cocuk guvenligi ve CSAE acik yasagi.
+
+    Google Play Cocuk Guvenligi Standartlari politikasi icin gereklidir:
+    belge CSAE icerigini acikca yasaklar, uygulama/gundesirici adina
+    atifta bulunur ve cocuk guvenligi iletisim noktasi sunar.
+    """
+    return """<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Synastry - Yayinlanmis Standartlar (Cocuk Guvenligi ve CSAE Yasagi)</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Yayinlanmis Standartlar &mdash; Cocuk Guvenligi ve CSAE Yasagi</h1>
+<p><b>Uygulama:</b> Fast Synastry (Google Play paket adi: <b>com.fastastrology.fast</b>)<br>
+<b>Gelistirici / Operator:</b> Fatih Asartepe (Google Play gelistirici hesabi)<br>
+<b>Son guncelleme:</b> Eylul 2026<br>
+<b>Cocuk guvenligi iletisim noktasi:</b> <b>smyrnaastrology@gmail.com</b></p>
+
+<h2>1. CSAE Iceriginin Acik Yasagi</h2>
+<p><b>Fast Synastry, Cocuk Sexuel Istismari ve Istismari (CSAE - Child Sexual Abuse and Exploitation)
+icerigini acikca yasaklar.</b> Bu yasak, uygulamanin kullanicilari, icerigi ve
+hizmetleri ne olursa olsun istisnasizdir. Uygulama icinde CSAE teşkil eden veya
+CSAE'yi temsil eden, hatta sanatsal, egitim veya "tarihsel" gerekceyle sunulan
+hicbir icerik barindirilmaz, sunulmaz veya ortaklastirilmaz.</p>
+
+<h2>2. Yasaklanan Icerik Turleri</h2>
+<ul>
+<li>Minikleri kapsayan cinsel icerik, gorsel, yazili, sesli veya video olarak.</li>
+<li>Cocuk istismari, cinsel siddet veya cinsel istismari gosteren/tasvir eden her turlu icerik.</li>
+<li>Bir cocugu cinsel istismara yonlten, yetistiren (grooming), tesvik eden veya baska birine acikca satan icerik.</li>
+<li>Miniklerin cinsel istismarini, zorlanmasini veya dogasini gosteren animasyon, illustrasyon, emoji, profil fotografi veya avatar icerigi.</li>
+<li>Yasadisi veya gizli olarak cocuk istismarina yonelik paylasim, tanitim veya iletisim kurma.</li>
+<li>Cocuk istismari materyali (CSAM) niteligindeki tum icerik; bu icerik her durumda yasaktir.</li>
+</ul>
+
+<h2>3. Kapsam ve Sifir Tolerans</h2>
+<p>Fast Synastry sifir tolerans ilkesiyle calisir. Uygulama kullanici tarafindan
+uretilen veya paylasilan her turlu icerigi, goreli, mesaj, yorum, profil alani
+ve paylasim ozelligini kabul etmez; bu ozellikler ileride eklenirse ayni yasak
+ve denetim mekanizmalariyla sunulacaktir. Tespit edilen CSAE icerigi derhal
+kaldirilir, ilgili hesaplar kalici olarak kapatilir, icerik saklanarak
+yetkili makamlara ve Google Play'e bildirilir.</p>
+
+<h2>4. Ihbar ve Bildirim Mekanizmasi</h2>
+<p>CSAE icerigi, cocuk istismari, cinsel siddet veya guvenligi tehdit eden baska bir
+durum tespit ettiginizi dusunuz. <b>smyrnaastrology@gmail.com</b> adresine
+konu satirinda <b>"CSAE Report"</b> yazarak bildirin. Bildiriminiz;</p>
+<ol>
+<li>geciksiz olarak alinir ve kayit altina alinir,</li>
+<li>24 saat icinde Google Play'e ve ilgili yasal makamlara aktarilir,</li>
+<li>gerekli kanitlar saklanir ve inceleme sonucu size donulur.</li>
+</ol>
+<p>Acil bir cocuk guvenligi olayi bildirimi lutan bu adres, cocuk guvenligi
+iletisim noktasi olarak yetkilidir.</p>
+
+<h2>5. Cocuklara Yoneliklik Durumu</h2>
+<p>Uygulama 13 yas alti cocuklara yonelik degildir ve cocuk hesabi olusturulmasina
+izin verilmez. Ancak CSAE yasagi tum yas gruplari ve ziyaretciler icin gecerlidir;
+yas farki icin istisna uygulanmaz.</p>
+
+<h2>6. Politika Uyumu ve Yas Proseduru</h2>
+<p>Fast Synastry, Google Play Politikalari, Google Play Cocuk Guvenligi Standartlari
+ve ilgili ulusal/uluslararasi kanunlara uymayi taahhut eder. Yas ihlali
+tespit edildiginde icerik kaldirilir, hesaplar kapatilir, gerekli hallerde
+hukuki islem baslatilir ve durum ilgili makamlara bildirilir. Bu belge
+Fast Synastry uygulamasi ve Fast Synastry gelistirici hesabina (Fatih Asartepe)
+aittir ve yalnizca bu uygulama icin gecerlidir.</p>
+
+<h2>7. Iletisim</h2>
+<p>Cocuk guvenligi ve CSAE bildirimleri: <b>smyrnaastrology@gmail.com</b><br>
+Gizlilik ve veri silme talepleri icin ayni adres kullanilir.</p>
+<hr><p>
+<a href="/standards-en">English version</a> &middot;
+<a href="/privacy">Gizlilik Politikasi</a> &middot;
+<a href="/delete">Veri Silme Talebi</a>
+</p>
+</body></html>"""
+
+@app_fast.get("/standards-en", response_class=HTMLResponse)
+def published_standards_en():
+    """Published standards (English): child safety and CSAE prohibition."""
+    return """<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Synastry - Published Standards (Child Safety and CSAE Prohibition)</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Published Standards &mdash; Child Safety and CSAE Prohibition</h1>
+<p><b>App:</b> Fast Synastry (Google Play package: <b>com.fastastrology.fast</b>)<br>
+<b>Developer / Operator:</b> Fatih Asartepe (Google Play developer account)<br>
+<b>Last updated:</b> September 2026<br>
+<b>Child safety contact:</b> <b>smyrnaastrology@gmail.com</b></p>
+
+<h2>1. Explicit Prohibition of CSAE Content</h2>
+<p><b>Fast Synastry explicitly prohibits Child Sexual Abuse and Exploitation
+(CSAE) content.</b> This prohibition is absolute and applies to the app's users,
+its content and its services. No content that constitutes or depicts CSAE is
+hosted, made available or shared in the app, including content presented for
+artistic, educational or historical reasons.</p>
+
+<h2>2. Prohibited Content Types</h2>
+<ul>
+<li>Any sexual content involving minors, in visual, written, audio or video form.</li>
+<li>Any content depicting or describing child abuse, sexual violence or sexual exploitation.</li>
+<li>Content that grooms, encourages, or solicits a child for sexual exploitation, or offers a child to another person.</li>
+<li>Animation, illustrations, emoji, profile photos or avatars that depict child sexual abuse, coercion or anatomy.</li>
+<li>Illegal or hidden sharing, solicitation or communication intended to facilitate child sexual exploitation.</li>
+<li>All child sexual abuse material (CSAM); such content is prohibited in all circumstances.</li>
+</ul>
+
+<h2>3. Scope and Zero Tolerance</h2>
+<p>Fast Synastry operates a zero-tolerance policy. The app does not accept
+user-generated or user-shared content, ratings and reviews moderation inputs,
+comments, messaging, profile content or sharing features; if such features are
+introduced in future, they will operate under the same prohibition and
+moderation rules. Any detected CSAE content is removed immediately, the
+associated accounts are permanently terminated, and the content is preserved and
+reported to law enforcement and to Google Play.</p>
+
+<h2>4. Reporting and Escalation</h2>
+<p>If you encounter CSAE content, child sexual abuse, sexual violence or any
+other child-safety risk in the app, report it to
+<b>smyrnaastrology@gmail.com</b> with the subject line <b>"CSAE Report"</b>.
+Reports are acknowledged without delay, and:</p>
+<ol>
+<li>logged and triaged immediately,</li>
+<li>escalated to Google Play and the relevant law-enforcement authorities
+within 24 hours,</li>
+<li>relevant evidence is preserved, and the outcome is reported back to you.</li>
+</ol>
+<p>This address is the designated child safety contact point for urgent
+child-safety reports.</p>
+
+<h2>5. Audience and Age</h2>
+<p>The app is not directed at children under 13 and does not permit the creation
+of child accounts. The CSAE prohibition nevertheless applies to all age groups
+and all visitors; no exception is made based on age.</p>
+
+<h2>6. Policy Compliance and Enforcement</h2>
+<p>Fast Synastry commits to compliance with the Google Play Policies, the Google
+Play Child Safety Standards and applicable national and international law. When
+a violation is detected, the content is removed, accounts are terminated,
+legal action is initiated where appropriate, and the matter is reported to the
+relevant authorities. This document belongs to the Fast Synastry app and the
+Fast Synastry developer account (Fatih Asartepe) and applies solely to that app.</p>
+
+<h2>7. Contact</h2>
+<p>Child safety and CSAE reports: <b>smyrnaastrology@gmail.com</b><br>
+The same address handles privacy and data deletion requests.</p>
+<hr><p>
+<a href="/standards">Turkce</a> &middot;
+<a href="/privacy-en">Privacy Policy</a>
+</p>
 </body></html>"""
 
 # ─── Frontend serving ───
