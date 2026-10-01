@@ -41,7 +41,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      // OAuth ekranı kapatıldıysa hata mesajı gösterme.
+      if (!AuthService.isCancellation(e)) _error = e.toString();
       notifyListeners();
       return false;
     } finally {

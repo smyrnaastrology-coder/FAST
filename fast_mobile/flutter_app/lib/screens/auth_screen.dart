@@ -63,7 +63,10 @@ class _AuthScreenState extends State<AuthScreen> {
     if (r.contains('invalid_credentials') || r.contains('invalidlogincredentials') || r.contains('wrong') || r.contains('authfail')) {
       return l10n.loginErrorInvalid;
     }
-    return l10n.loginErrorGeneric;
+    // Eşlenmemiş OAuth hataları eskiden "Genel hata"ya düşüyordu; bu yüzden
+    // Google girişi neden başarısız olduğu görünmüyordu. Artık ham nedeni göster.
+    final detay = raw.replaceFirst(RegExp(r'^(?:Bad state:\s*)'), '').trim();
+    return '${l10n.loginErrorGeneric}\n$detay';
   }
 
   Future<void> _oauth(Future<bool> Function() fn) async {
@@ -72,11 +75,16 @@ class _AuthScreenState extends State<AuthScreen> {
           SnackBar(content: Text(AppLocalizations.of(context).loginErrorDisabled)));
       return;
     }
+    final ap = context.read<AuthProvider>();
     final ok = await fn();
     if (!mounted) return;
     if (ok) {
       if (!widget.force) Navigator.of(context).pop();
       widget.onSignedIn?.call();
+    } else if (ap.error != null && ap.error!.isNotEmpty) {
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(_friendlyError(ap.error, l10n))));
     }
   }
 

@@ -1,11 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../config/api_config.dart';
 import 'revenuecat_service.dart';
+
+/// OAuth ekranı kullanıcı tarafından kapatıldı. Hata değildir ve kullanıcıya
+/// kırmızı uyarı gösterilmez.
+class OAuthCancelled implements Exception {
+  const OAuthCancelled();
+}
 
 /// Kayıtlı kişi modeli (backend auth_people tablosu ile birebir).
 class SavedPerson {
@@ -155,6 +162,9 @@ class AuthService {
   /// Facebook ile giriş (Supabase OAuth — deep link dönüşü).
   static Future<void> signInWithFacebook() => _oauthLogin(OAuthProvider.facebook);
 
+  /// Kullanıcı OAuth ekranını kapatıp vazgeçti — hata değil, sessiz çıkış.
+  static bool isCancellation(Object e) => e is OAuthCancelled;
+
   /// OAuth akışı (PKCE): yetkilendirme URL'si al → tarayıcı → deep link dönüşü.
   static Future<void> _oauthLogin(OAuthProvider provider) async {
     if (!enabled) throw StateError('supabase_disabled');
@@ -162,24 +172,70 @@ class AuthService {
     await prefs.setBool(_rememberKey, true);
 
     // 1) Yetkilendirme URL'sini al (tarayıcıyı kendimiz açacağız)
-    final oauthRes = await Supabase.instance.client.auth.getOAuthSignInUrl(
-      provider: provider,
-      redirectTo: _redirectUri,
-    );
-    final authUrl = oauthRes.url;
-    if (authUrl.isEmpty) throw StateError('oauth_url_null');
+    final String authUrl;
+    try {
+      final oauthRes = await Supabase.instance.client.auth.getOAuthSignInUrl(
+        provider: provider,
+        redirectTo: _redirectUri,
+      );
+      authUrl = oauthRes.url;
+    } catch (e) {
+      throw StateError('Yetkilendirme adresi alınamadı: $e');
+    }
+    if (authUrl.isEmpty) throw StateError('Yetkilendirme adresi boş döndü.');
 
     // 2) Tarayıcıyı aç, deep link dönüşünü bekle
-    final callbackUrl = await FlutterWebAuth2.authenticate(
-      url: authUrl,
-      callbackUrlScheme: _callbackScheme,
-    );
+    final String callbackUrl;
+    try {
+      callbackUrl = await FlutterWebAuth2.authenticate(
+        url: authUrl,
+        callbackUrlScheme: _callbackScheme,
+      );
+    } on PlatformException catch (e) {
+      // Kullanıcı ekranı kapattı — bu hata değil, normal çıkış.
+      if (e.code == 'CANCELED') throw const OAuthCancelled();
+      throw StateError('Tarayıcı açılamadı (${e.code}): ${e.message}');
+    } catch (e) {
+      throw StateError('Tarayıcı hatası: $e');
+    }
 
-    // 3) Dönüş URL'inden session'ı al
-    final sessionRes = await Supabase.instance.client.auth
-        .getSessionFromUrl(Uri.parse(callbackUrl));
-    _applySession(sessionRes.session);
+    // 3) Dönüş URL'ini doğrula. Sessizce geçip oturumsuz kalmak yerine
+    //    gelen ne ise bildir.
+    final uri = Uri.tryParse(callbackUrl);
+    if (uri == null) {
+      throw StateError('Dönüş adresi okunamadı: ${_kisa(callbackUrl)}');
+    }
+    final q = uri.queryParameters;
+    final frag = Uri.splitQueryString(uri.fragment);
+
+    final providerError = q['error'] ?? frag['error'];
+    if (providerError != null && providerError.isNotEmpty) {
+      final desc = q['error_description'] ?? frag['error_description'] ?? '';
+      throw StateError('$providerError${desc.isEmpty ? '' : ' — $desc'}');
+    }
+
+    final oturumVar = q.containsKey('code') ||
+        frag.containsKey('access_token') ||
+        frag.containsKey('refresh_token');
+    if (!oturumVar) {
+      throw StateError(
+          'Dönüş adresinde oturum yok (code/access_token yok). '
+          '$_redirectUri — dönüş: ${_kisa(callbackUrl)}');
+    }
+
+    // 4) Dönüş URL'inden session'ı al
+    try {
+      final sessionRes = await Supabase.instance.client.auth
+          .getSessionFromUrl(uri);
+      _applySession(sessionRes.session);
+    } catch (e) {
+      throw StateError('Oturum oluşturulamadı: $e');
+    }
   }
+
+  static String _kisa(String s) =>
+      s.length <= 110 ? s : '${s.substring(0, 110)}...';
+
 
   static Future<void> signOut() async {
     if (enabled) {
