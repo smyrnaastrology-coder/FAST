@@ -1,8 +1,12 @@
 <#
-    Release AAB build - Supabase degerlerini DAIMA gecirir.
+    Release build - Supabase degerlerini DAIMA gecirir.
 
-    Kullanim (flutter_app klasorunden):
-        .\tool\build_release.ps1
+    Kullanim:
+        powershell -ExecutionPolicy Bypass -File .\tool\build_release.ps1
+        powershell -ExecutionPolicy Bypass -File .\tool\build_release.ps1 -Target apk
+
+    -Target aab (varsayilan) : Play'a yuklenecek paket
+    -Target apk              : cihaza sideload icin test paketi
 
     Neden bu betik var:
     lib/config/api_config.dart icindeki
@@ -13,8 +17,17 @@
     gorunur ama kod saglamdir. Bu, 2026-10'da Play yuklemesinde gecilmis bir
     hatadir; betik bunu tekrar onlemmek icin yazildi.
 
+    ONEMLI: Dogrudan `flutter build ...` calistirmak bu degerleri GECIRMEZ.
+    Her zaman bu betigi kullanin. Betik kendisi -ExecutionPolicy Bypass
+    gerektirir; normalde `.` ile kaynak yukleme PowerShell ilkesinde engellenir.
+
     Degerler tool\supabase.local.ps1 icinde tutulur ve git'e commit edilmez.
 #>
+
+param(
+    [ValidateSet('aab', 'apk')]
+    [string]$Target = 'aab'
+)
 
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot\..   # flutter_app kokune gec
@@ -45,20 +58,36 @@ if ($SupabaseAnonKey -like 'sb_secret_*') {
 $SupabaseUrl = $SupabaseUrl.TrimEnd('/')
 $SupabaseUrl = $SupabaseUrl -replace '/rest/v1/?$', ''
 
-Write-Host "Supabase URL   : $SupabaseUrl" -ForegroundColor DarkGray
-Write-Host "Publishable key: $($SupabaseAnonKey.Substring(0, [Math]::Min(22, $SupabaseAnonKey.Length)))..." -ForegroundColor DarkGray
+Write-Host "Hedef        : $Target" -ForegroundColor Cyan
+Write-Host "Supabase URL : $SupabaseUrl" -ForegroundColor DarkGray
+Write-Host "Publishable  : $($SupabaseAnonKey.Substring(0, [Math]::Min(22, $SupabaseAnonKey.Length)))..." -ForegroundColor DarkGray
 Write-Host ""
 
-flutter build appbundle --release `
-    --dart-define="SUPABASE_URL=$SupabaseUrl" `
-    --dart-define="SUPABASE_ANON_KEY=$SupabaseAnonKey"
+$defines = @(
+    "--dart-define=SUPABASE_URL=$SupabaseUrl"
+    "--dart-define=SUPABASE_ANON_KEY=$SupabaseAnonKey"
+)
+
+if ($Target -eq 'apk') {
+    flutter build apk --release @defines
+} else {
+    flutter build appbundle --release @defines
+}
 
 if ($LASTEXITCODE -ne 0) { Write-Host "BUILD BASARISIZ" -ForegroundColor Red; exit $LASTEXITCODE }
 
-$aab = 'build\app\outputs\bundle\release\app-release.aab'
-if (Test-Path $aab) {
-    $mb = [Math]::Round((Get-Item $aab).Length / 1MB, 1)
+$yol = if ($Target -eq 'apk') {
+    'build\app\outputs\flutter-apk\app-release.apk'
+} else {
+    'build\app\outputs\bundle\release\app-release.aab'
+}
+
+if (Test-Path $yol) {
+    $mb = [Math]::Round((Get-Item $yol).Length / 1MB, 1)
     Write-Host ""
-    Write-Host "Tamam: $aab ($mb MB)" -ForegroundColor Green
+    Write-Host "Tamam: $yol ($mb MB)" -ForegroundColor Green
     Write-Host "Bu paket giris/profil/kayitli kisi ekranlarini ICERIR." -ForegroundColor Green
+} else {
+    Write-Host "HATA: $yol bulunamadi" -ForegroundColor Red
+    exit 1
 }
