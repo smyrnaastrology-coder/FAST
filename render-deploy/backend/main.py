@@ -6874,6 +6874,108 @@ def harita_es(input: EsSevgiliInput):
         return JSONResponse({"session_id": motor._session_id, "harita_base64": img_b64})
     raise HTTPException(404, "Harita oluşturulamadı")
 
+# ============================================================================
+# ASHTAKOOT · 36
+# ============================================================================
+# Kökte Streamlit paneli (ashtakoot_panel.goster) vardı; mobil uygulama ve
+# canlı API için JSON ucu burada.
+#
+# ÖNEMLİ: Ay'ın görünen coğrafi konumu YALNIZCA doğum ANINA bağlıdır, doğum
+# yerine bağlı değildir. Bu yüzden burada harita/şehir çözümü yoktur; yerel
+# saat + UTC ofseti yeterlidir.
+#
+# Modül `ashtakoot_motoru.py` yalnızca math/dataclasses/typing + swisseph
+# kullanır ve kendi içinde import edilir. Motor kendi Lahiri (FLG_SIDEREAL)
+# çağrısını yapar; render-deploy içinde başka hiçbir yerde FLG_SIDEREAL
+# kullanılmadığı için motorun eklenmesi mevcut tropikal hesapları bozmaz.
+try:
+    import ashtakoot_motoru as _ash_motor
+    _ASHTAKOOT_HATA = None
+except Exception as _ash_import_exc:  # pragma: no cover
+    _ash_motor = None
+    _ASHTAKOOT_HATA = str(_ash_import_exc)
+
+
+class AshtaKootInput(BaseModel):
+    # `lang` bilerek YOK: `_analiz_sonuc` girdide `lang` görürse sonucu
+    # `_en_localize`/`_es_localize`'dan geçirir. Ashtakoot cevabı çok dilli
+    # alanları (ad_en/ad_es, nakshatra_*_en/es) motorun kendi `tablo_sozlugu`
+    # çıktısında zaten taşır, ayrı bir çeviri katmanına gerek yok.
+    p1_isim: str = ""
+    p1_tarih: str
+    p1_saat: str = "12:00"
+    p1_utc_offset: float = 3.0
+    p2_isim: str = ""
+    p2_tarih: str
+    p2_saat: str = "12:00"
+    p2_utc_offset: float = 3.0
+    harita: bool = False
+
+
+def _ash_saat_utc(saat, offset):
+    """'HH:MM' yerel saat + UTC ofseti -> (UTC ondalık saat, saat_biliyor_mu).
+
+    Saat verilmemişse öğlen 12:00 varsayılır ve sonuç "yaklaşık" işaretlenir
+    (nakṣatra sınırına yakın doğumlarda puan değişebilir).
+    """
+    s = str(saat or "").strip()
+    if not s:
+        return 12.0 - float(offset), False
+    parca = s.split(":")
+    try:
+        sa = int(parca[0])
+        dk = int(parca[1]) if len(parca) > 1 else 0
+    except Exception:
+        return 12.0 - float(offset), False
+    return (sa + dk / 60.0) - float(offset), True
+
+
+@app_fast.post("/api/analiz/ashtakoot")
+def analiz_ashtakoot(input: AshtaKootInput):
+    global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
+
+    if _ash_motor is None:
+        raise HTTPException(status_code=503, detail={
+            "code": "ASHTAKOOT_UNAVAILABLE",
+            "msg": f"Ashtakoot modülü yüklenemedi: {_ASHTAKOOT_HATA}"})
+
+    # Tarih/saat dönüşümü doğrulaması `_analiz_sonuc` DIŞINDA yapılır; içerideki
+    # geniş `except` HTTPException'ı yutup genel hata döndürebilir.
+    try:
+        d1 = datetime.strptime(str(input.p1_tarih).strip()[:10], "%Y-%m-%d")
+        d2 = datetime.strptime(str(input.p2_tarih).strip()[:10], "%Y-%m-%d")
+    except Exception:
+        raise HTTPException(status_code=400, detail={
+            "code": "BAD_DATE",
+            "msg": "Tarih YYYY-AA-GG biçiminde olmalı."})
+    saat1, bil1 = _ash_saat_utc(input.p1_saat, input.p1_utc_offset)
+    saat2, bil2 = _ash_saat_utc(input.p2_saat, input.p2_utc_offset)
+
+    def calistir():
+        lon1 = _ash_motor.ay_konumu_utc(d1.year, d1.month, d1.day, saat1)
+        lon2 = _ash_motor.ay_konumu_utc(d2.year, d2.month, d2.day, saat2)
+        ay1 = _ash_motor.ay_nakshatrasi_hesapla(lon1, yaklasik=not bil1)
+        ay2 = _ash_motor.ay_nakshatrasi_hesapla(lon2, yaklasik=not bil2)
+        sonuc = _ash_motor.ashtakoot_hesapla(ay1, ay2)
+        cevap = {
+            "mod": "ashtakoot",
+            "p1_isim": input.p1_isim,
+            "p2_isim": input.p2_isim,
+            "toplam": sonuc.toplam,
+            "azami": sonuc.azami,
+            "yuzde": round(sonuc.yuzde, 1),
+            "seviye": sonuc.seviye,          # tr anahtarı, istemci çevirir
+            "ashtakoot": sonuc.tablo_sozlugu(),
+        }
+        if input.harita:
+            cevap["p1_harita"] = _ash_motor.nakshatra_uyum_haritasi(ay1)
+        return cevap
+
+    sonuc, hata = _analiz_sonuc("ashtakoot", input, calistir)
+    if hata: raise hata
+    return sonuc
+
+
 @app_fast.post("/api/analiz/es_sevgili")
 def analiz_es(input: EsSevgiliInput):
     global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
