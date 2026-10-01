@@ -834,7 +834,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyzerSectionLunarReturn => 'Lunar Return — Monthly Cycle';
 
   @override
-  String get analyzerSectionMinorProgress => 'Short-Term Progression — 3-Day Flow';
+  String get analyzerSectionMinorProgress =>
+      'Short-Term Progression — 3-Day Flow';
 
   @override
   String get analyzerSectionChartComment => 'Birth Chart Interpretation';

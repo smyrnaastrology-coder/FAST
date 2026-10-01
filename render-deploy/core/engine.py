@@ -6072,7 +6072,7 @@ class FBST_Engine:
             if _EN:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Pedagogical BSP Moon Climate (Minor Progress)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Pedagogical BSP Moon Climate (Short-Term Progression)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>The evolving emotional blueprint of your parent-child bond (1 Month = 1 Year vibration)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -6085,7 +6085,7 @@ class FBST_Engine:
             elif _ES:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Pedagógico (Progresión Menor)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Pedagógico (Progresión a Corto Plazo)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>El plano emocional en evolución de su vínculo padre/madre-hijo (1 Mes = 1 Año vibración)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -6098,7 +6098,7 @@ class FBST_Engine:
             else:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Pedagojik BSP Ay İklimi (Minör Progress)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Pedagojik BSP Ay İklimi (Kısa Vadeli İlerleme)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>Ebeveyn-Çocuk bağınızın anlık duygusal gelişim haritası (1 Ay = 1 Yıl titreşimi)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -6112,7 +6112,7 @@ class FBST_Engine:
             if _EN:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Current BSP Moon Climate (Minor Progress)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Current BSP Moon Climate (Short-Term Progression)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>The live emotional snapshot of your relationship (1 Month = 1 Year vibration)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -6125,7 +6125,7 @@ class FBST_Engine:
             elif _ES:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Actual (Progresión Menor)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Clima Lunar BSP Actual (Progresión a Corto Plazo)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>La instantánea emocional viva de su relación (1 Mes = 1 Año vibración)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -6138,7 +6138,7 @@ class FBST_Engine:
             else:
                 html_cikti = f"""
                 <div style='background-color:#FBF7F4; color:#4A4A4A; padding:15px; border-left:4px solid #B8A9C9; border-radius:5px; margin-bottom:12px; border:1px solid #E8E0D8;'>
-                    <b style='font-size:18px; color:#4A3F5C;'>Güncel BSP Ay İklimi (Minör Progress)</b><br>
+                    <b style='font-size:18px; color:#4A3F5C;'>Güncel BSP Ay İklimi (Kısa Vadeli İlerleme)</b><br>
                     <span style='color:#6B5B7B; font-size:14px;'>İlişkinizin anlık duygusal röntgeni (1 Ay = 1 Yıl titreşimi)</span>
                     <hr style='border-color:#E8E0D8; margin:8px 0;'>
                     <p style='margin-top:5px; color:#4A4A4A; font-size:15px;'>
@@ -9014,7 +9014,7 @@ class FBST_Engine:
                 story.append(progress_table)
                 story.append(Spacer(1, 8))
         else:
-            story.append(Paragraph(("No minor trigger is expected in the next 6 months. You are in a stable flow." if _EN else ("No se espera ningún desencadenante menor en los próximos 6 meses. Estás en un flujo estable." if _ES else "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız.")), styles['TurkishNormal']))
+            story.append(Paragraph(("No significant trigger is expected in the next 6 months. You are in a stable flow." if _EN else ("No se espera ningún desencadenante significativo en los próximos 6 meses. Estás en un flujo estable." if _ES else "Önümüzdeki 6 ay boyunca belirgin bir tetiklenme bulunmuyor. Stabil bir akıştasınız.")), styles['TurkishNormal']))
 
         # 🌟 7. BÖLÜM: KADERSEL YILDIZ MÜHÜRLERİ 🌟
         story.append(PageBreak())
@@ -12219,7 +12219,7 @@ class FBST_Engine:
                     ("Energía equilibrada — la relación fluye, pero aún se necesitan momentos intensos para alcanzar verdadera profundidad." if _ES else
                      "Dengeli enerji — ilişki akıyor; ancak gerçek derinlik için hâlâ yoğun anlar gerekiyor."))
         if v < 6:
-            return ("Good vitality — the bond carries a steady drive; minor ruts are quickly overcome with joint effort." if _EN else
+            return ("Good vitality — the bond carries a steady drive; small ruts are quickly overcome with joint effort." if _EN else
                     ("Buena vitalidad — el vínculo lleva un impulso constante; los pequeños altibajos se superan con esfuerzo conjunto." if _ES else
                      "İyi canlılık — bağ istikrarlı bir itki taşıyor; küçük sıkışmalar ortak çabayla hızla aşılıyor."))
         if v < 7:

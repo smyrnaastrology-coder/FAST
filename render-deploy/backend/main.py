@@ -1119,7 +1119,7 @@ def _natal_minor_progress_6month(motor):
     try:
         entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=180)
         if not entries:
-            return "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
+            return "Önümüzdeki 6 ay boyunca belirgin bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
         
         # Group by month
         aylar_tr = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
@@ -1140,10 +1140,10 @@ def _natal_minor_progress_6month(motor):
                 continue
         
         if not lines:
-            return "Önümüzdeki 6 ay boyunca minör bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
+            return "Önümüzdeki 6 ay boyunca belirgin bir tetiklenme bulunmuyor. Stabil bir akıştasınız."
         return "<br/>".join(lines)
     except Exception as e:
-        return f"6 aylık minör progress raporu alınamadı: {e}"
+        return f"6 aylık kısa vadeli ilerleme raporu alınamadı: {e}"
 
 app_fast = FastAPI(title="FAST — Asartepe Sinastri Tekniği API", version="4.0")
 
@@ -2105,7 +2105,7 @@ def _generate_natal_pdf(motor):
     if len(str(data.get("lunar_return", ""))) > 20:
         toc_bolumler.append((pdf_label("Lunar Return — Aylık Döngü"), "bolum_lunar"))
     if isinstance(mp6_entries, list) and mp6_entries:
-        toc_bolumler.append((pdf_label("6 Aylık Minor Progress — Gün Gün"), "bolum_minor"))
+        toc_bolumler.append((pdf_label("6 Aylık Kısa Vadeli İlerleme — Gün Gün"), "bolum_minor"))
     if sim and any(v for v in sim.values()):
         toc_bolumler.append((pdf_label("Global Kader Pusulası"), "bolum_kader"))
 
@@ -2542,7 +2542,7 @@ def _generate_natal_pdf(motor):
         bolum_no[0] += 1
         yeni_sayfa()
         c.bookmarkPage("bolum_minor")
-        y = sayfa_basligi(pdf_label("6 Aylık Minor Progress — Gün Gün"), numara=str(bolum_no[0]))
+        y = sayfa_basligi(pdf_label("6 Aylık Kısa Vadeli İlerleme — Gün Gün"), numara=str(bolum_no[0]))
         y = metin_yaz(SOL, y, pdf_label("İlerleyen Ay'ınızın önümüzdeki 6 ay boyunca oluşturacağı açılar, aylık takvim düzeninde aşağıda gösterilmiştir."), "DejaVu", 8.5, acik, 95) - 14
         _leg_x = SOL
         for _renk, _leg_metin in (
