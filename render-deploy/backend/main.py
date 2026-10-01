@@ -7758,8 +7758,9 @@ Fast Synastry uygulamasi ve Fast Synastry gelistirici hesabina (Fatih Asartepe)
 aittir ve yalnizca bu uygulama icin gecerlidir.</p>
 
 <h2>10. Iletisim</h2>
-<p><b>Cocuk guvenligi ve CSAE bildirimleri (belirlenmis iletisim noktasi):</b>
-<b>smyrnaastrology@gmail.com</b><br>
+<p><b>Belirlenmis cocuk guvenligi iletisim noktasi (Play gelistirici hesabi e-posta adresi):</b>
+<b>fatihasartepe@hotmail.com</b><br>
+<b>Cocuk guvenligi ve CSAE bildirimleri:</b> <b>smyrnaastrology@gmail.com</b><br>
 <b>Uygulama ici geri bildirim:</b> smyrnaastrology@gmail.com<br>
 <b>Gizlilik ve veri silme talepleri:</b> smyrnaastrology@gmail.com</p>
 <hr><p>
@@ -7869,8 +7870,9 @@ relevant authorities. This document belongs to the Fast Synastry app and the
 Fast Synastry developer account (Fatih Asartepe) and applies solely to that app.</p>
 
 <h2>10. Contact</h2>
-<p><b>Child safety and CSAE reports (designated point of contact):</b>
-<b>smyrnaastrology@gmail.com</b><br>
+<p><b>Designated child safety point of contact (Play developer account email):</b>
+<b>fatihasartepe@hotmail.com</b><br>
+<b>Child safety and CSAE reports:</b> <b>smyrnaastrology@gmail.com</b><br>
 <b>In-app user feedback:</b> smyrnaastrology@gmail.com<br>
 <b>Privacy and data deletion requests:</b> smyrnaastrology@gmail.com</p>
 <hr><p>
