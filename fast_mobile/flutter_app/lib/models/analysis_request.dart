@@ -18,6 +18,12 @@ class AnalysisRequest {
   final String mod;
   final String lang;
 
+  /// Ashtakoot modu için kişi başına UTC ofseti. Ay'ın konumu doğum ANINA
+  /// bağlı olduğu için (doğum yeri değil) tek bir ortak ofset yeterli olmayabilir;
+  /// iki kişi farklı ülkelerde doğmuş olabilir. Türkiye varsayılanı +3.
+  final double p1UtcOffset;
+  final double p2UtcOffset;
+
   AnalysisRequest({
     this.p1Isim = '',
     required this.p1Tarih,
@@ -33,6 +39,8 @@ class AnalysisRequest {
     required this.lat,
     required this.lon,
     this.utcOffset,
+    this.p1UtcOffset = 3.0,
+    this.p2UtcOffset = 3.0,
     this.mod = 'es_sevgili',
     this.lang = 'tr',
   });
@@ -65,6 +73,20 @@ class AnalysisRequest {
           'cocuk_saat': p2Saat,
         });
         break;
+      case 'ashtakoot':
+        // Ay konumu yalnızca doğum anına bağlı; şehir/enlem/boylam GÖNDERİLMEZ
+        // (backend bu yüzden harita çözümü yapmıyor).
+        base.remove('sehir');
+        base.remove('ulke');
+        base.remove('enlem');
+        base.remove('boylam');
+        base.addAll({
+          'p1_isim': p1Isim, 'p1_tarih': p1Tarih,
+          'p1_saat': p1Saat, 'p1_utc_offset': p1UtcOffset,
+          'p2_isim': p2Isim, 'p2_tarih': p2Tarih,
+          'p2_saat': p2Saat, 'p2_utc_offset': p2UtcOffset,
+        });
+        break;
     }
     return base;
   }
@@ -75,6 +97,7 @@ class AnalysisRequest {
       case 'ebeveyn_cocuk': return l10n.modeEbTitle;
       case 'potansiyel_yetenek': return l10n.modePyTitle;
       case 'bireysel_natal': return l10n.modeNatalTitle;
+      case 'ashtakoot': return l10n.modeAshTitle;
       default: return mod;
     }
   }

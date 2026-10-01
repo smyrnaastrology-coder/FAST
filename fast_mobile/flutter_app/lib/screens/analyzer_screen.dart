@@ -57,6 +57,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // Ebeveyn
   String _ebeveynRolu = 'anne';
 
+  // Ashtakoot: Ay konumu doğum anına bağlı, doğum yerine değil. Bu yüzden
+  // şehir/enlem/boylam yerine kişi başına UTC ofseti sorulur. Türkiye +3.
+  double _ashOfset1 = 3.0;
+  double _ashOfset2 = 3.0;
+
   // Astrocartography selector
   String _astroUlke = '';
   String _astroSehir = '';
@@ -79,15 +84,18 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     if (_mode == 'es_sevgili') return 'es_sevgili';
     if (_mode == 'ebeveyn_cocuk') return 'ebeveyn_cocuk';
     if (_mode == 'potansiyel_yetenek') return 'potansiyel_yetenek';
+    if (_mode == 'ashtakoot') return 'ashtakoot';
     return 'bireysel_natal';
   }
 
-  bool get _ikinciKisiGerekli => _modKey == 'es_sevgili' || _modKey == 'ebeveyn_cocuk';
+  bool get _ikinciKisiGerekli =>
+      _modKey == 'es_sevgili' || _modKey == 'ebeveyn_cocuk' || _modKey == 'ashtakoot';
   bool get _eventGerekli => _modKey == 'es_sevgili';
   bool get _ebeveynMod => _modKey == 'ebeveyn_cocuk';
   bool get _natalMod => _modKey == 'bireysel_natal';
   bool get _potansiyelMod => _modKey == 'potansiyel_yetenek';
   bool get _tekKisiMod => _natalMod || _potansiyelMod;
+  bool get _isAsh => _mode == 'ashtakoot';
   bool get _isNatal => _mode == 'bireysel_natal';
   bool get _isEs => _mode == 'es_sevgili';
   bool get _isEb => _mode == 'ebeveyn_cocuk';
@@ -244,6 +252,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       country: _seciliUlke,
       lat: double.tryParse(_latCtrl.text) ?? 41.0082,
       lon: double.tryParse(_lonCtrl.text) ?? 28.9784,
+      p1UtcOffset: _ashOfset1,
+      p2UtcOffset: _ashOfset2,
       mod: _modKey,
       lang: lp.locale.languageCode,
     );
@@ -335,6 +345,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       case 'ebeveyn_cocuk': return l10n.modeEbTitle;
       case 'potansiyel_yetenek': return l10n.modePyTitle;
       case 'bireysel_natal': return l10n.modeNatalTitle;
+      case 'ashtakoot': return l10n.modeAshTitle;
       default: return _mode;
     }
   }
@@ -417,8 +428,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           if (_isEb) _ebForm(l10n),
           if (_isPy) _pyForm(l10n),
           if (_isNatal) _natalForm(l10n),
+          if (_isAsh) _ashForm(l10n),
           const SizedBox(height: 4),
-          _locationForm(l10n),
+          // Ashtakoot'ta doğum YERİ önemsizdir (Ay konumu doğum anına bağlı),
+          // bu yüzden şehir formu gizlenir; yerine UTC ofseti seçilir.
+          if (!_isAsh) _locationForm(l10n),
           const SizedBox(height: 8),
           _peopleSection(l10n),
           const SizedBox(height: 8),
@@ -487,11 +501,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         if (_isEb) _ebForm(l10n),
         if (_isPy) _pyForm(l10n),
         if (_isNatal) _natalForm(l10n),
+        if (_isAsh) _ashForm(l10n),
 
         const SizedBox(height: 8),
 
-        // Location
-        _locationForm(l10n),
+        // Location — Ashtakoot'ta doğum yeri önemsiz (Ay konumu doğum anına bağlı).
+        if (!_isAsh) _locationForm(l10n),
 
         // Kayıtlı kişiler (Madde 5)
         _peopleSection(l10n),
@@ -523,6 +538,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.analyzerModeEbDesc, 'img': 'assets/ebeveyn_cocuk.png'},
       {'key': 'bireysel_natal', 'title': l10n.modeNatalTitle, 'desc': l10n.analyzerModeNatalDesc, 'img': 'assets/natal.png'},
       {'key': 'potansiyel_yetenek', 'title': l10n.modePyTitle, 'desc': l10n.analyzerModePyDesc, 'img': 'assets/potansiyel_yetenek.png'},
+      // Ashtakoot için ayrı görsel yok; aşağıdaki 'img' yerine ikon çizilir.
+      {'key': 'ashtakoot', 'title': l10n.modeAshTitle, 'desc': l10n.analyzerModeAshDesc, 'img': null},
     ];
     return modes.map((m) {
       final key = m['key'] as String;
@@ -554,7 +571,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   border: Border.all(color: active ? FastTheme.accentGold : FastTheme.border),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: Image.asset(m['img'] as String, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                child: m['img'] == null
+                    // Görseli olmayan modlar (ashtakoot) için ikon.
+                    ? Icon(Icons.auto_awesome,
+                        size: 20, color: active ? FastTheme.accentGold : FastTheme.textDim)
+                    : Image.asset(m['img'] as String, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -737,6 +758,65 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         _dateField(l10n.analyzerBirthDate, _p1TarihCtrl, l10n),
         _timeField(l10n.analyzerBirthTime, _p1SaatCtrl),
       ],
+    );
+  }
+
+  /// Ashtakoot · 36 — iki kişinin Ay nakṣatra uyumu.
+  ///
+  /// Burada bilerek şehir/ülke/enlem/boylam SORULMAZ: Ay'ın görünen konumu
+  /// yalnızca doğum anına bağlıdır, doğum yerine değil. Tek gereken, her kişi
+  /// için yerel saat ve o saatin UTC ofsetidir.
+  Widget _ashForm(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.ashExplainer, style: TextStyle(fontSize: 11, color: FastTheme.textDim)),
+        const SizedBox(height: 10),
+        _sectionTitle(l10n.analyzerPerson1),
+        _formField(l10n.analyzerName, _p1IsimCtrl, icon: Icons.person),
+        _dateField(l10n.analyzerBirthDate, _p1TarihCtrl, l10n),
+        _timeField(l10n.analyzerBirthTime, _p1SaatCtrl),
+        _ashOffsetField(l10n, 1),
+        _sectionTitle(l10n.analyzerPerson2),
+        _formField(l10n.analyzerName, _p2IsimCtrl, icon: Icons.person_outline),
+        _dateField(l10n.analyzerBirthDate, _p2TarihCtrl, l10n),
+        _timeField(l10n.analyzerBirthTime, _p2SaatCtrl),
+        _ashOffsetField(l10n, 2),
+      ],
+    );
+  }
+
+  /// Kişi başına UTC ofseti seçimi (slot 1 veya 2).
+  Widget _ashOffsetField(AppLocalizations l10n, int slot) {
+    const secenekler = <double>[
+      -8, -5, -3, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8, 9, 10, 12,
+    ];
+    final mevcut = slot == 1 ? _ashOfset1 : _ashOfset2;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: DropdownButtonFormField<double>(
+        initialValue: secenekler.contains(mevcut) ? mevcut : 3.0,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: '${l10n.ashUtcOffset} ${slot == 1 ? '1' : '2'}',
+          prefixIcon: const Icon(Icons.schedule, size: 18),
+          border: const OutlineInputBorder(),
+        ),
+        items: secenekler
+            .map((o) => DropdownMenuItem(
+                  value: o,
+                  child: Text('UTC${o >= 0 ? '+' : ''}${o % 1 == 0 ? o.toInt().toString() : o}'),
+                ))
+            .toList(),
+        onChanged: (v) => setState(() {
+          if (v == null) return;
+          if (slot == 1) {
+            _ashOfset1 = v;
+          } else {
+            _ashOfset2 = v;
+          }
+        }),
+      ),
     );
   }
 
@@ -1244,6 +1324,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // ========== RESULTS SECTION ==========
   Widget _resultsSection(AnalysisProvider provider, AppLocalizations l10n) {
     final r = provider.detayliResult ?? provider.result!;
+    // Ashtakoot'un kendi sunucusu, harita/PDF/simülasyon oturumu yok; genel
+    // sonuç düzeni ona uymuyor.
+    if (_isAsh) return _ashResults(r, l10n);
     final sessionId = provider.sessionId ?? '';
     final simData = provider.simData;
     if (simData != _prevSimData) {
@@ -1293,6 +1376,182 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             child: Text(l10n.analyzerSimulationRenewed(r['sim_sehir'].toString()),
               textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13)),
           ),
+      ],
+    );
+  }
+
+  /// Ashtakoot sonuç ekranı: toplam puan, iki Ay profili ve 8 koota satırı.
+  Widget _ashResults(Map<String, dynamic> r, AppLocalizations l10n) {
+    final t = (r['ashtakoot'] as Map?)?.cast<String, dynamic>() ?? r;
+    final kootalar = (t['kootalar'] as List?) ?? const [];
+    final a = (t['a'] as Map?)?.cast<String, dynamic>();
+    final b = (t['b'] as Map?)?.cast<String, dynamic>();
+    final toplam = (t['toplam'] ?? r['toplam'] ?? 0) as int;
+    final azami = (t['azami'] ?? r['azami'] ?? 36) as int;
+    final yuzde = (t['yuzde'] ?? r['yuzde'] ?? 0.0).toDouble();
+    final seviye = (t['seviye'] ?? r['seviye'] ?? '') as String;
+    final uyari = (t['uyari'] as List?)?.cast<String>() ?? const [];
+    final dil = Localizations.localeOf(context).languageCode;
+
+    String _ad(Map k) {
+      if (dil == 'en') return (k['ad_en'] ?? k['ad'] ?? '').toString();
+      if (dil == 'es') return (k['ad_es'] ?? k['ad'] ?? '').toString();
+      return (k['ad_tr'] ?? k['ad'] ?? '').toString();
+    }
+
+    String _seviyeMetni() {
+      switch (seviye) {
+        case 'cok_dusuk': return l10n.ashLevelVeryLow;
+        case 'dusuk': return l10n.ashLevelLow;
+        case 'yuksek': return l10n.ashLevelHigh;
+        default: return l10n.ashLevelMedium;
+      }
+    }
+
+    Widget _ayKarti(Map? m, String baslik) {
+      if (m == null) return const SizedBox.shrink();
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: FastTheme.cardBg,
+          border: Border.all(color: FastTheme.border),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(baslik,
+                style: TextStyle(
+                    color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(
+              '${m['nakshatra']} · ${m['pada']}. pada · ${m['burc']}',
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 13),
+            ),
+            Text(
+              'Lord: ${m['lord']}  ·  ${m['tanri']}',
+              style: TextStyle(color: FastTheme.textDim, fontSize: 11),
+            ),
+            Text(
+              '${l10n.ashVarna}: ${m['varna']}  ·  ${l10n.ashGana}: ${m['gana']}  ·  ${l10n.ashNadi}: ${m['nadi']}',
+              style: TextStyle(color: FastTheme.textDim, fontSize: 11),
+            ),
+            if (m['yaklasik'] == true)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(l10n.ashApproximate,
+                    style: TextStyle(color: FastTheme.accentGold, fontSize: 11)),
+              ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.analyzerResultsTitle,
+            style: TextStyle(color: FastTheme.textMuted, fontSize: 14, letterSpacing: 1)),
+        const SizedBox(height: 16),
+
+        // Toplam puan
+        _scoreCard(
+          l10n.ashTotalScore,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('$toplam / $azami',
+                  style: GoogleFonts.cormorantGaramond(
+                      fontSize: 34, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+              Text('${yuzde.toStringAsFixed(1)}%  ·  ${_seviyeMetni()}',
+                  style: TextStyle(color: FastTheme.textDim, fontSize: 12)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        _sectionTitle(l10n.ashMoonProfiles),
+        _ayKarti(a, l10n.ashPersonAMoon),
+        _ayKarti(b, l10n.ashPersonBMoon),
+        const SizedBox(height: 16),
+
+        _sectionTitle(l10n.ashKootalar),
+        ...kootalar.map((k) {
+          final kk = (k as Map).cast<String, dynamic>();
+          final p = (kk['puan'] ?? 0) as int;
+          final m = (kk['azami'] ?? 1) as int;
+          final oran = m == 0 ? 0.0 : (p / m).clamp(0.0, 1.0);
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: FastTheme.cardBg,
+              border: Border.all(
+                  color: oran >= 0.99 ? FastTheme.accentGold : FastTheme.border),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(_ad(kk),
+                          style: TextStyle(
+                              color: FastTheme.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700)),
+                    ),
+                    Text('$p / $m',
+                        style: GoogleFonts.cormorantGaramond(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: oran >= 0.99 ? FastTheme.accentGold : FastTheme.textDim)),
+                  ],
+                ),
+                if (oran > 0) ...[
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: oran,
+                      minHeight: 4,
+                      backgroundColor: FastTheme.bg,
+                      valueColor: AlwaysStoppedAnimation(
+                          oran >= 0.99 ? FastTheme.accentGold : FastTheme.textDim),
+                    ),
+                  ),
+                ],
+                if ((kk['not'] ?? '').toString().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(kk['not'].toString(),
+                      style: TextStyle(color: FastTheme.textDim, fontSize: 11, height: 1.35)),
+                ],
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: 16),
+
+        if (uyari.isNotEmpty) ...[
+          _sectionTitle(l10n.ashWarnings),
+          ...uyari.map((u) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline, size: 14, color: FastTheme.accentGold),
+                    const SizedBox(width: 6),
+                    Expanded(
+                        child: Text(u,
+                            style: TextStyle(
+                                color: FastTheme.textDim, fontSize: 11, height: 1.35))),
+                  ],
+                ),
+              )),
+        ],
       ],
     );
   }

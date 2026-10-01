@@ -33,6 +33,7 @@ class ApiService {
       'es_sevgili' => ApiConfig.analizEs,
       'ebeveyn_cocuk' => ApiConfig.analizEb,
       'potansiyel_yetenek' => ApiConfig.analizPy,
+      'ashtakoot' => ApiConfig.analizAshtakoot,
       _ => ApiConfig.analizNatal,
     };
     return _post(url, req.toJson(), timeout: ApiConfig.longTimeout);

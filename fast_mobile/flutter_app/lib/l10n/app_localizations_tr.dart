@@ -1344,4 +1344,60 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get peopleApplyPerson2 => '2. Kişi';
+
+  @override
+  String get modeAshTitle => 'Ashtakoot · 36';
+
+  @override
+  String get analyzerModeAshDesc => 'Ay nakṣatra uyum puanı';
+
+  @override
+  String get ashExplainer =>
+      'Ashtakoot, iki kişinin Ay nakṣatra (pada) uyumunu 36 puan üzerinden ölçer. Ay\'ın konumu doğum ANINA bağlıdır, doğum yerine değil — bu yüzden saat dilimini doğru seçin.';
+
+  @override
+  String get ashUtcOffset => 'Saat dilimi';
+
+  @override
+  String get ashPersonAMoon => 'Birinci kişinin Ay\'ı';
+
+  @override
+  String get ashPersonBMoon => 'İkinci kişinin Ay\'ı';
+
+  @override
+  String get ashMoonProfiles => 'Ay Profilleri';
+
+  @override
+  String get ashKootalar => 'Kootalar (36 puan)';
+
+  @override
+  String get ashTotalScore => 'Toplam Uyum';
+
+  @override
+  String get ashWarnings => 'Uyarılar';
+
+  @override
+  String get ashApproximate =>
+      'Doğum saati bilinmediği için yaklaşık hesaplandı.';
+
+  @override
+  String get ashVarna => 'Varna';
+
+  @override
+  String get ashGana => 'Gana';
+
+  @override
+  String get ashNadi => 'Nadi';
+
+  @override
+  String get ashLevelVeryLow => 'Çok düşük';
+
+  @override
+  String get ashLevelLow => 'Düşük';
+
+  @override
+  String get ashLevelMedium => 'Orta';
+
+  @override
+  String get ashLevelHigh => 'Yüksek';
 }

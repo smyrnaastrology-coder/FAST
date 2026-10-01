@@ -413,5 +413,77 @@
   "peopleFolderRequired": "Klasör adı girin",
   "peopleApplyTo": "Kişiyi şuraya uygula",
   "peopleApplyPerson1": "1. Kişi",
-  "peopleApplyPerson2": "2. Kişi"
+  "peopleApplyPerson2": "2. Kişi",
+  "modeAshTitle": "Ashtakoot · 36",
+  "analyzerModeAshDesc": "Ay nakṣatra uyum puanı",
+  "ashExplainer": "Ashtakoot, iki kişinin Ay nakṣatra (pada) uyumunu 36 puan üzerinden ölçer. Ay'ın konumu doğum ANINA bağlıdır, doğum yerine değil — bu yüzden saat dilimini doğru seçin.",
+  "ashUtcOffset": "Saat dilimi",
+  "ashPersonAMoon": "Birinci kişinin Ay'ı",
+  "ashPersonBMoon": "İkinci kişinin Ay'ı",
+  "ashMoonProfiles": "Ay Profilleri",
+  "ashKootalar": "Kootalar (36 puan)",
+  "ashTotalScore": "Toplam Uyum",
+  "ashWarnings": "Uyarılar",
+  "ashApproximate": "Doğum saati bilinmediği için yaklaşık hesaplandı.",
+  "ashVarna": "Varna",
+  "ashGana": "Gana",
+  "ashNadi": "Nadi",
+  "ashLevelVeryLow": "Çok düşük",
+  "ashLevelLow": "Düşük",
+  "ashLevelMedium": "Orta",
+  "ashLevelHigh": "Yüksek",
+  "@modeAshTitle": {
+    "description": "Ashtakoot · 36"
+  },
+  "@analyzerModeAshDesc": {
+    "description": "Ay nakṣatra uyum puanı"
+  },
+  "@ashExplainer": {
+    "description": "Ashtakoot, iki kişinin Ay nakṣatra (pada) uyumunu 36 puan üzerinden ölçer. Ay'ın konumu doğum ANINA bağlıdır, doğum yerine değil — bu yüzden saat dilimini doğru seçin."
+  },
+  "@ashUtcOffset": {
+    "description": "Saat dilimi"
+  },
+  "@ashPersonAMoon": {
+    "description": "Birinci kişinin Ay'ı"
+  },
+  "@ashPersonBMoon": {
+    "description": "İkinci kişinin Ay'ı"
+  },
+  "@ashMoonProfiles": {
+    "description": "Ay Profilleri"
+  },
+  "@ashKootalar": {
+    "description": "Kootalar (36 puan)"
+  },
+  "@ashTotalScore": {
+    "description": "Toplam Uyum"
+  },
+  "@ashWarnings": {
+    "description": "Uyarılar"
+  },
+  "@ashApproximate": {
+    "description": "Doğum saati bilinmediği için yaklaşık hesaplandı."
+  },
+  "@ashVarna": {
+    "description": "Varna"
+  },
+  "@ashGana": {
+    "description": "Gana"
+  },
+  "@ashNadi": {
+    "description": "Nadi"
+  },
+  "@ashLevelVeryLow": {
+    "description": "Çok düşük"
+  },
+  "@ashLevelLow": {
+    "description": "Düşük"
+  },
+  "@ashLevelMedium": {
+    "description": "Orta"
+  },
+  "@ashLevelHigh": {
+    "description": "Yüksek"
+  }
 }

@@ -406,5 +406,77 @@
   "peopleFolderRequired": "Ingrese un nombre de carpeta",
   "peopleApplyTo": "Aplicar persona a",
   "peopleApplyPerson1": "Persona 1",
-  "peopleApplyPerson2": "Persona 2"
+  "peopleApplyPerson2": "Persona 2",
+  "modeAshTitle": "Ashtakoot · 36",
+  "analyzerModeAshDesc": "Puntuación de compatibilidad del nakshatra lunar",
+  "ashExplainer": "Ashtakoot mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende del momento del nacimiento, no del lugar: elige la zona horaria correcta.",
+  "ashUtcOffset": "Zona horaria",
+  "ashPersonAMoon": "Luna de la primera persona",
+  "ashPersonBMoon": "Luna de la segunda persona",
+  "ashMoonProfiles": "Perfiles lunares",
+  "ashKootalar": "Kootas (36 puntos)",
+  "ashTotalScore": "Compatibilidad total",
+  "ashWarnings": "Advertencias",
+  "ashApproximate": "Calculado de forma aproximada porque no se conoce la hora de nacimiento.",
+  "ashVarna": "Varna",
+  "ashGana": "Gana",
+  "ashNadi": "Nadi",
+  "ashLevelVeryLow": "Muy baja",
+  "ashLevelLow": "Baja",
+  "ashLevelMedium": "Media",
+  "ashLevelHigh": "Alta",
+  "@modeAshTitle": {
+    "description": "Ashtakoot · 36"
+  },
+  "@analyzerModeAshDesc": {
+    "description": "Puntuación de compatibilidad del nakshatra lunar"
+  },
+  "@ashExplainer": {
+    "description": "Ashtakoot mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende del momento del nacimiento, no del lugar: elige la zona horaria correcta."
+  },
+  "@ashUtcOffset": {
+    "description": "Zona horaria"
+  },
+  "@ashPersonAMoon": {
+    "description": "Luna de la primera persona"
+  },
+  "@ashPersonBMoon": {
+    "description": "Luna de la segunda persona"
+  },
+  "@ashMoonProfiles": {
+    "description": "Perfiles lunares"
+  },
+  "@ashKootalar": {
+    "description": "Kootas (36 puntos)"
+  },
+  "@ashTotalScore": {
+    "description": "Compatibilidad total"
+  },
+  "@ashWarnings": {
+    "description": "Advertencias"
+  },
+  "@ashApproximate": {
+    "description": "Calculado de forma aproximada porque no se conoce la hora de nacimiento."
+  },
+  "@ashVarna": {
+    "description": "Varna"
+  },
+  "@ashGana": {
+    "description": "Gana"
+  },
+  "@ashNadi": {
+    "description": "Nadi"
+  },
+  "@ashLevelVeryLow": {
+    "description": "Muy baja"
+  },
+  "@ashLevelLow": {
+    "description": "Baja"
+  },
+  "@ashLevelMedium": {
+    "description": "Media"
+  },
+  "@ashLevelHigh": {
+    "description": "Alta"
+  }
 }

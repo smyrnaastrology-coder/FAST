@@ -583,8 +583,8 @@ class AshtaKootSonuc:
             "kendisi_ile": self.kendisi_ile,
             "a": _kisalt(self.a), "b": _kisalt(self.b),
             "kootalar": [
-                {"ad": k.ad, "ad_en": k.ad_en, "ad_es": k.ad_es, "azami": k.azami,
-                 "puan": k.puan, "not": k.not_, "detay": k.detay}
+                {"ad": k.ad, "ad_tr": k.ad_tr, "ad_en": k.ad_en, "ad_es": k.ad_es,
+                 "azami": k.azami, "puan": k.puan, "not": k.not_, "detay": k.detay}
                 for k in self.kootalar
             ],
             "uyari": list(self.uyari),

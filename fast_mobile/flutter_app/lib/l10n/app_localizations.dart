@@ -2541,6 +2541,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Person 2'**
   String get peopleApplyPerson2;
+
+  /// Ashtakoot · 36
+  ///
+  /// In en, this message translates to:
+  /// **'Ashtakoot · 36'**
+  String get modeAshTitle;
+
+  /// Moon nakshatra compatibility score
+  ///
+  /// In en, this message translates to:
+  /// **'Moon nakshatra compatibility score'**
+  String get analyzerModeAshDesc;
+
+  /// Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.
+  ///
+  /// In en, this message translates to:
+  /// **'Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.'**
+  String get ashExplainer;
+
+  /// Time zone
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get ashUtcOffset;
+
+  /// First person Moon
+  ///
+  /// In en, this message translates to:
+  /// **'First person Moon'**
+  String get ashPersonAMoon;
+
+  /// Second person Moon
+  ///
+  /// In en, this message translates to:
+  /// **'Second person Moon'**
+  String get ashPersonBMoon;
+
+  /// Moon Profiles
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Profiles'**
+  String get ashMoonProfiles;
+
+  /// Kootas (36 points)
+  ///
+  /// In en, this message translates to:
+  /// **'Kootas (36 points)'**
+  String get ashKootalar;
+
+  /// Total Compatibility
+  ///
+  /// In en, this message translates to:
+  /// **'Total Compatibility'**
+  String get ashTotalScore;
+
+  /// Warnings
+  ///
+  /// In en, this message translates to:
+  /// **'Warnings'**
+  String get ashWarnings;
+
+  /// Calculated approximately because the birth time is unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated approximately because the birth time is unknown.'**
+  String get ashApproximate;
+
+  /// Varna
+  ///
+  /// In en, this message translates to:
+  /// **'Varna'**
+  String get ashVarna;
+
+  /// Gana
+  ///
+  /// In en, this message translates to:
+  /// **'Gana'**
+  String get ashGana;
+
+  /// Nadi
+  ///
+  /// In en, this message translates to:
+  /// **'Nadi'**
+  String get ashNadi;
+
+  /// Very low
+  ///
+  /// In en, this message translates to:
+  /// **'Very low'**
+  String get ashLevelVeryLow;
+
+  /// Low
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get ashLevelLow;
+
+  /// Moderate
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get ashLevelMedium;
+
+  /// High
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get ashLevelHigh;
 }
 
 class _AppLocalizationsDelegate

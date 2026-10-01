@@ -406,5 +406,77 @@
   "peopleFolderRequired": "Enter a folder name",
   "peopleApplyTo": "Apply person to",
   "peopleApplyPerson1": "Person 1",
-  "peopleApplyPerson2": "Person 2"
+  "peopleApplyPerson2": "Person 2",
+  "modeAshTitle": "Ashtakoot · 36",
+  "analyzerModeAshDesc": "Moon nakshatra compatibility score",
+  "ashExplainer": "Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.",
+  "ashUtcOffset": "Time zone",
+  "ashPersonAMoon": "First person Moon",
+  "ashPersonBMoon": "Second person Moon",
+  "ashMoonProfiles": "Moon Profiles",
+  "ashKootalar": "Kootas (36 points)",
+  "ashTotalScore": "Total Compatibility",
+  "ashWarnings": "Warnings",
+  "ashApproximate": "Calculated approximately because the birth time is unknown.",
+  "ashVarna": "Varna",
+  "ashGana": "Gana",
+  "ashNadi": "Nadi",
+  "ashLevelVeryLow": "Very low",
+  "ashLevelLow": "Low",
+  "ashLevelMedium": "Moderate",
+  "ashLevelHigh": "High",
+  "@modeAshTitle": {
+    "description": "Ashtakoot · 36"
+  },
+  "@analyzerModeAshDesc": {
+    "description": "Moon nakshatra compatibility score"
+  },
+  "@ashExplainer": {
+    "description": "Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone."
+  },
+  "@ashUtcOffset": {
+    "description": "Time zone"
+  },
+  "@ashPersonAMoon": {
+    "description": "First person Moon"
+  },
+  "@ashPersonBMoon": {
+    "description": "Second person Moon"
+  },
+  "@ashMoonProfiles": {
+    "description": "Moon Profiles"
+  },
+  "@ashKootalar": {
+    "description": "Kootas (36 points)"
+  },
+  "@ashTotalScore": {
+    "description": "Total Compatibility"
+  },
+  "@ashWarnings": {
+    "description": "Warnings"
+  },
+  "@ashApproximate": {
+    "description": "Calculated approximately because the birth time is unknown."
+  },
+  "@ashVarna": {
+    "description": "Varna"
+  },
+  "@ashGana": {
+    "description": "Gana"
+  },
+  "@ashNadi": {
+    "description": "Nadi"
+  },
+  "@ashLevelVeryLow": {
+    "description": "Very low"
+  },
+  "@ashLevelLow": {
+    "description": "Low"
+  },
+  "@ashLevelMedium": {
+    "description": "Moderate"
+  },
+  "@ashLevelHigh": {
+    "description": "High"
+  }
 }

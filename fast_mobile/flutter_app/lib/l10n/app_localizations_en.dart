@@ -1348,4 +1348,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get peopleApplyPerson2 => 'Person 2';
+
+  @override
+  String get modeAshTitle => 'Ashtakoot · 36';
+
+  @override
+  String get analyzerModeAshDesc => 'Moon nakshatra compatibility score';
+
+  @override
+  String get ashExplainer =>
+      'Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.';
+
+  @override
+  String get ashUtcOffset => 'Time zone';
+
+  @override
+  String get ashPersonAMoon => 'First person Moon';
+
+  @override
+  String get ashPersonBMoon => 'Second person Moon';
+
+  @override
+  String get ashMoonProfiles => 'Moon Profiles';
+
+  @override
+  String get ashKootalar => 'Kootas (36 points)';
+
+  @override
+  String get ashTotalScore => 'Total Compatibility';
+
+  @override
+  String get ashWarnings => 'Warnings';
+
+  @override
+  String get ashApproximate =>
+      'Calculated approximately because the birth time is unknown.';
+
+  @override
+  String get ashVarna => 'Varna';
+
+  @override
+  String get ashGana => 'Gana';
+
+  @override
+  String get ashNadi => 'Nadi';
+
+  @override
+  String get ashLevelVeryLow => 'Very low';
+
+  @override
+  String get ashLevelLow => 'Low';
+
+  @override
+  String get ashLevelMedium => 'Moderate';
+
+  @override
+  String get ashLevelHigh => 'High';
 }

@@ -25,6 +25,7 @@ class ApiConfig {
   static const String analizEbDetayli = '$baseUrl/api/analiz/ebeveyn_cocuk/detayli';
   static const String analizPy = '$baseUrl/api/analiz/potansiyel_yetenek';
   static const String analizNatal = '$baseUrl/api/analiz/bireysel_natal';
+  static const String analizAshtakoot = '$baseUrl/api/analiz/ashtakoot';
 
   // Simülasyon
   static const String simulasyonRadar = '$baseUrl/api/simulasyon/radar';
