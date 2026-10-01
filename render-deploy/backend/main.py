@@ -7714,12 +7714,42 @@ konu satirinda <b>"CSAE Report"</b> yazarak bildirin. Bildiriminiz;</p>
 <p>Acil bir cocuk guvenligi olayi bildirimi lutan bu adres, cocuk guvenligi
 iletisim noktasi olarak yetkilidir.</p>
 
-<h2>5. Cocuklara Yoneliklik Durumu</h2>
+<h2>5. Uygulama Ici Geri Bildirim Mekanizmasi</h2>
+<p>Fast Synastry, kullanicilarin geri bildirim ve sikayet gonderebilmesi icin
+uygulama icinde acik bir iletisim kanali sunar. Uygulamanin ana ekranindaki
+<b>iletisim</b> bolumunde <b>smyrnaastrology@gmail.com</b> adresi yer alir.
+Kullanici bu adrese uygulama ile ilgili her turlu geri bildirim, sikayet,
+hata bildirimi ve cocuk guvenligi ihbari gonderebilir. Gelen mesajlar
+kayit altina alinir ve en kisa surede yanitlanir.</p>
+
+<h2>6. CSAM (Cocuk Istismari Materyali) ile Mucadele Yontemi</h2>
+<p>CSAM icerigi tespit edildiginde uygulama su adimlari uygular:</p>
+<ol>
+<li>Icerik <b>derhal kaldirilir</b> ve sunucudan silinir.</li>
+<li>Icerigi yukleyen veya paylasan <b>hesaplar kalici olarak kapatilir</b>; ayni kullanicidan yeni hesap acilamaz.</li>
+<li>Icerik ve ilgili kayitlar <b>saklanir</b> (kanit korunur).</li>
+<li>Kayitlar <b>24 saat icinde</b> cocuk istismariyla mucadele uluslararasi
+makamlarina (NCMEC / ECCC / ulusal POLIS birimi), Google Play'e ve
+Google'in CSAE ihbar kanalina bildirilir.</li>
+<li>Suc bulgusunda yasal islem baslatilir.</li>
+</ol>
+<p>Uygulama, cocuk istismari materyali barindirdigi tespit edilen her hesap
+icin yukaridaki sureci <b>istisnasiz</b> olarak uygular.</p>
+
+<h2>7. Cocuklara Yoneliklik Durumu</</h2>
 <p>Uygulama 13 yas alti cocuklara yonelik degildir ve cocuk hesabi olusturulmasina
 izin verilmez. Ancak CSAE yasagi tum yas gruplari ve ziyaretciler icin gecerlidir;
-yas farki icin istisna uygulanmaz.</p>
+yas farki icin istisna uygulanmaz. Cocuklardan hicbir sekilde dogrudan veri
+toplanmaz; ebeveyn cocuk modunda veriler yalnizca ebeveyn tarafindan girilir.</p>
 
-<h2>6. Politika Uyumu ve Yas Proseduru</h2>
+<h2>8. Yasal Uyum</h2>
+<p>Fast Synastry, uygulama ve hizmetlerinde <b>uygulanabilir tum cocuk guvenligi
+yasalarina ve duzenlemelerine uyum saglamayi</b> taahhut eder. Bunlar arasinda
+COPPA (ABD), GDPR Cocuklar Koruma Tammaci (AB), Turkiye'de 6698 sayili KVKK ve
+cocuk istismariyla mucadele huzurlari yer alir. Applicable child safety laws
+ve duzenlemelerine uyum, is birligi ekibimizin surekli gorevlerindendir.</p>
+
+<h2>9. Politika Uyumu ve Yas Proseduru</h2>
 <p>Fast Synastry, Google Play Politikalari, Google Play Cocuk Guvenligi Standartlari
 ve ilgili ulusal/uluslararasi kanunlara uymayi taahhut eder. Yas ihlali
 tespit edildiginde icerik kaldirilir, hesaplar kapatilir, gerekli hallerde
@@ -7727,9 +7757,11 @@ hukuki islem baslatilir ve durum ilgili makamlara bildirilir. Bu belge
 Fast Synastry uygulamasi ve Fast Synastry gelistirici hesabina (Fatih Asartepe)
 aittir ve yalnizca bu uygulama icin gecerlidir.</p>
 
-<h2>7. Iletisim</h2>
-<p>Cocuk guvenligi ve CSAE bildirimleri: <b>smyrnaastrology@gmail.com</b><br>
-Gizlilik ve veri silme talepleri icin ayni adres kullanilir.</p>
+<h2>10. Iletisim</h2>
+<p><b>Cocuk guvenligi ve CSAE bildirimleri (belirlenmis iletisim noktasi):</b>
+<b>smyrnaastrology@gmail.com</b><br>
+<b>Uygulama ici geri bildirim:</b> smyrnaastrology@gmail.com<br>
+<b>Gizlilik ve veri silme talepleri:</b> smyrnaastrology@gmail.com</p>
 <hr><p>
 <a href="/standards-en">English version</a> &middot;
 <a href="/privacy">Gizlilik Politikasi</a> &middot;
@@ -7790,12 +7822,45 @@ within 24 hours,</li>
 <p>This address is the designated child safety contact point for urgent
 child-safety reports.</p>
 
-<h2>5. Audience and Age</h2>
+<h2>5. In-App User Feedback Mechanism</h2>
+<p>Fast Synastry provides an in-app feedback and reporting channel. The
+<b>Contact</b> section on the app's main screen lists
+<b>smyrnaastrology@gmail.com</b>. Users can send any feedback, complaint, bug
+report or child-safety report to this address from inside the app. Messages are
+logged and answered as quickly as possible.</p>
+
+<h2>6. Method for Addressing CSAM</h2>
+<p>When CSAM (child sexual abuse material) is detected, the app follows these
+steps:</p>
+<ol>
+<li>The content is <b>removed immediately</b> and deleted from the server.</li>
+<li>Accounts that uploaded or shared the content are <b>permanently
+terminated</b>, and the same user cannot create a new account.</li>
+<li>The content and related records are <b>preserved</b> as evidence.</li>
+<li>Records are escalated <b>within 24 hours</b> to international
+child-protection hotlines and authorities (NCMEC / ECCC / the national police
+unit), to Google Play, and to Google's CSAE reporting channel.</li>
+<li>Legal proceedings are initiated where a criminal offence is identified.</li>
+</ol>
+<p>This process is applied without exception to every account found to host
+CSAM.</p>
+
+<h2>7. Audience and Age</h2>
 <p>The app is not directed at children under 13 and does not permit the creation
 of child accounts. The CSAE prohibition nevertheless applies to all age groups
-and all visitors; no exception is made based on age.</p>
+and all visitors; no exception is made based on age. No data is collected
+directly from children; in the parent/child mode all data is entered by the
+parent.</p>
 
-<h2>6. Policy Compliance and Enforcement</h2>
+<h2>8. Compliance with Applicable Child Safety Laws</h2>
+<p>Fast Synastry commits to compliance with <b>all applicable child safety laws
+and regulations</b> in operating the app and its services, including COPPA
+(United States), the GDPR Children's Code (European Union), and, in Turkey,
+Law No. 6698 (KVKK) and the applicable anti-child-abuse legislation.
+Compliance with applicable child safety laws is a standing responsibility of
+our team.</p>
+
+<h2>9. Policy Compliance and Enforcement</h2>
 <p>Fast Synastry commits to compliance with the Google Play Policies, the Google
 Play Child Safety Standards and applicable national and international law. When
 a violation is detected, the content is removed, accounts are terminated,
@@ -7803,9 +7868,11 @@ legal action is initiated where appropriate, and the matter is reported to the
 relevant authorities. This document belongs to the Fast Synastry app and the
 Fast Synastry developer account (Fatih Asartepe) and applies solely to that app.</p>
 
-<h2>7. Contact</h2>
-<p>Child safety and CSAE reports: <b>smyrnaastrology@gmail.com</b><br>
-The same address handles privacy and data deletion requests.</p>
+<h2>10. Contact</h2>
+<p><b>Child safety and CSAE reports (designated point of contact):</b>
+<b>smyrnaastrology@gmail.com</b><br>
+<b>In-app user feedback:</b> smyrnaastrology@gmail.com<br>
+<b>Privacy and data deletion requests:</b> smyrnaastrology@gmail.com</p>
 <hr><p>
 <a href="/standards">Turkce</a> &middot;
 <a href="/privacy-en">Privacy Policy</a>

@@ -23,13 +23,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
 
-/// Günlük minör progress bildirimini abonelere özel zamanlar.
+/// Günlük kısa vadeli ilerleme bildirimini abonelere özel zamanlar.
 Future<void> _scheduleDailyIfSubscribed() async {
   try {
     final isSub = await RevenueCatService.isSubscribed();
     if (!isSub) return;
     await NotificationService.instance
-        .scheduleDaily(9, 0, title: 'Fast Synastry', body: 'Günlük minör ilerleme akışını keşfet 🌟');
+        .scheduleDaily(9, 0, title: 'Fast Synastry', body: 'Günlük kısa vadeli ilerleme akışını keşfet 🌟');
   } catch (_) {}
 }
 

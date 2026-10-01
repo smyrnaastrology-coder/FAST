@@ -847,7 +847,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get analyzerSectionMinorProgress =>
-      'Progresión Menor — Flujo de 3 Días';
+      'Progresión a Corto Plazo — Flujo de 3 Días';
 
   @override
   String get analyzerSectionChartComment => 'Interpretación de la Carta Natal';
@@ -1123,7 +1123,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get analyzerMinorProgress6Month =>
-      '📄 Un informe integral de Progresión Menor de 6 meses se presenta en el PDF.';
+      '📄 Un informe integral de Progresión a Corto Plazo de 6 meses se presenta en el PDF.';
 
   @override
   String get analyzerChartCommentIntro =>

@@ -947,7 +947,11 @@ class _LandingScreenState extends State<LandingScreen> {
             _footerCol(l10n.footerContact, [
                Text('info@fatihasartepe.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
               const SizedBox(height: 4),
-              Text(l10n.footerRights, style:  TextStyle(fontSize: 12, color: FastTheme.textDim)),
+               // Uygulama ici geri bildirim ve cocuk guvenligi ihbar kanali
+               // (Google Play Cocuk Guvenligi Standartlari bildirimi).
+               Text('smyrnaastrology@gmail.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              const SizedBox(height: 4),
+               Text(l10n.footerRights, style:  TextStyle(fontSize: 12, color: FastTheme.textDim)),
             ]),
           ],
         ),

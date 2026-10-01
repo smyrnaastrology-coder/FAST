@@ -13,8 +13,11 @@ class NotificationService {
   bool _initialized = false;
 
   static const int _dailyId = 1001;
+  /// Kanal kimligi API/ayar uyumlulugu icin sabit tutulur; kullaniciya
+  /// gosterilen ad guncellenirse kimlik degismez ( aksi halde cihazda yeni
+  /// bir kanal olusur ve eskisi kalir).
   static const String _channelId = 'daily_minor_progress';
-  static const String _channelName = 'Günlük Minör Progress';
+  static const String _channelName = 'Günlük Kısa Vadeli İlerleme';
 
   Future<void> init() async {
     if (_initialized) return;
@@ -27,12 +30,12 @@ class NotificationService {
   }
 
   /// Her gün [hour]:[minute]'te bildirim zamanlar.
-  Future<void> scheduleDaily(int hour, int minute, {String title = 'Fast Synastry', String body = 'Bugünün minör ilerleme akışını keşfet'}) async {
+  Future<void> scheduleDaily(int hour, int minute, {String title = 'Fast Synastry', String body = 'Bugünün kısa vadeli ilerleme akışını keşfet'}) async {
     if (!_initialized) return;
     final android = AndroidNotificationDetails(
       _channelId,
       _channelName,
-      channelDescription: 'Günlük minör progress hatırlatması',
+      channelDescription: 'Günlük kısa vadeli ilerleme hatırlatması',
       importance: Importance.high,
       priority: Priority.high,
     );

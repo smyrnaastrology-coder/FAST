@@ -1615,7 +1615,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyzerSectionMinorProgress.
   ///
   /// In en, this message translates to:
-  /// **'Minor Progress — 3-Day Flow'**
+  /// **'Short-Term Progression — 3-Day Flow'**
   String get analyzerSectionMinorProgress;
 
   /// No description provided for @analyzerSectionChartComment.
@@ -2083,7 +2083,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyzerMinorProgress6Month.
   ///
   /// In en, this message translates to:
-  /// **'📄 A comprehensive 6-month Minor Progress report is presented in the PDF.'**
+  /// **'📄 A comprehensive 6-month Short-Term Progression report is presented in the PDF.'**
   String get analyzerMinorProgress6Month;
 
   /// No description provided for @analyzerChartCommentIntro.

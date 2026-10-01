@@ -830,7 +830,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get analyzerSectionLunarReturn => 'Lunar Return — Aylık Döngü';
 
   @override
-  String get analyzerSectionMinorProgress => 'Minor Progress — 3 Günlük Akış';
+  String get analyzerSectionMinorProgress => 'Kısa Vadeli İlerleme — 3 Günlük Akış';
 
   @override
   String get analyzerSectionChartComment => 'Doğum Haritası Yorumu';
@@ -1104,7 +1104,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get analyzerMinorProgress6Month =>
-      '📄 6 aylık kapsamlı Minor Progress raporu PDF\'te sunulmuştur.';
+      '📄 6 aylık kapsamlı Kısa Vadeli İlerleme raporu PDF\'te sunulmuştur.';
 
   @override
   String get analyzerChartCommentIntro =>
