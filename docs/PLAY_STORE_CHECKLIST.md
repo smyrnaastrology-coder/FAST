@@ -35,20 +35,22 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 
 ## 3. Mağaza Listesi
 
-### Kısa açıklama (80 karakter)
-- TR: Fast Synastry — 21 yıllık kadersel döngü, sinastri ve şehir uyumu
-- EN: Fast Synastry — 21-year karmic cycle, synastry & city compatibility
-- ES: Fast Synastry — Ciclo kármico de 21 años, sinastría y compatibilidad de ciudades
+> **Güncel metinler:** `docs/store_listing/PLAY_STORE_LISTING_1.0.11-28.md`
+> (TR/EN/ES uzun + kısa açıklama ve sürüm notu, karakter sayıları Play sınırlarına göre doğrulanmış).
 
-### Uzun açıklama (örnek ES - EN/TR benzer)
-```
-Técnica de Sinastría Fatih Asartepe (FAST) — tu carta relacional de 21 años.
-• Carta de pareja, padre-hijo, natal y potencial
-• 60-70 páginas de informe libro (PDF)
-• Flujo diario 6 meses + Flujo Celeste 21 años
-• Puntos árabes, sellos estelares, astrocartografía
-Primer informe GRATIS. Suscripción: guía diaria en vivo cada mañana.
-```
+### Kısa açıklama (80 karakter)
+- TR (62): Fast Synastry — 21 yıl kadersel döngü, doğal dil yorumlar, 16.000+ şehir uyumu
+- EN (61): Fast Synastry — 21-year karmic cycle, plain-language readings, 16,000+ cities
+- ES (70): Fast Synastry — Ciclo kármico de 21 años, lecturas en lenguaje claro, +16.000 ciudades
+
+### Uzun açıklama (4000 karakter)
+TR/EN/ES tam metinler için bkz. `docs/store_listing/PLAY_STORE_LISTING_1.0.11-28.md`. Öne çıkan bloklar:
+- Ashtakoot yorumları jargonuz; 44 puan durumu × 3 açı (vaat / anlatı / simge), her açılışta farklı açı
+- Doğum yeri: 225 ülke, 16.000+ şehir; seçilen şehirden otomatik saat dilimi (yaz saati dahil), yoksa elle UTC
+- "Analizden çık" ile form tekrar doldurulmadan sıfırlanır
+- Raporlar: aşk/sinastri, anne-çocuk, natal, potansiyel — 60-70 sayfa PDF
+- Zaman çizgisi: 6 aylık gündüz döngüsü + 21 yıllık gökyüzü döngüsü
+- İlk PDF ücretsiz; astroloji uyarısı (kehanet/kesin yargı değildir) her dilde mevcut
 
 ### Grafikler
 - İkon: 512x512 (mevcut `assets/logo.png`)
