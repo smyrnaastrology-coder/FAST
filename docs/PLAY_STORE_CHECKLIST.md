@@ -45,7 +45,7 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 
 ### Uzun açıklama (4000 karakter)
 TR/EN/ES tam metinler için bkz. `docs/store_listing/PLAY_STORE_LISTING_1.0.11-28.md`. Öne çıkan bloklar:
-- Ashtakoot yorumları jargonuz; 44 puan durumu × 3 açı (vaat / anlatı / simge), her açılışta farklı açı
+- Ashtakoot yorumları jargonuz; 44 puan durumu × 4 açı (vaat / anlatı / simge / dikkat) × 2 gövde = her açılışta 8 farklı metin
 - Doğum yeri: 225 ülke, 16.000+ şehir; seçilen şehirden otomatik saat dilimi (yaz saati dahil), yoksa elle UTC
 - "Analizden çık" ile form tekrar doldurulmadan sıfırlanır
 - Raporlar: aşk/sinastri, anne-çocuk, natal, potansiyel — 60-70 sayfa PDF

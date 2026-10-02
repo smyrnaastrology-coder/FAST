@@ -15,7 +15,7 @@
 
 ## TR
 
-### Uzun açıklama  (1587 / 4000)
+### Uzun açıklama (1598 / 4000)
 
 Fast Synastry — Fatih Asartepe (FAST) tekniğinin 21 yıllık kadersel döngü kartı.
 
@@ -23,8 +23,8 @@ Fast Synastry — Fatih Asartepe (FAST) tekniğinin 21 yıllık kadersel döngü
 
 YENİ — OKUNAN, ANLAŞILAN YORUMLAR
 • 8 başlığın her biri, ilişkinizin puan durumuna göre ayrı ayrı yazıldı (44 farklı puan durumu).
-• Her yorum üç farklı açıdan anlatılır: ne vaat ediyor, ne anlatıyor, neyi simgeliyor.
-• Her açtığınızda farklı bir yorum karşınıza çıkar; aynı cümleyi defalarca görmezsiniz.
+• Her yorum dört açıdan anlatılır: ne vaat ediyor, ne anlatıyor, neyi simgeliyor, neye dikkat etmeli.
+• Her açtığınızda 8 farklı yorumdan biri çıkar; aynı cümleyi defalarca görmezsiniz.
 • Teknik terim yoktur. Puanın nasıl hesaplandığını görmek isteyenler "Teknik detayı göster" ile açabilir.
 
 YENİ — DOĞUM YERİ SEÇİMİ
@@ -53,20 +53,20 @@ ZAMAN ÇİZGİSİ
 
 Bilgilendirme: Bu çalışma gelecekte olacak olayları öngörmez; kehanet, fal veya kesin yargı değildir. Doğum anındaki gökyüzünün yeryüzüne izdüşümünü, kişisel farkındalık ve gelişim perspektifiyle anlatan bir analiz rehberidir.
 
-### Kısa açıklama  (62 / 80)
+### Kısa açıklama (62 / 80)
 
 ```
 21 yıl kadersel döngü, doğal dil yorumlar, 16.000+ şehir uyumu
 ```
 
-### Sürüm notu  (478 / 500)
+### Sürüm notu (483 / 500)
 
 ```
 Yorumlar artık okunabilir.
 
 • Ashtakoot yorumları terimsiz; 44 puan durumuna ayrı metin.
-• Her yorum üç açıdan anlatılıyor: vaat, anlatı, simge.
-• Her açtığınızda farklı açı çıkıyor.
+• Her yorum 4 açıdan ve 2 ayrı metin olarak anlatılıyor.
+• Her açtığınızda 8 farklı yorum çıkıyor.
 • Puan hesabı "Teknik detayı göster" ile görülebilir.
 
 Doğum yeri
@@ -83,7 +83,7 @@ Diğer
 
 ## EN
 
-### Uzun açıklama  (1619 / 4000)
+### Uzun açıklama (1645 / 4000)
 
 Fast Synastry — the 21-year karmic cycle chart built on Fatih Asartepe's (FAST) technique.
 
@@ -91,7 +91,7 @@ Enter two birth records. The app compares them and writes a reading for each of 
 
 NEW — READINGS YOU CAN ACTUALLY READ
 • Each of the 8 areas has its own text for 44 different score states, written for your exact result.
-• Every reading is told from three angles: what it promises, what it tells you, what it symbolises.
+• Every reading is told from four angles: what it promises, what it tells you, what it symbolises, and what to watch out for.
 • Each time you reopen it you get a different reading. You will not read the same sentence over and over.
 • No jargon. If you want to see how the score was calculated, tap "Show technical detail".
 
@@ -121,19 +121,19 @@ First PDF free. Subscription adds a live guide every morning.
 
 Disclaimer: this does not predict future events. It is not fortune telling and not a definitive judgement. It is a reflective analysis guide based on the projection of the sky at birth, for personal awareness and growth.
 
-### Kısa açıklama  (61 / 80)
+### Kısa açıklama (61 / 80)
 
 ```
 21-year karmic cycle, plain-language readings, 16,000+ cities
 ```
 
-### Sürüm notu  (491 / 500)
+### Sürüm notu (486 / 500)
 
 ```
 Readings are now plain language.
 
 • No jargon. All 44 score states have own text.
-• Each reading is told from three angles: promise, story, symbol.
+• Each reading is told from 4 angles with 2 different texts.
 • Every reopen shows a new angle.
 • Score calculation is behind "Show technical detail".
 
@@ -151,7 +151,7 @@ Also
 
 ## ES
 
-### Uzun açıklama  (1733 / 4000)
+### Uzun açıklama (1765 / 4000)
 
 Fast Synastry — la carta del ciclo kármico de 21 años basada en la técnica de Fatih Asartepe (FAST).
 
@@ -159,7 +159,7 @@ Introduce dos datos de nacimiento. La aplicación los compara y escribe una lect
 
 NUEVO — LECTURAS QUE SE ENTIENDEN
 • Cada una de las 8 áreas tiene su propio texto para 44 estados de puntuación distintos, escritos para tu resultado exacto.
-• Cada lectura se cuenta desde tres ángulos: qué promete, qué cuenta, qué simboliza.
+• Cada lectura se cuenta desde cuatro ángulos: qué promete, qué cuenta, qué simboliza y a qué conviene estar atento.
 • Cada vez que la abres aparece una lectura distinta. No leerás la misma frase una y otra vez.
 • Sin jerga. Si quieres ver cómo se calcula la puntuación, pulsa "Mostrar detalle técnico".
 
@@ -189,18 +189,18 @@ Primer PDF gratis. La suscripción añade una guía en vivo cada mañana.
 
 Aviso: esto no predice acontecimientos futuros. No es adivinación ni un juicio definitivo. Es una guía de análisis reflexivo basada en la proyección del cielo en el momento del nacimiento, para el conocimiento personal y el desarrollo.
 
-### Kısa açıklama  (70 / 80)
+### Kısa açıklama (70 / 80)
 
 ```
 Ciclo kármico de 21 años, lecturas en lenguaje claro, +16.000 ciudades
 ```
 
-### Sürüm notu  (475 / 500)
+### Sürüm notu (471 / 500)
 
 ```
 Lecturas en lenguaje claro.
 • Sin jerga en Ashtakoot: los 44 estados tienen su lectura.
-• Tres ángulos por lectura: promesa, relato, símbolo. Cada vez, uno distinto.
+• Cuatro ángulos y dos textos por lectura: 8 lecturas distintas cada vez.
 • Cálculo de puntuación en "Mostrar detalle técnico".
 Lugar de nacimiento
 • Elige país y ciudad: 225 países, +16.000 ciudades.
