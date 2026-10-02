@@ -7218,16 +7218,23 @@ def analiz_ashtakoot(input: AshtaKootInput):
             "yuzde": round(sonuc.yuzde, 1),
             "seviye": sonuc.seviye,          # tr anahtarı, istemci çevirir
             "ashtakoot": tablo,
-            "aciklama": _ash_metin_zenginlestir(sonuc, dil, "es_sevgili"),
             "utc": {"p1": utc1, "p2": utc2},
         }
         if input.harita:
             cevap["p1_harita"] = _ash_motor.nakshatra_uyum_haritasi(ay1)
-        return cevap
+        # `aciklama` BILINCLI OLARAK burada uretilmez: `_analiz_sonuc` cevabi
+        # onbellekliyor ve metin katmani her istekte rastgele bir acidan
+        # (vaat/anlati/simge) secim yapiyor. Onbellek icinde kalirsa ayni veri
+        # tekrar gonderildiginde kullanici hep ayni varyanti gorurdu.
+        return cevap, sonuc
 
     sonuc, hata = _analiz_sonuc("ashtakoot", input, calistir)
     if hata: raise hata
-    return sonuc
+    cevap, ashta = sonuc
+    # Her istekte sadece aciklama tazelenir; puan tablosu onbellekten gelir.
+    cevap = dict(cevap)
+    cevap["aciklama"] = _ash_metin_zenginlestir(ashta, dil, "es_sevgili")
+    return cevap
 
 
 @app_fast.post("/api/analiz/es_sevgili")

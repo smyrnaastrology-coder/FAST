@@ -472,6 +472,90 @@ for _lang in ("en", "es"):
 
 
 # --------------------------------------------------------------------------
+# Metin katmani YANIT ONBELLEGINDEN CIKARILMALI. `_analiz_sonuc` cevabi
+# onbellekliyor; `aciklama` iceride uretilirse ayni veri tekrar gonderildiginde
+# kullanici daima ayni rastgele varyanti gorurdu. Bu regresyon, endpoint'in
+# metni her istekte tazeledigini sabitler.
+# --------------------------------------------------------------------------
+import os  # noqa: E402
+
+_BURAYA = os.path.dirname(os.path.abspath(__file__))
+# production kopyasi -> ./backend ; kok kopyasi -> ./render-deploy/backend
+_BACKEND_DIR = None
+for _aday in (os.path.join(_BURAYA, "backend"),
+              os.path.join(_BURAYA, "render-deploy", "backend")):
+    if os.path.isdir(_aday):
+        _BACKEND_DIR = _aday
+        break
+
+if _BACKEND_DIR:
+    import importlib.util  # noqa: E402
+
+    if _BACKEND_DIR not in sys.path:
+        sys.path.insert(0, _BACKEND_DIR)
+    if _BURAYA not in sys.path:
+        sys.path.insert(0, _BURAYA)
+
+    os.environ.setdefault("FBST_TEST", "1")
+
+    try:
+        _spec = importlib.util.spec_from_file_location(
+            "ash_test_main", os.path.join(_BACKEND_DIR, "main.py"))
+        _MAIN = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_MAIN)
+    except Exception as _e:  # noqa: BLE001
+        _MAIN = None
+        print("  (bilgi) backend main.py yuklenemedi, onbellek testi atlandi: %s" % _e)
+
+    if _MAIN is not None and hasattr(_MAIN, "analiz_ashtakoot"):
+        class _Girdi(dict):
+            __getattr__ = dict.__getitem__
+
+            def items(self):
+                return dict.items(self)
+
+        def _ash_istek():
+            return _MAIN.analiz_ashtakoot(_Girdi(
+                dil="tr", harita=False,
+                p1_isim="A", p1_tarih="1990-05-15", p1_saat="05:00",
+                p1_sehir="Istanbul", p1_ulke="Turkiye", p1_utc_offset=None,
+                p2_isim="B", p2_tarih="1992-11-03", p2_saat="19:00",
+                p2_sehir="Istanbul", p2_ulke="Turkiye", p2_utc_offset=None))
+
+        # AYNI girdi 120 kez: puan sabit kalmali, metin 3 varyant uretmeli.
+        _toplamlar, _yorumlar = set(), set()
+        for _ in range(120):
+            _r = _ash_istek()
+            _toplamlar.add(_r["toplam"])
+            _yorumlar.add(_r["aciklama"]["kootalar"][3]["aciklama"])
+        kontrol(len(_toplamlar) == 1,
+                "ayni girdi tekrarinda toplam puan sabit (%s)" % _toplamlar)
+        kontrol(len(_yorumlar) == 3,
+                "ayni girdi 120 istekte 3 farkli dogal metin (%d)" % len(_yorumlar))
+        _acilar = {_y.split("\n")[0].split(":")[0] for _y in _yorumlar}
+        kontrol(len(_acilar) == 3,
+                "3 metin 3 farkli aci kullaniyor (vaat/anlati/simge)")
+        _r = _ash_istek()
+        kontrol(len(_r["aciklama"]["kootalar"]) == 8,
+                "her yanitta 8 koota aciklamasi var")
+        kontrol(_r.get("p1_harita") is None,
+                "harita=False iken p1_harita gelmiyor")
+        kontrol("p1_harita" in _MAIN.analiz_ashtakoot(_Girdi(
+            dil="tr", harita=True,
+            p1_isim="A", p1_tarih="1990-05-15", p1_saat="05:00",
+            p1_sehir="Istanbul", p1_ulke="Turkiye", p1_utc_offset=None,
+            p2_isim="B", p2_tarih="1992-11-03", p2_saat="19:00",
+            p2_sehir="Istanbul", p2_ulke="Turkiye", p2_utc_offset=None)),
+            "harita=True iken p1_harita geliyor")
+        # onbellekte metin OLMAMALI
+        _onbellek = list(getattr(_MAIN, "_ANALIZ_CACHE", {}).values())
+        kontrol(_onbellek and not any(
+            isinstance(_o, (list, tuple)) and _o and isinstance(_o[0], dict)
+            and "aciklama" in _o[0] for _o in _onbellek),
+            "yanit onbelleginde aciklama metni tutulmuyor")
+
+
+# --------------------------------------------------------------------------
 print("\n" + "=" * 46)
 print("GECTI: %d    KALDI: %d" % (GECTI, KALDI))
 print("=" * 46)
