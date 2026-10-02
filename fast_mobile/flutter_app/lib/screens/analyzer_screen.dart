@@ -38,10 +38,12 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // Form controllers
   final _p1IsimCtrl = TextEditingController();
   final _p1TarihCtrl = TextEditingController();
-  final _p1SaatCtrl = TextEditingController(text: '12:00');
+  // Saat bilerek BOŞ başlar: kullanıcı doğum saatini girmeyebilir. Boş
+  // bırakıldığında sunucu öğleyi (12:00) varsayıp sonucu "yaklaşık" işaretler.
+  final _p1SaatCtrl = TextEditingController();
   final _p2IsimCtrl = TextEditingController();
   final _p2TarihCtrl = TextEditingController();
-  final _p2SaatCtrl = TextEditingController(text: '12:00');
+  final _p2SaatCtrl = TextEditingController();
   final _eventTarihCtrl = TextEditingController();
   final _eventSaatCtrl = TextEditingController(text: '12:00');
 
@@ -57,10 +59,17 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   // Ebeveyn
   String _ebeveynRolu = 'anne';
 
-  // Ashtakoot: Ay konumu doğum anına bağlı, doğum yerine değil. Bu yüzden
-  // şehir/enlem/boylam yerine kişi başına UTC ofseti sorulur. Türkiye +3.
-  double _ashOfset1 = 3.0;
-  double _ashOfset2 = 3.0;
+  // İlişki Skorları (Ashtakoot): Ay'ın konumu doğum ANINA bağlıdır, doğum
+  // yerinin koordinatına değil. Buna karşılık UTC ofseti yer + TARİHE bağlıdır
+  // (Türkiye'de 2016 öncesi kışın +2, yazın +3). Bu yüzden kullanıcıdan UTC
+  // ofseti değil, doğum ŞEHRİ sorulur; ofseti sunucu tarihsel DST ile hesaplar.
+  // _p1OfsetCtrl/_p2OfsetCtrl yalnızca şehir çözülemezse elle geçersiz kılma
+  // amaçlıdır ve varsayılan olarak boştur.
+  final _p1SehirCtrl = TextEditingController(text: 'Istanbul');
+  final _p2SehirCtrl = TextEditingController(text: 'Istanbul');
+  final _p1OfsetCtrl = TextEditingController();
+  final _p2OfsetCtrl = TextEditingController();
+  bool _ashShowManualOffset = false;
 
   // Astrocartography selector
   String _astroUlke = '';
@@ -237,14 +246,25 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     if (_ikinciKisiGerekli && _p2TarihCtrl.text.isEmpty) { _snack(l10n.analyzerDate2Required); return; }
     if (_tekKisiMod && _p1IsimCtrl.text.trim().isEmpty) { _snack(l10n.analyzerNameRequired); return; }
 
+    // İlişki Skorları: UTC ofseti kullanıcıdan değil şehirden hesaplanır.
+    // Şehir zorunludur; elle ofset girilmişse o slot şehirden bağımsızdır.
+    if (_isAsh) {
+      final ofset1 = double.tryParse(_p1OfsetCtrl.text.trim());
+      final ofset2 = double.tryParse(_p2OfsetCtrl.text.trim());
+      if (_p1SehirCtrl.text.trim().isEmpty && ofset1 == null) { _snack(l10n.ashCityRequired1); return; }
+      if (_ikinciKisiGerekli && _p2SehirCtrl.text.trim().isEmpty && ofset2 == null) { _snack(l10n.ashCityRequired2); return; }
+      if (ofset1 != null && (ofset1 < -12 || ofset1 > 14)) { _snack(l10n.ashOffsetRange); return; }
+      if (ofset2 != null && (ofset2 < -12 || ofset2 > 14)) { _snack(l10n.ashOffsetRange); return; }
+    }
+
     final lp = context.read<LocaleProvider>();
     final req = AnalysisRequest(
       p1Isim: _p1IsimCtrl.text,
       p1Tarih: _normalizeDate(_p1TarihCtrl.text),
-      p1Saat: _p1SaatCtrl.text,
+      p1Saat: _p1SaatCtrl.text.trim(),
       p2Isim: _p2IsimCtrl.text,
       p2Tarih: _ikinciKisiGerekli ? _normalizeDate(_p2TarihCtrl.text) : _normalizeDate(_p1TarihCtrl.text),
-      p2Saat: _p2SaatCtrl.text,
+      p2Saat: _p2SaatCtrl.text.trim(),
       eventTarih: _eventGerekli ? _normalizeDate(_eventTarihCtrl.text) : '',
       eventSaat: _eventSaatCtrl.text,
       ebeveynRolu: _ebeveynRolu,
@@ -252,8 +272,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       country: _seciliUlke,
       lat: double.tryParse(_latCtrl.text) ?? 41.0082,
       lon: double.tryParse(_lonCtrl.text) ?? 28.9784,
-      p1UtcOffset: _ashOfset1,
-      p2UtcOffset: _ashOfset2,
+      p1Sehir: _p1SehirCtrl.text.trim(),
+      p2Sehir: _p2SehirCtrl.text.trim(),
+      p1UtcOffset: double.tryParse(_p1OfsetCtrl.text.trim()),
+      p2UtcOffset: double.tryParse(_p2OfsetCtrl.text.trim()),
       mod: _modKey,
       lang: lp.locale.languageCode,
     );
@@ -538,8 +560,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.analyzerModeEbDesc, 'img': 'assets/ebeveyn_cocuk.png'},
       {'key': 'bireysel_natal', 'title': l10n.modeNatalTitle, 'desc': l10n.analyzerModeNatalDesc, 'img': 'assets/natal.png'},
       {'key': 'potansiyel_yetenek', 'title': l10n.modePyTitle, 'desc': l10n.analyzerModePyDesc, 'img': 'assets/potansiyel_yetenek.png'},
-      // Ashtakoot için ayrı görsel yok; aşağıdaki 'img' yerine ikon çizilir.
-      {'key': 'ashtakoot', 'title': l10n.modeAshTitle, 'desc': l10n.analyzerModeAshDesc, 'img': null},
+      {'key': 'ashtakoot', 'title': l10n.modeAshTitle, 'desc': l10n.analyzerModeAshDesc, 'img': 'assets/askahoot.png'},
     ];
     return modes.map((m) {
       final key = m['key'] as String;
@@ -548,9 +569,11 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         onTap: () => setState(() {
           _mode = key; _menuOpen = false;
           context.read<AnalysisProvider>().reset();
-          _p1IsimCtrl.clear(); _p1TarihCtrl.clear(); _p1SaatCtrl.text = '12:00';
-          _p2IsimCtrl.clear(); _p2TarihCtrl.clear(); _p2SaatCtrl.text = '12:00';
+          _p1IsimCtrl.clear(); _p1TarihCtrl.clear(); _p1SaatCtrl.clear();
+          _p2IsimCtrl.clear(); _p2TarihCtrl.clear(); _p2SaatCtrl.clear();
           _eventTarihCtrl.clear(); _eventSaatCtrl.text = '12:00';
+          // Şehir alanları modlar arası korunur; kullanıcı her seferinde
+          // aynı şehri yeniden yazmak zorunda kalmamalı.
         }),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -572,7 +595,6 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: m['img'] == null
-                    // Görseli olmayan modlar (ashtakoot) için ikon.
                     ? Icon(Icons.auto_awesome,
                         size: 20, color: active ? FastTheme.accentGold : FastTheme.textDim)
                     : Image.asset(m['img'] as String, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
@@ -601,7 +623,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     );
   }
 
-  Widget _formField(String label, TextEditingController ctrl, {IconData? icon, TextInputType? keyboardType}) {
+  Widget _formField(String label, TextEditingController ctrl, {IconData? icon, TextInputType? keyboardType, String? hint}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: TextField(
@@ -610,6 +632,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         style:  TextStyle(color: FastTheme.text, fontSize: 13),
         decoration: InputDecoration(
           labelText: label,
+          hintText: hint,
+          hintStyle: TextStyle(color: FastTheme.textDim, fontSize: 12),
           labelStyle:  TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1),
           prefixIcon: icon != null ? Icon(icon, size: 18, color: FastTheme.accentGold) : null,
         ),
@@ -761,12 +785,19 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     );
   }
 
-  /// Ashtakoot · 36 — iki kişinin Ay nakṣatra uyumu.
+  /// İlişki Skorları — iki kişinin Ay nakṣatra uyumu.
   ///
-  /// Burada bilerek şehir/ülke/enlem/boylam SORULMAZ: Ay'ın görünen konumu
-  /// yalnızca doğum anına bağlıdır, doğum yerine değil. Tek gereken, her kişi
-  /// için yerel saat ve o saatin UTC ofsetidir.
+  /// Doğum YERİNİN koordinatı hesaba girmez (Ay'ın görünen konumu yalnızca
+  /// doğum anına bağlıdır); ancak UTC ofseti yer + tarihe bağlı olduğu için
+  /// doğum şehri sorulur ve ofset sunucuda tarihsel DST ile hesaplanır. Kullanıcı
+  /// saat dilimini bilmek zorunda değildir. Saat de isteğe bağlıdır: bilinmiyorsa
+  /// boş bırakılır, sunucu öğleyi varsayıp yaklaşık işaretler.
   Widget _ashForm(AppLocalizations l10n) {
+    Widget saatNotu() => Padding(
+          padding: const EdgeInsets.only(bottom: 6, left: 2),
+          child: Text(l10n.ashTimeOptional,
+              style: TextStyle(fontSize: 11, color: FastTheme.accentGold, height: 1.3)),
+        );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -776,47 +807,76 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         _formField(l10n.analyzerName, _p1IsimCtrl, icon: Icons.person),
         _dateField(l10n.analyzerBirthDate, _p1TarihCtrl, l10n),
         _timeField(l10n.analyzerBirthTime, _p1SaatCtrl),
-        _ashOffsetField(l10n, 1),
+        saatNotu(),
+        _ashCityField(l10n, 1),
+        const SizedBox(height: 14),
         _sectionTitle(l10n.analyzerPerson2),
         _formField(l10n.analyzerName, _p2IsimCtrl, icon: Icons.person_outline),
         _dateField(l10n.analyzerBirthDate, _p2TarihCtrl, l10n),
         _timeField(l10n.analyzerBirthTime, _p2SaatCtrl),
-        _ashOffsetField(l10n, 2),
+        saatNotu(),
+        _ashCityField(l10n, 2),
+        const SizedBox(height: 4),
+        _ashManualOffsetSection(l10n),
       ],
     );
   }
 
-  /// Kişi başına UTC ofseti seçimi (slot 1 veya 2).
-  Widget _ashOffsetField(AppLocalizations l10n, int slot) {
-    const secenekler = <double>[
-      -8, -5, -3, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 6, 7, 8, 9, 10, 12,
-    ];
-    final mevcut = slot == 1 ? _ashOfset1 : _ashOfset2;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: DropdownButtonFormField<double>(
-        initialValue: secenekler.contains(mevcut) ? mevcut : 3.0,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: '${l10n.ashUtcOffset} ${slot == 1 ? '1' : '2'}',
-          prefixIcon: const Icon(Icons.schedule, size: 18),
-          border: const OutlineInputBorder(),
+  /// Kişi başına doğum şehri (slot 1 veya 2). Kullanıcı serbest metin yazar;
+  /// backend şehri eşleştirip UTC ofsetini hesaplar.
+  Widget _ashCityField(AppLocalizations l10n, int slot) {
+    return _formField(
+      slot == 1 ? l10n.ashBirthCity1 : l10n.ashBirthCity2,
+      slot == 1 ? _p1SehirCtrl : _p2SehirCtrl,
+      icon: Icons.location_city,
+      hint: l10n.ashCityHint,
+    );
+  }
+
+  /// Şehir çözülemezse kullanılacak elle UTC ofseti. Varsayılan kapalıdır ki
+  /// normal kullanıcıyı korkutmasın; çözüm şehirden otomatik yapılır.
+  Widget _ashManualOffsetSection(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _ashShowManualOffset = !_ashShowManualOffset),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              children: [
+                Icon(_ashShowManualOffset ? Icons.expand_less : Icons.expand_more,
+                    size: 16, color: FastTheme.textDim),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(l10n.ashManualOffset,
+                      style: TextStyle(fontSize: 11, color: FastTheme.textDim)),
+                ),
+              ],
+            ),
+          ),
         ),
-        items: secenekler
-            .map((o) => DropdownMenuItem(
-                  value: o,
-                  child: Text('UTC${o >= 0 ? '+' : ''}${o % 1 == 0 ? o.toInt().toString() : o}'),
-                ))
-            .toList(),
-        onChanged: (v) => setState(() {
-          if (v == null) return;
-          if (slot == 1) {
-            _ashOfset1 = v;
-          } else {
-            _ashOfset2 = v;
-          }
-        }),
-      ),
+        if (_ashShowManualOffset) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6, left: 2),
+            child: Text(l10n.ashManualOffsetHint,
+                style: TextStyle(fontSize: 10, color: FastTheme.textDim, height: 1.3)),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _formField(l10n.ashManualOffset1, _p1OfsetCtrl, icon: Icons.schedule,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true)),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _formField(l10n.ashManualOffset2, _p2OfsetCtrl, icon: Icons.schedule_outlined,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true)),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 
@@ -1380,7 +1440,306 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     );
   }
 
-  /// Ashtakoot sonuç ekranı: toplam puan, iki Ay profili ve 8 koota satırı.
+  /// Sunucuda üretilen doğal dil paragrafı.
+  Widget _metinKarti(String baslik, String metin, {String? ipucu}) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg,
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(baslik,
+              style: TextStyle(
+                  color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 6),
+          Text(metin,
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 13, height: 1.45)),
+          if (ipucu != null && ipucu.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.lightbulb_outline, size: 13, color: FastTheme.accentGold),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(ipucu,
+                      style: TextStyle(color: FastTheme.textDim, fontSize: 11, height: 1.35)),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Hangi şehir ve UTC ofsetinin kullanıldığını gösteren şeffaflık kutusu.
+  /// Backend anahtarları: offset, yontem, sehir, ulke, tz, belirsiz, saat_biliyor.
+  Widget _utcKarti(AppLocalizations l10n, Map<String, dynamic> utc, String notu) {
+    String _ofsetMetni(dynamic ofset) {
+      if (ofset is! num) return '?';
+      final d = ofset.toDouble();
+      final isaret = d >= 0 ? '+' : '-';
+      final mutlak = d.abs();
+      final saat = mutlak.floor();
+      final dakika = ((mutlak - saat) * 60).round();
+      return 'UTC$isaret$saat${dakika == 0 ? '' : ':${dakika.toString().padLeft(2, '0')}'}';
+    }
+
+    String _satir(String etiket, Map<String, dynamic>? k) {
+      if (k == null) return '';
+      final sehir = (k['sehir'] ?? '').toString();
+      final ulke = (k['ulke'] ?? '').toString();
+      final yer = sehir.isEmpty
+          ? ''
+          : (ulke.isEmpty || ulke == sehir ? sehir : '$sehir, $ulke');
+      final parcalar = <String>[];
+      if (yer.isNotEmpty) parcalar.add(yer);
+      parcalar.add(_ofsetMetni(k['offset']));
+      // Yöntem şeffaflığı: 'timezonefinder' = kesin, 'boylam' = ±30 dk tahmin,
+      // 'manuel' = kullanıcı girdi.
+      final yontem = (k['yontem'] ?? '').toString();
+      if (yontem == 'boylam') parcalar.add('≈ ${l10n.ashOffsetApprox}');
+      if (yontem == 'manuel') parcalar.add(l10n.ashOffsetManual);
+      if (k['yaklasik_ofset'] == true && yontem != 'boylam') {
+        parcalar.add('≈ ${l10n.ashOffsetApprox}');
+      }
+      if (k['saat_belirsiz'] == true) parcalar.add(l10n.ashTimeAmbiguous);
+      if (k['saat_biliyor'] == false) parcalar.add(l10n.ashApproximate);
+      return '$etiket: ${parcalar.join('  ·  ')}';
+    }
+
+    final satirlar = <String>[
+      _satir(l10n.ashPersonAMoon, (utc['p1'] as Map?)?.cast<String, dynamic>()),
+      _satir(l10n.ashPersonBMoon, (utc['p2'] as Map?)?.cast<String, dynamic>()),
+    ].where((s) => s.isNotEmpty).toList();
+
+    if (satirlar.isEmpty && notu.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg,
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.public, size: 14, color: FastTheme.textDim),
+              const SizedBox(width: 6),
+              Text(l10n.ashResolvedUtc,
+                  style: TextStyle(
+                      color: FastTheme.textDim, fontSize: 11, fontWeight: FontWeight.w700)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ...satirlar.map((s) => Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(s,
+                    style: TextStyle(color: FastTheme.textDim, fontSize: 11, height: 1.3)),
+              )),
+          if (notu.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(notu,
+                  style: TextStyle(color: FastTheme.textDim, fontSize: 10, height: 1.3)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Nadi Dosha kartı.
+  ///
+  /// Ashtakoot'un tek sıfır puanlı kalemi olduğu için ayrı bir kart olarak,
+  /// kootalar listesinden hemen önce gösterilir. Metinlerin tamamı
+  /// backend'de dile çevrildiği için (TR/EN/ES) burada yalnızca sunum
+  /// yapılır; ham koota puanı bu kartta değiştirilmez.
+  Widget _nadiDosyaKarti(Map<String, dynamic> n) {
+    final ozet = (n['ozet'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final kosullar = ((n['kosullar'] as List?) ?? const [])
+        .map((e) => (e as Map).cast<String, dynamic>())
+        .toList();
+    final kapsamDisi = ((n['kapsam_disi'] as List?) ?? const [])
+        .map((e) => (e as Map).cast<String, dynamic>())
+        .toList();
+    final baslik = (n['baslik'] ?? '').toString();
+    final baslikSeviye = (n['baslik_seviye'] ?? '').toString();
+    final aciklama = (n['aciklama'] ?? '').toString();
+    final ipucu = (n['ipucu'] ?? '').toString();
+    final puanNotu = (n['puan_notu'] ?? '').toString();
+    final kapsamBaslik = (n['kapsam_disi_baslik'] ?? '').toString();
+    final kapsamNotu = (n['kapsam_disi_notu'] ?? '').toString();
+    // Şiddet koduna göre vurgu rengi; "yok" hiçbir zaman gönderilmez çünkü
+    // backend dosha yoksa bu bloğu tamamen çıkarır.
+    final seviye = (n['seviye'] ?? '').toString();
+    final renk = seviye == 'belirgin'
+        ? FastTheme.danger
+        : (seviye == 'hafif' ? FastTheme.warning : FastTheme.accentGold);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg,
+        border: Border.all(color: renk.withValues(alpha: 0.55)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.balance, size: 16, color: renk),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(baslik,
+                    style: TextStyle(
+                        color: FastTheme.textMuted,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700)),
+              ),
+              if (baslikSeviye.isNotEmpty)
+                Text(baslikSeviye,
+                    style: TextStyle(
+                        color: renk, fontSize: 11, fontWeight: FontWeight.w700)),
+            ],
+          ),
+          if (aciklama.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(aciklama,
+                style:
+                    TextStyle(color: FastTheme.text, fontSize: 12.5, height: 1.6)),
+          ],
+          if (ozet.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            // Özet: etiket/değer çiftleri iki sütuna sarılır.
+            ...ozet.entries.map((e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(e.key.toString(),
+                            style: TextStyle(
+                                color: FastTheme.textDim, fontSize: 11.5)),
+                      ),
+                      Text(e.value.toString(),
+                          style: GoogleFonts.cormorantGaramond(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: FastTheme.textLight)),
+                    ],
+                  ),
+                )),
+          ],
+          for (final k in kosullar) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                    (k['tur'] ?? '') == 'taraka'
+                        ? Icons.priority_high
+                        : Icons.check_circle_outline,
+                    size: 14,
+                    color: (k['tur'] ?? '') == 'taraka'
+                        ? FastTheme.warning
+                        : FastTheme.success),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          '${k['tur_etiket'] ?? ''} ${k['baslik'] ?? ''}'
+                              .trimRight(),
+                          style: TextStyle(
+                              color: FastTheme.textLight,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text(k['detay']?.toString() ?? '',
+                          style: TextStyle(
+                              color: FastTheme.textDim,
+                              fontSize: 11.5,
+                              height: 1.5)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (ipucu.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: FastTheme.bgSecondary,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: FastTheme.border),
+              ),
+              child: Text(ipucu,
+                  style: TextStyle(
+                      color: FastTheme.textDim, fontSize: 11.5, height: 1.5)),
+            ),
+          ],
+          if (puanNotu.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(puanNotu,
+                style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+          ],
+          // Bu motor yalnızca Ay konumundan hesapladığı için klasik
+          // kürdürme (kendra/dusthana) kuralları burada bilinçli olarak
+          // uygulanmaz; hangilerinin atlandığı kullanıcıya açıkça söylenir.
+          if (kapsamDisi.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(kapsamBaslik,
+                style: TextStyle(
+                    color: FastTheme.textDim,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700)),
+            if (kapsamNotu.isNotEmpty) ...[
+              const SizedBox(height: 3),
+              Text(kapsamNotu,
+                  style: TextStyle(
+                      color: FastTheme.textDim, fontSize: 11, height: 1.5)),
+            ],
+            const SizedBox(height: 4),
+            ...kapsamDisi.map((k) => Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('·  ',
+                          style: TextStyle(color: FastTheme.textDim)),
+                      Expanded(
+                        child: Text(k['ad']?.toString() ?? '',
+                            style: TextStyle(
+                                color: FastTheme.textDim, fontSize: 11)),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// İlişki Skorları sonuç ekranı: toplam puan, iki Ay profili ve 8 koota satırı.
   Widget _ashResults(Map<String, dynamic> r, AppLocalizations l10n) {
     final t = (r['ashtakoot'] as Map?)?.cast<String, dynamic>() ?? r;
     final kootalar = (t['kootalar'] as List?) ?? const [];
@@ -1392,6 +1751,26 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     final seviye = (t['seviye'] ?? r['seviye'] ?? '') as String;
     final uyari = (t['uyari'] as List?)?.cast<String>() ?? const [];
     final dil = Localizations.localeOf(context).languageCode;
+    // Backend yanitinda aciklama ve utc ust seviyede gelir; ic ice gomulmus
+    // surum icin t[] de korunur. Once ust seviye denenir, boylece sozlesme
+    // degisse de okuma sessizce bos kalmaz.
+    final aciklama = ((r['aciklama'] ?? t['aciklama']) as Map?)
+        ?.cast<String, dynamic>();
+    final aciklamaKootalar = ((aciklama?['kootalar'] as List?) ?? const [])
+        .map((e) => (e as Map).cast<String, dynamic>())
+        .toList();
+    final aciklamaToplam = (aciklama?['toplam'] as Map?)?.cast<String, dynamic>();
+    final utc = ((r['utc'] ?? t['utc']) as Map?)?.cast<String, dynamic>();
+    final utcNotu = ((r['utc_notu'] ?? t['utc_notu'] ?? '') as String).trim();
+
+    // Sunucu her koota için ham puanı (t.kootalar) ve açıklamayı
+    // (aciklama.kootalar) ayrı döner; ekranda tek kartta birleştiriyoruz.
+    Map<String, dynamic>? _aciklamaKota(String ad) {
+      for (final k in aciklamaKootalar) {
+        if (k['ad'] == ad) return k;
+      }
+      return null;
+    }
 
     String _ad(Map k) {
       if (dil == 'en') return (k['ad_en'] ?? k['ad'] ?? '').toString();
@@ -1472,10 +1851,37 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         ),
         const SizedBox(height: 24),
 
+        // Genel yorum (doğal dil, sunucuda üretildi)
+        if ((aciklamaToplam?['aciklama'] ?? '').toString().isNotEmpty) ...[
+          _metinKarti(
+            (aciklamaToplam?['baslik'] ?? l10n.ashOverallReading).toString(),
+            aciklamaToplam!['aciklama'].toString(),
+            ipucu: (aciklamaToplam['ipucu'] ?? '').toString(),
+          ),
+          const SizedBox(height: 16),
+        ],
+
+        // UTC çözümü şeffaflığı: kullanıcı hangi şehir/ofsetin kullanıldığını
+        // görebilmeli; skor bu tek değere dayandığı için kritik.
+        if (utc != null) ...[
+          _utcKarti(l10n, utc, utcNotu),
+          const SizedBox(height: 16),
+        ],
+
         _sectionTitle(l10n.ashMoonProfiles),
         _ayKarti(a, l10n.ashPersonAMoon),
         _ayKarti(b, l10n.ashPersonBMoon),
         const SizedBox(height: 16),
+
+        // Nadi Dosha, Ashtakoot'un tek sifir puanli kalemi oldugu icin
+        // kootalar listesinden hemen once ayri bir kart olarak gosterilir.
+        // Backend metinleri tam olarak yerellestirdigi icin burada ek bir
+        // ceviri zinciri yoktur; yalnizca sunum yapilir.
+        if (aciklama?['nadi_dosha'] != null) ...[
+          _nadiDosyaKarti(
+              (aciklama!['nadi_dosha'] as Map).cast<String, dynamic>()),
+          const SizedBox(height: 16),
+        ],
 
         _sectionTitle(l10n.ashKootalar),
         ...kootalar.map((k) {
@@ -1483,6 +1889,17 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           final p = (kk['puan'] ?? 0) as int;
           final m = (kk['azami'] ?? 1) as int;
           final oran = m == 0 ? 0.0 : (p / m).clamp(0.0, 1.0);
+          // Ham puan (t.kootalar) + açıklama (aciklama.kootalar) birleştirilir.
+          final ak = _aciklamaKota((kk['ad'] ?? '').toString()) ?? const {};
+          // Backend'in yerellestirilmis adi onceliklidir; ham koota verisinde
+          // eksikse _ad() Turkce/Ingilizce/Ispanyolca alana duser.
+          final baslik = (ak['baslik'] ?? '').toString();
+          final gorunecekAd = baslik.isNotEmpty ? baslik : _ad(kk);
+          final konu = (ak['konu'] ?? '').toString();
+          final soru = (ak['soru'] ?? '').toString();
+          final yorum = (ak['aciklama'] ?? '').toString();
+          final ipucu = (ak['ipucu'] ?? '').toString();
+          final detay = (ak['detay'] as Map?)?.cast<String, dynamic>() ?? const {};
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),
@@ -1498,7 +1915,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(_ad(kk),
+                      child: Text(gorunecekAd,
                           style: TextStyle(
                               color: FastTheme.textMuted,
                               fontSize: 13,
@@ -1524,10 +1941,50 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     ),
                   ),
                 ],
+                if (konu.isNotEmpty || soru.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(konu,
+                      style: TextStyle(color: FastTheme.accentGold, fontSize: 11, height: 1.3)),
+                  if (soru.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(soru,
+                          style: TextStyle(
+                              color: FastTheme.textDim, fontSize: 11, height: 1.35,
+                              fontStyle: FontStyle.italic)),
+                    ),
+                ],
                 if ((kk['not'] ?? '').toString().isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(kk['not'].toString(),
                       style: TextStyle(color: FastTheme.textDim, fontSize: 11, height: 1.35)),
+                ],
+                if (detay.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '${detay['a'] ?? ''}  ↔  ${detay['b'] ?? ''}',
+                    style: TextStyle(color: FastTheme.textDim, fontSize: 11),
+                  ),
+                ],
+                // Sunucuda `dil`e göre üretilen bant yorumu (0-2 / 3 / 4 / 5-8)
+                if (yorum.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(yorum,
+                      style: TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.4)),
+                ],
+                if (ipucu.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.lightbulb_outline, size: 13, color: FastTheme.accentGold),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(ipucu,
+                            style: TextStyle(color: FastTheme.textDim, fontSize: 11, height: 1.35)),
+                      ),
+                    ],
+                  ),
                 ],
               ],
             ),

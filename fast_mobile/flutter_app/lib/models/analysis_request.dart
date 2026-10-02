@@ -18,19 +18,25 @@ class AnalysisRequest {
   final String mod;
   final String lang;
 
-  /// Ashtakoot modu için kişi başına UTC ofseti. Ay'ın konumu doğum ANINA
-  /// bağlı olduğu için (doğum yeri değil) tek bir ortak ofset yeterli olmayabilir;
-  /// iki kişi farklı ülkelerde doğmuş olabilir. Türkiye varsayılanı +3.
-  final double p1UtcOffset;
-  final double p2UtcOffset;
+  /// İlişki Skorları (Ashtakoot) modu için doğum ŞEHRİ. Kullanıcı UTC ofsetini
+  /// bilmez ve bilmesi de gerekmez; sunucu şehir + doğum tarihinden ofseti
+  /// hesaplar. Ofset sabit değildir (Türkiye'de 2016 öncesi kışın +2, yazın +3),
+  /// bu yüzden tarih bilgisi zorunludur.
+  final String p1Sehir;
+  final String p2Sehir;
+
+  /// Şehir otomatik çözülemezse kullanıcının elle verebileceği UTC ofseti.
+  /// null ise sunucu şehirden hesaplar.
+  final double? p1UtcOffset;
+  final double? p2UtcOffset;
 
   AnalysisRequest({
     this.p1Isim = '',
     required this.p1Tarih,
-    this.p1Saat = '12:00',
+    this.p1Saat = '',
     this.p2Isim = '',
     this.p2Tarih = '',
-    this.p2Saat = '12:00',
+    this.p2Saat = '',
     this.eventTarih = '',
     this.eventSaat = '12:00',
     this.ebeveynRolu = 'anne',
@@ -39,13 +45,21 @@ class AnalysisRequest {
     required this.lat,
     required this.lon,
     this.utcOffset,
-    this.p1UtcOffset = 3.0,
-    this.p2UtcOffset = 3.0,
+    this.p1Sehir = '',
+    this.p2Sehir = '',
+    this.p1UtcOffset,
+    this.p2UtcOffset,
     this.mod = 'es_sevgili',
     this.lang = 'tr',
   });
 
   Map<String, dynamic> toJson() {
+    // Saat alanı bilerek boş bırakılabilir. Ashtakoot dışındaki modlar saatin
+    // dolu olmasını bekler (natal haritası saat hassasiyetlidir), dolayısıyla
+    // orada öğleye düşüyoruz. Ashtakoot'ta boş saat SUNUCUDA öğleye düşer ve
+    // sonuç "yaklaşık" işaretlenir — bu yüzden burada varsayılan uygulanmaz.
+    String saat(String v) => v.trim().isEmpty ? '12:00' : v.trim();
+
     final base = <String, dynamic>{
       'sehir': city, 'ulke': country, 'enlem': lat, 'boylam': lon,
       'lang': lang,
@@ -53,15 +67,15 @@ class AnalysisRequest {
     if (utcOffset != null) base['utc_offset'] = utcOffset;
     switch (mod) {
       case 'bireysel_natal':
-        base.addAll({'isim': p1Isim, 'tarih': p1Tarih, 'saat': p1Saat});
+        base.addAll({'isim': p1Isim, 'tarih': p1Tarih, 'saat': saat(p1Saat)});
         break;
       case 'potansiyel_yetenek':
-        base.addAll({'isim': p1Isim, 'tarih': p1Tarih, 'saat': p1Saat});
+        base.addAll({'isim': p1Isim, 'tarih': p1Tarih, 'saat': saat(p1Saat)});
         break;
       case 'es_sevgili':
         base.addAll({
-          'p1_isim': p1Isim, 'p1_tarih': p1Tarih,
-          'p2_isim': p2Isim, 'p2_tarih': p2Tarih,
+          'p1_isim': p1Isim, 'p1_tarih': p1Tarih, 'p1_saat': saat(p1Saat),
+          'p2_isim': p2Isim, 'p2_tarih': p2Tarih, 'p2_saat': saat(p2Saat),
           'event_tarih': eventTarih, 'event_saat': eventSaat,
         });
         break;
@@ -70,22 +84,28 @@ class AnalysisRequest {
           'ebeveyn_isim': p1Isim, 'ebeveyn_tarih': p1Tarih,
           'ebeveyn_rolu': ebeveynRolu,
           'cocuk_isim': p2Isim, 'cocuk_tarih': p2Tarih,
-          'cocuk_saat': p2Saat,
+          'cocuk_saat': saat(p2Saat),
         });
         break;
       case 'ashtakoot':
-        // Ay konumu yalnızca doğum anına bağlı; şehir/enlem/boylam GÖNDERİLMEZ
-        // (backend bu yüzden harita çözümü yapmıyor).
+        // Ay konumu yalnızca doğum ANINA bağlıdır; doğum yerinin koordinatı
+        // hesaba girmez. Ancak UTC ofseti yer + TARİHE bağlı olduğu için şehir
+        // gönderilir ve sunucu ofseti kendisi çözer (tarihsel DST dahil).
+        // Açıklama metinleri sunucuda `dil`e göre üretilir.
         base.remove('sehir');
         base.remove('ulke');
         base.remove('enlem');
         base.remove('boylam');
         base.addAll({
           'p1_isim': p1Isim, 'p1_tarih': p1Tarih,
-          'p1_saat': p1Saat, 'p1_utc_offset': p1UtcOffset,
+          'p1_saat': p1Saat, 'p1_sehir': p1Sehir,
           'p2_isim': p2Isim, 'p2_tarih': p2Tarih,
-          'p2_saat': p2Saat, 'p2_utc_offset': p2UtcOffset,
+          'p2_saat': p2Saat, 'p2_sehir': p2Sehir,
+          'dil': lang,
         });
+        // Elle ofset verilmişse gönder; verilmemişse sunucu şehirden hesaplar.
+        if (p1UtcOffset != null) base['p1_utc_offset'] = p1UtcOffset;
+        if (p2UtcOffset != null) base['p2_utc_offset'] = p2UtcOffset;
         break;
     }
     return base;

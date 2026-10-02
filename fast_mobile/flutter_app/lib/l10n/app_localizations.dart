@@ -2542,22 +2542,22 @@ abstract class AppLocalizations {
   /// **'Person 2'**
   String get peopleApplyPerson2;
 
-  /// Ashtakoot · 36
+  /// Relationship Scores
   ///
   /// In en, this message translates to:
-  /// **'Ashtakoot · 36'**
+  /// **'Relationship Scores'**
   String get modeAshTitle;
 
-  /// Moon nakshatra compatibility score
+  /// Moon nakshatra compatibility (out of 36)
   ///
   /// In en, this message translates to:
-  /// **'Moon nakshatra compatibility score'**
+  /// **'Moon nakshatra compatibility (out of 36)'**
   String get analyzerModeAshDesc;
 
-  /// Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.
+  /// Relationship Scores measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon's position depends only on the moment of birth, so entering your birth city is enough — we calculate the correct time zone for you, including historical daylight saving. You can leave the birth time blank if you don't know it.
   ///
   /// In en, this message translates to:
-  /// **'Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.'**
+  /// **'Relationship Scores measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon\'s position depends only on the moment of birth, so entering your birth city is enough — we calculate the correct time zone for you, including historical daylight saving. You can leave the birth time blank if you don\'t know it.'**
   String get ashExplainer;
 
   /// Time zone
@@ -2649,6 +2649,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'High'**
   String get ashLevelHigh;
+
+  /// No description provided for @ashTimeOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank if you don\'t know the birth time — we use noon (12:00) and mark the result as approximate.'**
+  String get ashTimeOptional;
+
+  /// No description provided for @ashBirthCity1.
+  ///
+  /// In en, this message translates to:
+  /// **'First person\'s birth city'**
+  String get ashBirthCity1;
+
+  /// No description provided for @ashBirthCity2.
+  ///
+  /// In en, this message translates to:
+  /// **'Second person\'s birth city'**
+  String get ashBirthCity2;
+
+  /// No description provided for @ashCityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'City, country — e.g. Istanbul, Germany'**
+  String get ashCityHint;
+
+  /// No description provided for @ashManualOffset.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter UTC offset manually if the city is not found'**
+  String get ashManualOffset;
+
+  /// No description provided for @ashManualOffsetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Rarely needed — the city is enough. For example Turkey +3, USA −5, India +5.5. Historical daylight saving (Turkey, USA, EU) is calculated automatically.'**
+  String get ashManualOffsetHint;
+
+  /// No description provided for @ashManualOffset1.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 1 UTC'**
+  String get ashManualOffset1;
+
+  /// No description provided for @ashManualOffset2.
+  ///
+  /// In en, this message translates to:
+  /// **'Person 2 UTC'**
+  String get ashManualOffset2;
+
+  /// No description provided for @ashCityRequired1.
+  ///
+  /// In en, this message translates to:
+  /// **'A birth city is required for the first person.'**
+  String get ashCityRequired1;
+
+  /// No description provided for @ashCityRequired2.
+  ///
+  /// In en, this message translates to:
+  /// **'A birth city is required for the second person.'**
+  String get ashCityRequired2;
+
+  /// No description provided for @ashOffsetRange.
+  ///
+  /// In en, this message translates to:
+  /// **'UTC offset must be between −12 and +14.'**
+  String get ashOffsetRange;
+
+  /// No description provided for @ashOverallReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall Reading'**
+  String get ashOverallReading;
+
+  /// No description provided for @ashResolvedUtc.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth location and time zone used'**
+  String get ashResolvedUtc;
+
+  /// No description provided for @ashOffsetApprox.
+  ///
+  /// In en, this message translates to:
+  /// **'estimated'**
+  String get ashOffsetApprox;
+
+  /// No description provided for @ashOffsetManual.
+  ///
+  /// In en, this message translates to:
+  /// **'entered manually'**
+  String get ashOffsetManual;
+
+  /// No description provided for @ashTimeAmbiguous.
+  ///
+  /// In en, this message translates to:
+  /// **'DST transition hour'**
+  String get ashTimeAmbiguous;
 }
 
 class _AppLocalizationsDelegate

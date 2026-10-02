@@ -75,6 +75,7 @@ flutter:
     - assets/ebeveyn_cocuk.png
     - assets/natal.png
     - assets/potansiyel_yetenek.png
+    - assets/askahoot.png
     - assets/hero.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

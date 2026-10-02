@@ -383,22 +383,28 @@ def ay_nakshatrasi_hesapla(lon_sidereal: float, yaklasik: bool = False) -> AyBil
     )
 
 
-_SID_MOD_HAZIR = False
-
-
 def _sid_mod_ayarla():
-    """Lahiri modunu bir kez kurar.
+    """Lahiri modunu kurar.
 
-    `pyswisseph` 2.10'da ne `get_sid_mode` ne de `SIDM_NONE` vardır; bu yüzden
-    geri yükleme yapılmaz. Bu güvenlidir: `set_sid_mode` yalnızca
-    `FLG_SIDEREAL` verilen çağrılarda etkilidir ve o bayrak yalnızca bu
-    modülde kullanılır. Uygulamanın diğer tüm `calc_ut` çağrıları tropikal
-    sonuç vermeye devam eder.
+    ÖNEMLİ — bu çağrı "bir kez yapılıp bayraklaanır" şeklinde KURULAMAZ.
+    `pyswisseph` sidereal modu thread-local C durumu olarak tutar; `set_sid_mode`
+    yalnızca onu çağıran thread'in durumunu değiştirir. FastAPI/uvicorn her
+    isteği worker thread'de servis ettiği için, modu yalnızca ilk thread
+    kuran bir bayrak şu sonucu veriyordu:
+
+        ana thread        -> 359.235721
+        worker thread     -> 358.352513     (0.8832° yanlış)
+
+    0.8832° fark bir nakşatradan (13.33°) fazladır ve Ay'ın hangi nakşatra/
+    pada düştüğünü değiştirerek 36 puanlık tabloyu bozuyor; üstelik sonuç
+    isteği hangi thread'in karşıladığına bağlı olarak değişiyordu.
+
+    Bu yüzden mod HER çağrıda, thread ne olursa olsun yeniden kurulur.
+    `set_sid_mode` yalnızca `FLG_SIDEREAL` verilen çağrılarda etkili olduğu
+    için uygulamanın tropikal hesapları bozulmaz.
     """
-    global _SID_MOD_HAZIR
-    if not _SID_MOD_HAZIR and swe is not None:
+    if swe is not None:
         swe.set_sid_mode(swe.SIDM_LAHIRI)
-        _SID_MOD_HAZIR = True
 
 
 def ay_konumu_utc(yil: int, ay: int, gun: int, saat_utc: float) -> float:
@@ -522,6 +528,167 @@ def _koota_nadi(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dict]:
         "a": a.nadi, "b": b.nadi}
 
 
+# --------------------------------------------------------------------------
+# Nadi Dosha: puan değişmez, ama bağlamı modellenir
+# --------------------------------------------------------------------------
+#
+# Ashtakoot'un tek sıfır puanlı kalemi Nadi'dir ve bu sıfır **geleneksel olarak
+# nihai sonuç değildir**. Brihat Samhita ve ona dayanan bölümler, Nadi eşleşmesini
+# "bhanga" (kırılma/hafifletme) ve "taraka" (şiddetlendirme) koşullarıyla
+# birlikte ele alır:
+#
+#   * Bhanga — dosha etkisini zayıflatan etkenler. En sık örneklenen ve en güçlü
+#     kabul edileni, Ay burçlarının birbirine 2/4/6/8/12 mesafede olmasıdır.
+#   * Taraka — doshayı ağırlaştıran etkenler. Ay burçlarının 3/5/9/10/11
+#     mesafede olması bu grubun başında gelir.
+#
+# TASARIM KARARI — puan değiştirilmez
+# ----------------------------------
+# Bu blok `nadi` kootasının 0/8 puanına **dokunmaz**. Klasik literatürde
+# "dosha varsa iptal edilir" diyen okullar olsa da hangi okulun hangi ağırlığı
+# kullandığı tartışmalıdır; 36 puanlık tablo tek bir okulun sayısıdır ve
+# değiştirmek tüm sonuçları kaydırırdı. Bunun yerine doshanın varlığı, şiddeti
+# ve bağlamı ayrı bir blok olarak raporlanır; kullanıcı ham puanı görmeye
+# devam eder, yorumu ise çeviri katmanından gelir.
+#
+# KAPSAM
+# ------
+# Bu motor yalnızca Ay konumu üzerinden çalışır; doğum anındaki diğer gezegen
+# konumlarını hesaplamaz. Bu yüzden klasik kural setinin yalnızca Ay burçları ve
+# pada bilgisinden türetilebilen kısmı uygulanır. Nadi lordlarının 2/4/6/8/12
+# mesafede olması gibi gezegen konumu gerektiren alt kurallar **bilinçli olarak
+# dışarıda bırakılmıştır**; kapsam dışı oldukları `kapsam_disi` altında
+# bildirilir ki sessizce atlanmasınlar.
+
+#: Nadi lordları (pada -> gezegen). Brihat Samhita'daki yaygın eşleme:
+#: 1. pada Mars, 2. pada Ay, 3. pada Güneş, 4. pada Venüs.
+NADI_LORDU: Dict[int, str] = {1: "Mars", 2: "Moon", 3: "Sun", 4: "Venus"}
+
+#: Bhanga (hafifletme) koşulları — hepsi Ay verisinden türetilebilir.
+_BHANGA_KURALLARI = {
+    "rasi_kendra": (
+        "Ay burçları 2/12, 4/10 veya 6/8 konumunda",
+        "En sık örneklenen hafifleticidir. Dosha, Ay burçlarının bu konum "
+        "çiftlerinde olmasıyla dengelenir.",
+    ),
+    "nadi_lord_ayni": (
+        "Nadi lordları aynı gezegen",
+        "İki tarafın da nadi'sini yöneten gezegen aynıysa doshanın aracısı "
+        "ortaklaşır.",
+    ),
+    "ayni_gana": (
+        "Aynı gana",
+        "Ay'ın temel karakter sınıfı aynıysa dosha bağlamında zayıflar.",
+    ),
+    "ayni_varna": (
+        "Aynı varna",
+        "Ay'ın varna'sı aynıysa kasta katmanında örtüşme vardır.",
+    ),
+}
+
+#: Taraka (şiddetlendirme) koşulları.
+_TARAKA_KURALLARI = {
+    "rasi_dusman": (
+        "Ay burçları 3/11 veya 5/9 konumunda",
+        "Dosha, bu konum çiftlerinde en ağır kabul edilir; hafifletici koşul "
+        "yoksa dosha öne çıkar.",
+    ),
+}
+
+#: Gezegen konumu gerektirdiği için uygulanmayan klasik alt kurallar.
+#: Sessizce atlanmak yerine burada bildirilir.
+KAPSAM_DISI_KURALLAR = {
+    "nadi_lord_kendra": "Nadi lordlarının 2/12, 4/10 veya 6/8 konumunda olması",
+    "rasi_lord_kendra": "Ay burçlarının lordlarının 2/12, 4/10 veya 6/8 olması",
+    "nadi_lord_dusthana": "Her iki nadi lordunun da 6/8/12'de bulunması",
+    "kendra_lagna": "Lagna'nın her iki Ay'a 2/12, 4/10 veya 6/8 olması",
+}
+
+
+def _burc_iliskisi(x: int, y: int) -> Tuple[int, str]:
+    """İki burç arasındaki konum ilişkisini simetrik olarak çözer.
+
+    Klasik metinler burçları birbirine göre konumlarıyla anmaz, **eşleşen
+    ev çiftleriyle** anar: "2/12", "4/10", "6/8", "3/11", "5/9", "7". Bu
+    yüzden mesafe iki yönden de bakılarak küçültülür; iki tarafın "hangi
+    evde durduğu" önemsizdir, ilişkinin kendisi önemlidir.
+
+    Döndürür: (mesafe, etiket). `mesafe` 0..6, `etiket` "1", "2/12",
+    "3/11", "4/10", "5/9", "6/8", "7".
+    """
+    d = abs(int(x) - int(y)) % 12
+    d = min(d, 12 - d)
+    etiket = {0: "1", 1: "2/12", 2: "3/11", 3: "4/10",
+              4: "5/9", 5: "6/8", 6: "7"}[d]
+    return d, etiket
+
+
+#: Bhanga için klasik burç ilişkileri: 2/12, 4/10, 6/8.
+_BHANGA_BURC_MESAFELERI = (1, 3, 5)
+
+#: Taraka için klasik burç ilişkileri: 3/11, 5/9.
+_TARAKA_BURC_MESAFELERI = (2, 4)
+
+
+def nadi_dosha_analizi(a: AyBilgisi, b: AyBilgisi) -> dict:
+    """Nadi eşleşmesinin varlığını, şiddetini ve bağlamını çözer.
+
+    Dilden bağımsız kod döndürür: `kosullar` içindeki `kod` alanları metin
+    katmanında (`ashtakoot_metin.nadi_dosha_metin`) dile çevrilir.
+    """
+    mesafe, iliski = _burc_iliskisi(a.burc_no, b.burc_no)
+    lord_a = NADI_LORDU.get(a.pada)
+    lord_b = NADI_LORDU.get(b.pada)
+    var = a.nadi == b.nadi
+
+    bhanga: List[dict] = []
+    taraka: List[dict] = []
+
+    if var:
+        aday = {
+            "rasi_kendra": mesafe in _BHANGA_BURC_MESAFELERI,
+            "nadi_lord_ayni": lord_a is not None and lord_a == lord_b,
+            "ayni_gana": a.gana == b.gana,
+            "ayni_varna": a.varna == b.varna,
+        }
+        for kod, gecerli in aday.items():
+            if gecerli:
+                baslik, detay = _BHANGA_KURALLARI[kod]
+                bhanga.append({"kod": kod, "baslik": baslik, "detay": detay,
+                               "iliski": iliski})
+
+        if mesafe in _TARAKA_BURC_MESAFELERI:
+            baslik, detay = _TARAKA_KURALLARI["rasi_dusman"]
+            taraka.append({"kod": "rasi_dusman", "baslik": baslik, "detay": detay,
+                           "iliski": iliski})
+
+    if not var:
+        seviye = "yok"
+    elif not bhanga:
+        seviye = "belirgin"
+    elif len(bhanga) == 1:
+        seviye = "hafif"
+    else:
+        seviye = "hafifletilmis"
+
+    return {
+        "var": var,
+        "seviye": seviye,
+        "mesafe": mesafe,
+        "iliski": iliski,
+        "nadi_a": a.nadi,
+        "nadi_b": b.nadi,
+        "pada_a": a.pada,
+        "pada_b": b.pada,
+        "nadi_lord_a": lord_a,
+        "nadi_lord_b": lord_b,
+        "bhanga_sayisi": len(bhanga),
+        "taraka_sayisi": len(taraka),
+        "kosullar": bhanga + taraka,
+        "kapsam_disi": list(KAPSAM_DISI_KURALLAR.keys()),
+    }
+
+
 #: Sıralı kootalar: (anahtar, TR/EN/ES ad, azami puan, hesaplayıcı)
 KOOTALAR = [
     ("varna",         "Varna",         "Varna",         "Varna",         1, _koota_varna),
@@ -552,6 +719,7 @@ class AshtaKootSonuc:
     azami: int = AZAMI_TOPLAM
     kendisi_ile: bool = False
     uyari: List[str] = field(default_factory=list)
+    nadi_dosha: Dict[str, object] = field(default_factory=dict)
 
     @property
     def yuzde(self) -> float:
@@ -588,6 +756,7 @@ class AshtaKootSonuc:
                 for k in self.kootalar
             ],
             "uyari": list(self.uyari),
+            "nadi_dosha": dict(self.nadi_dosha),
         }
 
 
@@ -622,7 +791,8 @@ def ashtakoot_hesapla(a: AyBilgisi, b: AyBilgisi) -> AshtaKootSonuc:
             "Nakṣatra sınırına yakın doğumlarda sonuç değişebilir.")
 
     return AshtaKootSonuc(a=a, b=b, kootalar=kootalar, toplam=toplam,
-                          kendisi_ile=False, uyari=uyari)
+                          kendisi_ile=False, uyari=uyari,
+                          nadi_dosha=nadi_dosha_analizi(a, b))
 
 
 def kendisi_ile(ay: AyBilgisi) -> AshtaKootSonuc:

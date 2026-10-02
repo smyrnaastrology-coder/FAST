@@ -1346,14 +1346,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get peopleApplyPerson2 => '2. Kişi';
 
   @override
-  String get modeAshTitle => 'Ashtakoot · 36';
+  String get modeAshTitle => 'İlişki Skorları';
 
   @override
-  String get analyzerModeAshDesc => 'Ay nakṣatra uyum puanı';
+  String get analyzerModeAshDesc => 'Ay nakṣatra uyum puanı (36 üzerinden)';
 
   @override
   String get ashExplainer =>
-      'Ashtakoot, iki kişinin Ay nakṣatra (pada) uyumunu 36 puan üzerinden ölçer. Ay\'ın konumu doğum ANINA bağlıdır, doğum yerine değil — bu yüzden saat dilimini doğru seçin.';
+      'İlişki Skorları, iki kişinin Ay nakṣatra (pada) uyumunu 36 puan üzerinden ölçer. Ay\'ın konumu yalnızca doğum anına bağlıdır, bu yüzden doğum şehrinizi yazmanız yeterlidir — doğru saat dilimini (tarihsel yaz saati dahil) biz hesaplarız. Doğum saatini bilmiyorsanız boş bırakabilirsiniz.';
 
   @override
   String get ashUtcOffset => 'Saat dilimi';
@@ -1400,4 +1400,54 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get ashLevelHigh => 'Yüksek';
+
+  @override
+  String get ashTimeOptional =>
+      'Doğum saatini bilmiyorsanız boş bırakın — öğleyi (12:00) kabul eder ve sonucu yaklaşık işaretleriz.';
+
+  @override
+  String get ashBirthCity1 => 'Birinci kişinin doğum şehri';
+
+  @override
+  String get ashBirthCity2 => 'İkinci kişinin doğum şehri';
+
+  @override
+  String get ashCityHint => 'Şehir, ülke — örn. İstanbul, Almanya';
+
+  @override
+  String get ashManualOffset => 'Şehir bulunamazsa UTC ofsetini elle gir';
+
+  @override
+  String get ashManualOffsetHint =>
+      'Çoğu durumda gerekmez; şehir yeterlidir. Ör. Türkiye +3, ABD −5, Hindistan +5.5. Tarihsel yaz saati uygulaması (Türkiye, ABD, AB) otomatik hesaplanır.';
+
+  @override
+  String get ashManualOffset1 => '1. kişi UTC';
+
+  @override
+  String get ashManualOffset2 => '2. kişi UTC';
+
+  @override
+  String get ashCityRequired1 => 'Birinci kişi için doğum şehri gerekli.';
+
+  @override
+  String get ashCityRequired2 => 'İkinci kişi için doğum şehri gerekli.';
+
+  @override
+  String get ashOffsetRange => 'UTC ofseti −12 ile +14 arasında olmalı.';
+
+  @override
+  String get ashOverallReading => 'Genel Değerlendirme';
+
+  @override
+  String get ashResolvedUtc => 'Kullanılan doğum yeri ve saat dilimi';
+
+  @override
+  String get ashOffsetApprox => 'tahmini';
+
+  @override
+  String get ashOffsetManual => 'elle girildi';
+
+  @override
+  String get ashTimeAmbiguous => 'saat dilimi geçişinde';
 }

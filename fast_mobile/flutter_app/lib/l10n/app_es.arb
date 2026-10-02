@@ -407,9 +407,9 @@
   "peopleApplyTo": "Aplicar persona a",
   "peopleApplyPerson1": "Persona 1",
   "peopleApplyPerson2": "Persona 2",
-  "modeAshTitle": "Ashtakoot · 36",
-  "analyzerModeAshDesc": "Puntuación de compatibilidad del nakshatra lunar",
-  "ashExplainer": "Ashtakoot mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende del momento del nacimiento, no del lugar: elige la zona horaria correcta.",
+  "modeAshTitle": "Puntuaciones de Relación",
+  "analyzerModeAshDesc": "Compatibilidad del nakshatra lunar (de 36 puntos)",
+  "ashExplainer": "Puntuaciones de Relación mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende solo del momento del nacimiento, así que basta con indicar la ciudad de nacimiento: calculamos la zona horaria correcta, incluido el horario de verano histórico. Puedes dejar vacío el hora de nacimiento si no la conoces.",
   "ashUtcOffset": "Zona horaria",
   "ashPersonAMoon": "Luna de la primera persona",
   "ashPersonBMoon": "Luna de la segunda persona",
@@ -425,14 +425,30 @@
   "ashLevelLow": "Baja",
   "ashLevelMedium": "Media",
   "ashLevelHigh": "Alta",
+  "ashTimeOptional": "Déjalo vacío si no conoces la hora de nacimiento: usaremos el mediodía (12:00) y marcaremos el resultado como aproximado.",
+  "ashBirthCity1": "Ciudad de nacimiento de la primera persona",
+  "ashBirthCity2": "Ciudad de nacimiento de la segunda persona",
+  "ashCityHint": "Ciudad, país — p. ej. Estambul, Alemania",
+  "ashManualOffset": "Introduce el desfase UTC manualmente si no se encuentra la ciudad",
+  "ashManualOffsetHint": "Rara vez hace falta: basta la ciudad. Por ejemplo Turquía +3, EE. UU. −5, India +5.5. El horario de verano histórico (Turquía, EE. UU., UE) se calcula automáticamente.",
+  "ashManualOffset1": "Persona 1 UTC",
+  "ashManualOffset2": "Persona 2 UTC",
+  "ashCityRequired1": "Se necesita la ciudad de nacimiento de la primera persona.",
+  "ashCityRequired2": "Se necesita la ciudad de nacimiento de la segunda persona.",
+  "ashOffsetRange": "El desfase UTC debe estar entre −12 y +14.",
+  "ashOverallReading": "Lectura general",
+  "ashResolvedUtc": "Lugar de nacimiento y zona horaria utilizados",
+  "ashOffsetApprox": "estimado",
+  "ashOffsetManual": "introducido a mano",
+  "ashTimeAmbiguous": "hora de cambio horario",
   "@modeAshTitle": {
-    "description": "Ashtakoot · 36"
+    "description": "Puntuaciones de Relación"
   },
   "@analyzerModeAshDesc": {
-    "description": "Puntuación de compatibilidad del nakshatra lunar"
+    "description": "Compatibilidad del nakshatra lunar (de 36 puntos)"
   },
   "@ashExplainer": {
-    "description": "Ashtakoot mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende del momento del nacimiento, no del lugar: elige la zona horaria correcta."
+    "description": "Puntuaciones de Relación mide la compatibilidad de los nakshatras (padas) lunares de dos personas sobre 36 puntos. La posición de la Luna depende solo del momento del nacimiento, así que basta con indicar la ciudad de nacimiento: calculamos la zona horaria correcta, incluido el horario de verano histórico. Puedes dejar vacío el hora de nacimiento si no la conoces."
   },
   "@ashUtcOffset": {
     "description": "Zona horaria"

@@ -6895,21 +6895,45 @@ except Exception as _ash_import_exc:  # pragma: no cover
     _ash_motor = None
     _ASHTAKOOT_HATA = str(_ash_import_exc)
 
+# Yorum metni katmanı: koota başına 5 puan bandı + toplam için 4 bant, TR/EN/ES.
+# Bu olmadan uç yalnızca puan döndürür, kullanıcı ne ölçtüğünü anlamaz.
+try:
+    import ashtakoot_metin as _ash_metin
+    _ASHTAKOOT_METIN_HATA = None
+except Exception as _ash_metin_exc:  # pragma: no cover
+    _ash_metin = None
+    _ASHTAKOOT_METIN_HATA = str(_ash_metin_exc)
+
+# Otomatik UTC: doğum şehri + tarihten tarihsel DST dahil ofset hesabı.
+try:
+    import ashtakoot_utc as _ash_utc
+    _ASHTAKOOT_UTC_HATA = None
+except Exception as _ash_utc_exc:  # pragma: no cover
+    _ash_utc = None
+    _ASHTAKOOT_UTC_HATA = str(_ash_utc_exc)
+
 
 class AshtaKootInput(BaseModel):
     # `lang` bilerek YOK: `_analiz_sonuc` girdide `lang` görürse sonucu
-    # `_en_localize`/`_es_localize`'dan geçirir. Ashtakoot cevabı çok dilli
-    # alanları (ad_en/ad_es, nakshatra_*_en/es) motorun kendi `tablo_sozlugu`
-    # çıktısında zaten taşır, ayrı bir çeviri katmanına gerek yok.
+    # `_en_localize`/`_es_localize`'dan geçirir. Ashtakoot yorum metinleri
+    # `ashtakoot_metin` katmanında DİL BAŞINA hazır olduğu için istemci
+    # `dil` alanını gönderir; buradaki metinler doğrudan o dilde üretilir.
+    #
+    # `*_utc_offset` None ise şehirden OTOMATİK hesaplanır (ashtakoot_utc).
     p1_isim: str = ""
     p1_tarih: str
-    p1_saat: str = "12:00"
-    p1_utc_offset: float = 3.0
+    p1_saat: str = ""                  # boş -> 12:00 + "yaklaşık" işareti
+    p1_sehir: str = ""                 # otomatik UTC için doğum şehri
+    p1_ulke: str = ""
+    p1_utc_offset: Optional[float] = None
     p2_isim: str = ""
     p2_tarih: str
-    p2_saat: str = "12:00"
-    p2_utc_offset: float = 3.0
+    p2_saat: str = ""
+    p2_sehir: str = ""
+    p2_ulke: str = ""
+    p2_utc_offset: Optional[float] = None
     harita: bool = False
+    dil: str = "tr"                    # tr | en | es
 
 
 def _ash_saat_utc(saat, offset):
@@ -6930,6 +6954,216 @@ def _ash_saat_utc(saat, offset):
     return (sa + dk / 60.0) - float(offset), True
 
 
+def _ash_saat_ondalik(saat):
+    """'HH:MM' -> yerel saatin ondalık karşılığı (UTC hesabı için)."""
+    s = str(saat or "").strip()
+    if not s:
+        return 12.0
+    parca = s.split(":")
+    try:
+        sa = int(parca[0])
+        dk = int(parca[1]) if len(parca) > 1 else 0
+    except Exception:
+        return 12.0
+    return sa + dk / 60.0
+
+
+def _ash_utc_coz(girdi, no, tarih, saat_ondalik):
+    """Bir kişi için UTC ofsetini çözer: elle girilmişse onu, yoksa şehirden.
+
+    Dönen sözlük istemciye şeffaflık için geri verilir: hangi şehir/ülke
+    çözüldü, hangi yöntemle hangi ofset bulundu. Böylece kullanıcı yanlış
+    şehir seçtiğini sonuç ekranından görebilir.
+    """
+    sehir = str(getattr(girdi, f"p{no}_sehir", "") or "").strip()
+    ulke = str(getattr(girdi, f"p{no}_ulke", "") or "").strip()
+    manuel = getattr(girdi, f"p{no}_utc_offset", None)
+
+    if manuel is not None:
+        ofset = float(manuel)
+        return ofset, {"kaynak": "manuel", "offset": ofset, "yontem": "manuel",
+                       "sehir": sehir, "ulke": ulke, "lat": None, "lon": None}
+
+    if not sehir:
+        raise HTTPException(status_code=400, detail={
+            "code": "SEHIR_GEREKLI",
+            "msg": "Doğum şehri gerekli. Saat dilimi, doğum tarihi ve şehirden "
+                   "otomatik hesaplanır."})
+
+    try:
+        ofset, bilgi = _ash_utc.sehirden_utc_offset(
+            sehir, tarih.year, tarih.month, tarih.day, saat_ondalik, ulke or None)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail={
+            "code": "SEHIR_COZULEMEDI",
+            "msg": f"'{sehir}' çözülemedi: {e}"})
+
+    if ofset is None:
+        raise HTTPException(status_code=400, detail={
+            "code": "SEHIR_COZULEMEDI",
+            "msg": f"'{sehir}' için saat dilimi bulunamadı. Şehri ülkeyle birlikte "
+                   "yazın (örn. 'Berlin, Almanya')."})
+    bilgi["kaynak"] = "sehir"
+
+    # Şeffaflık: ofset kesin mi? tz veritabanı erişilemediyse boylam tahmini
+    # kullanılır ve bu ±30 dk hata payı demektir. Kullanıcı bunu bilmelidir,
+    # çünkü 1 saatlik ofset hatası Ay'ın nakṣatrasını/pada'sını değiştirir.
+    if bilgi.get("yontem") == "boylam":
+        bilgi["yaklasik_ofset"] = True
+    if bilgi.get("belirsiz"):
+        # Yerel saat yaz saati geçişinde iki kez geçiyor ya da hiç geçmiyor.
+        bilgi["saat_belirsiz"] = True
+
+    return ofset, bilgi
+
+
+_ASH_UTC_UYARI = {
+    "tr": {
+        "yaklasik_ofset": ("Saat dilimi tam olarak doğrulanamadı; şehirden boylam "
+                          "hesabıyla bulundu (±30 dk). Şehrin yanına ülke yazarak "
+                          "veya elle UTC ofseti girerek sonucu netleştirebilirsiniz."),
+        "saat_belirsiz": ("Girilen saat, yaz saati geçiş saatine denk geliyor; "
+                          "bu saat diliminde iki kez geçmiş olabilir."),
+    },
+    "en": {
+        "yaklasik_ofset": ("The time zone could not be verified precisely; it was "
+                          "estimated from the city's longitude (±30 min). Add the "
+                          "country to the city name, or enter the UTC offset "
+                          "manually, for an exact result."),
+        "saat_belirsiz": ("The entered time falls on a daylight-saving transition "
+                          "hour, which may occur twice in this time zone."),
+    },
+    "es": {
+        "yaklasik_ofset": ("No se pudo verificar con precisión la zona horaria; se "
+                          "estimó a partir de la longitud de la ciudad (±30 min). "
+                          "Añade el país al nombre de la ciudad o introduce el "
+                          "desfase UTC manualmente para un resultado exacto."),
+        "saat_belirsiz": ("La hora indicada coincide con el cambio de horario de "
+                          "verano y puede ocurrir dos veces en esta zona horaria."),
+    },
+}
+
+
+def _ash_utc_uyarilari(utc1, utc2, dil="tr"):
+    """UTC çözümünün kalitesine dair kullanıcı uyarıları (TR/EN/ES)."""
+    metinler = _ASH_UTC_UYARI.get(dil, _ASH_UTC_UYARI["tr"])
+    cikti = []
+    for no, bilgi in ((1, utc1), (2, utc2)):
+        kisi = 1 if dil == "en" and no == 1 else (
+            2 if dil == "en" else ("birinci" if no == 1 else "ikinci"))
+        if not isinstance(bilgi, dict):
+            continue
+        if bilgi.get("yaklasik_ofset"):
+            cikti.append(f"[{kisi}] {metinler['yaklasik_ofset']}")
+        if bilgi.get("saat_belirsiz"):
+            cikti.append(f"[{kisi}] {metinler['saat_belirsiz']}")
+    return cikti
+
+
+def _ash_metin_zenginlestir(sonuc, dil="tr", mod="es_sevgili"):
+    """Ham puan tablosunu kullanıcının okuyabileceği açıklamalara bağlar.
+
+    `ashtakoot_metin` katmanı her koota için 5 puan bandına (mukemmel/yuksek/
+    orta/dusuk/yok) ve toplam için 4 banda (0-17/18-24/25-32/33-36) ayrı
+    metin taşır. Jargon adları burada tek başına gösterilmez; her satır
+    "ne ölçtüğü + bu puan ne anlama gelir + ne yapılabilir" olarak döner.
+    """
+    if _ash_metin is None:
+        return {}
+
+    diller = _ash_metin.metinler(dil)
+    kootalar = []
+    for k in sonuc.kootalar:
+        govde = diller.get(k.ad, {})
+        m = _ash_metin.metin_getir(k.ad, k.puan, k.azami, dil)
+        kootalar.append({
+            "ad": k.ad, "ad_tr": k.ad_tr, "ad_en": k.ad_en, "ad_es": k.ad_es,
+            "azami": k.azami, "puan": k.puan, "not": k.not_, "detay": k.detay,
+            "bant": m.get("_bant", ""),
+            "baslik": m.get("baslik", ""),
+            "konu": govde.get("baslik", ""),
+            "soru": govde.get("soru", ""),
+            "aciklama": m.get("aciklama", ""),
+            "ipucu": m.get("ipucu", ""),
+            "mod_yorumu": _ash_metin.mod_yorumu(k.ad, mod, dil),
+        })
+
+    toplam = _ash_metin.toplam_metni(sonuc.seviye, dil)
+    cevap = {
+        "toplam": {
+            "baslik": toplam.get("baslik", ""),
+            "aciklama": toplam.get("aciklama", ""),
+            "ipucu": toplam.get("ipucu", ""),
+        },
+        "kootalar": kootalar,
+    }
+    if sonuc.kendisi_ile:
+        cevap["kendisi_ile"] = _ash_metin.kendisi_notu(dil)
+    nadi = _ash_nadi_dosha_metin(sonuc, dil)
+    if nadi:
+        cevap["nadi_dosha"] = nadi
+    return cevap
+
+
+def _ash_nadi_dosha_metin(sonuc, dil="tr"):
+    """Nadi Dosha değerlendirmesini dile çevirir.
+
+    Motordan gelen blok yalnızca kod ve sayı taşır (`var`, `seviye`,
+    `kosullar[].kod`); kullanıcının okuyacağı metin `ashtakoot_metin`
+    katmanından gelir. `seviye` "yok" ise (nadi farklı) hiçbir şey
+    göstermeye gerek yoktur.
+    """
+    ham = getattr(sonuc, "nadi_dosha", None) or {}
+    if not ham or not ham.get("var"):
+        return None
+    if _ash_metin is None:
+        return None
+
+    m = _ash_metin.nadi_dosha_metin(dil)
+    seviye = m.get("seviye", {}).get(ham.get("seviye"), {})
+    kosul_m = m.get("kosullar", {})
+
+    kosullar = []
+    for k in ham.get("kosullar", []):
+        kod = k.get("kod")
+        tur = "taraka" if kod == "rasi_dusman" else "bhanga"
+        t = kosul_m.get(kod, {})
+        kosullar.append({
+            "kod": kod,
+            "tur": tur,
+            "tur_etiket": m.get("etiket", {}).get(tur, ""),
+            "baslik": t.get("baslik", k.get("baslik", "")),
+            "detay": t.get("detay", k.get("detay", "")),
+            "iliski": k.get("iliski", ""),
+        })
+
+    et = m.get("ozet_etiket", {})
+    return {
+        "baslik": m.get("baslik", "Nadi Dosha"),
+        "seviye": ham.get("seviye", ""),
+        "baslik_seviye": seviye.get("baslik", ""),
+        "aciklama": seviye.get("aciklama", ""),
+        "ipucu": seviye.get("ipucu", ""),
+        "ozet": {
+            et.get("iliski", ""): ham.get("iliski", ""),
+            et.get("pada", ""): "%s / %s" % (ham.get("pada_a"), ham.get("pada_b")),
+            et.get("nadi", ""): "%s / %s" % (ham.get("nadi_a"), ham.get("nadi_b")),
+            et.get("lord", ""): "%s / %s" % (ham.get("nadi_lord_a"),
+                                            ham.get("nadi_lord_b")),
+            et.get("bhanga", ""): ham.get("bhanga_sayisi", 0),
+            et.get("taraka", ""): ham.get("taraka_sayisi", 0),
+        },
+        "kosullar": kosullar,
+        "kapsam_disi_baslik": m.get("kapsam_disi_baslik", ""),
+        "kapsam_disi_notu": m.get("kapsam_disi_notu", ""),
+        "kapsam_disi": [
+            {"kod": kod, "ad": m.get("kapsam_disi", {}).get(kod, "")}
+            for kod in ham.get("kapsam_disi", [])
+        ],
+        "puan_notu": m.get("puan_notu", ""),
+    }
+
+
 @app_fast.post("/api/analiz/ashtakoot")
 def analiz_ashtakoot(input: AshtaKootInput):
     global TOTAL_ANALYSIS; TOTAL_ANALYSIS += 1
@@ -6938,6 +7172,10 @@ def analiz_ashtakoot(input: AshtaKootInput):
         raise HTTPException(status_code=503, detail={
             "code": "ASHTAKOOT_UNAVAILABLE",
             "msg": f"Ashtakoot modülü yüklenemedi: {_ASHTAKOOT_HATA}"})
+
+    dil = (str(getattr(input, "dil", "tr") or "tr").lower()[:2])
+    if dil not in ("tr", "en", "es"):
+        dil = "tr"
 
     # Tarih/saat dönüşümü doğrulaması `_analiz_sonuc` DIŞINDA yapılır; içerideki
     # geniş `except` HTTPException'ı yutup genel hata döndürebilir.
@@ -6948,8 +7186,14 @@ def analiz_ashtakoot(input: AshtaKootInput):
         raise HTTPException(status_code=400, detail={
             "code": "BAD_DATE",
             "msg": "Tarih YYYY-AA-GG biçiminde olmalı."})
-    saat1, bil1 = _ash_saat_utc(input.p1_saat, input.p1_utc_offset)
-    saat2, bil2 = _ash_saat_utc(input.p2_saat, input.p2_utc_offset)
+
+    ofset1, utc1 = _ash_utc_coz(input, 1, d1, _ash_saat_ondalik(input.p1_saat))
+    ofset2, utc2 = _ash_utc_coz(input, 2, d2, _ash_saat_ondalik(input.p2_saat))
+
+    saat1, bil1 = _ash_saat_utc(input.p1_saat, ofset1)
+    saat2, bil2 = _ash_saat_utc(input.p2_saat, ofset2)
+    utc1["saat_biliyor"] = bil1
+    utc2["saat_biliyor"] = bil2
 
     def calistir():
         lon1 = _ash_motor.ay_konumu_utc(d1.year, d1.month, d1.day, saat1)
@@ -6957,6 +7201,10 @@ def analiz_ashtakoot(input: AshtaKootInput):
         ay1 = _ash_motor.ay_nakshatrasi_hesapla(lon1, yaklasik=not bil1)
         ay2 = _ash_motor.ay_nakshatrasi_hesapla(lon2, yaklasik=not bil2)
         sonuc = _ash_motor.ashtakoot_hesapla(ay1, ay2)
+        tablo = sonuc.tablo_sozlugu()
+        # UTC kalitesiyle ilgili uyarılar puan tablosunun uyarı listesine eklenir;
+        # kullanıcı ofsetin yaklaşık olduğunu sonuç ekranında görmelidir.
+        tablo["uyari"] = list(tablo.get("uyari") or []) + _ash_utc_uyarilari(utc1, utc2, dil)
         cevap = {
             "mod": "ashtakoot",
             "p1_isim": input.p1_isim,
@@ -6965,7 +7213,9 @@ def analiz_ashtakoot(input: AshtaKootInput):
             "azami": sonuc.azami,
             "yuzde": round(sonuc.yuzde, 1),
             "seviye": sonuc.seviye,          # tr anahtarı, istemci çevirir
-            "ashtakoot": sonuc.tablo_sozlugu(),
+            "ashtakoot": tablo,
+            "aciklama": _ash_metin_zenginlestir(sonuc, dil, "es_sevgili"),
+            "utc": {"p1": utc1, "p2": utc2},
         }
         if input.harita:
             cevap["p1_harita"] = _ash_motor.nakshatra_uyum_haritasi(ay1)

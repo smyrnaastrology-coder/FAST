@@ -1350,14 +1350,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get peopleApplyPerson2 => 'Person 2';
 
   @override
-  String get modeAshTitle => 'Ashtakoot · 36';
+  String get modeAshTitle => 'Relationship Scores';
 
   @override
-  String get analyzerModeAshDesc => 'Moon nakshatra compatibility score';
+  String get analyzerModeAshDesc => 'Moon nakshatra compatibility (out of 36)';
 
   @override
   String get ashExplainer =>
-      'Ashtakoot measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon position depends on the moment of birth, not the birthplace — pick the correct time zone.';
+      'Relationship Scores measures the Moon nakshatra (pada) compatibility of two people out of 36 points. The Moon\'s position depends only on the moment of birth, so entering your birth city is enough — we calculate the correct time zone for you, including historical daylight saving. You can leave the birth time blank if you don\'t know it.';
 
   @override
   String get ashUtcOffset => 'Time zone';
@@ -1404,4 +1404,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ashLevelHigh => 'High';
+
+  @override
+  String get ashTimeOptional =>
+      'Leave blank if you don\'t know the birth time — we use noon (12:00) and mark the result as approximate.';
+
+  @override
+  String get ashBirthCity1 => 'First person\'s birth city';
+
+  @override
+  String get ashBirthCity2 => 'Second person\'s birth city';
+
+  @override
+  String get ashCityHint => 'City, country — e.g. Istanbul, Germany';
+
+  @override
+  String get ashManualOffset =>
+      'Enter UTC offset manually if the city is not found';
+
+  @override
+  String get ashManualOffsetHint =>
+      'Rarely needed — the city is enough. For example Turkey +3, USA −5, India +5.5. Historical daylight saving (Turkey, USA, EU) is calculated automatically.';
+
+  @override
+  String get ashManualOffset1 => 'Person 1 UTC';
+
+  @override
+  String get ashManualOffset2 => 'Person 2 UTC';
+
+  @override
+  String get ashCityRequired1 =>
+      'A birth city is required for the first person.';
+
+  @override
+  String get ashCityRequired2 =>
+      'A birth city is required for the second person.';
+
+  @override
+  String get ashOffsetRange => 'UTC offset must be between −12 and +14.';
+
+  @override
+  String get ashOverallReading => 'Overall Reading';
+
+  @override
+  String get ashResolvedUtc => 'Birth location and time zone used';
+
+  @override
+  String get ashOffsetApprox => 'estimated';
+
+  @override
+  String get ashOffsetManual => 'entered manually';
+
+  @override
+  String get ashTimeAmbiguous => 'DST transition hour';
 }
