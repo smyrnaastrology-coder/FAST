@@ -29,7 +29,7 @@ DILLER: Dict[str, dict] = {
 }
 
 #: Doğal dildeki üç bakış açısı.
-ACILAR = ("vaat", "anlatı", "simge")
+ACILAR = ("vaat", "anlatı", "simge", "dikkat")
 
 
 def dogrula(lang: str) -> bool:
@@ -66,14 +66,16 @@ def dogal_aciklama(koota: str, puan: int, lang: str = "tr") -> dict:
     `ashtakoot_metinleri*` band metinleri uzman içindir; burada dönen metin
     "varna / bhanga / pada" gibi terimleri hiç kullanmaz ve doğrudan şunu
     söyler: bu puan ilişki adına ne vaat ediyor, ne anlatıyor, neyi
-    simgeliyor. Her (koota, puan) için 3 metin vardır; burada her çağrıda
-    biri rastgele seçilir.
+    simgeliyor ve neye dikkat etmek gerekiyor. Her (koota, puan) için
+    4 açı ve 2 gövde varyantı vardır; burada her çağrıda bunlardan biri
+    rastgele seçilir, yani bir puan için 8 farklı metin mümkündür.
 
     Dönüş: {"baslik": sade_koota_adi, "aciklama": metin, "aci": "vaat"}
     """
     mod = DILLER.get(lang, DILLER["tr"])["dogal"]
     baslik = mod.KOOTA_BASLIK.get(koota, "")
-    aci_index = random.randrange(3)
+    aci_sayisi = getattr(mod, "ACI_SAYISI", len(ACILAR))
+    aci_index = random.randrange(min(aci_sayisi, len(ACILAR)))
     metin = mod.dogal_metin(koota, puan, aci_index)
     if not metin:
         return {}

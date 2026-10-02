@@ -402,19 +402,19 @@ _BEK_PUAN = sum(a + 1 for a in _AZAMI.values())
 
 kontrol(_BEK_PUAN == 44, "dogal katman 44 puan durumu kapsar (%d)" % _BEK_PUAN)
 
-# ayni (koota, puan) icin UCH farkli metin uretilebilmeli
+# ayni (koota, puan) icin SEKIZ farkli metin uretilebilmeli (4 aci x 2 govde)
 for _lang in ("tr", "en", "es"):
     _dg = MT.dogal_aciklama("yoni", 0, _lang)
     kontrol(bool(_dg.get("aciklama")) and bool(_dg.get("baslik")),
             "dogal_aciklama[%s] baslik+aciklama donuyor" % _lang)
-    kontrol(_dg.get("aci") in ("vaat", "anlatı", "simge"),
+    kontrol(_dg.get("aci") in ("vaat", "anlatı", "simge", "dikkat"),
             "dogal_aciklama[%s] gecerli bir aci donuyor (%s)" % (_lang, _dg.get("aci")))
 
     _metinler = set()
-    for _ in range(120):
+    for _ in range(400):
         _metinler.add(MT.dogal_aciklama("yoni", 0, _lang)["aciklama"])
-    kontrol(len(_metinler) == 3,
-            "dogal_aciklama[%s] ayni puanda 3 farkli metin uretiyor (%d)"
+    kontrol(len(_metinler) == 8,
+            "dogal_aciklama[%s] ayni puanda 8 farkli metin uretiyor (%d)"
             % (_lang, len(_metinler)))
 
     # 44 puanin HESABININ tamami dolu, her biri 3 satirdan uzun ve jargonsuz
@@ -483,11 +483,11 @@ for _lang in ("en", "es"):
 # --------------------------------------------------------------------------
 _CERCEVE = {
     "tr": ("Bu alan şunu vaat ediyor:", "Bu alan şunu anlatıyor:",
-           "Bu alan şunu simgeliyor:"),
+           "Bu alan şunu simgeliyor:", "Bu alan şuna dikkat çekiyor:"),
     "en": ("This area shows what it promises:", "This area explains:",
-           "This area symbolizes:"),
+           "This area symbolizes:", "This area flags:"),
     "es": ("Esta área muestra lo que promete:", "Esta área explica:",
-           "Esta área simboliza:"),
+           "Esta área simboliza:", "Esta área señala:"),
 }
 
 #: vaat / anlati satirlarinda iki noktadan sonra bulunmasi zorunlu fiiller.
@@ -553,13 +553,80 @@ _YANLIS_DIL = {
     "es": ("ğ", "ş", "ınız", " olduğu", "çünkü", " your ", " the "),
 }
 
+#: dikkat satiri (3. aci) her kootada su kavramlardan birini ADLAMALI.
+_DIKKAT_KONU = {
+    "tr": {
+        "varna": ("kazandığınızı", "kaybettiğinizi", "karşıladığı"),
+        "vashya": ("çekimi", "dayanağı", "sanmanın"),
+        "tara": ("saat", "hesap defteri"),
+        "yoni": ("anladığınızı", "yanlışlar"),
+        "graha_maitri": ("susup", "fikirde"),
+        "gana": ("yapmıyor", "tekrarlanması"),
+        "rasi": ("hedefe", "nedenlerle"),
+        "nadi": ("eksik", "bulmaması"),
+    },
+    "en": {
+        "varna": ("gain", "lose"),
+        "vashya": ("pull", "only thing"),
+        "tara": ("clock", "tally"),
+        "yoni": ("quiet mistakes", "understood"),
+        "graha_maitri": ("quiet", "agree"),
+        "gana": ("not how i do it",),
+        "rasi": ("shared goal", "different reasons"),
+        "nadi": ("missing thing", "empty handed"),
+    },
+    "es": {
+        "varna": ("ganáis", "perdeis"),
+        "vashya": ("atracción", "único"),
+        "tara": ("horas", "recuento"),
+        "yoni": ("errores silenciosos", "entendíais"),
+        "graha_maitri": ("callaros", "acuerdo"),
+        "gana": ("no lo hago yo",),
+        "rasi": ("objetivo compartido", "motivos distintos"),
+        "nadi": ("misma falta", "vacías"),
+    },
+}
+
 for _lang in ("tr", "en", "es"):
     _mod = MT.DILLER[_lang]["dogal"]
     kontrol(len(_mod.ACILAR) == 8,
             "dogal[%s] 8 koota icin aci var (%d)" % (_lang, len(_mod.ACILAR)))
+    kontrol(_mod.ACI_SAYISI == 4,
+            "dogal[%s] ACI_SAYISI = 4 (%d)" % (_lang, _mod.ACI_SAYISI))
+    # her (koota, puan) icin IKINCI govde varyanti olmali
+    kontrol(len(_mod.GOVDE_ALT) == 8,
+            "dogal[%s] GOVDE_ALT 8 koota kapsiyor (%d)"
+            % (_lang, len(_mod.GOVDE_ALT)))
+    for _kota, _puanlar in _mod.GOVDE.items():
+        kontrol(sorted(_mod.GOVDE_ALT.get(_kota, {})) == sorted(_puanlar),
+                "dogal[%s]/%s GOVDE_ALT tum puanlari kapsiyor"
+                % (_lang, _kota))
+        for _p in _puanlar:
+            kontrol(len(_mod.govde_varyantlari(_kota, _p)) == 2,
+                    "dogal[%s]/%s/%d 2 govde varyanti"
+                    % (_lang, _kota, _p))
+            kontrol(_mod.GOVDE[_kota][_p] != _mod.GOVDE_ALT[_kota][_p],
+                    "dogal[%s]/%s/%d iki govde farkli"
+                    % (_lang, _kota, _p))
+            # 4 aci x 2 govde = 8 benzersiz metin
+            _sekiz = {_mod.dogal_metin(_kota, _p, a, g)
+                      for a in range(4) for g in range(2)}
+            kontrol(len(_sekiz) == 8,
+                    "dogal[%s]/%s/%d 8 benzersiz kombinasyon (%d)"
+                    % (_lang, _kota, _p, len(_sekiz)))
+            # her metin 4 satir (1 lead + 3 govde)
+            for _a in range(4):
+                for _g in range(2):
+                    _sat = _mod.dogal_metin(_kota, _p, _a, _g).split("\n")
+                    if len(_sat) != 4 or len(_sat[3].split()) < 4:
+                        kontrol(False,
+                                "dogal[%s]/%s/%d aci%d govde%d 4 dolu satir "
+                                "degil" % (_lang, _kota, _p, _a, _g))
+    kontrol(True, "dogal[%s] metin yapisi (4 aci x 2 govde x 4 satir) "
+                  "gecerli" % _lang)
     for _kota, _satirlar in _mod.ACILAR.items():
-        kontrol(len(_satirlar) == 3,
-                "dogal[%s]/%s 3 aci var (%d)" % (_lang, _kota, len(_satirlar)))
+        kontrol(len(_satirlar) == 4,
+                "dogal[%s]/%s 4 aci var (%d)" % (_lang, _kota, len(_satirlar)))
         for _i, _satir in enumerate(_satirlar):
             _etiket = "dogal[%s]/%s[%d]" % (_lang, _kota, _i)
             _cerceve = _CERCEVE[_lang][_i]
@@ -579,9 +646,13 @@ for _lang in ("tr", "en", "es"):
             if _i in (0, 1):
                 kontrol(re.search(_FIIL[_lang][0], _govde, re.I) is not None,
                         "%s iki noktadan sonra fiil iceriyor" % _etiket)
-            else:
+            elif _i == 2:
                 kontrol(any(t in _govde for t in _SIMGE_KONU[_lang][_kota]),
                         "%s simge satiri somut konu adliyor" % _etiket)
+            if _i == 3:
+                kontrol(any(t in _govde.lower()
+                            for t in _DIKKAT_KONU[_lang][_kota]),
+                        "%s dikkat satiri somut konu adliyor" % _etiket)
 
 
 # --------------------------------------------------------------------------
@@ -637,17 +708,17 @@ if _BACKEND_DIR:
 
         # AYNI girdi 120 kez: puan sabit kalmali, metin 3 varyant uretmeli.
         _toplamlar, _yorumlar = set(), set()
-        for _ in range(120):
+        for _ in range(200):
             _r = _ash_istek()
             _toplamlar.add(_r["toplam"])
             _yorumlar.add(_r["aciklama"]["kootalar"][3]["aciklama"])
         kontrol(len(_toplamlar) == 1,
                 "ayni girdi tekrarinda toplam puan sabit (%s)" % _toplamlar)
-        kontrol(len(_yorumlar) == 3,
-                "ayni girdi 120 istekte 3 farkli dogal metin (%d)" % len(_yorumlar))
-        _acilar = {_y.split("\n")[0].split(":")[0] for _y in _yorumlar}
-        kontrol(len(_acilar) == 3,
-                "3 metin 3 farkli aci kullaniyor (vaat/anlati/simge)")
+        kontrol(len(_yorumlar) == 8,
+                "ayni girdi 200 istekte 8 farkli dogal metin (%d)" % len(_yorumlar))
+        _acilar = {_y.split("\n")[0] for _y in _yorumlar}
+        kontrol(len(_acilar) == 4,
+                "8 metin 4 farkli lead kullaniyor (vaat/anlati/simge/dikkat)")
         _r = _ash_istek()
         kontrol(len(_r["aciklama"]["kootalar"]) == 8,
                 "her yanitta 8 koota aciklamasi var")

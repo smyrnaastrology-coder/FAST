@@ -9,7 +9,8 @@ Aquí no aparece ningún término sánscrito o jyotish; cada texto explica qué
 significa la puntuación para la relación en la vida cotidiana.
 """
 
-from typing import Dict, List
+import random
+from typing import Dict, List, Optional
 
 KOOTA_BASLIK: Dict[str, str] = {
     "varna": "Valores y mirada social",
@@ -30,6 +31,7 @@ ACILAR: Dict[str, List[str]] = {
         "discusiones sobre «quién tiene razón».",
         "Esta área simboliza: si coinciden de verdad las cosas que ambos "
         "consideráis importantes.",
+        "Esta área señala: cómo reacciona cada uno a lo que ganáis y a lo que perdeis.",
     ],
     "vashya": [
         "Esta área muestra lo que promete: cuán fuerte es de verdad la "
@@ -37,6 +39,7 @@ ACILAR: Dict[str, List[str]] = {
         "Esta área explica: de dónde viene esa sensación de «algo se me "
         "movió al verle».",
         "Esta área simboliza: ese primer momento silencioso de atracción.",
+        "Esta área señala: tomar la atracción por lo único que sujeta la relación.",
     ],
     "tara": [
         "Esta área muestra lo que promete: cuánto se solapan vuestros "
@@ -45,6 +48,7 @@ ACILAR: Dict[str, List[str]] = {
         "tarde y el otro se levante temprano.",
         "Esta área simboliza: un hogar donde los relojes van a horas "
         "distintas.",
+        "Esta área señala: un recuento de horas que se lleva debajo del mismo techo sin que nadie lo decida.",
     ],
     "yoni": [
         "Esta área muestra lo que promete: con qué facilidad vais a leeros "
@@ -53,6 +57,7 @@ ACILAR: Dict[str, List[str]] = {
         "sintiendo ahora?».",
         "Esta área simboliza: cuánto de abierta está la puerta de la "
         "intimidad.",
+        "Esta área señala: los errores silenciosos que cometeis creyendo que lo entendíais todo.",
     ],
     "graha_maitri": [
         "Esta área muestra lo que promete: cuán bien os leéis la mente el "
@@ -61,6 +66,7 @@ ACILAR: Dict[str, List[str]] = {
         "distinta.",
         "Esta área simboliza: la comodidad de dos personas que hablan el "
         "mismo idioma.",
+        "Esta área señala: callaros solo porque ya estáis de acuerdo.",
     ],
     "gana": [
         "Esta área muestra lo que promete: vuestra probabilidad de "
@@ -69,6 +75,7 @@ ACILAR: Dict[str, List[str]] = {
         "el mismo momento.",
         "Esta área simboliza: dos ritmos distintos que se ajustan en un "
         "mismo hogar.",
+        "Esta área señala: repetir «eso no lo hago yo» tal cual.",
     ],
     "rasi": [
         "Esta área muestra lo que promete: si podéis caminar hacia una meta "
@@ -76,6 +83,7 @@ ACILAR: Dict[str, List[str]] = {
         "Esta área explica: en qué áreas de la vida avanzáis al mismo "
         "ritmo.",
         "Esta área simboliza: dos personas leyendo el mismo mapa.",
+        "Esta área señala: caminar hacia un objetivo compartido por motivos distintos.",
     ],
     "nadi": [
         "Esta área muestra lo que promete: la posibilidad de que la misma "
@@ -84,6 +92,7 @@ ACILAR: Dict[str, List[str]] = {
         "otro.",
         "Esta área simboliza: dos personas en el mismo punto, "
         "completándose o chocando.",
+        "Esta área señala: buscar dos veces la misma falta y quedar con las manos vacías.",
     ],
 }
 
@@ -318,12 +327,227 @@ GOVDE: Dict[str, Dict[int, str]] = {
 }
 
 
-def dogal_metin(kod: str, puan: int, aci: int) -> str:
-    """Devuelve el texto sin jerga para `kod`, `puan` y ángulo `aci`."""
-    govde = GOVDE.get(kod, {}).get(puan)
-    if govde is None:
+
+#: Cada (koota, puan) tiene un segundo cuerpo. `GOVDE` define el nivel y su
+#: consecuencia; este texto monta una escena cotidiana concreta. Quien llama
+#: elige uno de los dos al azar.
+GOVDE_ALT: Dict[str, Dict[int, str]] = {
+
+    # ------------------------------------------------------ valores / mirada social
+    "varna": {
+        0: ("Manejáis el dinero de forma opuesta.\n"
+            "Uno lleva la cuenta y el otro gasta en el momento.\n"
+            "Para administrar un mismo presupuesto, seguís reglas distintas."),
+        1: ("Los días que os importan coinciden.\n"
+            "Los dos tenéis un motivo para celebrar juntos un día cualquiera.\n"
+            "Esos pequeños encuentros sostienen la relación sin que se vean."),
+    },
+
+    # ------------------------------------------------------------- atracción mutua
+    "vashya": {
+        0: ("Mostráis el interés de formas distintas.\n"
+            "Uno te invita, el otro te llama durante una hora.\n"
+            "Uno dice «quiero verte» y el otro «te he echado de menos»; ambos "
+            "entran por la misma puerta."),
+        1: ("Hay equilibrio entre cercanía y libertad.\n"
+            "Cuando uno se acerca, el otro deja un poco de espacio; eso es "
+            "respirar, no enfriarse.\n"
+            "Cuanto más os acercáis, más fácil es recuperar esa distancia."),
+        2: ("Tras separaros, uno de los dos busca al otro primero.\n"
+            "Un hueco corto no acaba con el interés: hace el reencuentro más "
+            "nítido.\n"
+            "Esto es lo que mantiene en pie la relación."),
+    },
+
+    # ------------------------------------------------------------ tiempo / ritmo
+    "tara": {
+        0: ("Teneis los fines de semana montados de otra forma.\n"
+            "Uno empieza temprano y el otro se mueve a última hora de la "
+            "tarde.\n"
+            "Averiguar a qué hora os veis lleva unas dos semanas."),
+        1: ("También hay días que sí coinciden.\n"
+            "Algunas semanas os levantáis a la misma hora y otras no os "
+            "llegáis a ver.\n"
+            "Elegir los buenos días vale más que quejarse de los "
+            "desajustes."),
+        2: ("Vuestros días empiezan a horas parecidas.\n"
+            "Salir a trabajar, sentarse a comer, acostarse: todo queda "
+            "cerca.\n"
+            "Caidar en el mismo ritmo facilita las tareas compartidas."),
+        3: ("Os cansáis a la misma hora.\n"
+            "Sus horas libres coinciden casi siempre.\n"
+            "Esta es la forma más fácil de compartir un día cansado."),
+    },
+
+    # ---------------------------------------------------------- mundo interior
+    "yoni": {
+        0: ("Los dos esperáis entenderos sin hablar.\n"
+            "Leéis el estado del otro sin preguntar.\n"
+            "Cuando la suposición falla, el otro se calla pensando que no le "
+            "estabais escuchando."),
+        1: ("Todavía hay temas reservados.\n"
+            "A mitad de una conversación, los dos os retiráis.\n"
+            "Abrir ese tema sin nombrarlo cansa menos que mantenerlo "
+            "cerrado."),
+        2: ("Leéis el estado de ánimo antes de que se note.\n"
+            "Un buen día se oye; un día malo se ve en la postura.\n"
+            "Esa lectura se convierte en una atención que nadie pidió."),
+        3: ("Mostráis que habéis escuchado aunque no estéis de acuerdo.\n"
+            "El otro se recompone una vez antes de hablar.\n"
+            "Esperar aquí vale más que preguntar."),
+        4: ("Queda muy poco sin compartir.\n"
+            "Saber lo que el otro piensa sin preguntar es raro.\n"
+            "Toda esa apertura también facilita las decisiones en común."),
+    },
+
+    # ----------------------------------------------------- mente / comunicación
+    "graha_maitri": {
+        0: ("Nombráis los sentimientos con palabras distintas.\n"
+            "Uno dice «estoy triste» donde el otro dice «estoy cansado».\n"
+            "Vivir el mismo momento con nombres distintos lleva a "
+            "malentendidos."),
+        1: ("La mayoría de las discusiones empiezan a destiempo.\n"
+            "Uno tiene prisa y el otro está dispuesto a escuchar.\n"
+            "La misma idea, dicha en mejor momento, cae de otra forma."),
+        2: ("A menudo termináis la frase del otro.\n"
+            "A uno le cuesta una palabra y el otro ya la tiene.\n"
+            "Eso ahorra tiempo real cuando hay que decidir."),
+        3: ("Llegáis a la misma conclusión por caminos distintos.\n"
+            "Uno decide primero y el otro un momento después.\n"
+            "Con caminos distintos y mismo destino, la discusión se acorta."),
+        4: ("Os entendéis sin hablar.\n"
+            "Cuando uno se calla, el otro sabe por qué.\n"
+            "Lo único que queda sin decir puede ser justo lo importante."),
+        5: ("Decidís casi en el mismo instante.\n"
+            "Cuando uno dice «este», el otro ya está ahí.\n"
+            "Incluso las decisiones difíciles se toman sin debate."),
+    },
+
+    # --------------------------------------------------------------- carácter
+    "gana": {
+        0: ("Decidís en unos dos segundos.\n"
+            "Uno contesta sin pensar y el otro enumera tres opciones.\n"
+            "La rapidez frente a la prudencia aparece en cada elección "
+            "pequeña."),
+        1: ("Ninguno espera que el otro sea como tú.\n"
+            "No se le debe una explicación por ser distinto.\n"
+            "Esa falta de expectativa mantiene la diferencia en algo "
+            "inofensivo."),
+        2: ("Os resulta gracioso casi lo mismo.\n"
+            "El mismo momento divertido os llega a la vez.\n"
+            "Las quejas pequeñas se cierran rápido con ese humor compartido."),
+        3: ("Aguantáis juntos el ritmo del día a día.\n"
+            "Cuando a uno se le acaba la energía, el otro carga con la "
+            "mitad.\n"
+            "Es apoyo dado sin decir una palabra."),
+        4: ("Vuestros gustos y el apetito encajan.\n"
+            "Misma comida, mismo programa, misma tarde.\n"
+            "Las cosas cotidianas que hacéis juntos se multiplican."),
+        5: ("El estado de uno mueve a la otra casi al instante.\n"
+            "Cuando os enfadáis, os enfadáis los dos a la vez.\n"
+            "Para una relación, enfadarse juntos y calmarse juntos es ideal."),
+        6: ("Os turnáis sin llevar la cuenta.\n"
+            "Uno da un paso al frente, el otro se retira; luego cambiáis.\n"
+            "Así nadie se queda permanentemente en segundo plano."),
+    },
+
+    # -------------------------------------------------------- dirección común
+    "rasi": {
+        0: ("No estáis leyendo el mismo mapa.\n"
+            "Uno señala el corto plazo y el otro el plan largo.\n"
+            "Cuando cambia la dirección, alguien tiene que volver a "
+            "preguntar adónde lleva el camino."),
+        1: ("Hay una dirección en la que ya estáis de acuerdo.\n"
+            "En eso llegáis a la misma decisión sin discutir.\n"
+            "Es un terreno que no hace falta reabrir cada vez."),
+        2: ("Uno frena y el otro espera.\n"
+            "Uno tiene prisa y el otro va despacio para asegurarse.\n"
+            "A veces quien espera acaba teniendo que apresurarse."),
+        3: ("Consideráis importantes las mismas cosas por el mismo motivo.\n"
+            "Los dos bebéis de experiencias parecidas.\n"
+            "Ese motivo compartido mantiene un plan largo sobre el papel."),
+        4: ("Vuestras prioridades se respaldan.\n"
+            "Cuando uno dice «esto primero», el otro dice «sí».\n"
+            "Ese acuerdo es lo que marca la velocidad de la decisión."),
+        5: ("Llegáis al mismo sitio por caminos distintos.\n"
+            "Mismo destino, carretera diferente.\n"
+            "Si uno se sale del camino, el otro tiene que buscar otro."),
+        6: ("Entendéis el plan sin explicarlo.\n"
+            "No hace falta hablarlo, porque el mañana ya está claro.\n"
+            "Un plan así aguantaría también con una tercera persona."),
+        7: ("Decidís juntos en lugar de por separado.\n"
+            "Dejáis vuestra preferencia en un lado y preguntáis primero la "
+            "del otro.\n"
+            "Eso facilita la parte más difícil de diseñar una vida común."),
+    },
+
+    # ------------------------------------------------ impulso interior / fricción
+    "nadi": {
+        0: ("Cerráis la misma falta de dos maneras distintas.\n"
+            "Uno olvidando y el otro trabajando.\n"
+            "El mismo vacío, método distinto."),
+        1: ("Queréis lo mismo al mismo tiempo.\n"
+            "Cuando a uno le apetece, al otro también.\n"
+            "Cualquiera de los dos sabe explicar por qué."),
+        2: ("No estáis mirando el mismo punto.\n"
+            "Los dos caéis en el mismo error sin verlo.\n"
+            "Uno tapa el punto ciego del otro."),
+        3: ("La ausencia de esa falta os molesta a los dos a la vez.\n"
+            "Os movéis cuando el otro está bien.\n"
+            "Eso os evita quedar a solas con ello."),
+        4: ("El objetivo es el mismo, el camino no.\n"
+            "Uno tiene prisa y el otro espera su turno.\n"
+            "Quien espera acaba frenando a quien se precipitó."),
+        5: ("Hay dos deseos opuestos sobre lo mismo.\n"
+            "Uno quiere más juntos y el otro más espacio.\n"
+            "Hablarlo cansa a los dos muy pronto."),
+        6: ("Llegáis al mismo sitio dos veces.\n"
+            "Uno busca y el otro no lo encuentra; luego os cambiáis.\n"
+            "El bucle se ve antes de poder romperlo."),
+        7: ("La inquietud de una encuentra su reflejo exacto en la otra.\n"
+            "Ninguna se calma hasta que la otra se calma.\n"
+            "No podéis empezar la conversación hasta que os calméis juntos."),
+        8: ("Dais la misma lección dos veces.\n"
+            "Cuando uno se rompe, el otro también.\n"
+            "La segunda vuelta dura menos que la primera."),
+    },
+}
+
+
+#: Cuatro ángulos: 0 promesa, 1 explica, 2 simboliza, 3 señala.
+ACI_SAYISI = 4
+
+
+def govde_varyantlari(kod: str, puan: int) -> List[str]:
+    """Todos los cuerpos disponibles para `kod`/`puan`.
+
+    `GOVDE` es siempre el primero; `GOVDE_ALT` añade el segundo cuando
+    existe, de modo que las kootas con un solo cuerpo siguen funcionando.
+    """
+    ilk = GOVDE.get(kod, {}).get(puan)
+    if ilk is None:
+        return []
+    liste = [ilk]
+    ikinci = GOVDE_ALT.get(kod, {}).get(puan)
+    if ikinci is not None:
+        liste.append(ikinci)
+    return liste
+
+
+def dogal_metin(kod: str, puan: int, aci: int,
+                govde_index: Optional[int] = None) -> str:
+    """Texto sin jerga para `kod` en `puan` desde el ángulo `aci`.
+
+    `aci`: 0 promesa, 1 explica, 2 simboliza, 3 señala.
+    `govde_index`: variante del cuerpo; `None` elige una al azar. Con cuatro
+    ángulos y dos cuerpos, un puntaje da ocho textos posibles.
+    """
+    if GOVDE.get(kod, {}).get(puan) is None:
         return ""
-    return "%s\n%s" % (ACILAR.get(kod, [""] * 3)[aci % 3], govde)
+    if govde_index is None:
+        govde_index = random.randrange(len(govde_varyantlari(kod, puan)))
+    return "%s\n%s" % (ACILAR.get(kod, [""] * ACI_SAYISI)[aci % ACI_SAYISI],
+                       govde_varyantlari(kod, puan)[govde_index])
 
 
 def mevcut(kod: str, puan: int) -> bool:

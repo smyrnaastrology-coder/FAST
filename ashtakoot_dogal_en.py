@@ -8,7 +8,8 @@ No Sanskrit/Jyotish term appears here; every text says what the score means
 for the relationship in everyday life.
 """
 
-from typing import Dict, List
+import random
+from typing import Dict, List, Optional
 
 KOOTA_BASLIK: Dict[str, str] = {
     "varna": "Values and social outlook",
@@ -29,6 +30,7 @@ ACILAR: Dict[str, List[str]] = {
         "up in everyday life.",
         "This area symbolizes: whether the things you both call important "
         "actually line up.",
+        "This area flags: how each of you reacts to what you gain and lose.",
     ],
     "vashya": [
         "This area shows what it promises: how strong your pull toward each "
@@ -36,6 +38,7 @@ ACILAR: Dict[str, List[str]] = {
         "This area explains: where the \"something in me stirred\" feeling "
         "comes from.",
         "This area symbolizes: that quiet first moment of attraction.",
+        "This area flags: treating the pull as the only thing holding the relationship up.",
     ],
     "tara": [
         "This area shows what it promises: how often your daily rhythms "
@@ -44,6 +47,7 @@ ACILAR: Dict[str, List[str]] = {
         "waking early affects the relationship.",
         "This area symbolizes: a household where clocks run at different "
         "hours.",
+        "This area flags: a running clock tally under one roof, kept without anyone meaning to.",
     ],
     "yoni": [
         "This area shows what it promises: how easily you will read each "
@@ -51,6 +55,7 @@ ACILAR: Dict[str, List[str]] = {
         "This area explains: how often \"what are they feeling right now?\" "
         "will come up.",
         "This area symbolizes: how far open the door to intimacy stands.",
+        "This area flags: quiet mistakes you make while believing you understood everything.",
     ],
     "graha_maitri": [
         "This area shows what it promises: how well you can read each "
@@ -58,6 +63,7 @@ ACILAR: Dict[str, List[str]] = {
         "This area explains: why you tell the same story differently.",
         "This area symbolizes: the ease of two people speaking the same "
         "language.",
+        "This area flags: going quiet just because you already agree.",
     ],
     "gana": [
         "This area shows what it promises: how likely you are to live "
@@ -65,6 +71,8 @@ ACILAR: Dict[str, List[str]] = {
         "This area explains: why your reactions sometimes collide at the "
         "same moment.",
         "This area symbolizes: two different rhythms settling into one home.",
+        "This area flags: repeating \"that is not how I do it\" word for "
+        "word.",
     ],
     "rasi": [
         "This area shows what it promises: whether you can walk toward one "
@@ -72,6 +80,7 @@ ACILAR: Dict[str, List[str]] = {
         "This area explains: which areas of life you move through at the "
         "same speed.",
         "This area symbolizes: two people reading the same map.",
+        "This area flags: walking toward one shared goal for entirely different reasons.",
     ],
     "nadi": [
         "This area shows what it promises: the chance that the same lack "
@@ -80,6 +89,7 @@ ACILAR: Dict[str, List[str]] = {
         "other.",
         "This area symbolizes: two people standing at the same spot, either "
         "completing or colliding.",
+        "This area flags: looking twice for the same missing thing and still leaving empty handed.",
     ],
 }
 
@@ -302,12 +312,227 @@ GOVDE: Dict[str, Dict[int, str]] = {
 }
 
 
-def dogal_metin(kod: str, puan: int, aci: int) -> str:
-    """Return the jargon-free text for `kod` at `puan` from angle `aci`."""
-    govde = GOVDE.get(kod, {}).get(puan)
-    if govde is None:
+
+#: Her (koota, puan) için ikinci gövde varyantı. `GOVDE` genel düzeyi
+#: tanımlayıp sonucu söyler; buradaki metin somut günlük sahneyi kurar.
+#: Çağıran taraf iki varyant arasından rastgele seçer.
+GOVDE_ALT: Dict[str, Dict[int, str]] = {
+
+    # ------------------------------------------------------- values / social view
+    "varna": {
+        0: ("You handle money in opposite ways.\n"
+            "One keeps a running total, the other spends for the moment.\n"
+            "Managing one budget, you two follow different rules."),
+        1: ("The days you consider important are the same days.\n"
+            "Both of you find a reason to mark an ordinary day together.\n"
+            "Small matches like this hold a relationship up unnoticed."),
+    },
+
+    # ------------------------------------------------------------- mutual pull
+    "vashya": {
+        0: ("You show interest in different ways.\n"
+            "One invites you over, the other calls for a long time.\n"
+            "One says \"I want to see you\", the other \"I missed you\"; both "
+            "come through the same door."),
+        1: ("There is a balance between closeness and freedom.\n"
+            "When one moves closer, the other gives a little space; that is "
+            "breathing, not cooling off.\n"
+            "The closer you get, the easier it becomes to find that distance "
+            "again."),
+        2: ("After time apart, one of you reaches out first.\n"
+            "A short gap does not end the interest, it makes the reunion "
+            "clearer.\n"
+            "This is what keeps the relationship standing."),
+    },
+
+    # --------------------------------------------------------------- time / rhythm
+    "tara": {
+        0: ("Your weekends are built differently.\n"
+            "One starts early, the other gets going in the evening.\n"
+            "It takes about two weeks to work out what time you can actually "
+            "meet."),
+        1: ("Some of your days overlap too.\n"
+            "Some weeks you wake at the same hour, some weeks you never meet.\n"
+            "Picking the good days is worth more than worrying about the "
+            "mismatched ones."),
+        2: ("Your days start at similar hours.\n"
+            "Leaving for work, sitting down to eat, going to sleep: all close "
+            "together.\n"
+            "Falling into the same rhythm makes shared tasks easy."),
+        3: ("You get tired at the same hour.\n"
+            "Your free hours happen to land at the same time.\n"
+            "This is the easiest version of sharing a tired day."),
+    },
+
+    # ------------------------------------------------------------- inner world
+    "yoni": {
+        0: ("You both expect to be understood without talking.\n"
+            "You read each other's state without asking.\n"
+            "When the guess is wrong, the other goes quiet thinking \"you "
+            "weren't listening\"."),
+        1: ("A few subjects are still off limits.\n"
+            "Halfway through a conversation, both of you pull back.\n"
+            "Opening that subject without naming it wears less on you than "
+            "keeping it shut."),
+        2: ("You read the mood before it shows.\n"
+            "A good day is audible, a hard one shows in posture.\n"
+            "That reading turns into attention you never had to ask for."),
+        3: ("You show you listened even when you did not agree.\n"
+            "The other person gathers themselves once before speaking.\n"
+            "Waiting is worth more here than asking."),
+        4: ("There is very little left unshared.\n"
+            "Knowing what the other thinks without asking is rare.\n"
+            "That much openness makes joint decisions easier too."),
+    },
+
+    # ------------------------------------------------------- mind / communication
+    "graha_maitri": {
+        0: ("You name feelings in different words.\n"
+            "One says \"I'm sad\" where the other says \"I'm tired\".\n"
+            "Living the same moment under different names invites "
+            "misunderstanding."),
+        1: ("Most arguments start at the wrong hour.\n"
+            "One is in a hurry, the other is ready to listen.\n"
+            "The same thought, said at a better moment, lands differently."),
+        2: ("You often finish each other's sentences.\n"
+            "One of you struggles for a word and the other has it almost at "
+            "once.\n"
+            "That saves real time when a decision has to be made."),
+        3: ("You reach the same conclusion by different routes.\n"
+            "One decides first, the other a moment later.\n"
+            "Different paths, same destination: the argument stays short."),
+        4: ("You understand each other without talking.\n"
+            "When one goes quiet, the other knows why.\n"
+            "The only thing left unsaid may be the one thing that matters."),
+        5: ("You decide at nearly the same moment.\n"
+            "When one says \"this one\", the other is already there.\n"
+            "Even hard decisions get made without a debate."),
+    },
+
+    # -------------------------------------------------------------- character
+    "gana": {
+        0: ("You decide in about two seconds.\n"
+            "One answers before thinking, the other lists three options.\n"
+            "Speed against caution shows up in every small choice."),
+        1: ("Neither of you expects the other to be like you.\n"
+            "You are not owed an explanation for being different.\n"
+            "That expectation being absent keeps the difference harmless."),
+        2: ("You laugh at almost the same things.\n"
+            "The same funny moment lands on both of you at once.\n"
+            "Small complaints close quickly through shared humour."),
+        3: ("You keep up with daily life together.\n"
+            "When one runs out of energy, the other takes half the load.\n"
+            "That is support given without a word."),
+        4: ("Your tastes and appetites line up.\n"
+            "Same food, same programme, same evening.\n"
+            "Everyday things you do together multiply."),
+        5: ("One person's mood moves the other almost instantly.\n"
+            "When you get angry, you get angry at the same time.\n"
+            "For a relationship, getting angry together and calming down "
+            "together is ideal."),
+        6: ("You take turns without keeping score.\n"
+            "One steps forward, the other steps back, then you swap.\n"
+            "That kind of sharing keeps neither of you permanently second."),
+    },
+
+    # --------------------------------------------------------- shared direction
+    "rasi": {
+        0: ("You are not reading the same map.\n"
+            "One points at the short term, the other at the long plan.\n"
+            "When the direction changes, someone has to ask where the road "
+            "leads again."),
+        1: ("There is one direction you already agree on.\n"
+            "In that area you reach the same decision without arguing.\n"
+            "It is ground that never has to be reopened."),
+        2: ("One of you slows down and the other waits.\n"
+            "One hurries, the other slows to be sure.\n"
+            "Sometimes the one waiting has to speed up too."),
+        3: ("You call the same things important for the same reason.\n"
+            "Both of you are fed by similar experience.\n"
+            "That shared reason keeps a long plan on paper."),
+        4: ("Your priorities back each other up.\n"
+            "When one says \"this first\", the other says \"yes\".\n"
+            "That agreement is what decides how fast you move."),
+        5: ("You reach the same place by different routes.\n"
+            "Same destination, different road.\n"
+            "When one of you steps off the road, the other has to find a new "
+            "one."),
+        6: ("You understand the plan without explaining it.\n"
+            "There is no need to discuss it, because tomorrow is already "
+            "clear.\n"
+            "A plan like that would hold with a third person too."),
+        7: ("You decide together rather than separately.\n"
+            "You set your own preference aside and ask for theirs first.\n"
+            "That makes the hardest part of designing a shared life easier."),
+    },
+
+    # ----------------------------------------------------- inner drive / friction
+    "nadi": {
+        0: ("You close the same gap in two different ways.\n"
+            "One forgets, the other works at it.\n"
+            "Same emptiness, different method."),
+        1: ("You want the same thing at the same time.\n"
+            "When one starts craving it, so does the other.\n"
+            "Either of you can explain why."),
+        2: ("You are not looking at the same spot.\n"
+            "Both of you fall into the same mistake without seeing it.\n"
+            "One closes the blind spot the other has."),
+        3: ("Its absence bothers you both at once.\n"
+            "You stir when the other is doing well.\n"
+            "That keeps either of you from being alone in it."),
+        4: ("Same goal, different route.\n"
+            "One hurries, the other waits their turn.\n"
+            "Whoever waits ends up slowing the one who rushed."),
+        5: ("Two opposite wants about the same thing.\n"
+            "One wants more togetherness, the other wants more room.\n"
+            "Talking about it tires you both quickly."),
+        6: ("You arrive at the same place twice.\n"
+            "One looks, the other cannot find it, then you swap.\n"
+            "You notice the loop before you can break it."),
+        7: ("One person's unease finds its exact match in the other.\n"
+            "Neither settles until the other does.\n"
+            "You cannot begin the conversation until you calm down together."),
+        8: ("You take the same lesson twice.\n"
+            "When one breaks, the other breaks too.\n"
+            "The second round is shorter than the first."),
+    },
+}
+
+
+#: Four angles: 0 promise, 1 explains, 2 symbolizes, 3 flags.
+ACI_SAYISI = 4
+
+
+def govde_varyantlari(kod: str, puan: int) -> List[str]:
+    """All body variants available for `kod`/`puan`.
+
+    `GOVDE` is always the first variant; `GOVDE_ALT` adds the second when
+    present, so kootas with a single body keep working unchanged.
+    """
+    ilk = GOVDE.get(kod, {}).get(puan)
+    if ilk is None:
+        return []
+    liste = [ilk]
+    ikinci = GOVDE_ALT.get(kod, {}).get(puan)
+    if ikinci is not None:
+        liste.append(ikinci)
+    return liste
+
+
+def dogal_metin(kod: str, puan: int, aci: int,
+                govde_index: Optional[int] = None) -> str:
+    """Jargon-free text for `kod` at `puan` from angle `aci`.
+
+    `aci`: 0 promise, 1 explains, 2 symbolizes, 3 flags.
+    `govde_index`: body variant; `None` picks one at random. With four
+    angles and two bodies, one score yields eight possible texts.
+    """
+    if GOVDE.get(kod, {}).get(puan) is None:
         return ""
-    return "%s\n%s" % (ACILAR.get(kod, [""] * 3)[aci % 3], govde)
+    if govde_index is None:
+        govde_index = random.randrange(len(govde_varyantlari(kod, puan)))
+    return "%s\n%s" % (ACILAR.get(kod, [""] * ACI_SAYISI)[aci % ACI_SAYISI],
+                       govde_varyantlari(kod, puan)[govde_index])
 
 
 def mevcut(kod: str, puan: int) -> bool:
