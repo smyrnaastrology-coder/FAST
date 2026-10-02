@@ -7076,24 +7076,28 @@ def _ash_metin_zenginlestir(sonuc, dil="tr", mod="es_sevgili"):
     for k in sonuc.kootalar:
         govde = diller.get(k.ad, {})
         m = _ash_metin.metin_getir(k.ad, k.puan, k.azami, dil)
+        # Kullanıcıya gösterilen sade metin: jargon yok, 3+ satır, puan
+        # başına ayrı ve üç açıdan (vaat/anlatı/simge) rastgele biri.
+        d = _ash_metin.dogal_aciklama(k.ad, k.puan, dil)
         kootalar.append({
             "ad": k.ad, "ad_tr": k.ad_tr, "ad_en": k.ad_en, "ad_es": k.ad_es,
             "azami": k.azami, "puan": k.puan, "not": k.not_, "detay": k.detay,
             "bant": m.get("_bant", ""),
-            "baslik": m.get("baslik", ""),
+            "baslik": d.get("baslik") or govde.get("baslik", ""),
             "konu": govde.get("baslik", ""),
             "soru": govde.get("soru", ""),
-            "aciklama": m.get("aciklama", ""),
+            "aciklama": d.get("aciklama") or m.get("aciklama", ""),
             "ipucu": m.get("ipucu", ""),
             "mod_yorumu": _ash_metin.mod_yorumu(k.ad, mod, dil),
         })
 
     toplam = _ash_metin.toplam_metni(sonuc.seviye, dil)
+    dt = _ash_metin.dogal_toplam(sonuc.seviye, dil)
     cevap = {
         "toplam": {
-            "baslik": toplam.get("baslik", ""),
-            "aciklama": toplam.get("aciklama", ""),
-            "ipucu": toplam.get("ipucu", ""),
+            "baslik": dt.get("baslik") or toplam.get("baslik", ""),
+            "aciklama": dt.get("aciklama") or toplam.get("aciklama", ""),
+            "ipucu": dt.get("ipucu") or toplam.get("ipucu", ""),
         },
         "kootalar": kootalar,
     }

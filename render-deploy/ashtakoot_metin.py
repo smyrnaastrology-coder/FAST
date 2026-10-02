@@ -10,17 +10,26 @@ modülleri onun yapısını birebir izler. Bu modül dili seçer ve TR sürümü
 çağrıldığında özyinelemeyi önlemek için yalnızca kendi TR sözlüğünü döndürür.
 """
 
+import random
 from typing import Dict, Optional
 
 import ashtakoot_metinleri as _tr
 import ashtakoot_metinleri_EN as _en
 import ashtakoot_metinleri_ES as _es
 
+# Kullanıcıya gösterilen JARGONSUZ doğal dil katmanı (ayrı modüller).
+import ashtakoot_dogal_tr as _d_tr
+import ashtakoot_dogal_en as _d_en
+import ashtakoot_dogal_es as _d_es
+
 DILLER: Dict[str, dict] = {
-    "tr": {"modul": _tr, "ad": "Türkçe", "sembol": "TR"},
-    "en": {"modul": _en, "ad": "English", "sembol": "EN"},
-    "es": {"modul": _es, "ad": "Español", "sembol": "ES"},
+    "tr": {"modul": _tr, "ad": "Türkçe", "sembol": "TR", "dogal": _d_tr},
+    "en": {"modul": _en, "ad": "English", "sembol": "EN", "dogal": _d_en},
+    "es": {"modul": _es, "ad": "Español", "sembol": "ES", "dogal": _d_es},
 }
+
+#: Doğal dildeki üç bakış açısı.
+ACILAR = ("vaat", "anlatı", "simge")
 
 
 def dogrula(lang: str) -> bool:
@@ -49,6 +58,42 @@ def metin_getir(koota: str, puan: int, azami: int, lang: str = "tr") -> dict:
     if lang == "tr":
         return _tr.metin_getir(koota, puan, azami)
     return m.metin_getir(koota, puan, azami)
+
+
+def dogal_aciklama(koota: str, puan: int, lang: str = "tr") -> dict:
+    """Kullanıcıya gösterilecek jargonSUZ, doğal dil açıklaması.
+
+    `ashtakoot_metinleri*` band metinleri uzman içindir; burada dönen metin
+    "varna / bhanga / pada" gibi terimleri hiç kullanmaz ve doğrudan şunu
+    söyler: bu puan ilişki adına ne vaat ediyor, ne anlatıyor, neyi
+    simgeliyor. Her (koota, puan) için 3 metin vardır; burada her çağrıda
+    biri rastgele seçilir.
+
+    Dönüş: {"baslik": sade_koota_adi, "aciklama": metin, "aci": "vaat"}
+    """
+    mod = DILLER.get(lang, DILLER["tr"])["dogal"]
+    baslik = mod.KOOTA_BASLIK.get(koota, "")
+    aci_index = random.randrange(3)
+    metin = mod.dogal_metin(koota, puan, aci_index)
+    if not metin:
+        return {}
+    return {
+        "baslik": baslik,
+        "aciklama": metin,
+        "aci": ACILAR[aci_index],
+    }
+
+
+def dogal_basliklar(lang: str = "tr") -> dict:
+    """koota -> sade ad sözlüğü (arayüz başlıkları için)."""
+    mod = DILLER.get(lang, DILLER["tr"])["dogal"]
+    return dict(mod.KOOTA_BASLIK)
+
+
+def dogal_toplam(seviye: str, lang: str = "tr") -> dict:
+    """Toplam bant için jargonSUZ metni (koota metinleriyle aynı katman)."""
+    mod = DILLER.get(lang, DILLER["tr"])["dogal"]
+    return mod.toplam_metin(seviye)
 
 
 def mod_yorumu(koota: str, mod: str, lang: str = "tr") -> str:

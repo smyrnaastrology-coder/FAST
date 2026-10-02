@@ -1450,4 +1450,78 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get ashTimeAmbiguous => 'saat dilimi geçişinde';
+
+  @override
+  String get ashCityNotInList =>
+      'Bu ülkede şehir listesi boş. Aşağıdaki elle UTC ofseti bölümünü kullanın.';
+
+  @override
+  String get ashShowDetail => 'Teknik detayı göster';
+
+  @override
+  String get ashHideDetail => 'Teknik detayı gizle';
+
+  @override
+  String get analyzerFeaturesPy4 =>
+      'Ay–Güneş açıları, açı haritası & kozmik sözleşme';
+
+  @override
+  String get analyzerFeaturesPy5 =>
+      'Sabian dereceleri ve hayat alanları kırılımı';
+
+  @override
+  String get analyzerFeaturesPy6 =>
+      'Güneş ve Ay dönüşleri, yıllık ilerleme akışı';
+
+  @override
+  String get analyzerFeaturesPy7 =>
+      'Zaman makinesi: istediğin yılın gökyüzü taraması';
+
+  @override
+  String get analyzerFeaturesPy8 =>
+      'Arap noktaları radarı ve göksel mühür analizi';
+
+  @override
+  String get analyzerFeaturesPy9 => 'Şifa reçeteleri ve asteroid etkileşimleri';
+
+  @override
+  String get analyzerFeaturesPy10 =>
+      'Astroharita, harita çizimleri & grafik ekranları';
+
+  @override
+  String get analyzerFeaturesPy11 => 'Tam PDF raporu (sınırsız indirme hakkı)';
+
+  @override
+  String get analyzerFeaturesAsh1 =>
+      'Ay nakşatralarının 36 puanlık uyum hesabı';
+
+  @override
+  String get analyzerFeaturesAsh2 =>
+      '8 uyum alanının puan başına sade dil açıklaması';
+
+  @override
+  String get analyzerFeaturesAsh3 =>
+      'Ay profilleri: Ay lordu, burç ve yön detayları';
+
+  @override
+  String get analyzerFeaturesAsh4 =>
+      'Doğum yeri seçimiyle tarihsel saat ve yaz saati düzeltmesi';
+
+  @override
+  String get analyzerFeaturesAsh5 =>
+      'İç çatışma (Nadi) uyuşmazlığının ayrıntılı tespiti';
+
+  @override
+  String get analyzerFeaturesAsh6 =>
+      'Doğum saati belirsizse uyarı ve en doğru saat önerisi';
+
+  @override
+  String get analyzerFeaturesAsh7 =>
+      'Kapsam dışı kurallar ve şeffaf hesap notları';
+
+  @override
+  String get analyzerFeaturesAsh8 => 'TR / EN / ES dilinde tam açıklama';
+
+  @override
+  String get analyzerFeaturesAsh9 => 'Tam PDF raporu (sınırsız indirme hakkı)';
 }

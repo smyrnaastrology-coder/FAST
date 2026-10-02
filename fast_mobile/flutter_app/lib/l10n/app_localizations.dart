@@ -2745,6 +2745,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'DST transition hour'**
   String get ashTimeAmbiguous;
+
+  /// No description provided for @ashCityNotInList.
+  ///
+  /// In en, this message translates to:
+  /// **'This country has no city list. Use the manual UTC offset section below.'**
+  String get ashCityNotInList;
+
+  /// No description provided for @ashShowDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Show technical detail'**
+  String get ashShowDetail;
+
+  /// No description provided for @ashHideDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide technical detail'**
+  String get ashHideDetail;
+
+  /// No description provided for @analyzerFeaturesPy4.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon–Sun aspects, aspect map & celestial contract'**
+  String get analyzerFeaturesPy4;
+
+  /// No description provided for @analyzerFeaturesPy5.
+  ///
+  /// In en, this message translates to:
+  /// **'Sabian degrees and life-area breakdown'**
+  String get analyzerFeaturesPy5;
+
+  /// No description provided for @analyzerFeaturesPy6.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar and lunar returns, yearly progression flow'**
+  String get analyzerFeaturesPy6;
+
+  /// No description provided for @analyzerFeaturesPy7.
+  ///
+  /// In en, this message translates to:
+  /// **'Time machine: scan the sky of any year you choose'**
+  String get analyzerFeaturesPy7;
+
+  /// No description provided for @analyzerFeaturesPy8.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic points radar and celestial seal analysis'**
+  String get analyzerFeaturesPy8;
+
+  /// No description provided for @analyzerFeaturesPy9.
+  ///
+  /// In en, this message translates to:
+  /// **'Healing prescriptions and asteroid interactions'**
+  String get analyzerFeaturesPy9;
+
+  /// No description provided for @analyzerFeaturesPy10.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrocartography, chart drawings & graph screens'**
+  String get analyzerFeaturesPy10;
+
+  /// No description provided for @analyzerFeaturesPy11.
+  ///
+  /// In en, this message translates to:
+  /// **'Full PDF report (unlimited download right)'**
+  String get analyzerFeaturesPy11;
+
+  /// No description provided for @analyzerFeaturesAsh1.
+  ///
+  /// In en, this message translates to:
+  /// **'36-point compatibility score between moon nakshatras'**
+  String get analyzerFeaturesAsh1;
+
+  /// No description provided for @analyzerFeaturesAsh2.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain-language reading for each of the 8 areas, score by score'**
+  String get analyzerFeaturesAsh2;
+
+  /// No description provided for @analyzerFeaturesAsh3.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon profiles: lord, sign and direction details'**
+  String get analyzerFeaturesAsh3;
+
+  /// No description provided for @analyzerFeaturesAsh4.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth-place picker with historical time and DST correction'**
+  String get analyzerFeaturesAsh4;
+
+  /// No description provided for @analyzerFeaturesAsh5.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed detection of inner friction (Nadi)'**
+  String get analyzerFeaturesAsh5;
+
+  /// No description provided for @analyzerFeaturesAsh6.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning and best-time suggestion when birth time is uncertain'**
+  String get analyzerFeaturesAsh6;
+
+  /// No description provided for @analyzerFeaturesAsh7.
+  ///
+  /// In en, this message translates to:
+  /// **'Out-of-scope rules and transparent calculation notes'**
+  String get analyzerFeaturesAsh7;
+
+  /// No description provided for @analyzerFeaturesAsh8.
+  ///
+  /// In en, this message translates to:
+  /// **'Full reading in TR / EN / ES'**
+  String get analyzerFeaturesAsh8;
+
+  /// No description provided for @analyzerFeaturesAsh9.
+  ///
+  /// In en, this message translates to:
+  /// **'Full PDF report (unlimited download right)'**
+  String get analyzerFeaturesAsh9;
 }
 
 class _AppLocalizationsDelegate

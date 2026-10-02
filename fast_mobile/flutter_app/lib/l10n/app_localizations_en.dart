@@ -1457,4 +1457,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ashTimeAmbiguous => 'DST transition hour';
+
+  @override
+  String get ashCityNotInList =>
+      'This country has no city list. Use the manual UTC offset section below.';
+
+  @override
+  String get ashShowDetail => 'Show technical detail';
+
+  @override
+  String get ashHideDetail => 'Hide technical detail';
+
+  @override
+  String get analyzerFeaturesPy4 =>
+      'Moon–Sun aspects, aspect map & celestial contract';
+
+  @override
+  String get analyzerFeaturesPy5 => 'Sabian degrees and life-area breakdown';
+
+  @override
+  String get analyzerFeaturesPy6 =>
+      'Solar and lunar returns, yearly progression flow';
+
+  @override
+  String get analyzerFeaturesPy7 =>
+      'Time machine: scan the sky of any year you choose';
+
+  @override
+  String get analyzerFeaturesPy8 =>
+      'Arabic points radar and celestial seal analysis';
+
+  @override
+  String get analyzerFeaturesPy9 =>
+      'Healing prescriptions and asteroid interactions';
+
+  @override
+  String get analyzerFeaturesPy10 =>
+      'Astrocartography, chart drawings & graph screens';
+
+  @override
+  String get analyzerFeaturesPy11 =>
+      'Full PDF report (unlimited download right)';
+
+  @override
+  String get analyzerFeaturesAsh1 =>
+      '36-point compatibility score between moon nakshatras';
+
+  @override
+  String get analyzerFeaturesAsh2 =>
+      'Plain-language reading for each of the 8 areas, score by score';
+
+  @override
+  String get analyzerFeaturesAsh3 =>
+      'Moon profiles: lord, sign and direction details';
+
+  @override
+  String get analyzerFeaturesAsh4 =>
+      'Birth-place picker with historical time and DST correction';
+
+  @override
+  String get analyzerFeaturesAsh5 =>
+      'Detailed detection of inner friction (Nadi)';
+
+  @override
+  String get analyzerFeaturesAsh6 =>
+      'Warning and best-time suggestion when birth time is uncertain';
+
+  @override
+  String get analyzerFeaturesAsh7 =>
+      'Out-of-scope rules and transparent calculation notes';
+
+  @override
+  String get analyzerFeaturesAsh8 => 'Full reading in TR / EN / ES';
+
+  @override
+  String get analyzerFeaturesAsh9 =>
+      'Full PDF report (unlimited download right)';
 }

@@ -494,5 +494,25 @@
   },
   "@ashLevelHigh": {
     "description": "Alta"
-  }
+  },
+  "ashCityNotInList": "Este país no tiene lista de ciudades. Usa la sección de desfase UTC manual de abajo.",
+  "ashShowDetail": "Ver detalle técnico",
+  "ashHideDetail": "Ocultar detalle técnico",
+  "analyzerFeaturesPy4": "Aspectos Luna–Sol, mapa de aspectos & contrato celeste",
+  "analyzerFeaturesPy5": "Grados Sabianos y desglose de áreas de vida",
+  "analyzerFeaturesPy6": "Revoluciones solares y lunares, flujo anual",
+  "analyzerFeaturesPy7": "Máquina del tiempo: escanea el cielo de cualquier año",
+  "analyzerFeaturesPy8": "Radar de puntos árabes y análisis de sellos celestes",
+  "analyzerFeaturesPy9": "Prescripciones de sanación e interacciones de asteroides",
+  "analyzerFeaturesPy10": "Astrocartografía, dibujos de carta & pantallas de gráficos",
+  "analyzerFeaturesPy11": "Informe PDF completo (derecho de descarga ilimitada)",
+  "analyzerFeaturesAsh1": "Puntuación de compatibilidad de 36 puntos entre nakshatras lunares",
+  "analyzerFeaturesAsh2": "Lectura en lenguaje claro para cada una de las 8 áreas, punto por punto",
+  "analyzerFeaturesAsh3": "Perfiles lunares: señor, signo y detalles de dirección",
+  "analyzerFeaturesAsh4": "Selector de lugar de nacimiento con corrección horaria histórica y horario de verano",
+  "analyzerFeaturesAsh5": "Detección detallada de la fricción interior (Nadi)",
+  "analyzerFeaturesAsh6": "Aviso y sugerencia de mejor hora cuando la hora de nacimiento es incierta",
+  "analyzerFeaturesAsh7": "Reglas fuera de alcance y notas de cálculo transparentes",
+  "analyzerFeaturesAsh8": "Lectura completa en TR / EN / ES",
+  "analyzerFeaturesAsh9": "Informe PDF completo (derecho de descarga ilimitada)"
 }

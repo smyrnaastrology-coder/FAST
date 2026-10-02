@@ -1472,4 +1472,81 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ashTimeAmbiguous => 'hora de cambio horario';
+
+  @override
+  String get ashCityNotInList =>
+      'Este país no tiene lista de ciudades. Usa la sección de desfase UTC manual de abajo.';
+
+  @override
+  String get ashShowDetail => 'Ver detalle técnico';
+
+  @override
+  String get ashHideDetail => 'Ocultar detalle técnico';
+
+  @override
+  String get analyzerFeaturesPy4 =>
+      'Aspectos Luna–Sol, mapa de aspectos & contrato celeste';
+
+  @override
+  String get analyzerFeaturesPy5 =>
+      'Grados Sabianos y desglose de áreas de vida';
+
+  @override
+  String get analyzerFeaturesPy6 =>
+      'Revoluciones solares y lunares, flujo anual';
+
+  @override
+  String get analyzerFeaturesPy7 =>
+      'Máquina del tiempo: escanea el cielo de cualquier año';
+
+  @override
+  String get analyzerFeaturesPy8 =>
+      'Radar de puntos árabes y análisis de sellos celestes';
+
+  @override
+  String get analyzerFeaturesPy9 =>
+      'Prescripciones de sanación e interacciones de asteroides';
+
+  @override
+  String get analyzerFeaturesPy10 =>
+      'Astrocartografía, dibujos de carta & pantallas de gráficos';
+
+  @override
+  String get analyzerFeaturesPy11 =>
+      'Informe PDF completo (derecho de descarga ilimitada)';
+
+  @override
+  String get analyzerFeaturesAsh1 =>
+      'Puntuación de compatibilidad de 36 puntos entre nakshatras lunares';
+
+  @override
+  String get analyzerFeaturesAsh2 =>
+      'Lectura en lenguaje claro para cada una de las 8 áreas, punto por punto';
+
+  @override
+  String get analyzerFeaturesAsh3 =>
+      'Perfiles lunares: señor, signo y detalles de dirección';
+
+  @override
+  String get analyzerFeaturesAsh4 =>
+      'Selector de lugar de nacimiento con corrección horaria histórica y horario de verano';
+
+  @override
+  String get analyzerFeaturesAsh5 =>
+      'Detección detallada de la fricción interior (Nadi)';
+
+  @override
+  String get analyzerFeaturesAsh6 =>
+      'Aviso y sugerencia de mejor hora cuando la hora de nacimiento es incierta';
+
+  @override
+  String get analyzerFeaturesAsh7 =>
+      'Reglas fuera de alcance y notas de cálculo transparentes';
+
+  @override
+  String get analyzerFeaturesAsh8 => 'Lectura completa en TR / EN / ES';
+
+  @override
+  String get analyzerFeaturesAsh9 =>
+      'Informe PDF completo (derecho de descarga ilimitada)';
 }

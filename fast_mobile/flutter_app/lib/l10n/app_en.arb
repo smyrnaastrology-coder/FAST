@@ -494,5 +494,25 @@
   },
   "@ashLevelHigh": {
     "description": "High"
-  }
+  },
+  "ashCityNotInList": "This country has no city list. Use the manual UTC offset section below.",
+  "ashShowDetail": "Show technical detail",
+  "ashHideDetail": "Hide technical detail",
+  "analyzerFeaturesPy4": "Moon–Sun aspects, aspect map & celestial contract",
+  "analyzerFeaturesPy5": "Sabian degrees and life-area breakdown",
+  "analyzerFeaturesPy6": "Solar and lunar returns, yearly progression flow",
+  "analyzerFeaturesPy7": "Time machine: scan the sky of any year you choose",
+  "analyzerFeaturesPy8": "Arabic points radar and celestial seal analysis",
+  "analyzerFeaturesPy9": "Healing prescriptions and asteroid interactions",
+  "analyzerFeaturesPy10": "Astrocartography, chart drawings & graph screens",
+  "analyzerFeaturesPy11": "Full PDF report (unlimited download right)",
+  "analyzerFeaturesAsh1": "36-point compatibility score between moon nakshatras",
+  "analyzerFeaturesAsh2": "Plain-language reading for each of the 8 areas, score by score",
+  "analyzerFeaturesAsh3": "Moon profiles: lord, sign and direction details",
+  "analyzerFeaturesAsh4": "Birth-place picker with historical time and DST correction",
+  "analyzerFeaturesAsh5": "Detailed detection of inner friction (Nadi)",
+  "analyzerFeaturesAsh6": "Warning and best-time suggestion when birth time is uncertain",
+  "analyzerFeaturesAsh7": "Out-of-scope rules and transparent calculation notes",
+  "analyzerFeaturesAsh8": "Full reading in TR / EN / ES",
+  "analyzerFeaturesAsh9": "Full PDF report (unlimited download right)"
 }

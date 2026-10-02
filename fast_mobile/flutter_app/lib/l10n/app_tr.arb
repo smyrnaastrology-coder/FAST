@@ -501,5 +501,25 @@
   },
   "@ashLevelHigh": {
     "description": "Yüksek"
-  }
+  },
+  "ashCityNotInList": "Bu ülkede şehir listesi boş. Aşağıdaki elle UTC ofseti bölümünü kullanın.",
+  "ashShowDetail": "Teknik detayı göster",
+  "ashHideDetail": "Teknik detayı gizle",
+  "analyzerFeaturesPy4": "Ay–Güneş açıları, açı haritası & kozmik sözleşme",
+  "analyzerFeaturesPy5": "Sabian dereceleri ve hayat alanları kırılımı",
+  "analyzerFeaturesPy6": "Güneş ve Ay dönüşleri, yıllık ilerleme akışı",
+  "analyzerFeaturesPy7": "Zaman makinesi: istediğin yılın gökyüzü taraması",
+  "analyzerFeaturesPy8": "Arap noktaları radarı ve göksel mühür analizi",
+  "analyzerFeaturesPy9": "Şifa reçeteleri ve asteroid etkileşimleri",
+  "analyzerFeaturesPy10": "Astroharita, harita çizimleri & grafik ekranları",
+  "analyzerFeaturesPy11": "Tam PDF raporu (sınırsız indirme hakkı)",
+  "analyzerFeaturesAsh1": "Ay nakşatralarının 36 puanlık uyum hesabı",
+  "analyzerFeaturesAsh2": "8 uyum alanının puan başına sade dil açıklaması",
+  "analyzerFeaturesAsh3": "Ay profilleri: Ay lordu, burç ve yön detayları",
+  "analyzerFeaturesAsh4": "Doğum yeri seçimiyle tarihsel saat ve yaz saati düzeltmesi",
+  "analyzerFeaturesAsh5": "İç çatışma (Nadi) uyuşmazlığının ayrıntılı tespiti",
+  "analyzerFeaturesAsh6": "Doğum saati belirsizse uyarı ve en doğru saat önerisi",
+  "analyzerFeaturesAsh7": "Kapsam dışı kurallar ve şeffaf hesap notları",
+  "analyzerFeaturesAsh8": "TR / EN / ES dilinde tam açıklama",
+  "analyzerFeaturesAsh9": "Tam PDF raporu (sınırsız indirme hakkı)"
 }

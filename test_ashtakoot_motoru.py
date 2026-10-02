@@ -389,6 +389,89 @@ for _lang in ("en", "es"):
 
 
 # --------------------------------------------------------------------------
+# JARGONSUZ dogal dil katmani (ashtakoot_dogal_*): her puan icin 3 metin.
+# --------------------------------------------------------------------------
+import re  # noqa: E402
+
+_JARGON = re.compile(
+    r"\b(varna|vashya|tara|yoni|graha|maitri|gana|rasi|nadi|bhanga|pada|koota|"
+    r"jyotish|kundli|dosha|nakshatra|paksha)\b", re.IGNORECASE)
+
+_AZAMI = {k[0]: k[4] for k in KOOTALAR}
+_BEK_PUAN = sum(a + 1 for a in _AZAMI.values())
+
+kontrol(_BEK_PUAN == 44, "dogal katman 44 puan durumu kapsar (%d)" % _BEK_PUAN)
+
+# ayni (koota, puan) icin UCH farkli metin uretilebilmeli
+for _lang in ("tr", "en", "es"):
+    _dg = MT.dogal_aciklama("yoni", 0, _lang)
+    kontrol(bool(_dg.get("aciklama")) and bool(_dg.get("baslik")),
+            "dogal_aciklama[%s] baslik+aciklama donuyor" % _lang)
+    kontrol(_dg.get("aci") in ("vaat", "anlatı", "simge"),
+            "dogal_aciklama[%s] gecerli bir aci donuyor (%s)" % (_lang, _dg.get("aci")))
+
+    _metinler = set()
+    for _ in range(120):
+        _metinler.add(MT.dogal_aciklama("yoni", 0, _lang)["aciklama"])
+    kontrol(len(_metinler) == 3,
+            "dogal_aciklama[%s] ayni puanda 3 farkli metin uretiyor (%d)"
+            % (_lang, len(_metinler)))
+
+    # 44 puanin HESABININ tamami dolu, her biri 3 satirdan uzun ve jargonsuz
+    _bos, _kisa, _jar, _basliksiz = [], [], [], []
+    for _k, _a in _AZAMI.items():
+        for _p in range(_a + 1):
+            _d = MT.dogal_aciklama(_k, _p, _lang)
+            _m = _d.get("aciklama") or ""
+            if not _m:
+                _bos.append((_k, _p))
+                continue
+            if _m.count("\n") + 1 < 4:
+                _kisa.append((_k, _p))
+            if _JARGON.search(_m):
+                _jar.append((_k, _p))
+            if not _d.get("baslik"):
+                _basliksiz.append((_k, _p))
+    kontrol(not _bos, "dogal[%s] 44 puanin tamami dolu (bos=%s)" % (_lang, _bos[:3]))
+    kontrol(not _kisa, "dogal[%s] her metin en az 3 satir (kisa=%s)" % (_lang, _kisa[:3]))
+    kontrol(not _jar, "dogal[%s] hicbir metin jargon icermiyor (%s)" % (_lang, _jar[:3]))
+    kontrol(not _basliksiz, "dogal[%s] 44 puanin basligi dolu" % _lang)
+
+    # toplam bant metinleri de jargonsuz ve dolu
+    for _sev in ("cok_dusuk", "dusuk", "orta", "yuksek"):
+        _t = MT.dogal_toplam(_sev, _lang)
+        kontrol(bool(_t.get("baslik")) and bool(_t.get("aciklama")) and bool(_t.get("ipucu")),
+                "dogal_toplam[%s].%s dolu" % (_lang, _sev))
+        kontrol(not _JARGON.search(" ".join(_t.values())),
+                "dogal_toplam[%s].%s jargonsuz" % (_lang, _sev))
+
+    # 132 metin/dil, 3 dilde toplam 396
+    kontrol(sum(a + 1 for a in _AZAMI.values()) * 3 == 132,
+            "dogal[%s] 132 metin (44 puan x 3 acil)" % _lang)
+
+kontrol(set(MT.dogal_basliklar("tr")) == set(_AZAMI),
+        "dogal basliklar tum 8 kootayi kapsar")
+kontrol(set(MT.dogal_basliklar("en")) == set(_AZAMI),
+        "dogal basliklar[en] tum 8 kootayi kapsar")
+kontrol(set(MT.dogal_basliklar("es")) == set(_AZAMI),
+        "dogal basliklar[es] tum 8 kootayi kapsar")
+kontrol(MT.dogal_basliklar("xx") == MT.dogal_basliklar("tr"),
+        "bilinmeyen dilde dogal basliklar TR")
+kontrol(MT.dogal_aciklama("yoni", 99, "tr") == {},
+        "puan kapsam disi dogal_aciklama bos donuyor")
+
+# Turkce metin Turkce karakter icermeli; EN/ES sizmamali.
+_dg_tr = " ".join(MT.dogal_aciklama(k, p, "tr").get("aciklama", "")
+                  for k, a in _AZAMI.items() for p in range(a + 1))
+kontrol(set(_dg_tr) & set("şŞğĞıİ"), "dogal[tr] metinleri Turkce karakter iceriyor")
+for _lang in ("en", "es"):
+    _dg = " ".join(MT.dogal_aciklama(k, p, _lang).get("aciklama", "")
+                   for k, a in _AZAMI.items() for p in range(a + 1))
+    kontrol(not (set(_dg) & set("çğıöşüÇĞİÖŞÜ")),
+            "dogal[%s] metinleri Turkce karakter sizdirmiyor" % _lang)
+
+
+# --------------------------------------------------------------------------
 print("\n" + "=" * 46)
 print("GECTI: %d    KALDI: %d" % (GECTI, KALDI))
 print("=" * 46)
