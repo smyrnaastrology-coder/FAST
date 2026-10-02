@@ -44,61 +44,64 @@ ACILAR: Dict[str, List[str]] = {
     "varna": [
         "Bu alan şunu vaat ediyor: birlikte hayat kurarken değer "
         "çatışması yaşamayacağınızı gösterir.",
-        "Bu alan şunu anlatıyor: hayatınızda “kimin haklı” tartışmasının "
-        "nereden geleceğini söyler.",
-        "Bu alan şunu simgeliyor: aynı sofrada oturduğunuzda masada kimin "
-        "de kendini yerinde bulacağını.",
+        "Bu alan şunu anlatıyor: hayatınızda \"kimin haklı\" tartışmasının "
+        "çıkıp çıkmayacağını gösterir.",
+        "Bu alan şunu simgeliyor: sizin de onun da \"bu önemli\" dediği "
+        "şeylerin örtüşmesi.",
     ],
     "vashya": [
         "Bu alan şunu vaat ediyor: karşınızdakine çekilme gücünüzün ne "
-        "kadar olduğunu.",
-        "Bu alan şunu anlatıyor: “gördüğümde içimde bir şey kıpırdadı” "
-        "hissinin kaynağını.",
-        "Bu alan şunu simgeliyor: birbirinize ilk çekildiğiniz o sessiz anı.",
+        "kadar güçlü olduğunu gösterir.",
+        "Bu alan şunu anlatıyor: \"gördüğümde içimde bir şey kıpırdadı\" "
+        "hissinin nereden geldiğini gösterir.",
+        "Bu alan şunu simgeliyor: birbirinize ilk çekildiğiniz o sessiz an.",
     ],
     "tara": [
-        "Bu alan şunu vaat ediyor: hayat ritimlerinizin aynı saatte "
-        "buluşup ayrılma ihtimalini.",
+        "Bu alan şunu vaat ediyor: günlük ritimlerinizin ne kadar "
+        "örtüştüğünü gösterir.",
         "Bu alan şunu anlatıyor: birinizin geç yatıp diğerinin erkenden "
-        "kalkmasının ilişkiye etkisini.",
+        "kalkmasının ilişkiye etkisini gösterir.",
         "Bu alan şunu simgeliyor: aynı evde farklı saatlerin çalıştığı bir "
-        "düzeni.",
+        "düzen.",
     ],
     "yoni": [
         "Bu alan şunu vaat ediyor: birbirinizin iç dünyasını ne kadar kolay "
-        "anlayacağınızı.",
-        "Bu alan şunu anlatıyor: “acaba şu an ne hissediyor?” sorusunun ne "
-        "sıklıkta doğacağını.",
-        "Bu alan şunu simgeliyor: mahremiyetin kapısının ne kadar açık "
-        "durduğunu.",
+        "anlayacağınızı gösterir.",
+        "Bu alan şunu anlatıyor: \"acaba şu an ne hissediyor?\" sorusunun ne "
+        "sıklıkta doğacağını gösterir.",
+        "Bu alan şunu simgeliyor: iç dünyanızın kapısının size ne kadar açık "
+        "durduğu.",
     ],
     "graha_maitri": [
-        "Bu alan şunu vaat ediyor: birbirinin aklını okuyabilme "
-        "kapasitenizi.",
-        "Bu alan şunu anlatıyor: aynı olayı neden farklı anlattığınızı.",
-        "Bu alan şunu simgeliyor: aynı dili konuşan iki kişinin rahatlığını.",
+        "Bu alan şunu vaat ediyor: birbirinin aklını ne kadar kolay "
+        "okuyabileceğinizi gösterir.",
+        "Bu alan şunu anlatıyor: aynı olayı neden farklı anlattığınızı "
+        "gösterir.",
+        "Bu alan şunu simgeliyor: aynı dili konuşan iki kişinin rahatlığı.",
     ],
     "gana": [
         "Bu alan şunu vaat ediyor: günlük hayatta birbirinizi yormadan "
-        "yaşayabilme ihtimalinizi.",
+        "yaşama ihtimalinizi gösterir.",
         "Bu alan şunu anlatıyor: tepkilerinizin neden bazen aynı anda "
-        "çarpıştığını.",
-        "Bu alan şunu simgeliyor: aynı evde yaşayan iki farklı ritmin "
-        "birbirine uyumunu.",
+        "çarpıştığını gösterir.",
+        "Bu alan şunu simgeliyor: iki farklı ritmin aynı çatı altında "
+        "buluşması.",
     ],
     "rasi": [
         "Bu alan şunu vaat ediyor: birlikte bir hedefe yürüyüp "
-        "yürüyemeyeceğinizi.",
+        "yürüyemeyeceğinizi gösterir.",
         "Bu alan şunu anlatıyor: hayatın hangi alanlarında aynı hızda "
-        "olduğunuzu.",
-        "Bu alan şunu simgeliyor: iki kişinin aynı haritayı okumasını.",
+        "olduğunuzu gösterir.",
+        "Bu alan şunu simgeliyor: iki kişinin aynı haritayı "
+        "okuyabilmesi.",
     ],
     "nadi": [
-        "Bu alan şunu vaat ediyor: aynı eksiğin sizde ikinizde de bulunma "
-        "ihtimalini.",
-        "Bu alan şunu anlatıyor: aynı şeyi neden hep birbirinizde aradığınızı.",
+        "Bu alan şunu vaat ediyor: aynı eksiğin ikinizde de bulunma "
+        "ihtimalini gösterir.",
+        "Bu alan şunu anlatıyor: aynı şeyi neden hep birbirinizde "
+        "aradığınızı gösterir.",
         "Bu alan şunu simgeliyor: aynı noktada duran iki kişinin birbirini "
-        "tamamlamasını ya da tıkamasını.",
+        "tamamlaması ya da çarpışması.",
     ],
 }
 

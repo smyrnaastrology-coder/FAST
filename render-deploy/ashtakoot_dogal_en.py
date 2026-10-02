@@ -25,9 +25,10 @@ ACILAR: Dict[str, List[str]] = {
     "varna": [
         "This area shows what it promises: whether you will clash over values "
         "while building a life together.",
-        "This area explains: where your \"who is right\" arguments will come "
-        "from in everyday life.",
-        "This area symbolizes: who at the table will still feel at home.",
+        "This area explains: whether your \"who is right\" arguments will come "
+        "up in everyday life.",
+        "This area symbolizes: whether the things you both call important "
+        "actually line up.",
     ],
     "vashya": [
         "This area shows what it promises: how strong your pull toward each "

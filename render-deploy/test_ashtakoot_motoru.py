@@ -472,6 +472,119 @@ for _lang in ("en", "es"):
 
 
 # --------------------------------------------------------------------------
+# ACILAR (ilk satir) TAM CUMLE OLMALI. Buraya giren metinler daha once yarim
+# kalmisti: "masada kimin de kendini yerinde bulacağini", "ne kadar
+# oldugunu." gibi fiilsiz parcalar. Asagidaki kurallar sinifi kapatir.
+#   1) nokta ile bitmeli
+#   2) iki noktadan sonra bos bir iki cumle kalmamali
+#   3) vaat/anlati satirlarinda iki noktadan sonra finite fiil olmali
+#   4) simge satiri somut bir konu adlamali
+#   5) baska dilden kelime sizmamali
+# --------------------------------------------------------------------------
+_CERCEVE = {
+    "tr": ("Bu alan şunu vaat ediyor:", "Bu alan şunu anlatıyor:",
+           "Bu alan şunu simgeliyor:"),
+    "en": ("This area shows what it promises:", "This area explains:",
+           "This area symbolizes:"),
+    "es": ("Esta área muestra lo que promete:", "Esta área explica:",
+           "Esta área simboliza:"),
+}
+
+#: vaat / anlati satirlarinda iki noktadan sonra bulunmasi zorunlu fiiller.
+#: Kelime siniriyla eslesir; alt kume eslesmesi yanlis pozitif uretmesin.
+_FIIL = {
+    "tr": (r"gösterir|anlatır|olduğunu|eder",
+           "gösterir|anlatır"),
+    "en": (r"is|are|was|were|will|can|could|may|might|do|does|did"
+           r"|show|tell|tell?s?|comes?|affects?|overlaps?|splits?"
+           r"|collides?|lives?|keep|looking|read|walk|wear|move",
+           "is|are|will|can|show|tell|tells|comes|affects|overlap"
+           r"|split|collide|lives|keep|looking|move"),
+    "es": (r"\bes\b|\bson\b|\bestá\b|\bests?\b|\bvan\b|\bvais\b|\bpuede"
+           r"|n\b|\bpueden\b|\bpodéis\b|\bcontáis\b|\bavanzáis\b|\bbuscáis"
+           r"|\bexista\b|\bsurgirán\b|\baparecerá\b|\bafecta\b|\bcoinciden"
+           r"|\bsolapan\b|\bseparan\b|\bviene\b|\bchocar\b|\bleeros\b"
+           r"|\bconstruís\b|\bacueste\b|\bse\s+levante\b",
+           "es|son|está|vais|pueden|podéis|contáis|avanzáis|buscáis"
+           r"|exista|surgirán|aparecerá|afecta|coinciden|solapan|separan"
+           r"|viene|chocar|leeros|construís|acueste|levante"),
+}
+
+#: simge satiri her kootada su somut kavramlardan birini ADLAMALI. Aksi halde
+#: "anlasilamaz metafor" hatasi geri gelir.
+_SIMGE_KONU = {
+    "tr": {
+        "varna": ("değer", "önemli", "aile", "para"),
+        "vashya": ("çekil", "sessiz", "an"),
+        "tara": ("saat", "düzen", "ev"),
+        "yoni": ("kapı", "dünya", "açık"),
+        "graha_maitri": ("dil", "rahatlık", "rahat"),
+        "gana": ("ritim", "çatı", "uyum"),
+        "rasi": ("harita", "oku"),
+        "nadi": ("nokta", "tamamla", "çarpış"),
+    },
+    "en": {
+        "varna": ("value", "important", "line up", "clash"),
+        "vashya": ("attraction", "moment"),
+        "tara": ("household", "clocks", "hours"),
+        "yoni": ("door", "intimacy", "open"),
+        "graha_maitri": ("language", "ease", "speaking"),
+        "gana": ("rhythm", "home", "settling"),
+        "rasi": ("map", "reading"),
+        "nadi": ("spot", "completing", "colliding"),
+    },
+    "es": {
+        "varna": ("valores", "importantes", "coinciden"),
+        "vashya": ("atracción", "momento"),
+        "tara": ("hogar", "relojes", "horas"),
+        "yoni": ("puerta", "intimidad", "abierta"),
+        "graha_maitri": ("idioma", "comodidad", "hablan"),
+        "gana": ("ritmos", "hogar", "ajustan"),
+        "rasi": ("mapa", "leyendo"),
+        "nadi": ("mismo punto", "completándose", "chocando"),
+    },
+}
+
+#: yanlis dilden sizan kelimeler (bir suret "promise" sizmis, bir suret
+#: Turkce metinde Ingilizce "the" vardi).
+_YANLIS_DIL = {
+    "tr": ("the ", " you ", " what ", " promise", " your "),
+    "en": ("ğ", "ş", "ı ", "ınız", " olduğu", "çünkü"),
+    "es": ("ğ", "ş", "ınız", " olduğu", "çünkü", " your ", " the "),
+}
+
+for _lang in ("tr", "en", "es"):
+    _mod = MT.DILLER[_lang]["dogal"]
+    kontrol(len(_mod.ACILAR) == 8,
+            "dogal[%s] 8 koota icin aci var (%d)" % (_lang, len(_mod.ACILAR)))
+    for _kota, _satirlar in _mod.ACILAR.items():
+        kontrol(len(_satirlar) == 3,
+                "dogal[%s]/%s 3 aci var (%d)" % (_lang, _kota, len(_satirlar)))
+        for _i, _satir in enumerate(_satirlar):
+            _etiket = "dogal[%s]/%s[%d]" % (_lang, _kota, _i)
+            _cerceve = _CERCEVE[_lang][_i]
+            kontrol(_satir.startswith(_cerceve),
+                    "%s dogru cerceve ile basliyor" % _etiket)
+            kontrol(_satir.rstrip().endswith("."),
+                    "%s nokta ile bitiyor" % _etiket)
+            _govde = _satir.split(":", 1)[1].strip() if ":" in _satir else ""
+            kontrol(len(_govde.split()) >= 5,
+                    "%s iki noktadan sonra yeterli icerik var (%d kelime)"
+                    % (_etiket, len(_govde.split())))
+            _kucuk = _satir.lower()
+            for _yabancı in _YANLIS_DIL[_lang]:
+                kontrol(_yabancı not in _kucuk,
+                        "%s yanlis dil kelimesi icermiyor (%r)"
+                        % (_etiket, _yabancı.strip()))
+            if _i in (0, 1):
+                kontrol(re.search(_FIIL[_lang][0], _govde, re.I) is not None,
+                        "%s iki noktadan sonra fiil iceriyor" % _etiket)
+            else:
+                kontrol(any(t in _govde for t in _SIMGE_KONU[_lang][_kota]),
+                        "%s simge satiri somut konu adliyor" % _etiket)
+
+
+# --------------------------------------------------------------------------
 # Metin katmani YANIT ONBELLEGINDEN CIKARILMALI. `_analiz_sonuc` cevabi
 # onbellekliyor; `aciklama` iceride uretilirse ayni veri tekrar gonderildiginde
 # kullanici daima ayni rastgele varyanti gorurdu. Bu regresyon, endpoint'in

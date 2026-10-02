@@ -26,10 +26,10 @@ ACILAR: Dict[str, List[str]] = {
     "varna": [
         "Esta área muestra lo que promete: si vais a chocar por valores "
         "mientras construís una vida juntos.",
-        "Esta área explica: de dónde saldrán en el día a día las "
+        "Esta área explica: si surgirán en el día a día las "
         "discusiones sobre «quién tiene razón».",
-        "Esta área simboliza: quién se sentirá todavía en su casa en la "
-        "mesa.",
+        "Esta área simboliza: si coinciden de verdad las cosas que ambos "
+        "consideráis importantes.",
     ],
     "vashya": [
         "Esta área muestra lo que promete: cuán fuerte es de verdad la "
@@ -55,15 +55,15 @@ ACILAR: Dict[str, List[str]] = {
         "intimidad.",
     ],
     "graha_maitri": [
-        "Esta área muestra lo que promete: vuestra capacidad de leeros la "
-        "mente.",
+        "Esta área muestra lo que promete: cuán bien os leéis la mente el "
+        "uno al otro.",
         "Esta área explica: por qué contáis la misma historia de forma "
         "distinta.",
         "Esta área simboliza: la comodidad de dos personas que hablan el "
         "mismo idioma.",
     ],
     "gana": [
-        "Esta área muestra lo que promise: vuestra probabilidad de "
+        "Esta área muestra lo que promete: vuestra probabilidad de "
         "convivir sin agotaros.",
         "Esta área explica: por qué vuestras reacciones chocan a veces en "
         "el mismo momento.",
