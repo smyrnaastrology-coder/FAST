@@ -540,14 +540,14 @@ def mevcut(kod: str, puan: int) -> bool:
 
 
 #: Overall reading for the total score, in plain language.
-#: The maximum is 36, but reachable totals only span 20-34, so the bands
-#: follow the measured range: `cok_dusuk` = 20-23 (Weak relationship),
-#: `dusuk` = 26-27 (Average), `orta` = 28-29 (Ideal),
-#: `yuksek` = 33-34 (Strong).
+#: The maximum is 36, but reachable totals only span 7-34 (28 values, no
+#: gaps). The bands follow that measured range, in four equal parts:
+#: `cok_dusuk` = 7-13 (Weak relationship), `dusuk` = 14-20 (Average),
+#: `orta` = 21-27 (Ideal), `yuksek` = 28-34 (Strong).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
         "baslik": "Weak relationship",
-        "aciklama": ("20-23 range. There is a lot to walk through and the habit "
+        "aciklama": ("7-13 range. There is a lot to walk through and the habit "
                     "of being together is not settled yet.\n"
                     "That does not mean the door is closed; it only shows "
                     "today's fit is low.\n"
@@ -558,7 +558,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "dusuk": {
         "baslik": "Average relationship",
-        "aciklama": ("26-27 range. There are areas the relationship rests on "
+        "aciklama": ("14-20 range. There are areas the relationship rests on "
                     "and does well, plus areas that still do not fit.\n"
                     "Your strong sides keep it standing; weak areas get "
                     "heavier if you never work on them together.\n"
@@ -568,7 +568,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "orta": {
         "baslik": "Ideal relationship",
-        "aciklama": ("28-29 range. Daily life does not wear you down, and most "
+        "aciklama": ("21-27 range. Daily life does not wear you down, and most "
                     "of what you build together settles in.\n"
                     "Some situations are hard, but they do not stop you; on "
                     "top of that you both know where it strains.\n"
@@ -579,7 +579,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "yuksek": {
         "baslik": "Strong relationship",
-        "aciklama": ("33-34 range. Your fit is close to complete.\n"
+        "aciklama": ("28-34 range. Your fit is close to complete.\n"
                     "You speak the same language day to day, you understand "
                     "each other and you care about the same things.\n"
                     "Such matches are rare, but a high score does not mean "

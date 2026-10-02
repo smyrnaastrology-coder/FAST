@@ -727,18 +727,19 @@ class AshtaKootSonuc:
 
     @property
     def seviye(self) -> str:
-        """20-23 / 26-27 / 28-29 / 33-34 bantları.
+        """7-13 / 14-20 / 21-27 / 28-34 bantları.
 
-        Azami 36 olsa da pratikte ulaşılabilir toplamlar 20-34 arasıdır
-        (ölçüldü: 20, 21, 22, 23, 26, 27, 28, 29, 33, 34). Bu yüzden bantlar
-        bu aralığa göre kurulur; aksi halde alt iki bant hiç dolmaz.
+        Azami 36 olsa da 259.560 gerçek naksatra çifti taranarak ölçüldü:
+        ulaşılabilir toplamlar 7-34 arasıdır ve 28 farklı değer alır
+        (7, 8, 9, ... 34; boşluk yok). Bu yüzden 36 değil, ölçülen aralık
+        dört eşit banda (7'şer) bölünür.
         """
         t = self.toplam
-        if t <= 23:
+        if t <= 13:
             return "cok_dusuk"
-        if t <= 27:
+        if t <= 20:
             return "dusuk"
-        if t <= 29:
+        if t <= 27:
             return "orta"
         return "yuksek"
 

@@ -98,7 +98,7 @@ for anahtar, p in beklenen.items():
     kontrol(k.puan == p, "%s = %d (alinan %d)" % (anahtar, p, k.puan))
 kontrol(s.toplam == 28, "Sevde kendisiyle 28")
 kontrol(round(s.yuzde, 1) == 77.8, "yuzde 77.8 (yuvarlanmis)")
-kontrol(s.seviye == "orta", "seviye 'orta' (28 -> 28-29 ideal bandi)")
+kontrol(s.seviye == "yuksek", "seviye 'yuksek' (28 -> 28-34 kuvvetli bandi)")
 kontrol(s.kendisi_ile is True, "kendisi_ile bayragi")
 
 # --------------------------------------------------------------------------
@@ -470,11 +470,11 @@ for _lang in ("tr", "en", "es"):
 
 # --------------------------------------------------------------------------
 # Genel ilişki yorumu: bantlar OLCULEN ulasilabilir araliga gore kurulur.
-# Azami 36 ama pratikte toplamlar yalnizca 20-34 arasi olabiliyor; 0-19 ve
-# 35-36 hicbir ciftte olusmuyor. Bu yuzden bantlar 20-34 uzerinden kurulur,
-# aksi halde alt bantlar olenmis olur.
-SINIR = [(20, "cok_dusuk"), (23, "cok_dusuk"), (26, "dusuk"), (27, "dusuk"),
-         (28, "orta"), (29, "orta"), (33, "yuksek"), (34, "yuksek")]
+# Azami 36 ama gercek dogum verileriyle tarandiginda toplamlar yalnizca
+# 7-34 arasi olabiliyor ve 28 farkli deger aliyor (bosluk yok). 0-6 ve
+# 35-36 hicbir ciftte olusmuyor; bu yuzden bantlar 7-34 uzerinden kurulur.
+SINIR = [(7, "cok_dusuk"), (13, "cok_dusuk"), (14, "dusuk"), (20, "dusuk"),
+         (21, "orta"), (27, "orta"), (28, "yuksek"), (34, "yuksek")]
 for _p, _bek in SINIR:
     _S = type("S", (), {})()
     _S.toplam = _p
@@ -482,23 +482,38 @@ for _p, _bek in SINIR:
             "toplam %d -> %s (beklenen %s)"
             % (_p, AshtaKootSonuc.seviye.fget(_S), _bek))
 
-# gercek tum naksatra ciftleri taranir: dort bandin de dolu oldugu kanitlanir
-_aylar = [ay_nakshatrasi_hesapla(_x) for _x in range(27)]
-_gercek = {}
-for _i, _a in enumerate(_aylar):
-    for _b in _aylar[_i:]:
-        _S = ashtakoot_hesapla(_a, _b)
-        _gercek[_S.toplam] = _gercek.get(_S.toplam, 0) + 1
-        _gercek.setdefault("bant_" + _S.seviye, 0)
-        _gercek["bant_" + _S.seviye] += 1
-_son = max(_a for _a in _gercek if isinstance(_a, int))
-_kucuk = min(_a for _a in _gercek if isinstance(_a, int))
-kontrol((_kucuk, _son) == (20, 34),
-        "ulasilabilir toplam araligi 20-34 (olculdu: %d-%d)" % (_kucuk, _son))
+# gercek dogum verileri taranir: aralik 7-34 ve dort bandin de dolu oldugu
+# kanitlanir. Aksi halde bir bant hicbir kullanicinin onunde gorunmez.
+_veri = []
+for _y in (1970, 1985, 2000):
+    for _a in range(1, 13):
+        for _g in (1, 11, 21):
+            for _s in (6, 14, 20):
+                _veri.append(ay_nakshatrasi_hesapla(
+                    __import__("ashtakoot_motoru").ay_konumu_utc(_y, _a, _g, _s)))
+_tot = {}
+_bant = {}
+for _i, _x in enumerate(_veri):
+    for _y2 in _veri[_i:]:
+        _S = ashtakoot_hesapla(_x, _y2)
+        _tot[_S.toplam] = _tot.get(_S.toplam, 0) + 1
+        _bant[_S.seviye] = _bant.get(_S.seviye, 0) + 1
+_tsayi = sorted(_tot)
+kontrol((_tsayi[0], _tsayi[-1]) == (7, 34),
+        "ulasilabilir toplam araligi 7-34 (olculdu: %d-%d, %d deger)"
+        % (_tsayi[0], _tsayi[-1], len(_tsayi)))
+kontrol(len(_tsayi) == 28, "28 farkli toplam degeri")
+kontrol(_tsayi == list(range(7, 35)), "toplam degerleri bosluksuz (7..34)")
 for _b in ("cok_dusuk", "dusuk", "orta", "yuksek"):
-    kontrol(_gercek.get("bant_" + _b, 0) > 0,
-            "bant %s gercek ciftlerde dolu (%d adet)"
-            % (_b, _gercek.get("bant_" + _b, 0)))
+    kontrol(_bant.get(_b, 0) > 0,
+            "bant %s gercek ciftlerde dolu (%d adet)" % (_b, _bant.get(_b, 0)))
+# her bant metindeki aralık, gercek aralıkla uyumlu olmalı
+_ar = {0: "7–13", 1: "14–20", 2: "21–27", 3: "28–34"}
+for _i, _b in enumerate(("cok_dusuk", "dusuk", "orta", "yuksek")):
+    _a = MT.dogal_toplam(_b, "tr")["aciklama"].split("\n")[0]
+    kontrol(_a.startswith(_ar[_i] + " puan"),
+            "dogal_toplam[tr].%s araligi %s yaziyor (%s)"
+            % (_b, _ar[_i], _a[:22]))
 
 for _lang in ("tr", "en", "es"):
     kontrol(sum(a + 1 for a in _AZAMI.values()) * 4 == 176,

@@ -582,14 +582,14 @@ def mevcut(kod: str, puan: int) -> bool:
 
 
 #: Toplam puan için sade dilde genel ilişki yorumları.
-#: Azami 36 olsa da ulaşılabilir toplamlar 20-34 aralığındadır, bu yüzden
-#: bantlar ölçülen aralığa göre kurulur: `cok_dusuk` 20-23 (Zayıf ilişki),
-#: `dusuk` 26-27 (Orta ilişki), `orta` 28-29 (İdeal ilişki),
-#: `yuksek` 33-34 (Kuvvetli ilişki).
+#: Azami 36 olsa da ulaşılabilir toplamlar 7-34 aralığındadır (28 değer,
+#: boşluksuz). Bu yüzden bantlar ölçülen aralığa göre kurulur:
+#: `cok_dusuk` 7-13 (Zayıf ilişki), `dusuk` 14-20 (Orta ilişki),
+#: `orta` 21-27 (İdeal ilişki), `yuksek` 28-34 (Kuvvetli ilişki).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
         "baslik": "Zayıf ilişki",
-        "aciklama": ("20–23 puan aralığı. Birlikte yürünecek çok şey var ve "
+        "aciklama": ("7–13 puan aralığı. Birlikte yürünecek çok şey var ve "
                     "alışkanlık henüz oturmamış.\n"
                     "Bu, ilişkinin kapısının kapalı olduğu anlamına "
                     "gelmez; sadece bugünkü uyumun düşük olduğunu "
@@ -601,7 +601,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "dusuk": {
         "baslik": "Orta ilişki",
-        "aciklama": ("26–27 puan aralığı. İlişkinin dayandığı ve iyi "
+        "aciklama": ("14–20 puan aralığı. İlişkinin dayandığı ve iyi "
                     "gittiği alanlar var, ama bazı konularda hâlâ uyum "
                     "yok.\n"
                     "Güçlü taraflarınız ilişkiyi ayakta tutar; zayıf "
@@ -612,7 +612,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "orta": {
         "baslik": "İdeal ilişki",
-        "aciklama": ("28–29 puan aralığı. Günlük hayatta birbirinizi "
+        "aciklama": ("21–27 puan aralığı. Günlük hayatta birbirinizi "
                     "yormuyorsunuz ve birlikteliklerin çoğu yerleşiyor.\n"
                     "Bazı konularda zorlanıyorsunuz ama bu konular sizi "
                     "durdurmuyor; üstelik nerede zorlandığınızı ikiniz de "
@@ -623,7 +623,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "yuksek": {
         "baslik": "Kuvvetli ilişki",
-        "aciklama": ("33–34 puan aralığı. İkinizin birbirine uyum "
+        "aciklama": ("28–34 puan aralığı. İkinizin birbirine uyum "
                     "neredeyse tam.\n"
                     "Günlük hayatta aynı dili konuşuyor, birbirinizi "
                     "anlıyorsunuz ve aynı şeyleri önemsiyorsunuz.\n"

@@ -555,14 +555,14 @@ def mevcut(kod: str, puan: int) -> bool:
 
 
 #: Lectura general del total, en lenguaje claro.
-#: El máximo es 36, pero los totales alcanzables sólo van de 20 a 34, así que
-#: las bandas siguen ese rango medido: `cok_dusuk` = 20-23 (Relación débil),
-#: `dusuk` = 26-27 (Media), `orta` = 28-29 (Ideal),
-#: `yuksek` = 33-34 (Fuerte).
+#: El máximo es 36, pero los totales alcanzables sólo van de 7 a 34 (28
+#: valores, sin huecos). Las bandas siguen ese rango medido, en cuatro
+#: partes iguales: `cok_dusuk` = 7-13 (Relación débil), `dusuk` = 14-20
+#: (Media), `orta` = 21-27 (Ideal), `yuksek` = 28-34 (Fuerte).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
         "baslik": "Relación débil",
-        "aciklama": ("Rango 20-23. Hay mucho que recorrer y el hábito de estar "
+        "aciklama": ("Rango 7-13. Hay mucho que recorrer y el hábito de estar "
                     "juntos aún no está asentado.\n"
                     "Eso no significa que la puerta esté cerrada; solo "
                     "muestra que el encaje actual es bajo.\n"
@@ -573,7 +573,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "dusuk": {
         "baslik": "Relación media",
-        "aciklama": ("Rango 26-27. Hay áreas en las que la relación se apoya "
+        "aciklama": ("Rango 14-20. Hay áreas en las que la relación se apoya "
                     "y funciona, y otras que todavía no encajan.\n"
                     "Vuestras fortalezas la sostienen; las débiles pesan "
                     "más si nunca las trabajáis juntos.\n"
@@ -583,7 +583,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "orta": {
         "baslik": "Relación ideal",
-        "aciklama": ("Rango 28-29. El día a día no os desgasta, y la mayoría "
+        "aciklama": ("Rango 21-27. El día a día no os desgasta, y la mayoría "
                     "de lo que construís juntos va asentando.\n"
                     "Hay situaciones difíciles, pero no os detienen; además "
                     "ambos sabéis dónde cuesta.\n"
@@ -594,7 +594,7 @@ TOPLAM: Dict[str, Dict[str, str]] = {
     },
     "yuksek": {
         "baslik": "Relación fuerte",
-        "aciklama": ("Rango 33-34. Vuestro encaje roza la totalidad.\n"
+        "aciklama": ("Rango 28-34. Vuestro encaje roza la totalidad.\n"
                     "Habláis el mismo idioma a diario, os entendéis y os "
                     "importan las mismas cosas.\n"
                     "Estas combinaciones son raras, pero una puntuación alta "

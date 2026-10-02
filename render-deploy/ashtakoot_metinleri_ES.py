@@ -358,25 +358,25 @@ KOOTA_METIN: dict = {
 
 TOPLAM_BANTLARI = {
     "cok_dusuk": {
-        "baslik": "20-23 · Relación débil",
+        "baslik": "7-13 · Relación débil",
         "aciklama": "Baja compatibilidad interna. Esto no significa que la relación o el vínculo "
                     "padre-hijo no exista; solo que los nakshatras lunares no coinciden en los "
                     "ocho criterios.",
         "ipucu": "Mire las otras capas: Nadi, Rasi y Gana llevan el peso.",
     },
     "dusuk": {
-        "baslik": "26-27 · Relación media",
+        "baslik": "14-20 · Relación media",
         "aciklama": "Compatibilidad parcial. Unos kootas son fuertes y otros débiles.",
         "ipucu": "Los kootas fuertes son aquello sobre lo que el vínculo se apoya de forma natural.",
     },
     "orta": {
-        "baslik": "28-29 · Relación ideal",
+        "baslik": "21-27 · Relación ideal",
         "aciklama": "Compatibilidad sana, el rango de los textos clásicos para una buena "
                     "unión.",
         "ipucu": "La mayoría de las relaciones largas cae en esta banda.",
     },
     "yuksek": {
-        "baslik": "33-34 · Relación fuerte",
+        "baslik": "28-34 · Relación fuerte",
         "aciklama": "Una combinación fuerte y poco frecuente. Los resultados por encima de 33 son "
                     "raros.",
         "ipucu": "En la práctica 36 no es alcanzable; el mismo nadi limita el total a 34.",
