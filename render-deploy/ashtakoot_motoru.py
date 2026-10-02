@@ -709,6 +709,27 @@ AZAMI_TOPLAM = sum(k[4] for k in KOOTALAR)   # 36
 #: ayrımı kullanır.
 YONLU_KOOTALAR = {"tara", "vashya", "gana"}
 
+#: Kendisiyle karşılaştırmada gösterilen uyarı metni (tek kaynak).
+KENDISI_UYARISI = (
+    "Bu, kişinin kendisine karşı yapılan referans karşılaştırmadır; "
+    "Varna-Vashya-Tara-Yoni-Gana-Graha Maitri-Rasi boyunca ölçülen "
+    "sistem içi tutarlılığı gösterir. Nadi 0 her zaman çıkar.")
+
+
+def ay_ayni_mi(a: "AyBilgisi", b: "AyBilgisi") -> bool:
+    """İki tarafın Ay konumu aynı mı, yani kişi kendisiyle mi karşılaştırıyor.
+
+    Sekiz kootanın tamamı sidereal Ay boylamından türetildiği için aynı
+    nakṣatra + aynı rasi + aynı pada, Ashtakoot açısından zaten aynı profile
+    demektir. Boylam toleransı iki ayrı doğumun kazara aynı profile düşmesini
+    engeller. Solar Fire v9.0.29 "Chart A = Chart B" raporunda da yedi koota
+    tam puan, Nadi 0 ve toplam 28/36 verir; buradaki eşik bununla uyumludur.
+    """
+    return (a.nakshatra_no == b.nakshatra_no
+            and a.burc_no == b.burc_no
+            and a.pada == b.pada
+            and abs(a.lon - b.lon) < 0.2)
+
 
 @dataclass
 class AshtaKootSonuc:
@@ -796,20 +817,18 @@ def ashtakoot_hesapla(a: AyBilgisi, b: AyBilgisi) -> AshtaKootSonuc:
             "Doğum saati bilinmediği için Ay konumu yaklaşık hesaplandı. "
             "Nakṣatra sınırına yakın doğumlarda sonuç değişebilir.")
 
+    ayni_kisi = ay_ayni_mi(a, b)
+    if ayni_kisi:
+        uyari.append(KENDISI_UYARISI)
+
     return AshtaKootSonuc(a=a, b=b, kootalar=kootalar, toplam=toplam,
-                          kendisi_ile=False, uyari=uyari,
+                          kendisi_ile=ayni_kisi, uyari=uyari,
                           nadi_dosha=nadi_dosha_analizi(a, b))
 
 
 def kendisi_ile(ay: AyBilgisi) -> AshtaKootSonuc:
     """Aynı kişiyi kendisiyle karşılaştırır — tanım gereği 28/36, Nadi 0."""
-    sonuc = ashtakoot_hesapla(ay, ay)
-    sonuc.kendisi_ile = True
-    sonuc.uyari = list(sonuc.uyari) + [
-        "Bu, kişinin kendisine karşı yapılan referans karşılaştırmadır; "
-        "Varna-Vashya-Tara-Yoni-Gana-Graha Maitri-Rasi boyunca ölçülen "
-        "sistem içi tutarlılığı gösterir. Nadi 0 her zaman çıkar."]
-    return sonuc
+    return ashtakoot_hesapla(ay, ay)
 
 
 # --------------------------------------------------------------------------

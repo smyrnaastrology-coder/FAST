@@ -4,6 +4,7 @@
 Çalıştırma:  python test_ashtakoot_motoru.py
 """
 
+import copy
 import sys
 import traceback
 
@@ -11,7 +12,8 @@ from ashtakoot_motoru import (
 
     AZAMI_TOPLAM, BURC_ADLARI, KAPSAM_DISI_KURALLAR, KOOTALAR,
     NADI_LORDU, NAKSHATRALAR, YONLU_KOOTALAR, AshtaKootSonuc, _burc_iliskisi,
-    ashtakoot_hesapla, ay_konumu_utc, ay_nakshatrasi_hesapla, kendisi_ile,
+    KENDISI_UYARISI, ashtakoot_hesapla, ay_ayni_mi, ay_konumu_utc,
+    ay_nakshatrasi_hesapla, kendisi_ile,
     nadi_dosha_analizi, nakshatra_profili, nakshatra_uyum_haritasi, vashya_grubu,
 )
 
@@ -100,6 +102,35 @@ kontrol(s.toplam == 28, "Sevde kendisiyle 28")
 kontrol(round(s.yuzde, 1) == 77.8, "yuzde 77.8 (yuvarlanmis)")
 kontrol(s.seviye == "yuksek", "seviye 'yuksek' (28 -> 28-34 kuvvetli bandi)")
 kontrol(s.kendisi_ile is True, "kendisi_ile bayragi")
+
+# Solar Fire v9.0.29 referansi (Chart A = Chart B, Izmir 23.06.1988 15:40 EEDT):
+# yedi koota tam puan, Nadi 0, toplam 28/36. Motor ayni veriyle birebir ayni.
+kontrol(s.koota("varna").puan == 1 and s.koota("vashya").puan == 2
+        and s.koota("tara").puan == 3 and s.koota("yoni").puan == 4
+        and s.koota("graha_maitri").puan == 5 and s.koota("gana").puan == 6
+        and s.koota("rasi").puan == 7 and s.koota("nadi").puan == 0,
+        "Solar Fire referansi: 1/2/3/4/5/6/7 + Nadi 0")
+
+# ONEMLI: kullanici akisi kendisi_ile() fonksiyonunu cagirmadan gider.
+# AshtaKootSonuc.kendisi_ile bayragi ashtakoot_hesapla() icinde kendiliginden
+# kurulmali; aksi halde API yanitinda "kendisi_ile" notu hic gelmez.
+_d = ashtakoot_hesapla(sevde, sevde)
+kontrol(_d.kendisi_ile is True,
+        "ashtakoot_hesapla(ay, ay) kendisi_ile bayragini kendisi kurar")
+kontrol(_d.toplam == 28 and _d.tablo_sozlugu()["kendisi_ile"] is True,
+        "tablo_sozlugu() kendisi_ile bayragini tasir")
+kontrol(any(KENDISI_UYARISI in u for u in _d.uyari),
+        "kendisi_ile uyarisi ashtakoot_hesapla icinde eklenir")
+kontrol(kendisi_ile(sevde).uyari.count(KENDISI_UYARISI) == 1,
+        "kendisi_ile() uyariyi iki kez eklemez")
+# farkli kisi bayragi almamali
+kontrol(ashtakoot_hesapla(sevde, aylar[-1]).kendisi_ile is False,
+        "farkli kisi kendisi_ile False")
+# ayni profile ama farkli boylam -> bayrak yok (yanlis pozitif korumasI)
+_yakin = copy.deepcopy(sevde)
+_yakin.lon += 0.5
+kontrol(ashtakoot_hesapla(sevde, _yakin).kendisi_ile is False,
+        "0,5 derece kaymis ayni profile bayrak vermez")
 
 # --------------------------------------------------------------------------
 baslik("5) SIMETRI: yalnizca yonsuz kootalar A/B == B/A vermeli")
