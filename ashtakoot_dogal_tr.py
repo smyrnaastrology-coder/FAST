@@ -581,24 +581,29 @@ def mevcut(kod: str, puan: int) -> bool:
     return puan in GOVDE.get(kod, {})
 
 
-#: Toplam (0-36) için sade dilde bant metinleri. `cok_dusuk` 0-17,
-#: `dusuk` 18-24, `orta` 25-32, `yuksek` 33-36 aralıklarına karşılık gelir.
+#: Toplam puan için sade dilde genel ilişki yorumları.
+#: Azami 36 olsa da ulaşılabilir toplamlar 20-34 aralığındadır, bu yüzden
+#: bantlar ölçülen aralığa göre kurulur: `cok_dusuk` 20-23 (Zayıf ilişki),
+#: `dusuk` 26-27 (Orta ilişki), `orta` 28-29 (İdeal ilişki),
+#: `yuksek` 33-34 (Kuvvetli ilişki).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
-        "baslik": "Zayıf bir başlangıç",
-        "aciklama": ("Birlikte yürünecek çok şey var ve alışkanlık henüz "
-                    "oturmamış.\n"
+        "baslik": "Zayıf ilişki",
+        "aciklama": ("20–23 puan aralığı. Birlikte yürünecek çok şey var ve "
+                    "alışkanlık henüz oturmamış.\n"
                     "Bu, ilişkinin kapısının kapalı olduğu anlamına "
-                    "gelmez; sadece bugünkü uyumun düşük olduğunu gösterir.\n"
+                    "gelmez; sadece bugünkü uyumun düşük olduğunu "
+                    "gösterir.\n"
                     "En çok işe yarayan şey, karşınızdakini anlamaya "
                     "çalışmaktır."),
         "ipucu": ("Küçük ve düzenli adımlar büyük başlangıçlardan daha "
                   "fazla işe yarar."),
     },
     "dusuk": {
-        "baslik": "Bazı alanlarda uyum var",
-        "aciklama": ("İlişkinin dayandığı ve iyi gittiği alanlar var, "
-                    "ama bazı konularda hâlâ uyum yok.\n"
+        "baslik": "Orta ilişki",
+        "aciklama": ("26–27 puan aralığı. İlişkinin dayandığı ve iyi "
+                    "gittiği alanlar var, ama bazı konularda hâlâ uyum "
+                    "yok.\n"
                     "Güçlü taraflarınız ilişkiyi ayakta tutar; zayıf "
                     "alanlar birlikte çalışılmazsa zamanla ağırlaşır.\n"
                     "Bu, kötü değil ama bilinçli çalışma ister."),
@@ -606,18 +611,20 @@ TOPLAM: Dict[str, Dict[str, str]] = {
                   "gelir."),
     },
     "orta": {
-        "baslik": "Sağlam bir uyum",
-        "aciklama": ("Bu aralıkta birlikteliklerin çoğu yerleşir.\n"
-                    "Günlük hayatta birbirinizi yormuyorsunuz, bazı "
-                    "konularda zorlanıyorsunuz ama bu konular sizi "
-                    "durdurmuyor.\n"
+        "baslik": "İdeal ilişki",
+        "aciklama": ("28–29 puan aralığı. Günlük hayatta birbirinizi "
+                    "yormuyorsunuz ve birlikteliklerin çoğu yerleşiyor.\n"
+                    "Bazı konularda zorlanıyorsunuz ama bu konular sizi "
+                    "durdurmuyor; üstelik nerede zorlandığınızı ikiniz de "
+                    "biliyorsunuz.\n"
                     "İlişki sağlam bir zeminde ve gelişmeye açık."),
         "ipucu": ("Sağlam zemin demek süresiz kalacak demek değildir; "
                   "üzerine kurulan şeyleri fark edin."),
     },
     "yuksek": {
-        "baslik": "Güçlü bir uyum",
-        "aciklama": ("İkinizin birbirine uyum neredeyse tam.\n"
+        "baslik": "Kuvvetli ilişki",
+        "aciklama": ("33–34 puan aralığı. İkinizin birbirine uyum "
+                    "neredeyse tam.\n"
                     "Günlük hayatta aynı dili konuşuyor, birbirinizi "
                     "anlıyorsunuz ve aynı şeyleri önemsiyorsunuz.\n"
                     "Böyle eşleşmeler nadirdir; ancak yüksek uyum "

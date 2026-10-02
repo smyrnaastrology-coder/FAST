@@ -539,13 +539,16 @@ def mevcut(kod: str, puan: int) -> bool:
     return puan in GOVDE.get(kod, {})
 
 
-#: Total (0-36) in plain language. `cok_dusuk` = 0-17, `dusuk` = 18-24,
-#: `orta` = 25-32, `yuksek` = 33-36.
+#: Overall reading for the total score, in plain language.
+#: The maximum is 36, but reachable totals only span 20-34, so the bands
+#: follow the measured range: `cok_dusuk` = 20-23 (Weak relationship),
+#: `dusuk` = 26-27 (Average), `orta` = 28-29 (Ideal),
+#: `yuksek` = 33-34 (Strong).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
-        "baslik": "A weak start",
-        "aciklama": ("There is a lot to walk through and the habit of being "
-                    "together is not settled yet.\n"
+        "baslik": "Weak relationship",
+        "aciklama": ("20-23 range. There is a lot to walk through and the habit "
+                    "of being together is not settled yet.\n"
                     "That does not mean the door is closed; it only shows "
                     "today's fit is low.\n"
                     "What helps most is the effort to understand the other "
@@ -554,9 +557,9 @@ TOPLAM: Dict[str, Dict[str, str]] = {
                   "a dramatic beginning."),
     },
     "dusuk": {
-        "baslik": "Some areas fit well",
-        "aciklama": ("There are areas the relationship rests on and does "
-                    "well, plus areas that still do not fit.\n"
+        "baslik": "Average relationship",
+        "aciklama": ("26-27 range. There are areas the relationship rests on "
+                    "and does well, plus areas that still do not fit.\n"
                     "Your strong sides keep it standing; weak areas get "
                     "heavier if you never work on them together.\n"
                     "That is not bad, but it asks for deliberate work."),
@@ -564,18 +567,19 @@ TOPLAM: Dict[str, Dict[str, str]] = {
                   "arrives over time."),
     },
     "orta": {
-        "baslik": "A solid fit",
-        "aciklama": ("Most long-term relationships fall in this range.\n"
-                    "Daily life does not wear you down; some situations are "
-                    "hard, but they do not stop you.\n"
+        "baslik": "Ideal relationship",
+        "aciklama": ("28-29 range. Daily life does not wear you down, and most "
+                    "of what you build together settles in.\n"
+                    "Some situations are hard, but they do not stop you; on "
+                    "top of that you both know where it strains.\n"
                     "The relationship stands on firm ground and stays open "
                     "to growth."),
         "ipucu": ("A solid base does not mean it lasts unchanged; notice "
                   "what you build on it."),
     },
     "yuksek": {
-        "baslik": "A strong fit",
-        "aciklama": ("Your fit is close to complete.\n"
+        "baslik": "Strong relationship",
+        "aciklama": ("33-34 range. Your fit is close to complete.\n"
                     "You speak the same language day to day, you understand "
                     "each other and you care about the same things.\n"
                     "Such matches are rare, but a high score does not mean "

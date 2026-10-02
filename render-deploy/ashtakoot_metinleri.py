@@ -382,24 +382,24 @@ KOOTA_METIN_TR: Dict[str, dict] = {
 #: Toplam puan için genel bant yorumları.
 TOPLAM_BANTLARI = {
     "cok_dusuk": {
-        "baslik": "0–17 · Düşük",
+        "baslik": "20–23 · Zayıf ilişki",
         "aciklama": "Sistem içi uyum düşük. Bu, ilişkinin ya da ebeveyn-çocuk bağının "
                     "olmadığı anlamına gelmez; yalnızca Ay nakṣatra'larının sekiz kriterde "
                     "örtüşmediğini gösterir.",
         "ipucu": "Diğer analiz katmanlarına bakın: Nadi, Rasi ve Gana ağırlıklıdır.",
     },
     "dusuk": {
-        "baslik": "18–24 · Orta-alt",
+        "baslik": "26–27 · Orta ilişki",
         "aciklama": "Kısmi uyum. Bazı kootalar güçlü, bazıları zayıf.",
         "ipucu": "Güçlü kootalar ilişkinin doğal olarak dayandığı alanlardır.",
     },
     "orta": {
-        "baslik": "25–32 · İyi",
+        "baslik": "28–29 · İdeal ilişki",
         "aciklama": "Sağlıklı bir uyum. Klasik metinlerin 'iyi eşleşme' aralığı.",
         "ipucu": "Çoğu uzun soluklu birliktelik bu aralıktadır.",
     },
     "yuksek": {
-        "baslik": "33–36 · Çok Yüksek",
+        "baslik": "33–34 · Kuvvetli ilişki",
         "aciklama": "Nadir görülen güçlü uyum. 33 üzeri sonuçlar seyrektir.",
         "ipucu": "Pratikte 36 mümkün değildir; aynı nadi nedeniyle üst sınır 34'tür.",
     },

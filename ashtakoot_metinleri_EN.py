@@ -353,25 +353,25 @@ KOOTA_METIN: dict = {
 
 TOPLAM_BANTLARI = {
     "cok_dusuk": {
-        "baslik": "0-17 · Low",
+        "baslik": "20-23 · Weak relationship",
         "aciklama": "Low internal compatibility. This does not mean the relationship or the "
                     "parent-child bond does not exist; it only means the Moon nakshatras do not "
                     "overlap on the eight criteria.",
         "ipucu": "Look at the other layers: Nadi, Rasi and Gana carry the weight.",
     },
     "dusuk": {
-        "baslik": "18-24 · Below average",
+        "baslik": "26-27 · Average relationship",
         "aciklama": "Partial compatibility. Some kootas are strong, others are weak.",
         "ipucu": "The strong kootas are what the bond naturally rests on.",
     },
     "orta": {
-        "baslik": "25-32 · Good",
+        "baslik": "28-29 · Ideal relationship",
         "aciklama": "Healthy compatibility, the classical texts' range for a good match.",
         "ipucu": "Most long-term partnerships fall in this band.",
     },
     "yuksek": {
-        "baslik": "33-36 · Very high",
-        "aciklama": "A rare strong match. Results above 33 are uncommon.",
+        "baslik": "33-34 · Strong relationship",
+        "aciklama": "A rare strong match. Results in this band are uncommon.",
         "ipucu": "36 is not attainable in practice; the same nadi caps the total at 34.",
     },
 }

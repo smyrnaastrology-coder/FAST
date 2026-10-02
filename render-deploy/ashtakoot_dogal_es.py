@@ -554,13 +554,16 @@ def mevcut(kod: str, puan: int) -> bool:
     return puan in GOVDE.get(kod, {})
 
 
-#: Total (0-36) en lenguaje claro. `cok_dusuk` = 0-17, `dusuk` = 18-24,
-#: `orta` = 25-32, `yuksek` = 33-36.
+#: Lectura general del total, en lenguaje claro.
+#: El máximo es 36, pero los totales alcanzables sólo van de 20 a 34, así que
+#: las bandas siguen ese rango medido: `cok_dusuk` = 20-23 (Relación débil),
+#: `dusuk` = 26-27 (Media), `orta` = 28-29 (Ideal),
+#: `yuksek` = 33-34 (Fuerte).
 TOPLAM: Dict[str, Dict[str, str]] = {
     "cok_dusuk": {
-        "baslik": "Un comienzo débil",
-        "aciklama": ("Hay mucho que recorrer y el hábito de estar juntos "
-                    "aún no está asentado.\n"
+        "baslik": "Relación débil",
+        "aciklama": ("Rango 20-23. Hay mucho que recorrer y el hábito de estar "
+                    "juntos aún no está asentado.\n"
                     "Eso no significa que la puerta esté cerrada; solo "
                     "muestra que el encaje actual es bajo.\n"
                     "Lo que más ayuda es el esfuerzo por entender a la otra "
@@ -569,9 +572,9 @@ TOPLAM: Dict[str, Dict[str, str]] = {
                   "comienzo espectacular."),
     },
     "dusuk": {
-        "baslik": "Algunas áreas encajan bien",
-        "aciklama": ("Hay áreas en las que la relación se apoya y funciona, "
-                    "y otras que todavía no encajan.\n"
+        "baslik": "Relación media",
+        "aciklama": ("Rango 26-27. Hay áreas en las que la relación se apoya "
+                    "y funciona, y otras que todavía no encajan.\n"
                     "Vuestras fortalezas la sostienen; las débiles pesan "
                     "más si nunca las trabajáis juntos.\n"
                     "No es malo, pero pide un trabajo consciente."),
@@ -579,19 +582,19 @@ TOPLAM: Dict[str, Dict[str, str]] = {
                   "el tiempo."),
     },
     "orta": {
-        "baslik": "Un encaje sólido",
-        "aciklama": ("La mayoría de las relaciones largas cae en este "
-                    "intervalo.\n"
-                    "El día a día no os desgasta; hay situaciones difíciles, "
-                    "pero no os detienen.\n"
+        "baslik": "Relación ideal",
+        "aciklama": ("Rango 28-29. El día a día no os desgasta, y la mayoría "
+                    "de lo que construís juntos va asentando.\n"
+                    "Hay situaciones difíciles, pero no os detienen; además "
+                    "ambos sabéis dónde cuesta.\n"
                     "La relación se apoya en un suelo firme y queda abierta "
                     "a crecer."),
         "ipucu": ("Un suelo firme no significa que todo se quede igual; "
                   "fijate en lo que construís encima."),
     },
     "yuksek": {
-        "baslik": "Un encaje fuerte",
-        "aciklama": ("Vuestro encaje roza la totalidad.\n"
+        "baslik": "Relación fuerte",
+        "aciklama": ("Rango 33-34. Vuestro encaje roza la totalidad.\n"
                     "Habláis el mismo idioma a diario, os entendéis y os "
                     "importan las mismas cosas.\n"
                     "Estas combinaciones son raras, pero una puntuación alta "

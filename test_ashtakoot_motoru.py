@@ -10,7 +10,7 @@ import traceback
 from ashtakoot_motoru import (
 
     AZAMI_TOPLAM, BURC_ADLARI, KAPSAM_DISI_KURALLAR, KOOTALAR,
-    NADI_LORDU, NAKSHATRALAR, YONLU_KOOTALAR, _burc_iliskisi,
+    NADI_LORDU, NAKSHATRALAR, YONLU_KOOTALAR, AshtaKootSonuc, _burc_iliskisi,
     ashtakoot_hesapla, ay_konumu_utc, ay_nakshatrasi_hesapla, kendisi_ile,
     nadi_dosha_analizi, nakshatra_profili, nakshatra_uyum_haritasi, vashya_grubu,
 )
@@ -98,7 +98,7 @@ for anahtar, p in beklenen.items():
     kontrol(k.puan == p, "%s = %d (alinan %d)" % (anahtar, p, k.puan))
 kontrol(s.toplam == 28, "Sevde kendisiyle 28")
 kontrol(round(s.yuzde, 1) == 77.8, "yuzde 77.8 (yuvarlanmis)")
-kontrol(s.seviye == "orta", "seviye 'orta'")
+kontrol(s.seviye == "orta", "seviye 'orta' (28 -> 28-29 ideal bandi)")
 kontrol(s.kendisi_ile is True, "kendisi_ile bayragi")
 
 # --------------------------------------------------------------------------
@@ -444,10 +444,65 @@ for _lang in ("tr", "en", "es"):
                 "dogal_toplam[%s].%s dolu" % (_lang, _sev))
         kontrol(not _JARGON.search(" ".join(_t.values())),
                 "dogal_toplam[%s].%s jargonsuz" % (_lang, _sev))
+        # genel yorum tam 3 satir, her satiri dolu
+        _sat = _t["aciklama"].split("\n")
+        kontrol(len(_sat) == 3 and all(len(x.split()) >= 5 for x in _sat),
+                "dogal_toplam[%s].%s 3 dolu satir" % (_lang, _sev))
+        # aralik metinde gecmeli, baslikta gecmemeli (kullanici sadece isim istedi)
+        kontrol(not _JARGON.search(_t["baslik"]),
+                "dogal_toplam[%s].%s baslik jargonsuz" % (_lang, _sev))
 
-    # 132 metin/dil, 3 dilde toplam 396
-    kontrol(sum(a + 1 for a in _AZAMI.values()) * 3 == 132,
-            "dogal[%s] 132 metin (44 puan x 3 acil)" % _lang)
+    # toplam bant basliklari kullaniciya dogrudan hitap eden 4 iliski adi
+    kontrol([MT.dogal_toplam(s, "tr")["baslik"] for s in
+             ("cok_dusuk", "dusuk", "orta", "yuksek")]
+            == ["Zayıf ilişki", "Orta ilişki", "İdeal ilişki", "Kuvvetli ilişki"],
+            "dogal_toplam[tr] basliklari zayif/orta/ideal/kuvvetli")
+    kontrol([MT.dogal_toplam(s, "en")["baslik"] for s in
+             ("cok_dusuk", "dusuk", "orta", "yuksek")]
+            == ["Weak relationship", "Average relationship",
+                "Ideal relationship", "Strong relationship"],
+            "dogal_toplam[en] basliklari zayif/orta/ideal/kuvvetli")
+    kontrol([MT.dogal_toplam(s, "es")["baslik"] for s in
+             ("cok_dusuk", "dusuk", "orta", "yuksek")]
+            == ["Relación débil", "Relación media",
+                "Relación ideal", "Relación fuerte"],
+            "dogal_toplam[es] basliklari zayif/orta/ideal/kuvvetli")
+
+# --------------------------------------------------------------------------
+# Genel ilişki yorumu: bantlar OLCULEN ulasilabilir araliga gore kurulur.
+# Azami 36 ama pratikte toplamlar yalnizca 20-34 arasi olabiliyor; 0-19 ve
+# 35-36 hicbir ciftte olusmuyor. Bu yuzden bantlar 20-34 uzerinden kurulur,
+# aksi halde alt bantlar olenmis olur.
+SINIR = [(20, "cok_dusuk"), (23, "cok_dusuk"), (26, "dusuk"), (27, "dusuk"),
+         (28, "orta"), (29, "orta"), (33, "yuksek"), (34, "yuksek")]
+for _p, _bek in SINIR:
+    _S = type("S", (), {})()
+    _S.toplam = _p
+    kontrol(AshtaKootSonuc.seviye.fget(_S) == _bek,
+            "toplam %d -> %s (beklenen %s)"
+            % (_p, AshtaKootSonuc.seviye.fget(_S), _bek))
+
+# gercek tum naksatra ciftleri taranir: dort bandin de dolu oldugu kanitlanir
+_aylar = [ay_nakshatrasi_hesapla(_x) for _x in range(27)]
+_gercek = {}
+for _i, _a in enumerate(_aylar):
+    for _b in _aylar[_i:]:
+        _S = ashtakoot_hesapla(_a, _b)
+        _gercek[_S.toplam] = _gercek.get(_S.toplam, 0) + 1
+        _gercek.setdefault("bant_" + _S.seviye, 0)
+        _gercek["bant_" + _S.seviye] += 1
+_son = max(_a for _a in _gercek if isinstance(_a, int))
+_kucuk = min(_a for _a in _gercek if isinstance(_a, int))
+kontrol((_kucuk, _son) == (20, 34),
+        "ulasilabilir toplam araligi 20-34 (olculdu: %d-%d)" % (_kucuk, _son))
+for _b in ("cok_dusuk", "dusuk", "orta", "yuksek"):
+    kontrol(_gercek.get("bant_" + _b, 0) > 0,
+            "bant %s gercek ciftlerde dolu (%d adet)"
+            % (_b, _gercek.get("bant_" + _b, 0)))
+
+for _lang in ("tr", "en", "es"):
+    kontrol(sum(a + 1 for a in _AZAMI.values()) * 4 == 176,
+            "dogal[%s] 176 metin (44 puan x 4 aci)" % _lang)
 
 kontrol(set(MT.dogal_basliklar("tr")) == set(_AZAMI),
         "dogal basliklar tum 8 kootayi kapsar")

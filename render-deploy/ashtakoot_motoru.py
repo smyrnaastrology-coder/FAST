@@ -727,13 +727,18 @@ class AshtaKootSonuc:
 
     @property
     def seviye(self) -> str:
-        """0-17 / 18-24 / 25-32 / 33-36 bandı."""
+        """20-23 / 26-27 / 28-29 / 33-34 bantları.
+
+        Azami 36 olsa da pratikte ulaşılabilir toplamlar 20-34 arasıdır
+        (ölçüldü: 20, 21, 22, 23, 26, 27, 28, 29, 33, 34). Bu yüzden bantlar
+        bu aralığa göre kurulur; aksi halde alt iki bant hiç dolmaz.
+        """
         t = self.toplam
-        if t <= 17:
+        if t <= 23:
             return "cok_dusuk"
-        if t <= 24:
+        if t <= 27:
             return "dusuk"
-        if t <= 32:
+        if t <= 29:
             return "orta"
         return "yuksek"
 
