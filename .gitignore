@@ -81,3 +81,9 @@ AppData/
 # Horary kredi/hesap DB - GIT'E COMMIT'LME (commit'liyken her Render deploy kredileri 100'e donuyordu)
 horary_oracle/users.json
 horary_oracle/users_runtime.json
+
+# Konum geri bildirimi: kullanicinin yazdigi yerler + geri bildirim jetonu
+# imzalayan gizli anahtar. Anahtar repoda olursa jetonlar sahtelenir, veri
+# dosyasi repoda olursa kullanicinin yazdigi yerler herkese acik olur.
+horary_oracle/horary_location_feedback.json
+horary_oracle/horary_feedback_secret

@@ -18,6 +18,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
 
 from engine import location_feedback as FB
 
+# Modulun GERCEK varsayilan deposu (testler gecici depoya yaziyor, ama
+# varsayilanin dogru dosya olup olmadigini da denetlememiz lazim).
+_DEFAULT_STORE = FB.STORE
+
 # testler gecici depoya yazsin, gercek veriye dokunmadan
 _tmp = os.path.join(tempfile.gettempdir(), "fb_test_store.json")
 FB.STORE = _tmp
@@ -129,6 +133,139 @@ def test_store_json_valid():
         assert k in e, k
     print(f"OK 10) depo gecerli JSON, {len(db['entries'])} kayit")
 
+
+def test_store_not_shared_with_legacy_list():
+    """Konum geri bildirimi ESKI is-sonucu geri bildirim dosyasiyla ayni
+    dosyaya yazmamali. O dosya JSON LISTESidir ve farkli sema kullanir; ayni
+    dosyaya yazmak ya veriyi bozar ya da yazmayi AttributeError ile engeller."""
+    import engine.location_feedback as M
+    real = _DEFAULT_STORE
+    assert os.path.basename(real) == "horary_location_feedback.json", real
+    assert real != os.path.join(os.path.dirname(real), "horary_feedback.json")
+    print("OK 11) konum geri bildirimi ayri depoda:", os.path.basename(real))
+
+
+def test_legacy_list_file_does_not_crash():
+    """Depo yanlislikla JSON listesi olsa bile cokmemeli, sessizce bos baslamali."""
+    import importlib
+    import engine.location_feedback as M
+    legacy = os.path.join(tempfile.gettempdir(), "fb_legacy_list.json")
+    with open(legacy, "w", encoding="utf-8") as f:
+        json.dump([{"question": "eski kayit", "predicted": {}}], f)
+    old = M.STORE
+    try:
+        M.STORE = legacy
+        db = M._load()
+        assert isinstance(db, dict), type(db)
+        assert db["entries"] == []
+        n = M.record("e@x.com", "q", "lost_object", "found")
+        assert n == 1, n
+    finally:
+        M.STORE = old
+        if os.path.exists(legacy):
+            os.remove(legacy)
+    print("OK 12) eski liste bicimi cokmeden bos basliyor")
+
+
+def test_token_is_single_use():
+    """Kritik: ayni jeton iki kez gonderilemez. Aksi halde tek bir cevap
+    binlerce sahte kayit uretir ve motoru bozabilir."""
+    import engine.location_feedback as M
+    old = M.STORE
+    single = os.path.join(tempfile.gettempdir(), "fb_single_use.json")
+    try:
+        M.STORE = single
+        if os.path.exists(single):
+            os.remove(single)
+        t = M.make_token("a@b.com", "Kalemim nerde?", "lost_object", 38.4, 27.1, "Kuzey")
+        ok1, info1 = M.submit(t, found=True, found_where="salon")
+        assert ok1, info1
+        assert info1["saved"] == 1, info1
+        ok2, info2 = M.submit(t, found=True, found_where="salon")
+        assert not ok2, "AYNI JETON IKINCE KABUL EDILDI!"
+        assert "kullanildi" in info2["error"], info2
+        assert M.stats()["n"] == 1, "replay kaydi eklenmis"
+        print("OK 13) jeton tek kullanimlik (replay reddedildi)")
+    finally:
+        M.STORE = old
+        if os.path.exists(single):
+            os.remove(single)
+
+
+def test_submit_rejects_bad_token_without_writing():
+    """Bozuk jeton HICBIR sey yazmamali."""
+    import engine.location_feedback as M
+    old = M.STORE
+    single = os.path.join(tempfile.gettempdir(), "fb_reject.json")
+    try:
+        M.STORE = single
+        ok, info = M.submit("sahte.jeton", found=True)
+        assert not ok and info.get("error"), info
+        assert not os.path.exists(single), "gecersiz jetonla dosya olustu!"
+        assert M.stats()["n"] == 0
+        print("OK 14) gecersiz jeton kayit yazmiyor")
+    finally:
+        M.STORE = old
+        if os.path.exists(single):
+            os.remove(single)
+
+
+def test_submit_records_real_question_type():
+    """Streamlit eskiden her seyi 'lost_object' yaziyordu; tip basina basari
+    orani bu yuzden bozuluyordu. submit jetondan gelen gercek tipi yazmali."""
+    import engine.location_feedback as M
+    old = M.STORE
+    single = os.path.join(tempfile.gettempdir(), "fb_qtype.json")
+    try:
+        M.STORE = single
+        for qt in ("child", "job", "lost_object"):
+            t = M.make_token("a@b.com", "soru", qt, 38.4, 27.1, "K")
+            assert M.submit(t, found=True)[0]
+        bt = M.stats()["by_type"]
+        assert set(bt) == {"child", "job", "lost_object"}, bt
+        assert bt["child"]["n"] == 1 and bt["job"]["n"] == 1, bt
+        print("OK 15) gercek soru tipi kaydediliyor:", sorted(bt))
+    finally:
+        M.STORE = old
+        if os.path.exists(single):
+            os.remove(single)
+
+
+def test_concurrent_submit_no_lost_writes():
+    """Iki istek ayni anda gelirse biri digerinin kaydini EZMEMELI.
+    (Kilidi olmayan eski surumde 'son yazan kazanir' -> veri kaybi.)"""
+    import threading
+    import engine.location_feedback as M
+    old = M.STORE
+    conc = os.path.join(tempfile.gettempdir(), "fb_concurrent.json")
+    try:
+        M.STORE = conc
+        if os.path.exists(conc):
+            os.remove(conc)
+        tokens = [M.make_token(f"u{i}@b.com", "q", "lost_object", 38.4, 27.1, "K")
+                  for i in range(20)]
+        results = []
+        lock = threading.Lock()
+
+        def work(tk):
+            r = M.submit(tk, found=True, found_where="x")
+            with lock:
+                results.append(r[0])
+
+        ths = [threading.Thread(target=work, args=(t,)) for t in tokens]
+        for t in ths:
+            t.start()
+        for t in ths:
+            t.join()
+        assert all(results), f"{results.count(False)} basarisiz"
+        assert M.stats()["n"] == 20, M.stats()["n"]
+        print("OK 16) es zamanli 20 gonderim, 20 kayit (kayip yok)")
+    finally:
+        M.STORE = old
+        if os.path.exists(conc):
+            os.remove(conc)
+
+
 if __name__ == "__main__":
     test_token_roundtrip()
     test_token_tampered()
@@ -140,7 +277,14 @@ if __name__ == "__main__":
     test_hit_rate_none_when_empty()
     test_no_calibration_mutation()
     test_store_json_valid()
+    test_store_not_shared_with_legacy_list()
+    test_legacy_list_file_does_not_crash()
+    test_token_is_single_use()
+    test_submit_rejects_bad_token_without_writing()
+    test_submit_records_real_question_type()
+    test_concurrent_submit_no_lost_writes()
     os.remove(_tmp)
-    print("\ntest_location_feedback: 11/11 OK")
-    print("SONUC: geri bildirim guvenli (imzali jeton), kalibrasyonu degistirmiyor,")
-    print("        'bulamadim' da veri olarak birikiyor, gercek basari orani olculebiliyor.")
+    print("\ntest_location_feedback: 16/16 OK")
+    print("SONUC: geri bildirim guvenli (imzali + TEK KULLANIMLI jeton), eski veri")
+    print("        dosyasiyla paylasmaz, kalibrasyonu degistirmez, es zamanli")
+    print("        yazmalarda kayit kaybolmaz, gercek soru tipiyle olculur.")

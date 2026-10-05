@@ -733,7 +733,7 @@ async def cast(req: CastRequest):
             if _u and _u.get("plan"):
                 engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
     except: pass
-    # kredi kontrolu (100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL)
+    # kredi kontrolu (100 soru paketleri: Temel 700TL, Gelismis 750TL, En iyi 1500TL)
     # Kimlik zaten cast basinda zorunlu; burada sadece dusen var (sohbet/selam bedava).
     import auth as _auth3
     _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
@@ -1100,25 +1100,34 @@ def _fb_make(email, question, question_type, lat, lon, loc_info=None):
 @app.post("/api/horary/feedback")
 def horary_feedback(payload: FeedbackRequest):
     """'Dogru muymus?' tik'i. Jeton gecerli degilse kayit alinmaz - kimse
-    motoru bozabilecek rastgele veri enjekte edemez. Geri bildirim yaniti
-    ASLA degistirmez, yalnizca olcum + gelecekteki olcek verisi toplar."""
+    motoru bozabilecek rastgele veri enjekte edemez. Jeton TEK KULLANIMLIDIR:
+    ayni jeton iki kez gonderilip binlerce sahte kayit uretemez. Geri bildirim
+    yaniti ASLA degistirmez, yalnizca olcum + gelecekteki olcek verisi toplar."""
     try:
         from engine import location_feedback as _FB
-        d = _FB.read_token(payload.token)
-        if not d:
-            return {"ok": False, "error": "gecersiz veya suresi dolmus jeton"}
-        _cal = HoraryCalibration()
-        _cal.load()
-        _n = _FB.record(
-            email=d.get("e"), question=d.get("q"), question_type=d.get("t"),
-            outcome="found" if payload.found else "not_found",
+        # HoraryCalibration modul seviyesinde DEGIL, cast fonksiyonunun icinde
+        # yerel olarak import ediliyor; burada da yerel import sart.
+        try:
+            from engine.horary_distance import HoraryCalibration as _HC
+            _cal = _HC()
+            _cal.load()
+            _trust = _cal.direction_confidence().get("label") or "zayif"
+        except Exception:
+            _trust = "zayif"
+        # Jetonu dogrulamak, harcamak ve kaydetmek tek kilit icinde olmalidir;
+        # ayri adimlar yarista tek bir cevabin cok kez sayilmasina izin verir.
+        _ok, _info = _FB.submit(
+            payload.token,
+            found=payload.found,
             found_where=payload.found_where,
-            predicted_dir=d.get("dir") or "",
-            trust_level=("zayif" if not _cal.direction_confidence().get("label") == "iyi" else "orta"),
-            recast=payload.recast, note=payload.note,
+            recast=payload.recast,
+            note=payload.note,
+            trust_level=_trust,
         )
-        return {"ok": True, "saved": _n, "thanks":
-                "Buldum" if payload.found else "Kaydettik - motorumuz bu hatayi duzeltecek"}
+        if not _ok:
+            return {"ok": False, "error": _info.get("error", "kaydedilemedi")}
+        return {"ok": True, "saved": _info.get("saved"),
+                "thanks": "Buldum" if payload.found else "Kaydettik - motorumuz bu hatayi duzeltecek"}
     except Exception as _e_fb:
         return {"ok": False, "error": str(_e_fb)[:200]}
 
@@ -1144,12 +1153,12 @@ def admin_page():
 <h2 style="color:#C9A96E">Admin - Sifre Uret</h2>
 <div style="margin:12px 0;padding:12px;background:#1A1423;border:1px solid #C9A96E;border-radius:8px;font-size:13px">
 <b style="color:#C9A96E">SATIS FIYATLARI</b><br>
-Kredili 100 soru: <b>Oracle 200 TL</b> &middot; <b>Premium 360 TL</b> &middot; <b>Elite 600 TL</b><br>
-Yillik Sinirsiz: <b>Oracle 5.000 TL</b> &middot; <b>Premium 10.000 TL</b> &middot; <b>Elite 20.000 TL</b>
+Kredili 100 soru: <b>Temel 700 TL</b> &middot; <b>Gelismis 750 TL</b> &middot; <b>En iyi 1.500 TL</b><br>
+Yillik Sinirsiz: fiyatlar maliyet &times;4 &mdash; kademe eklendikce buraya eklenir
 </div>
 <div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="365" style="width:60px"> gün <button onclick="createUser()">Uret (yillik)</button> <span id="out"></span></div>
-<div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''oracle''','''200''')" style="background:#6a9ae2">Oracle 100 - 200TL</button> <button onclick="addCredits('''premium''','''360''')" style="background:#C9A96E">Premium 100 - 360TL</button> <button onclick="addCredits('''elite''','''600''')" style="background:#D4AF37">Elite 100 - 600TL</button></div>
+<div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''basic''','''700''')" style="background:#6a9ae2">Temel 100 - 700TL</button> <button onclick="addCredits('''plus''','''750''')" style="background:#C9A96E">Gelismis 100 - 750TL</button> <button onclick="addCredits('''pro''','''1500''')" style="background:#D4AF37">En iyi 100 - 1500TL</button></div>
 <table id="tbl"><thead><tr><th>Kullanici</th><th>Plan</th><th>Expiry</th><th>Trial</th><th>Cihaz</th><th>Islem</th></tr></thead><tbody></tbody></table>
 <script>
 async function load(){
@@ -1243,8 +1252,12 @@ def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
     plan=(payload.get("plan") or "").strip()
     if not email:
         return {"error": "user gerekli"}
-    if plan not in ("", "oracle", "premium", "elite"):
-        return {"error": "gecersiz plan"}
+    # Gecerli plan adlari kademe sisteminden okunur; elle liste tutulmaz,
+    # boylece yeni kademe eklenince burasi kendiliginden guncel kalir.
+    # Eski adlar (oracle/premium/elite...) sunucuda yeni kademeye map'lenir.
+    from engine.tiers import PLAN_TIER as _PLAN_TIER
+    if plan.lower() not in _PLAN_TIER:
+        return {"error": "gecersiz plan", "allowed": sorted(_PLAN_TIER)}
     import auth as _auth6
     db=_auth6._load()
     u=db.get(email)

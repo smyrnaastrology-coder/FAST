@@ -60,4 +60,30 @@ class HoraryApi {
     final res = await http.get(Uri.parse('$baseUrl/api/health'));
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
+
+  // 'Doğru muydu?' - motorun yön tahminini besler.
+  // Jeton imzalıdır; sunucu reddederse sessizce geçilir, kullanıcıyı
+  // rahatsız etmeyiz (bu bir bonus özellik, cevabı asla etkilemez).
+  static Future<bool> sendFeedback({
+    required String token,
+    required bool found,
+    String? foundWhere,
+    String? recast,
+  }) async {
+    try {
+      final res = await http
+          .post(Uri.parse('$baseUrl/api/horary/feedback'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'token': token,
+                'found': found,
+                if (foundWhere != null && foundWhere.isNotEmpty) 'found_where': foundWhere,
+                if (recast != null && recast.isNotEmpty) 'recast': recast,
+              }))
+          .timeout(const Duration(seconds: 15));
+      return res.statusCode == 200;
+    } catch (_) {
+      return false; // geri bildirim kaybı cevabı bozmaz
+    }
+  }
 }

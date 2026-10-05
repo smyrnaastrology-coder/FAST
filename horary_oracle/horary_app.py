@@ -11,58 +11,79 @@ from engine.horary_engine import cast_horary_chart
 from engine.interpreter import mock_interpret, call_openai
 
 
-def _render_feedback(st, loc_info, question):
-    """'Dogru muymus?' - tek tikla motoru besler.
+def _render_feedback(st, loc_info, question, qtype="lost_object"):
+    """'Dogru muydu?' - tek tikla motoru besler.
 
     NEDEN: yon tahmininin orta hatasi 49.5 derece. Bu veri kendiliginden
     buyumez; kullanici kalemi bulunca gercek konumu soyler. 'Bulamadim'
     cevabi da veridir - yon tutmamis demektir.
 
     Guvenlik: yanit ASLA degistirilmez, kalibrasyon ASLA kirletilmez.
-    Yalnizca olcum toplanir ve 'found' + konum varsa ileride olcek olusturulur.
+    Yalnizca olcum toplanir.
+
+    DUZELTME (2026-10): iki hata vardi.
+      1. Butona tiklaninca Streamlit yeniden calisir ve yerel `found` degiskeni
+         sifirlanirdi -> metin kutusu ve 'Gonder' hic gorunmezdi. Asama artik
+         session_state'te tutuluyor.
+      2. question_type her zaman 'lost_object' yaziliyordu; cocuk/is/kayip
+         kisi sorulari da lost_object sayilip tip basina basari oranini
+         bozuyordu. Artik gercek tip yaziliyor.
     """
     try:
         import engine.location_feedback as FB
     except Exception:
         return
     key = "fb_" + str(abs(hash((question, loc_info.get('deg'), loc_info.get('house')))) % 10**9)
-    if st.session_state.get(key):
-        st.caption("✓ Geri bildirimin kaydedildi — teşekkürler.")
+    done_key = key + "_done"
+    stage_key = key + "_stage"
+    if st.session_state.get(done_key):
+        st.caption("Geri bildirimin kaydedildi, teşekkürler.")
         return
     with st.expander("Doğru muydu? (motorumuzu geliştirir)"):
         st.caption(f"Harita şu yönü gösterdi: **{loc_info.get('direction','')}**"
                    + (f" / {loc_info.get('sign_direction','')}" if loc_info.get('sign_direction') else ""))
         c1, c2 = st.columns(2)
-        found = None
-        if c1.button("✓ Buldum", key=key + "_y", use_container_width=True):
-            found = True
-        if c2.button("✗ Bulamadım", key=key + "_n", use_container_width=True):
-            found = False
-        if found is True:
+        # ASAMA session_state'te: yeniden calistirmada kaybolmaz.
+        stage = st.session_state.get(stage_key)
+        if stage is None:
+            if c1.button("Buldum", key=key + "_y", use_container_width=True):
+                stage = "found"
+            elif c2.button("Bulamadım", key=key + "_n", use_container_width=True):
+                stage = "not_found"
+            if stage is not None:
+                st.session_state[stage_key] = stage
+                st.rerun()
+            return
+        if stage == "found":
             where = st.text_input("Nerede buldun? (örn. salon, koltuk altı)",
                                   key=key + "_w", max_chars=120)
             if st.button("Gönder", key=key + "_sy", use_container_width=True):
+                if not where.strip():
+                    st.warning("Nerede bulduğunu yazmak kalibrasyon için şart.")
+                    return
                 try:
-                    FB.record(email="", question=question, question_type="lost_object",
-                              outcome="found", found_where=where,
+                    FB.record(email="", question=question, question_type=qtype,
+                              outcome="found", found_where=where.strip(),
                               predicted_dir=loc_info.get('direction', ''))
-                    st.session_state[key] = True
+                    st.session_state[done_key] = True
                     st.success("Kaydedildi. Bu, motorumuzu düzeltir.")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Kaydedilemedi: {e}")
-        elif found is False:
+        else:
             recast = st.text_input("Nerede aradın? (opsiyonel)", key=key + "_r", max_chars=160)
             if st.button("Gönder", key=key + "_sn", use_container_width=True):
                 try:
-                    FB.record(email="", question=question, question_type="lost_object",
+                    FB.record(email="", question=question, question_type=qtype,
                               outcome="not_found",
-                              predicted_dir=loc_info.get('direction', ''), recast=recast)
-                    st.session_state[key] = True
+                              predicted_dir=loc_info.get('direction', ''),
+                              recast=recast.strip() or None)
+                    st.session_state[done_key] = True
                     st.success("Kaydedildi. Bu hatayı düzeltmemize yardımcı oluyorsun.")
                     st.rerun()
                 except Exception as e:
                     st.error(f"Kaydedilemedi: {e}")
+
 
 st.set_page_config(page_title="Horary Oracle", page_icon="🔮", layout="centered")
 st.markdown("""
@@ -280,7 +301,7 @@ if submitted and question:
         st.caption(f"📍 {loc_info.get('direction','')} {loc_info.get('distance','')} | ⏳ {res.get('timing',{}).get('text','')}")
         # --- DOGRU MUYMUS? (yalnizca konum sorusunda) ---
         if res.get("verdict") == "LOCATION":
-            _render_feedback(st, loc_info, question)
+            _render_feedback(st, loc_info, question, qtype)
         # Ses - tarayıcı TTS (ElevenLabs sonra)
         import streamlit.components.v1 as components
         safe = answer.replace("'"," ").replace('"',' ').replace("\n"," ")

@@ -14,17 +14,21 @@ void main() => runApp(const HoraryApp());
 
 // i18n - tum sistem basliklari dile doner
 const _t = {
-  'tr': {'title':'Horary Oracle','subtitle':'EVRENLE SORU ANININ DILI','hint':'Sorunuz — muhabbet gibi yazın','send':'Gönder','loc':'Konum','clear':'Temizle','copy':'Kopyala','listen':'Dinle','chart':'Harita','asc':'Yükselen','moon':'Ay'},
-  'en': {'title':'Horary Oracle','subtitle':'LANGUAGE OF THE MOMENT','hint':'Ask like chatting to a friend','send':'Send','loc':'Location','clear':'Clear','copy':'Copy','listen':'Listen','chart':'Chart','asc':'Ascendant','moon':'Moon'},
-  'es': {'title':'Horary Oracle','subtitle':'LENGUAJE DEL MOMENTO','hint':'Pregunta como charlando','send':'Enviar','loc':'Ubicación','clear':'Limpiar','copy':'Copiar','listen':'Escuchar','chart':'Carta','asc':'Asc','moon':'Luna'},
-  'ar': {'title':'Horary Oracle','subtitle':'لغة اللحظة','hint':'اسأل كأنك تدردش','send':'إرسال','loc':'الموقع','clear':'مسح','copy':'نسخ','listen':'استماع','chart':'الخريطة','asc':'الطالع','moon':'القمر'},
-  'pt': {'title':'Horary Oracle','subtitle':'LINGUAGEM DO MOMENTO','hint':'Pergunte como conversando','send':'Enviar','loc':'Local','clear':'Limpar','copy':'Copiar','listen':'Ouvir','chart':'Mapa','asc':'Asc','moon':'Lua'},
-  'fr': {'title':'Horary Oracle','subtitle':'LANGAGE DU MOMENT','hint':'Demandez en discutant','send':'Envoyer','loc':'Lieu','clear':'Effacer','copy':'Copier','listen':'Écouter','chart':'Carte','asc':'Asc','moon':'Lune'},
-  'de': {'title':'Horary Oracle','subtitle':'SPRACHE DES MOMENTS','hint':'Frag wie im Gespräch','send':'Senden','loc':'Ort','clear':'Löschen','copy':'Kopieren','listen':'Anhören','chart':'Horoskop','asc':'Asz','moon':'Mond'},
-  'ru': {'title':'Horary Oracle','subtitle':'ЯЗЫК МОМЕНТА','hint':'Спроси как в беседе','send':'Отправить','loc':'Место','clear':'Очистить','copy':'Копировать','listen':'Слушать','chart':'Карта','asc':'Асц','moon':'Луна'},
-  'it': {'title':'Horary Oracle','subtitle':'LINGUAGGIO DEL MOMENTO','hint':'Chiedi come chiacchierando','send':'Invia','loc':'Posizione','clear':'Pulisci','copy':'Copia','listen':'Ascolta','chart':'Carta','asc':'Asc','moon':'Luna'},
-  'hi': {'title':'Horary Oracle','subtitle':'क्षण की भाषा','hint':'दोस्त से बात जैसे पूछें','send':'भेजें','loc':'स्थान','clear':'साफ करें','copy':'कॉपी','listen':'सुनें','chart':'कुंडली','asc':'लग्न','moon':'चंद्र'},
+  'tr': {'title':'Horary Oracle','subtitle':'EVRENLE SORU ANININ DILI','hint':'Sorunuz — muhabbet gibi yazın','send':'Gönder','loc':'Konum','clear':'Temizle','copy':'Kopyala','listen':'Dinle','chart':'Harita','asc':'Yükselen','moon':'Ay','fb_q':'Aradığınız yeri bulabildiniz mi?','fb_sub':'Motorumuzu düzeltmemize yardımcı olun.','fb_found':'Buldum','fb_notfound':'Bulamadım','fb_where_t':'Nerede buldun?','fb_where_h':'örn. salon, koltuk altı','fb_search_t':'Nerede aradın?','fb_search_h':'örn. mutfak, giyinme odası (isteğe bağlı)','fb_send':'Gönder','fb_cancel':'Vazgeç','fb_thanks':'Geri bildirimin alındı, teşekkürler.','fb_weak':'Bu konum tahmini zayıf güvenli — harita yalnız arama alanını daraltır.','fb_level':'Konum tahmini güven seviyesi: ','fb_ok_found':'Kaydedildi — motorumuzu geliştirmenize yardımcı oldunuz.','fb_ok_miss':'Kaydedildi — bu hatayı düzeltmemize yardımcı oluyorsunuz.'},
+  'en': {'title':'Horary Oracle','subtitle':'LANGUAGE OF THE MOMENT','hint':'Ask like chatting to a friend','send':'Send','loc':'Location','clear':'Clear','copy':'Copy','listen':'Listen','chart':'Chart','asc':'Ascendant','moon':'Moon','fb_q':'Did you find what you were looking for?','fb_sub':'Help us correct the engine.','fb_found':'Found it','fb_notfound':'Not found','fb_where_t':'Where did you find it?','fb_where_h':'e.g. living room, under the sofa','fb_search_t':'Where did you look?','fb_search_h':'e.g. kitchen, wardrobe (optional)','fb_send':'Send','fb_cancel':'Cancel','fb_thanks':'Feedback received, thank you.','fb_weak':'This location estimate has low confidence — the map only narrows the search area.','fb_level':'Location estimate confidence: ','fb_ok_found':'Saved — you helped us improve the engine.','fb_ok_miss':'Saved — you helped us correct this mistake.'},
+  'es': {'title':'Horary Oracle','subtitle':'LENGUAJE DEL MOMENTO','hint':'Pregunta como charlando','send':'Enviar','loc':'Ubicación','clear':'Limpiar','copy':'Copiar','listen':'Escuchar','chart':'Carta','asc':'Asc','moon':'Luna','fb_q':'¿Encontraste lo que buscabas?','fb_sub':'Ayúdanos a corregir el motor.','fb_found':'Encontrado','fb_notfound':'No encontrado','fb_where_t':'¿Dónde lo encontraste?','fb_where_h':'p. ej. salón, debajo del sofá','fb_search_t':'¿Dónde buscaste?','fb_search_h':'p. ej. cocina, armario (opcional)','fb_send':'Enviar','fb_cancel':'Cancelar','fb_thanks':'Comentario recibido, gracias.','fb_weak':'Esta ubicación tiene poca confianza — el mapa solo reduce el área de búsqueda.','fb_level':'Confianza de la ubicación: ','fb_ok_found':'Guardado — nos ayudaste a mejorar el motor.','fb_ok_miss':'Guardado — nos ayudaste a corregir este error.'},
+  'ar': {'title':'Horary Oracle','subtitle':'لغة اللحظة','hint':'اسأل كأنك تدردش','send':'إرسال','loc':'الموقع','clear':'مسح','copy':'نسخ','listen':'استماع','chart':'الخريطة','asc':'الطالع','moon':'القمر','fb_q':'هل وجدت ما تبحث عنه؟','fb_sub':'ساعدنا في تصحيح المحرك.','fb_found':'وجدته','fb_notfound':'لم أجده','fb_where_t':'أين وجدته؟','fb_where_h':'مثال: غرفة المعيشة، تحت الأريكة','fb_search_t':'أين بحثت؟','fb_search_h':'مثال: المطبخ، الخزانة (اختياري)','fb_send':'إرسال','fb_cancel':'إلغاء','fb_thanks':'تم استلام ملاحظاتك، شكرًا.','fb_weak':'تقدير الموقع ضعيف الثقة — الخريطة تضيق نطاق البحث فقط.','fb_level':'ثقة تقدير الموقع: ','fb_ok_found':'تم الحفظ — ساعدتنا في تحسين المحرك.','fb_ok_miss':'تم الحفظ — ساعدتنا في تصحيح هذا الخطأ.'},
+  'pt': {'title':'Horary Oracle','subtitle':'LINGUAGEM DO MOMENTO','hint':'Pergunte como conversando','send':'Enviar','loc':'Local','clear':'Limpar','copy':'Copiar','listen':'Ouvir','chart':'Mapa','asc':'Asc','moon':'Lua','fb_q':'Você encontrou o que procurava?','fb_sub':'Ajude-nos a corrigir o motor.','fb_found':'Encontrei','fb_notfound':'Não encontrei','fb_where_t':'Onde você encontrou?','fb_where_h':'ex.: sala, debaixo do sofá','fb_search_t':'Onde você procurou?','fb_search_h':'ex.: cozinha, armário (opcional)','fb_send':'Enviar','fb_cancel':'Cancelar','fb_thanks':'Comentário recebido, obrigado.','fb_weak':'Esta localização tem baixa confiança — o mapa apenas reduz a área de busca.','fb_level':'Confiança da localização: ','fb_ok_found':'Salvo — você nos ajudou a melhorar o motor.','fb_ok_miss':'Salvo — você nos ajudou a corrigir este erro.'},
+  'fr': {'title':'Horary Oracle','subtitle':'LANGAGE DU MOMENT','hint':'Demandez en discutant','send':'Envoyer','loc':'Lieu','clear':'Effacer','copy':'Copier','listen':'Écouter','chart':'Carte','asc':'Asc','moon':'Lune','fb_q':'Avez-vous trouvé ce que vous cherchiez ?','fb_sub':'Aidez-nous à corriger le moteur.','fb_found':'Trouvé','fb_notfound':'Introuvable','fb_where_t':'Où l\'avez-vous trouvé ?','fb_where_h':'ex. salon, sous le canapé','fb_search_t':'Où avez-vous cherché ?','fb_search_h':'ex. cuisine, armoire (facultatif)','fb_send':'Envoyer','fb_cancel':'Annuler','fb_thanks':'Retour reçu, merci.','fb_weak':'Cette localisation est peu fiable — la carte ne réduit que la zone de recherche.','fb_level':'Fiabilité de la localisation : ','fb_ok_found':'Enregistré — vous nous aidez à améliorer le moteur.','fb_ok_miss':'Enregistré — vous nous aidez à corriger cette erreur.'},
+  'de': {'title':'Horary Oracle','subtitle':'SPRACHE DES MOMENTS','hint':'Frag wie im Gespräch','send':'Senden','loc':'Ort','clear':'Löschen','copy':'Kopieren','listen':'Anhören','chart':'Horoskop','asc':'Asz','moon':'Mond','fb_q':'Hast du gefunden, was du gesucht hast?','fb_sub':'Hilf uns, die Engine zu korrigieren.','fb_found':'Gefunden','fb_notfound':'Nicht gefunden','fb_where_t':'Wo hast du es gefunden?','fb_where_h':'z. B. Wohnzimmer, unter dem Sofa','fb_search_t':'Wo hast du gesucht?','fb_search_h':'z. B. Küche, Schrank (optional)','fb_send':'Senden','fb_cancel':'Abbrechen','fb_thanks':'Rückmeldung erhalten, danke.','fb_weak':'Diese Ortsangabe ist unsicher — die Karte grenzt nur das Suchgebiet ein.','fb_level':'Zuverlässigkeit der Ortsangabe: ','fb_ok_found':'Gespeichert — Sie helfen uns, die Engine zu verbessern.','fb_ok_miss':'Gespeichert — Sie helfen uns, diesen Fehler zu korrigieren.'},
+  'ru': {'title':'Horary Oracle','subtitle':'ЯЗЫК МОМЕНТА','hint':'Спроси как в беседе','send':'Отправить','loc':'Место','clear':'Очистить','copy':'Копировать','listen':'Слушать','chart':'Карта','asc':'Асц','moon':'Луна','fb_q':'Вы нашли то, что искали?','fb_sub':'Помогите нам исправить алгоритм.','fb_found':'Нашёл','fb_notfound':'Не нашёл','fb_where_t':'Где вы это нашли?','fb_where_h':'например, зал, под диваном','fb_search_t':'Где вы искали?','fb_search_h':'например, кухня, шкаф (необязательно)','fb_send':'Отправить','fb_cancel':'Отмена','fb_thanks':'Отзыв получен, спасибо.','fb_weak':'Эта локация недостоверна — карта лишь сужает область поиска.','fb_level':'Надёжность локации: ','fb_ok_found':'Сохранено — вы помогаете улучшить алгоритм.','fb_ok_miss':'Сохранено — вы помогаете исправить эту ошибку.'},
+  'it': {'title':'Horary Oracle','subtitle':'LINGUAGGIO DEL MOMENTO','hint':'Chiedi come chiacchierando','send':'Invia','loc':'Posizione','clear':'Pulisci','copy':'Copia','listen':'Ascolta','chart':'Carta','asc':'Asc','moon':'Luna','fb_q':'Hai trovato quello che cercavi?','fb_sub':'Aiutaci a correggere il motore.','fb_found':'Trovato','fb_notfound':'Non trovato','fb_where_t':'Dove l\'hai trovato?','fb_where_h':'es. soggiorno, sotto il divano','fb_search_t':'Dove hai cercato?','fb_search_h':'es. cucina, armadio (facoltativo)','fb_send':'Invia','fb_cancel':'Annulla','fb_thanks':'Feedback ricevuto, grazie.','fb_weak':'Questa posizione ha bassa attendibilità — la mappa restringe solo l\'area di ricerca.','fb_level':'Attendibilità posizione: ','fb_ok_found':'Salvato — ci hai aiutato a migliorare il motore.','fb_ok_miss':'Salvato — ci hai aiutato a correggere questo errore.'},
+  'hi': {'title':'Horary Oracle','subtitle':'क्षण की भाषा','hint':'दोस्त से बात जैसे पूछें','send':'भेजें','loc':'स्थान','clear':'साफ करें','copy':'कॉपी','listen':'सुनें','chart':'कुंडली','asc':'लग्न','moon':'चंद्र','fb_q':'क्या आपको वह चीज़ मिली जो आप ढूँढ रहे थे?','fb_sub':'इंजन को सुधारने में हमारी मदद करें।','fb_found':'मिला','fb_notfound':'नहीं मिला','fb_where_t':'आपको यह कहाँ मिला?','fb_where_h':'जैसे बैठक, सोफे के नीचे','fb_search_t':'आपने कहाँ खोजा?','fb_search_h':'जैसे रसोई, अलमारी (वैकल्पिक)','fb_send':'भेजें','fb_cancel':'रद्द करें','fb_thanks':'आपकी प्रतिक्रिया मिली, धन्यवाद।','fb_weak':'यह स्थान अनिश्चित है — नक्शा केवल खोज क्षेत्र सीमित करता है।','fb_level':'स्थान का विश्वास स्तर: ','fb_ok_found':'सहेजा गया — आपने इंजन सुधारने में मदद की।','fb_ok_miss':'सहेजा गया — आपने इस गलती को सुधारने में मदद की।'},
 };
+
+// Widget'lar icinde de kullanilabilsin diye dil parametresi alan
+// surum. _HoraryHomeState.tr bunu sarar.
+String trL(String lang, String k) => _t[lang]?[k] ?? _t['tr']![k]!;
 
 class HoraryApp extends StatelessWidget {
   const HoraryApp({super.key});
@@ -147,7 +151,7 @@ class _HoraryHomeState extends State<HoraryHome> {
   String _ad='', _soyad='';
   Timer? _ticker;
 
-  String tr(String k) => _t[lang]?[k] ?? _t['tr']![k]!;
+  String tr(String k) => trL(lang, k);
   bool get _showRadar {
     final q = _lastQuestion.toLowerCase();
     return q.contains('nerede') || q.contains('nerde') || q.contains('nere') || q.contains('kayip') || q.contains('kayıp') || q.contains('tasin') || q.contains('taşın') || q.contains('nereye');
@@ -468,7 +472,7 @@ class _HoraryHomeState extends State<HoraryHome> {
         ]), centerTitle: true,
         actions: [
           if(_credits>=0) Padding(padding: const EdgeInsets.only(right:4, top:12), child: Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: const Color(0xFF2a1f38), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFC9A96E).withOpacity(0.4))), child: Center(child: Text("$_credits kredi", style: const TextStyle(color: Color(0xFFC9A96E), fontSize:10, fontWeight: FontWeight.bold))))),
-          if(_plan.isNotEmpty) Padding(padding: const EdgeInsets.only(right:8, top:10), child: Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:6), decoration: BoxDecoration(gradient: LinearGradient(colors: _plan=='elite' ? [Color(0xFFFFD700), Color(0xFFD4AF37)] : _plan=='premium' ? [Color(0xFFC9A96E), Color(0xFF8a6d3b)] : [Color(0xFF6a9ae2), Color(0xFF4a6fa5)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: (_plan=='elite' ? Color(0xFFFFD700) : Color(0xFFC9A96E)).withOpacity(0.5), blurRadius:8)], border: Border.all(color: Colors.white.withOpacity(0.3))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(_plan=='elite' ? Icons.star : Icons.workspace_premium, size:14, color: Colors.black), const SizedBox(width:4), Text(_plan.toUpperCase(), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold, letterSpacing:1))]))),
+          if(_plan.isNotEmpty) Padding(padding: const EdgeInsets.only(right:8, top:10), child: Container(padding: const EdgeInsets.symmetric(horizontal:10, vertical:6), decoration: BoxDecoration(gradient: LinearGradient(colors: _planColors(_plan), begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: _planColors(_plan)[0].withOpacity(0.5), blurRadius:8)], border: Border.all(color: Colors.white.withOpacity(0.3))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(_planIcon(_plan), size:14, color: Colors.black), const SizedBox(width:4), Text(_planLabel(_plan), style: const TextStyle(color: Colors.black, fontSize:11, fontWeight: FontWeight.bold, letterSpacing:1))]))),
           IconButton(onPressed: ()=> setState(() { _chat.clear(); _lastChart=null; _showLanding=true; _showDetails=false; _lastQuestion=''; _ctrl.clear(); }), icon: const Icon(Icons.delete_outline, color: Color(0xFFa898c0), size:20), tooltip: 'Clear'),
         ],
       ),
@@ -612,6 +616,9 @@ class _HoraryHomeState extends State<HoraryHome> {
                         onPressed: (){ _ctrl.text = s; _ask(); },
                       ),
                     ])),
+                    // ---- 'Dogrumuydu?' - yalnizca konum sorusunda gosterilir ----
+                    if(!isUser && m['meta']?['feedback_token'] != null && m['meta']?['verdict']=='LOCATION')
+                      _FeedbackWidget(meta: m['meta'] as Map<String,dynamic>, lang: lang),
                   ])));
             }),
           if(_loading) const Padding(padding: EdgeInsets.symmetric(vertical:6), child: LinearProgressIndicator(color: Color(0xFFC9A96E))),
@@ -654,6 +661,199 @@ class _HoraryHomeState extends State<HoraryHome> {
     );
   }
 }
+
+// 3 kademe: Temel(basic) / Gelismis(plus) / En iyi(pro).
+// Eski elite/premium degerleri de desteklenir (sunucu zaten yeni kademeye
+// map'liyor) ama rozet eski adda gorunmesin.
+const Map<String, List<Color>> _PLAN_COLORS = {
+  'pro': [Color(0xFFFFD700), Color(0xFFD4AF37)],
+  'elite': [Color(0xFFFFD700), Color(0xFFD4AF37)],
+  'master': [Color(0xFFFFD700), Color(0xFFD4AF37)],
+  'max': [Color(0xFFFFD700), Color(0xFFD4AF37)],
+  'plus': [Color(0xFFC9A96E), Color(0xFF8a6d3b)],
+  'sage': [Color(0xFFC9A96E), Color(0xFF8a6d3b)],
+  'seer': [Color(0xFF7fb3d5), Color(0xFF4a6fa5)],
+  'basic': [Color(0xFF6a9ae2), Color(0xFF4a6fa5)],
+  'premium': [Color(0xFF6a9ae2), Color(0xFF4a6fa5)],
+  'oracle': [Color(0xFF6a9ae2), Color(0xFF4a6fa5)],
+};
+const Map<String, String> _PLAN_LABELS = {
+  'pro': 'EN IYI', 'plus': 'GELISMIS', 'basic': 'TEMEL',
+  'elite': 'EN IYI', 'master': 'EN IYI', 'max': 'EN IYI',
+  'sage': 'GELISMIS', 'seer': 'TEMEL',
+  'premium': 'TEMEL', 'oracle': 'TEMEL',
+};
+List<Color> _planColors(String plan) =>
+    _PLAN_COLORS[plan.toLowerCase()] ?? const [Color(0xFF6a9ae2), Color(0xFF4a6fa5)];
+IconData _planIcon(String plan) {
+  final t = _PLAN_LABELS[plan.toLowerCase()] ?? 'TEMEL';
+  return t == 'EN IYI' ? Icons.star : Icons.workspace_premium;
+}
+String _planLabel(String plan) =>
+    _PLAN_LABELS[plan.toLowerCase()] ?? plan.toUpperCase();
+
+// 'Doğru muydu?' - tek tıkla motoru besler.
+// NEDEN: yön tahmininin ortalama hatası 49 derece. Bu veri kendiliğinden
+// büyümez; kullanıcı kalemi bulunca gerçek konumu söyler. 'Bulamadım' da
+// veridir - yön tutmamış demektir.
+// GERİ BİLDİRİM CEVABI ASLA ETKİLEMEZ; sunucu reddederse sessizce geçilir.
+class _FeedbackWidget extends StatefulWidget {
+  final Map<String, dynamic> meta;
+  final String lang;
+  const _FeedbackWidget({required this.meta, required this.lang});
+  @override State<_FeedbackWidget> createState() => _FeedbackWidgetState();
+}
+
+class _FeedbackWidgetState extends State<_FeedbackWidget> {
+  bool _done = false;
+  bool _sending = false;
+
+  Future<void> _send(bool found) async {
+    if (_sending || _done) return;
+    String? where, recast;
+    if (found) {
+      where = await showDialog<String>(
+        context: context,
+        builder: (ctx) => _askDialog(
+          title: trL(widget.lang, 'fb_where_t'),
+          hint: trL(widget.lang, 'fb_where_h'),
+          cta: trL(widget.lang, 'fb_send'),
+        ),
+      );
+      if (where == null) return;
+    } else {
+      recast = await showDialog<String>(
+        context: context,
+        builder: (ctx) => _askDialog(
+          title: trL(widget.lang, 'fb_search_t'),
+          hint: trL(widget.lang, 'fb_search_h'),
+          cta: trL(widget.lang, 'fb_send'),
+          optional: true,
+        ),
+      );
+      if (recast == null) return;
+    }
+    setState(() => _sending = true);
+    final ok = await HoraryApi.sendFeedback(
+      token: widget.meta['feedback_token'] as String,
+      found: found,
+      foundWhere: where,
+      recast: recast,
+    );
+    if (!mounted) return;
+    setState(() { _done = true; _sending = false; });
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(found ? trL(widget.lang, 'fb_ok_found') : trL(widget.lang, 'fb_ok_miss')),
+      ));
+    }
+  }
+
+  Widget _askDialog({
+    required String title,
+    required String hint,
+    required String cta,
+    bool optional = false,
+  }) {
+    final c = TextEditingController();
+    return AlertDialog(
+      backgroundColor: const Color(0xFF1A1423),
+      title: Text(title, style: const TextStyle(color: Color(0xFFC9A96E), fontSize: 16)),
+      content: TextField(
+        controller: c,
+        maxLines: 2,
+        maxLength: 160,
+        style: const TextStyle(color: Color(0xFFe8e0f0), fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFFa898c0), fontSize: 13),
+          counterStyle: const TextStyle(color: Color(0xFFa898c0), fontSize: 10),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, optional ? '' : null),
+          child: Text(trL(widget.lang, 'fb_cancel'), style: const TextStyle(color: Color(0xFFa898c0))),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, c.text.trim()),
+          child: Text(cta, style: const TextStyle(color: Color(0xFFC9A96E))),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final trust = widget.meta['trust'];
+    final lv = trust?['level'];
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: _done
+          ? Row(children: [
+              const Icon(Icons.check_circle, size: 14, color: Color(0xFF6aae73)),
+              const SizedBox(width: 6),
+              Text(trL(widget.lang, 'fb_thanks'),
+                  style: const TextStyle(color: Color(0xFF6aae73), fontSize: 11)),
+            ])
+          : Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2a1f38),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF6a9ae2).withOpacity(0.45)),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (lv != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      lv == 'zayif' ? trL(widget.lang, 'fb_weak') : '${trL(widget.lang, 'fb_level')}$lv',
+                      style: TextStyle(
+                        color: lv == 'zayif' ? const Color(0xFFfbbf24) : const Color(0xFF6a9ae2),
+                        fontSize: 10,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                Text(trL(widget.lang, 'fb_q'),
+                    style: const TextStyle(color: Color(0xFFe8e0f0), fontSize: 12)),
+                Text(trL(widget.lang, 'fb_sub'),
+                    style: const TextStyle(color: Color(0xFFa898c0), fontSize: 10)),
+                const SizedBox(height: 8),
+                Row(children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _sending ? null : () => _send(true),
+                      icon: const Icon(Icons.check, size: 15, color: Color(0xFF6aae73)),
+                      label: Text(trL(widget.lang, 'fb_found'),
+                          style: const TextStyle(color: Color(0xFF6aae73), fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF6aae73)),
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _sending ? null : () => _send(false),
+                      icon: const Icon(Icons.close, size: 15, color: Color(0xFFfbbf24)),
+                      label: Text(trL(widget.lang, 'fb_notfound'),
+                          style: const TextStyle(color: Color(0xFFfbbf24), fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFfbbf24)),
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                      ),
+                    ),
+                  ),
+                ]),
+              ]),
+            ),
+    );
+  }
+}
+
 
 class MiniChartPainter extends CustomPainter {
   final Map<String,dynamic> data;
