@@ -301,20 +301,34 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         from openai import OpenAI
         client = OpenAI(api_key=key)
         prompt = build_prompt(engine_json, lang)
-        # 3 kademe: oracle 5k -> mini, premium 8k -> 4o, elite 15k -> o1
+        # 3 kademe: oracle 5k -> mini, premium 8k -> gpt-4o, elite 15k -> o1 (reasoning)
         plan = (engine_json.get("user_plan") or engine_json.get("plan") or "").lower()
+        txt = ""
         if plan == "elite":
-            # o1 bos dondugu icin elite de gpt-4o kullan (15k yerine 1200 token)
-            model = "gpt-4o"
-            resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=1200)
+            # o1 REASONING modeli: Responses API (temperature yok), reasoning payı için yüksek tavan.
+            # Önceki "boş döndü" sebebi: chat.completions + temperature/max_tokens; o1 bunları kabul etmez.
+            # HORARY_ELITE_MODEL=gpt-4o ile kod değiştirmeden eski moda dönülebilir.
+            elite_model = os.getenv("HORARY_ELITE_MODEL", "o1")
+            if elite_model.startswith("o") and elite_model != "o1":
+                print(f"[elite] {elite_model} soylem API'si desteklenmiyor, o1 kullanilacak", flush=True)
+                elite_model = "o1"
+            try:
+                r = client.responses.create(model=elite_model, input=prompt, max_output_tokens=4000)
+                txt = (getattr(r, "output_text", "") or "").strip()
+            except Exception as e1:
+                print(f"[elite] {elite_model} basarisiz ({type(e1).__name__}: {str(e1)[:180]}) -> gpt-4o'ya dusuluyor", flush=True)
+            if not txt:
+                resp = client.chat.completions.create(model="gpt-4o", messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=2000)
+                txt = (resp.choices[0].message.content or "").strip()
         elif plan == "premium":
             model = "gpt-4o"
             resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
+            txt = (resp.choices[0].message.content or "").strip()
         else:
             # oracle 5k ve digerleri
             model = "gpt-4o-mini"
             resp = client.chat.completions.create(model=model, messages=[{"role":"user","content":prompt}], temperature=0.3, max_tokens=800)
-        txt = (resp.choices[0].message.content or "").strip()
+            txt = (resp.choices[0].message.content or "").strip()
         if not txt:
             raise ValueError("LLM bos dondu")
         # son doğrulama katmanı: gezegen burç halüsinasyonunu motorla düzelt
