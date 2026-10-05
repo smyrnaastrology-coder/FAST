@@ -314,13 +314,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planProFeat2 => 'Personal astrology interpretation';
 
   @override
-  String get planProFeat3 => 'Unlimited messages to your astrologer';
+  String get planProFeat3 => '1 year update right';
 
   @override
-  String get planProFeat4 => '1 year update right';
-
-  @override
-  String get planProFeat5 => 'Priority support';
+  String get planProFeat4 => 'Priority support';
 
   @override
   String get testimonialsTitle => 'User Reviews';

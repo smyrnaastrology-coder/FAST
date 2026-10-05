@@ -27,13 +27,12 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        <!-- Supabase OAuth geri dönüşü (deep link com.fastastrology.fast://login-callback) -->
-        <activity
-            android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
-            android:exported="true"
-            android:taskAffinity="">
-            <intent-filter android:label="flutter_web_auth_2">
+            <!-- Supabase OAuth geri dönüşü (deep link com.fastastrology.fast://login-callback).
+                 supabase_flutter'ın app_links gözlemcisi ancak bu activity'ye
+                 intent geldiğinde tetiklenir; bu yüzden filter MainActivity'de
+                 olmalı (flutter_web_auth_2 CallbackActivity'de tutulursa
+                 app_links hiç tetiklenmez ve giriş sessizce başarısız olur). -->
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>

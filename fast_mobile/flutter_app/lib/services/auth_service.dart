@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/widgets.dart' show AppLifecycleListener;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../config/api_config.dart';
 import 'revenuecat_service.dart';
 
@@ -165,76 +165,64 @@ class AuthService {
   /// Kullanıcı OAuth ekranını kapatıp vazgeçti — hata değil, sessiz çıkış.
   static bool isCancellation(Object e) => e is OAuthCancelled;
 
-  /// OAuth akışı (PKCE): yetkilendirme URL'si al → tarayıcı → deep link dönüşü.
+  /// OAuth akışı: `signInWithOAuth` tarayıcıyı açar, deep link dönüşünü
+  /// supabase_flutter'ın yerleşik gözlemcisi (app_links) yakalar ve
+  /// `getSessionFromUrl` ile oturumu kendisi kurar.
+  ///
+  /// flutter_web_auth_2 + CallbackActivity kullanılmıyor: CallbackActivity
+  /// deep link'i tüketip MainActivity'ye ulaştırmadığı için app_links
+  /// tetiklenmiyor, ayrıca plugin uygulama `resumed` olduğunda bekleyen
+  /// çağrıyı iptal edip sessizce boşa düşürüyordu.
+  ///
+  /// Dönüşü beklemek için `onAuthStateChange` dinlenir. Kullanıcı tarayıcıyı
+  /// kapatırsa uygulama resume olur ama oturum gelmez; o durum iptal sayılır.
   static Future<void> _oauthLogin(OAuthProvider provider) async {
     if (!enabled) throw StateError('supabase_disabled');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_rememberKey, true);
 
-    // 1) Yetkilendirme URL'sini al (tarayıcıyı kendimiz açacağız)
-    final String authUrl;
+    final oturum = Completer<void>();
+    final resume = Completer<void>();
+
+    final durumSub = Supabase.instance.client.auth.onAuthStateChange.listen((d) {
+      if (d.session != null && !oturum.isCompleted) {
+        _applySession(d.session);
+        oturum.complete();
+      }
+    });
+    final yasam = AppLifecycleListener(
+      onResume: () {
+        if (!resume.isCompleted) resume.complete();
+      },
+    );
+
     try {
-      final oauthRes = await Supabase.instance.client.auth.getOAuthSignInUrl(
-        provider: provider,
+      await Supabase.instance.client.auth.signInWithOAuth(
+        provider,
         redirectTo: _redirectUri,
       );
-      authUrl = oauthRes.url;
-    } catch (e) {
-      throw StateError('Yetkilendirme adresi alınamadı: $e');
-    }
-    if (authUrl.isEmpty) throw StateError('Yetkilendirme adresi boş döndü.');
 
-    // 2) Tarayıcıyı aç, deep link dönüşünü bekle
-    final String callbackUrl;
-    try {
-      callbackUrl = await FlutterWebAuth2.authenticate(
-        url: authUrl,
-        callbackUrlScheme: _callbackScheme,
-      );
-    } on PlatformException catch (e) {
-      // Kullanıcı ekranı kapattı — bu hata değil, normal çıkış.
-      if (e.code == 'CANCELED') throw const OAuthCancelled();
-      throw StateError('Tarayıcı açılamadı (${e.code}): ${e.message}');
-    } catch (e) {
-      throw StateError('Tarayıcı hatası: $e');
+      // Tarayıcı kapanana kadar bekle, sonra deep link'in işlenmesi için
+      // kısa bir tolerans tanı.
+      await resume.future;
+      if (!oturum.isCompleted) {
+        try {
+          await oturum.future.timeout(const Duration(seconds: 8));
+        } on TimeoutException {
+          throw StateError(
+              'Giriş dönüşü alınamadı. Deep link kaydı: $_redirectUri');
+        }
+      }
+    } finally {
+      yasam.dispose();
+      await durumSub.cancel();
     }
 
-    // 3) Dönüş URL'ini doğrula. Sessizce geçip oturumsuz kalmak yerine
-    //    gelen ne ise bildir.
-    final uri = Uri.tryParse(callbackUrl);
-    if (uri == null) {
-      throw StateError('Dönüş adresi okunamadı: ${_kisa(callbackUrl)}');
+    if (!isLoggedIn) {
+      _applySession(Supabase.instance.client.auth.currentSession);
     }
-    final q = uri.queryParameters;
-    final frag = Uri.splitQueryString(uri.fragment);
-
-    final providerError = q['error'] ?? frag['error'];
-    if (providerError != null && providerError.isNotEmpty) {
-      final desc = q['error_description'] ?? frag['error_description'] ?? '';
-      throw StateError('$providerError${desc.isEmpty ? '' : ' — $desc'}');
-    }
-
-    final oturumVar = q.containsKey('code') ||
-        frag.containsKey('access_token') ||
-        frag.containsKey('refresh_token');
-    if (!oturumVar) {
-      throw StateError(
-          'Dönüş adresinde oturum yok (code/access_token yok). '
-          '$_redirectUri — dönüş: ${_kisa(callbackUrl)}');
-    }
-
-    // 4) Dönüş URL'inden session'ı al
-    try {
-      final sessionRes = await Supabase.instance.client.auth
-          .getSessionFromUrl(uri);
-      _applySession(sessionRes.session);
-    } catch (e) {
-      throw StateError('Oturum oluşturulamadı: $e');
-    }
+    if (!isLoggedIn) throw StateError('Oturum oluşturulmadı.');
   }
-
-  static String _kisa(String s) =>
-      s.length <= 110 ? s : '${s.substring(0, 110)}...';
 
 
   static Future<void> signOut() async {

@@ -673,20 +673,14 @@ abstract class AppLocalizations {
   /// No description provided for @planProFeat3.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited messages to your astrologer'**
+  /// **'1 year update right'**
   String get planProFeat3;
 
   /// No description provided for @planProFeat4.
   ///
   /// In en, this message translates to:
-  /// **'1 year update right'**
-  String get planProFeat4;
-
-  /// No description provided for @planProFeat5.
-  ///
-  /// In en, this message translates to:
   /// **'Priority support'**
-  String get planProFeat5;
+  String get planProFeat4;
 
   /// No description provided for @testimonialsTitle.
   ///

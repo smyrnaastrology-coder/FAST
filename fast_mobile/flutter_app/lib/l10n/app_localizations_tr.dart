@@ -314,13 +314,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planProFeat2 => 'Kişisel astroloji yorumu';
 
   @override
-  String get planProFeat3 => 'Astroloğa sınırsız mesaj gönderme hakkı';
+  String get planProFeat3 => '1 yıl güncelleme hakkı';
 
   @override
-  String get planProFeat4 => '1 yıl güncelleme hakkı';
-
-  @override
-  String get planProFeat5 => 'Öncelikli destek';
+  String get planProFeat4 => 'Öncelikli destek';
 
   @override
   String get testimonialsTitle => 'Kullanıcı Yorumları';

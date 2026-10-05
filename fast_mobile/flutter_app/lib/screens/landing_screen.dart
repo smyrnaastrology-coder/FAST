@@ -107,9 +107,10 @@ class _LandingScreenState extends State<LandingScreen> {
     },
     {
       'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 49.99, 'productId': 'sub_daily_yearly', 'interval': 'year', 'desc': l10n.planProDesc,
-      'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4, l10n.planProFeat5],
+      'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4],
       'disabled': <String>[],
       'highlight': false,
+      'goldBtn': true,
     },
   ];
 
@@ -696,6 +697,8 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _planCard(Map p, AppLocalizations l10n) {
     final highlight = p['highlight'] as bool;
+    // Pro karti one cikarilmamis olsa da butonu altin olsun.
+    final goldBtn = highlight || (p['goldBtn'] as bool? ?? false);
     final price = p['price'] as num;
     // RevenueCat'ten bölgesel fiyat: ürün ID'sine göre (örn. '7.99').
     // Yoksa eski TL kopya ile fallback.
@@ -747,7 +750,7 @@ class _LandingScreenState extends State<LandingScreen> {
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                child: highlight
+                child: goldBtn
                     ? _goldBtn(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), () => _onPlanTap(p, l10n), height: 48, fontSize: 14)
                     : OutlinedButton(
                         onPressed: () => _onPlanTap(p, l10n),

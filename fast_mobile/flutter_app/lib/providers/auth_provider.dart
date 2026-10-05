@@ -37,9 +37,15 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await action();
-      _status = AuthService.isLoggedIn ? AuthStatus.signedIn : AuthStatus.signedOut;
+      // Hata atmamış olması oturumun kurulduğu anlamına gelmez. Sessiz
+      // başarısızlığı önlemek için oturumu burada da doğrula.
+      final giris = AuthService.isLoggedIn;
+      _status = giris ? AuthStatus.signedIn : AuthStatus.signedOut;
+      if (!giris) {
+        _error = 'Oturum oluşturulamadı. Lütfen tekrar dene.';
+      }
       notifyListeners();
-      return true;
+      return giris;
     } catch (e) {
       // OAuth ekranı kapatıldıysa hata mesajı gösterme.
       if (!AuthService.isCancellation(e)) _error = e.toString();
