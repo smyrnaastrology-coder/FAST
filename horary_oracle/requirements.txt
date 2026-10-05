@@ -11,5 +11,6 @@ numpy>=1.24.0
 geopy>=2.4.0
 pytz>=2023.3
 timezonefinder>=6.2.0
-openai>=1.0.0
+# Responses API (engine.tiers reasoning modelleri: o1 / gpt-5.6) 1.66.0 ile geldi.
+openai>=1.66.0
 pytest>=7.4.0
