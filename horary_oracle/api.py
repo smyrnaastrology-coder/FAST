@@ -746,6 +746,17 @@ async def cast(req: CastRequest):
         if is_visitor_why: hidden.append("WHY: 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat")
         if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
         engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
+    # GUVEN KATMANI hesaplaniyor; talimat sona eklenir (asagida).
+    _trust_txt = ""
+    if res["verdict"] == "LOCATION":
+        try:
+            from engine import location_trust as _LT
+            _trust = _LT.assess(_cal3, qtype_g)
+            engine_json.update(_LT.engine_fields(_trust))
+            loc_info.update(_LT.engine_fields(_trust))   # 'location' altinda da gorunsun
+            _trust_txt = _LT.prompt_text(_trust)
+        except Exception as _e_tr:
+            print(f"guven katmani hatasi: {_e_tr}")
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
     if res["verdict"] == "LOCATION" and loc_info.get("proximity"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu ve gösterge bir açıya (ASC/MC/DSC/IC) çok yakın (" + str(loc_info.get("proximity_angle","")) + " ≤10°) — kural: KİŞİ SORANA ÇOK YAKINDIR. Cevabında kişinin hemen yakınlarda/aynı mekanda olduğunu söyle; km çarpım formülü bu durumda GEÇERSİZ, HİÇBİR km/metre rakamı verme. Yine de 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']' kısımlarını rapor et (kişinin hangi yönde durduğuna işaret eder). Gösterge: " + str(loc_info.get('_qr_ruler_klasik','')) + "."
@@ -777,7 +788,15 @@ async def cast(req: CastRequest):
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     elif res["verdict"] == "LOCATION" and loc_info.get("qq_distance_km"):
-        engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']'. MESAFE: KESİNLİKLE kendi hesap/çarpma yapma ve 'qq_distance_km' dışında başka hiçbir km/metre rakamı verme. location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), formülünün 'Yükselen yönetici derecesi × sorulanın derecesi × 10' olduğunu kısaca belirt. Yükselen yöneticisi (klasik tablo): location['_qr_ruler_klasik']. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma."
+        if loc_info.get("trust_level") == "zayif":
+            engine_json["loc_instruction"] = ("Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, "
+                "birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: "
+                "location['sign_direction']'. MESAFE: HİÇBİR km/metre rakamı verme - bu soru tipi "
+                "için mesafe hesabı kalibre edilmedi, rakam vermek yanlış yönlendirir. "
+                "Yönü 'harita şu yana işaret ediyor' diye tahmin olarak sun. "
+                "location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma.")
+        else:
+            engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu. Yönü İKİ kısımda rapor et, birbirine karıştırma: 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']'. MESAFE: KESİNLİKLE kendi hesap/çarpma yapma ve 'qq_distance_km' dışında başka hiçbir km/metre rakamı verme. location['qq_distance_km'] değerini aynen 'km' cinsinden söyle (örneğin 'yaklaşık 1514 km'), formülünün 'Yükselen yönetici derecesi × sorulanın derecesi × 10' olduğunu kısaca belirt. Yükselen yöneticisi (klasik tablo): location['_qr_ruler_klasik']. location['distance'] (metre) değerini ana mesafe olarak kullanma. location['saturn_second'] sadece ikinci doğal gösterge bilgisi, mesafe hesabına karıştırma."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
@@ -785,6 +804,21 @@ async def cast(req: CastRequest):
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
     if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak":
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " NOT: bu soru kayıp/çalınma değil, gündelik MERAK kategorisinde (manasızlık riski) — kişinin şu an nerede olabileceğini yön+mesafe ile NAZİKÇE söyle, 'gitmiş/dönmüyor/kayıp' gibi kesin telaşlı hüküm ve tehdit tespiti verme. Cevabının SONUNA şunu da ekle: 'Kişi gerçekten kayıpsa veya ulaşamıyorsan bunu ayrıca söyle, kayıp analizi açarım.'"
+    # GUVEN KATMANI: rakam talimati uzmanlik taramasindan SONRA ve ustune eklenir,
+    # boylece onceki kurallar onu ezmiyor.
+    if _trust_txt:
+        engine_json["loc_instruction"] = (engine_json.get("loc_instruction", "") or "") + "\n" + _trust_txt
+        _loc = engine_json.get("location", {})
+        if _loc.get("trust_level") == "zayif":
+            # kalibrasyon bu soru tipini desteklemiyor: rakamli alanlari cevaptan cikar
+            for _k in ("qq_distance_km", "distance", "band", "mesafe_kalibre_km"):
+                _loc.pop(_k, None)
+            _g = _loc.get("horary_geo")
+            if isinstance(_g, dict):
+                _g.pop("band", None)
+                _g.pop("mesafe_kalibre_km", None)
+            _loc["trust_note"] = ("Mesafe hesabi kalibre edilmedi - yalnizca yon ve "
+                                  "ortam tahmini sunulabilir.")
     # --- SPOR GOL DAKİKASI (kullanıcı taktiği: ASC°=1.gol, +2.ev°=2.gol, +3.ev°=3.gol...) ---
     if any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         try:
