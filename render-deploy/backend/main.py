@@ -1161,6 +1161,20 @@ try:
 except Exception:
     pass
 
+
+@app_fast.on_event("startup")
+def _billing_baslangic_kontrolu():
+    """Hak deposunu acilista test et. PostgreSQL kurulu degilse veya
+    erisilemiyorsa bunu KONSOLA yaz — yoksa fail-closed devreye girip
+    kullanici neden indiremedigini anlamak cok zor olur."""
+    import os as _os
+    if not _os.getenv("DATABASE_URL", "").strip():
+        print("[billing] UYARI: DATABASE_URL yok -> haklar DOSYAYA yaziliyor "
+              "(Render free plan disk her deploy'da silinir).")
+        return
+    ok = ensure_schema_ready()
+    print(f"[billing] depolama: {storage_mode()} (sema hazir: {ok})")
+
 _TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc", "/api/debug_ephe"}
 
 # ─── Rate limit (basit, in-memory) ───
@@ -6456,9 +6470,9 @@ def debug_ephe():
 
 # ─── Billing & Entitlement ───
 try:
-    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single
+    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready
 except Exception:
-    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single
+    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready
 
 try:
     from backend.auth import verify_token, get_profile, upsert_profile, list_people, create_person, update_person, delete_person, folder_labels, supabase_enabled
@@ -6584,7 +6598,12 @@ class BillingWebhook(BaseModel):
 
 @app_fast.get("/api/billing/status")
 def billing_status(uid: str = "", device_token: str = ""):
-    return get_status(uid) | {"device_has_free": has_free_used("", device_token) if device_token else False}
+    # storage: haklar gercekte nerede duruyor. "postgres-disi" goruluyorsa
+    # ucretsiz haklar kalici degil ve fail-closed devreye girmis demektir.
+    return get_status(uid) | {
+        "device_has_free": has_free_used("", device_token) if device_token else False,
+        "storage": storage_mode(),
+    }
 
 @app_fast.post("/api/billing/claim-free")
 def claim_free(body: FreeClaim):
@@ -6639,13 +6658,22 @@ async def billing_webhook(request: Request):
         if hmac.compare_digest(auth_val, rc_auth_secret):
             imza_ok = True
 
-    # Geliştirme/test modu: secret tanımlı değilse doğrulamayı atla (logla)
+    # Guvenlik: secret tanimli DEGILSE imzali webhook calismaz. Onceki surumde
+    # dogrulama tamamen atlaniyordu; storage duzeltilince bu, internetteki
+    # herkesin kendine abonelik verebildigi acik endpoint olurdu.
+    # Lokal test icin bilerek ALLOW_UNSIGNED_WEBHOOK=1 verilmelidir.
+    acik_izni = os.getenv("ALLOW_UNSIGNED_WEBHOOK", "").strip().lower() in ("1", "true", "yes")
     debug_mode = not (rc_signing_secret or rc_auth_secret)
     if not imza_ok and not debug_mode:
         print(f"[billing] webhook REDDEDILDI (imza/auth gecersiz) ip={request.client.host if request.client else ''}")
         return JSONResponse(status_code=401, content={"ok": False, "msg": "unauthorized"})
+    if not imza_ok and debug_mode and not acik_izni:
+        print("[billing] webhook REDDEDILDI: REVENUECAT_WEBHOOK_SECRET/AUTH tanimli degil. "
+              "Lokal test icin ALLOW_UNSIGNED_WEBHOOK=1 verin.")
+        # 503: sunucu yapilandirma hatasi -> RevenueCat tekrar denesin, satin alim kaybolmasin
+        return JSONResponse(status_code=503, content={"ok": False, "msg": "webhook not configured"})
     if not imza_ok and debug_mode:
-        print("[billing] webhook doğrulaması ATLANDI (REVENUECAT_WEBHOOK_SECRET/AUTH tanımlı değil)")
+        print("[billing] UYARI: webhook dogrulamasi ATLANDI (ALLOW_UNSIGNED_WEBHOOK=1)")
 
     # RevenueCat payload: api_version kökte, olay alanları .event içinde
     try:

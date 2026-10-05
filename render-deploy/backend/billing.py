@@ -37,12 +37,44 @@ def _hash(s: str) -> str:
 
 
 # ─────────────────────────── Postgres store ───────────────────────────
+_SCHEMA_READY = False
+
+
 def _pg_connect():
     # Geç bağlan; her çağrıda yeni bağlantı (uygulama ömrü kısa, basit tut).
     import psycopg2
-    import psycopg2.extras
-    conn = psycopg2.connect(_DATABASE_URL)
+    conn = psycopg2.connect(_DATABASE_URL, connect_timeout=10)
     return conn
+
+
+def _pg_retry(fn, *a, **kw):
+    """PG işlemini 3 denemeyle dener. Başarılıysa değeri, kalıcı hatada None."""
+    son = None
+    for deneme in range(3):
+        try:
+            return fn(*a, **kw)
+        except Exception as e:
+            son = e
+            print(f"[billing] PG deneme {deneme+1}/3 hata: {e}")
+            time.sleep(1)
+    print(f"[billing] PG KALICI HATA ({fn.__name__}): {son}")
+    return None
+
+
+def ensure_schema_ready(force: bool = False) -> bool:
+    """Şemayı bir kez kurar. Hazırsa True, aksi halde False (fail-closed)."""
+    global _SCHEMA_READY
+    if not _use_pg():
+        return True
+    if _SCHEMA_READY and not force:
+        return True
+    if _pg_retry(_pg_ensure_schema) is None:
+        print("[billing] POSTGRES KULLANILAMIYOR — haklar dosya deposuna yazilacak")
+        return False
+    _SCHEMA_READY = True
+    print("[billing] postgres sema hazir")
+    return True
+
 
 def _pg_ensure_schema():
     """Tabloları yoksa oluştur (idempotent)."""
@@ -76,7 +108,6 @@ def _use_pg() -> bool:
 
 # — subscriptions —
 def _pg_is_subscribed(uid: str) -> bool:
-    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -106,6 +137,7 @@ def _pg_upsert_subscription(uid, product_id, expiry, status, provider):
                   updated=EXCLUDED.updated
             """, (uid, product_id, expiry, status, provider, time.time()))
         conn.commit()
+        return True
     finally:
         conn.close()
 
@@ -118,7 +150,6 @@ def _pg_has_free_used(uid: str, device_token: str) -> bool:
         keys.append(f"dev:{_hash(device_token)}")
     if not keys:
         return False
-    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -141,12 +172,12 @@ def _pg_mark_free_used(uid: str, device_token: str):
                 cur.execute("INSERT INTO billing_free (key, used_at) VALUES (%s,%s) ON CONFLICT DO NOTHING",
                             (f"dev:{_hash(device_token)}", time.time()))
         conn.commit()
+        return True
     finally:
         conn.close()
 
 # — pdf_single —
 def _pg_has_pdf_single(uid: str) -> bool:
-    _pg_ensure_schema()
     conn = _pg_connect()
     try:
         with conn.cursor() as cur:
@@ -168,20 +199,59 @@ def _pg_grant_pdf_single(uid: str, expiry: float):
                 ON CONFLICT (uid) DO UPDATE SET expiry=EXCLUDED.expiry
             """, (uid, expiry))
         conn.commit()
+        return True
     finally:
         conn.close()
 
 
 # ─────────────────────────── Public API (main.py) ───────────────────────────
+def storage_mode() -> str:
+    """Hakların gerçekte nerede durduğunu bildirir (teşhis için)."""
+    if not _use_pg():
+        return "file"
+    if _pg_retry(_pg_is_subscribed, "__probe__") is not None:
+        return "postgres"
+    return "postgres-disi"
+
+
+def _file_has_free_used(uid: str, device_token: str = ""):
+    """None = bilinmiyor (dosya hic yok), True/False = kesin durum."""
+    if not FREE_FILE.exists():
+        return None
+    data = _load(FREE_FILE)
+    if uid and data.get(f"uid:{uid}"):
+        return True
+    if device_token and data.get(f"dev:{_hash(device_token)}"):
+        return True
+    return False
+
+
+def _file_mark_free_used(uid: str, device_token: str = "") -> bool:
+    try:
+        data = _load(FREE_FILE)
+        if uid:
+            data[f"uid:{uid}"] = int(time.time())
+        if device_token:
+            data[f"dev:{_hash(device_token)}"] = int(time.time())
+        _save(FREE_FILE, data)
+        return True
+    except Exception as e:
+        print(f"[billing] dosya yedegi yazilamadi: {e}")
+        return False
+
+
 def is_subscribed(uid: str) -> bool:
     if not uid:
         return False
     if _use_pg():
-        try:
-            return _pg_is_subscribed(uid)
-        except Exception as e:
-            print(f"[billing] PG is_subscribed hatasi -> guvenli false: {e}")
-            return False
+        sonuc = _pg_retry(_pg_is_subscribed, uid)
+        if sonuc is not None:
+            return sonuc
+        rec = _load(SUBS_FILE).get(uid)
+        if rec:
+            return rec.get("status") == "active" and (
+                not rec.get("expiry") or rec.get("expiry", 0) >= time.time())
+        return False
     rec = _load(SUBS_FILE).get(uid)
     if not rec:
         return False
@@ -196,55 +266,49 @@ def upsert_subscription(uid: str, product_id: str, expiry: float = 0, status: st
     if not uid:
         return
     if _use_pg():
-        try:
-            _pg_ensure_schema()
-            _pg_upsert_subscription(uid, product_id, expiry, status, provider)
-        except Exception as e:
-            print(f"[billing] PG upsert hatasi (best-effort dosya): {e}")
-            # PG yoksa en azindan dosyaya yaz (kalici degil ama calistikca hak korunur)
-            subs = _load(SUBS_FILE)
-            subs[uid] = {"product_id": product_id, "expiry": expiry, "status": status, "provider": provider, "updated": time.time()}
-            _save(SUBS_FILE, subs)
-        return
+        if _pg_retry(_pg_upsert_subscription, uid, product_id, expiry, status, provider) is not None:
+            return
+        # PG yoksa en azindan dosyaya yaz (kalici degil ama calistikca hak korunur)
+        print(f"[billing] upsert dosyaya yazildi uid={uid}")
     subs = _load(SUBS_FILE)
     subs[uid] = {"product_id": product_id, "expiry": expiry, "status": status, "provider": provider, "updated": time.time()}
     _save(SUBS_FILE, subs)
 
 def has_free_used(uid: str, device_token: str = "") -> bool:
+    """True = ucretsiz hak kullanimda.
+
+    KRITIK: Onceki surumde PG hatasi durumunda False donuyordu (fail-open).
+    Bu, depolama hic yazilamadiginda herkese SINIRSIZ ucretsiz PDF veriyordu.
+    Artik bilinmiyorsa guvenli tarafa dusulur.
+    """
     if _use_pg():
-        try:
-            return _pg_has_free_used(uid, device_token)
-        except Exception as e:
-            print(f"[billing] PG has_free_used hatasi -> guvenli false: {e}")
+        sonuc = _pg_retry(_pg_has_free_used, uid, device_token)
+        if sonuc is not None:
+            return sonuc
+        # PG okunamadi -> dosyaya dus
+        dosya = _file_has_free_used(uid, device_token)
+        if dosya is not None:
+            return dosya
+        if os.getenv("BILLING_FAIL_CLOSED", "1").strip().lower() in ("0", "false", "no", "off"):
+            print("[billing] UYARI: ucretsiz hak durumu belirlenemedi ve "
+                  "BILLING_FAIL_CLOSED=0 -> indirmeye IZIN verildi (KACAK ACIK)")
             return False
-    data = _load(FREE_FILE)
-    if uid and data.get(f"uid:{uid}"):
+        print("[billing] UYARI: ucretsiz hak durumu belirlenemedi -> "
+              "indirme reddedildi (fail-closed)")
         return True
-    if device_token and data.get(f"dev:{_hash(device_token)}"):
-        return True
-    return False
+    dosya = _file_has_free_used(uid, device_token)
+    return bool(dosya)
 
 def mark_free_used(uid: str, device_token: str = ""):
+    """Ucretsiz hakki tuket. Onceki surumde dosya yedegi YOKTU; PG hatasinda
+    tuketim sessizce kayboluyor ve hak hiç bitmiyordu. Artik her zaman bir
+    depoya yazilir."""
     if _use_pg():
-        # Gecici DNS/ag baglanti hatalarina karsi 3 deneme; hepsi basarisizsa
-        # indirmeyi oldurme (logla, devam et) — dosya hazir, kullanici almali.
-        err = None
-        for deneme in range(3):
-            try:
-                _pg_mark_free_used(uid, device_token)
-                return
-            except Exception as e:
-                err = e
-                print(f"[billing] mark_free_used deneme {deneme+1}/3 hata: {e}")
-                time.sleep(1)
-        print(f"[billing] mark_free_used KALICI hata (indirme engellenmedi): {err}")
-        return
-    data = _load(FREE_FILE)
-    if uid:
-        data[f"uid:{uid}"] = int(time.time())
-    if device_token:
-        data[f"dev:{_hash(device_token)}"] = int(time.time())
-    _save(FREE_FILE, data)
+        if _pg_retry(_pg_mark_free_used, uid, device_token) is not None:
+            return
+        # onceki surumde burasi sessizce geciyordu -> hak kayboluyordu
+        print(f"[billing] mark_free_used PG basarisiz, dosyaya yaziliyor uid={uid}")
+    _file_mark_free_used(uid, device_token)
 
 def get_status(uid: str) -> dict:
     return {
@@ -258,11 +322,9 @@ def has_pdf_single(uid: str) -> bool:
     if not uid:
         return False
     if _use_pg():
-        try:
-            return _pg_has_pdf_single(uid)
-        except Exception as e:
-            print(f"[billing] PG has_pdf_single hatasi -> guvenli false: {e}")
-            return False
+        sonuc = _pg_retry(_pg_has_pdf_single, uid)
+        if sonuc is not None:
+            return sonuc
     data = _load(PURCHASES_FILE)
     val = data.get(uid)
     if val is None:
@@ -277,15 +339,9 @@ def grant_pdf_single(uid: str, expiry: float = 0):
     if not uid:
         return
     if _use_pg():
-        try:
-            _pg_ensure_schema()
-            _pg_grant_pdf_single(uid, expiry)
-        except Exception as e:
-            print(f"[billing] PG grant_pdf_single hatasi (best-effort dosya): {e}")
-            data = _load(PURCHASES_FILE)
-            data[uid] = str(expiry or 0)
-            _save(PURCHASES_FILE, data)
-        return
+        if _pg_retry(_pg_grant_pdf_single, uid, expiry) is not None:
+            return
+        print(f"[billing] grant_pdf_single PG basarisiz, dosyaya yaziliyor uid={uid}")
     data = _load(PURCHASES_FILE)
     data[uid] = str(expiry or 0)
     _save(PURCHASES_FILE, data)
