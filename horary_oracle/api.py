@@ -708,7 +708,7 @@ async def cast(req: CastRequest):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
-    # kullanici plani -> model secimi (oracle 5k mini, premium 8k 4o, elite 20k o1)
+    # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
     try:
         import auth as _auth2
         _db=_auth2._load()
@@ -1056,7 +1056,7 @@ async function load(){
   const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
   (j.users||[]).forEach(u=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="oracle" ${u.plan=='oracle'?'selected':''}>Oracle 5k</option><option value="premium" ${u.plan=='premium'?'selected':''}>Premium 10k</option><option value="elite" ${u.plan=='elite'?'selected':''}>Elite 20k</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
+    tr.innerHTML=`<td>${u.user}</td><td><select onchange="setPlan('${u.user}',this.value)" style="background:#1A1423;color:#e8e0f0;border:1px solid #3d2e50;border-radius:6px;padding:4px"><option value="" ${!u.plan?'selected':''}>-</option><option value="basic" ${u.plan=='basic'?'selected':''}>Temel (gpt-4.1)</option><option value="plus" ${u.plan=='plus'?'selected':''}>Gelisimis (terra)</option><option value="pro" ${u.plan=='pro'?'selected':''}>En iyi (sol)</option><option value="elite" ${u.plan=='elite'?'selected':''}>En iyi (eski elite)</option><option value="premium" ${u.plan=='premium'?'selected':''}>Temel (eski premium)</option></select></td><td>${(u.expiry||'').substring(0,19)}</td><td>${u.is_trial?'evet':''}</td><td>${u.devices}</td><td><button onclick="resetDevices('${u.user}')" style="padding:4px 8px;font-size:11px">Sifirla</button></td>`;
     tb.appendChild(tr);
   });
 }
@@ -1123,7 +1123,8 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
     u=db.get(email)
     if not u:
         return {"error": "kullanici yok"}
-    # 100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL
+    # 100 soru paketleri: Temel 700TL, Gelismis 750TL, En iyi 1500TL
+    # (maliyet x4 = %300 kar; olcum: temel $0.036, gelismis $0.038, en iyi $0.077)
     u["credits"]= (u.get("credits") or 0) + add
     if plan:
         u["plan"]=plan

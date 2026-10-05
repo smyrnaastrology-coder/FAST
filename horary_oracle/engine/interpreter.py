@@ -331,7 +331,7 @@ def _correct_timing_hallucination(text: str, engine_json: dict) -> str:
 
 
 def call_openai(engine_json: dict, lang="tr") -> str:
-    """Yorum katmanlari: engine.tiers merdiveni (local < oracle < premium < elite < master).
+    """Yorum katmanlari: engine.tiers merdiveni (local < basic < plus < pro).
     Bos metin/hatada bir alt katmana dusulur; en altta yerel deterministik yorum vardir."""
     import os
     if not os.getenv("OPENAI_API_KEY"):
