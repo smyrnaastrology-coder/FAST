@@ -36,7 +36,8 @@ class FakeClient:
         self.calls.append((kind, model, kwargs))
         b = self.behavior
         # model -> tier eslemesi (sadece test icin)
-        tid = {v: k for k, v in {"oracle": "gpt-4o-mini", "premium": "gpt-4o",
+        tid = {v: k for k, v in {"oracle": "gpt-4o-mini", "seer": "gpt-4.1",
+                                  "premium": "gpt-4o", "sage": "gpt-5.6-terra",
                                   "elite": "o1", "master": "gpt-5.6-sol"}.items()}.get(model, "local")
         mode = b.get(tid, "ok")
         if mode == "raise":
@@ -90,34 +91,37 @@ def _restore_openai():
 
 def test_ladder_order():
     ids = [t.id for t in T.TIERS]
-    assert ids == ["local", "oracle", "premium", "elite", "master"], ids
+    assert ids == ["local", "oracle", "seer", "premium", "sage", "elite", "master"], ids
     print("OK 1) merdiven sirasi:", " < ".join(ids))
 
 
 def test_plan_mapping():
     assert T.plan_to_tier("elite") == "elite"
     assert T.plan_to_tier("premium") == "premium"
+    assert T.plan_to_tier("seer") == "seer"
+    assert T.plan_to_tier("sage") == "sage"
     assert T.plan_to_tier("") == "oracle"
     assert T.plan_to_tier("xyz") == "oracle"
     print("OK 2) plan -> katman eslemesi")
 
 
 def test_fallback_one_step():
-    fake = _patch_client({"elite": "raise"})         # elite patlar -> premium'a dusmeli
+    fake = _patch_client({"elite": "raise"})         # elite patlar -> sage'e dusmeli
     os.environ["OPENAI_API_KEY"] = "sk-test"
     try:
         txt, used = T.run_ladder("elite", "P", {}, "tr")
     finally:
         _restore_openai()
-    assert used == "premium", used
-    assert txt == "premium metni"
+    assert used == "sage", used
+    assert txt == "sage metni"
     assert fake.calls[0][0] == "responses", fake.calls   # o1 Responses API
-    assert fake.calls[1][0] == "chat", fake.calls         # gpt-4o chat API
-    print("OK 3a) elite hata -> premium'a dusuldu:", used)
+    assert fake.calls[1][0] == "responses", fake.calls   # gpt-5.6-terra da Responses API
+    assert len(fake.calls) == 2, fake.calls              # sage basardi, daha dusulmedi
+    print("OK 3a) elite hata -> tek dusus:", " -> ".join(m for _, m, _ in fake.calls))
 
 
 def test_fallback_empty_text():
-    _patch_client({"elite": ""})                      # elite bos metin -> premium
+    _patch_client({"elite": "", "sage": ""})          # elite bos -> premium'a dusmeli
     os.environ["OPENAI_API_KEY"] = "sk-test"
     try:
         txt, used = T.run_ladder("elite", "P", {}, "tr")
@@ -128,13 +132,14 @@ def test_fallback_empty_text():
 
 
 def test_fallback_all_the_way_to_local():
-    _patch_client({"oracle": "raise", "premium": "", "elite": "raise", "master": "raise"})
+    _patch_client({"oracle": "raise", "seer": "raise", "premium": "", "sage": "",
+                   "elite": "raise"})
     os.environ["OPENAI_API_KEY"] = "sk-test"
     try:
         txt, used = T.run_ladder("elite", "P", {"verdict": "YES", "strictures": []}, "tr")
     finally:
         _restore_openai()
-    # master en ust oldugu icin zincir master->elite->premium->oracle->local
+    # elite -> sage -> premium -> seer -> oracle -> local
     assert used == "local", used
     assert txt and txt.strip(), "yerel katman bos metin verdi!"
     print("OK 4) tum katmanlar basarisiz -> yerel:", used, f"({len(txt)} krkt)")
@@ -145,17 +150,18 @@ def test_no_temperature_on_reasoning_models():
     os.environ["OPENAI_API_KEY"] = "sk-test"
     try:
         for tier, want_kind in (("elite", "responses"), ("master", "responses"),
-                                ("premium", "chat"), ("oracle", "chat")):
+                                ("sage", "responses"),
+                                ("premium", "chat"), ("seer", "chat"), ("oracle", "chat")):
             fake.calls.clear()
             T.run_ladder(tier, "P", {}, "tr")
             kind, model, kw = fake.calls[0]
-            assert kind == want_kind, (tier, kind)
+            assert kind == want_kind, (tier, kind, model)
             if kind == "responses":
                 assert "temperature" not in kw, f"{tier} reasoning modeline temperature gonderildi!"
                 assert "messages" not in kw, f"{tier} Responses API soylem formatinda olmali"
                 assert kw["max_output_tokens"] >= 4000, f"{tier} token tavani cok dusuk -> bos doner!"
-                # o1 'effort' parametresini kabul etmiyor; sadece gpt-5.6 serisi alir
-                if tier == "master":
+                # o1 'effort' parametresini kabul etmiyor; gpt-5.6 serisi alir (minimal de reddedilir)
+                if tier in ("sage", "master"):
                     assert kw.get("reasoning", {}).get("effort") == "high"
                 else:
                     assert "reasoning" not in kw, f"{tier} icin effort gonderilmemeli"
@@ -164,6 +170,21 @@ def test_no_temperature_on_reasoning_models():
     finally:
         _restore_openai()
     print("OK 5) reasoning modellerinde temperature yok, token tavani yuksek")
+
+
+def test_fallback_stays_below_start():
+    """Baslatilan katmandan ASLA ust kademeye atlanmamali (seer -> sage olmamali)."""
+    fake = _patch_client({"seer": "raise"})   # seer asagi dusmeli
+    os.environ["OPENAI_API_KEY"] = "sk-test"
+    try:
+        txt, used = T.run_ladder("seer", "P", {"verdict": "YES", "strictures": []}, "tr")
+    finally:
+        _restore_openai()
+    # seer'in ALTINDA sadece oracle ve local var -> premium/sage ASLA denenmemeli
+    assert used == "oracle", used
+    models = [m for _, m, _ in fake.calls]
+    assert models == ["gpt-4.1", "gpt-4o-mini"], models
+    print("OK 7) seer -> sadece asagi dustu (premium/sage denenmedi):", models)
 
 
 def test_no_key_goes_local():
@@ -182,4 +203,5 @@ if __name__ == "__main__":
     test_fallback_all_the_way_to_local()
     test_no_temperature_on_reasoning_models()
     test_no_key_goes_local()
-    print("test_tiers: 8/8 OK")
+    test_fallback_stays_below_start()
+    print("test_tiers: 9/9 OK")
