@@ -255,6 +255,17 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
             prompt += f"\n\nGERÇEK GEZEGEN BURÇLARI (SADECE BUNU KULLAN, ASLA UYDURMA): {_plist}"
             prompt += "\nYUKARIDAKİ BURÇLAR DIŞINDA HİÇBİR GEZEGEN BURCU YAZMA. Venüs Akrep ise Terazi yazma, Satürn Koç ise Oğlak yazma."
     except: pass
+    # SURE KILIDI: model kendi sure uyduruyor (motor 40 YIL derken "6 gün" yaziyordu).
+    # Motorun hesapladigi sure tek dogrudur - metinde baska sure YAZMA.
+    try:
+        _t = (engine_json.get("timing") or {}).get("text") or ""
+        if _t:
+            prompt += (f"\n\n⛔ SURE KILIDI: Zamanlama MOTORDA HESAPLANDI = {_t}. "
+                       f"Yanıtında MUTLAKA bu süreyi kullan. Başka bir süre, gün sayısı, ay veya "
+                       f"yıl YAZMA; uydurma süre verme. '2 gün içinde', '6 gün', '17 gün' gibi "
+                       f"kendi tahminini yazma. Eğer süre senin için belirsizse sadece motorun "
+                       f"süresini tekrarla.")
+    except: pass
     if engine_json.get("tone_instruction"):
         prompt += f"\n\nTONE: {engine_json['tone_instruction']}"
     if engine_json.get("pre_summary_instruction"):
@@ -292,6 +303,33 @@ def _correct_planet_hallucination(text: str, engine_json: dict) -> str:
         return text
     except: return text
 
+def _correct_timing_hallucination(text: str, engine_json: dict) -> str:
+    """LLM kendi sure uydurduysa motorun gercek suresiyle degistir.
+
+    Olcum (2026-10): motor '40 YIL' derken gpt-5.6-terra '6 gün', gpt-5.6-sol '6 gün'
+    yaziyordu; motor '30 YIL' derken terra '17 gün' demisti. Bu bir yorum degil,
+    motor verisinin yanlis aktarilmasi - kullaniciya yanlis tarih satar.
+
+    Cozum: metindeki sure kaliplarini bul, motor suresiyle degistir. Motor suresi
+    yoksa dokunma (LLM'in niteliksel 'yakinda/bu mevsimde' ifadeleri serbest kalir).
+    """
+    try:
+        import re
+        real = ((engine_json.get("timing") or {}).get("text") or "").strip()
+        if not real:
+            return text
+        # sure kaliplari: "6-16 gün", "17 gün", "40 yıl", "2 gün içinde", "30 YIL"
+        pat = re.compile(
+            r"\b\d{1,3}(?:\s*[-–—]\s*\d{1,3})?\s*"
+            r"(?:gün|gun|GÜN|Gün|ay|AY|Ay|yıl|YIL|Yıl|hafta|HAFTA|Hafta|"
+            r"day|days|month|months|year|years)\b")
+        out = pat.sub(real, text)
+        if out != text:
+            print(f"[interpreter] sure duzeltildi -> motor: {real}", flush=True)
+        return out
+    except: return text
+
+
 def call_openai(engine_json: dict, lang="tr") -> str:
     """Yorum katmanlari: engine.tiers merdiveni (local < oracle < premium < elite < master).
     Bos metin/hatada bir alt katmana dusulur; en altta yerel deterministik yorum vardir."""
@@ -306,8 +344,9 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         txt, used = run_ladder(want, prompt, engine_json, lang)
         if not txt:
             return mock_interpret(engine_json, lang) + "\n[LLM katmanlarinin hicbiri metin vermedi]"
-        # son dogrulama katmani: gezegen burc halusinasyonunu motorla duzelt
+        # son dogrulama katmanlari: gezegen burc + sure uydurmasini motorla duzelt
         txt = _correct_planet_hallucination(txt, engine_json)
+        txt = _correct_timing_hallucination(txt, engine_json)
         if used == "local":
             txt += "\n[LLM katmanlari kullanilamadi, yerel deterministik yorum verildi]"
         return txt

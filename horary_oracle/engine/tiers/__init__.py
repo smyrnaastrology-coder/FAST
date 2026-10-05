@@ -1,71 +1,73 @@
 # -*- coding: utf-8 -*-
-"""YORUMLAMA KATMANLARI (en kotuden en iyiye) + plan -> katman eslemesi.
+"""YORUMLAMA KALITELERI - 3 SATILABILIR KADEME + 1 YEREL SON CARE.
 
-    local  (deterministik, ucretsiz)      <- anahtar yoksa da son care
-    oracle (gpt-4o-mini)                  <- en ucuz hizli kademe
-    seer   (gpt-4.1)                      <- ara kademe: hizli + detayli anlatim
-    premium(gpt-4o)                       <- dengeli kademe
-    sage   (gpt-5.6-terra reasoning)      <- hizli reasoning, net hukum
-    elite  (o1 reasoning)                 <- en derin gerekce zinciri
-    master (gpt-5.6-sol)                  <- en kapsamli ust kademe
+    local  deterministik        anahtar yoksa / LLM calismazsa (satilabilir degil)
+    basic  gpt-4.1              KALITE 1 - Temel      $0.036/soru
+    plus   gpt-5.6-terra        KALITE 2 - Gelismis   $0.038/soru
+    pro    gpt-5.6-sol          KALITE 3 - En iyi     $0.077/soru
 
-Bir katman bos metin donerse veya hata verirse OTOMATIK olarak bir altindaki
-katmana dusulur; en altinda yerel deterministik yorum vardir, yani hicbir
-sartta bos cevap donmez.
+Olcum tabani: 5 horary haritasi (spor x2, kayip cocuk, is, para), 47k krkt prompt.
 
-Model degistirmek icin env: HORARY_TIER_ORACLE / _PREMIUM / _ELITE / _MASTER
-(ayrica geriye donuk uyum: HORARY_ELITE_MODEL).
+NEDEN o1 YOK: o1 de 0 hata verdi ama $0.356/soru (pro'nun 4.6 kati) ve 17.6s.
+Ayni isi gpt-5.6-sol 5 kat hizli ve daha yuksek konum dogruluguyla yapiyor
+(13/13 vs 5/5). Satisa koyulmadi.
+
+NEDEN gpt-4o-mini YOK: tek yanlis burc okumasini o yapti (Ay 7° -> "120°").
+
+Bir katman bos metin donerse veya hata verirse OTOMATIK olarak bir ALTINDAKI
+katmana dusulur; en altta yerel deterministik yorum vardir - hicbir sartta
+bos cevap donmez. YukarI kademeye ASLA atlanmaz.
+
+Model degistirmek icin env: HORARY_TIER_BASIC / _PLUS / _PRO
+(ayrica geriye donuk uyum: HORARY_ELITE_MODEL vb.)
 """
 import os
 
 from .base import Ctx, Tier, log
 from .tier_local import TIER as T_LOCAL
-from .tier_oracle import TIER as T_ORACLE
-from .tier_seer import TIER as T_SEER
-from .tier_premium import TIER as T_PREMIUM
-from .tier_sage import TIER as T_SAGE
-from .tier_elite import TIER as T_ELITE
-from .tier_master import TIER as T_MASTER
+from .tier_basic import TIER as T_BASIC
+from .tier_plus import TIER as T_PLUS
+from .tier_pro import TIER as T_PRO
 
-# en kotuden en iyiye (aralik kademeler olcum sonucu eklendi)
-TIERS = [T_LOCAL, T_ORACLE, T_SEER, T_PREMIUM, T_SAGE, T_ELITE, T_MASTER]
+# kotu -> iyi
+TIERS = [T_LOCAL, T_BASIC, T_PLUS, T_PRO]
 
 PLAN_TIER = {
-    "": "oracle",
-    "free": "oracle",
-    "oracle": "oracle",
-    "seer": "seer",
-    "premium": "premium",
-    "sage": "sage",
-    "elite": "elite",
-    "pro": "elite",
-    "master": "master",
-    "max": "master",
+    "": "basic",            # bos plan / deneme -> Temel
+    "free": "basic",
+    "trial": "basic",
+    "basic": "basic",
+    "oracle": "basic",
+    "seer": "basic",
+    "premium": "basic",
+    "plus": "plus",
+    "sage": "plus",
+    "pro": "pro",
+    "elite": "pro",         # eski elite -> en iyi kademe (o1 kaldirildi)
+    "master": "pro",
+    "max": "pro",
 }
 
 
 def plan_to_tier(plan: str) -> str:
-    return PLAN_TIER.get((plan or "").strip().lower(), "oracle")
+    return PLAN_TIER.get((plan or "").strip().lower(), "basic")
 
 
 def tier_index(tier_id: str) -> int:
     for i, t in enumerate(TIERS):
         if t.id == tier_id:
             return i
-    return 0
+    return 1  # bilinmeyen -> basic (local yanlislik olurdu)
 
 
 def tier_labels() -> str:
-    return " < ".join(f"{t.id}({t.label.split('(')[-1].rstrip(')')})" for t in TIERS)
+    return " < ".join(t.id for t in TIERS)
 
 
 def run_ladder(tier_id: str, prompt: str, engine_json: dict, lang: str = "tr"):
     """Verilen katmandan baslar; hata/bos metin olursa KOTUYE DOGRU iner
-    (elite -> premium -> oracle -> local). Asla daha iyi katmana atlamaz.
-    Donus: (metin, kullanilan_tier_id).
-
-    NOT: run_ladder secilen katmandan BASLAR ve asagi iner. Yani seer baslatirsak
-    gpt-4.1'den gpt-4o'ya ve gpt-5.6-terra'ya ASLA cikmaz - onlar ust kademedir."""
+    (pro -> plus -> basic -> local). Asla daha iyi katmana atlamaz.
+    Donus: (metin, kullanilan_tier_id)."""
     start = tier_index(tier_id)
     client = None
     if os.getenv("OPENAI_API_KEY"):

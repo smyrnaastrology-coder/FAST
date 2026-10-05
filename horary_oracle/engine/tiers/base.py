@@ -2,7 +2,7 @@
 """Tier ortak yardimcilar: API cagrisi, bos/incomplete yonetimi, model cozumleme.
 
 ONEMLI (2026 deneyimi):
-- reasoning modelleri (o1/o3/gpt-5*) chat.completions + temperature KABUL ETMEZ.
+- reasoning modelleri (gpt-5.6 serisi) chat.completions + temperature KABUL ETMEZ.
   Dogru yol Responses API: client.responses.create(model, input, max_output_tokens).
 - max_output_tokens dusunce reasoning token'lari tbani yiyip metin BOS doner
   (status=incomplete). Bu yuzden pro/ust modellerde tavan yuksek tutulur.
@@ -51,7 +51,7 @@ def chat_call(client, model: str, prompt: str, max_tokens: int = 800, temperatur
 
 def responses_call(client, model: str, prompt: str, max_output_tokens: int = 4000,
                    effort: Optional[str] = None) -> str:
-    """Responses API (reasoning modelleri: o1 / o3 / gpt-5*). temperature YOK."""
+    """Responses API (reasoning modelleri: gpt-5.6 serisi). temperature YOK."""
     kw = {"model": model, "input": prompt, "max_output_tokens": max_output_tokens}
     if effort:
         kw["reasoning"] = {"effort": effort}
