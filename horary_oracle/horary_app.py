@@ -10,6 +10,60 @@ from core.timezone_utils import otomatik_utc_offset
 from engine.horary_engine import cast_horary_chart
 from engine.interpreter import mock_interpret, call_openai
 
+
+def _render_feedback(st, loc_info, question):
+    """'Dogru muymus?' - tek tikla motoru besler.
+
+    NEDEN: yon tahmininin orta hatasi 49.5 derece. Bu veri kendiliginden
+    buyumez; kullanici kalemi bulunca gercek konumu soyler. 'Bulamadim'
+    cevabi da veridir - yon tutmamis demektir.
+
+    Guvenlik: yanit ASLA degistirilmez, kalibrasyon ASLA kirletilmez.
+    Yalnizca olcum toplanir ve 'found' + konum varsa ileride olcek olusturulur.
+    """
+    try:
+        import engine.location_feedback as FB
+    except Exception:
+        return
+    key = "fb_" + str(abs(hash((question, loc_info.get('deg'), loc_info.get('house')))) % 10**9)
+    if st.session_state.get(key):
+        st.caption("✓ Geri bildirimin kaydedildi — teşekkürler.")
+        return
+    with st.expander("Doğru muydu? (motorumuzu geliştirir)"):
+        st.caption(f"Harita şu yönü gösterdi: **{loc_info.get('direction','')}**"
+                   + (f" / {loc_info.get('sign_direction','')}" if loc_info.get('sign_direction') else ""))
+        c1, c2 = st.columns(2)
+        found = None
+        if c1.button("✓ Buldum", key=key + "_y", use_container_width=True):
+            found = True
+        if c2.button("✗ Bulamadım", key=key + "_n", use_container_width=True):
+            found = False
+        if found is True:
+            where = st.text_input("Nerede buldun? (örn. salon, koltuk altı)",
+                                  key=key + "_w", max_chars=120)
+            if st.button("Gönder", key=key + "_sy", use_container_width=True):
+                try:
+                    FB.record(email="", question=question, question_type="lost_object",
+                              outcome="found", found_where=where,
+                              predicted_dir=loc_info.get('direction', ''))
+                    st.session_state[key] = True
+                    st.success("Kaydedildi. Bu, motorumuzu düzeltir.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Kaydedilemedi: {e}")
+        elif found is False:
+            recast = st.text_input("Nerede aradın? (opsiyonel)", key=key + "_r", max_chars=160)
+            if st.button("Gönder", key=key + "_sn", use_container_width=True):
+                try:
+                    FB.record(email="", question=question, question_type="lost_object",
+                              outcome="not_found",
+                              predicted_dir=loc_info.get('direction', ''), recast=recast)
+                    st.session_state[key] = True
+                    st.success("Kaydedildi. Bu hatayı düzeltmemize yardımcı oluyorsun.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Kaydedilemedi: {e}")
+
 st.set_page_config(page_title="Horary Oracle", page_icon="🔮", layout="centered")
 st.markdown("""
 <style>
@@ -224,6 +278,9 @@ if submitted and question:
     with st.chat_message("assistant"):
         st.success(answer)
         st.caption(f"📍 {loc_info.get('direction','')} {loc_info.get('distance','')} | ⏳ {res.get('timing',{}).get('text','')}")
+        # --- DOGRU MUYMUS? (yalnizca konum sorusunda) ---
+        if res.get("verdict") == "LOCATION":
+            _render_feedback(st, loc_info, question)
         # Ses - tarayıcı TTS (ElevenLabs sonra)
         import streamlit.components.v1 as components
         safe = answer.replace("'"," ").replace('"',' ').replace("\n"," ")

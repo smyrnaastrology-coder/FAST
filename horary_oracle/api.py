@@ -53,6 +53,18 @@ class AuthRequest(BaseModel):
     password: str
     device_id: str | None = None
 
+class FeedbackRequest(BaseModel):
+    """'Doğru muydu?' ekranı. Tek tıkla motoru besler.
+    found=true  -> kalem bulundu, motorun dediği yere yakındı
+    found=false -> bulunamadı, yön tahmini tutmadı (bu da veridir)"""
+    token: str = Field(..., description="cast cevabındaki feedback_token")
+    found: bool = Field(..., description="True=buldum, False=bulamadım")
+    found_where: Optional[str] = Field(None, max_length=200,
+                                        description="bulduysan nerede (serbest metin)")
+    recast: Optional[str] = Field(None, max_length=300,
+                                  description="bulamadıysa neler denendi")
+    note: Optional[str] = Field(None, max_length=300)
+
 class HealthResponse(BaseModel):
     status: str
     version: str
@@ -1059,8 +1071,65 @@ async def cast(req: CastRequest):
         "derived_info": res.get("derived_info"),
         "answer": answer,
         "credits_left": engine_json.get("credits_left"),
+        # GUVEN: yanitta konum guveni ne, cevabi kac kademe yazdi
+        "trust": {
+            "level": engine_json.get("trust_level"),
+            "reason": engine_json.get("trust_reason"),
+            "n_records": engine_json.get("trust_n_type"),
+            "dir_err_deg": engine_json.get("trust_dir_err_deg"),
+        },
+        # 'Dogru muymus?' ekrani icin tek kullanimlik geri bildirim jetonu.
+        # LOCATION olmayan sorularda gonderilmez.
+        "feedback_token": (
+            _fb_make(req.email, req.question, qtype_g, req.lat, req.lon, loc_info)
+            if res["verdict"] == "LOCATION" else None
+        ),
         "meta": {"tz": tzname, "utc_offset": off, "local_dec": round(local_dec,2), "ms": round(dt,1)}
     }
+
+def _fb_make(email, question, question_type, lat, lon, loc_info=None):
+    """Cevapla donen tek kullanimlik geri bildirim jetonu."""
+    try:
+        from engine.location_feedback import make_token
+        return make_token(email, question, question_type, lat, lon,
+                          direction=(loc_info or {}).get("direction", ""))
+    except Exception:
+        return None
+
+
+@app.post("/api/horary/feedback")
+def horary_feedback(payload: FeedbackRequest):
+    """'Dogru muymus?' tik'i. Jeton gecerli degilse kayit alinmaz - kimse
+    motoru bozabilecek rastgele veri enjekte edemez. Geri bildirim yaniti
+    ASLA degistirmez, yalnizca olcum + gelecekteki olcek verisi toplar."""
+    try:
+        from engine import location_feedback as _FB
+        d = _FB.read_token(payload.token)
+        if not d:
+            return {"ok": False, "error": "gecersiz veya suresi dolmus jeton"}
+        _cal = HoraryCalibration()
+        _cal.load()
+        _n = _FB.record(
+            email=d.get("e"), question=d.get("q"), question_type=d.get("t"),
+            outcome="found" if payload.found else "not_found",
+            found_where=payload.found_where,
+            predicted_dir=d.get("dir") or "",
+            trust_level=("zayif" if not _cal.direction_confidence().get("label") == "iyi" else "orta"),
+            recast=payload.recast, note=payload.note,
+        )
+        return {"ok": True, "saved": _n, "thanks":
+                "Buldum" if payload.found else "Kaydettik - motorumuz bu hatayi duzeltecek"}
+    except Exception as _e_fb:
+        return {"ok": False, "error": str(_e_fb)[:200]}
+
+@app.get("/api/horary/feedback/stats")
+def horary_feedback_stats():
+    """Gercek basari orani - pazarlama degil, olcum."""
+    try:
+        from engine import location_feedback as _FB
+        return _FB.stats()
+    except Exception as _e_fs:
+        return {"error": str(_e_fs)[:200]}
 
 # --- ADMIN: sifre uretme paneli ---
 from fastapi import Header as _Header

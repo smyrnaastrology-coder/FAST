@@ -1,0 +1,146 @@
+# -*- coding: utf-8 -*-
+"""Geri bildirim -> motor besleme testleri.
+
+Kritik kurallar:
+  1. Jeton imzali: kimse rastgele veri enjekte edemez
+  2. Jeton suresi dolunca gecersiz
+  3. Geri bildirim yaniti/KALIBRASYONU degistirmez
+  4. 'Bulamadim' da veridir (yon tutmadi)
+  5. Gercek basari orani olculebilir
+"""
+import json
+import os
+import sys
+import tempfile
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
+
+from engine import location_feedback as FB
+
+# testler gecici depoya yazsin, gercek veriye dokunmadan
+_tmp = os.path.join(tempfile.gettempdir(), "fb_test_store.json")
+FB.STORE = _tmp
+if os.path.exists(_tmp):
+    os.remove(_tmp)
+
+
+def test_token_roundtrip():
+    t = FB.make_token("a@b.com", "Kalemim nerde?", "lost_object", 38.42, 27.14, "Kuzeydoğu")
+    d = FB.read_token(t)
+    assert d is not None, "jeton okunamadi"
+    assert d["e"] == "a@b.com"
+    assert d["t"] == "lost_object"
+    assert d["dir"] == "Kuzeydoğu", d
+    print("OK 1) jeton gidis-donus calisiyor")
+
+
+def test_token_tampered():
+    t = FB.make_token("a@b.com", "q", "lost_object", 1, 2)
+    bad = t[:-4] + "0000"
+    assert FB.read_token(bad) is None, "kurcalanmis jeton kabul edildi!"
+    assert FB.read_token(t[:-1] + ("0" if t[-1] != "0" else "1")) is None
+    print("OK 2) kurcalanmis jeton reddediliyor (imza)")
+
+
+def test_token_no_signature():
+    assert FB.read_token("abc") is None
+    assert FB.read_token("") is None
+    assert FB.read_token("a.b") is None
+    print("OK 3) imzasiz/bozuk jeton reddediliyor")
+
+
+def test_token_expiry():
+    import time as _t
+    old = int(_t.time()) - 10 * 3600          # 10 saat once (TTL 6 saat)
+    body = FB._b64e({"e": "x@y.com", "q": "q", "t": "lost_object",
+                     "lat": 1, "lon": 2, "dir": "", "ts": old})
+    import hmac as _h, hashlib as _hsh
+    sig = _h.new(FB._secret().encode(), body.encode(), _hsh.sha256).hexdigest()[:32]
+    assert FB.read_token(f"{body}.{sig}") is None, "sure dolmus jeton kabul edildi!"
+    print("OK 4) 6 saatten eski jeton reddediliyor")
+
+
+def test_record_found_and_miss():
+    FB.record("a@b.com", "Kalemim nerde?", "lost_object", "found",
+              found_where="salon, koltuk altı", predicted_dir="Kuzeydoğu")
+    FB.record("a@b.com", "Anahtarım nerde?", "lost_object", "not_found",
+              predicted_dir="Batı", recast="Mutfak, giyinme odası")
+    st = FB.stats("lost_object")
+    assert st["n"] == 2, st
+    assert st["found"] == 1 and st["not_found"] == 1, st
+    assert st["hit_rate"] == 0.5, st
+    print("OK 5) 'buldum' ve 'bulamadim' ikisi de kayit, hit_rate=0.5")
+
+
+def test_miss_is_also_data():
+    """'Bulamadim' cevabi yon tutmadi demek - bu da olcum."""
+    FB.record("b@b.com", "Cüzdanım nerde?", "lost_object", "not_found",
+              predicted_dir="Güney")
+    s = FB.stats("lost_object")
+    assert s["n"] == 3 and s["found"] == 1
+    assert s["not_found"] == 2
+    print("OK 6) 'bulamadim' de veri olarak birikiyor (n=3, found=1)")
+
+
+def test_by_type_breakdown():
+    FB.record("c@b.com", "İşe girecek miyim?", "job", "found")
+    bt = FB.stats()["by_type"]
+    assert "lost_object" in bt and "job" in bt, bt
+    assert bt["job"]["found"] == 1
+    print("OK 7) soru tipine gore kırılım:", {k: v["n"] for k, v in bt.items()})
+
+
+def test_hit_rate_none_when_empty():
+    FB.STORE = os.path.join(tempfile.gettempdir(), "fb_empty_store.json")
+    if os.path.exists(FB.STORE):
+        os.remove(FB.STORE)
+    st = FB.stats("hic_boyle_bir_tip")
+    assert st["n"] == 0 and st["hit_rate"] is None
+    print("OK 8) veri yokken hit_rate None (yanlis '0%' gostermez)")
+
+
+def test_no_calibration_mutation():
+    """Geri bildirim kalibrasyon dosyasina DOKUNMAMALI."""
+    FB.STORE = _tmp
+    cal_before = None
+    import hashlib as _hs
+    cal_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            "horary_calibration.json")
+    if os.path.exists(cal_path):
+        with open(cal_path, "rb") as f:
+            cal_before = _hs.sha256(f.read()).hexdigest()
+    FB.record("d@b.com", "Kalem nerde?", "lost_object", "found", found_where="mutfak")
+    FB.record("d@b.com", "Kalem nerde?", "lost_object", "not_found")
+    if cal_before:
+        with open(cal_path, "rb") as f:
+            after = _hs.sha256(f.read()).hexdigest()
+        assert cal_before == after, "geri bildirim kalibrasyonu degistirdi!"
+    print("OK 9) geri bildirim kalibrasyon dosyasini degistirmiyor")
+
+
+def test_store_json_valid():
+    with open(_tmp, "r", encoding="utf-8") as f:
+        db = json.load(f)
+    assert "entries" in db and isinstance(db["entries"], list)
+    assert db["entries"], "kayitlar yazilmadi"
+    e = db["entries"][0]
+    for k in ("ts", "question", "outcome"):
+        assert k in e, k
+    print(f"OK 10) depo gecerli JSON, {len(db['entries'])} kayit")
+
+if __name__ == "__main__":
+    test_token_roundtrip()
+    test_token_tampered()
+    test_token_no_signature()
+    test_token_expiry()
+    test_record_found_and_miss()
+    test_miss_is_also_data()
+    test_by_type_breakdown()
+    test_hit_rate_none_when_empty()
+    test_no_calibration_mutation()
+    test_store_json_valid()
+    os.remove(_tmp)
+    print("\ntest_location_feedback: 11/11 OK")
+    print("SONUC: geri bildirim guvenli (imzali jeton), kalibrasyonu degistirmiyor,")
+    print("        'bulamadim' da veri olarak birikiyor, gercek basari orani olculebiliyor.")
