@@ -163,7 +163,8 @@ def _require_account(email):
     if u is None:
         raise HTTPException(401, "kayitli kullanici degil - once giris yap")
     if u.get("credits") is None:
-        u["credits"] = _a.DEFAULT_CREDITS
+        # get_user zaten guvenli deger atiyor; burada ASLA 100 donme.
+        u["credits"] = 0
     return u
 
 @app.post("/api/horary/cast")
@@ -738,8 +739,16 @@ async def cast(req: CastRequest):
     import auth as _auth3
     _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
     _u3 = _auth3.get_user(_email3) or _acct
+    # ONCEDEN: _credits None ise DEFAULT_CREDITS (100) yaziliyordu. Bozuk/eksik
+    # bir kayit aninda 100 bedava soruya donuyordu - kullanicinin "99 kredim
+    # geri 100 oldu" belirtisinin bir parcasi. Artik kirik kayit 0 sayilir ve
+    # kirik oldugu loglanir; sessizce kredi verilmez.
     _credits = _u3.get("credits")
-    if _credits is None: _credits = _auth3.DEFAULT_CREDITS
+    if _credits is None:
+        import sys as _s
+        print(f"[auth] UYARI: {_email3} icin credits okunamadi - soru REDDEDILDI "
+              f"(kayit bozuk olabilir)", file=_s.stderr, flush=True)
+        _credits = 0
     if _credits <= 0:
         # 200 + NO_CREDITS: eski APK bunu yakalayip guzel "kredi bitti" dialogu gosteriyor
         return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
@@ -1208,15 +1217,21 @@ def admin_create(payload: dict, x_admin_key: str = _Header(None)):
     days=int(payload.get("days",2))
     pwd=_auth.create_user(email, days=days)
     # also add bare username alias if email contains @
+    # NOT: alias olusturma tek kilit icinde yapilir; create_user zaten yazdi,
+    # ayri _load/_save yarista kredi hareketini ezebilirdi.
     if "@" in email:
         uname=email.split("@")[0]
-        # create alias with same pwd hash
-        db=_auth._load()
-        if uname not in db:
-            import hashlib as _hl
+        import hashlib as _hl
+        def _mk(db):
+            if uname in db:
+                return
             # alias AYNI bakiyeyi paylasir (once kredisi olmayinca sınırsız sayılıyordu)
-            db[uname]={"pwd":hashlib.sha256(pwd.encode()).hexdigest(),"expiry":db[email]["expiry"],"created":db[email]["created"],"is_trial":db[email].get("is_trial",False),"credits":db[email].get("credits"),"plan":db[email].get("plan",""),"alias_of":email}
-            _auth._save(db)
+            db[uname]={"pwd":_hl.sha256(pwd.encode()).hexdigest(),
+                       "expiry":db[email]["expiry"],"created":db[email]["created"],
+                       "is_trial":db[email].get("is_trial",False),
+                       "credits":db[email].get("credits"),
+                       "plan":db[email].get("plan",""),"alias_of":email}
+        _auth.update(_mk)
     return {"user": email, "password": pwd, "days": days, "expiry": _auth._load().get(email,{}).get("expiry")}
 
 
@@ -1231,17 +1246,22 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
     add=int(payload.get("credits", 100))
     plan=payload.get("plan","")
     import auth as _auth4
-    db=_auth4._load()
-    u=db.get(email)
-    if not u:
-        return {"error": "kullanici yok"}
     # 100 soru paketleri: Temel 700TL, Gelismis 750TL, En iyi 1500TL
     # (maliyet x4 = %300 kar; olcum: temel $0.036, gelismis $0.038, en iyi $0.077)
-    u["credits"]= (u.get("credits") or 0) + add
-    if plan:
-        u["plan"]=plan
-    _auth4._save(db)
-    return {"user": email, "credits": u["credits"], "plan": u.get("plan","")}
+    # Tek kilit icinde: es zamanli kredi harcayan istekle yarismasin.
+    def _add(db):
+        u = db.get(email)
+        if not u:
+            return None
+        u["credits"] = (u.get("credits") or 0) + add
+        if plan:
+            u["plan"] = plan
+        return {"user": email, "credits": u["credits"], "plan": u.get("plan", "")}
+    out = _auth4.update(_add)
+    if out is None:
+        return {"error": "kullanici yok"}
+    _auth4._audit("admin_add", email=email, added=add, credits_left=out["credits"])
+    return out
 
 @app.post("/admin/set_plan")
 def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):

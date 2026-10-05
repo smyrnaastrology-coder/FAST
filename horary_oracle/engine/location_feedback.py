@@ -38,7 +38,7 @@ TOKEN_SECRET = os.getenv("HORARY_FEEDBACK_SECRET", "")
 # geri bildirimleri iceren bir JSON LISTESidir ve farkli bir sema kullanir;
 # ayni dosyaya yazmak ya veriyi bozar ya da yazmayi engeller. Konum geri
 # bildirimi kendi dosyasinda durur.
-STORE = os.path.join(_ROOT, "horary_location_feedback.json")
+STORE = os.getenv("HORARY_FEEDBACK_DB") or os.path.join(_ROOT, "horary_location_feedback.json")
 _SECRET_FILE = os.path.join(_ROOT, "horary_feedback_secret")
 
 # Yazma yarisi: iki istek ayni anda gelirse biri digerinin kaydini ezmesin.

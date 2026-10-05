@@ -87,3 +87,7 @@ horary_oracle/users_runtime.json
 # dosyasi repoda olursa kullanicinin yazdigi yerler herkese acik olur.
 horary_oracle/horary_location_feedback.json
 horary_oracle/horary_feedback_secret
+
+# Kredi hareketleri denetim kaydi: kullanici e-postasi + bakiye bilgisi iciyor.
+horary_oracle/horary_credit_audit.jsonl
+horary_oracle/*.corrupt-*

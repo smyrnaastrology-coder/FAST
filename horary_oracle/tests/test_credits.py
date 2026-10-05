@@ -81,12 +81,17 @@ def test_zero_credit_returns_no_credits_verdict():
 
 
 def test_missing_credit_key_is_not_unlimited():
+    # ONCEDEN burada DEFAULT_CREDITS (100) bekleniyordu. Kirilan bir kaydin
+    # aninda 100 bedava soruya donmesi demekti - kullanicinin "99 kredim geri
+    # 100 oldu" belirtisinin bir parcasi. Artik deneme kredisi verilir:
+    # kayip olan sey 100 degil, kullaniciya bedava soru vermek olmamali.
     _reset_db(5)
     db = auth._load()
     db[TEST_EMAIL].pop("credits", None)
     auth._save(db)
     u = auth.get_user(TEST_EMAIL)
-    assert u["credits"] == auth.DEFAULT_CREDITS, u
+    assert u["credits"] == auth.TRIAL_CREDITS, u
+    assert u["credits"] != auth.DEFAULT_CREDITS, "kirik kayit 100'e donmemeli"
     assert u["credits"] < 10**9, "credits anahtari yoksa sınırsız sayılmamalı"
 
 

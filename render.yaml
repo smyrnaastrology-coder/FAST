@@ -7,27 +7,50 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: bash start.sh
     healthCheckPath: /api/health
-   - type: web
+  - type: web
     name: horary-oracle-api
     runtime: python
-    plan: free
+    plan: starter
     buildCommand: pip install -r horary_oracle/requirements.txt
     startCommand: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
+    # KALICI DISK ZORUNLU. Render free plan'da disk YOKTUR ve dosya sistemi
+    # gecicidir: users_runtime.json her redeploy'da SILINIRDI. Kayit yok
+    # olunca kullanici 100 krediyle yeniden olusturuluyordu - "99 kredim geri
+    # 100 oldu" belirtisinin birinci sebebi buydu.
+    # NOT: Render diski yalnizca 'starter' ve uzeri planlarda kullanilabilir;
+    # free planda kalici depolama mumkun degildir (bkz. commit mesaji).
+    disk:
+      name: horary-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHONUNBUFFERED
         value: "true"
       - key: PYTHON_VERSION
         value: "3.12.8"
+      - key: USERS_DB
+        value: /var/data/users_runtime.json
+      - key: HORARY_AUDIT_DB
+        value: /var/data/horary_credit_audit.jsonl
+      - key: HORARY_FEEDBACK_DB
+        value: /var/data/horary_location_feedback.json
       - key: OPENAI_API_KEY
         sync: false
   - type: web
     name: horary-oracle-web
     runtime: python
-    plan: free
+    plan: starter
     buildCommand: pip install -r horary_oracle/requirements.txt
     startCommand: streamlit run horary_oracle/horary_app.py --server.port $PORT --server.address 0.0.0.0
     healthCheckPath: /_stcore/health
+    # AYNI disk: kullanici DB'si Streamlit tarafinda da okunuyor. Iki servis
+    # ayri gecici disk kullansaydi krediler iki farkli yerde birikir ve
+    # kaybolurdu.
+    disk:
+      name: horary-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHONUNBUFFERED
         value: "true"
@@ -35,6 +58,10 @@ services:
         value: "Agg"
       - key: PYTHON_VERSION
         value: "3.12.8"
+      - key: USERS_DB
+        value: /var/data/users_runtime.json
+      - key: HORARY_AUDIT_DB
+        value: /var/data/horary_credit_audit.jsonl
   - type: web
     name: horary-pwa
     runtime: static
