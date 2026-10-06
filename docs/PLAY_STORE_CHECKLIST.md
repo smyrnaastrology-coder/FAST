@@ -73,6 +73,35 @@ TR/EN/ES tam metinler için bkz. `docs/store_listing/PLAY_STORE_LISTING_1.0.11-3
 - PDF gating testi: (a) ilk PDF ücretsiz indirilir, (b) ikinci denemede 402, (c) abonelik/pdf_single sonrası tekrar indirilebilir
 - FCM: `google-services.json` zaten `android/app/` içinde, bildirim izni isteği `main.dart`'ta
 
+### 6.1 Facebook girişi (1.0.11+32 öncesi doğrulanmalı)
+Akış: Supabase `signInWithOAuth(facebook)` → tarayıcı → FB dialog → Supabase
+callback → deep link `com.fastastrology.fast://login-callback`.
+Sunucu tarafı 2026-10-06'da doğrulandı:
+- Supabase provider **aktif**: `/auth/v1/authorize?provider=facebook` → 302
+  `facebook.com/dialog/oauth?client_id=1688652896021449&redirect_uri=https://koexhcgkcopavymhblxc.supabase.co/auth/v1/callback`
+- FB dialog **redirect_uri'yi kabul ediyor** (login sayfası döndü, "URL Blocked" yok)
+- Callback canlı (geçersiz `state` → `bad_oauth_state`, sağduyulu hata)
+
+Kalacak manuel kontroller (developers.facebook.com > uygulama 1688652896021449):
+- [ ] **App Mode = Live** (Development'da yalnız testçiler giriş yapabilir)
+- [ ] Facebook Login > Settings > **Valid OAuth Redirect URIs**:
+      `https://koexhcgkcopavymhblxc.supabase.co/auth/v1/callback` (whitelist'te olmalı)
+- [ ] Yetkiler: `email`, `public_profile` (App Review gerekmez; istek `scope=email`)
+- [ ] Supabase > Auth > Providers > Facebook: App ID + **App Secret** dolu olmalı
+      (secret yalnız kod takasında kullanılır; dışarıdan doğrulanamaz)
+- [ ] Cihazda test: uygulamada "Facebook ile giriş" > dönüşte oturum açılmalı,
+      kayıtlı kişiler/klasörler korunmalı
+
+Not: tarayıcı-akışı olduğu için Android **key hash gerekmez** (yalnız FB SDK'sı
+ister, kullanılmıyor).
+
+### 6.2 Kademeli açılış (Play Console > Üretim > +32)
+1. Sürüm hazır (AAB +32 yüklü, `1.0.11`) > **Kademeli dağılım** aç
+2. İç testçiler → Kapsamı %10'a kadar artır (doğrulama süresi saatler sürebilir)
+3. Dış/kapalı test → kapsamı %20'ye çıkar; 7 gün sorunsuzsa %50 → %100
+4. Her aşamada izle: ANR/crash (Android vitrini), iptal oranı, RevenueCat webhook log
+5. Sorun çıkarsa duraklat → yeni sürüm (add 33) ile düzelt, aynı sürümü yamalama
+
 ## 7. App Store (iOS) Notu
 - `flutter build ipa` sadece Mac+Xcode ile. Bundle ID aynı `com.fastastrology.fast`, Apple Developer $99/yıl, App Store Connect'de ayrı kayıt. Backend aynı kalır.
 
