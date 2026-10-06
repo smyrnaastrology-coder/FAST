@@ -22,7 +22,7 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 |---------|-----|-------|----------|
 | `pdf_single` | Yönetilen ürün (managed) | $19.99 | 60-70 sayfalık kitap (Aşk/Anne-Çocuk/Natal/Potansiyel ayrı çağrıda tip parametresi ile) — ilk hak ücretsiz (backend `free_pdf_used` kontrolü) |
 
-> **RevenueCat eşlemesi:** Play ürün ID'leri RevenueCat dashboard'da aynı ID ile Entitlement `premium` altına ekle. Webhook: `https://fbst-api.onrender.com/api/billing/webhook` + `REVENUECAT_WEBHOOK_SECRET` env.
+> **RevenueCat eşlemesi:** Play ürün ID'leri RevenueCat dashboard'da aynı ID ile Entitlement `premium` altına ekle. Webhook URL: `https://fbst-api-mzum.onrender.com/api/billing/webhook` + Render env `REVENUECAT_WEBHOOK_SECRET` (Signed Webhooks) veya `REVENUECAT_WEBHOOK_AUTH`. Public SDK key: `tool/revenuecat.local.ps1` (git'e alınmaz) → `build_release.ps1` `--dart-define=REVENUECAT_API_KEY` olarak geçirir.
 
 ### 2.3 PDF indirme hakları (backend gating — uygulandı)
 - `/api/pdf/indir/{session_id}/{tip}?uid=...` artık **hakkı kontrol eder** (`billing.py::can_download_pdf`).
