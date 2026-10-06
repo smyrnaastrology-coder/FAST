@@ -68,21 +68,22 @@ GEZEGEN_ES = {
     "Ketu": "Ketu", "Rahu": "Rahu",
 }
 
-#: Yoni hayvanlarının İngilizce/İspanyolca adları (`YONI_ANIMALS` anahtarları).
+#: Yoni hayvanlarının İngilizce/İspanyolca adları (`YONI_ANIMALS` değerleri).
+#: 14 klasik hayvan; tamamı tekil listede tutulur (BPHS eşleşmesi).
 YONI_ANIMAL_EN = {
-    "At": "Horse", "İnek": "Cow", "Boğa": "Ox", "Koyun": "Sheep",
-    "Deve": "Camel", "Yılan": "Serpent", "Aslan": "Lion",
-    "Sakal": "Man (bearded)", "Leopard": "Leopard", "Tavus": "Peacock",
-    "Kaplan": "Tiger", "Geyik": "Deer", "Kartal": "Eagle", "Köpek": "Dog",
-    "Balık": "Fish", "Boş halka": "Empty ring",
+    "At": "Horse", "Fil": "Elephant", "Koyun": "Sheep",
+    "Yılan": "Serpent", "Köpek": "Dog", "Kedi": "Cat", "Fare": "Rat",
+    "İnek": "Cow", "Manda": "Buffalo", "Kaplan": "Tiger",
+    "Geyik": "Deer", "Maymun": "Monkey", "Kuyruksüren": "Mongoose",
+    "Aslan": "Lion",
 }
 
 YONI_ANIMAL_ES = {
-    "At": "Caballo", "İnek": "Vaca", "Boğa": "Buey", "Koyun": "Oveja",
-    "Deve": "Camello", "Yılan": "Serpiente", "Aslan": "León",
-    "Sakal": "Hombre (barba)", "Leopard": "Leopardo", "Tavus": "Pavo real",
-    "Kaplan": "Tigre", "Geyik": "Ciervo", "Kartal": "Águila",
-    "Köpek": "Perro", "Balık": "Pez", "Boş halka": "Anillo vacío",
+    "At": "Caballo", "Fil": "Elefante", "Koyun": "Oveja",
+    "Yılan": "Serpiente", "Köpek": "Perro", "Kedi": "Gato", "Fare": "Rata",
+    "İnek": "Vaca", "Manda": "Búfalo", "Kaplan": "Tigre",
+    "Geyik": "Ciervo", "Maymun": "Mono", "Kuyruksüren": "Mangosta",
+    "Aslan": "León",
 }
 
 BURC_UST_MARS = 4
@@ -131,28 +132,79 @@ NAKSHATRALAR: List[Tuple[str, str, str, str, str, str]] = [
 #: Nakṣatra -> yoni hayvanı (Yoni koota).
 #:
 #: Klasik Yastrijiyotish'te yoni, nakṣatranın **sembolü** değil **eşleşen
-#: hayvanıdır**: Hasta'nın sembolü "El" olmakla birlikte yonisi "At"tır ve
-#: Asvini ile eşleşir. Bu yüzden sözlük sembol sütunundan bağımsız
-#: tutulur — aşağıdaki 14 hayvan çifti klasik eşleşmeyi verir.
+#: hayvanıdır**: Hasta'nın sembolü "El" olmakla birlikte yonisi "Manda"dır ve
+#: Swati ile eşleşir. Bu yüzden sözlük sembol sütunundan bağımsız
+#: tutulur — aşağıdaki 14 hayvan çifti klasik eşleşmeyi verir (BPHS).
 #:
-#: Çifti olmayan nakṣatralar (Vishakha, Uttara Bhadrapada, Revati) yalnızca
-#: kendisiyle eşleşir; sembolleri `NAKSHATRALAR` 6. sütununda kalır.
+#: DÜZELTME (Solar Fire 16/36 örneği): daha önce Punarvasu/Swati "Sakal",
+#: Hasta "At", Magha/Purva Bhadrapada "Leopard" gibi sembolden türetilmiş
+#: yanlış hayvanlar yazıyordu; 27 nakṣatranın ~yarısı etkileniyordu.
 YONI_ANIMALS: Dict[str, Optional[str]] = {
-    "Asvini": "At",            "Hasta": "At",
-    "Bharani": "İnek",         "Uttara Phalguni": "İnek",
+    "Asvini": "At",            "Shatabhisha": "At",
+    "Bharani": "Fil",          "Revati": "Fil",
     "Krittika": "Koyun",       "Pushya": "Koyun",
-    "Mrigashira": "Yılan",     "Ashlesha": "Yılan",
-    "Ardra": "Aslan",          "Purva Phalguni": "Aslan",
-    "Punarvasu": "Sakal",      "Swati": "Sakal",
-    "Magha": "Leopard",        "Purva Bhadrapada": "Leopard",
-    "Chitra": "Tavus",         "Purva Ashadha": "Tavus",
-    "Mula": "Köpek",           "Dhanishta": "Köpek",
-    "Anuradha": "Geyik",       "Shravana": "Geyik",
-    "Jyeshtha": "Kartal",      "Uttara Ashadha": "Kartal",
-    # çifti olmayanlar / ayrı gruplar
-    "Vishakha": "Kaplan",      "Uttara Bhadrapada": "Boğa", "Revati": "Balık",
-    # sembolü hayvan olmayanlar — geleneksel karşılıklarıyla temsil edilir
-    "Rohini": "Deve",          "Shatabhisha": "Boş halka",
+    "Rohini": "Yılan",         "Mrigashira": "Yılan",
+    "Ardra": "Köpek",          "Mula": "Köpek",
+    "Punarvasu": "Kedi",       "Ashlesha": "Kedi",
+    "Magha": "Fare",           "Purva Phalguni": "Fare",
+    "Uttara Phalguni": "İnek", "Uttara Bhadrapada": "İnek",
+    "Swati": "Manda",          "Hasta": "Manda",
+    "Vishakha": "Kaplan",      "Chitra": "Kaplan",
+    "Anuradha": "Geyik",       "Jyeshtha": "Geyik",
+    "Purva Ashadha": "Maymun", "Shravana": "Maymun",
+    "Purva Bhadrapada": "Aslan", "Dhanishta": "Aslan",
+    # 27'li sistemde çifti Abhijit'te kalan tek yoni
+    "Uttara Ashadha": "Kuyruksüren",
+}
+
+#: Nakṣatra -> yoni cinsiyeti (Yoni koota). Pada numarasından DEĞİL,
+#: nakṣatranın klasik yonisinden gelir (tek padalar erkek kuralı yanlıştır;
+#: örn. Punarvasu 3. pada dişi Kedidir).
+YONI_CINSIYET: Dict[str, str] = {
+    "Asvini": "erkek",         "Shatabhisha": "kadin",
+    "Bharani": "kadin",        "Revati": "erkek",
+    "Krittika": "kadin",       "Pushya": "erkek",
+    "Rohini": "erkek",         "Mrigashira": "kadin",
+    "Ardra": "kadin",          "Mula": "erkek",
+    "Punarvasu": "kadin",      "Ashlesha": "erkek",
+    "Magha": "erkek",          "Purva Phalguni": "kadin",
+    "Uttara Phalguni": "erkek", "Uttara Bhadrapada": "kadin",
+    "Swati": "erkek",          "Hasta": "kadin",
+    "Vishakha": "erkek",       "Chitra": "kadin",
+    "Anuradha": "kadin",       "Jyeshtha": "erkek",
+    "Purva Ashadha": "erkek",  "Shravana": "kadin",
+    "Purva Bhadrapada": "erkek", "Dhanishta": "kadin",
+    "Uttara Ashadha": "erkek",
+}
+
+#: Yoni hayvan uyum matrisi (farklı hayvanlar için, 0-4).
+#:
+#: Klasik tablo (BPHS geleneği; örn. Kedi-Fare, Yılan-Kuyruksüren,
+#: Köpek-Geyik, Aslan-Fil, At-Manda, İnek-Kaplan doğal düşmandır ve 0 alır).
+#: Kaynak tabloda Yılan-Kuyruksüren yönlüdür (0/3); API cinsiyet geçirmediği
+#: için simetrik-güvenli olsun diye minimum (0) alınır. Koyun-Kedi = 2
+#: (Solar Fire 16/36 örneğiyle birebir).
+_YONI_SATIR = {
+    "At":         [4, 2, 2, 3, 2, 2, 2, 1, 0, 1, 3, 3, 2, 1],
+    "Fil":        [2, 4, 3, 3, 2, 2, 2, 2, 3, 1, 2, 3, 2, 0],
+    "Koyun":      [2, 3, 4, 2, 1, 2, 1, 3, 3, 1, 2, 0, 3, 1],
+    "Yılan":      [3, 3, 2, 4, 2, 1, 1, 1, 1, 2, 2, 2, 0, 2],
+    "Köpek":      [2, 2, 1, 2, 4, 2, 1, 2, 2, 1, 0, 2, 1, 1],
+    "Kedi":       [2, 2, 2, 1, 2, 4, 0, 2, 2, 1, 3, 3, 2, 1],
+    "Fare":       [2, 2, 1, 1, 1, 0, 4, 2, 2, 2, 2, 2, 1, 2],
+    "İnek":       [1, 2, 3, 1, 2, 2, 2, 4, 3, 0, 3, 2, 2, 1],
+    "Manda":      [0, 3, 3, 1, 2, 2, 2, 3, 4, 1, 2, 2, 2, 1],
+    "Kaplan":     [1, 1, 1, 2, 1, 1, 2, 0, 1, 4, 1, 1, 2, 1],
+    "Geyik":      [3, 2, 2, 2, 0, 3, 2, 3, 2, 1, 4, 2, 2, 1],
+    "Maymun":     [3, 3, 0, 2, 2, 3, 2, 2, 2, 1, 2, 4, 3, 2],
+    "Kuyruksüren": [2, 2, 3, 0, 1, 2, 1, 2, 2, 2, 2, 3, 4, 2],
+    "Aslan":      [1, 0, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 2, 4],
+}
+_YONI_SIRA = ["At", "Fil", "Koyun", "Yılan", "Köpek", "Kedi", "Fare",
+              "İnek", "Manda", "Kaplan", "Geyik", "Maymun", "Kuyruksüren",
+              "Aslan"]
+YONI_UYUM: Dict[Tuple[str, str], int] = {
+    (a, b): _YONI_SATIR[a][i] for a in _YONI_SIRA for i, b in enumerate(_YONI_SIRA)
 }
 
 #: Padaya göre kasta (Varna koota)
@@ -188,6 +240,19 @@ PLANET_DOSTLUK = {
 PLANET_NOTR = {
     frozenset(("Sun", "Venus")), frozenset(("Mars", "Mercury")),
     frozenset(("Jupiter", "Mercury")),
+}
+
+#: Yönlü Naisargika dostluk listeleri (Graha Maitri koota).
+#: `PLANET_DOSTLUK` simetriktir ve tek yönlü dostlukları da "dost" sayar;
+#: klasik puan karşılıklı dostluğa 5 verir (örn. Venus-Mercury).
+NAISARGIKA_DOST = {
+    "Sun": {"Moon", "Mars", "Jupiter"},
+    "Moon": {"Sun", "Mercury"},
+    "Mars": {"Sun", "Moon", "Jupiter"},
+    "Mercury": {"Sun", "Venus"},
+    "Jupiter": {"Sun", "Moon", "Mars"},
+    "Venus": {"Mercury", "Saturn"},
+    "Saturn": {"Mercury", "Venus"},
 }
 
 
@@ -376,7 +441,8 @@ def ay_nakshatrasi_hesapla(lon_sidereal: float, yaklasik: bool = False) -> AyBil
         varna=VARNA_PADALARI[pada - 1],
         gana=GANA_PADALARI[pada - 1],
         yoni=YONI_ANIMALS.get(tr),
-        cinsiyet=_cinsiyet(pada),
+        # Yoni cinsiyeti padadan değil nakṣatradan gelir (klasik eşleşme).
+        cinsiyet=YONI_CINSIYET.get(tr) or _cinsiyet(pada),
         nadi=("nadi_1" if pada in (1, 2) else
               "nadi_2" if pada == 3 else "nadi_3"),
         yaklasik=yaklasik,
@@ -467,27 +533,40 @@ def _lord_burc_no(lord: str) -> int:
 
 
 def _koota_tara(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dict]:
-    sira = ((a.nakshatra_no - b.nakshatra_no) % 9) + 1
-    if sira <= 3:
-        return 3, True, "", {"sira": sira}
-    if sira <= 6:
-        return 1, False, "Orta tara", {"sira": sira}
-    return 0, False, "Düşük tara", {"sira": sira}
+    # Gözlemlenebilir Solar Fire davranışı: ilk haritadan ikinciye sayım
+    # (Chart A -> Chart B). API çiftinde p1 -> p2; yönlü kalır.
+    # Devir: 1 Janma, 2 Sampat, 3 Vipat, 4 Kshema, 5 Pratyak, 6 Sadhaka,
+    # 7 Vadha, 8 Mitra, 9 Atimitra. İyi devirler 3 puan, Vipat/Pratyak/Vadha 0.
+    t = ((b.nakshatra_no - a.nakshatra_no) % 27) + 1
+    r = ((t - 1) % 9) + 1
+    puan = 3 if r in (1, 2, 4, 6, 8, 9) else 0
+    return puan, puan == 3, ("" if puan == 3 else "Düşük tara"), {
+        "sira": t, "devir": r}
 
 
 def _koota_yoni(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dict]:
-    if a.yoni != b.yoni:
-        return 0, False, f"Farklı yoni: {a.yoni} / {b.yoni}", {"a": a.yoni, "b": b.yoni}
-    if a.cinsiyet == b.cinsiyet:
-        return 4, True, "", {"a": a.yoni, "b": b.yoni, "cinsiyet": a.cinsiyet}
-    return 3, False, "Aynı yoni, zıt cinsiyet", {
-        "a": a.yoni, "b": b.yoni, "cinsiyet": f"{a.cinsiyet}/{b.cinsiyet}"}
+    if a.yoni == b.yoni:
+        # Aynı hayvan her zaman tam puan (kendisiyle karşılaştırma 4 gerektirir).
+        return 4, True, "", {"a": a.yoni, "b": b.yoni,
+                             "cinsiyet": f"{a.cinsiyet}/{b.cinsiyet}"}
+    puan = YONI_UYUM.get((a.yoni, b.yoni), YONI_UYUM.get((b.yoni, a.yoni), 0))
+    return puan, False, f"Farklı yoni: {a.yoni} / {b.yoni}", {
+        "a": a.yoni, "b": b.yoni}
+
+
+def _karsilikli_dost(la: str, lb: str) -> bool:
+    """İki lord birbirini karşılıklı dost sayıyor mu (Naisargika)?"""
+    return lb in NAISARGIKA_DOST.get(la, set()) and la in NAISARGIKA_DOST.get(lb, set())
 
 
 def _koota_graha_maitri(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dict]:
     if a.burc_no == b.burc_no:
         return 5, True, "", {"a": a.burc_adi}
     la, lb = BURC_LORDU[a.burc_adi], BURC_LORDU[b.burc_adi]
+    if _karsilikli_dost(la, lb):
+        # Klasik tam puan (örn. Venus-Mercury; Solar Fire 16/36 örneği).
+        return 5, False, f"{la} / {lb}: karşılıklı dost", {
+            "a": la, "b": lb, "iliski": "dost"}
     iliski = gezegen_iliskisi(la, lb)
     puan = {"dost": 4, "notr": 3, "dusman": 1}[iliski]
     return puan, False, f"{la} / {lb}: {iliski}", {"a": la, "b": lb, "iliski": iliski}
@@ -498,7 +577,10 @@ def _koota_graha_maitri(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dic
 GANA_TABLOSU = {
     ("Deva", "Deva"): 6, ("Deva", "Manushya"): 5, ("Deva", "Rakshasa"): 0,
     ("Manushya", "Deva"): 5, ("Manushya", "Manushya"): 6, ("Manushya", "Rakshasa"): 1,
-    ("Rakshasa", "Deva"): 0, ("Rakshasa", "Manushya"): 0, ("Rakshasa", "Rakshasa"): 6,
+    # (Rakshasa, Manushya) klasikte yönlüdür; ancak API cinsiyet geçirmediği
+    # için sıra-belirsiz skor sakıncalıdır ve Solar Fire örneği (R,M)=1
+    # verir. Bu yüzden hücre simetrik 1 alınır.
+    ("Rakshasa", "Deva"): 0, ("Rakshasa", "Manushya"): 1, ("Rakshasa", "Rakshasa"): 6,
 }
 
 
@@ -513,12 +595,10 @@ def _koota_rasi(a: AyBilgisi, b: AyBilgisi) -> Tuple[int, bool, str, dict]:
     fark = (a.burc_no - b.burc_no) % 12
     if fark == 0:
         return 7, True, "", {"fark": 0}
-    if fark in (1, 2, 3, 9, 10, 11):
-        return 5, False, "2./4. dost veya 3./12. tarafta", {"fark": fark}
-    if fark in (4, 8):
-        return 3, False, "5. veya 9. taraf", {"fark": fark}
-    if fark in (5, 7):
-        return 1, False, "6. veya 8. taraf", {"fark": fark}
+    if fark in (0, 2, 3, 6, 9, 10):
+        return 7, fark == 0, ("" if fark == 0 else "Uyumlu burc konumu"), {"fark": fark}
+    ad = {1: "2-12", 11: "2-12", 4: "5-9", 8: "5-9", 5: "6-8", 7: "6-8"}.get(fark, "?")
+    return 0, False, "Bhakoot kusuru (" + ad + ")", {"fark": fark}
     return 0, False, "Karşı taraf (7.)", {"fark": fark}
 
 

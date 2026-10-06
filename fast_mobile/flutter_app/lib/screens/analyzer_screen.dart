@@ -2012,6 +2012,8 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           // Ana metin: 3+ satirlik dogral dil yorumu (sunucu her istekte
           // vaat/anlati/simge acilarindan birini rastgele secer).
           final yorum = (ak['aciklama'] ?? '').toString();
+          // Kisisel satir: gercek yerlesim adlari (her ciftte farkli).
+          final kisisel = (ak['kisisel'] ?? '').toString();
           // Teknik icerik varsayilan gizli; kullanici "Detayi goster" ile acar.
           final konu = (ak['konu'] ?? '').toString();
           final soru = (ak['soru'] ?? '').toString();
@@ -2071,6 +2073,15 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   Text(yorum,
                       style: TextStyle(
                           color: FastTheme.textMuted, fontSize: 12.5, height: 1.45)),
+                ],
+                if (kisisel.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(kisisel,
+                      style: TextStyle(
+                          color: FastTheme.accentGold,
+                          fontSize: 11.5,
+                          height: 1.4,
+                          fontStyle: FontStyle.italic)),
                 ],
                 if (detayVar) ...[
                   const SizedBox(height: 6),

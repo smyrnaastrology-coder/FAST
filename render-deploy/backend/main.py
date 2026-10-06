@@ -7088,6 +7088,86 @@ def _ash_utc_uyarilari(utc1, utc2, dil="tr"):
     return cikti
 
 
+_DEVIR_ADI = {1: "Janma", 2: "Sampat", 3: "Vipat", 4: "Kshema",
+               5: "Pratyak", 6: "Sadhaka", 7: "Vadha", 8: "Mitra",
+               9: "Atimitra"}
+
+
+def _ash_kisisel(ay1, ay2, koota_ad, detay, dil="tr"):
+    """Koota kartına kişisel satır: GERÇEK yerleşimleri adıyla yazar.
+
+    `aciklama` metinleri (koota, puan bandı, açı) başına statiktir; iki
+    farklı çift aynı skoru alınca kelimesi kelimesine aynı paragrafı
+    görürdü ("hepsi birbirine benziyor" şikâyeti). Bu satır her çiftte
+    farklıdır çünkü gerçek Ay nakshatra/burç/lord/hayvan adlarını taşır.
+    Deterministiktir (önbellek güvenli).
+    """
+    try:
+        d = (dil or "tr")[:2]
+        if d not in ("tr", "en", "es"):
+            d = "tr"
+        ay = "Ay" if d == "tr" else ("Moon" if d == "en" else "Luna")
+        det = detay or {}
+        if koota_ad == "varna":
+            return f"{ay}: {ay1.ozet(d)} ({ay1.varna}) · {ay2.ozet(d)} ({ay2.varna})"
+        if koota_ad == "vashya":
+            g1 = _ash_motor.vashya_grubu(ay1.burc_no, ay1.pada)
+            g2 = _ash_motor.vashya_grubu(ay2.burc_no, ay2.pada)
+            return f"{ay}: {ay1.burc(d)} ({g1}) · {ay2.burc(d)} ({g2})"
+        if koota_ad == "tara":
+            t = det.get("sira", "?")
+            r = det.get("devir", "?")
+            dev = _DEVIR_ADI.get(r, "?") if isinstance(r, int) else "?"
+            kelime = ("sayım" if d == "tr"
+                      else ("count" if d == "en" else "conteo"))
+            return (f"{ay}: {ay1.nakshatra(d)} → {ay2.nakshatra(d)}; "
+                    f"{kelime} {t} ({dev})")
+        if koota_ad == "yoni":
+            y1 = ay1.yoni_adi(d) or "?"
+            y2 = ay2.yoni_adi(d) or "?"
+            return (f"{ay}: {ay1.nakshatra(d)} ({y1}) · "
+                    f"{ay2.nakshatra(d)} ({y2})")
+        if koota_ad == "graha_maitri":
+            la = _ash_motor.BURC_LORDU.get(ay1.burc_adi, "?")
+            lb = _ash_motor.BURC_LORDU.get(ay2.burc_adi, "?")
+            dost_a = _ash_motor.NAISARGIKA_DOST.get(la, set())
+            dost_b = _ash_motor.NAISARGIKA_DOST.get(lb, set())
+            ek = ""
+            if lb in dost_a and la in dost_b:
+                ek = (" — karşılıklı dost" if d == "tr"
+                      else (" — mutual friends" if d == "en"
+                            else " — amigos mutuos"))
+            return f"{ay}: {ay1.burc(d)} ({la}) · {ay2.burc(d)} ({lb}){ek}"
+        if koota_ad == "gana":
+            return (f"{ay}: {ay1.nakshatra(d)} ({ay1.gana}) · "
+                    f"{ay2.nakshatra(d)} ({ay2.gana})")
+        if koota_ad == "rasi":
+            fark = (ay1.burc_no - ay2.burc_no) % 12
+            if fark == 0:
+                tip = ("aynı burç" if d == "tr"
+                       else ("same sign" if d == "en" else "mismo signo"))
+            elif fark == 6:
+                tip = ("karşıt burçlar" if d == "tr"
+                       else ("opposite signs" if d == "en"
+                             else "signos opuestos"))
+            else:
+                tip = {1: "2-12", 11: "2-12", 4: "5-9", 8: "5-9",
+                       5: "6-8", 7: "6-8", 2: "3-11", 10: "3-11",
+                       3: "4-10", 9: "4-10"}.get(fark, "?")
+            return f"{ay}: {ay1.burc(d)} – {ay2.burc(d)} ({tip})"
+        if koota_ad == "nadi":
+            ayni = ay1.nadi == ay2.nadi
+            durum = ("aynı" if ayni else "farklı") if d == "tr" else (
+                ("same" if ayni else "different") if d == "en" else (
+                    "igual" if ayni else "diferente"))
+            kelime = "kanalları" if d == "tr" else (
+                "channels" if d == "en" else "canales")
+            return f"{ay} {kelime} {durum} ({ay1.nadi} · {ay2.nadi})"
+    except Exception:
+        pass
+    return ""
+
+
 def _ash_metin_zenginlestir(sonuc, dil="tr", mod="es_sevgili"):
     """Ham puan tablosunu kullanıcının okuyabileceği açıklamalara bağlar.
 
@@ -7116,6 +7196,7 @@ def _ash_metin_zenginlestir(sonuc, dil="tr", mod="es_sevgili"):
             "soru": govde.get("soru", ""),
             "aciklama": d.get("aciklama") or m.get("aciklama", ""),
             "ipucu": m.get("ipucu", ""),
+            "kisisel": _ash_kisisel(sonuc.a, sonuc.b, k.ad, k.detay, dil),
             "mod_yorumu": _ash_metin.mod_yorumu(k.ad, mod, dil),
         })
 

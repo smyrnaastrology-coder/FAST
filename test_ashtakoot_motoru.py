@@ -111,6 +111,19 @@ kontrol(s.koota("varna").puan == 1 and s.koota("vashya").puan == 2
         and s.koota("rasi").puan == 7 and s.koota("nadi").puan == 0,
         "Solar Fire referansi: 1/2/3/4/5/6/7 + Nadi 0")
 
+# Solar Fire v9.0.29 capraz ornegi (16/36):
+# A: 16.01.1992 03:30 UTC (Krittika-4, Boga) - B: 16.01.1995 15:30 UTC
+# (Punarvasu-3, Ikizler). SF: 0,0,0,2,5,1,0,8 = 16. Motor birebir ayni olmali.
+_sf_a = ay_nakshatrasi_hesapla(ay_konumu_utc(1992, 1, 16, 3.5))
+_sf_b = ay_nakshatrasi_hesapla(ay_konumu_utc(1995, 1, 16, 15.5))
+_sf = ashtakoot_hesapla(_sf_a, _sf_b)
+_sf_bek = {"varna": 0, "vashya": 0, "tara": 0, "yoni": 2,
+           "graha_maitri": 5, "gana": 1, "rasi": 0, "nadi": 8}
+for _k, _p in _sf_bek.items():
+    kontrol(_sf.koota(_k).puan == _p, "SF capraz %s = %d (alinan %d)"
+            % (_k, _p, _sf.koota(_k).puan))
+kontrol(_sf.toplam == 16, "SF capraz toplam 16 (alinan %d)" % _sf.toplam)
+
 # ONEMLI: kullanici akisi kendisi_ile() fonksiyonunu cagirmadan gider.
 # AshtaKootSonuc.kendisi_ile bayragi ashtakoot_hesapla() icinde kendiliginden
 # kurulmali; aksi halde API yanitinda "kendisi_ile" notu hic gelmez.
@@ -198,14 +211,18 @@ kontrol(p["harita"] == sorted(p["harita"], key=lambda s: (-s["toplam"], s["naksh
 kontrol(len(p["en_iyi"]) == 5 and len(p["en_kotu"]) == 5,
         "en iyi 5 / en kotu 5")
 kendi_satir = [s for s in p["harita"] if s["kendisi"]][0]
-kontrol(kendi_satir["toplam"] == 28, "haritada kendi satiri 28")
+# Ayni nakshatra ama farkli pada (sevde Hasta-4, satir Hasta-1):
+# Varna 0 + Vashya 2 + Tara 3 + Yoni 4 + GM 5 + Gana 0 + Rasi 7 + Nadi 8 = 29.
+# Eskiden 28 cikiyordu cunku bozuk Yoni verisi ayni hayvana 3 veriyordu.
+kontrol(kendi_satir["toplam"] == 29, "haritada kendi satiri 29")
 # puan 0-36 araliginda
 kontrol(all(0 <= s["toplam"] <= 36 for s in p["harita"]), "puanlar 0..36 araliginda")
 
 # --------------------------------------------------------------------------
 baslik("9b) YONI KLASIK ESLESMELERI")
-# Yoni, sembol degil eslesen hayvandir: Hasta'nin sembolu "El" ama yonisi "At"
-# ve Asvini ile 4/4 verir. Sembol ile yoni karistirilirsa burasi kacar.
+# Yoni, sembol degil eslesen hayvandir: Hasta'nin sembolu "El" ama yonisi
+# "Manda"dir ve Swati ile 4/4 verir. Sembol ile yoni karistirilirsa burasi
+# kacar. Ciftler BPHS eslesmesidir (13 cift + Kuyruksuren tek).
 def nak(n, p=1):
     from ashtakoot_motoru import NAKSHATRA_ADI, PADA_ADI
     return ay_nakshatrasi_hesapla((n - 1) * NAKSHATRA_ADI + (p - 1) * PADA_ADI + 0.4)
@@ -215,21 +232,33 @@ def yoni_puani(a, b):
     return [k.puan for k in ashtakoot_hesapla(a, b).kootalar if k.ad == "yoni"][0]
 
 
-KLASIK_CIFTLER = [(1, 13), (2, 12), (3, 8), (5, 9), (6, 11), (7, 15),
-                  (10, 25), (14, 20), (17, 22), (18, 21), (19, 23)]
+KLASIK_CIFTLER = [(1, 24), (2, 27), (3, 8), (4, 5), (6, 19), (7, 9),
+                   (10, 11), (12, 26), (13, 15), (14, 16), (17, 18),
+                   (20, 22), (23, 25)]
 for a_no, b_no in KLASIK_CIFTLER:
     a, b = nak(a_no), nak(b_no)
     kontrol(yoni_puani(a, b) == 4,
             "klasik cift 4/4: %s - %s" % (a.nakshatra_adi, b.nakshatra_adi))
     kontrol(a.yoni == b.yoni,
             "cift ayni hayvani paylasiyor: %s" % a.yoni)
+# 27'li sistemde cifti Abhijit'te kalan tek yoni: Kuyruksuren (Uttara Ashadha)
+kontrol(nak(21).yoni == "Kuyruksüren",
+        "Uttara Ashadha yonisi Kuyruksüren")
 
-kontrol(yoni_puani(nak(1, 1), nak(13, 2)) == 3, "ayni hayvan, zit cinsiyet 3/4")
-kontrol(yoni_puani(nak(1), nak(16)) == 0, "farkli yoni 0/4")
-kontrol(nak(13).yoni == "At" and nak(13).sembol == "El",
-        "Hasta: yoni At, sembol El (ayri kavramlar)")
-kontrol(len({nak(n).yoni for n in range(1, 28)}) == 16,
-        "16 farkli yoni hayvani")
+kontrol(yoni_puani(nak(1, 1), nak(24, 1)) == 4,
+        "ayni hayvan 4/4: At-Erkek ile At-Disi (Asvini - Shatabhisha)")
+kontrol(yoni_puani(nak(1), nak(17)) == 3,
+        "dost hayvan 3/4: At - Geyik")
+kontrol(yoni_puani(nak(3), nak(7)) == 2,
+        "notr hayvan 2/4: Koyun - Kedi (Solar Fire 16/36 ornegi)")
+kontrol(yoni_puani(nak(1), nak(16)) == 1,
+        "zayif hayvan 1/4: At - Kaplan")
+kontrol(yoni_puani(nak(7), nak(10)) == 0,
+        "dusman hayvan 0/4: Kedi - Fare")
+kontrol(nak(13).yoni == "Manda" and nak(13).sembol == "El",
+        "Hasta: yoni Manda, sembol El (ayri kavramlar)")
+kontrol(len({nak(n).yoni for n in range(1, 28)}) == 14,
+        "14 farkli yoni hayvani")
 kontrol(all(nak(n).yoni is not None for n in range(1, 28)),
         "27 nakshatranin hepsinde yoni var")
 
@@ -263,10 +292,10 @@ kontrol(a.ozet("es") == "Hasta 1. · Virgo", "ozet ES (burc cevrildi)")
 kontrol(a.burc("es") == "Virgo" and a.burc("en") == "Virgo", "burc EN/ES")
 kontrol(a.lord_adi("tr") == "Moon" and a.lord_adi("es") == "Luna",
         "lord adi cevrildi")
-kontrol(a.yoni_adi("tr") == "At" and a.yoni_adi("es") == "Caballo",
+kontrol(a.yoni_adi("tr") == "Manda" and a.yoni_adi("es") == "Búfalo",
         "yoni adi cevrildi")
-kontrol(a.cinsiyet_adi("tr") == "erkek" and a.cinsiyet_adi("es") == "masculino",
-        "cinsiyet cevrildi")
+kontrol(a.cinsiyet_adi("tr") == "kadin" and a.cinsiyet_adi("es") == "femenino",
+        "cinsiyet cevrildi (Hasta disi Mandadir)")
 kontrol(a.ozet("fr") == a.ozet("tr"), "bilinmeyen dil TR'a duser")
 
 h = nakshatra_uyum_haritasi(a)[0]
@@ -502,8 +531,9 @@ for _lang in ("tr", "en", "es"):
 # --------------------------------------------------------------------------
 # Genel ilişki yorumu: bantlar OLCULEN ulasilabilir araliga gore kurulur.
 # Azami 36 ama gercek dogum verileriyle tarandiginda toplamlar yalnizca
-# 7-34 arasi olabiliyor ve 28 farkli deger aliyor (bosluk yok). 0-6 ve
-# 35-36 hicbir ciftte olusmuyor; bu yuzden bantlar 7-34 uzerinden kurulur.
+# 8-34 arasi olabiliyor ve 27 farkli deger aliyor (bosluk yok). 0-7 ve
+# 35-36 hicbir ciftte olusmuyor; bantlar 7-34 tanimi uzerinden kurulur
+# (7 gozlenmez ama bant alt siniri olarak kalir).
 SINIR = [(7, "cok_dusuk"), (13, "cok_dusuk"), (14, "dusuk"), (20, "dusuk"),
          (21, "orta"), (27, "orta"), (28, "yuksek"), (34, "yuksek")]
 for _p, _bek in SINIR:
@@ -530,11 +560,11 @@ for _i, _x in enumerate(_veri):
         _tot[_S.toplam] = _tot.get(_S.toplam, 0) + 1
         _bant[_S.seviye] = _bant.get(_S.seviye, 0) + 1
 _tsayi = sorted(_tot)
-kontrol((_tsayi[0], _tsayi[-1]) == (7, 34),
-        "ulasilabilir toplam araligi 7-34 (olculdu: %d-%d, %d deger)"
+kontrol((_tsayi[0], _tsayi[-1]) == (8, 34),
+        "ulasilabilir toplam araligi 8-34 (olculdu: %d-%d, %d deger)"
         % (_tsayi[0], _tsayi[-1], len(_tsayi)))
-kontrol(len(_tsayi) == 28, "28 farkli toplam degeri")
-kontrol(_tsayi == list(range(7, 35)), "toplam degerleri bosluksuz (7..34)")
+kontrol(len(_tsayi) == 27, "27 farkli toplam degeri")
+kontrol(_tsayi == list(range(8, 35)), "toplam degerleri bosluksuz (8..34)")
 for _b in ("cok_dusuk", "dusuk", "orta", "yuksek"):
     kontrol(_bant.get(_b, 0) > 0,
             "bant %s gercek ciftlerde dolu (%d adet)" % (_b, _bant.get(_b, 0)))
