@@ -1063,14 +1063,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
       final headers = <String, String>{
         if (integrityToken != null) 'X-Play-Integrity-Token': integrityToken,
       };
-      var resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 90));
+      var resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
       if (!mounted) return;
       if (resp.statusCode == 402) {
         // Tek PDF ($19.99) satın alma teklif et; başarılıysa bir kez tekrar dene.
         final bought = await RevenueCatService.purchase('pdf_single');
         if (!mounted) return;
         if (bought) {
-          resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 90));
+          resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
           if (!mounted) return;
         } else {
           setState(() => _pdfLoading = false);

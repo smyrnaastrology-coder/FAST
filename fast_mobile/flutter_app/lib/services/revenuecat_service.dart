@@ -77,9 +77,13 @@ class RevenueCatService {
 
   static Future<bool> purchase(String productId) async {
     if (!_inited) {
-      // Mock: backend'e direkt webhook simülasyonu
-      if (kDebugMode) print('[RC mock] purchase $productId');
-      return true;
+      // Debug: backend'e direkt webhook simülasyonu.
+      // Release: RevenueCat ayarlanmamişsa sahte başarı DÖNDÜRME — gerçek satın alma açılsın.
+      if (kDebugMode) {
+        print('[RC mock] purchase $productId');
+        return true;
+      }
+      return false;
     }
     try {
       final offerings = await Purchases.getOfferings();

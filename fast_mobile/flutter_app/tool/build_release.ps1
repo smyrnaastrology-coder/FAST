@@ -68,6 +68,19 @@ $defines = @(
     "--dart-define=SUPABASE_ANON_KEY=$SupabaseAnonKey"
 )
 
+# RevenueCat (opsiyonel): tool\revenuecat.local.ps1 icindeki $RevenueCatApiKey
+# degeri gecirilir. Yoksa uyari yazilir (release'de PDF satin alma acilmaz).
+$rcLocal = Join-Path $PSScriptRoot 'revenuecat.local.ps1'
+$RevenueCatApiKey = ''
+if (Test-Path $rcLocal) {
+    . $rcLocal
+}
+if (-not [string]::IsNullOrWhiteSpace($RevenueCatApiKey)) {
+    $defines += "--dart-define=REVENUECAT_API_KEY=$RevenueCatApiKey"
+} else {
+    Write-Host "UYARI: REVENUECAT_API_KEY yok. PDF 402 'satın al' akışı Play'de AÇILMAZ." -ForegroundColor Yellow
+}
+
 if ($Target -eq 'apk') {
     flutter build apk --release @defines
 } else {
