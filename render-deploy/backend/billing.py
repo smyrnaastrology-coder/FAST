@@ -98,6 +98,12 @@ def _pg_ensure_schema():
                     uid TEXT PRIMARY KEY,
                     expiry DOUBLE PRECISION
                 );
+                CREATE TABLE IF NOT EXISTS analysis_sessions (
+                    session_id TEXT PRIMARY KEY,
+                    builder TEXT,
+                    input JSONB,
+                    created_at DOUBLE PRECISION
+                );
             """)
         conn.commit()
     finally:

@@ -1,5 +1,6 @@
 import os, sys, logging, base64, stripe, json, hmac, hashlib, re, time, tempfile
 import requests
+from pathlib import Path
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
@@ -1220,6 +1221,111 @@ def _cache_engine(motor):
 
 def _get_engine(sid: str):
     return _ENGINE_CACHE.get(sid)
+
+# ─── Analiz girdisi kaliciligi (PG + dosya yedegi) ───
+# Motor yalnizca bellekte tutuluyor; sunucu restart / cold-start / 12+ analiz
+# sonrasi cache'ten dusunce PDF/gorsel/simulasyon "Oturum bulunamadi" verir.
+# Analiz girdisini kalicilastirip motoryu istek aninda yeniden kuruyoruz.
+import json as _json
+try:
+    from billing import DATA_DIR as _BILLING_DATA_DIR
+except Exception:
+    _BILLING_DATA_DIR = None
+
+_SESSION_INPUT_DIR = None
+if _BILLING_DATA_DIR is not None:
+    _SESSION_INPUT_DIR = _BILLING_DATA_DIR / "sessions"
+else:
+    _SESSION_INPUT_DIR = Path(_PROJECT_ROOT) / "data" / "sessions"
+_SESSION_INPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+def _pg_ready():
+    try:
+        import billing as _b
+        return _b._use_pg() and _b.ensure_schema_ready()
+    except Exception:
+        return False
+
+def _save_session_input(sid: str, builder: str, veri: dict):
+    try:
+        fd = _SESSION_INPUT_DIR / f"{sid}.json"
+        fd.write_text(_json.dumps({"builder": builder, "input": veri}, ensure_ascii=False), encoding="utf-8")
+    except Exception as _e:
+        print(f"[session] dosya yazma hatasi {sid}: {_e}", flush=True)
+    if not _pg_ready():
+        return
+    try:
+        import billing as _b
+        conn = _b._pg_connect()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO analysis_sessions (session_id, builder, input, created_at)
+                    VALUES (%s,%s,%s,%s)
+                    ON CONFLICT (session_id) DO UPDATE SET
+                      builder=EXCLUDED.builder, input=EXCLUDED.input,
+                      created_at=EXCLUDED.created_at
+                """, (sid, builder, _json.dumps(veri, ensure_ascii=False), time.time()))
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception as _e:
+        print(f"[session] pg yazma hatasi {sid}: {_e}", flush=True)
+
+def _load_session_input(sid: str):
+    rec = None
+    if _pg_ready():
+        try:
+            import billing as _b
+            conn = _b._pg_connect()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT builder, input FROM analysis_sessions WHERE session_id=%s", (sid,))
+                    row = cur.fetchone()
+                if row:
+                    rec = {"builder": row[0], "input": _json.loads(row[1])}
+            finally:
+                conn.close()
+        except Exception as _e:
+            print(f"[session] pg okuma hatasi {sid}: {_e}", flush=True)
+    if rec:
+        return rec
+    fd = _SESSION_INPUT_DIR / f"{sid}.json"
+    if fd.exists():
+        try:
+            return _json.loads(fd.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return None
+
+def _engine_or_rebuild(sid: str):
+    """Cache'teki motoru dondurur; yoksa kayitli girdiden yeniden kurar."""
+    m = _get_engine(sid)
+    if m is not None:
+        return m
+    rec = _load_session_input(sid)
+    if not rec:
+        return None
+    builder = rec.get("builder", "")
+    inp = rec.get("input", {})
+    try:
+        if builder == "es":
+            m = _engine_es(EsSevgiliInput(**inp))
+        elif builder == "eb":
+            m = _engine_eb(EbeveynCocukInput(**inp))
+        elif builder == "py":
+            m = _engine_py(PotansiyelYetenekInput(**inp))
+        elif builder == "natal":
+            m = _engine_natal(BireyselNatalInput(**inp))
+        else:
+            return None
+        if m is not None:
+            m._session_id = sid
+            _ENGINE_CACHE[sid] = m
+        return m
+    except Exception as _e:
+        print(f"[session] motor yeniden kurma hatasi sid={sid}: {_e}", flush=True)
+    return None
 
 # ─── Analiz sonuc cache + tek-kilitleme + 429 ───
 import hashlib as _hashlib
@@ -3086,6 +3192,7 @@ def _engine_es(p: EsSevgiliInput, ek_charts=False):
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
+    _save_session_input(motor._session_id, "es", p.model_dump(mode="json"))
     return motor
 
 def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
@@ -3104,6 +3211,7 @@ def _engine_eb(p: EbeveynCocukInput, ek_charts=False):
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
+    _save_session_input(motor._session_id, "eb", p.model_dump(mode="json"))
     return motor
 
 def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
@@ -3122,6 +3230,7 @@ def _engine_py(p: PotansiyelYetenekInput, ek_charts=False):
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
+    _save_session_input(motor._session_id, "py", p.model_dump(mode="json"))
     return motor
 
 def _engine_natal(p: BireyselNatalInput, ek_charts=False):
@@ -3140,6 +3249,7 @@ def _engine_natal(p: BireyselNatalInput, ek_charts=False):
     )
     motor.fbst_analizi_yap(sessiz=True)
     _cache_engine(motor)
+    _save_session_input(motor._session_id, "natal", p.model_dump(mode="json"))
     return motor
 
 def _collect_sabian_data(motor):
@@ -6863,7 +6973,7 @@ def astrokartografi_analiz(input: AstroInput, request: Request):
         # limitli preview: sadece ilk skor, detay yok
         raise HTTPException(status_code=402, detail={"code": "SUB_REQUIRED", "msg": "Astrokartografi için abonelik gerekli", "locked": True})
     try:
-        motor = _get_engine(input.session_id)
+        motor = _engine_or_rebuild(input.session_id)
         if not motor:
             raise HTTPException(404, "Oturum bulunamadı")
         comp = _composite_midpoints(motor.p1, motor.p2)
@@ -7557,7 +7667,7 @@ def pdf_indir(request: Request, session_id: str, tip: str, uid: str = "", device
         dosya_adi = f"{session_id}_Cift_Tarafli_Kontrat.pdf"
     yol = os.path.join(_PROJECT_ROOT, dosya_adi)
     if not os.path.exists(yol):
-        m = _get_engine(session_id)
+        m = _engine_or_rebuild(session_id)
         if m is not None:
             try:
                 _generate_pdf(m, tip)
@@ -7591,7 +7701,7 @@ def gorsel_situa_a(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_A.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.haritalari_ciz()
     r = _resim_once(svg, png)
     if r: return r
@@ -7603,7 +7713,7 @@ def gorsel_situa_b(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Situa_B.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.haritalari_ciz()
     r = _resim_once(svg, png)
     if r: return r
@@ -7615,7 +7725,7 @@ def gorsel_frekans(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Frekans.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.ciz_titresim_grafigi(dosya_adi=png)
     r = _resim_once(svg, png)
     if r: return r
@@ -7627,7 +7737,7 @@ def gorsel_composite(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Composite.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.ciz_composite_harita(dosya_adi=png)
     r = _resim_once(svg, png)
     if r: return r
@@ -7639,7 +7749,7 @@ def gorsel_aci_gridi(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Aci_Gridi.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.ciz_aci_gridi(dosya_adi=png)
     r = _resim_once(svg, png)
     if r: return r
@@ -7651,7 +7761,7 @@ def gorsel_arap(session_id: str):
     png = os.path.join(_PROJECT_ROOT, f"{session_id}_Arap_Noktalari.png")
     r = _resim_once(svg, png)
     if r: return r
-    m = _get_engine(session_id)
+    m = _engine_or_rebuild(session_id)
     if m: m.ciz_arap_noktalari_radar(dosya_adi=png)
     r = _resim_once(svg, png)
     if r: return r
@@ -7888,7 +7998,7 @@ def simulasyon_natal_radar(input: BireyselNatalInput):
 @app_fast.post("/api/simulasyon/alternatif")
 def simulasyon_alternatif(input: AlternatifInput):
     # Re-run analysis with different coordinates
-    motor = _get_engine(input.session_id)
+    motor = _engine_or_rebuild(input.session_id)
     if not motor:
         raise HTTPException(404, "Oturum bulunamadı. Önce analiz çalıştırın.")
     # Create new engine with alternative location
@@ -7973,7 +8083,7 @@ def sehir_bilgi(sehir: str):
 @app_fast.get("/api/astrocartography/harita/{session_id}")
 def astrocartography_harita(session_id: str):
     """Astrocartography dünya haritasını SVG olarak döndürür."""
-    motor = _get_engine(session_id)
+    motor = _engine_or_rebuild(session_id)
     if not motor:
         raise HTTPException(404, "Oturum bulunamadı")
     try:
