@@ -32,6 +32,8 @@ from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     OZEL_BAG_ACI_TEMA, GUNES_AY_UYUM_OZET, BUYUK_SEHIRLER)
 from core.sifa_receteler_en import FBST_RECETELER_EN, FBST_RECETELER_EBEVEYN_EN
 from core.sifa_receteler_es import FBST_RECETELER_ES, FBST_RECETELER_EBEVEYN_ES
+from core.sinastri_anlati import (SINASTRI_ANLATI, SINASTRI_ANLATI_BAGLAM,
+    SINASTRI_ANLATI_UYGULAMA)
 try:
     from core._lr_es_sozlukleri import (lr_ebeveyn_vitrin_es, lr_bireysel_vitrin_es,
         lr_ebeveyn_ayev_es, lr_bireysel_ayev_es)
@@ -1770,6 +1772,12 @@ class FBST_Engine:
         from datetime import datetime, date
         _EN = _core_get_lang() == "en"
         _ES = _core_get_lang() == "es"
+        if _EN:
+            lang_kodu = "en"
+        elif _ES:
+            lang_kodu = "es"
+        else:
+            lang_kodu = "tr"
 
         if not sessiz:
             print("MOTOR TESTİ: Sinastri Hesaplama Fonksiyonu Tetiklendi!")
@@ -1798,14 +1806,18 @@ class FBST_Engine:
 
         sinastri_verileri = []
         receteler = []
+        anlati_verileri = []
         
         # Açı Tipleri ve Orb Değerleri
         aci_tipleri = {
             0: {"isim": (("Conjunction" if _EN else ("Conjunción" if _ES else "Kavuşum"))), "etki": (("Powerful Union" if _EN else ("Unión Poderosa" if _ES else "Güçlü Birleşme"))), "puan": 10},
-            180: {"isim": (("Opposition" if _EN else ("Oposición" if _ES else "Karşıt"))), "etki": (("Awareness/Tension" if _EN else ("Conciencia/Tensión" if _ES else "Farkındalık/Gerilim"))), "puan": -5},
+            45: {"isim": (("Semi-Square" if _EN else ("Semicuadratura" if _ES else "Yarım Kare"))), "etki": (("Friction" if _EN else ("Fricción" if _ES else "Sürtünme"))), "puan": -6},
+            60: {"isim": (("Sextile" if _EN else ("Sextil" if _ES else "Sekstil"))), "etki": (("Opportunity/Harmony" if _EN else ("Oportunidad/Armonía" if _ES else "Fırsat/Uyum"))), "puan": 5},
             90: {"isim": (("Square" if _EN else ("Cuadratura" if _ES else "Kare"))), "etki": (("Struggle/Dynamism" if _EN else ("Lucha/Dinamismo" if _ES else "Mücadele/Dinamizm"))), "puan": -8},
             120: {"isim": (("Trine" if _EN else ("Trígono" if _ES else "Üçgen"))), "etki": (("Natural Flow/Luck" if _EN else ("Flujo Natural/Suerte" if _ES else "Doğal Akış/Şans"))), "puan": 8},
-            60: {"isim": (("Sextile" if _EN else ("Sextil" if _ES else "Sekstil"))), "etki": (("Opportunity/Harmony" if _EN else ("Oportunidad/Armonía" if _ES else "Fırsat/Uyum"))), "puan": 5}
+            135: {"isim": (("Sesquiquadrate" if _EN else ("Sesquicuadrado" if _ES else "Bir Buçuk Kare"))), "etki": (("Adjustment" if _EN else ("Ajuste" if _ES else "Ayar"))), "puan": -5},
+            150: {"isim": (("Quincunx" if _EN else ("Quincuncio" if _ES else "Quincunx"))), "etki": (("Adaptation" if _EN else ("Adaptación" if _ES else "Uyum"))), "puan": -3},
+            180: {"isim": (("Opposition" if _EN else ("Oposición" if _ES else "Karşıt"))), "etki": (("Awareness/Tension" if _EN else ("Conciencia/Tensión" if _ES else "Farkındalık/Gerilim"))), "puan": -5}
         }
         
         if self.mod == "ebeveyn_cocuk":
@@ -1914,6 +1926,39 @@ class FBST_Engine:
                         "Neptün": "ilham ve maneviyat", "Plüton": "dönüşüm ve güçlenme",
                     }
                 },
+                45: {
+                    "baslik": "Bu iki enerji arasında sürekli ama büyük olmayan bir sürtünme var",
+                    "aciklama": "Bu yarım kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ebeveyn-çocuk bağında {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
+                    "konu_map": {
+                        "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve anlama", "Venüs": "değer algısı",
+                        "Mars": "eylem ve cesaret", "Jüpiter": "büyüme ve bolluk",
+                        "Satürn": "yapı ve sınır", "Uranüs": "yenilik ve rutin",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
+                    }
+                },
+                135: {
+                    "baslik": "Bu iki enerji arasında üst üste binen küçük uyumsuzluklar var",
+                    "aciklama": "Bu bir buçuk kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ebeveyn-çocuk bağında {konu} alanında ritim kaybı doğurur. Ritmi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
+                    "konu_map": {
+                        "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve zihinsel ritim", "Venüs": "değer algısı",
+                        "Mars": "eylem hızı", "Jüpiter": "genişleme ve inanç",
+                        "Satürn": "yapı ve sorumluluk", "Uranüs": "özgürlük ve değişim",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
+                    }
+                },
+                150: {
+                    "baslik": "Bu iki enerji birbirine uymayan ihtiyaçlarla karşılaşıyor",
+                    "aciklama": "Bu quincunx açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ebeveyn-çocuk bağında {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
+                    "konu_map": {
+                        "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve anlama", "Venüs": "değer algısı",
+                        "Mars": "eylem ve cesaret", "Jüpiter": "büyüme ve inanç",
+                        "Satürn": "yapı ve sınır", "Uranüs": "yenilik ve değişim",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve dönüşüm",
+                    }
+                },
             }
         else:
             ACI_DINAMIKLERI = {
@@ -1972,11 +2017,46 @@ class FBST_Engine:
                         "Neptün": "ilham ve maneviyat", "Plüton": "dönüşüm ve güçlenme",
                     }
                 },
+                45: {
+                    "baslik": "Bu iki enerji arasında sürekli ama büyük olmayan bir sürtünme var",
+                    "aciklama": "Bu yarım kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ilişkinizde {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
+                    "konu_map": {
+                        "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve anlama", "Venüs": "sevgi ve değer",
+                        "Mars": "tutku ve eylem", "Jüpiter": "büyüme ve bolluk",
+                        "Satürn": "yapı ve sınır", "Uranüs": "yenilik ve rutin",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
+                    }
+                },
+                135: {
+                    "baslik": "Bu iki enerji arasında üst üste binen küçük uyumsuzluklar var",
+                    "aciklama": "Bu bir buçuk kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ilişkinizde {konu} alanında ritim kaybı doğurur. Ritminizi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
+                    "konu_map": {
+                        "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve zihinsel ritim", "Venüs": "sevgi ve değer",
+                        "Mars": "tutku ve eylem hızı", "Jüpiter": "büyüme ve inanç",
+                        "Satürn": "yapı ve sorumluluk", "Uranüs": "özgürlük ve değişim",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve kontrol",
+                    }
+                },
+                150: {
+                    "baslik": "Bu iki enerji birbirine uymayan ihtiyaçlarla karşılaşıyor",
+                    "aciklama": "Bu quincunx açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ilişkinizde {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
+                    "konu_map": {
+                        "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
+                        "Merkür": "iletişim ve anlama", "Venüs": "sevgi ve değer",
+                        "Mars": "tutku ve eylem", "Jüpiter": "büyüme ve inanç",
+                        "Satürn": "yapı ve sınır", "Uranüs": "yenilik ve değişim",
+                        "Neptün": "gerçek ve hayal", "Plüton": "güç ve dönüşüm",
+                    }
+                },
             }
 
         # Gezegen derecelerini önceden hesapla
         p1_pos = {}
         p2_pos = {}
+        p1_hiz = {}
+        p2_hiz = {}
         
         for g in gezegenler_listesi:
             try:
@@ -1986,11 +2066,19 @@ class FBST_Engine:
                         flags = get_safe_flags(gid)
                         p1_pos[g] = swe.calc_ut(j1, gid, flags)[0][0]
                         p2_pos[g] = swe.calc_ut(j2, gid, flags)[0][0]
+                        try:
+                            p1_hiz[g] = swe.calc_ut(j1, gid, flags | swe.FLG_SPEED)[0][3]
+                            p2_hiz[g] = swe.calc_ut(j2, gid, flags | swe.FLG_SPEED)[0][3]
+                        except Exception:
+                            p1_hiz[g] = None
+                            p2_hiz[g] = None
                     except Exception:
                         tahmini = asteroit_tahmini_derece(g, j1)
                         if tahmini is not None:
                             p1_pos[g] = tahmini
                             p2_pos[g] = asteroit_tahmini_derece(g, j2)
+                            p1_hiz[g] = None
+                            p2_hiz[g] = None
             except Exception as e:
                 if not sessiz: print(f"UYARI: {g} hesaplanamadı ({e})")
                 continue
@@ -2036,6 +2124,12 @@ class FBST_Engine:
                         burclar = ["Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi", "Akrep", "Yay", "Oğlak", "Kova", "Balık"]
                         burc1 = burclar[int(d1 / 30) % 12]
                         burc2 = burclar[int(d2 / 30) % 12]
+                        _orb_tam = int(orb)
+                        _orb_dk = int(round((orb - _orb_tam) * 60))
+                        if _orb_dk >= 60:
+                            _orb_dk -= 60
+                            _orb_tam += 1
+                        orb_str = f"{_orb_tam}°{_orb_dk:02d}'"
                         
                         # --- FBST SİNASTRİ YORUMLARI (dış dosyadan) ---
                         fbst_yorumlar = FBST_SINASTRI_OZEL if FBST_SINASTRI_OZEL else {}
@@ -2088,6 +2182,81 @@ class FBST_Engine:
                                 yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_info['isim']} {'Theme:' if _EN else ('Tema:' if _ES else 'Teması:')}</b> {zengin_yorum}"
                         
                         sinastri_verileri.append(yorum)
+                        
+                        # --- SOLAR FIRE TARZI ANLATI KATMANI (mevcut hiçbir blok eksiltilmez) ---
+                        try:
+                            anlati_baslik = None
+                            anlati_plan = SINASTRI_ANLATI.get(aci_deg, {}).get(lang_kodu)
+                            h1 = p1_hiz.get(g1)
+                            h2 = p2_hiz.get(g2)
+                            uygulama_key = None
+                            if h1 is not None and h2 is not None:
+                                gap = ((d2 - d1) % 360) - aci_deg
+                                if gap > 180: gap -= 360
+                                elif gap < -180: gap += 360
+                                rel = h2 - h1
+                                uygulama_key = "applying" if (abs(gap) < 1e-6 or rel * gap < 0) else "separating"
+                            if anlati_plan:
+                                # Türkçe iyelik eklerini isim ve gezegen adına göre doğru üret
+                                def _iyelik(ad):
+                                    if not ad: return ""
+                                    def _tv(c):
+                                        if c == 'I': return 'ı'
+                                        if c == 'İ': return 'i'
+                                        return c.lower()
+                                    unlu = "aıeiöouü"
+                                    son = _tv(ad[-1])
+                                    if son in unlu:
+                                        v = son
+                                        if v in "aı": ek = "nın"
+                                        elif v in "ei": ek = "nin"
+                                        elif v in "ou": ek = "nun"
+                                        else: ek = "nün"
+                                    else:
+                                        ek = ""
+                                        for c in reversed(ad):
+                                            v = _tv(c)
+                                            if v in unlu:
+                                                if v in "aı": ek = "ın"
+                                                elif v in "ei": ek = "in"
+                                                elif v in "ou": ek = "un"
+                                                else: ek = "ün"
+                                                break
+                                        if not ek: ek = "ın"
+                                    return ad + "'" + ek
+                                if lang_kodu == "tr":
+                                    import re as _re_re
+                                    for _k, _ad in (("p1", self.p1_isim), ("p2", self.p2_isim)):
+                                        anlati_plan = _re_re.sub(r"\{" + _k + r"\}'[^ \.,;:!?)]+", "{" + _k + "_iy}", anlati_plan)
+                                    for _k, _ad in (("g1", pdf_label(g1)), ("g2", pdf_label(g2))):
+                                        anlati_plan = _re_re.sub(r"\{" + _k + r"\}'[^ \.,;:!?)]+", "{" + _k + "_iy}", anlati_plan)
+                                uygulama_metni = ""
+                                uygulama_etiket = ""
+                                if uygulama_key:
+                                    uygulama_metni = SINASTRI_ANLATI_UYGULAMA.get(lang_kodu, {}).get(uygulama_key, "")
+                                    if _EN:
+                                        uygulama_etiket = "Applying" if uygulama_key == "applying" else "Separating"
+                                    elif _ES:
+                                        uygulama_etiket = "Aplicativo" if uygulama_key == "applying" else "Separativo"
+                                    else:
+                                        uygulama_etiket = "Uygulanan" if uygulama_key == "applying" else "Ayrılan"
+                                baglam_metni = SINASTRI_ANLATI_BAGLAM.get(self.mod, SINASTRI_ANLATI_BAGLAM.get("bireysel_natal", {})).get(lang_kodu, "")
+                                if uygulama_etiket:
+                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_info['isim']} — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str} ({uygulama_etiket})"
+                                else:
+                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_info['isim']} — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str}"
+                                anlati_metin = anlati_plan.format(
+                                    p1=self.p1_isim, p2=self.p2_isim,
+                                    p1_iy=_iyelik(self.p1_isim), p2_iy=_iyelik(self.p2_isim),
+                                    g1=pdf_label(g1), g2=pdf_label(g2),
+                                    g1_iy=_iyelik(pdf_label(g1)), g2_iy=_iyelik(pdf_label(g2)),
+                                    ev1=p1_evler.get(g1, "?"), ev2=p2_evler.get(g2, "?"),
+                                    uygulama=uygulama_metni, baglam=baglam_metni,
+                                )
+                                if anlati_metin:
+                                    anlati_verileri.append((anlati_baslik, anlati_metin))
+                        except Exception:
+                            pass
                         
                         # --- GELİŞTİRİLMİŞ ŞİFA REÇETELERİ ---
                         fbst_receteler = {
@@ -2601,7 +2770,17 @@ class FBST_Engine:
         for madde in set(sinastri_verileri):
             html_cikti += f"<p style='font-size:13px; line-height:2.0; margin-bottom:14px; padding: 6px 0; border-bottom: 1px solid #E8E0D8;'>✨ {madde}</p>"
             
-        html_cikti += """</div><div style="background-color: #FFF0ED; padding: 15px; border-radius: 8px; border-left: 5px solid #D4878F;">"""
+        html_cikti += "</div>"
+        
+        # --- SOLAR FIRE TARZI ANLATI KATMANI (PDF'e eklenir; mevcut bölümler eksilmez) ---
+        if anlati_verileri:
+            html_cikti += ("""<h4 style="color: #8E7CC3; margin-top: 0;">📖 NARRATIVE READING</h4>""" if _EN else ("""<h4 style="color: #8E7CC3; margin-top: 0;">📖 LECTURA NARRATIVA</h4>""" if _ES else """<h4 style="color: #8E7CC3; margin-top: 0;">📖 SİNASTRİ ANLATISI</h4>"""))
+            html_cikti += """<div style="background-color: #F4F1FB; padding: 15px; border-radius: 8px; border-left: 5px solid #8E7CC3; margin-bottom: 20px;">"""
+            for _ab, _am in anlati_verileri:
+                html_cikti += f"<p style='font-size:13px; line-height:2.0; margin-bottom:14px; padding: 6px 0; border-bottom: 1px solid #E1DAF2;'><b>{_ab}</b><br/>{_am}</p>"
+            html_cikti += "</div>"
+            
+        html_cikti += """<div style="background-color: #FFF0ED; padding: 15px; border-radius: 8px; border-left: 5px solid #D4878F;">"""
         
         if self.mod == "ebeveyn_cocuk":
             html_cikti += ("""<h4 style="color: #C47A82; margin-top: 0;">💊 FATE LESSONS AND HEALING SUGGESTIONS</h4>""" if _EN else ("""<h4 style="color: #C47A82; margin-top: 0;">💊 LECCIONES DESTINADAS Y SUGERENCIAS DE SANACIÓN</h4>""" if _ES else """<h4 style="color: #C47A82; margin-top: 0;">💊 KADERSEL DERSLER VE ŞİFA ÖNERİLERİ</h4>"""))
@@ -2619,6 +2798,11 @@ class FBST_Engine:
             html_cikti += ("<p style='font-size:13px;'>Your current fate themes do not require an acute healing prescription. Stay in your natural flow.</p>" if _EN else ("<p style='font-size:13px;'>Sus temas dеstinados actuales no requieren una receta aguda de sanación. Permanezcan en su flujo natural.</p>" if _ES else "<p style='font-size:13px;'>Mevcut kadersel temaslarınız akut bir şifa reçetesi gerektirmemektedir. Doğal akışınızda kalın.</p>"))
             
         html_cikti += "</div>"
+        
+        try:
+            self._son_sinastri_anlati = [{"baslik": _ab, "metin": _am} for (_ab, _am) in anlati_verileri]
+        except Exception:
+            self._son_sinastri_anlati = []
         
         return html_cikti
 

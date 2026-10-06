@@ -35,7 +35,7 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 
 ## 3. Mağaza Listesi
 
-> **Güncel metinler:** `docs/store_listing/PLAY_STORE_LISTING_1.0.11-28.md`
+> **Güncel metinler:** `docs/store_listing/PLAY_STORE_LISTING_1.0.11-32.md`
 > (TR/EN/ES uzun + kısa açıklama ve sürüm notu, karakter sayıları Play sınırlarına göre doğrulanmış).
 
 ### Kısa açıklama (80 karakter)
@@ -44,7 +44,7 @@ Play Console'da: Abonelik oluştur > Faturalandırma dönemi 1 ay / 1 yıl > Üc
 - ES (70): Fast Synastry — Ciclo kármico de 21 años, lecturas en lenguaje claro, +16.000 ciudades
 
 ### Uzun açıklama (4000 karakter)
-TR/EN/ES tam metinler için bkz. `docs/store_listing/PLAY_STORE_LISTING_1.0.11-28.md`. Öne çıkan bloklar:
+TR/EN/ES tam metinler için bkz. `docs/store_listing/PLAY_STORE_LISTING_1.0.11-32.md`. Öne çıkan bloklar:
 - Ashtakoot yorumları jargonuz; 44 puan durumu × 4 açı (vaat / anlatı / simge / dikkat) × 2 gövde = her açılışta 8 farklı metin
 - Doğum yeri: 225 ülke, 16.000+ şehir; seçilen şehirden otomatik saat dilimi (yaz saati dahil), yoksa elle UTC
 - "Analizden çık" ile form tekrar doldurulmadan sıfırlanır

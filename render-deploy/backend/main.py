@@ -2860,6 +2860,15 @@ def _wrap_text(text, maxlen):
     if cur: lines.append(cur)
     return lines or [text]
 
+def _sinastri_anlati_topla(motor, limit=40):
+    """Solar Fire tarzı sinastri anlatı katmanını (JSON için) üretir."""
+    try:
+        motor.sinastri_hesapla(sessiz=True)
+        kayitlar = getattr(motor, "_son_sinastri_anlati", [])
+        return kayitlar[:limit] if isinstance(kayitlar, list) else []
+    except Exception:
+        return []
+
 def _collect_extra_data(motor):
     data = {}
     try:
@@ -7367,6 +7376,7 @@ def analiz_es(input: EsSevgiliInput):
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
         base.update(_collect_extra_data(motor))
+        base["sinastri_anlati"] = _sinastri_anlati_topla(motor)
         base["event_tarih"] = motor.event_date_str
         base["event_saat"] = motor.event_time_str
         try:
@@ -7399,6 +7409,7 @@ def analiz_eb(input: EbeveynCocukInput):
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
         base.update(_collect_extra_data(motor))
+        base["sinastri_anlati"] = _sinastri_anlati_topla(motor)
         base["event_tarih"] = motor.event_date_str
         base["event_saat"] = motor.event_time_str
         try:
@@ -7440,6 +7451,7 @@ def analiz_eb_detayli(input: EbeveynCocukInput):
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
         base.update(extra)
+        base["sinastri_anlati"] = _sinastri_anlati_topla(motor)
         base["event_tarih"] = motor.event_date_str
         base["event_saat"] = motor.event_time_str
         try:
@@ -7674,6 +7686,7 @@ def analiz_es_detayli(input: EsSevgiliInput):
             "chartlar": ["situa_a", "situa_b", "frekans", "composite", "aci_gridi", "arap_noktalari"],
         }
         base.update(extra)
+        base["sinastri_anlati"] = _sinastri_anlati_topla(motor)
         base["event_tarih"] = motor.event_date_str
         base["event_saat"] = motor.event_time_str
         try:

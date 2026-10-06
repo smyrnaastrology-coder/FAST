@@ -1,6 +1,6 @@
-# Play Store Mağaza Listesi — 1.0.11+28
+# Play Store Mağaza Listesi — 1.0.11+32
 
-> Bu metinler 1.0.11+28 AAB/APK ile birlikte üretildi.
+> Bu metinler 1.0.11+32 AAB/APK ile birlikte üretildi.
 > Tüm karakter sayıları Google Play sınırlarına göre kontrol edildi.
 > Uygulama adı her dilde aynı: **Fast Synastry** (13/30).
 

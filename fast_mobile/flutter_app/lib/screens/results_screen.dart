@@ -240,6 +240,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
           if (r['chart_yorumu'] != null)
             _buildHtmlSection(l10n.analyzerSectionChartComment, r['chart_yorumu']),
 
+          // Sinastri Anlatisi (Solar Fire tarzi)
+          if (r['sinastri_anlati'] is List && (r['sinastri_anlati'] as List).isNotEmpty)
+            _buildSinastriAnlati(r['sinastri_anlati'] as List),
+
           // Sifa Receteleri
           if (r['sifa_receteleri'] != null)
             _buildSifaReceteleri(r['sifa_receteleri']),
@@ -769,6 +773,39 @@ class _ResultsScreenState extends State<ResultsScreen> {
       title: l10n.analyzerSectionHealing,
       icon: Icons.spa,
       child: HtmlRender(data.toString()),
+    );
+  }
+
+  Widget _buildSinastriAnlati(List data) {
+    final l10n = AppLocalizations.of(context);
+    return SectionCard(
+      title: l10n.analyzerSectionSinastriNarrative,
+      icon: Icons.auto_stories,
+      child: Column(
+        children: data.map((item) {
+          final m = item is Map ? Map<String, dynamic>.from(item) : <String, dynamic>{};
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: FastTheme.bg,
+              border: Border.all(color: FastTheme.border),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  m['baslik']?.toString() ?? '',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: FastTheme.primary, height: 1.4),
+                ),
+                const SizedBox(height: 6),
+                Text(m['metin']?.toString() ?? '', style: const TextStyle(fontSize: 12, height: 1.7)),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 

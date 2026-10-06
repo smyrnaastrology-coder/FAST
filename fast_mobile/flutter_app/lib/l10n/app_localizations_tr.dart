@@ -840,6 +840,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get analyzerSectionHealingDetail => 'Detaylı Şifa Reçeteleri';
 
   @override
+  String get analyzerSectionSinastriNarrative => 'Sinastri Anlatısı';
+
+  @override
   String get analyzerSectionAsteroids => 'Asteroit Etkileşimleri';
 
   @override

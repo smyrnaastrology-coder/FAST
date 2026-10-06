@@ -844,6 +844,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyzerSectionHealingDetail => 'Detailed Healing Prescriptions';
 
   @override
+  String get analyzerSectionSinastriNarrative => 'Synastry Narrative';
+
+  @override
   String get analyzerSectionAsteroids => 'Asteroid Interactions';
 
   @override

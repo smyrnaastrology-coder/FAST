@@ -1630,6 +1630,12 @@ abstract class AppLocalizations {
   /// **'Detailed Healing Prescriptions'**
   String get analyzerSectionHealingDetail;
 
+  /// No description provided for @analyzerSectionSinastriNarrative.
+  ///
+  /// In en, this message translates to:
+  /// **'Synastry Narrative'**
+  String get analyzerSectionSinastriNarrative;
+
   /// No description provided for @analyzerSectionAsteroids.
   ///
   /// In en, this message translates to:
