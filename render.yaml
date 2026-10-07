@@ -2,14 +2,16 @@ services:
   - type: web
     name: fbst-api
     runtime: python
+    branch: main
     rootDir: render-deploy
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: bash start.sh
     healthCheckPath: /api/health
-   - type: web
+    - type: web
     name: horary-oracle-api
     runtime: python
+    branch: horary
     plan: free
     buildCommand: pip install -r horary_oracle/requirements.txt
     startCommand: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
@@ -24,6 +26,7 @@ services:
   - type: web
     name: horary-oracle-web
     runtime: python
+    branch: horary
     plan: free
     buildCommand: pip install -r horary_oracle/requirements.txt
     startCommand: streamlit run horary_oracle/horary_app.py --server.port $PORT --server.address 0.0.0.0
@@ -38,6 +41,7 @@ services:
   - type: web
     name: horary-pwa
     runtime: static
+    branch: horary
     plan: free
     buildCommand: cd horary_ios && flutter build web --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
     staticPublishPath: horary_ios/build/web
