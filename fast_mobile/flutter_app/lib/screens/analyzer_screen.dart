@@ -2919,7 +2919,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                   children: [
                     Expanded(
                       child: _dropdownField(l10n.analyzerCountry, ((_lokasyonDB?['sehirler'] as Map? ?? {}).keys.toList()..sort()).cast<String>(), _astroUlke, (v) {
-                        setState(() { _astroUlke = v ?? ''; _astroSehir = ''; provider.reset(); });
+                        setState(() { _astroUlke = v ?? ''; _astroSehir = ''; provider.resetAstro(); });
                       }, labels: countryLabels(Localizations.localeOf(context).languageCode)),
                     ),
                     const SizedBox(width: 8),

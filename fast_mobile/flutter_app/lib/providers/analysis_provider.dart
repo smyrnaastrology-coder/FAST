@@ -160,4 +160,11 @@ class AnalysisProvider extends ChangeNotifier {
     _paid = false;
     notifyListeners();
   }
+
+  /// Ülke/Şehir değişince yalnız astro puanlarını temizle; analiz sonucuna dokunma
+  /// (reset() tüm raporu silip ekranı başa çeviriyordu).
+  void resetAstro() {
+    _astroData = null;
+    notifyListeners();
+  }
 }
