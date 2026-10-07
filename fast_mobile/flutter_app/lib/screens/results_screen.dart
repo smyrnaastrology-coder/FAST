@@ -11,6 +11,7 @@ import '../models/analysis_request.dart';
 import '../providers/analysis_provider.dart';
 import '../services/api_service.dart';
 import '../services/billing_service.dart';
+import '../services/pdf_repurchase_service.dart';
 import '../services/play_integrity_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/score_display.dart';
@@ -1091,6 +1092,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
           setState(() => _pdfLoading = false);
           if (!mounted) return;
           if (!ok && RevenueCatService.lastAlreadyOwned) {
+            // Aynı hesapla TEKRAR ödeme alınabilsin diye: eski sahiplenmeyi
+            // Play'de consume et → kilit kalkar → akışı baştan çalıştır
+            // (ödeme ekranı açılır). Tüketilecek bir şey yoksa dialog.
+            final freed = await PdfRepurchaseService.consumeOwnedPdfSingle();
+            if (freed) {
+              if (!mounted) return;
+              return _downloadPdf(provider, sessionId, mod, l10n);
+            }
+            if (!mounted) return;
             // Play: "bu öğe zaten sizde var" — hak, satın alan Google
             // hesabında. Girişe yönlendir (misafir kimliğiyle hak görünmez).
             _showAlreadyOwnedDialog(l10n);
