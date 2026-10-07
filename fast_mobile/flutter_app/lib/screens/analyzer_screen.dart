@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -2938,7 +2938,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                         ? () => provider.loadAstroScores(_astroSehir, _astroUlke)
                         : null,
                     icon: const Icon(Icons.public, size: 16),
-                    label: Text('🌍 ${l10n.analyzerCalc}'),
+                    label: Text(l10n.analyzerCalc),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
