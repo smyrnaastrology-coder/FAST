@@ -6731,6 +6731,60 @@ def claim_free(body: FreeClaim):
     mark_free_used(body.uid, body.device_token or "")
     return {"ok": True, "msg": "Free PDF claimed"}
 
+class SyncClaim(BaseModel):
+    uid: str
+
+@app_fast.post("/api/billing/sync_entitlement")
+def billing_sync_entitlement(body: SyncClaim):
+    """Kurtarma endpoint'i: Play "zaten sizde var" deyip sunucuda hak yoksa
+    (webhook kaçağı / misafir→giriş uid değişimi / reinstall), RevenueCat REST
+    API ile DOĞRULAYIP hakkı bu uid'e işler. Doğrulama olmadan hak yazılmaz.
+    Gereken env: REVENUECAT_API_SECRET (dashboard secret API key).
+    """
+    uid = (body.uid or "").strip()
+    if not uid:
+        raise HTTPException(status_code=400, detail={"code": "UID_REQUIRED", "msg": "uid gerekli"})
+    secret = os.getenv("REVENUECAT_API_SECRET", "").strip()
+    if not secret:
+        return {"ok": True, "synced": False, "reason": "not_configured"}
+    from urllib.parse import quote as _q
+    try:
+        r = requests.get(
+            f"https://api.revenuecat.com/v1/subscribers/{_q(uid, safe='')}",
+            headers={"Authorization": f"Bearer {secret}", "Content-Type": "application/json"},
+            timeout=15,
+        )
+    except Exception as e:
+        logging.warning(f"[billing-sync] RC API erisim hatasi uid={uid}: {e}")
+        return {"ok": False, "synced": False, "reason": "rc_error"}
+    if r.status_code == 404:
+        return {"ok": True, "synced": False, "reason": "no_record"}
+    if r.status_code != 200:
+        logging.warning(f"[billing-sync] RC API {r.status_code} uid={uid}")
+        return {"ok": False, "synced": False, "reason": "rc_error"}
+    try:
+        sub = (r.json().get("subscriber") or {})
+    except Exception:
+        return {"ok": False, "synced": False, "reason": "rc_error"}
+    granted = []
+    now = time.time()
+    for pid, info in ((sub.get("subscriptions") or {}).items()):
+        exp = (info or {}).get("expires_date")
+        try:
+            exp_ts = datetime.fromisoformat(str(exp).replace("Z", "+00:00")).timestamp() if exp else 0.0
+        except Exception:
+            exp_ts = 0.0
+        if not exp or exp_ts > now:
+            upsert_subscription(uid, str(pid), exp_ts, "active", provider="revenuecat-sync")
+            granted.append(f"sub:{pid}")
+    for pid, txns in ((sub.get("non_subscriptions") or {}).items()):
+        if txns and str(pid).startswith("pdf_single"):
+            grant_pdf_single(uid)
+            granted.append("pdf_single")
+    if granted:
+        logging.info(f"[billing-sync] hak yazildi uid={uid} {granted}")
+    return {"ok": True, "synced": bool(granted), "granted": granted}
+
 @app_fast.post("/api/billing/webhook")
 async def billing_webhook(request: Request):
     """RevenueCat webhook — HMAC imzasıyla doğrulanır; geçersiz ise 401 ile bloklanır.
