@@ -1074,6 +1074,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;
         if (resp.statusCode == 402) {
+          // Kurtarma: Play'de sahiplenilmiş ama sunucuda hak yoksa (webhook
+          // kaçağı / misafir→giriş uid değişimi / reinstall), RC kaydını
+          // doğrulayıp hakkı bu uid'e işlet, sonra son kez dene.
+          try {
+            await RevenueCatService.restore();
+            final sync = await BillingService.syncEntitlement();
+            if (sync['synced'] == true) {
+              resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
+              if (!mounted) return;
+            }
+          } catch (_) {}
+        }
+        if (!mounted) return;
+        if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);
           if (!mounted) return;
           if (!ok && RevenueCatService.lastAlreadyOwned) {

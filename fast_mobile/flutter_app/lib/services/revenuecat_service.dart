@@ -130,6 +130,17 @@ class RevenueCatService {
     }
   }
 
+  /// Play'deki mevcut sahiplenmeyi RC'ye geri yükle (reinstall / uid
+  /// değişimi sonrası "zaten sizde var" kilidini açmak için).
+  static Future<void> restore() async {
+    if (!_inited) return;
+    try {
+      await Purchases.restorePurchases();
+    } catch (e) {
+      if (kDebugMode) print('[RC] restore err $e');
+    }
+  }
+
   /// Giriş yapan kullanıcıyı RevenueCat'te kimliklendir (app_user_id = Supabase userId).
   /// Böylece abonelik hesaba bağlanır, cihaz değişse de kaybolmaz.
   static Future<void> identify(String userId) async {

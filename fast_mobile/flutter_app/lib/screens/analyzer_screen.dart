@@ -15,6 +15,7 @@ import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
+import '../services/billing_service.dart';
 import '../services/play_integrity_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/language_switcher.dart';
@@ -3375,6 +3376,20 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         final ok = await RevenueCatService.purchase('pdf_single');
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
+        if (!mounted) return;
+        if (resp.statusCode == 402) {
+          // Kurtarma: Play'de sahiplenilmiş ama sunucuda hak yoksa (webhook
+          // kaçağı / misafir→giriş uid değişimi / reinstall), RC kaydını
+          // doğrulayıp hakkı bu uid'e işlet, sonra son kez dene.
+          try {
+            await RevenueCatService.restore();
+            final sync = await BillingService.syncEntitlement();
+            if (sync['synced'] == true) {
+              resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
+              if (!mounted) return;
+            }
+          } catch (_) {}
+        }
         if (!mounted) return;
         if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);

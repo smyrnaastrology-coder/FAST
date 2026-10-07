@@ -57,5 +57,21 @@ class BillingService {
     }
   }
 
+  /// Kurtarma: Play'de sahiplenilmiş ama sunucuda hak yoksa (webhook kaçağı /
+  /// uid değişimi / reinstall), sunucu RevenueCat API ile doğrulayıp hakkı
+  /// bu uid'e işler. Dönen map: {ok, synced, granted?, reason?}
+  static Future<Map<String, dynamic>> syncEntitlement() async {
+    try {
+      final uid = await getBillingUid();
+      final r = await http.post(Uri.parse('$_base/api/billing/sync_entitlement'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'uid': uid})).timeout(const Duration(seconds: 20));
+      if (r.statusCode == 200) return jsonDecode(r.body) as Map<String, dynamic>;
+    } catch (e) {
+      if (kDebugMode) print('billing sync error: $e');
+    }
+    return {'ok': false, 'synced': false};
+  }
+
   static Map<String, String> authHeaders(String uid) => {'X-UID': uid};
 }
