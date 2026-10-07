@@ -10333,7 +10333,7 @@ class FBST_Engine:
         _EN = _core_get_lang() == "en"
         _ES = _core_get_lang() == "es"
         if dosya_adi is None:
-            dosya_adi = f"{self._session_id}_Potansiyel_Yetenek.pdf"
+            dosya_adi = f"{self._session_id}_Potansiyel_Kitabi.pdf"
         from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle

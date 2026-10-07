@@ -1863,10 +1863,11 @@ def _generate_pdf(motor, tip="rapor"):
         _generate_natal_pdf(motor)
     elif tip == "potansiyel":
         _attach_radar_to_engine(motor, natal=True)
-        motor.pdf_potansiyel_rapor_uret(dosya_adi=f"{motor._session_id}_Potansiyel_Yetenek.pdf")
+        motor.pdf_potansiyel_rapor_uret(dosya_adi=f"{motor._session_id}_Potansiyel_Kitabi.pdf")
     else:
         _attach_radar_to_engine(motor, natal=False)
-        motor.pdf_rapor_uret(dosya_adi=f"{motor._session_id}_Cift_Tarafli_Kontrat.pdf")
+        _kitap = f"{motor._session_id}_Ebeveyn_Kitabi.pdf" if tip == "ebeveyn" else f"{motor._session_id}_Iliski_Kitabi.pdf"
+        motor.pdf_rapor_uret(dosya_adi=_kitap)
 
 
 def _attach_radar_to_engine(motor, natal: bool = False):
@@ -1978,7 +1979,7 @@ def _generate_natal_pdf(motor):
     pdfmetrics.registerFont(TTFont("DejaVu-Oblique", os.path.join(font_dir, "DejaVuSans-Oblique.ttf")))
     pdfmetrics.registerFont(TTFont("DejaVu-BoldOblique", os.path.join(font_dir, "DejaVuSans-BoldOblique.ttf")))
 
-    dosya = f"{motor._session_id}_Bireysel_Natal.pdf"
+    dosya = f"{motor._session_id}_Natal_Kitabi.pdf"
     yol = os.path.join(_PROJECT_ROOT, dosya)
     w, h = A4
     c = canvas.Canvas(yol, pagesize=A4)
@@ -2164,8 +2165,7 @@ def _generate_natal_pdf(motor):
         else:
             c.setFont("DejaVu-Bold", 34)
             c.setFillColor(HexColor('#FDFAF5'))
-            c.drawCentredString(w / 2, h - 150, pdf_label("Bireysel Natal"))
-            c.drawCentredString(w / 2, h - 190, pdf_label("Analiz Raporu"))
+            c.drawCentredString(w / 2, h - 150, pdf_label("El Kitabı"))
             c.setStrokeColor(altin)
             c.setLineWidth(1)
             c.line(w / 2 - 110, h - 212, w / 2 + 110, h - 212)
@@ -7660,11 +7660,13 @@ def pdf_indir(request: Request, session_id: str, tip: str, uid: str = "", device
             raise HTTPException(status_code=402, detail={"code": "PAYMENT_REQUIRED", "msg": "PDF hakkınız yok. Abone olun, tek PDF satın alın veya ücretsiz hakkınızı kullanın."})
         raise HTTPException(status_code=402, detail={"code": "PAYMENT_REQUIRED", "msg": "PDF indirilemiyor (altyapı)"})
     if tip == "natal":
-        dosya_adi = f"{session_id}_Bireysel_Natal.pdf"
+        dosya_adi = f"{session_id}_Natal_Kitabi.pdf"
     elif tip == "potansiyel":
-        dosya_adi = f"{session_id}_Potansiyel_Yetenek.pdf"
+        dosya_adi = f"{session_id}_Potansiyel_Kitabi.pdf"
+    elif tip == "ebeveyn":
+        dosya_adi = f"{session_id}_Ebeveyn_Kitabi.pdf"
     else:
-        dosya_adi = f"{session_id}_Cift_Tarafli_Kontrat.pdf"
+        dosya_adi = f"{session_id}_Iliski_Kitabi.pdf"
     yol = os.path.join(_PROJECT_ROOT, dosya_adi)
     if not os.path.exists(yol):
         m = _engine_or_rebuild(session_id)
