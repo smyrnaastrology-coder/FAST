@@ -1765,7 +1765,7 @@ abstract class AppLocalizations {
   /// No description provided for @pdfPaymentRequired.
   ///
   /// In en, this message translates to:
-  /// **'This report requires a subscription or a one-time purchase.'**
+  /// **'This book requires a subscription or a one-time purchase.'**
   String get pdfPaymentRequired;
 
   /// No description provided for @astrokartografiSubscribe.
@@ -1965,6 +1965,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'📥 Download PDF ({mod})'**
   String downloadPdfButton(Object mod);
+
+  /// No description provided for @bookIliski.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship Book'**
+  String get bookIliski;
+
+  /// No description provided for @bookEbeveyn.
+  ///
+  /// In en, this message translates to:
+  /// **'Parenting Book'**
+  String get bookEbeveyn;
+
+  /// No description provided for @bookEl.
+  ///
+  /// In en, this message translates to:
+  /// **'Handbook'**
+  String get bookEl;
+
+  /// No description provided for @downloadBookButton.
+  ///
+  /// In en, this message translates to:
+  /// **'📥 Download {book}'**
+  String downloadBookButton(Object book);
+
+  /// No description provided for @pdfAlreadyOwnedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already purchased'**
+  String get pdfAlreadyOwnedTitle;
+
+  /// No description provided for @pdfAlreadyOwnedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This book appears to be already purchased on your Google Play account. Sign in with the account you purchased with, then try downloading again.'**
+  String get pdfAlreadyOwnedBody;
 
   /// No description provided for @analyzerYearLine.
   ///

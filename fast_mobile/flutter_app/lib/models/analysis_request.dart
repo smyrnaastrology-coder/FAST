@@ -121,4 +121,13 @@ class AnalysisRequest {
       default: return mod;
     }
   }
+
+  /// PDF artık uzun bir kitap: moda göre kitap adı (İlişki / Ebeveyn / El Kitabı).
+  String bookLabel(AppLocalizations l10n) {
+    switch (mod) {
+      case 'es_sevgili': return l10n.bookIliski;
+      case 'ebeveyn_cocuk': return l10n.bookEbeveyn;
+      default: return l10n.bookEl;
+    }
+  }
 }

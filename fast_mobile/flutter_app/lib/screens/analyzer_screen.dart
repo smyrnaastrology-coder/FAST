@@ -2934,10 +2934,22 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _astroSehir.isNotEmpty && _astroUlke.isNotEmpty
-                        ? () => provider.loadAstroScores(_astroSehir, _astroUlke)
+                    onPressed: (_astroSehir.isNotEmpty && _astroUlke.isNotEmpty && !provider.astroLoading)
+                        ? () {
+                            // Sunucu YYYY-AA-GG + SS:DD ister; boş giderse 400 döner.
+                            // Önce raporun kendi event tarihi, yoksa formdaki değer.
+                            final evT = (r['event_tarih'] as String?)?.trim().isNotEmpty == true
+                                ? (r['event_tarih'] as String).trim()
+                                : _normalizeDate(_eventTarihCtrl.text);
+                            final evS = (r['event_saat'] as String?)?.trim().isNotEmpty == true
+                                ? (r['event_saat'] as String).trim()
+                                : (_eventSaatCtrl.text.trim().isEmpty ? '12:00' : _eventSaatCtrl.text.trim());
+                            provider.loadAstroScores(_astroSehir, _astroUlke, evT, evS);
+                          }
                         : null,
-                    icon: const Icon(Icons.public, size: 16),
+                    icon: provider.astroLoading
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.public, size: 16),
                     label: Text(l10n.analyzerCalc),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -2945,6 +2957,13 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
                     ),
                   ),
                 ),
+
+                // Astro hata (örn. abonelik gerekli) — sessiz kalmasın
+                if (provider.astroError != null) ...[
+                  const SizedBox(height: 8),
+                  Text(provider.astroError!,
+                    style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12)),
+                ],
 
                 // Astro scores
                 if (provider.astroData != null || r['astrokartografi'] is Map) ...[
@@ -3305,12 +3324,38 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
 
   List<Map<String, String>> _pdfLinks(String sessionId, AppLocalizations l10n) {
     switch (_mode) {
-      case 'es_sevgili': return [{'tip': 'rapor', 'label': l10n.analyzerPdfReport}];
-      case 'potansiyel_yetenek': return [{'tip': 'potansiyel', 'label': l10n.analyzerPdfPotential}];
-      case 'ebeveyn_cocuk': return [{'tip': 'rapor', 'label': l10n.analyzerPdfReport}];
-      case 'bireysel_natal': return [{'tip': 'natal', 'label': l10n.analyzerPdfNatal}];
+      case 'es_sevgili': return [{'tip': 'rapor', 'label': l10n.downloadBookButton(l10n.bookIliski)}];
+      case 'potansiyel_yetenek': return [{'tip': 'potansiyel', 'label': l10n.downloadBookButton(l10n.bookEl)}];
+      case 'ebeveyn_cocuk': return [{'tip': 'ebeveyn', 'label': l10n.downloadBookButton(l10n.bookEbeveyn)}];
+      case 'bireysel_natal': return [{'tip': 'natal', 'label': l10n.downloadBookButton(l10n.bookEl)}];
       default: return [];
     }
+  }
+
+  /// Play "zaten sizde var" durumu: satın alma bu Google hesabında duruyor,
+  /// sunucu hakkı misafir kimliğinde görünmüyor → girişe yönlendir.
+  void _showAlreadyOwnedDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.pdfAlreadyOwnedTitle),
+        content: Text(l10n.pdfAlreadyOwnedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.peopleCancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AuthScreen()));
+            },
+            child: Text(l10n.loginButton),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _downloadPdf(String sessionId, String? tip, AppLocalizations l10n) async {
@@ -3327,13 +3372,20 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       if (resp.statusCode == 402) {
         // Tek PDF ($19.99) satın alma; webhook hakkı sunucuya yazsın diye kısa
         // bekleme + her durumda bir kez daha dene (zaten alınmışsa bile).
-        await RevenueCatService.purchase('pdf_single');
+        final ok = await RevenueCatService.purchase('pdf_single');
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;
         if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+          if (!mounted) return;
+          if (!ok && RevenueCatService.lastAlreadyOwned) {
+            // Play: "bu öğe zaten sizde var" — hak, satın alan Google
+            // hesabında. Girişe yönlendir (misafir kimliğiyle hak görünmez).
+            _showAlreadyOwnedDialog(l10n);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+          }
           return;
         }
       }

@@ -75,7 +75,13 @@ class RevenueCatService {
     }
   }
 
+  /// Son purchase() çağrısı Google Play'de "bu öğe zaten sizde var"
+  /// (ALREADY_OWNED) ile reddedildiyse true olur. PDF akışı bunu yakalayıp
+  /// kullanıcıyı girişe yönlendirir (hak, satın alan Google hesabındadır).
+  static bool lastAlreadyOwned = false;
+
   static Future<bool> purchase(String productId) async {
+    lastAlreadyOwned = false;
     if (!_inited) {
       // Debug: backend'e direkt webhook simülasyonu.
       // Release: RevenueCat ayarlanmamişsa sahte başarı DÖNDÜRME — gerçek satın alma açılsın.
@@ -104,6 +110,8 @@ class RevenueCatService {
       final res = await Purchases.purchase(PurchaseParams.package(pkg));
       return res.customerInfo.entitlements.active.isNotEmpty;
     } catch (e) {
+      final s = e.toString().toLowerCase();
+      if (s.contains('already')) lastAlreadyOwned = true;
       if (kDebugMode) print('[RC] purchase err $e');
       return false;
     }

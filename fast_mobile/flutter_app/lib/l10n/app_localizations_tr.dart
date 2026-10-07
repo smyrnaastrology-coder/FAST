@@ -909,7 +909,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get pdfPaymentRequired =>
-      'Bu rapor için abonelik veya tek seferlik satın alma gerekiyor.';
+      'Bu kitap için abonelik veya tek seferlik satın alma gerekiyor.';
 
   @override
   String get astrokartografiSubscribe => 'Abone Ol';
@@ -1020,6 +1020,27 @@ class AppLocalizationsTr extends AppLocalizations {
   String downloadPdfButton(Object mod) {
     return '📥 PDF İndir ($mod)';
   }
+
+  @override
+  String get bookIliski => 'İlişki Kitabı';
+
+  @override
+  String get bookEbeveyn => 'Ebeveyn Kitabı';
+
+  @override
+  String get bookEl => 'El Kitabı';
+
+  @override
+  String downloadBookButton(Object book) {
+    return '📥 $book\'nı İndir';
+  }
+
+  @override
+  String get pdfAlreadyOwnedTitle => 'Bu ürün zaten alınmış';
+
+  @override
+  String get pdfAlreadyOwnedBody =>
+      'Bu kitap Google Play hesabınızda zaten satın alınmış görünüyor. Satın aldığınız hesapla giriş yapın, ardından tekrar indirmeyi deneyin.';
 
   @override
   String analyzerYearLine(Object year) {

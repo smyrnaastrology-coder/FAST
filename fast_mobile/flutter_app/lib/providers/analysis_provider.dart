@@ -113,7 +113,15 @@ class AnalysisProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _astroLoading = false;
+  String? _astroError;
+  bool get astroLoading => _astroLoading;
+  String? get astroError => _astroError;
+
   Future<void> loadAstroScores(String sehir, String ulke, [String tarih = '', String saat = '']) async {
+    _astroLoading = true;
+    _astroError = null;
+    notifyListeners();
     try {
       final g = await _api.geocode('$sehir, $ulke');
       _astroData = await _api.astroKartografi({
@@ -124,11 +132,11 @@ class AnalysisProvider extends ChangeNotifier {
         'tarih': tarih,
         'saat': saat,
       });
-      notifyListeners();
     } catch (e) {
-      _error = e.toString();
-      notifyListeners();
+      _astroError = e.toString().replaceFirst('Exception: ', '');
     }
+    _astroLoading = false;
+    notifyListeners();
   }
 
   Future<String?> loadAcgMap() async {
@@ -165,6 +173,8 @@ class AnalysisProvider extends ChangeNotifier {
   /// (reset() tüm raporu silip ekranı başa çeviriyordu).
   void resetAstro() {
     _astroData = null;
+    _astroError = null;
+    _astroLoading = false;
     notifyListeners();
   }
 }

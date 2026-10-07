@@ -927,7 +927,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get pdfPaymentRequired =>
-      'Este informe requiere una suscripción o una compra única.';
+      'Este libro requiere una suscripción o una compra única.';
 
   @override
   String get astrokartografiSubscribe => 'Suscribirse';
@@ -1038,6 +1038,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String downloadPdfButton(Object mod) {
     return '📥 Descargar PDF ($mod)';
   }
+
+  @override
+  String get bookIliski => 'Libro de Relación';
+
+  @override
+  String get bookEbeveyn => 'Libro de Crianza';
+
+  @override
+  String get bookEl => 'Manual';
+
+  @override
+  String downloadBookButton(Object book) {
+    return '📥 Descargar $book';
+  }
+
+  @override
+  String get pdfAlreadyOwnedTitle => 'Ya adquirido';
+
+  @override
+  String get pdfAlreadyOwnedBody =>
+      'Este libro ya parece estar comprado en tu cuenta de Google Play. Inicia sesión con la cuenta de compra e inténtalo de nuevo.';
 
   @override
   String analyzerYearLine(Object year) {

@@ -16,6 +16,7 @@ import '../services/revenuecat_service.dart';
 import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
+import 'auth_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
   final AnalysisRequest request;
@@ -1015,7 +1016,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 icon: _pdfLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.download, size: 20),
                 label: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadPdfButton(widget.request.modLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadBookButton(widget.request.bookLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: FastTheme.accent,
@@ -1068,13 +1069,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
       if (resp.statusCode == 402) {
         // Tek PDF ($19.99) satın alma; webhook hakkı sunucuya yazsın diye kısa
         // bekleme + her durumda bir kez daha dene (zaten alınmışsa bile).
-        await RevenueCatService.purchase('pdf_single');
+        final ok = await RevenueCatService.purchase('pdf_single');
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;
         if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+          if (!mounted) return;
+          if (!ok && RevenueCatService.lastAlreadyOwned) {
+            // Play: "bu öğe zaten sizde var" — hak, satın alan Google
+            // hesabında. Girişe yönlendir (misafir kimliğiyle hak görünmez).
+            _showAlreadyOwnedDialog(l10n);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+          }
           return;
         }
       }
@@ -1095,6 +1103,32 @@ class _ResultsScreenState extends State<ResultsScreen> {
       setState(() => _pdfLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.analyzerPdfError('$e'))));
     }
+  }
+
+  /// Play "zaten sizde var" durumu: satın alma bu Google hesabında duruyor,
+  /// sunucu hakkı misafir kimliğinde görünmüyor → girişe yönlendir.
+  void _showAlreadyOwnedDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.pdfAlreadyOwnedTitle),
+        content: Text(l10n.pdfAlreadyOwnedBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.peopleCancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AuthScreen()));
+            },
+            child: Text(l10n.loginButton),
+          ),
+        ],
+      ),
+    );
   }
 
   // ---- Skor kartları (yan yana kompakt) ----
