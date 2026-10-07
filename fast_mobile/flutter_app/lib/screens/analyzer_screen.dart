@@ -3325,13 +3325,13 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       var resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
       if (!mounted) return;
       if (resp.statusCode == 402) {
-        // Tek PDF ($19.99) satın alma teklif et; başarılıysa bir kez tekrar dene.
-        final bought = await RevenueCatService.purchase('pdf_single');
+        // Tek PDF ($19.99) satın alma; webhook hakkı sunucuya yazsın diye kısa
+        // bekleme + her durumda bir kez daha dene (zaten alınmışsa bile).
+        await RevenueCatService.purchase('pdf_single');
+        await Future.delayed(const Duration(seconds: 3));
+        resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;
-        if (bought) {
-          resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
-          if (!mounted) return;
-        } else {
+        if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
           return;

@@ -62,7 +62,7 @@ class RevenueCatService {
     }
     try {
       await Purchases.setLogLevel(LogLevel.debug);
-      final uid = await BillingService.getUid();
+      final uid = await BillingService.getBillingUid();
       PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
       await Purchases.configure(config);
       _inited = true;
@@ -139,7 +139,7 @@ class RevenueCatService {
     if (!_inited) return;
     try {
       await Purchases.logOut();
-      final uid = await BillingService.getUid();
+      final uid = await BillingService.getBillingUid();
       await Purchases.logIn(uid);
     } catch (e) {
       if (kDebugMode) print('[RC] reset err $e');

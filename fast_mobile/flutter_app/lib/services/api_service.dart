@@ -74,7 +74,7 @@ class ApiService {
       '${ApiConfig.gorselBase}/$sessionId/$tip';
 
   Future<String> getPdfUrl(String sessionId, String tip) async {
-    final uid = await BillingService.getUid();
+    final uid = await BillingService.getBillingUid();
     return '${ApiConfig.pdfBase}/$sessionId/$tip?uid=${Uri.encodeQueryComponent(uid)}';
   }
 

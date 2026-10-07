@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fast_app/config/api_config.dart';
+import 'auth_service.dart';
 
 class BillingService {
   static const _uidKey = 'fbst_uid';
@@ -10,6 +11,16 @@ class BillingService {
   static String get _base => ApiConfig.baseUrl;
 
   static String? _cachedUid;
+
+  /// Faturalama kimliği: giriş yapan kullanıcıda Supabase userId (RevenueCat
+  /// `app_user_id` ile aynı), değilse cihaz uid'i. Webhook hakları bu kimliğe
+  /// yazılır; PDF/status/claim-free de aynı kimliği kullanmalı — aksi halde
+  /// "ödedim ama PDF inmiyor / zaten sizde var" döngüsü yaşanır.
+  static Future<String> getBillingUid() async {
+    final authUid = AuthService.userId;
+    if (authUid.isNotEmpty) return authUid;
+    return getUid();
+  }
 
   static Future<String> getUid() async {
     if (_cachedUid != null) return _cachedUid!;
@@ -25,7 +36,7 @@ class BillingService {
 
   static Future<Map<String, dynamic>> getStatus() async {
     try {
-      final uid = await getUid();
+      final uid = await getBillingUid();
       final r = await http.get(Uri.parse('$_base/api/billing/status?uid=$uid')).timeout(const Duration(seconds: 8));
       if (r.statusCode == 200) return jsonDecode(r.body) as Map<String, dynamic>;
     } catch (e) {
@@ -36,7 +47,7 @@ class BillingService {
 
   static Future<bool> claimFree() async {
     try {
-      final uid = await getUid();
+      final uid = await getBillingUid();
       final r = await http.post(Uri.parse('$_base/api/billing/claim-free'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'uid': uid})).timeout(const Duration(seconds: 10));
