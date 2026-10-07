@@ -3399,7 +3399,15 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             // hesabında. Girişe yönlendir (misafir kimliğiyle hak görünmez).
             _showAlreadyOwnedDialog(l10n);
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.pdfPaymentRequired)));
+            // Ödeme gerekiyorsa çıkmaz sokak yok: tek dokunuşla ödeme
+            // ekranını (Play satın alma) yeniden aç.
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(l10n.pdfPaymentRequired),
+              action: SnackBarAction(
+                label: l10n.retryButton,
+                onPressed: () => _downloadPdf(sessionId, tip, l10n),
+              ),
+            ));
           }
           return;
         }
