@@ -409,6 +409,56 @@ def is_subscribed(uid: str) -> bool:
         return False
     return True
 
+def _pg_expire_transfer_subs():
+    """provider revenuecat* + active + vadesiz satırları kapatır. Dönüş: satır sayısı."""
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE billing_subs SET status='expired', updated=%s
+                WHERE status='active' AND provider LIKE 'revenuecat%%'
+                  AND (expiry IS NULL OR expiry = 0)
+            """, (time.time(),))
+            n = cur.rowcount
+        conn.commit()
+        return n
+    finally:
+        conn.close()
+
+def repair_transfer_subs() -> int:
+    """TRANSFER/SUBSCRIBER_ALIAS webhook olaylarıyla yanlış yazılmış ömür boyu
+    abonelikleri kapatır (kimlik olayı satın alma değildir).
+
+    Hedef: provider revenuecat* + status active + vadesiz (expiry falsy) satırlar.
+    Gerçek aboneliklerde RC her zaman expiration gönderir; vadesiz aktif satır
+    neredeyse kesin TRANSFER/ALIAS kalıntısıdır. Idempotent — her açılışta çalışır.
+    """
+    fixed = 0
+    if _use_pg():
+        try:
+            n = _pg_retry(_pg_expire_transfer_subs)
+            if n:
+                print(f"[billing] TRANSFER kalintisi kapatildi (PG): {n} satir")
+                fixed += n
+        except Exception:
+            pass
+    try:
+        data = _load(SUBS_FILE)
+        dirty = False
+        for uid, rec in list(data.items()):
+            if not isinstance(rec, dict):
+                continue
+            if (rec.get("provider") or "").startswith("revenuecat") and rec.get("status") == "active" and not rec.get("expiry"):
+                rec["status"] = "expired"
+                dirty = True
+                fixed += 1
+        if dirty:
+            _save(SUBS_FILE, data)
+            print(f"[billing] TRANSFER kalintisi kapatildi (dosya)")
+    except Exception:
+        pass
+    return fixed
+
 def upsert_subscription(uid: str, product_id: str, expiry: float = 0, status: str = "active", provider: str = "revenuecat"):
     if not uid:
         return

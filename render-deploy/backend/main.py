@@ -1169,6 +1169,11 @@ def _billing_baslangic_kontrolu():
     erisilemiyorsa bunu KONSOLA yaz — yoksa fail-closed devreye girip
     kullanici neden indiremedigini anlamak cok zor olur."""
     import os as _os
+    try:
+        _onar = repair_transfer_subs()
+        print(f"[billing] transfer onarimi: {_onar} satir kapatildi")
+    except Exception as _e:
+        print(f"[billing] transfer onarimi atlandi: {_e}")
     if not _os.getenv("DATABASE_URL", "").strip():
         print("[billing] UYARI: DATABASE_URL yok -> haklar DOSYAYA yaziliyor "
               "(Render free plan disk her deploy'da silinir).")
@@ -6589,9 +6594,9 @@ def debug_ephe():
 
 # ─── Billing & Entitlement ───
 try:
-    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted
+    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted, repair_transfer_subs
 except Exception:
-    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted
+    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted, repair_transfer_subs
 
 try:
     from backend.auth import verify_token, get_profile, upsert_profile, list_people, create_person, update_person, delete_person, folder_labels, supabase_enabled
@@ -6889,10 +6894,15 @@ async def billing_webhook(request: Request):
     else:
         expiry_ts = 0.0
 
-    # Event tipleri haritalama
+    # Event tipleri haritalama.
+    # TRANSFER / SUBSCRIBER_ALIAS kimlik olaylarıdır (giriş/alias birleşmesi),
+    # satın alma DEĞİL — hak yazılmaz (yoksa her giriş ömür boyu abonelik üretir!).
     GRANT_TYPES = {"INITIAL_PURCHASE", "RENEWAL", "RENEWAL_FAILURE", "NON_RENEWING_PURCHASE",
-                   "SUBSCRIBER_ALIAS", "TRANSFER", "PRODUCT_CHANGE"}
+                   "PRODUCT_CHANGE", "UNCANCELLATION"}
     REVOKE_TYPES = {"CANCELLATION", "EXPIRATION", "BILLING_ISSUE"}
+    if etype in ("TRANSFER", "SUBSCRIBER_ALIAS"):
+        logging.info(f"[billing] kimlik olayi atlandi (hak yazilmadi) etype={etype} uid={uid}")
+        return {"ok": True}
 
     # Tek seferlik PDF ürünü (Model B: her satın alma +1 kredi).
     # Webhook tekrarları çift-kredi üretmesin diye işlem defteri tutulur.
