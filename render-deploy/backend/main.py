@@ -6760,7 +6760,7 @@ def billing_sync_entitlement(body: SyncClaim):
         return {"ok": True, "synced": False, "reason": "no_record"}
     if r.status_code != 200:
         logging.warning(f"[billing-sync] RC API {r.status_code} uid={uid}")
-        return {"ok": False, "synced": False, "reason": "rc_error"}
+        return {"ok": False, "synced": False, "reason": f"rc_http_{r.status_code}"}
     try:
         sub = (r.json().get("subscriber") or {})
     except Exception:
