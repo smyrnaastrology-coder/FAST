@@ -74,6 +74,68 @@ def _fmt_tarih(dt_obj, lang=None):
     return "%02d %s %d" % (dt_obj.day, _AYLAR_TR[dt_obj.month], dt_obj.year)
 
 
+_SINASTRI_EMOJI = ("✨", "📖", "💊", "🌿", "🔮", "☀️", "🌙", "⭐", "🌟", "🚀", "📍", "👉")
+
+def _sinastri_emoji_temizle(metin):
+    if not isinstance(metin, str):
+        return ""
+    for _e in _SINASTRI_EMOJI:
+        metin = metin.replace(_e, "")
+    return metin.strip()
+
+def _sinastri_html_parcala(html):
+    """sinastri_hesapla() HTML çıktısını PDF kartları için bloklara ayırır.
+
+    Dönüş: {"bloklar": [(tur, baslik_html, govde_html)],
+            "anlati_baslik": str, "recete_baslik": str}
+    tur ∈ {"etkilesim", "anlati", "recete"}. Emoji'ler DejaVu'da olmadığı için
+    (tofu kutu çıkarır) temizlenir. Dil bağımsız: h4 sırasına değil içeriğine bakılır.
+    """
+    import re
+    bloklar = []
+    anlati_baslik = ""
+    recete_baslik = ""
+    try:
+        parcalar = re.split(r"<h4[^>]*>(.*?)</h4>", html or "", flags=re.S)
+        govde_listesi = [(parcalar[0], "etkilesim")]
+        for i in range(1, len(parcalar), 2):
+            ham = _sinastri_emoji_temizle(re.sub(r"<[^>]+>", "", parcalar[i] or ""))
+            govde = parcalar[i + 1] if i + 1 < len(parcalar) else ""
+            ust = ham.upper()
+            if "NARRAT" in ust or "ANLAT" in ust or "LECTURA" in ust:
+                tur = "anlati"
+                if ham:
+                    anlati_baslik = ham
+            elif any(k in ust for k in ("KADER", "FATE", "RECET", "REÇET", "LECC", "HEAL", "ŞİFA", "SIFA", "SANA")):
+                tur = "recete"
+                if ham:
+                    recete_baslik = ham
+            else:
+                tur = govde_listesi[-1][1]
+            govde_listesi.append((govde, tur))
+        for govde, tur in govde_listesi:
+            govde = re.sub(r"</?div[^>]*>", "", govde or "")
+            for m in re.finditer(r"<p[^>]*>(.*?)</p>", govde, flags=re.S):
+                ic = (m.group(1) or "").strip()
+                if not ic:
+                    continue
+                if "</b>" in ic:
+                    bas, gov = ic.split("</b>", 1)
+                    bas = _sinastri_emoji_temizle(bas) + "</b>"
+                    gov = re.sub(r"^(<br\s*/?>)+", "", gov.strip())
+                else:
+                    bas, gov = "", ic
+                bas = re.sub(r"</?div[^>]*>", "", bas)
+                gov = re.sub(r"</?div[^>]*>", "", gov)
+                bas_ciplak = re.sub(r"<[^>]+>", "", bas).strip()
+                if not gov and not bas_ciplak:
+                    continue
+                bloklar.append((tur, bas, gov))
+    except Exception:
+        pass
+    return {"bloklar": bloklar, "anlati_baslik": anlati_baslik, "recete_baslik": recete_baslik}
+
+
 class FBST_Engine:
 
     
@@ -1895,7 +1957,7 @@ class FBST_Engine:
                 },
                 90: {
                     "baslik": "Bu iki enerji arasında yapıcı bir mücadele var",
-                    "aciklama": "Bu kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir gerilim ve itme-çekme dinamiği var. Bu mücadele, ebeveyn-çocuk bağında {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
+                    "aciklama": "Bu 90° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir gerilim ve itme-çekme dinamiği var. Bu mücadele, ebeveyn-çocuk bağında {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
                     "konu_map": {
                         "Güneş": "ego ve benlik", "Ay": "duygusal güvenlik",
                         "Merkür": "anlama ve anlaşma", "Venüs": "değer ve kabul",
@@ -1928,7 +1990,7 @@ class FBST_Engine:
                 },
                 45: {
                     "baslik": "Bu iki enerji arasında sürekli ama büyük olmayan bir sürtünme var",
-                    "aciklama": "Bu yarım kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ebeveyn-çocuk bağında {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
+                    "aciklama": "Bu 45° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ebeveyn-çocuk bağında {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
                     "konu_map": {
                         "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve anlama", "Venüs": "değer algısı",
@@ -1939,7 +2001,7 @@ class FBST_Engine:
                 },
                 135: {
                     "baslik": "Bu iki enerji arasında üst üste binen küçük uyumsuzluklar var",
-                    "aciklama": "Bu bir buçuk kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ebeveyn-çocuk bağında {konu} alanında ritim kaybı doğurur. Ritmi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
+                    "aciklama": "Bu 135° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ebeveyn-çocuk bağında {konu} alanında ritim kaybı doğurur. Ritmi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
                     "konu_map": {
                         "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve zihinsel ritim", "Venüs": "değer algısı",
@@ -1950,7 +2012,7 @@ class FBST_Engine:
                 },
                 150: {
                     "baslik": "Bu iki enerji birbirine uymayan ihtiyaçlarla karşılaşıyor",
-                    "aciklama": "Bu quincunx açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ebeveyn-çocuk bağında {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
+                    "aciklama": "Bu 150° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ebeveyn-çocuk bağında {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
                     "konu_map": {
                         "Güneş": "benlik ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve anlama", "Venüs": "değer algısı",
@@ -1986,7 +2048,7 @@ class FBST_Engine:
                 },
                 90: {
                     "baslik": "Bu iki enerji arasında yapıcı bir mücadele var",
-                    "aciklama": "Bu kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir Gerilim ve itme-çekme dinamiği var. Bu mücadele, ilişkinizde {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
+                    "aciklama": "Bu 90° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi arasında sürekli bir Gerilim ve itme-çekme dinamiği var. Bu mücadele, ilişkinizde {konu} alanında büyütücü bir baskı yaratıyor. Bu enerjiyi kanalize etmek için ortak bir hedef belirlemek en sağlıklı yoldur.",
                     "konu_map": {
                         "Güneş": "ego ve benlik", "Ay": "duygusal güvenlik",
                         "Merkür": "anlama ve anlaşma", "Venüs": "sevgi ve değer",
@@ -2019,7 +2081,7 @@ class FBST_Engine:
                 },
                 45: {
                     "baslik": "Bu iki enerji arasında sürekli ama büyük olmayan bir sürtünme var",
-                    "aciklama": "Bu yarım kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ilişkinizde {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
+                    "aciklama": "Bu 45° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi ufak ama sürekli bir sürtünme kurar. Bu durum, ilişkinizde {konu} alanında görünmez bir gerilim biriktirir. Küçük düzeltmelerle bu enerji rayına oturur.",
                     "konu_map": {
                         "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve anlama", "Venüs": "sevgi ve değer",
@@ -2030,7 +2092,7 @@ class FBST_Engine:
                 },
                 135: {
                     "baslik": "Bu iki enerji arasında üst üste binen küçük uyumsuzluklar var",
-                    "aciklama": "Bu bir buçuk kare açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ilişkinizde {konu} alanında ritim kaybı doğurur. Ritminizi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
+                    "aciklama": "Bu 135° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi tek tek küçük ama biriken uyumsuzluklar yaratır. Bu durum, ilişkinizde {konu} alanında ritim kaybı doğurur. Ritminizi bilinçli şekilde birbirine uydurabildikçe denge yerine oturur.",
                     "konu_map": {
                         "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve zihinsel ritim", "Venüs": "sevgi ve değer",
@@ -2041,7 +2103,7 @@ class FBST_Engine:
                 },
                 150: {
                     "baslik": "Bu iki enerji birbirine uymayan ihtiyaçlarla karşılaşıyor",
-                    "aciklama": "Bu quincunx açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ilişkinizde {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
+                    "aciklama": "Bu 150° açıda, {p1}'in {anlam1} enerjisi ile {p2}'in {anlam2} enerjisi aynı zemine oturur ama birbirine tam değmez. Bu durum, ilişkinizde {konu} alanında pratik bir uyumsuzluk yaratır. Bilinçli adaptasyonla bu alan ilişkiye yeni bir ustalık katar.",
                     "konu_map": {
                         "Güneş": "öz-güç ve ifade", "Ay": "duygusal ihtiyaçlar",
                         "Merkür": "iletişim ve anlama", "Venüs": "sevgi ve değer",
@@ -2161,9 +2223,9 @@ class FBST_Engine:
                             except Exception:
                                 ozel_yorum_fmt = ozel_yorum
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_info['isim']} {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {ozel_yorum_fmt}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {ozel_yorum_fmt}"
                             else:
-                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_info['isim']} {'Seal Theme:' if _EN else ('Sello:' if _ES else 'Mührü:')}</b> {ozel_yorum_fmt}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} & {self.p2_isim} {pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Seal Theme:' if _EN else ('Sello:' if _ES else 'Mührü:')}</b> {ozel_yorum_fmt}"
                         else:
                             p1_anlam = GEZEGEN_ANLAMLARI.get(g1, "enerji")
                             p2_anlam = GEZEGEN_ANLAMLARI.get(g2, "enerji")
@@ -2177,9 +2239,9 @@ class FBST_Engine:
                                 anlam1=p1_anlam, anlam2=p2_anlam, konu=konu
                             )
                             if self.mod == "ebeveyn_cocuk":
-                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_info['isim']} {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {zengin_yorum}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_deg}° ({aci_info['isim']}) {'Lesson:' if _EN else ('Lección:' if _ES else 'Dersi:')}</b> {zengin_yorum}"
                             else:
-                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_info['isim']} {'Theme:' if _EN else ('Tema:' if _ES else 'Teması:')}</b> {zengin_yorum}"
+                                yorum = f"<b>{self.p1_isim} {pdf_label(g1)} ({pdf_label(burc1)}) & {self.p2_isim} {pdf_label(g2)} ({pdf_label(burc2)}) {aci_deg}° ({aci_info['isim']}) {'Theme:' if _EN else ('Tema:' if _ES else 'Teması:')}</b> {zengin_yorum}"
                         
                         sinastri_verileri.append(yorum)
                         
@@ -2242,9 +2304,9 @@ class FBST_Engine:
                                         uygulama_etiket = "Uygulanan" if uygulama_key == "applying" else "Ayrılan"
                                 baglam_metni = SINASTRI_ANLATI_BAGLAM.get(self.mod, SINASTRI_ANLATI_BAGLAM.get("bireysel_natal", {})).get(lang_kodu, "")
                                 if uygulama_etiket:
-                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_info['isim']} — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str} ({uygulama_etiket})"
+                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_deg}° ({aci_info['isim']}) — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str} ({uygulama_etiket})"
                                 else:
-                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_info['isim']} — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str}"
+                                    anlati_baslik = f"{self.p1_isim} {pdf_label(g1)} — {aci_deg}° ({aci_info['isim']}) — {self.p2_isim} {pdf_label(g2)} · Orb {orb_str}"
                                 anlati_metin = anlati_plan.format(
                                     p1=self.p1_isim, p2=self.p2_isim,
                                     p1_iy=_iyelik(self.p1_isim), p2_iy=_iyelik(self.p2_isim),
@@ -2748,19 +2810,19 @@ class FBST_Engine:
                             }
                             _recete_ebeveyn = FBST_RECETELER_EBEVEYN_ES if _ES else (FBST_RECETELER_EBEVEYN_EN if _EN else fbst_receteler_ebeveyn)
                             if r_key in _recete_ebeveyn:
-                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_key]}")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_key]}")
                             elif r_alt_key in _recete_ebeveyn:
-                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_alt_key]}")
+                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_deg}° ({aci_info['isim']}) {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {_recete_ebeveyn[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {('Choose a shared activity and channel this tense energy into a constructive space.' if _EN else ('Elijan una actividad conjunta y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir aktivite belirleyin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Lección:' if _ES else ('Lesson:' if _EN else 'Dersi:')}</b> {('Choose a shared activity and channel this tense energy into a constructive space.' if _EN else ('Elijan una actividad conjunta y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir aktivite belirleyin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
                         else:
                             _recete = FBST_RECETELER_ES if _ES else (FBST_RECETELER_EN if _EN else fbst_receteler)
                             if r_key in _recete:
-                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_key]}")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_key]}")
                             elif r_alt_key in _recete:
-                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_alt_key]}")
+                                receteler.append(f"<b>{pdf_label(g2)}-{pdf_label(g1)} {aci_deg}° ({aci_info['isim']}) {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {_recete[r_alt_key]}")
                             elif aci_deg in [90, 180] and len(receteler) < 12:
-                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_info['isim']} {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {('Take up a shared hobby and channel this tense energy into a constructive space.' if _EN else ('Practiquen un pasatiempo compartido y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir hobi edinin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
+                                receteler.append(f"<b>{pdf_label(g1)}-{pdf_label(g2)} {aci_deg}° ({aci_info['isim']}) {'Remedio:' if _ES else ('Remedy:' if _EN else 'Şifası:')}</b> {('Take up a shared hobby and channel this tense energy into a constructive space.' if _EN else ('Practiquen un pasatiempo compartido y canalicen esta energía tensa hacia un espacio constructivo.' if _ES else 'Ortak bir hobi edinin ve bu gerilimli enerjiyi yapıcı bir alana kanalize edin.'))}")
 
         if not sinastri_verileri:
             sinastri_verileri = ["No major synastry interaction was detected." if _EN else "Majör bir sinastri etkileşimi saptanmadı."]
@@ -8992,26 +9054,39 @@ class FBST_Engine:
         # --- YENİ SİNASTRİ VE ŞİFA REÇETELERİ ENTEGRASYONU ---
         story.append(Paragraph(pdf_label("GEZEGEN ETKİLEŞİMLERİ"), styles['TurkishHeading']))
         
-        # Yeni motorumuzdan tek parça HTML dönen veriyi alıyoruz
+        # Sinastri HTML'ini kartlı bölümlere ayırarak bas (tek dev paragraf YOK):
+        # her etkileşim/anlatı/reçete kendi kartında; DejaVu'da olmayan
+        # emoji'ler parser'da temizlenir; açı adları dereceyle birlikte gelir.
         sinastri_html = self.sinastri_hesapla(sessiz=True)
-        
-        # ReportLab (PDF) kütüphanesinin desteklemediği web HTML etiketlerini (div, p, h4) 
-        # senin PDF stillerinin (TurkishNormal) anlayacağı formata çeviren güvenlik filtresi:
-        import re
-        temiz_html = re.sub(r'<div[^>]*>', '', sinastri_html)
-        temiz_html = temiz_html.replace('</div>', '<br/><br/>')
-        
-        temiz_html = re.sub(r'<h4[^>]*>', '<b><font size="12" color="#C47A82">', temiz_html)
-        temiz_html = temiz_html.replace('</h4>', '</font></b><br/><br/>')
-        
-        temiz_html = re.sub(r'<p[^>]*>', '', temiz_html)
-        temiz_html = temiz_html.replace('</p>', '<br/>')
-        
-        # Reçete madde numaralarını yeni satira tasima
-        temiz_html = re.sub(r'(\d+)\)\s+', r'<br/><b>\1)</b> ', temiz_html)
-        
-        # İki ayrı for döngüsü yerine, filtrelenmiş şık metni tek hamlede PDF'e basıyoruz
-        story.append(Paragraph(temiz_html, styles['TurkishNormal']))
+        _kart_baslik_stili = ParagraphStyle("SinastriKartBaslik", parent=styles["CardText"],
+                                            fontName="DejaVuSans-Bold", fontSize=11, leading=15,
+                                            textColor=HexColor("#2D2D44"), spaceAfter=6)
+        _sinastri_parca = _sinastri_html_parcala(sinastri_html)
+        _son_alt = None
+        for _tur, _b, _m in _sinastri_parca["bloklar"]:
+            if _tur in ("anlati", "recete"):
+                _alt = _sinastri_parca["anlati_baslik"] if _tur == "anlati" else _sinastri_parca["recete_baslik"]
+                if _alt and _alt != _son_alt:
+                    story.append(Paragraph(_alt, styles["TurkishHeading"]))
+                    story.append(Spacer(1, 8))
+                    _son_alt = _alt
+            if _b:
+                _kart = Table([[Paragraph(_b, _kart_baslik_stili)],
+                               [Paragraph(_m, styles["CardText"])]], colWidths=[500])
+                _kart.setStyle(TableStyle([
+                    ("BACKGROUND", (0, 0), (-1, -1), HexColor("#F8F9FA")),
+                    ("BOX", (0, 0), (-1, -1), 1.2, HexColor("#C9A96E")),
+                    ("LINEBELOW", (0, 0), (-1, 0), 0.6, HexColor("#E4D6BE")),
+                    ("LINELEFT", (0, 0), (0, -1), 5, ALTIN_AMBER),
+                    ("TOPPADDING", (0, 0), (-1, -1), 12),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 16),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 16),
+                ]))
+                story.append(_kart)
+            else:
+                story.append(Paragraph(_m, styles["TurkishNormal"]))
+            story.append(Spacer(1, 10))
 
         # =========================================================
         # 🌋 5. BÖLÜM: DÖNÜŞÜM SINAVLARI VE GLOBAL RADAR
