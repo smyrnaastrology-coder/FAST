@@ -308,6 +308,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planProDesc => 'Kişisel danışmanlık dahil';
 
   @override
+  String get planProMonthlyDesc => 'Aylık Pro üyeliği';
+
+  @override
+  String get planProYearlyDesc => 'Yıllık Pro üyeliği';
+
+  @override
   String get planProFeat1 => 'Premiumdaki her şey';
 
   @override
@@ -1368,6 +1374,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get modeAshTitle => 'İlişki Skorları';
+
+  @override
+  String get modeAshDesc => 'Vedik ilişki uyum skorları (36 guna puanı)';
+
+  @override
+  String get modeAshBadge => 'Uyum';
 
   @override
   String get analyzerModeAshDesc => 'Ay nakṣatra uyum puanı (36 üzerinden)';

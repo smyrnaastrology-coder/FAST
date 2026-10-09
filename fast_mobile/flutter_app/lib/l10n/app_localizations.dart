@@ -658,6 +658,18 @@ abstract class AppLocalizations {
   /// **'Includes personal consultation'**
   String get planProDesc;
 
+  /// No description provided for @planProMonthlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Pro membership'**
+  String get planProMonthlyDesc;
+
+  /// No description provided for @planProYearlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly Pro membership'**
+  String get planProYearlyDesc;
+
   /// No description provided for @planProFeat1.
   ///
   /// In en, this message translates to:
@@ -2583,6 +2595,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Relationship Scores'**
   String get modeAshTitle;
+
+  /// No description provided for @modeAshDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vedic relationship compatibility scores (36 guna points)'**
+  String get modeAshDesc;
+
+  /// No description provided for @modeAshBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Match'**
+  String get modeAshBadge;
 
   /// Moon nakshatra compatibility (out of 36)
   ///

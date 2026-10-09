@@ -308,6 +308,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planProDesc => 'Incluye consulta personal';
 
   @override
+  String get planProMonthlyDesc => 'Membresía Pro mensual';
+
+  @override
+  String get planProYearlyDesc => 'Membresía Pro anual';
+
+  @override
   String get planProFeat1 => 'Todo lo del Premium';
 
   @override
@@ -1386,6 +1392,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get modeAshTitle => 'Puntuaciones de Relación';
+
+  @override
+  String get modeAshDesc =>
+      'Puntuaciones védicas de compatibilidad (36 puntos guna)';
+
+  @override
+  String get modeAshBadge => 'Afinidad';
 
   @override
   String get analyzerModeAshDesc =>

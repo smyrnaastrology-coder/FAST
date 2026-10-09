@@ -4,6 +4,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../services/auth_service.dart';
+import '../widgets/brand_icons.dart';
 
 /// Giriş / kayıt ekranı. [force] true ise kapanamaz (paywall akışı).
 class AuthScreen extends StatefulWidget {
@@ -159,7 +160,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                _oauthButton(Icons.g_mobiledata, l10n.loginGoogle, () => _oauth(() => context.read<AuthProvider>().signInWithGoogle())),
+                _oauthButton(Icons.g_mobiledata, l10n.loginGoogle, () => _oauth(() => context.read<AuthProvider>().signInWithGoogle()), leading: const GoogleLogo(size: 20)),
                 const SizedBox(height: 10),
                 _oauthButton(Icons.facebook_outlined, l10n.loginFacebook, () => _oauth(() => context.read<AuthProvider>().signInWithFacebook())),
                 const SizedBox(height: 16),
@@ -273,10 +274,10 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _oauthButton(IconData icon, String text, VoidCallback onTap) {
+  Widget _oauthButton(IconData icon, String text, VoidCallback onTap, {Widget? leading}) {
     return OutlinedButton.icon(
       onPressed: onTap,
-      icon: Icon(icon, color: FastTheme.text, size: 20),
+      icon: leading ?? Icon(icon, color: FastTheme.text, size: 20),
       label: Text(text, style:  TextStyle(color: FastTheme.text, fontSize: 14)),
       style: OutlinedButton.styleFrom(
         side:  BorderSide(color: FastTheme.border),

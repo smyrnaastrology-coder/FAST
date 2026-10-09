@@ -8,6 +8,8 @@ import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/api_service.dart';
 import '../services/revenuecat_service.dart';
+import '../widgets/brand_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'analyzer_screen.dart';
 import 'auth_screen.dart';
 import 'profile_screen.dart';
@@ -70,6 +72,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
   List<Map<String, dynamic>> _modes(AppLocalizations l10n) => [
     {'key': 'es_sevgili', 'title': l10n.modeEsTitle, 'desc': l10n.modeEsDesc, 'badge': l10n.modeEsBadge, 'icon': '💑'},
+    {'key': 'ashtakoot', 'title': l10n.modeAshTitle, 'desc': l10n.modeAshDesc, 'badge': l10n.modeAshBadge, 'icon': '💫'},
     {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.modeEbDesc, 'badge': l10n.modeEbBadge, 'icon': '👨‍👩‍👧‍👦'},
     {'key': 'bireysel_natal', 'title': l10n.modeNatalTitle, 'desc': l10n.modeNatalDesc, 'badge': l10n.modeNatalBadge, 'icon': '⭐'},
     {'key': 'potansiyel_yetenek', 'title': l10n.modePyTitle, 'desc': l10n.modePyDesc, 'badge': l10n.modePyBadge, 'icon': '🌟'},
@@ -99,17 +102,16 @@ class _LandingScreenState extends State<LandingScreen> {
       'disabled': [l10n.planFreeDisabled1, l10n.planFreeDisabled2, l10n.planFreeDisabled3, l10n.planFreeDisabled4, l10n.planFreeDisabled5],
       'highlight': false,
     },
+    // Tek Pro kartı: aylık/yıllık düğmesi fiyatı, ürünü ve açıklamayı değiştirir.
     {
-      'name': l10n.planPremiumName, 'badge': l10n.planPremiumBadge, 'price': 7.99, 'productId': 'sub_daily', 'interval': 'month', 'desc': l10n.planPremiumDesc,
+      'name': l10n.planProName, 'badge': l10n.planProBadge,
+      'price': _priceYearly ? 49.99 : 7.99,
+      'productId': _priceYearly ? 'sub_daily_yearly' : 'sub_daily',
+      'interval': _priceYearly ? 'year' : 'month',
+      'desc': _priceYearly ? l10n.planProYearlyDesc : l10n.planProMonthlyDesc,
       'features': [l10n.planPremiumFeat1, l10n.planPremiumFeat2, l10n.planPremiumFeat3, l10n.planPremiumFeat4, l10n.planPremiumFeat5, l10n.planPremiumFeat6, l10n.planPremiumFeat7],
       'disabled': <String>[],
       'highlight': true,
-    },
-    {
-      'name': l10n.planProName, 'badge': l10n.planProBadge, 'price': 49.99, 'productId': 'sub_daily_yearly', 'interval': 'year', 'desc': l10n.planProDesc,
-      'features': [l10n.planProFeat1, l10n.planProFeat2, l10n.planProFeat3, l10n.planProFeat4],
-      'disabled': <String>[],
-      'highlight': false,
       'goldBtn': true,
     },
   ];
@@ -953,6 +955,18 @@ class _LandingScreenState extends State<LandingScreen> {
                // Uygulama ici geri bildirim ve cocuk guvenligi ihbar kanali
                // (Google Play Cocuk Guvenligi Standartlari bildirimi).
                Text('smyrnaastrology@gmail.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () { launchUrl(Uri.parse('https://instagram.com/fatihasartepe'), mode: LaunchMode.externalApplication); },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const InstagramLogo(size: 18),
+                    const SizedBox(width: 6),
+                    Text('@fatihasartepe', style: TextStyle(fontSize: 12, color: FastTheme.accentGold, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
               const SizedBox(height: 4),
                Text(l10n.footerRights, style:  TextStyle(fontSize: 12, color: FastTheme.textDim)),
             ]),
