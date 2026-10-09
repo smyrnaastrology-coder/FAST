@@ -16,6 +16,8 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 SUBS_FILE = DATA_DIR / "subscriptions.json"
 FREE_FILE = DATA_DIR / "free_pdf_used.json"
 PURCHASES_FILE = DATA_DIR / "pdf_purchases.json"
+CREDITS_FILE = DATA_DIR / "pdf_credits.json"
+TXNS_FILE = DATA_DIR / "pdf_seen_txns.json"
 
 _DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
@@ -97,6 +99,17 @@ def _pg_ensure_schema():
                 CREATE TABLE IF NOT EXISTS billing_pdf_single (
                     uid TEXT PRIMARY KEY,
                     expiry DOUBLE PRECISION
+                );
+                CREATE TABLE IF NOT EXISTS billing_pdf_credits (
+                    uid TEXT PRIMARY KEY,
+                    credits INTEGER NOT NULL DEFAULT 0,
+                    updated DOUBLE PRECISION
+                );
+                CREATE TABLE IF NOT EXISTS billing_pdf_txns (
+                    uid TEXT,
+                    txn TEXT,
+                    created DOUBLE PRECISION,
+                    PRIMARY KEY (uid, txn)
                 );
                 CREATE TABLE IF NOT EXISTS analysis_sessions (
                     session_id TEXT PRIMARY KEY,
@@ -182,7 +195,84 @@ def _pg_mark_free_used(uid: str, device_token: str):
     finally:
         conn.close()
 
-# — pdf_single —
+# — pdf_single kredileri (Model B: ilk ücretsiz hariç her kitap 1 kredi) —
+def _pg_get_credits_row(uid: str):
+    """Kredi satırı yoksa None, varsa int döner (yok/bilinmiyor ayrımı için)."""
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT credits FROM billing_pdf_credits WHERE uid=%s", (uid,))
+            row = cur.fetchone()
+        if not row:
+            return None
+        try:
+            return max(0, int(row[0] or 0))
+        except (TypeError, ValueError):
+            return 0
+    finally:
+        conn.close()
+
+def _pg_add_credits(uid: str, n: int) -> int:
+    """Krediye n ekler (negatifte taban 0). Tek atomik ifade — çift uygulama yok."""
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO billing_pdf_credits (uid, credits, updated)
+                VALUES (%s, GREATEST(0, %s), %s)
+                ON CONFLICT (uid) DO UPDATE SET
+                  credits = GREATEST(0, billing_pdf_credits.credits + %s),
+                  updated = EXCLUDED.updated
+            """, (uid, n, time.time(), n))
+            cur.execute("SELECT credits FROM billing_pdf_credits WHERE uid=%s", (uid,))
+            row = cur.fetchone()
+        conn.commit()
+        return max(0, int((row or [0])[0] or 0))
+    finally:
+        conn.close()
+
+def _pg_txn_seen(uid: str, txn: str):
+    """True/False; PG bilinmiyorsa None."""
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM billing_pdf_txns WHERE uid=%s AND txn=%s", (uid, txn))
+            return bool(cur.fetchone())
+    finally:
+        conn.close()
+
+def _pg_mark_txn(uid: str, txn: str):
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO billing_pdf_txns (uid, txn, created) VALUES (%s,%s,%s) ON CONFLICT DO NOTHING",
+                        (uid, txn, time.time()))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+def _pg_legacy_row(uid: str):
+    """Eski kalıcı hak satırı: True/False; PG bilinmiyorsa None."""
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1 FROM billing_pdf_single WHERE uid=%s", (uid,))
+            return bool(cur.fetchone())
+    finally:
+        conn.close()
+
+def _pg_delete_legacy(uid: str):
+    conn = _pg_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM billing_pdf_single WHERE uid=%s", (uid,))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+# — pdf_single (legacy kalıcı bayrak — migrasyon sonrası okunmaz) —
 def _pg_has_pdf_single(uid: str) -> bool:
     conn = _pg_connect()
     try:
@@ -244,6 +334,57 @@ def _file_mark_free_used(uid: str, device_token: str = "") -> bool:
     except Exception as e:
         print(f"[billing] dosya yedegi yazilamadi: {e}")
         return False
+
+
+# — pdf kredi sayacı (dosya modu) —
+def _file_get_credits_row(uid: str):
+    """Satır yoksa None, varsa int (yok/bilinmiyor ayrımı için)."""
+    data = _load(CREDITS_FILE)
+    if uid not in data:
+        return None
+    try:
+        return max(0, int(data.get(uid) or 0))
+    except (TypeError, ValueError):
+        return 0
+
+def _file_add_credits(uid: str, n: int) -> int:
+    try:
+        data = _load(CREDITS_FILE)
+        cur = 0
+        try:
+            cur = max(0, int(data.get(uid) or 0))
+        except (TypeError, ValueError):
+            cur = 0
+        new = max(0, cur + n)
+        data[uid] = new
+        _save(CREDITS_FILE, data)
+        return new
+    except Exception as e:
+        print(f"[billing] kredi dosyasi yazilamadi: {e}")
+        return max(0, n)
+
+def _file_txn_seen(uid: str, txn: str) -> bool:
+    data = _load(TXNS_FILE)
+    return bool(data.get(f"{uid}|{txn}"))
+
+def _file_mark_txn(uid: str, txn: str) -> bool:
+    try:
+        data = _load(TXNS_FILE)
+        data[f"{uid}|{txn}"] = int(time.time())
+        _save(TXNS_FILE, data)
+        return True
+    except Exception as e:
+        print(f"[billing] islem defteri yazilamadi: {e}")
+        return False
+
+def _file_delete_legacy(uid: str):
+    try:
+        data = _load(PURCHASES_FILE)
+        if uid in data:
+            del data[uid]
+            _save(PURCHASES_FILE, data)
+    except Exception:
+        pass
 
 
 def is_subscribed(uid: str) -> bool:
@@ -322,35 +463,81 @@ def get_status(uid: str) -> dict:
         "is_subscribed": is_subscribed(uid),
         "has_free_used": has_free_used(uid),
         "free_remaining": not has_free_used(uid),
+        "has_pdf_single": has_pdf_single(uid),
+        "pdf_credits": get_pdf_credits(uid),
     }
 
-def has_pdf_single(uid: str) -> bool:
-    if not uid:
-        return False
-    if _use_pg():
-        sonuc = _pg_retry(_pg_has_pdf_single, uid)
-        if sonuc is not None:
-            return sonuc
-    data = _load(PURCHASES_FILE)
-    val = data.get(uid)
-    if val is None:
-        return False
-    try:
-        exp = float(val)
-        return exp == 0 or exp > time.time()
-    except (TypeError, ValueError):
-        return True
-
-def grant_pdf_single(uid: str, expiry: float = 0):
+def _migrate_legacy_pdf_single(uid: str):
+    """Eski kalıcı hak (tek satın alma = ömür boyu) → Model B: 1 kredi.
+    Her depo bağımsız taşınır (aynı uid iki depoda da hakka sahip olabilir —
+    ikisi de gerçek satın almadır). Idempotent: legacy satır taşınınca silinir.
+    """
     if not uid:
         return
     if _use_pg():
-        if _pg_retry(_pg_grant_pdf_single, uid, expiry) is not None:
-            return
-        print(f"[billing] grant_pdf_single PG basarisiz, dosyaya yaziliyor uid={uid}")
+        leg = _pg_retry(_pg_legacy_row, uid)
+        if leg:
+            if _pg_retry(_pg_get_credits_row, uid) is None:
+                _pg_retry(_pg_add_credits, uid, 1)
+                print(f"[billing] legacy pdf_single -> 1 kredi (PG) uid={uid}")
+            _pg_retry(_pg_delete_legacy, uid)
     data = _load(PURCHASES_FILE)
-    data[uid] = str(expiry or 0)
-    _save(PURCHASES_FILE, data)
+    if uid in data:
+        if _file_get_credits_row(uid) is None:
+            _file_add_credits(uid, 1)
+            print(f"[billing] legacy pdf_single -> 1 kredi (dosya) uid={uid}")
+        _file_delete_legacy(uid)
+
+def get_pdf_credits(uid: str) -> int:
+    """Kalan kitap kredisi (ilk ücretsiz hak hariç)."""
+    if not uid:
+        return 0
+    _migrate_legacy_pdf_single(uid)
+    if _use_pg():
+        sonuc = _pg_retry(_pg_get_credits_row, uid)
+        if sonuc is not None:
+            return sonuc
+    v = _file_get_credits_row(uid)
+    return v if v is not None else 0
+
+def add_pdf_credits(uid: str, n: int) -> int:
+    if not uid:
+        return 0
+    if _use_pg():
+        sonuc = _pg_retry(_pg_add_credits, uid, n)
+        if sonuc is not None:
+            return sonuc
+        print(f"[billing] add_credits PG basarisiz, dosyaya yaziliyor uid={uid}")
+    return _file_add_credits(uid, n)
+
+def txn_granted(uid: str, txn: str) -> bool:
+    """Bu satın alma işlemi daha önce krediye çevrildi mi? (çift-kredi koruması)"""
+    if not uid or not txn:
+        return False
+    if _use_pg():
+        sonuc = _pg_retry(_pg_txn_seen, uid, txn)
+        if sonuc is not None:
+            return sonuc
+    return _file_txn_seen(uid, txn)
+
+def mark_txn_granted(uid: str, txn: str):
+    if not uid or not txn:
+        return
+    if _use_pg():
+        if _pg_retry(_pg_mark_txn, uid, txn) is not None:
+            return
+    _file_mark_txn(uid, txn)
+
+def has_pdf_single(uid: str) -> bool:
+    # Model B: kalıcı bayrak yok; kredi > 0 ise hak var.
+    return get_pdf_credits(uid) > 0
+
+def grant_pdf_single(uid: str, expiry: float = 0):
+    """Model B: her hak kazandıran olay +1 kredi (kalıcı bayrak yazılmaz).
+    İmza korundu — webhook/sync çağıranları değişmedi."""
+    if not uid:
+        return
+    add_pdf_credits(uid, 1)
 
 def can_download_pdf(uid: str, device_token: str = "", tip: str = "") -> dict:
     if is_subscribed(uid):
@@ -364,4 +551,7 @@ def can_download_pdf(uid: str, device_token: str = "", tip: str = "") -> dict:
 def consume_pdf(uid: str, device_token: str = "", tip: str = "", reason: str = "free"):
     if reason == "free":
         mark_free_used(uid, device_token)
-    # subscribed / pdf_single için ekstra tüketim yok (kalıcı).
+    elif reason == "pdf_single":
+        # Model B: her kitap 1 kredi düşer (taban 0).
+        add_pdf_credits(uid, -1)
+    # subscribed için tüketim yok (abonelik sınırsız).

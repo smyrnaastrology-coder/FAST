@@ -6589,9 +6589,9 @@ def debug_ephe():
 
 # ─── Billing & Entitlement ───
 try:
-    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready
+    from backend.billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted
 except Exception:
-    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready
+    from billing import is_subscribed, has_free_used, mark_free_used, upsert_subscription, get_status, can_download_pdf, consume_pdf, grant_pdf_single, storage_mode, ensure_schema_ready, get_pdf_credits, txn_granted, mark_txn_granted
 
 try:
     from backend.auth import verify_token, get_profile, upsert_profile, list_people, create_person, update_person, delete_person, folder_labels, supabase_enabled
@@ -6778,8 +6778,19 @@ def billing_sync_entitlement(body: SyncClaim):
             upsert_subscription(uid, str(pid), exp_ts, "active", provider="revenuecat-sync")
             granted.append(f"sub:{pid}")
     for pid, txns in ((sub.get("non_subscriptions") or {}).items()):
-        if txns and str(pid).startswith("pdf_single"):
+        if not str(pid).startswith("pdf_single"):
+            continue
+        # Model B: GÖRÜLMEMİŞ her işlem +1 kredi (webhook ile aynı hak iki
+        # kez sayılmasın diye store işlem kimliği üzerinden defter tutulur).
+        for t in (txns or []):
+            t = t or {}
+            _stid = str(t.get("store_transaction_id") or "").strip()
+            _rid = str(t.get("id") or "").strip()
+            _tkey = f"store:{_stid}" if _stid else (f"rc:{_rid}" if _rid else f"rc:{pid}")
+            if txn_granted(uid, _tkey):
+                continue
             grant_pdf_single(uid)
+            mark_txn_granted(uid, _tkey)
             granted.append("pdf_single")
     if granted:
         logging.info(f"[billing-sync] hak yazildi uid={uid} {granted}")
@@ -6884,10 +6895,21 @@ async def billing_webhook(request: Request):
                    "SUBSCRIBER_ALIAS", "TRANSFER", "PRODUCT_CHANGE"}
     REVOKE_TYPES = {"CANCELLATION", "EXPIRATION", "BILLING_ISSUE"}
 
-    # Tek seferlik PDF ürünü: kalıcı hak
+    # Tek seferlik PDF ürünü (Model B: her satın alma +1 kredi).
+    # Webhook tekrarları çift-kredi üretmesin diye işlem defteri tutulur.
     if product_id.startswith("pdf_single"):
         if etype in ("INITIAL_PURCHASE", "NON_RENEWING_PURCHASE", "PURCHASE", "UNSUBSCRIPTION"):
-            grant_pdf_single(uid, expiry_ts)
+            _tid = (event.get("transaction_id") or "").strip()
+            _eid = (event.get("id") or "").strip()
+            # store işlem kimliği (Play GPA...) sync tarafındaki
+            # store_transaction_id ile aynı uzaya düşer → tek hak.
+            _tkey = f"store:{_tid}" if _tid else (f"rcevent:{_eid}" if _eid else f"we:{product_id}:{int(expiry_ts)}")
+            if txn_granted(uid, _tkey):
+                logging.info(f"[billing] pdf_single tekrar webhook, atlandi uid={uid} key={_tkey}")
+            else:
+                grant_pdf_single(uid)
+                mark_txn_granted(uid, _tkey)
+                logging.info(f"[billing] pdf_single +1 kredi uid={uid} key={_tkey}")
         return {"ok": True}
 
     # Yalnızca gerçek hak kazandıran olayları işle (trial/kurumsal entitlement kontrolü)
