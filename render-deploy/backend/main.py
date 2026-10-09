@@ -6726,10 +6726,9 @@ def billing_status(uid: str = "", device_token: str = ""):
 
 @app_fast.post("/api/billing/claim-free")
 def claim_free(body: FreeClaim):
-    if has_free_used(body.uid, body.device_token or ""):
-        raise HTTPException(status_code=402, detail={"code": "FREE_ALREADY_USED", "msg": "Free PDF already claimed"})
-    mark_free_used(body.uid, body.device_token or "")
-    return {"ok": True, "msg": "Free PDF claimed"}
+    # Model B+: ücretsiz program kapatıldı — tüm kitaplar ödemeli.
+    # Rota eski uygulama sürümleriyle uyumluluk için korunur, hep reddeder.
+    raise HTTPException(status_code=402, detail={"code": "FREE_DISABLED", "msg": "Ucretsiz kitap kaldirildi"})
 
 class SyncClaim(BaseModel):
     uid: str

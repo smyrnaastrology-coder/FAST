@@ -421,13 +421,19 @@ def upsert_subscription(uid: str, product_id: str, expiry: float = 0, status: st
     subs[uid] = {"product_id": product_id, "expiry": expiry, "status": status, "provider": provider, "updated": time.time()}
     _save(SUBS_FILE, subs)
 
+FREE_PROGRAM_DISABLED = True  # Örnek/ücretsiz PDF kaldırıldı: tüm kitaplar ödemeli.
+
 def has_free_used(uid: str, device_token: str = "") -> bool:
     """True = ucretsiz hak kullanimda.
 
     KRITIK: Onceki surumde PG hatasi durumunda False donuyordu (fail-open).
     Bu, depolama hic yazilamadiginda herkese SINIRSIZ ucretsiz PDF veriyordu.
     Artik bilinmiyorsa guvenli tarafa dusulur.
+
+    Model B+: ücretsiz program tamamen kapatıldı — her zaman True (hak yok).
     """
+    if FREE_PROGRAM_DISABLED:
+        return True
     if _use_pg():
         sonuc = _pg_retry(_pg_has_free_used, uid, device_token)
         if sonuc is not None:
@@ -449,7 +455,12 @@ def has_free_used(uid: str, device_token: str = "") -> bool:
 def mark_free_used(uid: str, device_token: str = ""):
     """Ucretsiz hakki tuket. Onceki surumde dosya yedegi YOKTU; PG hatasinda
     tuketim sessizce kayboluyor ve hak hiç bitmiyordu. Artik her zaman bir
-    depoya yazilir."""
+    depoya yazilir.
+
+    Model B+: program kapalı — no-op (imza uyumluluk için korundu).
+    """
+    if FREE_PROGRAM_DISABLED:
+        return
     if _use_pg():
         if _pg_retry(_pg_mark_free_used, uid, device_token) is not None:
             return
@@ -540,12 +551,11 @@ def grant_pdf_single(uid: str, expiry: float = 0):
     add_pdf_credits(uid, 1)
 
 def can_download_pdf(uid: str, device_token: str = "", tip: str = "") -> dict:
+    # Model B+: ücretsiz dal YOK — abone, kredisi olan, ya da 402 (ödeme).
     if is_subscribed(uid):
         return {"allowed": True, "reason": "subscribed"}
     if has_pdf_single(uid):
         return {"allowed": True, "reason": "pdf_single"}
-    if not has_free_used(uid, device_token):
-        return {"allowed": True, "reason": "free"}
     return {"allowed": False, "reason": "no_right"}
 
 def consume_pdf(uid: str, device_token: str = "", tip: str = "", reason: str = "free"):
