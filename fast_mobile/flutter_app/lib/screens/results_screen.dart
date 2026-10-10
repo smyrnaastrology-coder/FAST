@@ -1068,16 +1068,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
       var resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
       if (!mounted) return;
       if (resp.statusCode == 402) {
-        // Tek PDF ($19.99) satın alma; webhook hakkı sunucuya yazsın diye kısa
-        // bekleme + her durumda bir kez daha dene (zaten alınmışsa bile).
+        try {
+          await PdfRepurchaseService.consumeOwnedPdfSingle();
+          await Future.delayed(const Duration(milliseconds: 800));
+        } catch (_) {}
         final ok = await RevenueCatService.purchase('pdf_single');
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;
         if (resp.statusCode == 402) {
-          // Kurtarma: Play'de sahiplenilmiş ama sunucuda hak yoksa (webhook
-          // kaçağı / misafir→giriş uid değişimi / reinstall), RC kaydını
-          // doğrulayıp hakkı bu uid'e işlet, sonra son kez dene.
           try {
             await RevenueCatService.restore();
             final sync = await BillingService.syncEntitlement();
@@ -1091,30 +1090,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
         if (resp.statusCode == 402) {
           setState(() => _pdfLoading = false);
           if (!mounted) return;
-          if (!ok && RevenueCatService.lastAlreadyOwned) {
-            // Aynı hesapla TEKRAR ödeme alınabilsin diye: eski sahiplenmeyi
-            // Play'de consume et → kilit kalkar → akışı baştan çalıştır
-            // (ödeme ekranı açılır). Tüketilecek bir şey yoksa dialog.
-            final freed = await PdfRepurchaseService.consumeOwnedPdfSingle();
-            if (freed) {
-              if (!mounted) return;
-              return _downloadPdf(provider, sessionId, mod, l10n);
-            }
-            if (!mounted) return;
-            // Play: "bu öğe zaten sizde var" — hak, satın alan Google
-            // hesabında. Girişe yönlendir (misafir kimliğiyle hak görünmez).
-            _showAlreadyOwnedDialog(l10n);
-          } else {
-            // Ödeme gerekiyorsa çıkmaz sokak yok: tek dokunuşla ödeme
-            // ekranını (Play satın alma) yeniden aç.
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(l10n.pdfPaymentRequired),
-              action: SnackBarAction(
-                label: l10n.retryButton,
-                onPressed: () => _downloadPdf(provider, sessionId, mod, l10n),
-              ),
-            ));
-          }
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(l10n.pdfPaymentRequired),
+            action: SnackBarAction(
+              label: l10n.retryButton,
+              onPressed: () => _downloadPdf(provider, sessionId, mod, l10n),
+            ),
+          ));
           return;
         }
       }
