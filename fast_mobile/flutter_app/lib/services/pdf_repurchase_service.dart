@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 /// Aynı Google hesabıyla TEKRAR pdf_single alınabilsin diye eski sahiplenmeyi
 /// Play'de consume (tüket) eder.
@@ -41,13 +43,20 @@ class PdfRepurchaseService {
               p.status != PurchaseStatus.restored) {
             continue;
           }
-          // Android'de one-time ürün için completePurchase = consume.
-          // (RC üzerinden acknowledge edilmiş olsa bile owned managed ürün
-          // consume edilebilir; kilit kalkar, yeniden satış açılır.)
+          // GERÇEK consume: platform addition üzerinden consumePurchase.
+          // DİKKAT: iap.completePurchase() SADECE acknowledge eder, consume
+          // ETMEZ (özellikle RC acknowledge etmişse hiçbir şey yapmaz ve
+          // sahiplenme kalır → "zaten sizde var" hiç kalkmaz). Kilit ancak
+          // BillingClient.consumeAsync ile kalkar.
           try {
-            await iap.completePurchase(p);
-            if (kDebugMode) print('[repurchase] consumed ${p.productID}');
-            done(true);
+            final addition = iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+            final res = await addition.consumePurchase(p);
+            if (res.responseCode == BillingResponse.ok) {
+              if (kDebugMode) print('[repurchase] consumed ${p.productID}');
+              done(true);
+            } else {
+              if (kDebugMode) print('[repurchase] consume blocked: ${res.responseCode} ${res.debugMessage}');
+            }
           } catch (e) {
             if (kDebugMode) print('[repurchase] consume err $e');
           }
