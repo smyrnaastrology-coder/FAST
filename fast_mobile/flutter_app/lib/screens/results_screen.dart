@@ -1053,6 +1053,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Future<void> _downloadPdf(AnalysisProvider provider, String sessionId, String mod, AppLocalizations l10n) async {
     if (_pdfLoading) return;
     setState(() => _pdfLoading = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.pdfPreparingNote), duration: const Duration(seconds: 4)),
+    );
     final tip = switch (mod) {
       'potansiyel_yetenek' => 'potansiyel',
       'bireysel_natal' => 'natal',
@@ -1073,6 +1076,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
           await Future.delayed(const Duration(milliseconds: 800));
         } catch (_) {}
         final ok = await RevenueCatService.purchase('pdf_single');
+        if (!mounted) return;
+        if (!ok && !RevenueCatService.lastAlreadyOwned) {
+          // Kullanıcı ödeme ekranını kapattı (vazgeçti): sarmala girmeden DUR.
+          setState(() => _pdfLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.subscribeCancelled)),
+          );
+          return;
+        }
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;

@@ -1780,6 +1780,12 @@ abstract class AppLocalizations {
   /// **'This book requires a subscription or a one-time purchase.'**
   String get pdfPaymentRequired;
 
+  /// No description provided for @pdfPreparingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your report is being prepared, this may take a while.'**
+  String get pdfPreparingNote;
+
   /// No description provided for @astrokartografiSubscribe.
   ///
   /// In en, this message translates to:

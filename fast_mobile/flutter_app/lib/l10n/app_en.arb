@@ -280,6 +280,7 @@
   "exitFromAnalysis": "Exit Analysis",
   "newAnalysis": "New Analysis",
   "pdfPaymentRequired": "This book requires a subscription or a one-time purchase.",
+  "pdfPreparingNote": "Your report is being prepared, this may take a while.",
   "astrokartografiSubscribe": "Subscribe",
   "astrokartografiHint": "World map view is included with subscription.",
   "subscribeSuccess": "Your subscription is active. Welcome!",

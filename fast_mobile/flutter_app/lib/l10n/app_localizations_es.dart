@@ -936,6 +936,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este libro requiere una suscripción o una compra única.';
 
   @override
+  String get pdfPreparingNote =>
+      'Tu informe se está preparando, esto puede tardar un poco.';
+
+  @override
   String get astrokartografiSubscribe => 'Suscribirse';
 
   @override

@@ -3363,6 +3363,9 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   Future<void> _downloadPdf(String sessionId, String? tip, AppLocalizations l10n) async {
     if (_pdfLoading) return;
     setState(() => _pdfLoading = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.pdfPreparingNote), duration: const Duration(seconds: 4)),
+    );
     try {
       final url = await _api.getPdfUrl(sessionId, tip ?? 'rapor');
       final integrityToken = await PlayIntegrityService().requestToken();
@@ -3379,6 +3382,16 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         } catch (_) {}
         // Şimdi direkt ödeme ekranına git
         final ok = await RevenueCatService.purchase('pdf_single');
+        if (!mounted) return;
+        if (!ok && !RevenueCatService.lastAlreadyOwned) {
+          // Kullanıcı ödeme ekranını kapattı (vazgeçti): sarmala girmeden DUR.
+          setState(() => _pdfLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.subscribeCancelled)),
+          );
+          return;
+        }
         await Future.delayed(const Duration(seconds: 3));
         resp = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 240));
         if (!mounted) return;

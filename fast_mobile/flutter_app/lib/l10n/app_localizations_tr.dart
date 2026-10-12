@@ -918,6 +918,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu kitap için abonelik veya tek seferlik satın alma gerekiyor.';
 
   @override
+  String get pdfPreparingNote =>
+      'Raporunuz hazırlanıyor, bu işlem biraz zaman alabilir.';
+
+  @override
   String get astrokartografiSubscribe => 'Abone Ol';
 
   @override
