@@ -5,6 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = os.environ.get("FASTKOC_DATABASE_URL", "sqlite:///./fastkoc.db")
+if DATABASE_URL.startswith("postgres://"):
+    # Render/Heroku tarzi URL -> SQLAlchemy psycopg3 formatina cevir
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
