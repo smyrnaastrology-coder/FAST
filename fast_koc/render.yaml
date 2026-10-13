@@ -46,16 +46,18 @@ services:
       - key: FASTKOC_ADMIN_SIFRE
         sync: false
 
-  - type: cron
-    name: fastkoc-gunluk-push
-    runtime: python
-    plan: free
-    rootDir: fast_koc
-    buildCommand: pip install -r requirements.txt
-    schedule: "30 18 * * *" # 21:30 TSİ = 18:30 UTC (kış)
-    startCommand: python -m backend.jobs.gunluk_push
-    envVars:
-      - key: FASTKOC_DATABASE_URL
-        sync: false
-      - key: FCM_SERVER_KEY
-        sync: false
+  # NOT: cron Render'da free plan kabul etmez. Ucretli plana gecince asagidaki
+  # blogu acin (plan satirini silip birakin, starter varsayilir) veya
+  # .github/workflows ile ucretsiz zamanlayici kullanin.
+  # - type: cron
+  #   name: fastkoc-gunluk-push
+  #   runtime: python
+  #   rootDir: fast_koc
+  #   buildCommand: pip install -r requirements.txt
+  #   schedule: "30 18 * * *" # 21:30 TSI = 18:30 UTC (kis)
+  #   startCommand: python -m backend.jobs.gunluk_push
+  #   envVars:
+  #     - key: FASTKOC_DATABASE_URL
+  #       sync: false
+  #     - key: FCM_SERVER_KEY
+  #       sync: false
