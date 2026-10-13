@@ -26,7 +26,7 @@
       53,
       66
     ],
-    "note": "goller mac saatine gore; 36' sayilmayan GS golu gol SAYILMADI. 28 (GS), 43 (BAR), 50 (BAR), 53 (BAR), 66 (BAR). (devam eden mac - nihai degil)",
+    "note": "NIHAI. Goller mac saatine gore. 28 (GS), 43/50/53/66 (BAR). 36' sayilmayan GS golu gol SAYILMADI. 90+ uzatma golu yok.",
     "marks": [
       24.964,
       44.062,
@@ -42,6 +42,8 @@
       162.92599999999996
     ],
     "_id": 1,
-    "ts": "2026-10-13T23:04:46"
+    "ts": "2026-10-13T23:04:46",
+    "score": "Galatasaray 1-5 Barcelona",
+    "final": true
   }
 ]
