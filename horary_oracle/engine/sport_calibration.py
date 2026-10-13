@@ -197,6 +197,18 @@ class SportCalibration:
         # cusps verilirse marks türet (fit hızı + tutarlılık için sakla)
         if rec.get("cusps") and not rec.get("marks"):
             rec["marks"] = degree_marks(rec["cusps"])
+        # planets verilirse skor sinyalini (applying major açı sayısı) türet ve sakla;
+        # planets sözlüğü depoyu şişirmesin diye kayda konmaz.
+        planets = rec.pop("planets", None)
+        if planets and rec.get("scoring_index") is None:
+            try:
+                from engine.sport_score import scoring_index
+                rec["scoring_index"] = scoring_index(planets)
+            except Exception:
+                pass
+        # gerçek toplam gol, açıkça verilmediyse gol dakikalarından türet
+        if rec.get("total_goals") is None and rec.get("goal_minutes"):
+            rec["total_goals"] = len(rec["goal_minutes"])
         rec["_id"] = (max([r.get("_id", 0) for r in self.records]) + 1) if self.records else 1
         rec.setdefault("ts", datetime.now().isoformat(timespec="seconds"))
         self.records.append(rec)

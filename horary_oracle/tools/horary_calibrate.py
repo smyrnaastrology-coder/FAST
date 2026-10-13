@@ -14,6 +14,9 @@ Komutlar:
   goal-fit                   gol dakikası modelini öğren (dakika = a*mark + b)
   goal-stats                 gol kalibrasyon güven raporu (yetersizse dakika verilmez)
 
+  score-fit                  toplam gol/skor modelini öğren (toplam_gol = round(c*sinyal+d))
+  score-stats                skor kalibrasyon güven raporu (yetersizse sayı verilmez)
+
 Örn:
   python horary_oracle/tools/horary_calibrate.py stats
   python horary_oracle/tools/horary_calibrate.py add vaka.json
@@ -42,6 +45,10 @@ CAL.load()
 from engine.sport_calibration import (
     SportCalibration, fit_goal_params, save_params, load_params,
     assess as goal_assess, degree_marks,
+)
+from engine.sport_score import (
+    fit_score_params, save_params as save_score_params,
+    load_params as load_score_params, assess_score,
 )
 GOALS = SportCalibration()
 GOALS.load()
@@ -146,7 +153,9 @@ def cmd_goal_list():
     print(f"{len(GOALS.records)} maç kaydı:")
     for r in GOALS.records:
         print(f"  #{r['_id']} {r.get('match','?')} {r.get('date','')} "
-              f"goller={r.get('goal_minutes')} marks={[round(m,1) for m in (r.get('marks') or [])][:6]}...")
+              f"goller={r.get('goal_minutes')} toplam={r.get('total_goals')} "
+              f"sinyal={r.get('scoring_index')} "
+              f"marks={[round(m,1) for m in (r.get('marks') or [])][:6]}...")
 
 
 def cmd_goal_add(path):
@@ -158,8 +167,11 @@ def cmd_goal_add(path):
     for r in rows:
         GOALS.add_record(**r)
     GOALS.save()
+    last = GOALS.records[-1]
     print(f"Maç eklendi. Toplam {len(GOALS.records)}. "
-          f"(marks türetildi: {bool(GOALS.records[-1].get('marks'))})")
+          f"(marks türetildi: {bool(last.get('marks'))}, "
+          f"scoring_index: {last.get('scoring_index')}, "
+          f"total_goals: {last.get('total_goals')})")
 
 
 def cmd_goal_fit():
@@ -177,6 +189,23 @@ def cmd_goal_stats():
     trust = goal_assess(GOALS.records, load_params())
     _json_print({"kayit_sayisi": len(GOALS.records),
                  "params": load_params(), "guven": trust})
+
+
+def cmd_score_fit():
+    res = fit_score_params(GOALS.records)
+    if res.get("fitted"):
+        save_score_params(res)
+        print(f"Skor modeli: toplam_gol = round({res['c']}*sinyal + {res['d']})  |  "
+              f"ortalama sapma {res['mae']} gol (n={res['n']})")
+        print("  kaydedildi -> horary_sport_score_params.json")
+    else:
+        print(f"Skor modeli öğrenilemedi: {res['reason']} (n={res['n']})")
+
+
+def cmd_score_stats():
+    _json_print({"kayit_sayisi": len(GOALS.records),
+                 "params": load_score_params(),
+                 "guven": assess_score(GOALS.records, load_score_params())})
 
 
 if __name__ == "__main__":
@@ -203,8 +232,13 @@ if __name__ == "__main__":
         cmd_goal_fit()
     elif cmd == "goal-stats":
         cmd_goal_stats()
+    elif cmd == "score-fit":
+        cmd_score_fit()
+    elif cmd == "score-stats":
+        cmd_score_stats()
     elif cmd == "tohum":
         cmd_tohum()
     else:
         print("Bilinmeyen komut. list | add <json> | stats | fit | ladder | "
-              "goal-list | goal-add <json> | goal-fit | goal-stats | tohum")
+              "goal-list | goal-add <json> | goal-fit | goal-stats | "
+              "score-fit | score-stats | tohum")

@@ -1422,7 +1422,7 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         if "combustion" in s["code"]:
             _sc(RULES["scoring"].get("combust_penalty",-5) // 2, "combust_penalty"); # hafifletilmiş
 
-    _sport_goals = _sport_goals_block(houses, quesited_type)
+    _sport_goals = _sport_goals_block(houses, planets, quesited_type)
 
     return {
         "jd": jd,
@@ -1441,17 +1441,25 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         "_trace": _tr if _DO_TRACE else [],
     }
 
-def _sport_goals_block(houses, quesited_type):
-    """sport_goals sorusunda dakika tahminini YALNIZ kalibrasyon izin verirse ekle.
-    Ölçüm yoksa dakika dönmez (uydurma yerine susma ilkesi)."""
+def _sport_goals_block(houses, planets, quesited_type):
+    """sport_goals sorusunda dakika VE toplam gol tahminini YALNIZ kalibrasyon
+    izin verirse ekle. Ölçüm yoksa sayı dönmez (uydurma yerine susma ilkesi)."""
     if quesited_type != "sport_goals":
         return None
+    out = {}
     try:
         from engine.sport_calibration import forecast
-        return forecast(houses.get("cusps"))
+        out = forecast(houses.get("cusps"))
     except Exception as e:  # kalibrasyon yüklenemezse sessizce sus
-        return {"trust_level": "zayif", "give_minutes": False, "minutes": None,
-                "text": f"Gol dakikası kalibrasyonu okunamadı: {e}"}
+        out = {"trust_level": "zayif", "give_minutes": False, "minutes": None,
+               "text": f"Gol dakikası kalibrasyonu okunamadı: {e}"}
+    try:
+        from engine.sport_score import forecast_score
+        out["score"] = forecast_score(planets)
+    except Exception as e:
+        out["score"] = {"trust_level": "zayif", "give_total": False,
+                        "total_goals": None, "text": f"Skor kalibrasyonu okunamadı: {e}"}
+    return out
 
 def sport_goal_minutes(cusps):
     """Kullanıcı taktiği: 1.gol = ASC°, 2.gol = ASC°+2.ev cusp°, 3.gol = +3.ev cusp° ... 90' içinde.
