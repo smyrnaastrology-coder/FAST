@@ -1,0 +1,153 @@
+{
+ "ozet": {
+  "toplam": 16,
+  "dogrulandi": 0,
+  "sorunlu": 16
+ },
+ "kitaplar": [
+  {
+   "id": "KT-001",
+   "baslik": "345 TYT Matematik Soru Bankasi",
+   "isbn": "9786051880006",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-002",
+   "baslik": "Bilgi Sarmal TYT Matematik Soru Bankasi",
+   "isbn": "9786051880013",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-003",
+   "baslik": "3D TYT Matematik Soru Bankasi",
+   "isbn": "9786051880020",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-004",
+   "baslik": "Apotemi AYT Matematik Soru Bankasi",
+   "isbn": "9786051880037",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-005",
+   "baslik": "Karekok 0'dan Matematik Konu Anlatimi",
+   "isbn": "9786051880044",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-006",
+   "baslik": "Palme TYT Fizik Konu Anlatimli Soru Bankasi",
+   "isbn": "9786051880051",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-007",
+   "baslik": "Aydin TYT Fizik Soru Bankasi",
+   "isbn": "9786051880068",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-008",
+   "baslik": "Miray TYT Turkce Paragraf Soru Bankasi",
+   "isbn": "9786051880075",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-009",
+   "baslik": "Dil Bilgisi Pro TYT Turkce",
+   "isbn": "9786051880082",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-010",
+   "baslik": "Endemik TYT Fen Denemeleri (12'li)",
+   "isbn": "9786051880099",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-011",
+   "baslik": "Hiz ve Renk LGS Matematik Soru Bankasi",
+   "isbn": "9786051880105",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-012",
+   "baslik": "Nitelik LGS Fen Soru Bankasi",
+   "isbn": "9786051880112",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-013",
+   "baslik": "Muba LGS Turkce Soru Bankasi",
+   "isbn": "9786051880129",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-014",
+   "baslik": "Okyanus 9. Sinif Matematik Konu Anlatimi",
+   "isbn": "9786051880136",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-015",
+   "baslik": "Supara 11. Sinif Fizik Soru Bankasi",
+   "isbn": "9786051880143",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  },
+  {
+   "id": "KT-016",
+   "baslik": "Limit AYT Edebiyat Soru Bankasi",
+   "isbn": "9786051880150",
+   "checksum_gecerli": true,
+   "google_books_bulundu": false,
+   "google_books_baslik": null,
+   "durum": "dogrulanmadi-yer-tutucu"
+  }
+ ]
+}

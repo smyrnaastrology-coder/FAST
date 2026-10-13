@@ -1,0 +1,345 @@
+{
+ "meta": {
+  "aciklama": "Seviyeye gore kitap oneri katalogu. tur: konu_anlatim | soru_bankasi | test | deneme. seviye: temel | orta | ileri. Kapak ve kuenye Google Books / Open Library'den zenginlestirilir; burada seed bilgi tutulur.",
+  "surum": "0.2.0",
+  "not": "DIKKAT: ISBN alanlari checksum-gecerli YER TUTUCUdur; Google Books canli dogrulamasi yapilmamistir. Yayin oncesi editor her kitabin gercek ISBNini Admin sayfasindan girmeli ve python -m backend.services.isbn_dogrulama --canli ile dogrulatmalidir."
+ },
+ "kitaplar": [
+  {
+   "id": "KT-001",
+   "baslik": "345 TYT Matematik Soru Bankasi",
+   "yazar": "345 Komisyon",
+   "yayin": "345 Yayinlari",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "TYT-Matematik"
+   ],
+   "isbn": "9786051880006",
+   "sayfa": 480,
+   "aciklama": "Video cozumlu, kolaydan zora kademeli testler. Problemler unitesi genis.",
+   "maarif": [
+    "TYT-MAT-01",
+    "TYT-MAT-05",
+    "TYT-MAT-06"
+   ],
+   "neden": "Orta seviye ogrenci icin gunluk duzenli soru rutini kurar.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=345+TYT+Matematik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-002",
+   "baslik": "Bilgi Sarmal TYT Matematik Soru Bankasi",
+   "yazar": "Bilgi Sarmal Komisyon",
+   "yayin": "Bilgi Sarmal",
+   "tur": "soru_bankasi",
+   "seviye": "temel",
+   "dersler": [
+    "TYT-Matematik"
+   ],
+   "isbn": "9786051880013",
+   "sayfa": 420,
+   "aciklama": "Temel kavramlari ornek cozumlerle ogreten baslangic seviyesi bankasi.",
+   "maarif": [
+    "TYT-MAT-01",
+    "TYT-MAT-02",
+    "TYT-MAT-03"
+   ],
+   "neden": "Temeli zayif ogrenci icin ozguven kazandirir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Bilgi+Sarmal+TYT+Matematik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-003",
+   "baslik": "3D TYT Matematik Soru Bankasi",
+   "yazar": "3D Komisyon",
+   "yayin": "3D Yayinlari",
+   "tur": "soru_bankasi",
+   "seviye": "ileri",
+   "dersler": [
+    "TYT-Matematik"
+   ],
+   "isbn": "9786051880020",
+   "sayfa": 520,
+   "aciklama": "Zor ve secici sorular, OSM duzeyinde testler.",
+   "maarif": [
+    "TYT-MAT-06",
+    "TYT-MAT-07"
+   ],
+   "neden": "Ileri ogrenciyi sinav zorluguna hazirlar.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=3D+TYT+Matematik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-004",
+   "baslik": "Apotemi AYT Matematik Soru Bankasi",
+   "yazar": "Apotemi Komisyon",
+   "yayin": "Apotemi",
+   "tur": "soru_bankasi",
+   "seviye": "ileri",
+   "dersler": [
+    "AYT-Matematik"
+   ],
+   "isbn": "9786051880037",
+   "sayfa": 560,
+   "aciklama": "Turev-integral agirlikli, sinav otesi dusunme gerektiren sorular.",
+   "maarif": [
+    "AYT-MAT-04"
+   ],
+   "neden": "AYT'de ilk 50 bine oynayanlar icin vazgecilmez.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Apotemi+AYT+Matematik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-005",
+   "baslik": "Karekok 0'dan Matematik Konu Anlatimi",
+   "yazar": "Karekok Komisyon",
+   "yayin": "Karekok",
+   "tur": "konu_anlatim",
+   "seviye": "temel",
+   "dersler": [
+    "TYT-Matematik",
+    "Matematik-9"
+   ],
+   "isbn": "9786051880044",
+   "sayfa": 380,
+   "aciklama": "Sifirdan baslayanlar icin adim adim konu anlatimi + ornekler.",
+   "maarif": [
+    "TYT-MAT-01",
+    "ARA-MAT9-03"
+   ],
+   "neden": "Matematik korkusunu yener, oncul eksikleri kapatir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Karekok+0'dan+Matematik+Konu+Anlatimi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-006",
+   "baslik": "Palme TYT Fizik Konu Anlatimli Soru Bankasi",
+   "yazar": "Palme Komisyon",
+   "yayin": "Palme",
+   "tur": "konu_anlatim",
+   "seviye": "orta",
+   "dersler": [
+    "TYT-Fen"
+   ],
+   "isbn": "9786051880051",
+   "sayfa": 440,
+   "aciklama": "Konu ozeti + cozumlu ornek + test duzeni.",
+   "maarif": [
+    "TYT-FEN-01"
+   ],
+   "neden": "Fizikte kavram + islem dengesini kurar.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Palme+TYT+Fizik+Konu+Anlatimli+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-007",
+   "baslik": "Aydin TYT Fizik Soru Bankasi",
+   "yazar": "Aydin Komisyon",
+   "yayin": "Aydin",
+   "tur": "soru_bankasi",
+   "seviye": "ileri",
+   "dersler": [
+    "TYT-Fen"
+   ],
+   "isbn": "9786051880068",
+   "sayfa": 400,
+   "aciklama": "Zor fizik sorulari, yorum agirlikli.",
+   "maarif": [
+    "TYT-FEN-01"
+   ],
+   "neden": "Fizikte 6+ net hedefleyenlere.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Aydin+TYT+Fizik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-008",
+   "baslik": "Miray TYT Turkce Paragraf Soru Bankasi",
+   "yazar": "Miray Komisyon",
+   "yayin": "Miray",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "TYT-Turkce",
+    "Turkce"
+   ],
+   "isbn": "9786051880075",
+   "sayfa": 320,
+   "aciklama": "Gunluk 20 paragraf rutini icin ideal, sure tutma onerili.",
+   "maarif": [
+    "TYT-TR-01",
+    "LGS-TR-03"
+   ],
+   "neden": "Paragraf hizini artirir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Miray+TYT+Turkce+Paragraf+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-009",
+   "baslik": "Dil Bilgisi Pro TYT Turkce",
+   "yazar": "Ritim Komisyon",
+   "yayin": "Ritim",
+   "tur": "test",
+   "seviye": "orta",
+   "dersler": [
+    "TYT-Turkce"
+   ],
+   "isbn": "9786051880082",
+   "sayfa": 280,
+   "aciklama": "Ses-yapi-cati-oge tablolariyla ozet konu + test.",
+   "maarif": [
+    "TYT-TR-02"
+   ],
+   "neden": "Dil bilgisindeki ezber yukunu azaltir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Dil+Bilgisi+Pro+TYT+Turkce+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-010",
+   "baslik": "Endemik TYT Fen Denemeleri (12'li)",
+   "yazar": "Endemik Komisyon",
+   "yayin": "Endemik",
+   "tur": "deneme",
+   "seviye": "orta",
+   "dersler": [
+    "TYT-Fen"
+   ],
+   "isbn": "9786051880099",
+   "sayfa": 216,
+   "aciklama": "Gercek sinav provasi, video cozumlu.",
+   "maarif": [
+    "TYT-FEN-01",
+    "TYT-FEN-02",
+    "TYT-FEN-03"
+   ],
+   "neden": "Haftalik TYT fen provasi icin.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Endemik+TYT+Fen+Denemeleri+(12'li)+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-011",
+   "baslik": "Hiz ve Renk LGS Matematik Soru Bankasi",
+   "yazar": "Hiz ve Renk Komisyon",
+   "yayin": "Hiz ve Renk",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "Matematik (LGS)"
+   ],
+   "isbn": "9786051880105",
+   "sayfa": 380,
+   "aciklama": "Beceri temelli yeni nesil sorular agirlikli.",
+   "maarif": [
+    "LGS-MAT-03",
+    "LGS-MAT-07"
+   ],
+   "neden": "LGS yeni nesil soru diline alistirir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Hiz+ve+Renk+LGS+Matematik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-012",
+   "baslik": "Nitelik LGS Fen Soru Bankasi",
+   "yazar": "Nitelik Komisyon",
+   "yayin": "Nitelik",
+   "tur": "soru_bankasi",
+   "seviye": "temel",
+   "dersler": [
+    "Fen Bilimleri (LGS)"
+   ],
+   "isbn": "9786051880112",
+   "sayfa": 340,
+   "aciklama": "Deney-duzenekli sorularla kavram ogretir.",
+   "maarif": [
+    "LGS-FEN-03",
+    "LGS-FEN-05"
+   ],
+   "neden": "Fende deney yorumunu gelistirir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Nitelik+LGS+Fen+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-013",
+   "baslik": "Muba LGS Turkce Soru Bankasi",
+   "yazar": "Muba Komisyon",
+   "yayin": "Muba",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "Turkce (LGS)"
+   ],
+   "isbn": "9786051880129",
+   "sayfa": 300,
+   "aciklama": "Paragraf + dil bilgisi dengeli dagilim.",
+   "maarif": [
+    "LGS-TR-03",
+    "LGS-TR-04"
+   ],
+   "neden": "Turkcede istikrarli 15+ net icin.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Muba+LGS+Turkce+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-014",
+   "baslik": "Okyanus 9. Sinif Matematik Konu Anlatimi",
+   "yazar": "Okyanus Komisyon",
+   "yayin": "Okyanus",
+   "tur": "konu_anlatim",
+   "seviye": "temel",
+   "dersler": [
+    "Matematik-9"
+   ],
+   "isbn": "9786051880136",
+   "sayfa": 360,
+   "aciklama": "9. sinif yaziliya ve TYT temeline cift hazirlik.",
+   "maarif": [
+    "ARA-MAT9-01",
+    "ARA-MAT9-03"
+   ],
+   "neden": "9. sinifta saglam temel atar.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Okyanus+9.+Sinif+Matematik+Konu+Anlatimi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-015",
+   "baslik": "Supara 11. Sinif Fizik Soru Bankasi",
+   "yazar": "Supara Komisyon",
+   "yayin": "Supara",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "Fizik (11)"
+   ],
+   "isbn": "9786051880143",
+   "sayfa": 380,
+   "aciklama": "Vektor-Newton agirlikli, okul + YKS cift yonlu.",
+   "maarif": [
+    "ARA-FIZ-05"
+   ],
+   "neden": "11. fizik ortalamasini yukseltir.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Supara+11.+Sinif+Fizik+Soru+Bankasi+satın+al&tbm=shop"
+  },
+  {
+   "id": "KT-016",
+   "baslik": "Limit AYT Edebiyat Soru Bankasi",
+   "yazar": "Limit Komisyon",
+   "yayin": "Limit",
+   "tur": "soru_bankasi",
+   "seviye": "orta",
+   "dersler": [
+    "AYT-Edebiyat"
+   ],
+   "isbn": "9786051880150",
+   "sayfa": 340,
+   "aciklama": "Donem-yazar-eser tablolari + testler.",
+   "maarif": [
+    "AYT-EDE-01",
+    "AYT-EDE-02"
+   ],
+   "neden": "EA ogrencisi icin ezberi teste donusturur.",
+   "isbn_durum": "yer-tutucu-dogrulanmadi",
+   "satin_alma_arama": "https://www.google.com/search?q=Limit+AYT+Edebiyat+Soru+Bankasi+satın+al&tbm=shop"
+  }
+ ]
+}

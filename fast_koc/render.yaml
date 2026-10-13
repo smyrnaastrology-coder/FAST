@@ -1,0 +1,61 @@
+# Fast Koç — Render deploy (ayrı servisler, FBST'ten izole)
+services:
+  - type: web
+    name: fastkoc-api
+    runtime: python
+    plan: free
+    rootDir: fast_koc
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "true"
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: MPLBACKEND
+        value: "Agg"
+      - key: FASTKOC_DATABASE_URL
+        sync: false
+      - key: AUTH_ZORUNLU
+        value: "true"
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: FCM_SERVER_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+
+  - type: web
+    name: fastkoc-web
+    runtime: python
+    plan: free
+    rootDir: fast_koc
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run web/Home.py --server.port $PORT --server.address 0.0.0.0
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "true"
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: MPLBACKEND
+        value: "Agg"
+      - key: FASTKOC_DATABASE_URL
+        sync: false
+      - key: FASTKOC_ADMIN_SIFRE
+        sync: false
+
+  - type: cron
+    name: fastkoc-gunluk-push
+    runtime: python
+    plan: free
+    rootDir: fast_koc
+    buildCommand: pip install -r requirements.txt
+    schedule: "30 18 * * *" # 21:30 TSİ = 18:30 UTC (kış)
+    startCommand: python -m backend.jobs.gunluk_push
+    envVars:
+      - key: FASTKOC_DATABASE_URL
+        sync: false
+      - key: FCM_SERVER_KEY
+        sync: false

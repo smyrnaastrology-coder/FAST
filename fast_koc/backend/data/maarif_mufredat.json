@@ -1,0 +1,1257 @@
+{
+ "meta": {
+  "model": "Turkiye Yuzyili Maarif Modeli (2024)",
+  "aciklama": "LGS / 9-10-11 ara sinif / YKS (TYT+AYT) konu-kazanim agaci. Her konu: kod, ders, baslik, oncul konular, zorluk (1-5), sinav agirligi.",
+  "surum": "0.2.0",
+  "kaynak": "MEB Ogretim Programlari + OGM Materyal + gecmis OSYM/MEB soru dagilimlari (ozet)",
+  "donem_notu": "2026-27: 9-10-11 Maarif, 12+mezun eski sistem. 2027-28: tumu Maarif (TUMU_MAARIF_DONEMI bayragi).",
+  "alias_notu": "Eski 'YKS' degeri YKS_ESKI olarak okunur (geriye uyumluluk)."
+ },
+ "segmentler": {
+  "LGS": {
+   "aciklama": "8. sinif; 6 ders",
+   "dersler": {
+    "Turkce": [
+     {
+      "kod": "LGS-TR-01",
+      "baslik": "Sozcukte Anlam",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-TR-02",
+      "baslik": "Cumlede Anlam",
+      "oncul": [
+       "LGS-TR-01"
+      ],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-TR-03",
+      "baslik": "Paragrafta Anlam",
+      "oncul": [
+       "LGS-TR-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 5
+     },
+     {
+      "kod": "LGS-TR-04",
+      "baslik": "Fiilimsiler",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-TR-05",
+      "baslik": "Cati (Fiilde Cati)",
+      "oncul": [
+       "LGS-TR-04"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-TR-06",
+      "baslik": "Cumlenin Ogeleri",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-TR-07",
+      "baslik": "Cumle Turleri",
+      "oncul": [
+       "LGS-TR-06"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-TR-08",
+      "baslik": "Anlatim Bozukluklari",
+      "oncul": [
+       "LGS-TR-06"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-TR-09",
+      "baslik": "Yazim Kurallari ve Noktalama",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-TR-10",
+      "baslik": "Edebi Turler ve Soz Sanatlari",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ],
+    "Matematik": [
+     {
+      "kod": "LGS-MAT-01",
+      "baslik": "Carpanlar ve Katlar",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-MAT-02",
+      "baslik": "Uslu Ifadeler",
+      "oncul": [
+       "LGS-MAT-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-MAT-03",
+      "baslik": "Karekoklu Ifadeler",
+      "oncul": [
+       "LGS-MAT-02"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-MAT-04",
+      "baslik": "Veri Analizi",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-MAT-05",
+      "baslik": "Basit Olaylarin Olma Olasiligi",
+      "oncul": [
+       "LGS-MAT-04"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-MAT-06",
+      "baslik": "Cebirsel Ifadeler ve Ozdeslikler",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-MAT-07",
+      "baslik": "Dogrusal Denklemler",
+      "oncul": [
+       "LGS-MAT-06"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-MAT-08",
+      "baslik": "Esitsizlikler",
+      "oncul": [
+       "LGS-MAT-07"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-MAT-09",
+      "baslik": "Ucgenler",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-MAT-10",
+      "baslik": "Eslik ve Benzerlik",
+      "oncul": [
+       "LGS-MAT-09"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-MAT-11",
+      "baslik": "Donusum Geometrisi",
+      "oncul": [
+       "LGS-MAT-09"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-MAT-12",
+      "baslik": "Geometrik Cisimler",
+      "oncul": [
+       "LGS-MAT-09"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     }
+    ],
+    "Fen Bilimleri": [
+     {
+      "kod": "LGS-FEN-01",
+      "baslik": "Mevsimler ve Iklim",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-FEN-02",
+      "baslik": "DNA ve Genetik Kod",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-FEN-03",
+      "baslik": "Basinc",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-FEN-04",
+      "baslik": "Madde ve Endustri (Periyodik Sistem, Asit-Baz)",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-FEN-05",
+      "baslik": "Basit Makineler",
+      "oncul": [
+       "LGS-FEN-03"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "LGS-FEN-06",
+      "baslik": "Enerji Donusumleri ve Cevre Bilimi",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-FEN-07",
+      "baslik": "Elektrik Yukleri ve Elektrik Enerjisi",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "Inkilap Tarihi": [
+     {
+      "kod": "LGS-INK-01",
+      "baslik": "Bir Kahraman Doguyor",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-INK-02",
+      "baslik": "Milli Uyanis",
+      "oncul": [
+       "LGS-INK-01"
+      ],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-INK-03",
+      "baslik": "Ya Istiklal Ya Olum",
+      "oncul": [
+       "LGS-INK-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-INK-04",
+      "baslik": "Cagdas Turkiye Yolunda Adimlar",
+      "oncul": [
+       "LGS-INK-03"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     }
+    ],
+    "Din Kulturu": [
+     {
+      "kod": "LGS-DIN-01",
+      "baslik": "Kader Inanci",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-DIN-02",
+      "baslik": "Zekat ve Sadaka",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "LGS-DIN-03",
+      "baslik": "Din ve Hayat",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-DIN-04",
+      "baslik": "Hz. Muhammed'in Ornek Hayati",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     }
+    ],
+    "Ingilizce": [
+     {
+      "kod": "LGS-ING-01",
+      "baslik": "Friendship",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-ING-02",
+      "baslik": "Teen Life",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-ING-03",
+      "baslik": "In The Kitchen",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-ING-04",
+      "baslik": "On The Phone",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "LGS-ING-05",
+      "baslik": "The Internet",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     }
+    ]
+   }
+  },
+  "ARA_9_10_11": {
+   "aciklama": "9-10-11. siniflar; ortak + alan dersleri",
+   "dersler": {
+    "Matematik-9": [
+     {
+      "kod": "ARA-MAT9-01",
+      "baslik": "Mantik",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "ARA-MAT9-02",
+      "baslik": "Kumeler",
+      "oncul": [
+       "ARA-MAT9-01"
+      ],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "ARA-MAT9-03",
+      "baslik": "Denklemler ve Esitsizlikler",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-MAT9-04",
+      "baslik": "Ucgenler",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-MAT9-05",
+      "baslik": "Veri",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     }
+    ],
+    "Matematik-10": [
+     {
+      "kod": "ARA-MAT10-01",
+      "baslik": "Sayma ve Olasilik",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT10-02",
+      "baslik": "Fonksiyonlar",
+      "oncul": [
+       "ARA-MAT9-03"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-MAT10-03",
+      "baslik": "Polinomlar",
+      "oncul": [
+       "ARA-MAT10-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT10-04",
+      "baslik": "Ikinci Dereceden Denklemler",
+      "oncul": [
+       "ARA-MAT10-03"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-MAT10-05",
+      "baslik": "Dortgenler ve Cokgenler",
+      "oncul": [
+       "ARA-MAT9-04"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT10-06",
+      "baslik": "Kati Cisimler",
+      "oncul": [
+       "ARA-MAT10-05"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     }
+    ],
+    "Matematik-11": [
+     {
+      "kod": "ARA-MAT11-01",
+      "baslik": "Trigonometri",
+      "oncul": [
+       "ARA-MAT10-02"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-MAT11-02",
+      "baslik": "Analityk Geometri",
+      "oncul": [
+       "ARA-MAT11-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT11-03",
+      "baslik": "Fonksiyonlarda Uygulamalar",
+      "oncul": [
+       "ARA-MAT10-02"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT11-04",
+      "baslik": "Denklem ve Esitsizlik Sistemleri",
+      "oncul": [
+       "ARA-MAT10-04"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT11-05",
+      "baslik": "Cember ve Daire",
+      "oncul": [
+       "ARA-MAT10-05"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-MAT11-06",
+      "baslik": "Olasilik (ileri)",
+      "oncul": [
+       "ARA-MAT10-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 2
+     }
+    ],
+    "Fizik": [
+     {
+      "kod": "ARA-FIZ-01",
+      "baslik": "Hareket ve Kuvvet",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-FIZ-02",
+      "baslik": "Enerji",
+      "oncul": [
+       "ARA-FIZ-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-FIZ-03",
+      "baslik": "Elektrik ve Manyetizma (temel)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-FIZ-04",
+      "baslik": " optik (10. sinif)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-FIZ-05",
+      "baslik": "Vektorler, Bagil Hareket, Newton (11. sinif)",
+      "oncul": [
+       "ARA-FIZ-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "Kimya": [
+     {
+      "kod": "ARA-KIM-01",
+      "baslik": "Kimya Bilimi ve Atom",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-KIM-02",
+      "baslik": "Periyodik Sistem ve Baglar",
+      "oncul": [
+       "ARA-KIM-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-KIM-03",
+      "baslik": "Maddenin Halleri, Karisimlar",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-KIM-04",
+      "baslik": "Mol, Kimyasal Hesaplamalar (10)",
+      "oncul": [
+       "ARA-KIM-02"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-KIM-05",
+      "baslik": "Gazlar, Sivi Cozeltiler, Kimyasal Tepkimelerde Enerji (11)",
+      "oncul": [
+       "ARA-KIM-04"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "Biyoloji": [
+     {
+      "kod": "ARA-BIY-01",
+      "baslik": "Yasam Bilimi ve Hucre",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-BIY-02",
+      "baslik": "Canlilar Dunyasi ve Ekoloji (10)",
+      "oncul": [
+       "ARA-BIY-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-BIY-03",
+      "baslik": "Insan Fizyolojisi (11)",
+      "oncul": [
+       "ARA-BIY-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "ARA-BIY-04",
+      "baslik": "Komunite ve Populasyon Ekolojisi (11)",
+      "oncul": [
+       "ARA-BIY-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     }
+    ],
+    "Turk Dili ve Edebiyati": [
+     {
+      "kod": "ARA-EDE-01",
+      "baslik": "Hikaye, Siir Bilgisi",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-EDE-02",
+      "baslik": "Roman, Tiyatro (10)",
+      "oncul": [
+       "ARA-EDE-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "ARA-EDE-03",
+      "baslik": "Tanzimat-Edebiyat Tarihi Giris (11)",
+      "oncul": [
+       "ARA-EDE-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 4
+     }
+    ],
+    "Tarih-Cografya": [
+     {
+      "kod": "ARA-TAR-01",
+      "baslik": "Tarih Bilimine Giris, Ilk Caglar",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 2
+     },
+     {
+      "kod": "ARA-COG-01",
+      "baslik": "Harita, Iklim, Yer Sekilleri",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ]
+   }
+  },
+  "YKS_MAARIF": {
+   "aciklama": "TYT (ortak) + AYT (alan) — Maarif Modeli ile okuyanlar: 11. sinif erken hazirlik + 2027-28 doneminden itibaren tum YKS.",
+   "dersler": {
+    "TYT-Turkce": [
+     {
+      "kod": "TYT-TR-01",
+      "baslik": "Paragraf ve Anlam Bilgisi",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 5
+     },
+     {
+      "kod": "TYT-TR-02",
+      "baslik": "Dil Bilgisi (Ses, Yapi, Cati, Oge)",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-TR-03",
+      "baslik": "Yazim-Noktalama ve Anlatim",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ],
+    "TYT-Matematik": [
+     {
+      "kod": "TYT-MAT-01",
+      "baslik": "Temel Kavramlar, Sayi Basamaklari",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-02",
+      "baslik": "Bolme-Bolunebilme, EBOB-EKOK",
+      "oncul": [
+       "TYT-MAT-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-03",
+      "baslik": "Rasyonel, Uslu, Koklu Ifadeler",
+      "oncul": [
+       "TYT-MAT-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-04",
+      "baslik": "Carpanlara Ayirma, Oran-Oranti",
+      "oncul": [
+       "TYT-MAT-03"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-05",
+      "baslik": "Denklem Cozme, Esitsizlik, Mutlak Deger",
+      "oncul": [
+       "TYT-MAT-04"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-06",
+      "baslik": "Problemler (Sayi-Kesir-Yas-Yuzde-Kar-Zarar-Karisim-Hareket-Grafik)",
+      "oncul": [
+       "TYT-MAT-05"
+      ],
+      "zorluk": 4,
+      "agirlik": 5
+     },
+     {
+      "kod": "TYT-MAT-07",
+      "baslik": "Kumeler, Fonksiyon, Permutasyon-Kombinasyon-Olasilik",
+      "oncul": [
+       "TYT-MAT-05"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-08",
+      "baslik": "Geometri (Ucgen-Dortgen-Cember-Kati Cisim)",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "TYT-Fen": [
+     {
+      "kod": "TYT-FEN-01",
+      "baslik": "Fizik: Hareket, Kuvvet, Enerji, Elektrik, Optik, Dalga",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-FEN-02",
+      "baslik": "Kimya: Atom, Periyodik, Baglar, Mol, Karisim, Asit-Baz",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-FEN-03",
+      "baslik": "Biyoloji: Hucre, Kalitim, Ekoloji, Insan",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     }
+    ],
+    "TYT-Sosyal": [
+     {
+      "kod": "TYT-SOS-01",
+      "baslik": "Tarih (Islami-yet Oncesi, Osmanli, Inkilap ilkeleri)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-SOS-02",
+      "baslik": "Cografya (Harita, Iklim, Nufus, Ekonomi)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-SOS-03",
+      "baslik": "Felsefe, Din Kulturu",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ],
+    "AYT-Matematik": [
+     {
+      "kod": "AYT-MAT-01",
+      "baslik": "Fonksiyonlar (ileri)",
+      "oncul": [
+       "TYT-MAT-07"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-02",
+      "baslik": "Trigonometri",
+      "oncul": [
+       "AYT-MAT-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-03",
+      "baslik": "Logaritma, Diziler",
+      "oncul": [
+       "AYT-MAT-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-04",
+      "baslik": "Limit, Turev, Integral",
+      "oncul": [
+       "AYT-MAT-03"
+      ],
+      "zorluk": 5,
+      "agirlik": 5
+     }
+    ],
+    "AYT-Fizik": [
+     {
+      "kod": "AYT-FIZ-01",
+      "baslik": "Vektor, Bagil, Newton, Atislar",
+      "oncul": [
+       "TYT-FEN-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-FIZ-02",
+      "baslik": "Elektrik, Manyetizma, Alternatif Akim",
+      "oncul": [
+       "AYT-FIZ-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-FIZ-03",
+      "baslik": "Cembersel Hareket, Basit Harmonik, Dalga, Optik, Modern Fizik",
+      "oncul": [
+       "AYT-FIZ-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Kimya": [
+     {
+      "kod": "AYT-KIM-01",
+      "baslik": "Gazlar, Cozeltiler, Entalpi, Hiz, Denge",
+      "oncul": [
+       "TYT-FEN-02"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-KIM-02",
+      "baslik": "Elektrokimya, Organik Kimyaya Giris",
+      "oncul": [
+       "AYT-KIM-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Biyoloji": [
+     {
+      "kod": "AYT-BIY-01",
+      "baslik": "Sinir, Endokrin, Duyu, Destek-Hareket, Sindirim",
+      "oncul": [
+       "TYT-FEN-03"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-BIY-02",
+      "baslik": "Dolasim, Solunum, Bosaltim, Ureme, Bitki",
+      "oncul": [
+       "AYT-BIY-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Edebiyat": [
+     {
+      "kod": "AYT-EDE-01",
+      "baslik": "Islamiyet Oncesi-Tanzimat-Servetifunun-Milli Edebiyat",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-EDE-02",
+      "baslik": "Cumhuriyet Donemi Siir-Hikaye-Roman",
+      "oncul": [
+       "AYT-EDE-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Tarih-Cografya": [
+     {
+      "kod": "AYT-TAR-01",
+      "baslik": "Tarih: Beylik-Osmanli-Cagdas Dunya",
+      "oncul": [
+       "TYT-SOS-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "AYT-COG-01",
+      "baslik": "Cografya: Beheri Sistemler, Bolgeler, Cevre",
+      "oncul": [
+       "TYT-SOS-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     }
+    ]
+   },
+   "sistem": "maarif",
+   "gecerli_donem": "2027-28 ve sonrasi tum YKS; 2026-27de 11. sinif erken hazirlik"
+  },
+  "YKS_ESKI": {
+   "aciklama": "TYT (ortak) + AYT (alan) — 2026-27de 12. sinif ve mezunlar (9-11. sinifi eski programla okuyanlar). Konu kodlari ortak tutulur; fark ders notlarinda.",
+   "dersler": {
+    "TYT-Turkce": [
+     {
+      "kod": "TYT-TR-01",
+      "baslik": "Paragraf ve Anlam Bilgisi",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 5
+     },
+     {
+      "kod": "TYT-TR-02",
+      "baslik": "Dil Bilgisi (Ses, Yapi, Cati, Oge)",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-TR-03",
+      "baslik": "Yazim-Noktalama ve Anlatim",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ],
+    "TYT-Matematik": [
+     {
+      "kod": "TYT-MAT-01",
+      "baslik": "Temel Kavramlar, Sayi Basamaklari",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-02",
+      "baslik": "Bolme-Bolunebilme, EBOB-EKOK",
+      "oncul": [
+       "TYT-MAT-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-03",
+      "baslik": "Rasyonel, Uslu, Koklu Ifadeler",
+      "oncul": [
+       "TYT-MAT-01"
+      ],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-04",
+      "baslik": "Carpanlara Ayirma, Oran-Oranti",
+      "oncul": [
+       "TYT-MAT-03"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-MAT-05",
+      "baslik": "Denklem Cozme, Esitsizlik, Mutlak Deger",
+      "oncul": [
+       "TYT-MAT-04"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-06",
+      "baslik": "Problemler (Sayi-Kesir-Yas-Yuzde-Kar-Zarar-Karisim-Hareket-Grafik)",
+      "oncul": [
+       "TYT-MAT-05"
+      ],
+      "zorluk": 4,
+      "agirlik": 5
+     },
+     {
+      "kod": "TYT-MAT-07",
+      "baslik": "Kumeler, Fonksiyon, Permutasyon-Kombinasyon-Olasilik",
+      "oncul": [
+       "TYT-MAT-05"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-MAT-08",
+      "baslik": "Geometri (Ucgen-Dortgen-Cember-Kati Cisim)",
+      "oncul": [],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "TYT-Fen": [
+     {
+      "kod": "TYT-FEN-01",
+      "baslik": "Fizik: Hareket, Kuvvet, Enerji, Elektrik, Optik, Dalga",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-FEN-02",
+      "baslik": "Kimya: Atom, Periyodik, Baglar, Mol, Karisim, Asit-Baz",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "TYT-FEN-03",
+      "baslik": "Biyoloji: Hucre, Kalitim, Ekoloji, Insan",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     }
+    ],
+    "TYT-Sosyal": [
+     {
+      "kod": "TYT-SOS-01",
+      "baslik": "Tarih (Islami-yet Oncesi, Osmanli, Inkilap ilkeleri)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-SOS-02",
+      "baslik": "Cografya (Harita, Iklim, Nufus, Ekonomi)",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 3
+     },
+     {
+      "kod": "TYT-SOS-03",
+      "baslik": "Felsefe, Din Kulturu",
+      "oncul": [],
+      "zorluk": 2,
+      "agirlik": 3
+     }
+    ],
+    "AYT-Matematik": [
+     {
+      "kod": "AYT-MAT-01",
+      "baslik": "Fonksiyonlar (ileri)",
+      "oncul": [
+       "TYT-MAT-07"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-02",
+      "baslik": "Trigonometri",
+      "oncul": [
+       "AYT-MAT-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-03",
+      "baslik": "Logaritma, Diziler",
+      "oncul": [
+       "AYT-MAT-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-MAT-04",
+      "baslik": "Limit, Turev, Integral",
+      "oncul": [
+       "AYT-MAT-03"
+      ],
+      "zorluk": 5,
+      "agirlik": 5
+     }
+    ],
+    "AYT-Fizik": [
+     {
+      "kod": "AYT-FIZ-01",
+      "baslik": "Vektor, Bagil, Newton, Atislar",
+      "oncul": [
+       "TYT-FEN-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-FIZ-02",
+      "baslik": "Elektrik, Manyetizma, Alternatif Akim",
+      "oncul": [
+       "AYT-FIZ-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-FIZ-03",
+      "baslik": "Cembersel Hareket, Basit Harmonik, Dalga, Optik, Modern Fizik",
+      "oncul": [
+       "AYT-FIZ-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Kimya": [
+     {
+      "kod": "AYT-KIM-01",
+      "baslik": "Gazlar, Cozeltiler, Entalpi, Hiz, Denge",
+      "oncul": [
+       "TYT-FEN-02"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-KIM-02",
+      "baslik": "Elektrokimya, Organik Kimyaya Giris",
+      "oncul": [
+       "AYT-KIM-01"
+      ],
+      "zorluk": 5,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Biyoloji": [
+     {
+      "kod": "AYT-BIY-01",
+      "baslik": "Sinir, Endokrin, Duyu, Destek-Hareket, Sindirim",
+      "oncul": [
+       "TYT-FEN-03"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-BIY-02",
+      "baslik": "Dolasim, Solunum, Bosaltim, Ureme, Bitki",
+      "oncul": [
+       "AYT-BIY-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Edebiyat": [
+     {
+      "kod": "AYT-EDE-01",
+      "baslik": "Islamiyet Oncesi-Tanzimat-Servetifunun-Milli Edebiyat",
+      "oncul": [],
+      "zorluk": 3,
+      "agirlik": 4
+     },
+     {
+      "kod": "AYT-EDE-02",
+      "baslik": "Cumhuriyet Donemi Siir-Hikaye-Roman",
+      "oncul": [
+       "AYT-EDE-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 4
+     }
+    ],
+    "AYT-Tarih-Cografya": [
+     {
+      "kod": "AYT-TAR-01",
+      "baslik": "Tarih: Beylik-Osmanli-Cagdas Dunya",
+      "oncul": [
+       "TYT-SOS-01"
+      ],
+      "zorluk": 4,
+      "agirlik": 3
+     },
+     {
+      "kod": "AYT-COG-01",
+      "baslik": "Cografya: Beheri Sistemler, Bolgeler, Cevre",
+      "oncul": [
+       "TYT-SOS-02"
+      ],
+      "zorluk": 3,
+      "agirlik": 3
+     }
+    ]
+   },
+   "sistem": "eski",
+   "gecerli_donem": "2026-27 (12. sinif + mezun)",
+   "fark_notu": "Editor teyidi gerekir: eski programa ozgu agirlik farklari (or. AYT 12. sinif konulari) ders bazinda isaretlenecek."
+  }
+ }
+}

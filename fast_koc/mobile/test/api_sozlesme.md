@@ -1,0 +1,21 @@
+# API sözleşmesi (mobil, Faz 3) — her satır manuel/otomatik doğrulanır.
+
+- [ ] POST /api/profil {ad, rol, segment, seviye} -> {id, rol, sistem}
+  - segment: LGS | ARA_9_10_11 | YKS_ESKI (12/mezun) | YKS_MAARIF (11. sınıf erken hazırlık)
+  - eski 'YKS' değeri YKS_ESKI sayılır
+- [ ] GET /api/segmentler -> donem, tumu_maarif, secilebilir[] (donem bayrağı)
+- [ ] GET /api/profil/{id} -> rol + sistem alani içerir
+- [ ] GET /api/profil/{id} -> rol alani içerir
+- [ ] POST /api/sinav -> {sinav_id, analiz{net, oncelikli}}
+- [ ] GET /api/analiz/{id} -> {konular[], kritik_sayisi}
+- [ ] GET /api/odev/haftalik/{id} -> 7 gun, son gun DENEME
+- [ ] POST /api/gunluk -> {yorum, odev_sayisi}
+- [ ] GET /api/kitap/oner/{id} -> oneriler[6]{baslik, kapak_url}
+- [ ] GET /api/takvim?segment=YKS -> dogrulama_durumu + kaynak_url içerir
+- [ ] GET /api/karne/{id} -> application/pdf, %PDF- ile baslar
+- [ ] POST /api/baglanti -> {id, durum}
+- [ ] GET /api/koc/{id}/ogrenciler -> {ogrenciler[]}
+- [ ] POST /api/cihaz -> {id}
+- [ ] POST /api/push/{id} -> {bildirim_id, gonderildi}
+- [ ] GET /api/plan/{id} -> {plan, ozellikler}
+- [ ] GET /api/auth/me (tokensiz) -> {sub: anonim}
