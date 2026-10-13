@@ -9,6 +9,11 @@ Komutlar:
   ladder                     ölçek katmanı merdiveni (kayıtların k değerleri hangi katmanda kümeleniyor)
   tohum                      seed Kırıkkale veya şehir çifti kaydı ekle
 
+  goal-add <json>            spor gol dakikası maçı ekle (cusps + goal_minutes)
+  goal-list                  maç kayıtlarını göster
+  goal-fit                   gol dakikası modelini öğren (dakika = a*mark + b)
+  goal-stats                 gol kalibrasyon güven raporu (yetersizse dakika verilmez)
+
 Örn:
   python horary_oracle/tools/horary_calibrate.py stats
   python horary_oracle/tools/horary_calibrate.py add vaka.json
@@ -32,6 +37,14 @@ from engine.horary_questions import classify_question
 
 CAL = HoraryCalibration()
 CAL.load()
+
+# Spor gol dakikasi kalibrasyonu (ayri depo: horary_sport_calibration.json)
+from engine.sport_calibration import (
+    SportCalibration, fit_goal_params, save_params, load_params,
+    assess as goal_assess, degree_marks,
+)
+GOALS = SportCalibration()
+GOALS.load()
 
 
 def _json_print(obj):
@@ -128,6 +141,44 @@ def cmd_ladder():
     _json_print(out)
 
 
+# ---------------- SPOR GOL DAKİKASI KALİBRASYONU ----------------
+def cmd_goal_list():
+    print(f"{len(GOALS.records)} maç kaydı:")
+    for r in GOALS.records:
+        print(f"  #{r['_id']} {r.get('match','?')} {r.get('date','')} "
+              f"goller={r.get('goal_minutes')} marks={[round(m,1) for m in (r.get('marks') or [])][:6]}...")
+
+
+def cmd_goal_add(path):
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    rows = data.get("records") if isinstance(data, dict) else data
+    if rows is None:
+        rows = [data]
+    for r in rows:
+        GOALS.add_record(**r)
+    GOALS.save()
+    print(f"Maç eklendi. Toplam {len(GOALS.records)}. "
+          f"(marks türetildi: {bool(GOALS.records[-1].get('marks'))})")
+
+
+def cmd_goal_fit():
+    res = fit_goal_params(GOALS.records)
+    if res.get("fitted"):
+        save_params(res)
+        print(f"Gol modeli: dakika = {res['a']}*mark + {res['b']}  |  "
+              f"ortalama sapma {res['mae']} dk (n={res['n']})")
+        print("  kaydedildi -> horary_sport_goal_params.json")
+    else:
+        print(f"Model öğrenilemedi: {res['reason']} (n={res['n']})")
+
+
+def cmd_goal_stats():
+    trust = goal_assess(GOALS.records, load_params())
+    _json_print({"kayit_sayisi": len(GOALS.records),
+                 "params": load_params(), "guven": trust})
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "list"
     if cmd == "list":
@@ -142,7 +193,18 @@ if __name__ == "__main__":
         cmd_fit()
     elif cmd == "ladder":
         cmd_ladder()
+    elif cmd == "goal-list":
+        cmd_goal_list()
+    elif cmd == "goal-add":
+        if len(sys.argv) < 3:
+            print("Kullanım: horary_calibrate.py goal-add <json>"); sys.exit(1)
+        cmd_goal_add(sys.argv[2])
+    elif cmd == "goal-fit":
+        cmd_goal_fit()
+    elif cmd == "goal-stats":
+        cmd_goal_stats()
     elif cmd == "tohum":
         cmd_tohum()
     else:
-        print("Bilinmeyen komut. list | add <json> | stats | fit | ladder | tohum")
+        print("Bilinmeyen komut. list | add <json> | stats | fit | ladder | "
+              "goal-list | goal-add <json> | goal-fit | goal-stats | tohum")

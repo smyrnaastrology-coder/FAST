@@ -42,6 +42,7 @@ QUESTION_HOUSES = {
     "sport_fav": 5,      # KENDİ takımın (katılımcı/antrenör çerçevesi, kitap #34) -> 5.ev; rakip onun 7.'si
     "sport_rival": 11,
     "sport_fan": 7,      # TARAFTAR çerçevesi (kitap #59): takım 7.ev, rakip takımın 7.'si = sorgu 1., onur 4., rakip takım 11.
+    "sport_goals": 5,    # GOL/DAKİKA/skor sorusu (gösteri/spekülasyon 5.ev) -> kalibre değilse dakika verilmez
     "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
@@ -56,6 +57,7 @@ LABEL_TR = {
     "home": "Ev/Ev dairesi", "hidden_enemy": "Gizli düşman / şikayet eden", "partner": "Eş/Partner",
     "sport_fav": "Kendi takımın (katılımcı çerçevesi, #34)", "sport_rival": "Rakip takım (11.ev)",
     "sport_fan": "Taraftar: üçüncü taraf takım (7.ev) — rakip 1., onur 4., rakip takım 11.",
+    "sport_goals": "Gol/dakika/skor sorusu (5. ev) — kalibre değilse dakika verilmez",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
@@ -135,6 +137,16 @@ _SPORT_MATCH_RE = re.compile(r"(play[-\s]?off|play[-\s]?offs|maç|mac|derbi|fina
 _SPORT_OWN_RE = re.compile(r"\b(bizim|biz|miyiz|takımım|takimim|takımımız|takimimiz|maçımız|macimiz|my team|our team|will we|we win)\b", re.I)
 _SPORT_WHO_WINS_RE = re.compile(r"(maçı kim kazanacak|maci kim kazanacak|kim kazanır|kim kazanacak|kazanan kim|kim kazandı)", re.I)
 
+# GOL/DAKİKA/skor sorusu: kazanma sorusu DEĞİL, ama spor sorusu. "gol olur",
+# "kaçıncı dakikada gol", "kaç gol", "kaç kaç biter", "skor ne olur".
+_SPORT_GOALS_RE = re.compile(
+    r"(\bgol\w*\D{0,30}?(olur|olacak|oldu|at(ar|acak|ıyor|iyor|mış|mis)|dakika|kaç|kac|zaman|dk)"
+    r"|(kaç|kac)\D{0,12}(gol|dakika|dakikalar|dk)"
+    r"|(kaç|kac)\s*(kaç|kac)\s*biter"
+    r"|\bskor\b)",
+    re.I,
+)
+
 
 def _load_team_lexicon():
     """horary_rules.json -> sport_team_lexicon (takım/lig adları). Sözlük dışı takım
@@ -186,6 +198,8 @@ def classify_question(question):
     q = _strip_nested(question.lower())
     if is_fan_sport_question(q):
         return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}
+    if _SPORT_GOALS_RE.search(q):
+        return {"type": "sport_goals", "house": QUESTION_HOUSES["sport_goals"], "label": LABEL_TR["sport_goals"]}
     for t, kws in TYPE_KEYWORDS:
         for kw in kws:
             if kw in q:

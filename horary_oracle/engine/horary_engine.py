@@ -1422,6 +1422,8 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         if "combustion" in s["code"]:
             _sc(RULES["scoring"].get("combust_penalty",-5) // 2, "combust_penalty"); # hafifletilmiş
 
+    _sport_goals = _sport_goals_block(houses, quesited_type)
+
     return {
         "jd": jd,
         "houses": houses,
@@ -1434,13 +1436,32 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         "verdict": verdict,
         "quesited_type": quesited_type,
         "timing": timing,
+        "sport_goals": _sport_goals,
         "lots": lots if 'lots' in locals() else {},
         "_trace": _tr if _DO_TRACE else [],
     }
 
+def _sport_goals_block(houses, quesited_type):
+    """sport_goals sorusunda dakika tahminini YALNIZ kalibrasyon izin verirse ekle.
+    Ölçüm yoksa dakika dönmez (uydurma yerine susma ilkesi)."""
+    if quesited_type != "sport_goals":
+        return None
+    try:
+        from engine.sport_calibration import forecast
+        return forecast(houses.get("cusps"))
+    except Exception as e:  # kalibrasyon yüklenemezse sessizce sus
+        return {"trust_level": "zayif", "give_minutes": False, "minutes": None,
+                "text": f"Gol dakikası kalibrasyonu okunamadı: {e}"}
+
 def sport_goal_minutes(cusps):
     """Kullanıcı taktiği: 1.gol = ASC°, 2.gol = ASC°+2.ev cusp°, 3.gol = +3.ev cusp° ... 90' içinde.
     cusps: 12 elemanlı ekliptik boylam listesi (0-360). Döner: [(gol_no, dakika, kaynak), ...]
+
+    DİKKAT (deprecated): Bu ham taktik KALİBRE DEĞİLDİR ve bir maçta 7 gol
+    öngörebilir. Kullanıcıya gösterilen dakikalar için
+    engine.sport_calibration.forecast() kullanılmalı; o fonksiyon ölçüm
+    yetersizse dakika vermez. Bu fonksiyon yalnız kalibrasyon verisi
+    üretmek (ham işaretler) için duruyor.
     """
     if not cusps or len(cusps) < 4:
         return []
