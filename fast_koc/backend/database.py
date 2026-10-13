@@ -4,13 +4,28 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.environ.get("FASTKOC_DATABASE_URL", "sqlite:///./fastkoc.db")
-if DATABASE_URL.startswith("postgres://"):
-    # Render/Heroku tarzi URL -> SQLAlchemy psycopg3 formatina cevir
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+def _url_temizle(ham: str) -> str:
+    """Env'den gelen URL'yi temizle: kirp, tirnaklari at, postgres:// cevir."""
+    url = (ham or "").strip().strip('"').strip("'").strip()
+    if url.startswith("postgres://"):
+        # Render/Heroku tarzi URL -> SQLAlchemy psycopg3 formatina cevir
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
+    return url
+
+
+DATABASE_URL = _url_temizle(os.environ.get("FASTKOC_DATABASE_URL", "sqlite:///./fastkoc.db"))
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+try:
+    engine = create_engine(DATABASE_URL, connect_args=connect_args)
+except Exception as e:
+    # Secret sizdirmeden teshis: sadece sema + uzunluk goster
+    sema = DATABASE_URL.split("://")[0] if "://" in DATABASE_URL else "(sema yok)"
+    raise RuntimeError(
+        f"FASTKOC_DATABASE_URL parse edilemedi (sema={sema!r}, uzunluk={len(DATABASE_URL)}). "
+        f"Render panelinde degerin 'postgres://...' ile basladigini ve bosluk/newline icermedigini kontrol edin. "
+        f"Orjinal hata: {e}"
+    ) from e
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
