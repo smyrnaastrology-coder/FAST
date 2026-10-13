@@ -20,6 +20,14 @@ Kayıt şeması (horary_sport_calibration.json, liste):
   {"_id", "match", "date", "kickoff_local", "lat", "lon",
    "cusps": [12 float], "goal_minutes": [int,...], "ts"}
 
+ÖNEMLİ — harita hangi andan? Gol dakikaları MAÇ SAATİNE göre verildiği için
+harita MAÇ BAŞLANGIÇ (kickoff) anından çıkarılır, soru anından değil.
+Kanıt (n=1, kesin değil): GS-Barcelona 13.10.2026 kickoff 22:00 İzmir
+haritasında ilk iki işaret 25.0 ve 44.1; gerçek goller 28' ve 43'.
+dakika = 0.8*mark + 8 ile 28.0 ve 43.3 çıkıyor (neredeyse tam). Aynı maçın
+18:30 soru-anı haritası (işaretler 19.4 / 47.8) daha kötü oturuyordu.
+Yeni kayıt eklerken tutarlılık için kickoff haritasını kullanın.
+
 Öğrenilen parametreler horary_sport_goal_params.json dosyasına yazılır.
 """
 import json
