@@ -1,50 +1,52 @@
+# FAST (fast_mobile/flutter_app) — iOS Release (App Store / TestFlight)
+# Gerekli Codemagic ayarlari (Teams > Integrations + bu workflow'un Environment variables):
+#   APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER,
+#   APP_STORE_CONNECT_PRIVATE_KEY, CERTIFICATE_PRIVATE_KEY (hepsi Encrypted)
+#   REVENUECAT_IOS_KEY (RevenueCat iOS public key, appl_...) (Encrypted)
+# Secure files'a yuklenecek: GoogleService-Info.plist (Firebase iOS uygulamasi)
+
 workflows:
-  horary-ios:
-    name: Horary iOS (IPA)
-    instance_type: mac_mini_m2
+  ios-release:
+    name: iOS Release
     max_build_duration: 60
+    instance_type: mac_mini_m2
     environment:
-      flutter: stable
+      ios_signing:
+        distribution_type: app_store
+        bundle_ids:
+          - com.fastastrology.fast
+      vars:
+        BUNDLE_ID: com.fastastrology.fast
+        PROJECT_PATH: fast_mobile/flutter_app
+      flutter: 3.44.8
       xcode: latest
       cocoapods: default
-    working_directory: horary_ios
     scripts:
-      - name: Flutter pub get
-        script: flutter pub get
-      - name: Pod install
+      - name: Keychain initialize
         script: |
-          cd ios && pod install --repo-update
-      - name: Build IPA
+          keychain initialize
+      - name: Fetch signing files
         script: |
-          flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist || flutter build ipa --release
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+      - name: Set up signing
+        script: |
+          keychain add-certificates
+          xcode-project use-profiles --project "$CM_BUILD_DIR/$PROJECT_PATH/ios/Runner.xcodeproj"
+      - name: Copy GoogleService-Info.plist
+        script: |
+          cp "$CM_FILE_GOOGLESERVICE_INFO_PLIST" "$CM_BUILD_DIR/$PROJECT_PATH/ios/Runner/GoogleService-Info.plist"
+      - name: Flutter build ipa
+        script: |
+          cd "$CM_BUILD_DIR/$PROJECT_PATH"
+          flutter pub get
+          flutter build ipa --release \
+            --export-options-plist="$HOME/export_options.plist" \
+            --dart-define=REVENUECAT_API_KEY="$REVENUECAT_IOS_KEY" \
+            --build-name=1.0.11 \
+            --build-number=49
     artifacts:
-      - build/ios/ipa/*.ipa
-      - build/ios/ipa/*.app
+      - fast_mobile/flutter_app/build/ios/ipa/*.ipa
     publishing:
-      email:
-        recipients:
-          - smyrnaastrology@gmail.com
-  horary-android:
-    name: Horary Android (APK/AAB)
-    instance_type: linux_x2
-    max_build_duration: 60
-    environment:
-      flutter: stable
-      java: 17
-    working_directory: horary_mobile
-    scripts:
-      - name: Flutter pub get
-        script: flutter pub get
-      - name: Build APK
-        script: |
-          flutter build apk --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
-      - name: Build AAB
-        script: |
-          flutter build appbundle --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
-    artifacts:
-      - build/app/outputs/flutter-apk/*.apk
-      - build/app/outputs/bundle/release/*.aab
-    publishing:
-      email:
-        recipients:
-          - smyrnaastrology@gmail.com
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
