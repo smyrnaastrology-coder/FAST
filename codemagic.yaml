@@ -6,8 +6,57 @@
 # Secure files'a yuklenecek: GoogleService-Info.plist (Firebase iOS uygulamasi)
 
 workflows:
-  ios-release:
-    name: iOS Release
+  horary-ios:
+    name: Horary iOS (IPA)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    working_directory: horary_ios
+    scripts:
+      - name: Flutter pub get
+        script: flutter pub get
+      - name: Pod install
+        script: |
+          cd ios && pod install --repo-update
+      - name: Build IPA
+        script: |
+          flutter build ipa --release --export-options-plist=ios/Runner/ExportOptions.plist || flutter build ipa --release
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/ipa/*.app
+    publishing:
+      email:
+        recipients:
+          - smyrnaastrology@gmail.com
+  horary-android:
+    name: Horary Android (APK/AAB)
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      java: 17
+    working_directory: horary_mobile
+    scripts:
+      - name: Flutter pub get
+        script: flutter pub get
+      - name: Build APK
+        script: |
+          flutter build apk --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
+      - name: Build AAB
+        script: |
+          flutter build appbundle --release --dart-define=HORARY_API_URL=https://horary-oracle-api.onrender.com
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+      - build/app/outputs/bundle/release/*.aab
+    publishing:
+      email:
+        recipients:
+          - smyrnaastrology@gmail.com
+  fast-ios-release:
+    name: FAST iOS Release
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
