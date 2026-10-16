@@ -21,6 +21,7 @@ import '../services/play_integrity_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart' as w;
+import '../widgets/premium_pdf_button.dart';
 import 'auth_screen.dart';
 
 class AnalyzerScreen extends StatefulWidget {
@@ -3297,23 +3298,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               constraints: const BoxConstraints(maxWidth: 360),
               child: Wrap(
                 spacing: 12, runSpacing: 12, alignment: WrapAlignment.center,
-                children: _pdfLinks(sessionId, l10n).map((link) => SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
-                    icon: _pdfLoading ?  SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: FastTheme.bg)) : const Icon(Icons.download, size: 20),
-                    label: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : '📥 ${link['label']}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: FastTheme.accentGold,
-                      foregroundColor: FastTheme.bg,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 4,
-                    ),
-                  ),
+                children: _pdfLinks(sessionId, l10n).map((link) => PremiumPdfButton(
+                  onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
+                  loading: _pdfLoading,
+                  label: _pdfLoading ? l10n.analyzerPdfPreparing : link['label']!,
                 )).toList(),
               ),
             ),

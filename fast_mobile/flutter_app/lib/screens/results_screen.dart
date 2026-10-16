@@ -17,6 +17,7 @@ import '../services/revenuecat_service.dart';
 import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
+import '../widgets/premium_pdf_button.dart';
 import 'auth_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -1010,23 +1011,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
+              child: PremiumPdfButton(
                 onPressed: _pdfLoading ? null : () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
-                icon: _pdfLoading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.download, size: 20),
-                label: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(_pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadBookButton(widget.request.bookLabel(l10n)), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: FastTheme.accent,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 4,
-                ),
+                loading: _pdfLoading,
+                label: _pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadBookButton(widget.request.bookLabel(l10n)),
               ),
-            ),
           ),
         ),
       ),
