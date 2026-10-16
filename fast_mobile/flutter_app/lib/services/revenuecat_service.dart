@@ -3,12 +3,12 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'billing_service.dart';
 
 /// RevenueCat iskeleti — API key .env / --dart-define ile verilir.
-/// Gerçek ürünler: sub_daily ($7.99), sub_daily_yearly ($49.99), pdf_single ($19.99)
+/// Gerçek ürünler: sub_daily ($14.99), sub_daily_yearly ($49.99), pdf_single ($9.99)
 class RevenueCatService {
   static bool _inited = false;
 
   /// Ürün ID -> yerelleştirilmiş (bölgesel) fiyat etiketi.
-  /// RevenueCat offering'inden getirilir; yoksa '7.99' gibi sabit düşer.
+  /// RevenueCat offering'inden getirilir; yoksa '14.99' gibi sabit düşer.
   static Map<String, String> _prices = {};
 
   /// Google aboneliklerinde identifier `urun:temelplan` formatindadir

@@ -105,7 +105,7 @@ class _LandingScreenState extends State<LandingScreen> {
     // Tek Pro kartı: aylık/yıllık düğmesi fiyatı, ürünü ve açıklamayı değiştirir.
     {
       'name': l10n.planProName, 'badge': l10n.planProBadge,
-      'price': _priceYearly ? 49.99 : 7.99,
+      'price': _priceYearly ? 49.99 : 14.99,
       'productId': _priceYearly ? 'sub_daily_yearly' : 'sub_daily',
       'interval': _priceYearly ? 'year' : 'month',
       'desc': _priceYearly ? l10n.planProYearlyDesc : l10n.planProMonthlyDesc,
