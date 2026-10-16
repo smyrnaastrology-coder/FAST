@@ -940,6 +940,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tu informe se está preparando, esto puede tardar un poco.';
 
   @override
+  String get samplePdfButton => 'Ver Muestra';
+
+  @override
   String get astrokartografiSubscribe => 'Suscribirse';
 
   @override

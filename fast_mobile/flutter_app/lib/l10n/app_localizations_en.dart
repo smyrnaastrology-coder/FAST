@@ -926,6 +926,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your report is being prepared, this may take a while.';
 
   @override
+  String get samplePdfButton => 'View Sample';
+
+  @override
   String get astrokartografiSubscribe => 'Subscribe';
 
   @override

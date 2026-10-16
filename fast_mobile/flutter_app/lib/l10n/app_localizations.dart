@@ -1786,6 +1786,12 @@ abstract class AppLocalizations {
   /// **'Your report is being prepared, this may take a while.'**
   String get pdfPreparingNote;
 
+  /// No description provided for @samplePdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View Sample'**
+  String get samplePdfButton;
+
   /// No description provided for @astrokartografiSubscribe.
   ///
   /// In en, this message translates to:

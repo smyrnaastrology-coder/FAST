@@ -922,6 +922,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Raporunuz hazırlanıyor, bu işlem biraz zaman alabilir.';
 
   @override
+  String get samplePdfButton => 'Örneği Gör';
+
+  @override
   String get astrokartografiSubscribe => 'Abone Ol';
 
   @override
