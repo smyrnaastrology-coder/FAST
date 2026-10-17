@@ -1,17 +1,20 @@
 """1-Profil: ogrenci olustur / sec. Veriler SQLite'da (MVP) tutulur."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st
+import ui
 from backend.database import SessionLocal, init_db
 from backend.models import Profile
 from backend.engine import mufredat as muf
 
+ui.setup("Profil", "👤")
+ui.baslik("Profil", ikon="👤", alt="Öğrenci profili oluştur veya seç. Sınıfını yazınca segment otomatik önerilir.")
 init_db()
-st.title("👤 Profil")
 db = SessionLocal()
 profilller = db.query(Profile).order_by(Profile.id.desc()).all()
 if profilller:
-    st.subheader("Kayitli profiller")
+    ui.bolum("Kayıtlı profiller")
     for p in profilller:
         rol = getattr(p, "rol", "ogrenci")
         if st.button(f"Sec: {p.ad} [{rol}] ({muf.etiket_of(p.segment)}/{p.seviye})", key=f"sec{p.id}"):
@@ -21,7 +24,7 @@ secili = st.session_state.get("ogrenci_id")
 if secili:
     st.info(f"Aktif ogrenci id: {secili}")
 st.divider()
-st.subheader("Yeni profil")
+ui.bolum("Yeni profil")
 st.caption("2026-27: 9-10-11 Maarif, 12/mezun eski sistem. Sınıfını yaz, segment önerilsin.")
 sinif_on = st.text_input("Sinif (örn 8, 10, 12/mezun)", "12", key="sinif_on")
 onerilen = muf.siniftan_oner(sinif_on)

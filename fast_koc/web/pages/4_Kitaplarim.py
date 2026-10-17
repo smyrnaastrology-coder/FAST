@@ -1,13 +1,16 @@
 """4-Kitaplarim: seviyeye gore kapakli oneriler (ISBN API)."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 import streamlit as st
 from backend.database import SessionLocal
 from backend.models import Profile, SinavSonuc
 from backend.engine import mufredat as muf
 from backend.services.kitap_servisi import kitap_oner
 
-st.title("📖 Kitaplarım")
+ui.setup("Kitaplarım", "📖")
+ui.baslik("Kitaplarım", ikon="📖", alt="Konu anlatım / soru bankası / test önerileri; kapak ve ISBN bilgisiyle.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Once 1-Profil sayfasindan ogrenci secin.")

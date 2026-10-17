@@ -5,9 +5,12 @@ Uretimde bu sayfa kapatilmali veya Supabase rollerine baglanmali.
 """
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 import streamlit as st
 
-st.title("🛠️ Admin — Veri Editörü")
+ui.setup("Admin — Veri Editörü", "🛠️")
+ui.baslik("Admin — Veri Editörü", ikon="🛠️", alt="Kitap katalogu, deneme takvimi ve Maarif müfredatı JSON editörü.")
 sifre = st.sidebar.text_input("Admin şifresi", type="password")
 beklenen = os.environ.get("FASTKOC_ADMIN_SIFRE", "fastkoc-admin")
 if sifre != beklenen:

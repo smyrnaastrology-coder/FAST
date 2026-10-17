@@ -1,6 +1,8 @@
 """5-Takvim: 2026-27 TG denemeleri + erken uyari."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 from datetime import date
 import streamlit as st
 from backend.database import SessionLocal, init_db
@@ -11,7 +13,8 @@ from backend.services.takvim_seed import takvim_seed_yukle
 init_db()
 db = SessionLocal()
 takvim_seed_yukle(db)
-st.title("🗓️ Deneme Takvimi (2026-27)")
+ui.setup("Deneme Takvimi", "🗓️")
+ui.baslik("Deneme Takvimi", ikon="🗓️", pill="2026-27", alt="Türkiye geneli denemeler, başvuru tarihleri ve erken uyarılar.")
 oid = st.session_state.get("ogrenci_id")
 segment = None
 if oid:

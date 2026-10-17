@@ -1,13 +1,16 @@
 """10-Pro: plan + odeme stub + push cihaz kaydi (Faz 3)."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 import streamlit as st
 from backend.database import SessionLocal, init_db
 from backend.models import Profile, Cihaz
 from backend.services.odeme_servisi import plan_of, checkout_link, pro_aktif_et, PLANLAR
 
 init_db()
-st.title("⭐ Pro & Cihazlar")
+ui.setup("Pro & Cihazlar", "⭐")
+ui.baslik("Pro & Cihazlar", ikon="⭐", alt="Abonelik planı, ödeme (stub) ve push cihaz kaydı.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Önce 1-Profil sayfasından profil seçin.")
@@ -18,7 +21,7 @@ plan = plan_of(db, oid)
 st.info(f"{pr.ad} — mevcut plan: **{plan}** | özellikler: {', '.join(PLANLAR[plan]['ozellik'])}")
 c1, c2 = st.columns(2)
 with c1:
-    st.subheader("Pro'ya yükselt")
+    ui.bolum("Pro'ya yükselt")
     st.write(f"Pro: {PLANLAR['pro']['ucret']} {PLANLAR['pro']['para']} — koç paneli + push önceliği.")
     if st.button("Checkout linki üret (stub)"):
         link = checkout_link(oid)
@@ -27,7 +30,7 @@ with c1:
         ab = pro_aktif_et(db, oid, "test-session")
         st.success(f"Pro aktif: {ab.bitis}")
 with c2:
-    st.subheader("Push cihazı kaydet")
+    ui.bolum("Push cihazı kaydet")
     st.caption("Mobil FCM token buraya yapıştırılır (gerçek token Firebase'den gelir).")
     token = st.text_input("FCM token")
     platform = st.selectbox("Platform", ["android", "ios", "web"])

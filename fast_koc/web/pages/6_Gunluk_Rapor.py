@@ -1,6 +1,8 @@
 """6-Gunluk: gun sonu soru girisi + odev kiyas yorumu."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 from datetime import date
 import streamlit as st
 import matplotlib
@@ -10,7 +12,8 @@ from backend.database import SessionLocal
 from backend.models import Profile, GunlukLog, Odev
 from backend.engine.yorum_motoru import gunluk_kiyas, donem_yorumu
 
-st.title("📊 Günlük + Raporlarım")
+ui.setup("Günlük + Raporlarım", "📊")
+ui.baslik("Günlük + Raporlarım", ikon="📊", alt="Gün sonu soru/dakika girişi, haftalık-aylık kıyas ve bildirimler.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Once 1-Profil sayfasindan ogrenci secin.")
@@ -35,7 +38,7 @@ with st.form("gunluk"):
 st.divider()
 loglar = db.query(GunlukLog).filter_by(ogrenci_id=oid).order_by(GunlukLog.tarih).all()
 if loglar:
-    st.subheader("Haftalik / aylik / kumulatif")
+    ui.bolum("Haftalık / aylık / kümülatif")
     tarihler = [l.tarih.isoformat()[5:] for l in loglar[-30:]]
     sorular = [l.cozulen_soru for l in loglar[-30:]]
     dklar = [l.calisilan_dk for l in loglar[-30:]]
@@ -55,7 +58,7 @@ if loglar:
 else:
     st.write("Henuz gunluk girisi yok.")
 st.divider()
-st.subheader("🔔 Bildirim kutusu")
+ui.bolum("🔔 Bildirim kutusu")
 st.write("Gun sonu + TG erken uyarilari burada toplanir (uygulama ici).")
 from backend.models import Bildirim
 from backend.services.bildirim_servisi import gun_sonu_hatirlatma_uret, erken_uyari_tara

@@ -1,6 +1,8 @@
 """11-Optik: cevap anahtari + ogrenci cevabi -> otomatik D/Y/B -> sinava isle."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 from datetime import date
 import streamlit as st
 from backend.database import SessionLocal
@@ -9,7 +11,8 @@ from backend.engine import mufredat as muf
 from backend.engine.optik import optik_karsilastir
 from backend.engine.analiz_motoru import konu_analiz
 
-st.title("🔲 Optik Hızlı Giriş")
+ui.setup("Optik Hızlı Giriş", "🔲")
+ui.baslik("Optik Hızlı Giriş", ikon="🔲", alt="Cevap anahtarı + öğrenci cevabından otomatik D/Y/B ve net hesabı.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Önce 1-Profil sayfasından öğrenci seçin.")

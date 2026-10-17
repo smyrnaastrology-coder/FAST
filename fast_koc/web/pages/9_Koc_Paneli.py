@@ -1,13 +1,16 @@
 """9-Koc Paneli: veli/koc -> ogrenci baglantisi + ozet (Faz 3)."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 import streamlit as st
 from backend.database import SessionLocal, init_db
 from backend.models import Profile, Baglanti, SinavSonuc, GunlukLog
 from backend.services.odeme_servisi import plan_of
 
 init_db()
-st.title("🧑‍🏫 Koç / Veli Paneli")
+ui.setup("Koç / Veli Paneli", "🧑‍🏫")
+ui.baslik("Koç / Veli Paneli", ikon="🧑‍🏫", alt="Veli veya koç, öğrenciye bağlanır ve gelişim özetini izler.")
 db = SessionLocal()
 sahipler = db.query(Profile).filter(Profile.rol.in_(["veli", "koc"])).all()
 if not sahipler:
@@ -37,7 +40,7 @@ with st.form("bagla"):
             st.success("Bağlandı.")
 
 st.divider()
-st.subheader("Öğrencilerim")
+ui.bolum("Öğrencilerim")
 baglar = db.query(Baglanti).filter_by(sahip_id=sahip_id, durum="aktif").all()
 for b in baglar:
     o = db.get(Profile, b.ogrenci_id)

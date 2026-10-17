@@ -1,6 +1,8 @@
 """3-Odevlerim: haftalik plan uret + gunluk onay."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 from datetime import date
 import streamlit as st
 from backend.database import SessionLocal
@@ -9,7 +11,8 @@ from backend.engine import analiz_motoru, odev_motoru
 from backend.engine import mufredat as muf
 from backend.services.kitap_servisi import kitap_oner
 
-st.title("📚 Ödevlerim")
+ui.setup("Ödevlerim", "📚")
+ui.baslik("Ödevlerim", ikon="📚", alt="Seviyene göre haftalık ve günlük, kitap eşlemeli çalışma planı.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Once 1-Profil sayfasindan ogrenci secin.")

@@ -1,6 +1,8 @@
 """8-Karne: PDF karne onizleme + indirme."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 import streamlit as st
 from backend.database import SessionLocal
 from backend.models import Profile, SinavSonuc, GunlukLog, Odev, DenemeTakvim
@@ -9,7 +11,8 @@ from backend.engine import mufredat as muf
 from backend.services.kitap_servisi import kitap_oner
 from backend.services.karne_pdf import karne_pdf_uret
 
-st.title("🎓 Karnem (PDF)")
+ui.setup("Karnem (PDF)", "🎓")
+ui.baslik("Karnem (PDF)", ikon="🎓", alt="Tüm verilerinden tek tıkla indirilebilir gelişim karnesi.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Önce 1-Profil sayfasından öğrenci seçin.")

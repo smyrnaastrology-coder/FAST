@@ -1,6 +1,8 @@
 """2-Sinavlarim: sonuc girisi + konu analizi + grafik."""
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import ui
 from datetime import date
 import streamlit as st
 import matplotlib
@@ -11,7 +13,8 @@ from backend.models import Profile, SinavSonuc
 from backend.engine.analiz_motoru import konu_analiz
 from backend.engine import mufredat as muf
 
-st.title("📝 Sınavlarım")
+ui.setup("Sınavlarım", "📝")
+ui.baslik("Sınavlarım", ikon="📝", alt="Deneme sonuçlarını gir; konu konu başarı analizi ve grafiğini gör.")
 oid = st.session_state.get("ogrenci_id")
 if not oid:
     st.warning("Once 1-Profil sayfasindan ogrenci secin.")
@@ -51,7 +54,7 @@ with st.form("sinav"):
             st.success(analiz["ozet_cumle"])
 
 st.divider()
-st.subheader("Gecmis + analiz")
+ui.bolum("Geçmiş + analiz")
 sinavlar = db.query(SinavSonuc).filter_by(ogrenci_id=oid).order_by(SinavSonuc.tarih.desc()).all()
 for s in sinavlar[:10]:
     with st.expander(f"{s.tarih} — {s.ad} ({s.ders}) net {s.net}"):
