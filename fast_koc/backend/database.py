@@ -13,7 +13,19 @@ def _url_temizle(ham: str) -> str:
     return url
 
 
-DATABASE_URL = _url_temizle(os.environ.get("FASTKOC_DATABASE_URL", "sqlite:///./fastkoc.db"))
+def _gecerli(url: str) -> bool:
+    return bool(url) and "://" in url
+
+
+_ham = os.environ.get("FASTKOC_DATABASE_URL") or ""
+DATABASE_URL = _url_temizle(_ham)
+if not _gecerli(DATABASE_URL):
+    # Yanlis/eksik FASTKOC degeri -> Render'in otomatik DATABASE_URL'ine dus
+    alternatif = _url_temizle(os.environ.get("DATABASE_URL") or "")
+    if _gecerli(alternatif):
+        DATABASE_URL = alternatif
+    elif not _gecerli(DATABASE_URL):
+        DATABASE_URL = "sqlite:///./fastkoc.db"
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
 try:
