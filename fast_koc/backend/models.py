@@ -1,7 +1,8 @@
 """Fast Koc — SQLAlchemy modelleri (9 tablo)."""
 from __future__ import annotations
 from datetime import date, datetime
-from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, Integer, String, Text, Boolean, JSON
+from sqlalchemy import (Column, Date, DateTime, Float, ForeignKey, Integer, String, Text,
+                        Boolean, JSON, UniqueConstraint)
 from .database import Base
 
 
@@ -38,6 +39,7 @@ class SinavSonuc(Base):
 
 class GunlukLog(Base):
     __tablename__ = "gunluk_log"
+    __table_args__ = (UniqueConstraint("ogrenci_id", "tarih", name="uq_gunluk_ogrenci_tarih"),)
     id = Column(Integer, primary_key=True)
     ogrenci_id = Column(Integer, ForeignKey("profiles.id"), index=True, nullable=False)
     tarih = Column(Date, index=True, nullable=False)
@@ -109,6 +111,7 @@ class Bildirim(Base):
 class Baglanti(Base):
     """Veli/koç <-> öğrenci bağlantısı (Faz 3). durum: beklemede | aktif | reddedildi."""
     __tablename__ = "baglantilar"
+    __table_args__ = (UniqueConstraint("ogrenci_id", "sahip_id", name="uq_baglanti_ogrenci_sahip"),)
     id = Column(Integer, primary_key=True)
     ogrenci_id = Column(Integer, ForeignKey("profiles.id"), index=True, nullable=False)
     sahip_id = Column(Integer, ForeignKey("profiles.id"), index=True, nullable=False)  # veli/koc profili

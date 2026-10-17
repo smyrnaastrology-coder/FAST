@@ -54,6 +54,27 @@ def init_db() -> None:
     from . import models  # noqa: F401  (tablolari kaydet)
     Base.metadata.create_all(bind=engine)
     _hafif_migrasyon()
+    _indeks_migrasyon()
+
+
+def _indeks_migrasyon() -> None:
+    """Unique index'leri guvenli ekler; once olasi mukerrer satirlari temizler."""
+    from sqlalchemy import text
+    islemler = [
+        ("DELETE FROM gunluk_log WHERE id NOT IN "
+         "(SELECT MIN(id) FROM gunluk_log GROUP BY ogrenci_id, tarih)",
+         "CREATE UNIQUE INDEX IF NOT EXISTS uq_gunluk_ogrenci_tarih ON gunluk_log (ogrenci_id, tarih)"),
+        ("DELETE FROM baglantilar WHERE id NOT IN "
+         "(SELECT MIN(id) FROM baglantilar GROUP BY ogrenci_id, sahip_id)",
+         "CREATE UNIQUE INDEX IF NOT EXISTS uq_baglanti_ogrenci_sahip ON baglantilar (ogrenci_id, sahip_id)"),
+    ]
+    for temizle, indeks in islemler:
+        try:
+            with engine.begin() as conn:
+                conn.execute(text(temizle))
+                conn.execute(text(indeks))
+        except Exception:
+            pass
 
 
 def _hafif_migrasyon() -> None:

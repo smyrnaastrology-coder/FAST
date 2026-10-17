@@ -10,6 +10,11 @@ import ui
 import streamlit as st
 
 ui.setup("Admin — Veri Editörü", "🛠️")
+
+if os.environ.get("FASTKOC_ADMIN_AKTIF", "true").lower() != "true":
+    ui.baslik("Admin kapalı", ikon="🚫", alt="Üretim güvenliği için admin paneli kapatıldı (FASTKOC_ADMIN_AKTIF=false).")
+    st.stop()
+
 ui.baslik("Admin — Veri Editörü", ikon="🛠️", alt="Kitap katalogu, deneme takvimi ve Maarif müfredatı JSON editörü.")
 sifre = st.sidebar.text_input("Admin şifresi", type="password")
 beklenen = os.environ.get("FASTKOC_ADMIN_SIFRE", "fastkoc-admin")

@@ -7,6 +7,17 @@ from ..models import Bildirim, DenemeTakvim, GunlukLog, Odev
 
 def gun_sonu_hatirlatma_uret(db: Session, ogrenci_id: int, tarih: date | None = None) -> Bildirim:
     tarih = tarih or date.today()
+    # Ayni gun icin tekrar uretme (dedup): cron tekrar calissa da spam olmaz.
+    bas = datetime.combine(tarih, datetime.min.time())
+    son = datetime.combine(tarih, datetime.max.time())
+    mevcut = db.query(Bildirim).filter(
+        Bildirim.ogrenci_id == ogrenci_id,
+        Bildirim.tip == "gun_sonu",
+        Bildirim.tarih >= bas,
+        Bildirim.tarih <= son,
+    ).first()
+    if mevcut:
+        return mevcut
     var = db.query(GunlukLog).filter_by(ogrenci_id=ogrenci_id, tarih=tarih).first()
     if var:
         metin = "Bugunku kaydini guncelleyebilirsin. Cozdukce grafiklerin canlanacak."

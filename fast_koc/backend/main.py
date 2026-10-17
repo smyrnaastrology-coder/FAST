@@ -5,7 +5,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import date
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from backend.database import get_db, init_db
@@ -13,7 +15,7 @@ from backend import models, schemas
 from backend.auth import mevcut_kullanici
 from backend.engine import analiz_motoru, odev_motoru, yorum_motoru
 from backend.engine import mufredat as muf
-from backend.services import takvim_seed, bildirim_servisi
+from backend.services import takvim_seed
 from backend.services.kitap_servisi import kitap_oner
 
 from contextlib import asynccontextmanager
@@ -33,6 +35,17 @@ async def _yasam(app: FastAPI):
 
 
 app = FastAPI(title="Fast Koc API", version="0.3.0", lifespan=_yasam)
+
+# CORS: FASTKOC_CORS_ORIGINS virgulle ayrilmis liste (varsayilan "*").
+_cors = os.environ.get("FASTKOC_CORS_ORIGINS", "*").strip()
+_origins = ["*"] if _cors == "*" else [o.strip() for o in _cors.split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/auth/me")
@@ -143,8 +156,13 @@ def karne_pdf(ogrenci_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/api/health")
-def health():
-    return {"ok": True, "app": "fast-koc", "version": "0.3.0"}
+def health(db: Session = Depends(get_db)):
+    db_ok = True
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception:
+        db_ok = False
+    return {"ok": db_ok, "app": "fast-koc", "version": "0.3.0", "db": db_ok}
 
 
 @app.post("/api/profil")
@@ -328,8 +346,19 @@ def koc_yorum_api(ogrenci_id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/bildirim/{ogrenci_id}")
 def bildirimler(ogrenci_id: int, db: Session = Depends(get_db)):
-    bildirim_servisi.gun_sonu_hatirlatma_uret(db, ogrenci_id)
+    # Salt okunur: uretim yan etkisi yok. Uretim cron (jobs/gunluk_push) ile yapilir.
     bils = db.query(models.Bildirim).filter_by(ogrenci_id=ogrenci_id).order_by(models.Bildirim.id.desc()).limit(20).all()
-    return [{"id": b.id, "tip": b.tip, "kanal": getattr(b, "kanal", "uygulama_ici"),
-             "metin": b.metin, "okundu": b.okundu,
-             "tarih": b.tarih.isoformat()} for b in bils]
+    return {"okunmamis": sum(1 for b in bils if not b.okundu),
+            "bildirimler": [{"id": b.id, "tip": b.tip, "kanal": getattr(b, "kanal", "uygulama_ici"),
+                             "metin": b.metin, "okundu": b.okundu,
+                             "tarih": b.tarih.isoformat()} for b in bils]}
+
+
+@app.post("/api/bildirim/{bildirim_id}/oku")
+def bildirim_oku(bildirim_id: int, db: Session = Depends(get_db)):
+    b = db.get(models.Bildirim, bildirim_id)
+    if not b:
+        raise HTTPException(404, "bildirim yok")
+    b.okundu = True
+    db.commit()
+    return {"id": b.id, "okundu": True}
