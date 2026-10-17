@@ -18,7 +18,6 @@ import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
 import '../widgets/premium_pdf_button.dart';
-import '../services/sample_pdf_service.dart';
 import 'auth_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -1012,32 +1011,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PremiumPdfButton(
-                  onPressed: _pdfLoading ? null : () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
-                  loading: _pdfLoading,
-                  label: _pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadBookButton(widget.request.bookLabel(l10n)),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      final lang = Localizations.localeOf(context).languageCode;
-                      SamplePdfService.openSample(_sampleTip(widget.request.mod), lang);
-                    },
-                    icon: Icon(Icons.visibility_outlined, size: 18, color: FastTheme.accentGold),
-                    label: Text(l10n.samplePdfButton, style: TextStyle(fontSize: 14, color: FastTheme.accentGold)),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: FastTheme.accentGold),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-              ],
+            child: PremiumPdfButton(
+              onPressed: _pdfLoading ? null : () => _downloadPdf(provider, sessionId, widget.request.mod, l10n),
+              loading: _pdfLoading,
+              label: _pdfLoading ? l10n.analyzerPdfPreparing : l10n.downloadBookButton(widget.request.bookLabel(l10n)),
             ),
           ),
         ),
@@ -1060,15 +1037,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(l10n.subscribeCancelled)));
     }
-  }
-
-  String _sampleTip(String mod) {
-    return switch (mod) {
-      'potansiyel_yetenek' => 'potansiyel',
-      'bireysel_natal' => 'natal',
-      'ebeveyn_cocuk' => 'ebeveyn',
-      _ => 'rapor',
-    };
   }
 
   Future<void> _downloadPdf(AnalysisProvider provider, String sessionId, String mod, AppLocalizations l10n) async {

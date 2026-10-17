@@ -22,7 +22,6 @@ import '../services/revenuecat_service.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart' as w;
 import '../widgets/premium_pdf_button.dart';
-import '../services/sample_pdf_service.dart';
 import 'auth_screen.dart';
 
 class AnalyzerScreen extends StatefulWidget {
@@ -3299,32 +3298,10 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
               constraints: const BoxConstraints(maxWidth: 360),
               child: Wrap(
                 spacing: 12, runSpacing: 12, alignment: WrapAlignment.center,
-                children: _pdfLinks(sessionId, l10n).map((link) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PremiumPdfButton(
-                      onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
-                      loading: _pdfLoading,
-                      label: _pdfLoading ? l10n.analyzerPdfPreparing : link['label']!,
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          final lang = Localizations.localeOf(context).languageCode;
-                          SamplePdfService.openSample(link['tip']!, lang);
-                        },
-                        icon: Icon(Icons.visibility_outlined, size: 18, color: FastTheme.accentGold),
-                        label: Text(l10n.samplePdfButton, style: TextStyle(fontSize: 14, color: FastTheme.accentGold)),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: FastTheme.accentGold),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
-                    ),
-                  ],
+                children: _pdfLinks(sessionId, l10n).map((link) => PremiumPdfButton(
+                  onPressed: _pdfLoading ? null : () => _downloadPdf(sessionId, link['tip'], l10n),
+                  loading: _pdfLoading,
+                  label: _pdfLoading ? l10n.analyzerPdfPreparing : link['label']!,
                 )).toList(),
               ),
             ),
