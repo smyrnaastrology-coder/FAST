@@ -153,13 +153,22 @@ async def admin_create(email: str, key: str = ""):
     return {"email":email, "password":pwd, "expiry": "1 yil"}
 
 def _require_account(email):
-    """cast icin kimlik kapisi: email yoksa/kayitlis degilse 401.
-    Selif: kredisi olan kayitli kullanici dict'i (credits None ise varsayilana cekilir)."""
+    """cast icin kimlik kapisi: email yoksa 401; kayitli degilse OTOMATIK hesap acilir.
+    Holavon tek-giris modeli: Supabase ile giren kullanici horary tarafinda ayri kayit
+    yapmaz. E-posta ilk kez geliyorsa varsayilan kredili hesap olusturulur.
+    Selif: kredisi olan kayitli kullanici dict'i (credits None ise 0'a cekilir)."""
     import auth as _a
     e = (email or "").strip().lower()
     if not e:
         raise HTTPException(401, "login gerekli - once uygulamadan giris yap")
     u = _a.get_user(e)
+    if u is None:
+        # Otomatik kayit: 1 yil gecerli, varsayilan kredi (DEFAULT_CREDITS).
+        try:
+            _a.create_user(e, days=365, credits=_a.DEFAULT_CREDITS)
+        except Exception:
+            pass
+        u = _a.get_user(e)
     if u is None:
         raise HTTPException(401, "kayitli kullanici degil - once giris yap")
     if u.get("credits") is None:
