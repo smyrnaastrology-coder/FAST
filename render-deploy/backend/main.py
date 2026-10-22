@@ -6790,6 +6790,226 @@ def sky(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float] = None):
     _SKY_CACHE[cache_key] = sonuc
     return sonuc
 
+# ── Gökyüzü takvimi: yaklaşan ay fazları ve tutulmalar ──────────────────
+# Küresel olaylar; tutulma görünürlüğü istenen koordinata göre hesaplanır.
+
+_SKY_CAL_CACHE = {}
+
+
+def _sky_body(jd, pid):
+    d, _h = _sky_pos(jd, pid)
+    return {"mutlak": round(d, 4), "burc": int(d // 30), "derece": round(d % 30, 2)}
+
+
+def _sky_lunation_diff(jd, target):
+    m, _mh = _sky_pos(jd, swe.MOON)
+    s, _sh = _sky_pos(jd, swe.SUN)
+    return _sky_wrap180(m - s - target)
+
+
+def _sky_next_lunation(jd_start, target):
+    jd = jd_start + 0.005
+    prev = _sky_lunation_diff(jd, target)
+    for _ in range(180):
+        nxt = jd + 0.25
+        cur = _sky_lunation_diff(nxt, target)
+        if prev == 0 or (prev * cur < 0 and abs(prev - cur) < 20):
+            lo, hi = jd, nxt
+            for _ in range(45):
+                mid = (lo + hi) / 2.0
+                if _sky_lunation_diff(lo, target) * _sky_lunation_diff(mid, target) <= 0:
+                    hi = mid
+                else:
+                    lo = mid
+            root = (lo + hi) / 2.0
+            if root >= jd_start - 0.001:
+                return root
+        jd, prev = nxt, cur
+    return None
+
+
+def _sky_phase_events(jd_now):
+    events = []
+    for target, tip in ((0.0, "new_moon"), (180.0, "full_moon")):
+        jd = jd_now
+        for _ in range(3):
+            e = _sky_next_lunation(jd, target)
+            if e is None:
+                break
+            events.append((e, tip))
+            jd = e + 2.0
+    events.sort(key=lambda e: e[0])
+    return [
+        {
+            "tip": tip,
+            "zaman": _sky_epoch(e),
+            "ay": _sky_body(e, swe.MOON),
+            "gunes": _sky_body(e, swe.SUN),
+        }
+        for e, tip in events
+    ]
+
+
+def _sky_eclipse_type(flag, solar):
+    if solar:
+        if flag & swe.ECL_HYBRID:
+            return "hybrid"
+        if flag & swe.ECL_TOTAL:
+            return "total"
+        if flag & swe.ECL_ANNULAR:
+            return "annular"
+        return "partial"
+    if flag & swe.ECL_TOTAL:
+        return "total"
+    if flag & swe.ECL_PARTIAL:
+        return "partial"
+    return "penumbral"
+
+
+def _sky_eclipse_global(jd_start, solar):
+    try:
+        if solar:
+            flag, tret = swe.sol_eclipse_when_glob(
+                jd_start, swe.FLG_MOSEPH, swe.ECL_ALLTYPES_SOLAR
+            )
+        else:
+            flag, tret = swe.lun_eclipse_when(
+                jd_start, swe.FLG_MOSEPH, swe.ECL_ALLTYPES_LUNAR
+            )
+        if tret and tret[0] > 0:
+            return int(flag), float(tret[0])
+    except Exception:
+        pass
+    return None, None
+
+
+def _sky_eclipse_local(jd_start, lat, lon, solar):
+    try:
+        if solar:
+            flag, tret, attr = swe.sol_eclipse_when_loc(
+                jd_start, (float(lon), float(lat), 0.0), swe.FLG_MOSEPH
+            )
+        else:
+            flag, tret, attr = swe.lun_eclipse_when_loc(
+                jd_start, (float(lon), float(lat), 0.0), swe.FLG_MOSEPH
+            )
+        if tret and tret[0] > 0:
+            return int(flag), float(tret[0]), tuple(float(x) for x in attr)
+    except Exception:
+        pass
+    return None
+
+
+def _sky_eclipse_numbers(solar, attr):
+    if not attr:
+        return None, None
+    if solar:
+        obscuration = max(0.0, min(100.0, attr[2] * 100.0)) if len(attr) > 2 else None
+        magnitude = attr[8] if len(attr) > 8 else None
+    else:
+        obscuration = None
+        magnitude = None
+        if len(attr) > 1:
+            magnitude = attr[0] if attr[0] > 0 else attr[1]
+    return (
+        round(obscuration, 1) if obscuration is not None else None,
+        round(magnitude, 2) if magnitude is not None else None,
+    )
+
+
+def _sky_local_visible_summary(jd_now, lat, lon, solar):
+    local = _sky_eclipse_local(jd_now, lat, lon, solar)
+    if not local:
+        return None
+    flag, t, attr = local
+    if t <= jd_now:
+        return None
+    ob, mag = _sky_eclipse_numbers(solar, attr)
+    return {
+        "zaman": _sky_epoch(t),
+        "tip": "solar" if solar else "lunar",
+        "alt_tip": _sky_eclipse_type(flag, solar),
+        "ay": _sky_body(t, swe.MOON),
+        "gunes": _sky_body(t, swe.SUN),
+        "ortulme": ob,
+        "buyukluk": mag,
+    }
+
+
+def _sky_eclipse_event(jd_now, lat, lon, solar):
+    flag, t = _sky_eclipse_global(jd_now, solar)
+    if t is None:
+        return None
+    tip = _sky_eclipse_type(flag, solar)
+    local = _sky_eclipse_local(max(jd_now, t - 2.0), lat, lon, solar)
+    visible = bool(local and abs(local[1] - t) < 2.0)
+    visibility = {
+        "gorunur": visible,
+        "yerel_tip": None,
+        "ortulme": None,
+        "buyukluk": None,
+        "sonraki_gorunur": None,
+    }
+    if visible:
+        lflag, _lt, lattr = local
+        ob, mag = _sky_eclipse_numbers(solar, lattr)
+        visibility["yerel_tip"] = _sky_eclipse_type(lflag, solar)
+        visibility["ortulme"] = ob
+        visibility["buyukluk"] = mag
+    else:
+        visibility["sonraki_gorunur"] = _sky_local_visible_summary(
+            jd_now, lat, lon, solar
+        )
+    return {
+        "tip": "solar" if solar else "lunar",
+        "alt_tip": tip,
+        "zaman": _sky_epoch(t),
+        "ay": _sky_body(t, swe.MOON),
+        "gunes": _sky_body(t, swe.SUN),
+        "gorunurluk": visibility,
+    }
+
+
+@app_fast.get("/api/sky/calendar")
+def sky_calendar(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float] = None):
+    """Yaklaşan 6 yeni ay/dolunay ve sıradaki güneş + ay tutulması."""
+    lat = max(-89.0, min(89.0, float(lat)))
+    lon = ((float(lon) + 180.0) % 360.0) - 180.0
+    uo = 3.0 if tz is None else max(-14.0, min(14.0, float(tz)))
+    cache_key = (int(time.time() // 21600), round(lat, 1), round(lon, 1), round(uo, 1))
+    cached = _SKY_CAL_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    now = datetime.utcnow()
+    jd_now = swe.julday(
+        now.year, now.month, now.day,
+        now.hour + now.minute / 60.0 + now.second / 3600.0,
+    )
+
+    eclipses = []
+    for solar in (True, False):
+        ev = _sky_eclipse_event(jd_now, lat, lon, solar)
+        if ev is not None:
+            eclipses.append(ev)
+    eclipses.sort(key=lambda e: e["zaman"])
+
+    sonuc = {
+        "ok": True,
+        "utc_offset": round(uo, 2),
+        "sunucu_zamani": _sky_epoch(jd_now),
+        "fazlar": _sky_phase_events(jd_now),
+        "tutulmalar": eclipses,
+    }
+    if len(_SKY_CAL_CACHE) > 64:
+        _SKY_CAL_CACHE.clear()
+    _SKY_CAL_CACHE[cache_key] = sonuc
+    return sonuc
+
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
     """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
