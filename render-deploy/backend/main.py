@@ -1814,6 +1814,16 @@ class BireyselNatalInput(BaseModel):
 class SehirInput(BaseModel):
     arama: str
 
+class KunyeInput(BaseModel):
+    """Sosyal profil kunyesi: dogum tarihi/saati/yeri -> Gunes + Ay burcu."""
+    tarih: str
+    saat: str = "12:00"
+    sehir: str = "Istanbul"
+    ulke: str = "Turkiye"
+    enlem: Optional[float] = None
+    boylam: Optional[float] = None
+    utc_offset: Optional[float] = None
+
 class AlternatifInput(BaseModel):
     session_id: str
     sehir: str
@@ -6492,6 +6502,48 @@ def _collect_natal_data(motor):
 @app_fast.get("/api/health")
 def health():
     return {"status": "ok", "version": "4.0"}
+
+@app_fast.post("/api/kunye")
+def kunye(p: KunyeInput):
+    """Gunes/Ay burcu + derece (profil kunyesi icin hafif hesap).
+
+    Burc 0 = Koc (Aries-first) mutlak ekliptik boylamdan turetilir.
+    Saat verilmezse 12:00 varsayilir; UTC ofseti sehir koordinatlarindan
+    (timezonefinder) tarihe gore hesaplanir.
+    """
+    from core.utils import otomatik_utc_offset
+    tarih = _parse_date(p.tarih)
+    saat = _parse_time(p.saat)
+    try:
+        yil, ay, gun = [int(x) for x in tarih.split("-")]
+        hh, mm = [int(x) for x in saat.split(":")]
+    except Exception:
+        raise HTTPException(status_code=400, detail="gecersiz_tarih")
+    saat_ondalik = hh + mm / 60.0
+    lat = p.enlem if p.enlem is not None else 41.0082
+    lon = p.boylam if p.boylam is not None else 28.9784
+    uo = p.utc_offset
+    if uo is None:
+        uo = otomatik_utc_offset(lat, lon, yil, ay, gun, saat_ondalik)
+    jd = swe.julday(yil, ay, gun, saat_ondalik - float(uo))
+    ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    def _poz(pid):
+        try:
+            arr, _ = swe.calc_ut(jd, pid, swe.FLG_SWIEPH | swe.FLG_SPEED)
+        except Exception:
+            arr, _ = swe.calc_ut(jd, pid, swe.FLG_MOSEPH | swe.FLG_SPEED)
+        deg = float(arr[0]) % 360.0
+        return {"mutlak": round(deg, 4), "burc": int(deg // 30), "derece": round(deg % 30, 2)}
+
+    return {
+        "ok": True,
+        "utc_offset": round(float(uo), 2),
+        "gunes": _poz(swe.SUN),
+        "ay": _poz(swe.MOON),
+    }
 
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
