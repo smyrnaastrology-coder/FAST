@@ -7,33 +7,33 @@ import 'package:google_fonts/google_fonts.dart';
 /// geçilir ve tüm widget'lar (eski `FastTheme.bg` vs. okumaları) yeni değerleri
 /// görür. Varsayılan: koyu tema (dark).
 class FastTheme {
-  // ── Dark (varsayılan) ──
-  static const Color darkPrimary = Color(0xFF3D2E50);
-  static const Color darkPrimaryLight = Color(0xFF5a4470);
+  // ── Dark (varsayılan) — canlı mor + altın ──
+  static const Color darkPrimary = Color(0xFF6444A0);
+  static const Color darkPrimaryLight = Color(0xFF8A66CC);
   static const Color darkAccentGold = Color(0xFFC9A96E);
   static const Color darkAccentGoldLight = Color(0xFFe0c68a);
   static const Color darkAccentGoldGlow = Color(0x4DC9A96E);
-  static const Color darkBg = Color(0xFF1a1423);
-  static const Color darkBgSecondary = Color(0xFF221a30);
-  static const Color darkCardBg = Color(0xFF2a1f38);
-  static const Color darkCardBgHover = Color(0xFF34284a);
-  static const Color darkBorder = Color(0xFF3d2e50);
+  static const Color darkBg = Color(0xFF181026);
+  static const Color darkBgSecondary = Color(0xFF1F1530);
+  static const Color darkCardBg = Color(0xFF2C2039);
+  static const Color darkCardBgHover = Color(0xFF3A2B4E);
+  static const Color darkBorder = Color(0xFF463262);
 
-  // ── Light (açık renkler) ──
-  static const Color lightPrimary = Color(0xFF5a4470);
-  static const Color lightPrimaryLight = Color(0xFF7a6490);
-  static const Color lightAccentGold = Color(0xFFb08d3f);
-  static const Color lightAccentGoldLight = Color(0xFFcfa96a);
+  // ── Light (yumuşak krem) ──
+  static const Color lightPrimary = Color(0xFF6B4BA5);
+  static const Color lightPrimaryLight = Color(0xFF8E6BC4);
+  static const Color lightAccentGold = Color(0xFFA8823A);
+  static const Color lightAccentGoldLight = Color(0xFFC9A25C);
   static const Color lightAccentGoldGlow = Color(0x33C9A96E);
   static const Color lightBg = Color(0xFFFDFAF6);
-  static const Color lightBgSecondary = Color(0xFFF5EFE7);
+  static const Color lightBgSecondary = Color(0xFFF4EDE2);
   static const Color lightCardBg = Color(0xFFFFFFFF);
   static const Color lightCardBgHover = Color(0xFFF7F1E8);
   static const Color lightBorder = Color(0xFFE6DCCF);
 
   // ── Spain (koyu, İspanya bayrağı: kırmızı + altın sarısı) ──
-  static const Color spainPrimary = Color(0xFF7A1218);
-  static const Color spainPrimaryLight = Color(0xFFA81C24);
+  static const Color spainPrimary = Color(0xFFAA151B);
+  static const Color spainPrimaryLight = Color(0xFFD4292F);
   static const Color spainAccentGold = Color(0xFFE8B23A);
   static const Color spainAccentGoldLight = Color(0xFFF7D060);
   static const Color spainAccentGoldGlow = Color(0x4DE8B23A);
@@ -43,17 +43,22 @@ class FastTheme {
   static const Color spainCardBgHover = Color(0xFF3A1C1F);
   static const Color spainBorder = Color(0xFF5A2126);
 
-  // ── Argentina (açık, Arjantin bayrağı: gök mavisi + siyah yazı) ──
+  // ── Argentina (açık, Arjantin bayrağı: gök mavisi) ──
   static const Color argPrimary = Color(0xFF2E6DA4);
-  static const Color argPrimaryLight = Color(0xFF4A90D9);
+  static const Color argPrimaryLight = Color(0xFF6FA8DC);
   static const Color argAccentGold = Color(0xFF1E5F94);
-  static const Color argAccentGoldLight = Color(0xFF5FA8DC);
-  static const Color argAccentGoldGlow = Color(0x334A90D9);
+  static const Color argAccentGoldLight = Color(0xFF74ACDF);
+  static const Color argAccentGoldGlow = Color(0x331E5F94);
   static const Color argBg = Color(0xFFF4F9FD);
   static const Color argBgSecondary = Color(0xFFE3EFF9);
   static const Color argCardBg = Color(0xFFFFFFFF);
   static const Color argCardBgHover = Color(0xFFEAF3FB);
   static const Color argBorder = Color(0xFFBFD6E9);
+
+  // ── Logo mavisi (yeni "h" ambleminin iç rengi) ──
+  static const Color logoBlue = Color(0xFF3E8FE0);
+  static const Color logoBlueLight = Color(0xFF7FC0FF);
+  static const Color logoBlueGlow = Color(0x593E8FE0);
 
   // ── Aktif renkler (dark varsayılan) ──
   static Color primary = darkPrimary;

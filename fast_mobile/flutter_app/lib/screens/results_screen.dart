@@ -13,6 +13,7 @@ import '../services/api_service.dart';
 import '../services/billing_service.dart';
 import '../services/pdf_repurchase_service.dart';
 import '../services/play_integrity_service.dart';
+import '../services/pro_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
@@ -1028,6 +1029,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
       final ok = await RevenueCatService.purchase(productId);
       if (!mounted) return;
       if (ok) {
+        ProService.invalidate();
         messenger.showSnackBar(SnackBar(content: Text(l10n.subscribeSuccess)));
         setState(() {});
       } else {

@@ -4,10 +4,24 @@ class ApiConfig {
   static const String baseUrl = 'https://fbst-api-mzum.onrender.com';
 
   // Supabase (üyelik) — --dart-define ile verilir; boşsa üyelik modu pasiftir.
-  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: '');
-  static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: '',
+  );
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue: '',
+  );
 
-  static bool get supabaseEnabled => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+  static bool get supabaseEnabled =>
+      supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+
+  // Horary Oracle API (ayrı Render servisi). --dart-define ile ezilebilir.
+  static const String horaryBaseUrl = String.fromEnvironment(
+    'HORARY_API_URL',
+    defaultValue: 'https://horary-oracle-api.onrender.com',
+  );
+  static const String horaryCast = '$horaryBaseUrl/api/horary/cast';
 
   // Health
   static const String health = '$baseUrl/api/health';
@@ -20,17 +34,21 @@ class ApiConfig {
 
   // Analiz
   static const String analizEs = '$baseUrl/api/analiz/es_sevgili';
-  static const String analizEsDetayli = '$baseUrl/api/analiz/es_sevgili/detayli';
+  static const String analizEsDetayli =
+      '$baseUrl/api/analiz/es_sevgili/detayli';
   static const String analizEb = '$baseUrl/api/analiz/ebeveyn_cocuk';
-  static const String analizEbDetayli = '$baseUrl/api/analiz/ebeveyn_cocuk/detayli';
+  static const String analizEbDetayli =
+      '$baseUrl/api/analiz/ebeveyn_cocuk/detayli';
   static const String analizPy = '$baseUrl/api/analiz/potansiyel_yetenek';
   static const String analizNatal = '$baseUrl/api/analiz/bireysel_natal';
   static const String analizAshtakoot = '$baseUrl/api/analiz/ashtakoot';
 
   // Simülasyon
   static const String simulasyonRadar = '$baseUrl/api/simulasyon/radar';
-  static const String simulasyonNatalRadar = '$baseUrl/api/simulasyon/natal_radar';
-  static const String simulasyonAlternatif = '$baseUrl/api/simulasyon/alternatif';
+  static const String simulasyonNatalRadar =
+      '$baseUrl/api/simulasyon/natal_radar';
+  static const String simulasyonAlternatif =
+      '$baseUrl/api/simulasyon/alternatif';
 
   // Astrokartografi
   static const String astrokartografi = '$baseUrl/api/astrokartografi';
@@ -49,6 +67,15 @@ class ApiConfig {
 
   // İstatistik
   static const String stats = '$baseUrl/api/stats';
+
+  // Künye (Güneş + Ay burcu/derecesi) — sosyal profil rozeti
+  static const String kunye = '$baseUrl/api/kunye';
+
+  // Anlık gökyüzü (Ay fazı/derecesi, VOC, gezegen saati)
+  static const String sky = '$baseUrl/api/sky';
+
+  // Yaklaşan ay fazları ve tutulmalar
+  static const String skyCalendar = '$baseUrl/api/sky/calendar';
 
   static const Duration timeout = Duration(seconds: 60);
   static const Duration longTimeout = Duration(seconds: 120);

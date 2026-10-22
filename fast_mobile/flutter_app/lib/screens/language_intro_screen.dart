@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
+import '../widgets/holavon_mark.dart';
 
 class LanguageIntroScreen extends StatelessWidget {
   const LanguageIntroScreen({super.key});
@@ -20,18 +21,9 @@ class LanguageIntroScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               SizedBox(
-                width: 72,
-                height: 72,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold),
-                  child: Center(
-                    child: Text('F', style: TextStyle(color: FastTheme.bg, fontSize: 36, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ),
+               HolavonLogo(size: 72, radius: 18, glow: 0.28),
               const SizedBox(height: 16),
-               Text('Fast Synastry', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
+                Text('Holavon', style: TextStyle(color: FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700, letterSpacing: 4)),
               const SizedBox(height: 40),
               Text(l10n.chooseLanguage, style:  TextStyle(color: FastTheme.text, fontSize: 18)),
               Text(l10n.chooseLanguageSub, style:  TextStyle(color: FastTheme.textMuted, fontSize: 14)),

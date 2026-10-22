@@ -19,10 +19,14 @@ import '../services/billing_service.dart';
 import '../services/pdf_repurchase_service.dart';
 import '../services/play_integrity_service.dart';
 import '../services/revenuecat_service.dart';
+import '../services/social_service.dart';
 import '../widgets/language_switcher.dart';
+import '../widgets/holavon_mark.dart';
 import '../widgets/section_card.dart' as w;
 import '../widgets/premium_pdf_button.dart';
+import '../widgets/holavon_mark.dart';
 import 'auth_screen.dart';
+import 'create_post_screen.dart';
 
 class AnalyzerScreen extends StatefulWidget {
   final String initialMode;
@@ -486,8 +490,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(width: 32, height: 32, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 16)]),
-              child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
+            HolavonLogo(size: 32, radius: 9),
             const SizedBox(width: 8),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(l10n.appTitle, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
@@ -550,8 +553,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
         Center(
           child: Column(
             children: [
-              Container(width: 72, height: 72, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold, boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 24)]),
-                child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 32)))),
+              HolavonLogo(size: 72, radius: 18, glow: 0.28),
               const SizedBox(height: 8),
               Text(l10n.homeTitle, textAlign: TextAlign.center,
                 style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold, height: 1.3)),
@@ -3279,8 +3281,36 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 8),
+        // Haritayı topluluğa paylaş.
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () => _shareChart(sessionId),
+            icon:  Icon(Icons.share_outlined, color: FastTheme.accentGold, size: 18),
+            label: Text(l10n.createPostShare, style:  TextStyle(color: FastTheme.accentGold, fontSize: 13, fontWeight: FontWeight.w600)),
+          ),
+        ),
       ],
     );
+  }
+
+  /// Harita görselini byte olarak indirip topluluk post ekranını açar.
+  Future<void> _shareChart(String sessionId) async {
+    final l10n = AppLocalizations.of(context);
+    final url = _api.getGorselUrl(sessionId, _chartTab);
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.createPostProcessing)));
+      final resp = await http.get(Uri.parse(url));
+      if (resp.statusCode != 200 || resp.bodyBytes.isEmpty) throw Exception('fetch_failed');
+      if (!mounted) return;
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => CreatePostScreen(initialBytes: resp.bodyBytes, isChart: true),
+      ));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.createPostError)));
+    }
   }
 
   // ========== PDF SECTION ==========

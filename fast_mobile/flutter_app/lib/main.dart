@@ -11,9 +11,11 @@ import 'l10n/app_localizations.dart';
 import 'providers/analysis_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/social_provider.dart';
 import 'providers/theme_provider.dart';
-import 'screens/landing_screen.dart';
+import 'screens/auth_screen.dart';
 import 'screens/language_intro_screen.dart';
+import 'screens/main_shell.dart';
 import 'screens/warning_screen.dart';
 import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
@@ -29,7 +31,7 @@ Future<void> _scheduleDailyIfSubscribed() async {
     final isSub = await RevenueCatService.isSubscribed();
     if (!isSub) return;
     await NotificationService.instance
-        .scheduleDaily(9, 0, title: 'Fast Synastry', body: 'Günlük kısa vadeli ilerleme akışını keşfet 🌟');
+        .scheduleDaily(9, 0, title: 'Holavon', body: 'Günlük kısa vadeli ilerleme akışını keşfet 🌟');
   } catch (_) {}
 }
 
@@ -76,6 +78,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AnalysisProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => SocialProvider()),
       ],
       child: const FastApp(),
     ),
@@ -92,8 +95,8 @@ class FastApp extends StatelessWidget {
         return Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) {
             return MaterialApp(
-              key: ValueKey('theme-${themeProvider.mode}'),
-              title: 'Fast Synastry',
+              key: ValueKey('theme-${themeProvider.palette}-${themeProvider.mode}'),
+              title: 'Holavon',
               debugShowCheckedModeBanner: false,
               theme: FastTheme.light,
               darkTheme: FastTheme.dark,
@@ -146,16 +149,21 @@ class _StartupGateState extends State<StartupGate> {
     setState(() => _warningAccepted = accepted);
   }
 
-  Widget _decideHome(LocaleProvider lp) {
+  Widget _decideHome(LocaleProvider lp, AuthProvider ap) {
     if (!lp.ready) return const SplashLogo();
     if (!lp.hasChoice) return const LanguageIntroScreen();
     if (!_warningAccepted) return WarningScreen(onAccepted: () => setState(() => _warningAccepted = true));
-    return const LandingScreen();
+    // Auth-first: oturum henüz geri yüklenmediyse bekle.
+    if (ap.status == AuthStatus.unknown) return const SplashLogo();
+    // Auth-first: giriş yapmadan uygulama açılmaz (Google/Facebook/e-posta).
+    if (ap.enabled && !ap.isLoggedIn) return const AuthScreen(force: true);
+    return const MainShell();
   }
 
   @override
   Widget build(BuildContext context) {
     final lp = context.watch<LocaleProvider>();
-    return _decideHome(lp);
+    final ap = context.watch<AuthProvider>();
+    return _decideHome(lp, ap);
   }
 }

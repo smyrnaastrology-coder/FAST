@@ -9,7 +9,69 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'Fast Synastry';
+  String get editorPinchHint => 'Pellizca para ampliar • gira para rotar';
+
+  @override
+  String get storyDelete => 'Eliminar historia';
+
+  @override
+  String get storyDeleteConfirm =>
+      'Esta historia se eliminará permanentemente.';
+
+  @override
+  String get storyDeleteDone => 'Historia eliminada';
+
+  @override
+  String get profileTabPosts => 'PUBLICACIONES';
+
+  @override
+  String get profileTabReels => 'REELS';
+
+  @override
+  String get profileLoginNeeded => 'Inicia sesion para ver tu perfil';
+
+  @override
+  String get socialErrorNetwork => 'Sin conexión';
+
+  @override
+  String get socialErrorServer => 'No se pudo conectar con el servidor';
+
+  @override
+  String get socialErrorHint =>
+      'No se pudo cargar el feed de la comunidad. Comprueba tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get socialRetry => 'Reintentar';
+
+  @override
+  String get dmBlocked => 'No puedes enviar mensajes a este usuario';
+
+  @override
+  String get accountDelete => 'Eliminar mi cuenta y mis datos';
+
+  @override
+  String get accountDeleteTitle => 'Eliminar cuenta';
+
+  @override
+  String get accountDeleteConfirm =>
+      'Tu cuenta, todas tus publicaciones, comentarios, mensajes y personas guardadas se eliminarán permanentemente. Esta acción no se puede deshacer.';
+
+  @override
+  String get accountDeleteConfirmBtn => 'Eliminar definitivamente';
+
+  @override
+  String get accountDeleteDone => 'Tu cuenta y tus datos han sido eliminados';
+
+  @override
+  String get accountDeleteFailed =>
+      'No se pudo eliminar la cuenta. Inténtalo de nuevo más tarde.';
+
+  @override
+  String get fileTooLarge =>
+      'El archivo es demasiado grande. Elige una imagen de menos de 5 MB.';
+
+  @override
+  String get appTitle => 'Holavon';
 
   @override
   String get appSlogan => 'Sistema de Análisis de Vínculos Estelares';
@@ -37,7 +99,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get heroSubtitle =>
-      'Descubre las profundidades de tu relación, el potencial de tu hijo o tus propios talentos con la Técnica de Sinastría Fatih Asartepe (FAST).';
+      'Descubre las profundidades de tu relación, el potencial de tu hijo o tus propios talentos con Holavon.';
 
   @override
   String get heroDisclaimer =>
@@ -109,7 +171,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get featuresDesc =>
-      'Explora cada dimensión del análisis astrológico con Fast Synastry';
+      'Explora cada dimensión del análisis astrológico con Holavon';
 
   @override
   String get feature1Title => 'Análisis de Sinastría';
@@ -236,7 +298,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planFreeBadge => 'Gratis';
 
   @override
-  String get planFreeDesc => 'Experimenta el análisis';
+  String get planFreeDesc => 'Prueba Análisis, Horary y Social gratis';
 
   @override
   String get planFreeFeat1 => 'Todos los resultados del análisis en pantalla';
@@ -254,6 +316,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planFreeFeat5 => 'Datos limitados de asteroides';
 
   @override
+  String get planFreeFeat6 => 'Horary: 3 preguntas al día';
+
+  @override
+  String get planFreeFeat7 => 'Feed social, historias y mensajes';
+
+  @override
+  String get planFreeFeat8 => 'Perfil y personas guardadas';
+
+  @override
   String get planFreeDisabled1 => 'Informe PDF';
 
   @override
@@ -267,6 +338,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get planFreeDisabled5 => 'PDF por correo';
+
+  @override
+  String get planFreeDisabled6 => 'Horary ilimitado';
+
+  @override
+  String get planFreeDisabled7 => 'Insignia dorada Pro';
 
   @override
   String get planPremiumName => 'Premium';
@@ -324,6 +401,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get planProFeat4 => 'Soporte prioritario';
+
+  @override
+  String get planProFeat8 => 'Preguntas de Horary ilimitadas';
+
+  @override
+  String get planProFeat9 => 'Insignia dorada Pro en tu perfil social';
+
+  @override
+  String get planProFeat10 =>
+      'Tres apps, una suscripción: Análisis + Horary + Social';
 
   @override
   String get testimonialsTitle => 'Opiniones de Usuarios';
@@ -449,7 +536,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get footerTagline =>
-      'Análisis de vínculo estelar con la Técnica de Sinastría Fatih Asartepe (FAST).';
+      'Holavon — análisis de vínculo estelar con la Técnica de Sinastría Fatih Asartepe (FAST).';
 
   @override
   String get footerQuickLinks => 'Enlaces Rápidos';
@@ -458,8 +545,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get footerContact => 'Contacto';
 
   @override
-  String get footerRights =>
-      '© 2024 Fast Synastry. Todos los derechos reservados.';
+  String get footerRights => '© 2026 Holavon®. Todos los derechos reservados.';
 
   @override
   String get language => 'Idioma';
@@ -474,11 +560,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get spanish => 'Español';
 
   @override
-  String get homeTitle => 'Técnica de Sinastría\nFatih Asartepe';
+  String get homeTitle => 'Holavon\nAstrología';
 
   @override
   String get homeSubtitle =>
-      'Fast Synastry — Sistema de Análisis de Vínculos Estelares';
+      'Holavon — Sistema de Análisis de Vínculos Estelares';
 
   @override
   String get homeVersion => 'Versión 4.0';
@@ -652,8 +738,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'El análisis no se pudo completar. Revisa tu información e inténtalo de nuevo.';
 
   @override
-  String get analyzerSidebarTagline =>
-      'Fast Synastry — Análisis de Vínculo Estelar';
+  String get analyzerSidebarTagline => 'Holavon — Análisis de Vínculo Estelar';
 
   @override
   String get analyzerSidebarVersion => 'Versión 4.0 | Ciclo de 21 Años';
@@ -890,16 +975,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themePickerTitle => 'Elegir Tema';
 
   @override
+  String get themeAppearanceTitle => 'Apariencia';
+
+  @override
+  String get themeAppearanceHint => 'Elige la paleta de colores de la app';
+
+  @override
+  String get proBadgeTooltip => 'Miembro de Holavon Pro';
+
+  @override
   String get themePaletteDark => 'Mor (Oscuro)';
 
   @override
-  String get themePaletteLight => 'Crema (Claro)';
+  String get themePaletteLight => 'Crema Suave (Claro)';
 
   @override
-  String get themePaletteSpain => 'España (Oscuro)';
+  String get themePaletteSpain => 'España Rojo (Oscuro)';
 
   @override
-  String get themePaletteArgentina => 'Argentina (Claro)';
+  String get themePaletteArgentina => 'Argentina Azul (Claro)';
 
   @override
   String get chartTabSituaA => 'Carta A';
@@ -1587,4 +1681,794 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get analyzerFeaturesAsh9 =>
       'Informe PDF completo (derecho de descarga ilimitada)';
+
+  @override
+  String get navHome => 'Inicio';
+
+  @override
+  String get navCommunity => 'Comunidad';
+
+  @override
+  String get navProfile => 'Perfil';
+
+  @override
+  String get communityLoginTitle => 'Únete a la comunidad de astrología';
+
+  @override
+  String get communityLoginSubtitle =>
+      'Inicia sesión para ver publicaciones, compartir tus cartas y seguir a otros. La sinastria sigue siendo pública.';
+
+  @override
+  String get communityLoginButton => 'Inicia sesión para unirte';
+
+  @override
+  String get handleTitle => 'Elige tu @usuario';
+
+  @override
+  String get handleSubtitle =>
+      'Elige un nombre de usuario único. Así te encuentran y te siguen.';
+
+  @override
+  String get handleLabel => 'Nombre de usuario';
+
+  @override
+  String get handleDisplayName => 'Nombre visible';
+
+  @override
+  String get handleDisplayNameHint => 'Cómo aparece tu nombre';
+
+  @override
+  String get handleBio => 'Biografía';
+
+  @override
+  String get handleBioHint => 'Una línea corta sobre ti';
+
+  @override
+  String get handleBirthDate => 'Fecha de nacimiento (opcional)';
+
+  @override
+  String get handleBirthDateHint =>
+      'Añade tu fecha de nacimiento para mostrar tu signo solar';
+
+  @override
+  String get handleBirthPrivateNote =>
+      'Tu fecha de nacimiento es privada. Solo se muestra la insignia de tu signo solar.';
+
+  @override
+  String get kunyeBirthTime => 'Hora de nacimiento (opcional)';
+
+  @override
+  String get kunyeBirthTimeHint => 'Elige una hora';
+
+  @override
+  String get kunyeBirthTimeNote =>
+      'Si añades la hora, se fijan los grados de tu Sol y tu Luna.';
+
+  @override
+  String get kunyeBirthCity => 'Ciudad de nacimiento (opcional)';
+
+  @override
+  String get kunyeBirthCityHint => 'Ej. Estambul';
+
+  @override
+  String get kunyeCityNotFound => 'Ciudad no encontrada, revisa el nombre.';
+
+  @override
+  String get kunyeCalcNote =>
+      'Tu Sol y tu Luna se calculan con precisión en el servidor.';
+
+  @override
+  String get kunyeRoleLabel => 'Tu relación con la astrología';
+
+  @override
+  String get kunyeRoleAstrolog => 'Astrólogo/a';
+
+  @override
+  String get kunyeRoleLover => 'Aficionado/a a la astrología';
+
+  @override
+  String get kunyeFieldLabel => 'Tu especialidad';
+
+  @override
+  String get settingsTitle => 'Ajustes';
+
+  @override
+  String get settingsAppearance => 'Apariencia';
+
+  @override
+  String get settingsLanguage => 'Idioma';
+
+  @override
+  String get settingsNotifications => 'Notificaciones';
+
+  @override
+  String get settingsDailyReminder => 'Recordatorio diario (09:00)';
+
+  @override
+  String get settingsSubscription => 'Suscripción';
+
+  @override
+  String get settingsProActive => 'Pro activo';
+
+  @override
+  String get settingsProFree => 'Plan gratuito';
+
+  @override
+  String get settingsManagePro => 'Gestionar Pro';
+
+  @override
+  String get settingsRestore => 'Restaurar compras';
+
+  @override
+  String get settingsAccount => 'Cuenta';
+
+  @override
+  String get settingsAbout => 'Acerca de';
+
+  @override
+  String get settingsVersion => 'Versión';
+
+  @override
+  String get settingsSignOut => 'Cerrar sesión';
+
+  @override
+  String get profileShare => 'Compartir perfil';
+
+  @override
+  String get postShareSend => 'Enviar';
+
+  @override
+  String get postShareStory => 'Añadir a mi historia';
+
+  @override
+  String get postShareSystem => 'Compartir';
+
+  @override
+  String get postShareTitle => 'Compartir publicación';
+
+  @override
+  String get shareToTitle => 'Enviar a…';
+
+  @override
+  String get shareNoFollowing => 'Aún no sigues a nadie.';
+
+  @override
+  String get shareSent => 'Enviado';
+
+  @override
+  String get shareFailed => 'No se pudo compartir';
+
+  @override
+  String get storyRepostAdded => 'Añadido a tu historia';
+
+  @override
+  String get storyRepostFailed => 'No se pudo añadir a la historia';
+
+  @override
+  String shareProfileMessage(String handle) {
+    return '@$handle — comunidad de astrología Holavon';
+  }
+
+  @override
+  String get feedFollowingTab => 'Siguiendo';
+
+  @override
+  String get feedDiscoverTab => 'Descubrir';
+
+  @override
+  String get feedFollowingEmpty =>
+      'Las publicaciones de las personas que sigues aparecerán aquí.';
+
+  @override
+  String get feedDiscoverCta => 'Ir a Descubrir';
+
+  @override
+  String get skyTitle => 'Cielo';
+
+  @override
+  String skyMoonLine(String sign, String degree) {
+    return 'Luna $sign $degree°';
+  }
+
+  @override
+  String skyIllumination(String pct) {
+    return '%$pct iluminada';
+  }
+
+  @override
+  String get skySpeedSlow => 'lenta';
+
+  @override
+  String get skySpeedNormal => 'normal';
+
+  @override
+  String get skySpeedFast => 'rápida';
+
+  @override
+  String get skyVoid => 'Luna en vacío';
+
+  @override
+  String get skyNotVoid => 'Luna en flujo';
+
+  @override
+  String skyVoidUntil(String time) {
+    return 'Vacío hasta $time';
+  }
+
+  @override
+  String skyPlanetHour(String planet) {
+    return 'hora de $planet';
+  }
+
+  @override
+  String skyNextHour(String planet) {
+    return 'Siguiente: hora de $planet';
+  }
+
+  @override
+  String get skyAspects => 'Aspectos de la Luna';
+
+  @override
+  String get skyNoAspects => 'Sin aspecto mayor ahora';
+
+  @override
+  String get skyRetro => 'Retrógrado';
+
+  @override
+  String skySunLine(String sign, String degree) {
+    return 'Sol $sign $degree°';
+  }
+
+  @override
+  String get skyPhaseNew => 'Luna Nueva';
+
+  @override
+  String get skyPhaseWaxingCrescent => 'Creciente';
+
+  @override
+  String get skyPhaseFirstQuarter => 'Cuarto Creciente';
+
+  @override
+  String get skyPhaseWaxingGibbous => 'Gibosa Creciente';
+
+  @override
+  String get skyPhaseFull => 'Luna Llena';
+
+  @override
+  String get skyPhaseWaningGibbous => 'Gibosa Menguante';
+
+  @override
+  String get skyPhaseLastQuarter => 'Cuarto Menguante';
+
+  @override
+  String get skyPhaseWaningCrescent => 'Menguante';
+
+  @override
+  String get skyDayHour => 'hora diurna';
+
+  @override
+  String get skyNightHour => 'hora nocturna';
+
+  @override
+  String get skyCalendarTitle => 'Calendario del Cielo';
+
+  @override
+  String get skyCalendarPhases => 'Fases Lunares';
+
+  @override
+  String get skyCalendarEclipses => 'Eclipses';
+
+  @override
+  String get skyCalendarOpen => 'Abrir calendario';
+
+  @override
+  String get skyCalendarEmpty => 'Sin eventos próximos';
+
+  @override
+  String get skyCalendarNow => 'ahora';
+
+  @override
+  String get skyCalendarToday => 'hoy';
+
+  @override
+  String get skyCalendarTomorrow => 'mañana';
+
+  @override
+  String skyCalendarInDays(String days) {
+    return 'en $days días';
+  }
+
+  @override
+  String skyCalendarInHours(String hours) {
+    return 'en $hours h';
+  }
+
+  @override
+  String get skyNewMoon => 'Luna Nueva';
+
+  @override
+  String get skyFullMoon => 'Luna Llena';
+
+  @override
+  String get skyEclipseSolar => 'Eclipse solar';
+
+  @override
+  String get skyEclipseLunar => 'Eclipse lunar';
+
+  @override
+  String get skyEclipseTotal => 'total';
+
+  @override
+  String get skyEclipseAnnular => 'anular';
+
+  @override
+  String get skyEclipsePartial => 'parcial';
+
+  @override
+  String get skyEclipseHybrid => 'híbrido';
+
+  @override
+  String get skyEclipsePenumbral => 'penumbral';
+
+  @override
+  String get skyEclipseVisibleHere => 'visible desde aquí';
+
+  @override
+  String get skyEclipseNotVisible => 'no visible desde aquí';
+
+  @override
+  String skyEclipseNextVisible(String when) {
+    return 'Próximo visible: $when';
+  }
+
+  @override
+  String skyEclipseObscuration(String pct) {
+    return '%$pct cubierto';
+  }
+
+  @override
+  String skyPerDay(String value) {
+    return '$value°/día';
+  }
+
+  @override
+  String get skyMoonSpeed => 'Velocidad lunar';
+
+  @override
+  String get handleTooShort => 'El nombre debe tener al menos 3 caracteres.';
+
+  @override
+  String get handleInvalid =>
+      'Solo minúsculas, números, puntos y guiones bajos.';
+
+  @override
+  String get handleTaken => 'Ese nombre de usuario ya está en uso.';
+
+  @override
+  String get handleContinue => 'Continuar';
+
+  @override
+  String get postReport => 'Reportar';
+
+  @override
+  String get blockUser => 'Bloquear usuario';
+
+  @override
+  String get postDelete => 'Eliminar publicación';
+
+  @override
+  String get reportSent => 'Reporte enviado. Gracias.';
+
+  @override
+  String get blockDone => 'Usuario bloqueado.';
+
+  @override
+  String get timeJustNow => 'ahora';
+
+  @override
+  String timeMinutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String timeHours(int n) {
+    return '$n h';
+  }
+
+  @override
+  String timeDays(int n) {
+    return '$n d';
+  }
+
+  @override
+  String get feedEmpty => 'Aún no hay publicaciones';
+
+  @override
+  String get feedEmptyHint => 'Sé el primero en compartir algo astral.';
+
+  @override
+  String get createPostTitle => 'Nueva publicación';
+
+  @override
+  String get createPostShare => 'Compartir';
+
+  @override
+  String get createPostNoImage => 'Elige una imagen primero.';
+
+  @override
+  String get createPostError => 'Algo salió mal. Inténtalo de nuevo.';
+
+  @override
+  String get createPostPick => 'Toca para elegir una foto';
+
+  @override
+  String get createPostGallery => 'Elegir de la galería';
+
+  @override
+  String get mediaSourceTitle => 'Origen de la foto';
+
+  @override
+  String get mediaCamera => 'Cámara';
+
+  @override
+  String get mediaGallery => 'Galería';
+
+  @override
+  String get mediaChange => 'Cambiar foto';
+
+  @override
+  String get mediaCameraDenied =>
+      'Permiso de cámara denegado. Permite el acceso a la cámara de Holavon en los ajustes del teléfono.';
+
+  @override
+  String get mediaPickError =>
+      'No se pudo obtener la foto. Inténtalo de nuevo.';
+
+  @override
+  String get createPostChartBadge => 'Carta';
+
+  @override
+  String get createPostCaptionHint => 'Escribe una descripción...';
+
+  @override
+  String get profilePosts => 'Publicaciones';
+
+  @override
+  String get profileFollowers => 'Seguidores';
+
+  @override
+  String get profileFollowing => 'Seguidos';
+
+  @override
+  String get profilePlanets => 'Carta natal';
+
+  @override
+  String get storyCreateTitle => 'Nueva historia';
+
+  @override
+  String get storyMention => 'Etiquetar personas';
+
+  @override
+  String get storyMentioned => 'etiquetado';
+
+  @override
+  String get storyMine => 'Tu historia';
+
+  @override
+  String get storyAdd => 'Añadir historia';
+
+  @override
+  String get editImageHint =>
+      'Pellizca para ampliar · toca las flechas para girar';
+
+  @override
+  String get profileEdit => 'Editar perfil';
+
+  @override
+  String get profileFollow => 'Seguir';
+
+  @override
+  String get profileFollowingBtn => 'Siguiendo';
+
+  @override
+  String get profileNoPosts => 'Aún no hay publicaciones.';
+
+  @override
+  String get profileNoPostsMe =>
+      'Comparte tu primera publicación con el botón +.';
+
+  @override
+  String get commentsTitle => 'Comentarios';
+
+  @override
+  String get commentsEmpty => 'Aún no hay comentarios.';
+
+  @override
+  String get commentsHint => 'Añade un comentario...';
+
+  @override
+  String get searchHint => 'Buscar personas';
+
+  @override
+  String get searchEmpty => 'No se encontraron usuarios.';
+
+  @override
+  String get searchPrompt => 'Busca personas para seguir.';
+
+  @override
+  String viewAllComments(int n) {
+    return 'Ver los $n comentarios';
+  }
+
+  @override
+  String get createPostProcessing => 'Preparando tu carta...';
+
+  @override
+  String get hubWelcome => 'Bienvenido';
+
+  @override
+  String get hubChoose => '¿A dónde vamos?';
+
+  @override
+  String get hubSocialTitle => 'Holavon';
+
+  @override
+  String get hubSocialDesc =>
+      'Comparte, añade historias, conecta con la comunidad';
+
+  @override
+  String get hubAnalysisTitle => 'Fast Synastry';
+
+  @override
+  String get hubAnalysisDesc => 'Análisis de sinastría, natal y potencial';
+
+  @override
+  String get hubHoraryTitle => 'Horary Oracle';
+
+  @override
+  String get hubHoraryDesc => 'Una respuesta clara desde la carta del momento';
+
+  @override
+  String get horaryTitle => 'Horary Oracle';
+
+  @override
+  String get horarySubtitle =>
+      'Escribe tu única pregunta; lanzaré la carta del momento.';
+
+  @override
+  String get horaryQuestionHint =>
+      'Escribe tu pregunta... (ej. ¿conseguiré este trabajo?)';
+
+  @override
+  String get horaryAsk => 'Preguntar ✨';
+
+  @override
+  String get horaryCategory => 'Categoría';
+
+  @override
+  String get horaryAsker => '¿De quién es el ascendente?';
+
+  @override
+  String get horaryAskerMe => 'Yo';
+
+  @override
+  String get horaryAskerOther => 'Otra persona';
+
+  @override
+  String get horaryLocation => 'Ubicación';
+
+  @override
+  String get horaryLocationHint => 'Elige tu ubicación antes de preguntar';
+
+  @override
+  String get horaryVerdict => 'Veredicto';
+
+  @override
+  String get horaryTiming => 'Momento';
+
+  @override
+  String get horaryDetailsShow => 'Ver detalles';
+
+  @override
+  String get horaryDetailsHide => 'Ocultar detalles';
+
+  @override
+  String get horaryAsc => 'Ascendente';
+
+  @override
+  String get editorRotateHint => 'Mantén pulsado y gira';
+
+  @override
+  String get dmTitle => 'Chat';
+
+  @override
+  String get dmInboxTitle => 'Mensajes';
+
+  @override
+  String get dmInboxEmpty =>
+      'Aún no hay mensajes. Pulsa \"Mensaje\" en el perfil de alguien para empezar un chat.';
+
+  @override
+  String get dmMessage => 'Mensaje';
+
+  @override
+  String get dmHint => 'Escribe un mensaje...';
+
+  @override
+  String get dmEmpty => 'Aún no hay mensajes. Envía el primero.';
+
+  @override
+  String get dmSendError => 'No se pudo enviar el mensaje.';
+
+  @override
+  String get horaryMoon => 'Luna';
+
+  @override
+  String get horaryNoCredits => 'Te quedaste sin créditos. Compra un paquete.';
+
+  @override
+  String get horaryError => 'No se pudo obtener respuesta. Inténtalo de nuevo.';
+
+  @override
+  String get horaryCatGeneral => 'Automático';
+
+  @override
+  String get horaryCatRelationship => 'Relación';
+
+  @override
+  String get horaryCatMoney => 'Dinero';
+
+  @override
+  String get horaryCatJob => 'Trabajo';
+
+  @override
+  String get horaryCatHealth => 'Salud';
+
+  @override
+  String get horaryCatLostObject => 'Objeto perdido';
+
+  @override
+  String get horaryCatMissingPerson => 'Persona perdida';
+
+  @override
+  String get horaryCatHouse => 'Casa/Propiedad';
+
+  @override
+  String get horaryCatChild => 'Niño';
+
+  @override
+  String get horaryCatPet => 'Mascota';
+
+  @override
+  String get horarySuggestLabel => 'Ejemplos de preguntas';
+
+  @override
+  String get horarySuggestRelationship =>
+      '¿Me ama? | ¿Nos reconciliaremos? | ¿Nos casaremos?';
+
+  @override
+  String get horarySuggestJob =>
+      '¿Conseguiré este trabajo? | ¿Me ascenderán? | ¿Salirá bien?';
+
+  @override
+  String get horarySuggestMoney =>
+      '¿Llegará dinero? | ¿Se pagará la deuda? | ¿Compraré una casa?';
+
+  @override
+  String get horarySuggestLostObject =>
+      '¿Dónde está? | ¿Lo encontraré? | ¿Quién lo tomó?';
+
+  @override
+  String get horarySuggestHealth => '¿Me recuperaré? | ¿Debo operarme?';
+
+  @override
+  String get horarySuggestDefault =>
+      '¿Conseguiré este trabajo? | ¿Me escribirá? | ¿Tendré hogar?';
+
+  @override
+  String get horaryIntroTitle => 'Hacer la pregunta correcta en Horary';
+
+  @override
+  String get horaryIntroSubtitle =>
+      'No es adivinación, es el lenguaje del momento';
+
+  @override
+  String get horaryIntroR1 =>
+      'Pregunta cuando realmente lo necesites — no por curiosidad, sino con el corazón apretado. No repitas la misma pregunta cada 2-3 días.';
+
+  @override
+  String get horaryIntroR2 =>
+      'Haz una sola pregunta clara — una frase como «¿Conseguiré este trabajo?»';
+
+  @override
+  String get horaryIntroR3 =>
+      'Espera radicalidad — si la carta está en 0-1°/29° o la Luna está vacía, dice «ahora no fluye»; pregunta de nuevo en 1-2 días.';
+
+  @override
+  String get horaryIntroR4 =>
+      'Da hora y lugar honestos — el momento en que te vino la pregunta, y tu ciudad.';
+
+  @override
+  String get horaryIntroR5 =>
+      'Escucha la respuesta tal como es — «difícil pero ocurrirá» también es respuesta; la demora de Saturno es parte de ella.';
+
+  @override
+  String get horaryIntroFooter =>
+      'Cuando estés listo, pregunta — el cielo te escucha. ✨';
+
+  @override
+  String get horaryIntroDontShow => 'No mostrar de nuevo';
+
+  @override
+  String get horaryIntroOk => 'Entendido, haz la pregunta ✨';
+
+  @override
+  String get proEntry => 'Hazte Pro';
+
+  @override
+  String get proPaywallTitle => 'Holavon Pro';
+
+  @override
+  String get proBenefitHorary => 'Pro: preguntas horarias ilimitadas';
+
+  @override
+  String get proBenefitAnalysis => 'Pro: informes PDF ilimitados';
+
+  @override
+  String get horaryQuota => 'Preguntas restantes hoy:';
+
+  @override
+  String get horaryLimitTitle => 'Preguntas Gratis Diarias Agotadas';
+
+  @override
+  String get horaryLimitDesc =>
+      'En el plan gratuito puedes hacer 3 preguntas al día. Pro desbloquea preguntas ilimitadas y todos los informes PDF.';
+
+  @override
+  String get horaryLimitLater => 'Vuelve mañana';
+
+  @override
+  String get horaryAuthError =>
+      'No se pudo verificar la sesión. Inicia sesión de nuevo e inténtalo otra vez.';
+
+  @override
+  String get horaryCredits => 'créditos';
+
+  @override
+  String get horaryClear => 'Borrar chat';
+
+  @override
+  String get horaryCopy => 'Copiar';
+
+  @override
+  String get horaryLocationWarning =>
+      'Define tu ubicación antes de hacer la pregunta.';
+
+  @override
+  String get horaryNoticeBody =>
+      'La horaria no es adivinación; es el lenguaje del momento. El cielo responde; se levanta la carta del momento de la pregunta. Haz una sola pregunta clara cuando de verdad necesites una respuesta. Espera la radicalidad — si la carta está en un límite o la Luna está vacía, dice \"ahora no fluye\"; pregunta de nuevo en 1-2 días.';
+
+  @override
+  String get noticeDontShow => 'No mostrar de nuevo';
+
+  @override
+  String get proPillarAnalysis => 'Fast Synastry';
+
+  @override
+  String get proPillarAnalysisDesc =>
+      'Descargas ilimitadas del informe PDF completo en todos los modos.';
+
+  @override
+  String get proPillarHorary => 'Horary Oracle';
+
+  @override
+  String get proPillarHoraryDesc =>
+      'Se elimina el límite de 3 preguntas al día; preguntas horarias ilimitadas.';
+
+  @override
+  String get proPillarSocial => 'Social';
+
+  @override
+  String get proPillarSocialDesc =>
+      'La comunidad es gratis e ilimitada para todos — comparte, añade historias, interactúa.';
 }

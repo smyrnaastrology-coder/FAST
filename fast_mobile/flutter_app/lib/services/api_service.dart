@@ -5,20 +5,33 @@ import '../models/analysis_request.dart';
 import 'billing_service.dart';
 
 class ApiService {
-  Future<Map<String, dynamic>> _post(String url, Map<String, dynamic> body, {Duration? timeout}) async {
-    final r = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    ).timeout(timeout ?? ApiConfig.timeout);
+  Future<Map<String, dynamic>> _post(
+    String url,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    final r = await http
+        .post(
+          Uri.parse(url),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        )
+        .timeout(timeout ?? ApiConfig.timeout);
     if (r.statusCode == 200) return jsonDecode(r.body);
     String msg;
-    try { final e = jsonDecode(r.body); msg = e['detail'] ?? r.body; } catch (_) { msg = r.body; }
+    try {
+      final e = jsonDecode(r.body);
+      msg = e['detail'] ?? r.body;
+    } catch (_) {
+      msg = r.body;
+    }
     throw Exception(msg);
   }
 
   Future<Map<String, dynamic>> _get(String url, {Duration? timeout}) async {
-    final r = await http.get(Uri.parse(url)).timeout(timeout ?? ApiConfig.timeout);
+    final r = await http
+        .get(Uri.parse(url))
+        .timeout(timeout ?? ApiConfig.timeout);
     if (r.statusCode == 200) return jsonDecode(r.body);
     throw Exception('HTTP ${r.statusCode}');
   }
@@ -47,14 +60,26 @@ class ApiService {
     return _post(url, req.toJson(), timeout: ApiConfig.longTimeout);
   }
 
-  Future<Map<String, dynamic>> simulasyonRadar(AnalysisRequest req) =>
-      _post(ApiConfig.simulasyonRadar, req.toJson(), timeout: ApiConfig.longTimeout);
+  Future<Map<String, dynamic>> simulasyonRadar(AnalysisRequest req) => _post(
+    ApiConfig.simulasyonRadar,
+    req.toJson(),
+    timeout: ApiConfig.longTimeout,
+  );
 
   Future<Map<String, dynamic>> simulasyonNatalRadar(AnalysisRequest req) =>
-      _post(ApiConfig.simulasyonNatalRadar, req.toJson(), timeout: ApiConfig.longTimeout);
+      _post(
+        ApiConfig.simulasyonNatalRadar,
+        req.toJson(),
+        timeout: ApiConfig.longTimeout,
+      );
 
-  Future<Map<String, dynamic>> simulasyonAlternatif(Map<String, dynamic> data) =>
-      _post(ApiConfig.simulasyonAlternatif, data, timeout: ApiConfig.longTimeout);
+  Future<Map<String, dynamic>> simulasyonAlternatif(
+    Map<String, dynamic> data,
+  ) => _post(
+    ApiConfig.simulasyonAlternatif,
+    data,
+    timeout: ApiConfig.longTimeout,
+  );
 
   Future<Map<String, dynamic>> astroKartografi(Map<String, dynamic> data) =>
       _post(ApiConfig.astrokartografi, data, timeout: ApiConfig.longTimeout);
@@ -89,4 +114,47 @@ class ApiService {
 
   Future<Map<String, dynamic>> loadAcgMap(String sessionId) =>
       _get('${ApiConfig.acgHarita}/$sessionId');
+
+  /// Doğum tarihi/saati/yeri → Güneş + Ay burcu ve dereceleri (künye).
+  Future<Map<String, dynamic>> kunye({
+    required String tarih,
+    String saat = '12:00',
+    double? lat,
+    double? lon,
+    String? sehir,
+    String? ulke,
+  }) => _post(ApiConfig.kunye, {
+    'tarih': tarih,
+    'saat': saat,
+    if (sehir != null && sehir.isNotEmpty) 'sehir': sehir,
+    if (ulke != null && ulke.isNotEmpty) 'ulke': ulke,
+    'enlem': ?lat,
+    'boylam': ?lon,
+  });
+
+  /// Anlık gökyüzü şeridi. Konum verilmezse İstanbul, saat dilimi cihazdan.
+  Future<Map<String, dynamic>> sky({
+    double lat = 41.0082,
+    double lon = 28.9784,
+    double? tz,
+  }) {
+    final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
+    return _get(
+      '${ApiConfig.sky}?lat=$lat&lon=$lon&tz=$offset',
+      timeout: const Duration(seconds: 20),
+    );
+  }
+
+  /// Yaklaşan ay fazları ve tutulmalar.
+  Future<Map<String, dynamic>> skyCalendar({
+    double lat = 41.0082,
+    double lon = 28.9784,
+    double? tz,
+  }) {
+    final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
+    return _get(
+      '${ApiConfig.skyCalendar}?lat=$lat&lon=$lon&tz=$offset',
+      timeout: const Duration(seconds: 20),
+    );
+  }
 }

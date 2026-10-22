@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
+import '../widgets/holavon_mark.dart';
 
 class WarningScreen extends StatefulWidget {
   final VoidCallback onAccepted;
@@ -40,7 +41,7 @@ class _WarningScreenState extends State<WarningScreen> {
                       gradient:  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]),
                       boxShadow: [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 28)],
                     ),
-                    child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontSize: 34, fontWeight: FontWeight.bold))),
+                    child: HolavonLogo(size: 72, radius: 18, glow: 0.30),
                   ),
                   const SizedBox(height: 20),
                   Text(l10n.warningTitle,

@@ -240,6 +240,39 @@ class AuthService {
     RevenueCatService.reset();
   }
 
+  /// Hesabı ve tüm kişisel verileri kalıcı olarak siler.
+  ///
+  /// Play Store "Veri silme" + GDPR gerekliliği. Silme işlemi sunucu tarafında
+  /// (`delete-account` Edge Function, service_role) yapılır; istemci yalnızca
+  /// kendi JWT'si ile çağırır.
+  ///
+  /// Edge Function dağıtılmamışsa çağrı hata verir ve istemci uyarı gösterir.
+  static Future<void> deleteAccount() async {
+    if (!enabled) throw StateError('auth_disabled');
+    final base = ApiConfig.supabaseUrl.trim();
+    if (base.isEmpty) throw StateError('supabase_not_configured');
+    final session = Supabase.instance.client.auth.currentSession;
+    final token = session?.accessToken;
+    if (token == null || token.isEmpty) throw StateError('not_signed_in');
+
+    final res = await http
+        .post(
+          Uri.parse('$base/functions/v1/delete-account'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+            'apikey': ApiConfig.supabaseAnonKey,
+          },
+          body: '{}',
+        )
+        .timeout(const Duration(seconds: 30));
+    if (res.statusCode != 200) {
+      throw StateError('delete_failed_${res.statusCode}');
+    }
+    // Oturumu kapat.
+    await signOut();
+  }
+
   static Future<bool> refreshSession() async {
     if (!enabled || refreshToken == null) return false;
     try {

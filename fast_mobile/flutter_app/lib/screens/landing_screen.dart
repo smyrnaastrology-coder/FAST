@@ -7,15 +7,21 @@ import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/api_service.dart';
+import '../services/pro_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/brand_icons.dart';
+import '../widgets/holavon_mark.dart';
+import '../widgets/theme_palette_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'analyzer_screen.dart';
 import 'auth_screen.dart';
 import 'profile_screen.dart';
 
 class LandingScreen extends StatefulWidget {
-  const LandingScreen({super.key});
+  const LandingScreen({super.key, this.asPaywall = false});
+
+  /// true: Hub'dan açılan Pro satın alma ekranı — AppBar'lı, fiyat bölümüne kaydırılmış.
+  final bool asPaywall;
 
   @override
   State<LandingScreen> createState() => _LandingScreenState();
@@ -45,14 +51,20 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   void _scrollTo(double offset) {
-    _scrollCtrl.animateTo(offset.clamp(0, _scrollCtrl.position.maxScrollExtent),
-        duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    _scrollCtrl.animateTo(
+      offset.clamp(0, _scrollCtrl.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _startAnalysis([String? mode]) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (_) => AnalyzerScreen(initialMode: mode ?? 'es_sevgili'),
-    ));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AnalyzerScreen(initialMode: mode ?? 'es_sevgili'),
+      ),
+    );
   }
 
   Future<void> _onPlanTap(Map p, AppLocalizations l10n) async {
@@ -64,18 +76,51 @@ class _LandingScreenState extends State<LandingScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final ok = await RevenueCatService.purchase(productId);
     if (!mounted) return;
-    messenger.showSnackBar(SnackBar(
-      content: Text(ok ? l10n.subscribeSuccess : l10n.subscribeCancelled),
-    ));
+    if (ok) ProService.invalidate();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(ok ? l10n.subscribeSuccess : l10n.subscribeCancelled),
+      ),
+    );
     if (ok) _startAnalysis();
   }
 
   List<Map<String, dynamic>> _modes(AppLocalizations l10n) => [
-    {'key': 'es_sevgili', 'title': l10n.modeEsTitle, 'desc': l10n.modeEsDesc, 'badge': l10n.modeEsBadge, 'icon': '💑'},
-    {'key': 'ashtakoot', 'title': l10n.modeAshTitle, 'desc': l10n.modeAshDesc, 'badge': l10n.modeAshBadge, 'icon': '💫'},
-    {'key': 'ebeveyn_cocuk', 'title': l10n.modeEbTitle, 'desc': l10n.modeEbDesc, 'badge': l10n.modeEbBadge, 'icon': '👨‍👩‍👧‍👦'},
-    {'key': 'bireysel_natal', 'title': l10n.modeNatalTitle, 'desc': l10n.modeNatalDesc, 'badge': l10n.modeNatalBadge, 'icon': '⭐'},
-    {'key': 'potansiyel_yetenek', 'title': l10n.modePyTitle, 'desc': l10n.modePyDesc, 'badge': l10n.modePyBadge, 'icon': '🌟'},
+    {
+      'key': 'es_sevgili',
+      'title': l10n.modeEsTitle,
+      'desc': l10n.modeEsDesc,
+      'badge': l10n.modeEsBadge,
+      'icon': '💑',
+    },
+    {
+      'key': 'ashtakoot',
+      'title': l10n.modeAshTitle,
+      'desc': l10n.modeAshDesc,
+      'badge': l10n.modeAshBadge,
+      'icon': '💫',
+    },
+    {
+      'key': 'ebeveyn_cocuk',
+      'title': l10n.modeEbTitle,
+      'desc': l10n.modeEbDesc,
+      'badge': l10n.modeEbBadge,
+      'icon': '👨‍👩‍👧‍👦',
+    },
+    {
+      'key': 'bireysel_natal',
+      'title': l10n.modeNatalTitle,
+      'desc': l10n.modeNatalDesc,
+      'badge': l10n.modeNatalBadge,
+      'icon': '⭐',
+    },
+    {
+      'key': 'potansiyel_yetenek',
+      'title': l10n.modePyTitle,
+      'desc': l10n.modePyDesc,
+      'badge': l10n.modePyBadge,
+      'icon': '🌟',
+    },
   ];
 
   List<Map<String, String>> _features(AppLocalizations l10n) => [
@@ -90,26 +135,73 @@ class _LandingScreenState extends State<LandingScreen> {
   ];
 
   List<Map<String, String>> _howSteps(AppLocalizations l10n) => [
-    {'step': '1', 'icon': '📝', 'title': l10n.step1Title, 'desc': l10n.step1Desc},
-    {'step': '2', 'icon': '🔮', 'title': l10n.step2Title, 'desc': l10n.step2Desc},
-    {'step': '3', 'icon': '📥', 'title': l10n.step3Title, 'desc': l10n.step3Desc},
+    {
+      'step': '1',
+      'icon': '📝',
+      'title': l10n.step1Title,
+      'desc': l10n.step1Desc,
+    },
+    {
+      'step': '2',
+      'icon': '🔮',
+      'title': l10n.step2Title,
+      'desc': l10n.step2Desc,
+    },
+    {
+      'step': '3',
+      'icon': '📥',
+      'title': l10n.step3Title,
+      'desc': l10n.step3Desc,
+    },
   ];
 
   List<Map<String, dynamic>> _plans(AppLocalizations l10n) => [
     {
-      'name': l10n.planFreeName, 'badge': l10n.planFreeBadge, 'price': 0, 'desc': l10n.planFreeDesc,
-      'features': [l10n.planFreeFeat1, l10n.planFreeFeat2, l10n.planFreeFeat3, l10n.planFreeFeat4, l10n.planFreeFeat5],
-      'disabled': [l10n.planFreeDisabled1, l10n.planFreeDisabled2, l10n.planFreeDisabled3, l10n.planFreeDisabled4, l10n.planFreeDisabled5],
+      'name': l10n.planFreeName,
+      'badge': l10n.planFreeBadge,
+      'price': 0,
+      'desc': l10n.planFreeDesc,
+      'features': [
+        l10n.planFreeFeat1,
+        l10n.planFreeFeat2,
+        l10n.planFreeFeat3,
+        l10n.planFreeFeat4,
+        l10n.planFreeFeat5,
+        l10n.planFreeFeat6,
+        l10n.planFreeFeat7,
+        l10n.planFreeFeat8,
+      ],
+      'disabled': [
+        l10n.planFreeDisabled1,
+        l10n.planFreeDisabled2,
+        l10n.planFreeDisabled3,
+        l10n.planFreeDisabled4,
+        l10n.planFreeDisabled5,
+        l10n.planFreeDisabled6,
+        l10n.planFreeDisabled7,
+      ],
       'highlight': false,
     },
     // Tek Pro kartı: aylık/yıllık düğmesi fiyatı, ürünü ve açıklamayı değiştirir.
     {
-      'name': l10n.planProName, 'badge': l10n.planProBadge,
+      'name': l10n.planProName,
+      'badge': l10n.planProBadge,
       'price': _priceYearly ? 49.99 : 14.99,
       'productId': _priceYearly ? 'sub_daily_yearly' : 'sub_daily',
       'interval': _priceYearly ? 'year' : 'month',
       'desc': _priceYearly ? l10n.planProYearlyDesc : l10n.planProMonthlyDesc,
-      'features': [l10n.planPremiumFeat1, l10n.planPremiumFeat2, l10n.planPremiumFeat3, l10n.planPremiumFeat4, l10n.planPremiumFeat5, l10n.planPremiumFeat6, l10n.planPremiumFeat7],
+      'features': [
+        l10n.planPremiumFeat1,
+        l10n.planPremiumFeat2,
+        l10n.planPremiumFeat3,
+        l10n.planPremiumFeat4,
+        l10n.planPremiumFeat5,
+        l10n.planPremiumFeat6,
+        l10n.planPremiumFeat7,
+        l10n.planProFeat8,
+        l10n.planProFeat9,
+        l10n.planProFeat10,
+      ],
       'disabled': <String>[],
       'highlight': true,
       'goldBtn': true,
@@ -144,6 +236,25 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    if (widget.asPaywall) {
+      // Paywall: yalnız Pro başlığı + fiyatlandırma. Uzun landing bölümleri gizlenir.
+      return Scaffold(
+        backgroundColor: FastTheme.bg,
+        appBar: AppBar(
+          backgroundColor: FastTheme.bgSecondary,
+          foregroundColor: FastTheme.accentGold,
+          elevation: 0,
+          title: Text(
+            l10n.proPaywallTitle,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+          ),
+        ),
+        body: SingleChildScrollView(
+          controller: _scrollCtrl,
+          child: Column(children: [_proPillars(l10n), _pricingSection(l10n)]),
+        ),
+      );
+    }
     return Scaffold(
       body: SingleChildScrollView(
         controller: _scrollCtrl,
@@ -165,13 +276,93 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
+  /// Paywall üstü: Pro'nun 3 sütunu (Analiz + Horary + Sosyal).
+  Widget _proPillars(AppLocalizations l10n) {
+    final items = [
+      {
+        'icon': Icons.auto_awesome,
+        'title': l10n.proPillarAnalysis,
+        'desc': l10n.proPillarAnalysisDesc,
+      },
+      {
+        'icon': Icons.auto_stories,
+        'title': l10n.proPillarHorary,
+        'desc': l10n.proPillarHoraryDesc,
+      },
+      {
+        'icon': Icons.people_alt,
+        'title': l10n.proPillarSocial,
+        'desc': l10n.proPillarSocialDesc,
+      },
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+      child: Column(
+        children: [
+          for (final it in items)
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: FastTheme.cardBg,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: FastTheme.border),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: FastTheme.accentGold.withValues(alpha: 0.15),
+                    ),
+                    child: Icon(
+                      it['icon'] as IconData,
+                      color: FastTheme.accentGold,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          it['title'] as String,
+                          style: TextStyle(
+                            color: FastTheme.textLight,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          it['desc'] as String,
+                          style: TextStyle(
+                            color: FastTheme.textMuted,
+                            fontSize: 12,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _navbar(AppLocalizations l10n) {
     final lp = context.read<LocaleProvider>();
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: BoxDecoration(
         color: FastTheme.bg.withValues(alpha: 0.85),
-        border:  Border(bottom: BorderSide(color: FastTheme.border)),
+        border: Border(bottom: BorderSide(color: FastTheme.border)),
       ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -179,12 +370,23 @@ class _LandingScreenState extends State<LandingScreen> {
         child: Row(
           children: [
             GestureDetector(
-              onTap: () => _scrollCtrl.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut),
+              onTap: () => _scrollCtrl.animateTo(
+                0,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut,
+              ),
               child: Row(
                 children: [
-                  Container(width: 32, height: 32, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold), child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 16)))),
+                  HolavonLogo(size: 32, radius: 9),
                   const SizedBox(width: 6),
-                  Text('Fast Synastry', style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                  Text(
+                    'Holavon',
+                    style: GoogleFonts.cormorantGaramond(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: FastTheme.accentGold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -195,17 +397,27 @@ class _LandingScreenState extends State<LandingScreen> {
             const SizedBox(width: 12),
             _authButton(context.watch<AuthProvider>(), l10n),
             const Spacer(),
-            Flexible(child: SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(
-              children: [
-                _navLink(l10n.navFeatures, () => _scrollTo(900)),
-                const SizedBox(width: 12),
-                _navLink(l10n.navPricing, () => _scrollTo(1800)),
-                const SizedBox(width: 12),
-                _navLink(l10n.navFaq, () => _scrollTo(2600)),
-                const SizedBox(width: 12),
-                _goldBtn(l10n.navStartAnalysis, () => _startAnalysis(), height: 34, fontSize: 11),
-              ],
-            ))),
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _navLink(l10n.navFeatures, () => _scrollTo(900)),
+                    const SizedBox(width: 12),
+                    _navLink(l10n.navPricing, () => _scrollTo(1800)),
+                    const SizedBox(width: 12),
+                    _navLink(l10n.navFaq, () => _scrollTo(2600)),
+                    const SizedBox(width: 12),
+                    _goldBtn(
+                      l10n.navStartAnalysis,
+                      () => _startAnalysis(),
+                      height: 34,
+                      fontSize: 11,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -216,8 +428,10 @@ class _LandingScreenState extends State<LandingScreen> {
     if (!ap.enabled) return const SizedBox.shrink();
     if (ap.isLoggedIn) {
       return GestureDetector(
-        onTap: () => Navigator.push(context,
-            MaterialPageRoute(builder: (_) => const ProfileScreen())),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -227,7 +441,7 @@ class _LandingScreenState extends State<LandingScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-               Icon(Icons.person, size: 16, color: FastTheme.accentGold),
+              Icon(Icons.person, size: 16, color: FastTheme.accentGold),
               const SizedBox(width: 6),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 120),
@@ -235,34 +449,42 @@ class _LandingScreenState extends State<LandingScreen> {
                   ap.email,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style:  TextStyle(color: FastTheme.accentGold, fontSize: 12),
+                  style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
                 ),
               ),
               const SizedBox(width: 4),
-               Icon(Icons.chevron_right, size: 14, color: FastTheme.accentGold),
+              Icon(Icons.chevron_right, size: 14, color: FastTheme.accentGold),
             ],
           ),
         ),
       );
     }
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const AuthScreen())),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AuthScreen()),
+      ),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: FastTheme.accentGold.withValues(alpha: 0.12),
         ),
-        child: Text(l10n.loginNav,
-            style:  TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
+        child: Text(
+          l10n.loginNav,
+          style: TextStyle(
+            color: FastTheme.accentGold,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
 
   Widget _themeToggle(ThemeProvider tp) {
     return GestureDetector(
-      onTap: () => _showThemeSheet(context, tp),
+      onTap: () => showThemePaletteSheet(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
@@ -283,99 +505,6 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  void _showThemeSheet(BuildContext context, ThemeProvider tp) {
-    final l10n = AppLocalizations.of(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: FastTheme.cardBg,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.themePickerTitle,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.text)),
-              const SizedBox(height: 12),
-              ...ThemeProvider.palettes.map((p) {
-                final selected = tp.palette == p.key;
-                final colors = _palettePreview(p.key);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: GestureDetector(
-                    onTap: () {
-                      tp.setPalette(p.key);
-                      Navigator.of(ctx).pop();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: selected ? FastTheme.cardBgHover : FastTheme.bg,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: selected ? FastTheme.accentGold : FastTheme.border, width: selected ? 2 : 1),
-                      ),
-                      child: Row(
-                        children: [
-                          Row(
-                            children: colors
-                                .map((c) => Container(
-                                      width: 18,
-                                      height: 18,
-                                      margin: const EdgeInsets.only(right: 4),
-                                      decoration:
-                                          BoxDecoration(color: c, shape: BoxShape.circle, border: Border.all(color: FastTheme.border)),
-                                    ))
-                                .toList(),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(_paletteLabel(p.key, l10n),
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                                    color: FastTheme.text)),
-                          ),
-                          if (selected) Icon(Icons.check_circle, size: 18, color: FastTheme.accentGold),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _paletteLabel(String id, AppLocalizations l10n) {
-    switch (id) {
-      case 'spain': return l10n.themePaletteSpain;
-      case 'argentina': return l10n.themePaletteArgentina;
-      case 'light': return l10n.themePaletteLight;
-      default: return l10n.themePaletteDark;
-    }
-  }
-
-  List<Color> _palettePreview(String id) {
-    switch (id) {
-      case 'spain':
-        return [FastTheme.spainBg, FastTheme.spainCardBg, FastTheme.spainAccentGold];
-      case 'argentina':
-        return [FastTheme.argBg, FastTheme.argCardBg, FastTheme.argPrimary];
-      case 'light':
-        return [FastTheme.lightBg, FastTheme.lightCardBg, FastTheme.lightAccentGold];
-      default:
-        return [FastTheme.darkBg, FastTheme.darkCardBg, FastTheme.darkAccentGold];
-    }
-  }
-
   Widget _languageDropdown(LocaleProvider lp) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -387,12 +516,30 @@ class _LandingScreenState extends State<LandingScreen> {
         child: DropdownButton<String>(
           value: lp.locale.languageCode,
           dropdownColor: FastTheme.cardBg,
-          icon:  Icon(Icons.language, size: 16, color: FastTheme.accentGold),
-          style:  TextStyle(color: FastTheme.text, fontSize: 12),
-          items:  [
-            DropdownMenuItem(value: 'tr', child: Text('Türkçe', style: TextStyle(color: FastTheme.text, fontSize: 12))),
-            DropdownMenuItem(value: 'en', child: Text('English', style: TextStyle(color: FastTheme.text, fontSize: 12))),
-            DropdownMenuItem(value: 'es', child: Text('Español', style: TextStyle(color: FastTheme.text, fontSize: 12))),
+          icon: Icon(Icons.language, size: 16, color: FastTheme.accentGold),
+          style: TextStyle(color: FastTheme.text, fontSize: 12),
+          items: [
+            DropdownMenuItem(
+              value: 'tr',
+              child: Text(
+                'Türkçe',
+                style: TextStyle(color: FastTheme.text, fontSize: 12),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'en',
+              child: Text(
+                'English',
+                style: TextStyle(color: FastTheme.text, fontSize: 12),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'es',
+              child: Text(
+                'Español',
+                style: TextStyle(color: FastTheme.text, fontSize: 12),
+              ),
+            ),
           ],
           onChanged: (v) {
             if (v != null) lp.setLanguage(v);
@@ -405,20 +552,41 @@ class _LandingScreenState extends State<LandingScreen> {
   Widget _navLink(String text, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Text(text, style:  TextStyle(color: FastTheme.textMuted, fontSize: 13)),
+      child: Text(
+        text,
+        style: TextStyle(color: FastTheme.textMuted, fontSize: 13),
+      ),
     );
   }
 
-  Widget _goldBtn(String text, VoidCallback onTap, {double height = 44, double fontSize = 13}) {
+  Widget _goldBtn(
+    String text,
+    VoidCallback onTap, {
+    double height = 44,
+    double fontSize = 13,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: (height - fontSize - 4) / 2),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: (height - fontSize - 4) / 2,
+        ),
         decoration: BoxDecoration(
-          gradient:  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]),
+          gradient: LinearGradient(
+            colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(text, style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.w700, fontSize: fontSize, letterSpacing: 0.5)),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: FastTheme.bg,
+            fontWeight: FontWeight.w700,
+            fontSize: fontSize,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
     );
   }
@@ -427,77 +595,160 @@ class _LandingScreenState extends State<LandingScreen> {
     final stats = _stats;
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 80, 24, 60),
-      decoration:  BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [FastTheme.bg, FastTheme.bgSecondary],
         ),
       ),
-      child: Column(
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: FastTheme.accentGold.withValues(alpha: 0.12),
-              border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.3)),
-              borderRadius: BorderRadius.circular(20),
+          // Arka planda büyük soluk amblem (filigran)
+          Positioned(
+            top: 24,
+            child: Opacity(
+              opacity: 0.07,
+              child: HolavonLogo(size: 300, radius: 0),
             ),
-            child: Text(l10n.heroBadge.toUpperCase(), style:  TextStyle(color: FastTheme.accentGold, fontSize: 11, letterSpacing: 1)),
           ),
-          const SizedBox(height: 24),
-          Text.rich(
-            TextSpan(
-              text: l10n.heroTitle,
-              style: GoogleFonts.cormorantGaramond(fontSize: 48, fontWeight: FontWeight.w700, color: FastTheme.text, height: 1.15),
-              children: [TextSpan(text: l10n.heroTitleAccent, style:  TextStyle(color: FastTheme.accentGold, shadows: [Shadow(color: FastTheme.accentGoldGlow, blurRadius: 40)]))],
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Text(l10n.heroSubtitle,
-              textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.textMuted, fontSize: 16, height: 1.6)),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: FastTheme.cardBg,
-              border: Border.all(color: FastTheme.border),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(l10n.heroDisclaimer,
-              textAlign: TextAlign.center, style:  TextStyle(color: FastTheme.textMuted, fontSize: 11, height: 1.5)),
-          ),
-          const SizedBox(height: 32),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            runSpacing: 12,
+          Column(
             children: [
-              _goldBtn(l10n.freeAnalysis, () => _startAnalysis(), height: 50, fontSize: 14),
-              OutlinedButton.icon(
-                onPressed: () => _scrollTo(400),
-                icon:  Icon(Icons.arrow_downward, size: 18, color: FastTheme.accentGold),
-                label: Text(l10n.chooseAnalysisType, style:  TextStyle(color: FastTheme.accentGold, fontSize: 14)),
-                style: OutlinedButton.styleFrom(
-                  side:  BorderSide(color: FastTheme.accentGold, width: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              HolavonLogo(size: 84, radius: 20, glow: 0.30),
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: FastTheme.accentGold.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: FastTheme.accentGold.withValues(alpha: 0.3),
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  l10n.heroBadge.toUpperCase(),
+                  style: TextStyle(
+                    color: FastTheme.accentGold,
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 48),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _stat('${stats['total_analysis']}+', l10n.statAnalysis),
-              const SizedBox(width: 40),
-              _stat('21', l10n.statYearCycle),
-              const SizedBox(width: 40),
-              _stat('${stats['total_cities']}+', l10n.statCities),
+              const SizedBox(height: 24),
+              Text.rich(
+                TextSpan(
+                  text: l10n.heroTitle,
+                  style: GoogleFonts.cormorantGaramond(
+                    fontSize: 48,
+                    fontWeight: FontWeight.w700,
+                    color: FastTheme.text,
+                    height: 1.15,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: l10n.heroTitleAccent,
+                      style: TextStyle(
+                        color: FastTheme.accentGold,
+                        shadows: [
+                          Shadow(
+                            color: FastTheme.accentGoldGlow,
+                            blurRadius: 40,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Text(
+                  l10n.heroSubtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: FastTheme.textMuted,
+                    fontSize: 16,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: FastTheme.cardBg,
+                  border: Border.all(color: FastTheme.border),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  l10n.heroDisclaimer,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: FastTheme.textMuted,
+                    fontSize: 11,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 12,
+                children: [
+                  _goldBtn(
+                    l10n.freeAnalysis,
+                    () => _startAnalysis(),
+                    height: 50,
+                    fontSize: 14,
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => _scrollTo(400),
+                    icon: Icon(
+                      Icons.arrow_downward,
+                      size: 18,
+                      color: FastTheme.accentGold,
+                    ),
+                    label: Text(
+                      l10n.chooseAnalysisType,
+                      style: TextStyle(
+                        color: FastTheme.accentGold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: FastTheme.accentGold, width: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 48),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _stat('${stats['total_analysis']}+', l10n.statAnalysis),
+                  const SizedBox(width: 40),
+                  _stat('21', l10n.statYearCycle),
+                  const SizedBox(width: 40),
+                  _stat('${stats['total_cities']}+', l10n.statCities),
+                ],
+              ),
             ],
           ),
         ],
@@ -508,8 +759,22 @@ class _LandingScreenState extends State<LandingScreen> {
   Widget _stat(String num, String label) {
     return Column(
       children: [
-        Text(num, style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-        Text(label, style:  TextStyle(fontSize: 10, color: FastTheme.textDim, letterSpacing: 1)),
+        Text(
+          num,
+          style: GoogleFonts.cormorantGaramond(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            color: FastTheme.accentGold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: FastTheme.textDim,
+            letterSpacing: 1,
+          ),
+        ),
       ],
     );
   }
@@ -541,23 +806,58 @@ class _LandingScreenState extends State<LandingScreen> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned(top: -10, left: 0, right: 0, child: Center(child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
-              decoration: BoxDecoration(
-                gradient:  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]),
-                borderRadius: BorderRadius.circular(10),
+            Positioned(
+              top: -10,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    m['badge'] as String,
+                    style: TextStyle(
+                      color: FastTheme.bg,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
               ),
-              child: Text(m['badge'] as String, style:  TextStyle(color: FastTheme.bg, fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1)),
-            ))),
+            ),
             const SizedBox(height: 16),
             Column(
               children: [
                 const SizedBox(height: 8),
                 Text(m['icon'] as String, style: const TextStyle(fontSize: 48)),
                 const SizedBox(height: 12),
-                Text(m['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 18, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+                Text(
+                  m['title'] as String,
+                  style: GoogleFonts.cormorantGaramond(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: FastTheme.accentGold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(m['desc'] as String, textAlign: TextAlign.center, style:  TextStyle(fontSize: 12, color: FastTheme.textMuted, height: 1.5)),
+                Text(
+                  m['desc'] as String,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: FastTheme.textMuted,
+                    height: 1.5,
+                  ),
+                ),
               ],
             ),
           ],
@@ -567,65 +867,141 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   Widget _featuresSection(AppLocalizations l10n) {
-    return _section(l10n.featuresTitle, l10n.featuresDesc,
+    return _section(
+      l10n.featuresTitle,
+      l10n.featuresDesc,
       child: Wrap(
         spacing: 16,
         runSpacing: 16,
-        children: _features(l10n).map((f) => Container(
-          width: 300,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: FastTheme.cardBg,
-            border: Border.all(color: FastTheme.border),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              Text(f['icon'] as String, style: const TextStyle(fontSize: 40)),
-              const SizedBox(height: 12),
-              Text(f['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              const SizedBox(height: 8),
-              Text(f['desc'] as String, textAlign: TextAlign.center, style:  TextStyle(fontSize: 14, color: FastTheme.textMuted, height: 1.6)),
-            ],
-          ),
-        )).toList(),
+        children: _features(l10n)
+            .map(
+              (f) => Container(
+                width: 300,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: FastTheme.cardBg,
+                  border: Border.all(color: FastTheme.border),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      f['icon'] as String,
+                      style: const TextStyle(fontSize: 40),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      f['title'] as String,
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: FastTheme.accentGold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      f['desc'] as String,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: FastTheme.textMuted,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
 
   Widget _howSection(AppLocalizations l10n) {
-    return _section(l10n.howTitle, l10n.howDesc, isAlt: true,
+    return _section(
+      l10n.howTitle,
+      l10n.howDesc,
+      isAlt: true,
       child: Column(
         children: [
           Wrap(
-            spacing: 24, runSpacing: 24,
-            children: _howSteps(l10n).map((s) => Container(
-              width: 260,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: FastTheme.cardBg, border: Border.all(color: FastTheme.border), borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                children: [
-                  Container(width: 36, height: 36, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold),
-                    child: Center(child: Text(s['step'] as String, style:  TextStyle(color: FastTheme.bg, fontWeight: FontWeight.w700)))),
-                  const SizedBox(height: 12),
-                  Text(s['icon'] as String, style: const TextStyle(fontSize: 28)),
-                  const SizedBox(height: 8),
-                  Text(s['title'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                  const SizedBox(height: 6),
-                  Text(s['desc'] as String, textAlign: TextAlign.center, style:  TextStyle(fontSize: 12, color: FastTheme.textMuted, height: 1.5)),
-                ],
-              ),
-            )).toList(),
+            spacing: 24,
+            runSpacing: 24,
+            children: _howSteps(l10n)
+                .map(
+                  (s) => Container(
+                    width: 260,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: FastTheme.cardBg,
+                      border: Border.all(color: FastTheme.border),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: FastTheme.accentGold,
+                          ),
+                          child: Center(
+                            child: Text(
+                              s['step'] as String,
+                              style: TextStyle(
+                                color: FastTheme.bg,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          s['icon'] as String,
+                          style: const TextStyle(fontSize: 28),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          s['title'] as String,
+                          style: GoogleFonts.cormorantGaramond(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: FastTheme.accentGold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          s['desc'] as String,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: FastTheme.textMuted,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           const SizedBox(height: 32),
-          _goldBtn(l10n.howStart, () => _startAnalysis(), height: 50, fontSize: 14),
+          _goldBtn(
+            l10n.howStart,
+            () => _startAnalysis(),
+            height: 50,
+            fontSize: 14,
+          ),
         ],
       ),
     );
   }
 
   Widget _pricingSection(AppLocalizations l10n) {
-    return _section(l10n.pricingTitle, l10n.pricingDesc,
+    return _section(
+      l10n.pricingTitle,
+      l10n.pricingDesc,
       child: Column(
         children: [
           Row(
@@ -633,24 +1009,46 @@ class _LandingScreenState extends State<LandingScreen> {
             children: [
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = false),
-                child: Text(l10n.pricingMonthly, style: TextStyle(fontSize: 15, color: _priceYearly ? FastTheme.textDim : FastTheme.accentGold, fontWeight: _priceYearly ? FontWeight.normal : FontWeight.w600)),
+                child: Text(
+                  l10n.pricingMonthly,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: _priceYearly
+                        ? FastTheme.textDim
+                        : FastTheme.accentGold,
+                    fontWeight: _priceYearly
+                        ? FontWeight.normal
+                        : FontWeight.w600,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = !_priceYearly),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: 52, height: 28,
+                  width: 52,
+                  height: 28,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    color: _priceYearly ? FastTheme.accentGold : FastTheme.cardBg,
-                    border: Border.all(color: _priceYearly ? FastTheme.accentGold : FastTheme.border),
+                    color: _priceYearly
+                        ? FastTheme.accentGold
+                        : FastTheme.cardBg,
+                    border: Border.all(
+                      color: _priceYearly
+                          ? FastTheme.accentGold
+                          : FastTheme.border,
+                    ),
                   ),
                   child: AnimatedAlign(
                     duration: const Duration(milliseconds: 300),
-                    alignment: _priceYearly ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: _priceYearly
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                     child: Container(
-                      width: 22, height: 22, margin: const EdgeInsets.all(2),
+                      width: 22,
+                      height: 22,
+                      margin: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _priceYearly ? FastTheme.bg : FastTheme.text,
@@ -662,18 +1060,59 @@ class _LandingScreenState extends State<LandingScreen> {
               const SizedBox(width: 12),
               GestureDetector(
                 onTap: () => setState(() => _priceYearly = true),
-                child: Text.rich(TextSpan(
-                  text: '${l10n.pricingYearly} ',
-                  style: TextStyle(fontSize: 15, color: _priceYearly ? FastTheme.accentGold : FastTheme.textDim, fontWeight: _priceYearly ? FontWeight.w600 : FontWeight.normal),
-                  children: [TextSpan(text: l10n.pricingDiscount, style:  TextStyle(color: FastTheme.success, fontSize: 11))],
-                )),
+                child: Text.rich(
+                  TextSpan(
+                    text: '${l10n.pricingYearly} ',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: _priceYearly
+                          ? FastTheme.accentGold
+                          : FastTheme.textDim,
+                      fontWeight: _priceYearly
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: l10n.pricingDiscount,
+                        style: TextStyle(
+                          color: FastTheme.success,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 32),
-          Wrap(
-            spacing: 20, runSpacing: 20,
-            children: _plans(l10n).map((p) => _planCard(p, l10n)).toList(),
+          LayoutBuilder(
+            builder: (ctx, c) {
+              final wide = c.maxWidth >= 700;
+              final plans = _plans(l10n);
+              if (wide) {
+                return IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0; i < plans.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 20),
+                        Expanded(child: _planCard(plans[i], l10n, fill: true)),
+                      ],
+                    ],
+                  ),
+                );
+              }
+              return Column(
+                children: [
+                  for (var i = 0; i < plans.length; i++) ...[
+                    if (i > 0) const SizedBox(height: 16),
+                    _planCard(plans[i], l10n),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -697,7 +1136,7 @@ class _LandingScreenState extends State<LandingScreen> {
     return '$p${vowels.contains(last) ? "'YA BAŞLA" : "'A BAŞLA"}';
   }
 
-  Widget _planCard(Map p, AppLocalizations l10n) {
+  Widget _planCard(Map p, AppLocalizations l10n, {bool fill = false}) {
     final highlight = p['highlight'] as bool;
     // Pro karti one cikarilmamis olsa da butonu altin olsun.
     final goldBtn = highlight || (p['goldBtn'] as bool? ?? false);
@@ -709,60 +1148,140 @@ class _LandingScreenState extends State<LandingScreen> {
     final interval = p['interval'] as String? ?? 'month';
     final perLabel = interval == 'year' ? l10n.planPerYear : l10n.planPerMonth;
     return Container(
-      width: 320,
+      width: double.infinity,
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: highlight ?  LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [FastTheme.cardBgHover, FastTheme.cardBg]) : null,
+        gradient: highlight
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [FastTheme.cardBgHover, FastTheme.cardBg],
+              )
+            : null,
         color: highlight ? null : FastTheme.cardBg,
-        border: Border.all(color: highlight ? FastTheme.accentGold : FastTheme.border, width: highlight ? 2 : 1),
+        border: Border.all(
+          color: highlight ? FastTheme.accentGold : FastTheme.border,
+          width: highlight ? 2 : 1,
+        ),
         borderRadius: BorderRadius.circular(18),
-        boxShadow: highlight ? [ BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 28)] : null,
+        boxShadow: highlight
+            ? [BoxShadow(color: FastTheme.accentGoldGlow, blurRadius: 28)]
+            : null,
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           if (p['badge'] != null && (p['badge'] as String).isNotEmpty)
-            Positioned(top: -12, left: 0, right: 0, child: Center(child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              decoration: BoxDecoration(
-                gradient:  LinearGradient(colors: [FastTheme.accentGold, FastTheme.accentGoldLight]),
-                borderRadius: BorderRadius.circular(12),
+            Positioned(
+              top: -12,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    p['badge'] as String,
+                    style: TextStyle(
+                      color: FastTheme.bg,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
               ),
-              child: Text(p['badge'] as String, style:  TextStyle(color: FastTheme.bg, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1)),
-            ))),
+            ),
           const SizedBox(height: 8),
           Column(
+            mainAxisSize: fill ? MainAxisSize.max : MainAxisSize.min,
             children: [
               const SizedBox(height: 8),
-              Text(p['name'] as String, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-              Text(p['desc'] as String, style:  TextStyle(fontSize: 13, color: FastTheme.textDim)),
+              Text(
+                p['name'] as String,
+                style: GoogleFonts.cormorantGaramond(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: FastTheme.accentGold,
+                ),
+              ),
+              Text(
+                p['desc'] as String,
+                style: TextStyle(fontSize: 13, color: FastTheme.textDim),
+              ),
               const SizedBox(height: 20),
               price == 0
-                  ? Text(l10n.planFree, style: GoogleFonts.cormorantGaramond(fontSize: 34, fontWeight: FontWeight.w700, color: FastTheme.accentGold))
+                  ? Text(
+                      l10n.planFree,
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        color: FastTheme.accentGold,
+                      ),
+                    )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(rcPrice.isNotEmpty ? rcPrice : '\$${_fmt(price)}', style: GoogleFonts.cormorantGaramond(fontSize: 38, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
-                        Text(perLabel, style:  TextStyle(fontSize: 15, color: FastTheme.textDim)),
+                        Text(
+                          rcPrice.isNotEmpty ? rcPrice : '\$${_fmt(price)}',
+                          style: GoogleFonts.cormorantGaramond(
+                            fontSize: 38,
+                            fontWeight: FontWeight.w700,
+                            color: FastTheme.accentGold,
+                          ),
+                        ),
+                        Text(
+                          perLabel,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: FastTheme.textDim,
+                          ),
+                        ),
                       ],
                     ),
               const SizedBox(height: 20),
-              ...((p['features'] as List).map((f) => _planFeat(f as String, true))),
-              ...((p['disabled'] as List).map((f) => _planFeat(f as String, false))),
-              const SizedBox(height: 20),
+              ...((p['features'] as List).map(
+                (f) => _planFeat(f as String, true),
+              )),
+              ...((p['disabled'] as List).map(
+                (f) => _planFeat(f as String, false),
+              )),
+              if (fill) const Spacer() else const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: goldBtn
-                    ? _goldBtn(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), () => _onPlanTap(p, l10n), height: 48, fontSize: 14)
+                    ? _goldBtn(
+                        p['price'] == 0
+                            ? l10n.planTrial
+                            : _planStartLabel(p['name'] as String, l10n),
+                        () => _onPlanTap(p, l10n),
+                        height: 48,
+                        fontSize: 14,
+                      )
                     : OutlinedButton(
                         onPressed: () => _onPlanTap(p, l10n),
                         style: OutlinedButton.styleFrom(
-                          side:  BorderSide(color: FastTheme.border),
+                          side: BorderSide(color: FastTheme.border),
                           foregroundColor: FastTheme.text,
                           padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        child: Text(p['price'] == 0 ? l10n.planTrial : _planStartLabel(p['name'] as String, l10n), style: const TextStyle(fontSize: 14)),
+                        child: Text(
+                          p['price'] == 0
+                              ? l10n.planTrial
+                              : _planStartLabel(p['name'] as String, l10n),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
               ),
             ],
@@ -777,10 +1296,25 @@ class _LandingScreenState extends State<LandingScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(included ? '✓' : '✗', style: TextStyle(fontSize: 14, color: included ? FastTheme.success : FastTheme.textDim, fontWeight: FontWeight.w700)),
+          Text(
+            included ? '✓' : '✗',
+            style: TextStyle(
+              fontSize: 14,
+              color: included ? FastTheme.success : FastTheme.textDim,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: included ? FastTheme.text : FastTheme.textDim,
-              decoration: included ? null : TextDecoration.lineThrough))),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: included ? FastTheme.text : FastTheme.textDim,
+                decoration: included ? null : TextDecoration.lineThrough,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -788,29 +1322,61 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _testimonialSection(AppLocalizations l10n) {
     final testimonials = _testimonials(l10n);
-    return _section(l10n.testimonialsTitle, l10n.testimonialsDesc, isAlt: true,
+    return _section(
+      l10n.testimonialsTitle,
+      l10n.testimonialsDesc,
+      isAlt: true,
       child: Column(
         children: [
-           Text('★★★★★', style: TextStyle(fontSize: 22, color: FastTheme.accentGold, letterSpacing: 4)),
+          Text(
+            '★★★★★',
+            style: TextStyle(
+              fontSize: 22,
+              color: FastTheme.accentGold,
+              letterSpacing: 4,
+            ),
+          ),
           const SizedBox(height: 12),
-          Text('"${testimonials[_testimonialIdx]['text']}"', textAlign: TextAlign.center,
-            style:  TextStyle(fontSize: 16, color: FastTheme.text, fontStyle: FontStyle.italic, height: 1.7)),
+          Text(
+            '"${testimonials[_testimonialIdx]['text']}"',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: FastTheme.text,
+              fontStyle: FontStyle.italic,
+              height: 1.7,
+            ),
+          ),
           const SizedBox(height: 12),
-          Text('— ${testimonials[_testimonialIdx]['name']}', style:  TextStyle(fontSize: 13, color: FastTheme.accentGold, fontWeight: FontWeight.w600)),
+          Text(
+            '— ${testimonials[_testimonialIdx]['name']}',
+            style: TextStyle(
+              fontSize: 13,
+              color: FastTheme.accentGold,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(testimonials.length, (i) => GestureDetector(
-              onTap: () => setState(() => _testimonialIdx = i),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: _testimonialIdx == i ? 24 : 8, height: 8, margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: _testimonialIdx == i ? FastTheme.accentGold : FastTheme.border,
+            children: List.generate(
+              testimonials.length,
+              (i) => GestureDetector(
+                onTap: () => setState(() => _testimonialIdx = i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: _testimonialIdx == i ? 24 : 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: _testimonialIdx == i
+                        ? FastTheme.accentGold
+                        : FastTheme.border,
+                  ),
                 ),
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -819,7 +1385,9 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget _faqSection(AppLocalizations l10n) {
     final faqs = _faqs(l10n);
-    return _section(l10n.faqTitle, l10n.faqDesc,
+    return _section(
+      l10n.faqTitle,
+      l10n.faqDesc,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 700),
         child: Column(
@@ -833,7 +1401,9 @@ class _LandingScreenState extends State<LandingScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: FastTheme.cardBg,
-                  border: Border.all(color: open ? FastTheme.accentGold : FastTheme.border),
+                  border: Border.all(
+                    color: open ? FastTheme.accentGold : FastTheme.border,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -841,13 +1411,37 @@ class _LandingScreenState extends State<LandingScreen> {
                   children: [
                     Row(
                       children: [
-                        Expanded(child: Text(faqs[i]['q'] as String, style: TextStyle(fontSize: 14, color: open ? FastTheme.accentGold : FastTheme.text, fontWeight: FontWeight.w600))),
-                        Text(open ? '▾' : '▸', style:  TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                        Expanded(
+                          child: Text(
+                            faqs[i]['q'] as String,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: open
+                                  ? FastTheme.accentGold
+                                  : FastTheme.text,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          open ? '▾' : '▸',
+                          style: TextStyle(
+                            color: FastTheme.textDim,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                     if (open) ...[
                       const SizedBox(height: 8),
-                      Text(faqs[i]['a'] as String, style:  TextStyle(fontSize: 13, color: FastTheme.textMuted, height: 1.6)),
+                      Text(
+                        faqs[i]['a'] as String,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: FastTheme.textMuted,
+                          height: 1.6,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -863,30 +1457,55 @@ class _LandingScreenState extends State<LandingScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
-      decoration:  BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [FastTheme.bgSecondary, FastTheme.bg]),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [FastTheme.bgSecondary, FastTheme.bg],
+        ),
       ),
       child: Column(
         children: [
-          Text(l10n.ctaTitle, textAlign: TextAlign.center,
-            style: GoogleFonts.cormorantGaramond(fontSize: 32, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          Text(
+            l10n.ctaTitle,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              color: FastTheme.accentGold,
+            ),
+          ),
           const SizedBox(height: 10),
-          Text(l10n.ctaDesc,
-            textAlign: TextAlign.center, style:  TextStyle(fontSize: 14, color: FastTheme.textDim)),
+          Text(
+            l10n.ctaDesc,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: FastTheme.textDim),
+          ),
           const SizedBox(height: 24),
           Wrap(
-            spacing: 12, runSpacing: 12,
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              _goldBtn(l10n.ctaCouple, () => _startAnalysis('es_sevgili'), height: 52, fontSize: 16),
+              _goldBtn(
+                l10n.ctaCouple,
+                () => _startAnalysis('es_sevgili'),
+                height: 52,
+                fontSize: 16,
+              ),
               OutlinedButton.icon(
                 onPressed: () => _startAnalysis('ebeveyn_cocuk'),
                 icon: const Icon(Icons.family_restroom, size: 18),
                 label: Text(l10n.ctaParentChild),
                 style: OutlinedButton.styleFrom(
-                  side:  BorderSide(color: FastTheme.accentGold, width: 2),
+                  side: BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -895,10 +1514,15 @@ class _LandingScreenState extends State<LandingScreen> {
                 icon: const Icon(Icons.person, size: 18),
                 label: Text(l10n.ctaNatal),
                 style: OutlinedButton.styleFrom(
-                  side:  BorderSide(color: FastTheme.accentGold, width: 2),
+                  side: BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -907,10 +1531,15 @@ class _LandingScreenState extends State<LandingScreen> {
                 icon: const Icon(Icons.auto_awesome, size: 18),
                 label: Text(l10n.ctaPotential),
                 style: OutlinedButton.styleFrom(
-                  side:  BorderSide(color: FastTheme.accentGold, width: 2),
+                  side: BorderSide(color: FastTheme.accentGold, width: 2),
                   foregroundColor: FastTheme.accentGold,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -925,21 +1554,30 @@ class _LandingScreenState extends State<LandingScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 48, 24, 48),
-      decoration:  BoxDecoration(border: Border(top: BorderSide(color: FastTheme.border))),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: FastTheme.border)),
+      ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1100),
         child: Wrap(
-          spacing: 48, runSpacing: 32,
+          spacing: 48,
+          runSpacing: 32,
           children: [
             SizedBox(
               width: 260,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: 40, height: 40, decoration:  BoxDecoration(shape: BoxShape.circle, color: FastTheme.accentGold),
-                    child:  Center(child: Text('F', style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold, fontSize: 18)))),
+                  HolavonLogo(size: 40, radius: 12),
                   const SizedBox(height: 8),
-                  Text(l10n.footerTagline, style:  TextStyle(fontSize: 12, color: FastTheme.textDim, height: 1.5)),
+                  Text(
+                    l10n.footerTagline,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: FastTheme.textDim,
+                      height: 1.5,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -950,25 +1588,46 @@ class _LandingScreenState extends State<LandingScreen> {
               _footerLink(l10n.navStartAnalysis, () => _startAnalysis()),
             ]),
             _footerCol(l10n.footerContact, [
-               Text('info@fatihasartepe.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              Text(
+                'info@fatihasartepe.com',
+                style: TextStyle(fontSize: 12, color: FastTheme.textDim),
+              ),
               const SizedBox(height: 4),
-               // Uygulama ici geri bildirim ve cocuk guvenligi ihbar kanali
-               // (Google Play Cocuk Guvenligi Standartlari bildirimi).
-               Text('smyrnaastrology@gmail.com', style: TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              // Uygulama ici geri bildirim ve cocuk guvenligi ihbar kanali
+              // (Google Play Cocuk Guvenligi Standartlari bildirimi).
+              Text(
+                'smyrnaastrology@gmail.com',
+                style: TextStyle(fontSize: 12, color: FastTheme.textDim),
+              ),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () { launchUrl(Uri.parse('https://instagram.com/fatihasartepe'), mode: LaunchMode.externalApplication); },
+                onTap: () {
+                  launchUrl(
+                    Uri.parse('https://instagram.com/holavonastrology'),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const InstagramLogo(size: 18),
                     const SizedBox(width: 6),
-                    Text('@fatihasartepe', style: TextStyle(fontSize: 12, color: FastTheme.accentGold, fontWeight: FontWeight.w600)),
+                    Text(
+                      '@holavonastrology',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: FastTheme.accentGold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 4),
-               Text(l10n.footerRights, style:  TextStyle(fontSize: 12, color: FastTheme.textDim)),
+              Text(
+                l10n.footerRights,
+                style: TextStyle(fontSize: 12, color: FastTheme.textDim),
+              ),
             ]),
           ],
         ),
@@ -982,7 +1641,14 @@ class _LandingScreenState extends State<LandingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: GoogleFonts.cormorantGaramond(fontSize: 16, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+          Text(
+            title,
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: FastTheme.accentGold,
+            ),
+          ),
           const SizedBox(height: 8),
           ...children,
         ],
@@ -995,12 +1661,20 @@ class _LandingScreenState extends State<LandingScreen> {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 6),
-        child: Text(text, style:  TextStyle(fontSize: 12, color: FastTheme.textMuted)),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 12, color: FastTheme.textMuted),
+        ),
       ),
     );
   }
 
-  Widget _section(String title, String desc, {required Widget child, bool isAlt = false}) {
+  Widget _section(
+    String title,
+    String desc, {
+    required Widget child,
+    bool isAlt = false,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
@@ -1009,9 +1683,25 @@ class _LandingScreenState extends State<LandingScreen> {
         constraints: const BoxConstraints(maxWidth: 1100),
         child: Column(
           children: [
-            Text(title, textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 36, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cormorantGaramond(
+                fontSize: 36,
+                fontWeight: FontWeight.w700,
+                color: FastTheme.accentGold,
+              ),
+            ),
             const SizedBox(height: 10),
-            Text(desc, textAlign: TextAlign.center, style:  TextStyle(fontSize: 15, color: FastTheme.textDim, height: 1.5)),
+            Text(
+              desc,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                color: FastTheme.textDim,
+                height: 1.5,
+              ),
+            ),
             const SizedBox(height: 44),
             child,
           ],

@@ -100,10 +100,124 @@ abstract class AppLocalizations {
     Locale('tr'),
   ];
 
+  /// No description provided for @editorPinchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom • twist to rotate'**
+  String get editorPinchHint;
+
+  /// No description provided for @storyDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete story'**
+  String get storyDelete;
+
+  /// No description provided for @storyDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This story will be permanently deleted.'**
+  String get storyDeleteConfirm;
+
+  /// No description provided for @storyDeleteDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Story deleted'**
+  String get storyDeleteDone;
+
+  /// No description provided for @profileTabPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'POSTS'**
+  String get profileTabPosts;
+
+  /// No description provided for @profileTabReels.
+  ///
+  /// In en, this message translates to:
+  /// **'REELS'**
+  String get profileTabReels;
+
+  /// No description provided for @profileLoginNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in to see your profile'**
+  String get profileLoginNeeded;
+
+  /// No description provided for @socialErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get socialErrorNetwork;
+
+  /// No description provided for @socialErrorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach the server'**
+  String get socialErrorServer;
+
+  /// No description provided for @socialErrorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The community feed could not be loaded. Check your internet connection and try again.'**
+  String get socialErrorHint;
+
+  /// No description provided for @socialRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get socialRetry;
+
+  /// No description provided for @dmBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'You cannot message this user'**
+  String get dmBlocked;
+
+  /// No description provided for @accountDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account and data'**
+  String get accountDelete;
+
+  /// No description provided for @accountDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountDeleteTitle;
+
+  /// No description provided for @accountDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account, all your posts, comments, messages and saved people will be permanently deleted. This cannot be undone.'**
+  String get accountDeleteConfirm;
+
+  /// No description provided for @accountDeleteConfirmBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get accountDeleteConfirmBtn;
+
+  /// No description provided for @accountDeleteDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and data were deleted'**
+  String get accountDeleteDone;
+
+  /// No description provided for @accountDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the account. Please try again later.'**
+  String get accountDeleteFailed;
+
+  /// No description provided for @fileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File is too large. Please pick an image under 5 MB.'**
+  String get fileTooLarge;
+
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fast Synastry'**
+  /// **'Holavon'**
   String get appTitle;
 
   /// No description provided for @appSlogan.
@@ -157,7 +271,7 @@ abstract class AppLocalizations {
   /// No description provided for @heroSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Discover the depths of your relationship, your child\'s potential, or your own talents with the Fatih Asartepe Synastry Technique (FAST).'**
+  /// **'Discover the depths of your relationship, your child\'s potential, or your own talents with Holavon.'**
   String get heroSubtitle;
 
   /// No description provided for @heroDisclaimer.
@@ -289,7 +403,7 @@ abstract class AppLocalizations {
   /// No description provided for @featuresDesc.
   ///
   /// In en, this message translates to:
-  /// **'Explore every dimension of astrological analysis with Fast Synastry'**
+  /// **'Explore every dimension of astrological analysis with Holavon'**
   String get featuresDesc;
 
   /// No description provided for @feature1Title.
@@ -517,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @planFreeDesc.
   ///
   /// In en, this message translates to:
-  /// **'Experience the analysis'**
+  /// **'Try Analysis, Horary and Social for free'**
   String get planFreeDesc;
 
   /// No description provided for @planFreeFeat1.
@@ -550,6 +664,24 @@ abstract class AppLocalizations {
   /// **'Limited asteroid data'**
   String get planFreeFeat5;
 
+  /// No description provided for @planFreeFeat6.
+  ///
+  /// In en, this message translates to:
+  /// **'Horary: 3 questions per day'**
+  String get planFreeFeat6;
+
+  /// No description provided for @planFreeFeat7.
+  ///
+  /// In en, this message translates to:
+  /// **'Social feed, stories and DMs'**
+  String get planFreeFeat7;
+
+  /// No description provided for @planFreeFeat8.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile and saved people'**
+  String get planFreeFeat8;
+
   /// No description provided for @planFreeDisabled1.
   ///
   /// In en, this message translates to:
@@ -579,6 +711,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email PDF'**
   String get planFreeDisabled5;
+
+  /// No description provided for @planFreeDisabled6.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Horary'**
+  String get planFreeDisabled6;
+
+  /// No description provided for @planFreeDisabled7.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold Pro badge'**
+  String get planFreeDisabled7;
 
   /// No description provided for @planPremiumName.
   ///
@@ -693,6 +837,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Priority support'**
   String get planProFeat4;
+
+  /// No description provided for @planProFeat8.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Horary questions'**
+  String get planProFeat8;
+
+  /// No description provided for @planProFeat9.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold Pro badge on your social profile'**
+  String get planProFeat9;
+
+  /// No description provided for @planProFeat10.
+  ///
+  /// In en, this message translates to:
+  /// **'Three apps in one subscription: Analysis + Horary + Social'**
+  String get planProFeat10;
 
   /// No description provided for @testimonialsTitle.
   ///
@@ -913,7 +1075,7 @@ abstract class AppLocalizations {
   /// No description provided for @footerTagline.
   ///
   /// In en, this message translates to:
-  /// **'Stellar bond analysis with the Fatih Asartepe Synastry Technique (FAST).'**
+  /// **'Holavon — stellar bond analysis with the Fatih Asartepe Synastry Technique (FAST).'**
   String get footerTagline;
 
   /// No description provided for @footerQuickLinks.
@@ -931,7 +1093,7 @@ abstract class AppLocalizations {
   /// No description provided for @footerRights.
   ///
   /// In en, this message translates to:
-  /// **'© 2024 Fast Synastry. All rights reserved.'**
+  /// **'© 2026 Holavon®. All rights reserved.'**
   String get footerRights;
 
   /// No description provided for @language.
@@ -961,13 +1123,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fatih Asartepe\nSynastry Technique'**
+  /// **'Holavon\nAstrology'**
   String get homeTitle;
 
   /// No description provided for @homeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Fast Synastry — Stellar Bond Analysis System'**
+  /// **'Holavon — Stellar Bond Analysis System'**
   String get homeSubtitle;
 
   /// No description provided for @homeVersion.
@@ -1297,7 +1459,7 @@ abstract class AppLocalizations {
   /// No description provided for @analyzerSidebarTagline.
   ///
   /// In en, this message translates to:
-  /// **'Fast Synastry — Stellar Bond Analysis'**
+  /// **'Holavon — Stellar Bond Analysis'**
   String get analyzerSidebarTagline;
 
   /// No description provided for @analyzerSidebarVersion.
@@ -1690,6 +1852,24 @@ abstract class AppLocalizations {
   /// **'Select Theme'**
   String get themePickerTitle;
 
+  /// No description provided for @themeAppearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get themeAppearanceTitle;
+
+  /// No description provided for @themeAppearanceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the app color palette'**
+  String get themeAppearanceHint;
+
+  /// No description provided for @proBadgeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Holavon Pro member'**
+  String get proBadgeTooltip;
+
   /// No description provided for @themePaletteDark.
   ///
   /// In en, this message translates to:
@@ -1699,19 +1879,19 @@ abstract class AppLocalizations {
   /// No description provided for @themePaletteLight.
   ///
   /// In en, this message translates to:
-  /// **'Cream (Light)'**
+  /// **'Soft Cream (Light)'**
   String get themePaletteLight;
 
   /// No description provided for @themePaletteSpain.
   ///
   /// In en, this message translates to:
-  /// **'Spain (Dark)'**
+  /// **'Spain Red (Dark)'**
   String get themePaletteSpain;
 
   /// No description provided for @themePaletteArgentina.
   ///
   /// In en, this message translates to:
-  /// **'Argentina (Light)'**
+  /// **'Argentina Blue (Light)'**
   String get themePaletteArgentina;
 
   /// No description provided for @chartTabSituaA.
@@ -2931,6 +3111,1452 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full PDF report (unlimited download right)'**
   String get analyzerFeaturesAsh9;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get navCommunity;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// No description provided for @communityLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the astrology community'**
+  String get communityLoginTitle;
+
+  /// No description provided for @communityLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to see posts, share your charts and follow other members. Synastry stays available to everyone.'**
+  String get communityLoginSubtitle;
+
+  /// No description provided for @communityLoginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to join'**
+  String get communityLoginButton;
+
+  /// No description provided for @handleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim your @handle'**
+  String get handleTitle;
+
+  /// No description provided for @handleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a unique username. This is how others find and follow you.'**
+  String get handleSubtitle;
+
+  /// No description provided for @handleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get handleLabel;
+
+  /// No description provided for @handleDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get handleDisplayName;
+
+  /// No description provided for @handleDisplayNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'How your name appears'**
+  String get handleDisplayNameHint;
+
+  /// No description provided for @handleBio.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get handleBio;
+
+  /// No description provided for @handleBioHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A short line about you'**
+  String get handleBioHint;
+
+  /// No description provided for @handleBirthDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth date (optional)'**
+  String get handleBirthDate;
+
+  /// No description provided for @handleBirthDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your birth date to show your sun sign'**
+  String get handleBirthDateHint;
+
+  /// No description provided for @handleBirthPrivateNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your birth date stays private. Only your sun sign badge is shown on your profile.'**
+  String get handleBirthPrivateNote;
+
+  /// No description provided for @kunyeBirthTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth time (optional)'**
+  String get kunyeBirthTime;
+
+  /// No description provided for @kunyeBirthTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time'**
+  String get kunyeBirthTimeHint;
+
+  /// No description provided for @kunyeBirthTimeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding your time pins your Sun and Moon sign degrees.'**
+  String get kunyeBirthTimeNote;
+
+  /// No description provided for @kunyeBirthCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth city (optional)'**
+  String get kunyeBirthCity;
+
+  /// No description provided for @kunyeBirthCityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Istanbul'**
+  String get kunyeBirthCityHint;
+
+  /// No description provided for @kunyeCityNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'City not found, check the name.'**
+  String get kunyeCityNotFound;
+
+  /// No description provided for @kunyeCalcNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Sun and Moon signs are calculated precisely on the server.'**
+  String get kunyeCalcNote;
+
+  /// No description provided for @kunyeRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your relation to astrology'**
+  String get kunyeRoleLabel;
+
+  /// No description provided for @kunyeRoleAstrolog.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrologer'**
+  String get kunyeRoleAstrolog;
+
+  /// No description provided for @kunyeRoleLover.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrology enthusiast'**
+  String get kunyeRoleLover;
+
+  /// No description provided for @kunyeFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your field'**
+  String get kunyeFieldLabel;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsDailyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder (09:00)'**
+  String get settingsDailyReminder;
+
+  /// No description provided for @settingsSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get settingsSubscription;
+
+  /// No description provided for @settingsProActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro active'**
+  String get settingsProActive;
+
+  /// No description provided for @settingsProFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free plan'**
+  String get settingsProFree;
+
+  /// No description provided for @settingsManagePro.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Pro'**
+  String get settingsManagePro;
+
+  /// No description provided for @settingsRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get settingsRestore;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settingsAccount;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// No description provided for @settingsVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsVersion;
+
+  /// No description provided for @settingsSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get settingsSignOut;
+
+  /// No description provided for @profileShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share profile'**
+  String get profileShare;
+
+  /// No description provided for @postShareSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get postShareSend;
+
+  /// No description provided for @postShareStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my story'**
+  String get postShareStory;
+
+  /// No description provided for @postShareSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get postShareSystem;
+
+  /// No description provided for @postShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share post'**
+  String get postShareTitle;
+
+  /// No description provided for @shareToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to…'**
+  String get shareToTitle;
+
+  /// No description provided for @shareNoFollowing.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not following anyone yet.'**
+  String get shareNoFollowing;
+
+  /// No description provided for @shareSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get shareSent;
+
+  /// No description provided for @shareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not share'**
+  String get shareFailed;
+
+  /// No description provided for @storyRepostAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to your story'**
+  String get storyRepostAdded;
+
+  /// No description provided for @storyRepostFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add to story'**
+  String get storyRepostFailed;
+
+  /// No description provided for @shareProfileMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'@{handle} — Holavon astrology community'**
+  String shareProfileMessage(String handle);
+
+  /// No description provided for @feedFollowingTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get feedFollowingTab;
+
+  /// No description provided for @feedDiscoverTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover'**
+  String get feedDiscoverTab;
+
+  /// No description provided for @feedFollowingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts from people you follow will appear here.'**
+  String get feedFollowingEmpty;
+
+  /// No description provided for @feedDiscoverCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Discover'**
+  String get feedDiscoverCta;
+
+  /// No description provided for @skyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sky'**
+  String get skyTitle;
+
+  /// No description provided for @skyMoonLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon {sign} {degree}°'**
+  String skyMoonLine(String sign, String degree);
+
+  /// No description provided for @skyIllumination.
+  ///
+  /// In en, this message translates to:
+  /// **'%{pct} illuminated'**
+  String skyIllumination(String pct);
+
+  /// No description provided for @skySpeedSlow.
+  ///
+  /// In en, this message translates to:
+  /// **'slow'**
+  String get skySpeedSlow;
+
+  /// No description provided for @skySpeedNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'normal'**
+  String get skySpeedNormal;
+
+  /// No description provided for @skySpeedFast.
+  ///
+  /// In en, this message translates to:
+  /// **'fast'**
+  String get skySpeedFast;
+
+  /// No description provided for @skyVoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon void of course'**
+  String get skyVoid;
+
+  /// No description provided for @skyNotVoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon in flow'**
+  String get skyNotVoid;
+
+  /// No description provided for @skyVoidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Void until {time}'**
+  String skyVoidUntil(String time);
+
+  /// No description provided for @skyPlanetHour.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} hour'**
+  String skyPlanetHour(String planet);
+
+  /// No description provided for @skyNextHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {planet} hour'**
+  String skyNextHour(String planet);
+
+  /// No description provided for @skyAspects.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon aspects'**
+  String get skyAspects;
+
+  /// No description provided for @skyNoAspects.
+  ///
+  /// In en, this message translates to:
+  /// **'No major aspect right now'**
+  String get skyNoAspects;
+
+  /// No description provided for @skyRetro.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde'**
+  String get skyRetro;
+
+  /// No description provided for @skySunLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun {sign} {degree}°'**
+  String skySunLine(String sign, String degree);
+
+  /// No description provided for @skyPhaseNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon'**
+  String get skyPhaseNew;
+
+  /// No description provided for @skyPhaseWaxingCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Crescent'**
+  String get skyPhaseWaxingCrescent;
+
+  /// No description provided for @skyPhaseFirstQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'First Quarter'**
+  String get skyPhaseFirstQuarter;
+
+  /// No description provided for @skyPhaseWaxingGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Gibbous'**
+  String get skyPhaseWaxingGibbous;
+
+  /// No description provided for @skyPhaseFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon'**
+  String get skyPhaseFull;
+
+  /// No description provided for @skyPhaseWaningGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Gibbous'**
+  String get skyPhaseWaningGibbous;
+
+  /// No description provided for @skyPhaseLastQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Quarter'**
+  String get skyPhaseLastQuarter;
+
+  /// No description provided for @skyPhaseWaningCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Crescent'**
+  String get skyPhaseWaningCrescent;
+
+  /// No description provided for @skyDayHour.
+  ///
+  /// In en, this message translates to:
+  /// **'day hour'**
+  String get skyDayHour;
+
+  /// No description provided for @skyNightHour.
+  ///
+  /// In en, this message translates to:
+  /// **'night hour'**
+  String get skyNightHour;
+
+  /// No description provided for @skyCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sky Calendar'**
+  String get skyCalendarTitle;
+
+  /// No description provided for @skyCalendarPhases.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Phases'**
+  String get skyCalendarPhases;
+
+  /// No description provided for @skyCalendarEclipses.
+  ///
+  /// In en, this message translates to:
+  /// **'Eclipses'**
+  String get skyCalendarEclipses;
+
+  /// No description provided for @skyCalendarOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open calendar'**
+  String get skyCalendarOpen;
+
+  /// No description provided for @skyCalendarEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming events'**
+  String get skyCalendarEmpty;
+
+  /// No description provided for @skyCalendarNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get skyCalendarNow;
+
+  /// No description provided for @skyCalendarToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get skyCalendarToday;
+
+  /// No description provided for @skyCalendarTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'tomorrow'**
+  String get skyCalendarTomorrow;
+
+  /// No description provided for @skyCalendarInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'in {days} days'**
+  String skyCalendarInDays(String days);
+
+  /// No description provided for @skyCalendarInHours.
+  ///
+  /// In en, this message translates to:
+  /// **'in {hours} h'**
+  String skyCalendarInHours(String hours);
+
+  /// No description provided for @skyNewMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon'**
+  String get skyNewMoon;
+
+  /// No description provided for @skyFullMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon'**
+  String get skyFullMoon;
+
+  /// No description provided for @skyEclipseSolar.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar eclipse'**
+  String get skyEclipseSolar;
+
+  /// No description provided for @skyEclipseLunar.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar eclipse'**
+  String get skyEclipseLunar;
+
+  /// No description provided for @skyEclipseTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'total'**
+  String get skyEclipseTotal;
+
+  /// No description provided for @skyEclipseAnnular.
+  ///
+  /// In en, this message translates to:
+  /// **'annular'**
+  String get skyEclipseAnnular;
+
+  /// No description provided for @skyEclipsePartial.
+  ///
+  /// In en, this message translates to:
+  /// **'partial'**
+  String get skyEclipsePartial;
+
+  /// No description provided for @skyEclipseHybrid.
+  ///
+  /// In en, this message translates to:
+  /// **'hybrid'**
+  String get skyEclipseHybrid;
+
+  /// No description provided for @skyEclipsePenumbral.
+  ///
+  /// In en, this message translates to:
+  /// **'penumbral'**
+  String get skyEclipsePenumbral;
+
+  /// No description provided for @skyEclipseVisibleHere.
+  ///
+  /// In en, this message translates to:
+  /// **'visible from here'**
+  String get skyEclipseVisibleHere;
+
+  /// No description provided for @skyEclipseNotVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'not visible here'**
+  String get skyEclipseNotVisible;
+
+  /// No description provided for @skyEclipseNextVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Next visible: {when}'**
+  String skyEclipseNextVisible(String when);
+
+  /// No description provided for @skyEclipseObscuration.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% covered'**
+  String skyEclipseObscuration(String pct);
+
+  /// No description provided for @skyPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}°/day'**
+  String skyPerDay(String value);
+
+  /// No description provided for @skyMoonSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon speed'**
+  String get skyMoonSpeed;
+
+  /// No description provided for @handleTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Username must be at least 3 characters.'**
+  String get handleTooShort;
+
+  /// No description provided for @handleInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Only lowercase letters, numbers, dots and underscores.'**
+  String get handleInvalid;
+
+  /// No description provided for @handleTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'That username is already taken.'**
+  String get handleTaken;
+
+  /// No description provided for @handleContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get handleContinue;
+
+  /// No description provided for @postReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get postReport;
+
+  /// No description provided for @blockUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Block user'**
+  String get blockUser;
+
+  /// No description provided for @postDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete post'**
+  String get postDelete;
+
+  /// No description provided for @reportSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Report sent. Thank you.'**
+  String get reportSent;
+
+  /// No description provided for @blockDone.
+  ///
+  /// In en, this message translates to:
+  /// **'User blocked.'**
+  String get blockDone;
+
+  /// No description provided for @timeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get timeJustNow;
+
+  /// timeMinutes
+  ///
+  /// In en, this message translates to:
+  /// **'{n}m'**
+  String timeMinutes(int n);
+
+  /// timeHours
+  ///
+  /// In en, this message translates to:
+  /// **'{n}h'**
+  String timeHours(int n);
+
+  /// timeDays
+  ///
+  /// In en, this message translates to:
+  /// **'{n}d'**
+  String timeDays(int n);
+
+  /// No description provided for @feedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet'**
+  String get feedEmpty;
+
+  /// No description provided for @feedEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to share something astrological.'**
+  String get feedEmptyHint;
+
+  /// No description provided for @createPostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New post'**
+  String get createPostTitle;
+
+  /// No description provided for @createPostShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get createPostShare;
+
+  /// No description provided for @createPostNoImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an image first.'**
+  String get createPostNoImage;
+
+  /// No description provided for @createPostError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get createPostError;
+
+  /// No description provided for @createPostPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose a photo'**
+  String get createPostPick;
+
+  /// No description provided for @createPostGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get createPostGallery;
+
+  /// No description provided for @mediaSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo source'**
+  String get mediaSourceTitle;
+
+  /// No description provided for @mediaCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get mediaCamera;
+
+  /// No description provided for @mediaGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get mediaGallery;
+
+  /// No description provided for @mediaChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get mediaChange;
+
+  /// No description provided for @mediaCameraDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission denied. Allow camera access for Holavon in your phone settings.'**
+  String get mediaCameraDenied;
+
+  /// No description provided for @mediaPickError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get the photo. Try again.'**
+  String get mediaPickError;
+
+  /// No description provided for @createPostChartBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart'**
+  String get createPostChartBadge;
+
+  /// No description provided for @createPostCaptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a caption...'**
+  String get createPostCaptionHint;
+
+  /// No description provided for @profilePosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get profilePosts;
+
+  /// No description provided for @profileFollowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Followers'**
+  String get profileFollowers;
+
+  /// No description provided for @profileFollowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get profileFollowing;
+
+  /// No description provided for @profilePlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal chart'**
+  String get profilePlanets;
+
+  /// No description provided for @storyCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New story'**
+  String get storyCreateTitle;
+
+  /// No description provided for @storyMention.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag people'**
+  String get storyMention;
+
+  /// No description provided for @storyMentioned.
+  ///
+  /// In en, this message translates to:
+  /// **'tagged'**
+  String get storyMentioned;
+
+  /// No description provided for @storyMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Your story'**
+  String get storyMine;
+
+  /// No description provided for @storyAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add story'**
+  String get storyAdd;
+
+  /// No description provided for @editImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom · tap arrows to rotate'**
+  String get editImageHint;
+
+  /// No description provided for @profileEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get profileEdit;
+
+  /// No description provided for @profileFollow.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get profileFollow;
+
+  /// No description provided for @profileFollowingBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get profileFollowingBtn;
+
+  /// No description provided for @profileNoPosts.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet.'**
+  String get profileNoPosts;
+
+  /// No description provided for @profileNoPostsMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your first post from the + button.'**
+  String get profileNoPostsMe;
+
+  /// No description provided for @commentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsTitle;
+
+  /// No description provided for @commentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet.'**
+  String get commentsEmpty;
+
+  /// No description provided for @commentsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment...'**
+  String get commentsHint;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search people'**
+  String get searchHint;
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found.'**
+  String get searchEmpty;
+
+  /// No description provided for @searchPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for people to follow.'**
+  String get searchPrompt;
+
+  /// viewAllComments
+  ///
+  /// In en, this message translates to:
+  /// **'View all {n} comments'**
+  String viewAllComments(int n);
+
+  /// No description provided for @createPostProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your chart...'**
+  String get createPostProcessing;
+
+  /// No description provided for @hubWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get hubWelcome;
+
+  /// No description provided for @hubChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Where to?'**
+  String get hubChoose;
+
+  /// No description provided for @hubSocialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holavon'**
+  String get hubSocialTitle;
+
+  /// No description provided for @hubSocialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Share, add stories, connect with the community'**
+  String get hubSocialDesc;
+
+  /// No description provided for @hubAnalysisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast Synastry'**
+  String get hubAnalysisTitle;
+
+  /// No description provided for @hubAnalysisDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Synastry, natal and potential analyses'**
+  String get hubAnalysisDesc;
+
+  /// No description provided for @hubHoraryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Horary Oracle'**
+  String get hubHoraryTitle;
+
+  /// No description provided for @hubHoraryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A clear answer from the chart of the moment'**
+  String get hubHoraryDesc;
+
+  /// No description provided for @horaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Horary Oracle'**
+  String get horaryTitle;
+
+  /// No description provided for @horarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type your one question; I\'ll cast the chart of the moment.'**
+  String get horarySubtitle;
+
+  /// No description provided for @horaryQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your question... (e.g. will I get this job?)'**
+  String get horaryQuestionHint;
+
+  /// No description provided for @horaryAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask ✨'**
+  String get horaryAsk;
+
+  /// No description provided for @horaryCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get horaryCategory;
+
+  /// No description provided for @horaryAsker.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose rising?'**
+  String get horaryAsker;
+
+  /// No description provided for @horaryAskerMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get horaryAskerMe;
+
+  /// No description provided for @horaryAskerOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone else'**
+  String get horaryAskerOther;
+
+  /// No description provided for @horaryLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get horaryLocation;
+
+  /// No description provided for @horaryLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your location before asking'**
+  String get horaryLocationHint;
+
+  /// No description provided for @horaryVerdict.
+  ///
+  /// In en, this message translates to:
+  /// **'Verdict'**
+  String get horaryVerdict;
+
+  /// No description provided for @horaryTiming.
+  ///
+  /// In en, this message translates to:
+  /// **'Timing'**
+  String get horaryTiming;
+
+  /// No description provided for @horaryDetailsShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show details'**
+  String get horaryDetailsShow;
+
+  /// No description provided for @horaryDetailsHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide details'**
+  String get horaryDetailsHide;
+
+  /// No description provided for @horaryAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascendant'**
+  String get horaryAsc;
+
+  /// No description provided for @editorRotateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold & rotate'**
+  String get editorRotateHint;
+
+  /// No description provided for @dmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get dmTitle;
+
+  /// No description provided for @dmInboxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get dmInboxTitle;
+
+  /// No description provided for @dmInboxEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Tap \"Message\" on someone\'s profile to start a chat.'**
+  String get dmInboxEmpty;
+
+  /// No description provided for @dmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get dmMessage;
+
+  /// No description provided for @dmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
+  String get dmHint;
+
+  /// No description provided for @dmEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Send the first one.'**
+  String get dmEmpty;
+
+  /// No description provided for @dmSendError.
+  ///
+  /// In en, this message translates to:
+  /// **'Message could not be sent.'**
+  String get dmSendError;
+
+  /// No description provided for @horaryMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get horaryMoon;
+
+  /// No description provided for @horaryNoCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re out of credits. Please get a credit pack.'**
+  String get horaryNoCredits;
+
+  /// No description provided for @horaryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get an answer. Try again.'**
+  String get horaryError;
+
+  /// No description provided for @horaryCatGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic'**
+  String get horaryCatGeneral;
+
+  /// No description provided for @horaryCatRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship'**
+  String get horaryCatRelationship;
+
+  /// No description provided for @horaryCatMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Money'**
+  String get horaryCatMoney;
+
+  /// No description provided for @horaryCatJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Job/Career'**
+  String get horaryCatJob;
+
+  /// No description provided for @horaryCatHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get horaryCatHealth;
+
+  /// No description provided for @horaryCatLostObject.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost Object'**
+  String get horaryCatLostObject;
+
+  /// No description provided for @horaryCatMissingPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing Person'**
+  String get horaryCatMissingPerson;
+
+  /// No description provided for @horaryCatHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'House/Property'**
+  String get horaryCatHouse;
+
+  /// No description provided for @horaryCatChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get horaryCatChild;
+
+  /// No description provided for @horaryCatPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet'**
+  String get horaryCatPet;
+
+  /// No description provided for @horarySuggestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Example questions'**
+  String get horarySuggestLabel;
+
+  /// No description provided for @horarySuggestRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Does he love me? | Will we reconcile? | Will we marry?'**
+  String get horarySuggestRelationship;
+
+  /// No description provided for @horarySuggestJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Will I get this job? | Will I get promoted? | Will this work out?'**
+  String get horarySuggestJob;
+
+  /// No description provided for @horarySuggestMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Will money come? | Will the debt be paid? | Will I buy a house?'**
+  String get horarySuggestMoney;
+
+  /// No description provided for @horarySuggestLostObject.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is it? | Will I find it? | Who took it?'**
+  String get horarySuggestLostObject;
+
+  /// No description provided for @horarySuggestHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Will I recover? | Should I have surgery?'**
+  String get horarySuggestHealth;
+
+  /// No description provided for @horarySuggestDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Will I get this job? | Will they text me? | Will I have a home?'**
+  String get horarySuggestDefault;
+
+  /// No description provided for @horaryIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Asking the Right Question in Horary'**
+  String get horaryIntroTitle;
+
+  /// No description provided for @horaryIntroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not fortune-telling, the language of the moment'**
+  String get horaryIntroSubtitle;
+
+  /// No description provided for @horaryIntroR1.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask when you truly need to — not out of curiosity, but when your heart is heavy. Don\'t repeat the same question every 2-3 days.'**
+  String get horaryIntroR1;
+
+  /// No description provided for @horaryIntroR2.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask one clear question — a single sentence like “Will I get this job?”'**
+  String get horaryIntroR2;
+
+  /// No description provided for @horaryIntroR3.
+  ///
+  /// In en, this message translates to:
+  /// **'Expect radicality — if the chart is at 0-1°/29° or the Moon is void, it says “not flowing now”; ask again in 1-2 days.'**
+  String get horaryIntroR3;
+
+  /// No description provided for @horaryIntroR4.
+  ///
+  /// In en, this message translates to:
+  /// **'Give honest time and place — the moment the question came to you, and your city.'**
+  String get horaryIntroR4;
+
+  /// No description provided for @horaryIntroR5.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to the answer as it is — “hard but it will happen” is also an answer; Saturn\'s delay is part of it.'**
+  String get horaryIntroR5;
+
+  /// No description provided for @horaryIntroFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'When ready, ask — the sky is listening. ✨'**
+  String get horaryIntroFooter;
+
+  /// No description provided for @horaryIntroDontShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get horaryIntroDontShow;
+
+  /// No description provided for @horaryIntroOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it, Ask the Question ✨'**
+  String get horaryIntroOk;
+
+  /// No description provided for @proEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Pro'**
+  String get proEntry;
+
+  /// No description provided for @proPaywallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holavon Pro'**
+  String get proPaywallTitle;
+
+  /// No description provided for @proBenefitHorary.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro: unlimited horary questions'**
+  String get proBenefitHorary;
+
+  /// No description provided for @proBenefitAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro: unlimited PDF reports'**
+  String get proBenefitAnalysis;
+
+  /// No description provided for @horaryQuota.
+  ///
+  /// In en, this message translates to:
+  /// **'Questions left today:'**
+  String get horaryQuota;
+
+  /// No description provided for @horaryLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Daily Questions Used Up'**
+  String get horaryLimitTitle;
+
+  /// No description provided for @horaryLimitDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'On the free plan you can ask 3 questions per day. Pro unlocks unlimited questions and all PDF reports.'**
+  String get horaryLimitDesc;
+
+  /// No description provided for @horaryLimitLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Come back tomorrow'**
+  String get horaryLimitLater;
+
+  /// No description provided for @horaryAuthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Session could not be verified. Please sign in again and retry.'**
+  String get horaryAuthError;
+
+  /// No description provided for @horaryCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'credits'**
+  String get horaryCredits;
+
+  /// No description provided for @horaryClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear chat'**
+  String get horaryClear;
+
+  /// No description provided for @horaryCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get horaryCopy;
+
+  /// No description provided for @horaryLocationWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your location before asking the question.'**
+  String get horaryLocationWarning;
+
+  /// No description provided for @horaryNoticeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Horary is not fortune-telling; it is the language of the moment. The sky answers; the chart of the question\'s moment is cast. Ask one clear question when you truly need an answer. Wait for radicality — if the chart is on a boundary or the Moon is void, it says \"not flowing now\"; ask again in 1-2 days.'**
+  String get horaryNoticeBody;
+
+  /// No description provided for @noticeDontShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get noticeDontShow;
+
+  /// No description provided for @proPillarAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast Synastry'**
+  String get proPillarAnalysis;
+
+  /// No description provided for @proPillarAnalysisDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited full PDF report downloads across all modes.'**
+  String get proPillarAnalysisDesc;
+
+  /// No description provided for @proPillarHorary.
+  ///
+  /// In en, this message translates to:
+  /// **'Horary Oracle'**
+  String get proPillarHorary;
+
+  /// No description provided for @proPillarHoraryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The 3-questions-a-day limit is lifted; unlimited horary questions.'**
+  String get proPillarHoraryDesc;
+
+  /// No description provided for @proPillarSocial.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get proPillarSocial;
+
+  /// No description provided for @proPillarSocialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The community is free and unlimited for everyone — share, add stories, interact.'**
+  String get proPillarSocialDesc;
 }
 
 class _AppLocalizationsDelegate

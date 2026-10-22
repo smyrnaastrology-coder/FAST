@@ -4,7 +4,11 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../services/auth_service.dart';
+import '../services/pro_service.dart';
+import '../services/social_service.dart';
+import '../widgets/theme_palette_picker.dart';
 import 'auth_screen.dart';
+import 'social_profile_screen.dart';
 
 /// Profil ekranı (Madde 4): hesap bilgisi, kayıtlı kişiler, çıkış.
 /// Giriş yapan kullanıcı için doldurulur; giriş yoksa [AuthScreen]'e gönderir.
@@ -18,11 +22,55 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   List<SavedPerson> _people = [];
   bool _loading = true;
+  bool _deleting = false;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  /// Hesabı ve tüm kişisel verileri kalıcı olarak sil (Play/GDPR).
+  Future<void> _deleteAccount() async {
+    final l10n = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: FastTheme.cardBg,
+        title: Text(l10n.accountDeleteTitle, style: TextStyle(color: FastTheme.text)),
+        content: Text(l10n.accountDeleteConfirm, style: TextStyle(color: FastTheme.textMuted, height: 1.45)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.warningBack, style: TextStyle(color: FastTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.accountDeleteConfirmBtn, style: TextStyle(color: FastTheme.error)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    setState(() => _deleting = true);
+    try {
+      await AuthService.deleteAccount();
+      if (!mounted) return;
+      final ap = context.read<AuthProvider>();
+      await ap.signOut();
+      if (!mounted) return;
+      Navigator.of(context).popUntil((r) => r.isFirst);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.accountDeleteDone)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _deleting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.accountDeleteFailed)),
+      );
+    }
   }
 
   Future<void> _load() async {
@@ -127,7 +175,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(l10n.profileTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         actions: [
           IconButton(
-            onPressed: ap.signOut,
+            onPressed: () async {
+              ProService.invalidate();
+              await ap.signOut();
+              if (context.mounted) {
+                Navigator.of(context).popUntil((r) => r.isFirst);
+              }
+            },
             icon:  Icon(Icons.logout, color: FastTheme.accentGold),
           ),
         ],
@@ -159,8 +213,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Text(l10n.profileChangePassword, style: const TextStyle(fontSize: 13)),
               ),
+              const SizedBox(height: 10),
+              OutlinedButton(
+                onPressed: _deleting ? null : _deleteAccount,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: FastTheme.error.withValues(alpha: 0.6)),
+                  foregroundColor: FastTheme.error,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: _deleting
+                    ? SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(color: FastTheme.error, strokeWidth: 2),
+                      )
+                    : Text(l10n.accountDelete, style: const TextStyle(fontSize: 13)),
+              ),
             ],
           ),
+          const SizedBox(height: 24),
+          _themeCard(l10n),
+          const SizedBox(height: 24),
+          // Topluluk profili (@handle) — sosyal alana giriş.
+          if (SocialService.enabled) _socialCard(),
           const SizedBox(height: 24),
           Row(
             children: [
@@ -200,6 +276,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(children: children),
+    );
+  }
+
+  Widget _themeCard(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg,
+        border: Border.all(color: FastTheme.border),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.palette_outlined, color: FastTheme.accentGold, size: 20),
+              const SizedBox(width: 10),
+              Text(
+                l10n.themeAppearanceTitle,
+                style: TextStyle(color: FastTheme.text, fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(l10n.themeAppearanceHint, style: TextStyle(color: FastTheme.textDim, fontSize: 12)),
+          const SizedBox(height: 14),
+          const ThemePalettePicker(),
+        ],
+      ),
+    );
+  }
+
+  Widget _socialCard() {
+    final l10n = AppLocalizations.of(context);
+    final uid = SocialService.currentUserId;
+    return GestureDetector(
+      onTap: () {
+        if (uid.isEmpty) return;
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => SocialProfileScreen(userId: uid)));
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: FastTheme.cardBg,
+          border: Border.all(color: FastTheme.border),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+             Icon(Icons.people_alt_outlined, color: FastTheme.accentGold, size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(l10n.navCommunity,
+                  style:  TextStyle(color: FastTheme.text, fontSize: 15, fontWeight: FontWeight.w600)),
+            ),
+             Icon(Icons.chevron_right, color: FastTheme.textDim),
+          ],
+        ),
+      ),
     );
   }
 

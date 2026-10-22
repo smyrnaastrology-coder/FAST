@@ -9,7 +9,68 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'Fast Synastry';
+  String get editorPinchHint => 'Parmakla büyüt • iki parmakla döndür';
+
+  @override
+  String get storyDelete => 'Hikâyeyi sil';
+
+  @override
+  String get storyDeleteConfirm => 'Bu hikâye kalıcı olarak silinsin mi?';
+
+  @override
+  String get storyDeleteDone => 'Hikâye silindi';
+
+  @override
+  String get profileTabPosts => 'GÖNDERİLER';
+
+  @override
+  String get profileTabReels => 'REELS';
+
+  @override
+  String get profileLoginNeeded => 'Profilinizi gormek icin giris yapin';
+
+  @override
+  String get socialErrorNetwork => 'Bağlantı yok';
+
+  @override
+  String get socialErrorServer => 'Sunucuya ulaşılamadı';
+
+  @override
+  String get socialErrorHint =>
+      'Topluluk akışı yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get socialRetry => 'Tekrar dene';
+
+  @override
+  String get dmBlocked => 'Bu kullanıcıya mesaj gönderemezsin';
+
+  @override
+  String get accountDelete => 'Hesabımı ve verilerimi sil';
+
+  @override
+  String get accountDeleteTitle => 'Hesabı sil';
+
+  @override
+  String get accountDeleteConfirm =>
+      'Hesabın, tüm gönderilerin, yorumların, mesajların ve kayıtlı kişilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.';
+
+  @override
+  String get accountDeleteConfirmBtn => 'Kalıcı olarak sil';
+
+  @override
+  String get accountDeleteDone => 'Hesabın ve verilerin silindi';
+
+  @override
+  String get accountDeleteFailed =>
+      'Hesap silinemedi. Lütfen biraz sonra tekrar dene.';
+
+  @override
+  String get fileTooLarge =>
+      'Dosya çok büyük. Lütfen 5 MB’dan küçük bir görsel seç.';
+
+  @override
+  String get appTitle => 'Holavon';
 
   @override
   String get appSlogan => 'Yıldız Bağ Analizi Sistemi';
@@ -37,7 +98,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get heroSubtitle =>
-      'Fatih Asartepe Sinastri Tekniği (FAST) ile ilişkinizin derinliklerini, çocuğunuzun potansiyelini veya kendi yeteneklerinizi keşfedin.';
+      'Holavon ile ilişkinizin derinliklerini, çocuğunuzun potansiyelini veya kendi yeteneklerinizi keşfedin.';
 
   @override
   String get heroDisclaimer =>
@@ -109,7 +170,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get featuresDesc =>
-      'Fast Synastry ile astrolojik analizlerin her boyutunu keşfedin';
+      'Holavon ile astrolojik analizlerin her boyutunu keşfedin';
 
   @override
   String get feature1Title => 'Sinastri Analizi';
@@ -236,7 +297,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planFreeBadge => 'Ücretsiz';
 
   @override
-  String get planFreeDesc => 'Analizi deneyimleyin';
+  String get planFreeDesc => 'Analiz, Horary ve Sosyal\'i ücretsiz dene';
 
   @override
   String get planFreeFeat1 => 'Tüm analiz sonuçları ekranda';
@@ -254,6 +315,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planFreeFeat5 => 'Sınırlı asteroid verisi';
 
   @override
+  String get planFreeFeat6 => 'Horary: günde 3 soru';
+
+  @override
+  String get planFreeFeat7 => 'Sosyal akış, hikâye ve mesajlar';
+
+  @override
+  String get planFreeFeat8 => 'Profil ve kayıtlı kişiler';
+
+  @override
   String get planFreeDisabled1 => 'PDF Raporu';
 
   @override
@@ -267,6 +337,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get planFreeDisabled5 => 'E-posta PDF';
+
+  @override
+  String get planFreeDisabled6 => 'Sınırsız Horary';
+
+  @override
+  String get planFreeDisabled7 => 'Altın Pro rozeti';
 
   @override
   String get planPremiumName => 'Premium';
@@ -324,6 +400,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get planProFeat4 => 'Öncelikli destek';
+
+  @override
+  String get planProFeat8 => 'Sınırsız Horary sorusu';
+
+  @override
+  String get planProFeat9 => 'Sosyal profilde altın Pro rozeti';
+
+  @override
+  String get planProFeat10 =>
+      'Üç uygulama tek abonelikte: Analiz + Horary + Sosyal';
 
   @override
   String get testimonialsTitle => 'Kullanıcı Yorumları';
@@ -449,7 +535,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get footerTagline =>
-      'Fatih Asartepe Sinastri Tekniği (FAST) ile yıldız bağı analizi.';
+      'Holavon — Fatih Asartepe Sinastri Tekniği (FAST) ile yıldız bağı analizi.';
 
   @override
   String get footerQuickLinks => 'Hızlı Linkler';
@@ -458,7 +544,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get footerContact => 'İletişim';
 
   @override
-  String get footerRights => '© 2024 Fast Synastry. Tüm hakları saklıdır.';
+  String get footerRights => '© 2026 Holavon®. Tüm hakları saklıdır.';
 
   @override
   String get language => 'Dil';
@@ -473,10 +559,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get spanish => 'İspanyolca';
 
   @override
-  String get homeTitle => 'Fatih Asartepe\nSinastri Tekniği';
+  String get homeTitle => 'Holavon\nAstroloji';
 
   @override
-  String get homeSubtitle => 'Fast Synastry — Yıldız Bağ Analizi Sistemi';
+  String get homeSubtitle => 'Holavon — Yıldız Bağ Analizi Sistemi';
 
   @override
   String get homeVersion => 'Sürüm 4.0';
@@ -648,7 +734,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Analiz tamamlanamadı. Lütfen bilgilerinizi kontrol edip tekrar deneyin.';
 
   @override
-  String get analyzerSidebarTagline => 'Fast Synastry — Yıldız Bağ Analizi';
+  String get analyzerSidebarTagline => 'Holavon — Yıldız Bağ Analizi';
 
   @override
   String get analyzerSidebarVersion => 'Sürüm 4.0 | 21 Yıllık Döngü';
@@ -872,16 +958,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get themePickerTitle => 'Tema Seç';
 
   @override
+  String get themeAppearanceTitle => 'Görünüm';
+
+  @override
+  String get themeAppearanceHint => 'Uygulama renk paletini seç';
+
+  @override
+  String get proBadgeTooltip => 'Holavon Pro üyesi';
+
+  @override
   String get themePaletteDark => 'Mor (Koyu)';
 
   @override
-  String get themePaletteLight => 'Krem (Açık)';
+  String get themePaletteLight => 'Yumuşak Krem (Açık)';
 
   @override
-  String get themePaletteSpain => 'İspanya (Koyu)';
+  String get themePaletteSpain => 'İspanya Kırmızısı (Koyu)';
 
   @override
-  String get themePaletteArgentina => 'Arjantin (Açık)';
+  String get themePaletteArgentina => 'Arjantin Mavisi (Açık)';
 
   @override
   String get chartTabSituaA => 'Oturan A';
@@ -1561,4 +1656,786 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get analyzerFeaturesAsh9 => 'Tam PDF raporu (sınırsız indirme hakkı)';
+
+  @override
+  String get navHome => 'Ana';
+
+  @override
+  String get navCommunity => 'Topluluk';
+
+  @override
+  String get navProfile => 'Profil';
+
+  @override
+  String get communityLoginTitle => 'Astroloji topluluğuna katıl';
+
+  @override
+  String get communityLoginSubtitle =>
+      'Paylaşımları görmek, haritanı yayınlamak ve üyeleri takip etmek için giriş yap. Sinastri herkese açık kalır.';
+
+  @override
+  String get communityLoginButton => 'Katılmak için giriş yap';
+
+  @override
+  String get handleTitle => '@kullanıcı adını al';
+
+  @override
+  String get handleSubtitle =>
+      'Benzersiz bir kullanıcı adı seç. Diğerleri seni böyle bulur ve takip eder.';
+
+  @override
+  String get handleLabel => 'Kullanıcı adı';
+
+  @override
+  String get handleDisplayName => 'Görünen ad';
+
+  @override
+  String get handleDisplayNameHint => 'Adın nasıl görünsün';
+
+  @override
+  String get handleBio => 'Biyografi';
+
+  @override
+  String get handleBioHint => 'Kendin hakkında kısa bir satır';
+
+  @override
+  String get handleBirthDate => 'Doğum tarihi (isteğe bağlı)';
+
+  @override
+  String get handleBirthDateHint =>
+      'Güneş burcunu göstermek için doğum tarihi ekle';
+
+  @override
+  String get handleBirthPrivateNote =>
+      'Doğum tarihin gizli kalır. Profilinde yalnızca güneş burcu rozetin görünür.';
+
+  @override
+  String get kunyeBirthTime => 'Doğum saati (opsiyonel)';
+
+  @override
+  String get kunyeBirthTimeHint => 'Saat seç';
+
+  @override
+  String get kunyeBirthTimeNote =>
+      'Saat girersen Güneş ve Ay burcun derecesiyle kesinleşir.';
+
+  @override
+  String get kunyeBirthCity => 'Doğum şehri (opsiyonel)';
+
+  @override
+  String get kunyeBirthCityHint => 'Örn. İstanbul';
+
+  @override
+  String get kunyeCityNotFound => 'Şehir bulunamadı, adını kontrol edin.';
+
+  @override
+  String get kunyeCalcNote => 'Güneş ve Ay burcun sunucuda kesin hesaplanır.';
+
+  @override
+  String get kunyeRoleLabel => 'Astrolojiyle ilişkin';
+
+  @override
+  String get kunyeRoleAstrolog => 'Astrolog';
+
+  @override
+  String get kunyeRoleLover => 'Astroloji sever';
+
+  @override
+  String get kunyeFieldLabel => 'Uzmanlık alanın';
+
+  @override
+  String get settingsTitle => 'Ayarlar';
+
+  @override
+  String get settingsAppearance => 'Görünüm';
+
+  @override
+  String get settingsLanguage => 'Dil';
+
+  @override
+  String get settingsNotifications => 'Bildirimler';
+
+  @override
+  String get settingsDailyReminder => 'Günlük hatırlatma (09:00)';
+
+  @override
+  String get settingsSubscription => 'Abonelik';
+
+  @override
+  String get settingsProActive => 'Pro aktif';
+
+  @override
+  String get settingsProFree => 'Ücretsiz plan';
+
+  @override
+  String get settingsManagePro => 'Pro\'yu yönet';
+
+  @override
+  String get settingsRestore => 'Satın alımları geri yükle';
+
+  @override
+  String get settingsAccount => 'Hesap';
+
+  @override
+  String get settingsAbout => 'Hakkında';
+
+  @override
+  String get settingsVersion => 'Sürüm';
+
+  @override
+  String get settingsSignOut => 'Çıkış yap';
+
+  @override
+  String get profileShare => 'Profili paylaş';
+
+  @override
+  String get postShareSend => 'Gönder';
+
+  @override
+  String get postShareStory => 'Hikayeme ekle';
+
+  @override
+  String get postShareSystem => 'Paylaş';
+
+  @override
+  String get postShareTitle => 'Gönderiyi paylaş';
+
+  @override
+  String get shareToTitle => 'Kime göndereceksin?';
+
+  @override
+  String get shareNoFollowing => 'Henüz takip ettiğin kimse yok.';
+
+  @override
+  String get shareSent => 'Gönderildi';
+
+  @override
+  String get shareFailed => 'Paylaşılamadı';
+
+  @override
+  String get storyRepostAdded => 'Hikâyene eklendi';
+
+  @override
+  String get storyRepostFailed => 'Hikâyeye eklenemedi';
+
+  @override
+  String shareProfileMessage(String handle) {
+    return '@$handle — Holavon astroloji topluluğu';
+  }
+
+  @override
+  String get feedFollowingTab => 'Takip';
+
+  @override
+  String get feedDiscoverTab => 'Keşfet';
+
+  @override
+  String get feedFollowingEmpty =>
+      'Takip ettiğin kişilerin gönderileri burada görünecek.';
+
+  @override
+  String get feedDiscoverCta => 'Keşfet\'e geç';
+
+  @override
+  String get skyTitle => 'Gökyüzü';
+
+  @override
+  String skyMoonLine(String sign, String degree) {
+    return 'Ay $sign $degree°';
+  }
+
+  @override
+  String skyIllumination(String pct) {
+    return '%$pct aydınlık';
+  }
+
+  @override
+  String get skySpeedSlow => 'yavaş';
+
+  @override
+  String get skySpeedNormal => 'normal';
+
+  @override
+  String get skySpeedFast => 'hızlı';
+
+  @override
+  String get skyVoid => 'Ay boşlukta';
+
+  @override
+  String get skyNotVoid => 'Ay akışta';
+
+  @override
+  String skyVoidUntil(String time) {
+    return 'Boşluk bitişi $time';
+  }
+
+  @override
+  String skyPlanetHour(String planet) {
+    return '$planet saati';
+  }
+
+  @override
+  String skyNextHour(String planet) {
+    return 'Sıradaki: $planet saati';
+  }
+
+  @override
+  String get skyAspects => 'Ay\'ın açıları';
+
+  @override
+  String get skyNoAspects => 'Şu an majör açı yok';
+
+  @override
+  String get skyRetro => 'Retro';
+
+  @override
+  String skySunLine(String sign, String degree) {
+    return 'Güneş $sign $degree°';
+  }
+
+  @override
+  String get skyPhaseNew => 'Yeni Ay';
+
+  @override
+  String get skyPhaseWaxingCrescent => 'Hilal';
+
+  @override
+  String get skyPhaseFirstQuarter => 'İlk Dördün';
+
+  @override
+  String get skyPhaseWaxingGibbous => 'Şişkin Ay';
+
+  @override
+  String get skyPhaseFull => 'Dolunay';
+
+  @override
+  String get skyPhaseWaningGibbous => 'Şişkin Ay (azalan)';
+
+  @override
+  String get skyPhaseLastQuarter => 'Son Dördün';
+
+  @override
+  String get skyPhaseWaningCrescent => 'Hilal (azalan)';
+
+  @override
+  String get skyDayHour => 'gündüz saati';
+
+  @override
+  String get skyNightHour => 'gece saati';
+
+  @override
+  String get skyCalendarTitle => 'Gökyüzü Takvimi';
+
+  @override
+  String get skyCalendarPhases => 'Ay Evreleri';
+
+  @override
+  String get skyCalendarEclipses => 'Tutulmalar';
+
+  @override
+  String get skyCalendarOpen => 'Takvimi aç';
+
+  @override
+  String get skyCalendarEmpty => 'Yaklaşan olay yok';
+
+  @override
+  String get skyCalendarNow => 'şimdi';
+
+  @override
+  String get skyCalendarToday => 'bugün';
+
+  @override
+  String get skyCalendarTomorrow => 'yarın';
+
+  @override
+  String skyCalendarInDays(String days) {
+    return '$days gün sonra';
+  }
+
+  @override
+  String skyCalendarInHours(String hours) {
+    return '$hours sa sonra';
+  }
+
+  @override
+  String get skyNewMoon => 'Yeni Ay';
+
+  @override
+  String get skyFullMoon => 'Dolunay';
+
+  @override
+  String get skyEclipseSolar => 'Güneş tutulması';
+
+  @override
+  String get skyEclipseLunar => 'Ay tutulması';
+
+  @override
+  String get skyEclipseTotal => 'tam';
+
+  @override
+  String get skyEclipseAnnular => 'halkalı';
+
+  @override
+  String get skyEclipsePartial => 'parçalı';
+
+  @override
+  String get skyEclipseHybrid => 'hibrit';
+
+  @override
+  String get skyEclipsePenumbral => 'yarı gölgeli';
+
+  @override
+  String get skyEclipseVisibleHere => 'buradan görünür';
+
+  @override
+  String get skyEclipseNotVisible => 'buradan görünmez';
+
+  @override
+  String skyEclipseNextVisible(String when) {
+    return 'Sonraki görünür: $when';
+  }
+
+  @override
+  String skyEclipseObscuration(String pct) {
+    return '%$pct örtülme';
+  }
+
+  @override
+  String skyPerDay(String value) {
+    return '$value°/gün';
+  }
+
+  @override
+  String get skyMoonSpeed => 'Ay hızı';
+
+  @override
+  String get handleTooShort => 'Kullanıcı adı en az 3 karakter olmalı.';
+
+  @override
+  String get handleInvalid =>
+      'Yalnızca küçük harf, rakam, nokta ve alt çizgi kullanılır.';
+
+  @override
+  String get handleTaken => 'Bu kullanıcı adı zaten alınmış.';
+
+  @override
+  String get handleContinue => 'Devam et';
+
+  @override
+  String get postReport => 'Bildir';
+
+  @override
+  String get blockUser => 'Kullanıcıyı engelle';
+
+  @override
+  String get postDelete => 'Paylaşımı sil';
+
+  @override
+  String get reportSent => 'Bildirim gönderildi. Teşekkürler.';
+
+  @override
+  String get blockDone => 'Kullanıcı engellendi.';
+
+  @override
+  String get timeJustNow => 'az önce';
+
+  @override
+  String timeMinutes(int n) {
+    return '$n dk';
+  }
+
+  @override
+  String timeHours(int n) {
+    return '$n sa';
+  }
+
+  @override
+  String timeDays(int n) {
+    return '$n gün';
+  }
+
+  @override
+  String get feedEmpty => 'Henüz paylaşım yok';
+
+  @override
+  String get feedEmptyHint => 'Astrolojik ilk paylaşımı sen yap.';
+
+  @override
+  String get createPostTitle => 'Yeni paylaşım';
+
+  @override
+  String get createPostShare => 'Paylaş';
+
+  @override
+  String get createPostNoImage => 'Önce bir görsel seç.';
+
+  @override
+  String get createPostError => 'Bir şeyler ters gitti. Tekrar dene.';
+
+  @override
+  String get createPostPick => 'Fotoğraf seçmek için dokun';
+
+  @override
+  String get createPostGallery => 'Galeriden seç';
+
+  @override
+  String get mediaSourceTitle => 'Fotoğraf kaynağı';
+
+  @override
+  String get mediaCamera => 'Kamera';
+
+  @override
+  String get mediaGallery => 'Galeri';
+
+  @override
+  String get mediaChange => 'Fotoğrafı değiştir';
+
+  @override
+  String get mediaCameraDenied =>
+      'Kamera izni verilmedi. Telefon ayarlarından Holavon\'a kamera izni verin.';
+
+  @override
+  String get mediaPickError => 'Fotoğraf alınamadı. Tekrar deneyin.';
+
+  @override
+  String get createPostChartBadge => 'Harita';
+
+  @override
+  String get createPostCaptionHint => 'Bir açıklama yaz...';
+
+  @override
+  String get profilePosts => 'Paylaşım';
+
+  @override
+  String get profileFollowers => 'Takipçi';
+
+  @override
+  String get profileFollowing => 'Takip';
+
+  @override
+  String get profilePlanets => 'Doğum Haritası';
+
+  @override
+  String get storyCreateTitle => 'Hikaye oluştur';
+
+  @override
+  String get storyMention => 'Kişi etiketle';
+
+  @override
+  String get storyMentioned => 'etiketlendi';
+
+  @override
+  String get storyMine => 'Hikayen';
+
+  @override
+  String get storyAdd => 'Hikaye ekle';
+
+  @override
+  String get editImageHint =>
+      'Yakınlaştırmak için sıkıştır · döndürmek için oklara dokun';
+
+  @override
+  String get profileEdit => 'Profili düzenle';
+
+  @override
+  String get profileFollow => 'Takip et';
+
+  @override
+  String get profileFollowingBtn => 'Takip ediliyor';
+
+  @override
+  String get profileNoPosts => 'Henüz paylaşım yok.';
+
+  @override
+  String get profileNoPostsMe => 'İlk paylaşımını + butonundan yap.';
+
+  @override
+  String get commentsTitle => 'Yorumlar';
+
+  @override
+  String get commentsEmpty => 'Henüz yorum yok.';
+
+  @override
+  String get commentsHint => 'Yorum ekle...';
+
+  @override
+  String get searchHint => 'Kişi ara';
+
+  @override
+  String get searchEmpty => 'Kullanıcı bulunamadı.';
+
+  @override
+  String get searchPrompt => 'Takip edeceğin kişileri ara.';
+
+  @override
+  String viewAllComments(int n) {
+    return 'Tüm $n yorumu gör';
+  }
+
+  @override
+  String get createPostProcessing => 'Haritan hazırlanıyor...';
+
+  @override
+  String get hubWelcome => 'Hoş geldin';
+
+  @override
+  String get hubChoose => 'Nereye gidelim?';
+
+  @override
+  String get hubSocialTitle => 'Holavon';
+
+  @override
+  String get hubSocialDesc => 'Paylaş, hikâye ekle, toplulukla etkileş';
+
+  @override
+  String get hubAnalysisTitle => 'Fast Synastry';
+
+  @override
+  String get hubAnalysisDesc => 'Sinastri, natal ve potansiyel analizleri';
+
+  @override
+  String get hubHoraryTitle => 'Horary Oracle';
+
+  @override
+  String get hubHoraryDesc => 'Soru anının haritasıyla net cevap';
+
+  @override
+  String get horaryTitle => 'Horary Oracle';
+
+  @override
+  String get horarySubtitle =>
+      'Aklındaki tek soruyu yaz; soru anının haritasını dökeyim.';
+
+  @override
+  String get horaryQuestionHint => 'Sorunu yaz... (örn. bu işe girecek miyim?)';
+
+  @override
+  String get horaryAsk => 'Sor ✨';
+
+  @override
+  String get horaryCategory => 'Kategori';
+
+  @override
+  String get horaryAsker => 'Yükselen kim?';
+
+  @override
+  String get horaryAskerMe => 'Ben';
+
+  @override
+  String get horaryAskerOther => 'Başkası';
+
+  @override
+  String get horaryLocation => 'Konum';
+
+  @override
+  String get horaryLocationHint => 'Sormadan önce konumunu seç';
+
+  @override
+  String get horaryVerdict => 'Hüküm';
+
+  @override
+  String get horaryTiming => 'Zamanlama';
+
+  @override
+  String get horaryDetailsShow => 'Detayları gör';
+
+  @override
+  String get horaryDetailsHide => 'Detayları gizle';
+
+  @override
+  String get horaryAsc => 'Yükselen';
+
+  @override
+  String get editorRotateHint => 'Basılı tutup çevir';
+
+  @override
+  String get dmTitle => 'Sohbet';
+
+  @override
+  String get dmInboxTitle => 'Mesajlar';
+
+  @override
+  String get dmInboxEmpty =>
+      'Henüz mesaj yok. Birinin profilinden \"Mesaj\" butonuna dokunarak sohbet başlat.';
+
+  @override
+  String get dmMessage => 'Mesaj';
+
+  @override
+  String get dmHint => 'Mesajını yaz...';
+
+  @override
+  String get dmEmpty => 'Henüz mesaj yok. İlk mesajı sen gönder.';
+
+  @override
+  String get dmSendError => 'Mesaj gönderilemedi.';
+
+  @override
+  String get horaryMoon => 'Ay';
+
+  @override
+  String get horaryNoCredits => 'Kredin bitti. Lütfen kredi paketi al.';
+
+  @override
+  String get horaryError => 'Soru alınamadı. Tekrar dene.';
+
+  @override
+  String get horaryCatGeneral => 'Otomatik';
+
+  @override
+  String get horaryCatRelationship => 'İlişki/Eş';
+
+  @override
+  String get horaryCatMoney => 'Para';
+
+  @override
+  String get horaryCatJob => 'İş/Kariyer';
+
+  @override
+  String get horaryCatHealth => 'Sağlık';
+
+  @override
+  String get horaryCatLostObject => 'Kayıp Eşya';
+
+  @override
+  String get horaryCatMissingPerson => 'Kayıp Kişi';
+
+  @override
+  String get horaryCatHouse => 'Ev/Arsa';
+
+  @override
+  String get horaryCatChild => 'Çocuk';
+
+  @override
+  String get horaryCatPet => 'Evcil';
+
+  @override
+  String get horarySuggestLabel => 'Örnek sorular';
+
+  @override
+  String get horarySuggestRelationship =>
+      'Beni seviyor mu? | Barışacak mıyız? | Evlenecek miyiz?';
+
+  @override
+  String get horarySuggestJob =>
+      'İşe girecek miyim? | Terfi alacak mıyım? | Bu iş olacak mı?';
+
+  @override
+  String get horarySuggestMoney =>
+      'Para gelecek mi? | Borç ödenecek mi? | Ev alacak mıyım?';
+
+  @override
+  String get horarySuggestLostObject => 'Nerede? | Bulacak mıyım? | Kim aldı?';
+
+  @override
+  String get horarySuggestHealth =>
+      'İyileşecek miyim? | Ameliyat olmalı mıyım?';
+
+  @override
+  String get horarySuggestDefault =>
+      'Bu işe girecek miyim? | Bana yazacak mı? | Evim olacak mı?';
+
+  @override
+  String get horaryIntroTitle => 'Horary\'de Doğru Soru Sormak';
+
+  @override
+  String get horaryIntroSubtitle => 'Fal değil, anın dili';
+
+  @override
+  String get horaryIntroR1 =>
+      'Gerçekten ihtiyacın olduğunda sor — merak için değil, kalbin sıkıştığında. Aynı soruyu 2-3 günde bir tekrarlama.';
+
+  @override
+  String get horaryIntroR2 =>
+      'Tek ve net sor — “İşe girecek miyim?” gibi bir cümle.';
+
+  @override
+  String get horaryIntroR3 =>
+      'Radikalliği bekle — harita 0-1°/29° sınırda veya Ay boşlukta ise “şu an akmıyor” der, 1-2 gün sonra tekrar sor.';
+
+  @override
+  String get horaryIntroR4 =>
+      'Zamanı ve yeri dürüst ver — soru aklına düştüğü an ve şehir.';
+
+  @override
+  String get horaryIntroR5 =>
+      'Cevabı olduğu gibi dinle — “zor ama olur” da cevaptır, Satürn\'ün geciktirmesi parçasıdır.';
+
+  @override
+  String get horaryIntroFooter => 'Hazırsan sor — gökyüzü dinliyor. ✨';
+
+  @override
+  String get horaryIntroDontShow => 'Bir daha gösterme';
+
+  @override
+  String get horaryIntroOk => 'Anladım, Soruyu Sor ✨';
+
+  @override
+  String get proEntry => 'Pro\'ya Geç';
+
+  @override
+  String get proPaywallTitle => 'Holavon Pro';
+
+  @override
+  String get proBenefitHorary => 'Pro: sınırsız horary sorusu';
+
+  @override
+  String get proBenefitAnalysis => 'Pro: sınırsız PDF raporu';
+
+  @override
+  String get horaryQuota => 'Bugün kalan soru:';
+
+  @override
+  String get horaryLimitTitle => 'Günlük Ücretsiz Soru Doldu';
+
+  @override
+  String get horaryLimitDesc =>
+      'Ücretsiz planda günde 3 soru sorabilirsin. Pro ile sınırsız soru ve tüm PDF raporlar açılır.';
+
+  @override
+  String get horaryLimitLater => 'Yarın tekrar gel';
+
+  @override
+  String get horaryAuthError =>
+      'Oturum doğrulanamadı. Lütfen tekrar giriş yapıp yeniden dene.';
+
+  @override
+  String get horaryCredits => 'kredi';
+
+  @override
+  String get horaryClear => 'Sohbeti temizle';
+
+  @override
+  String get horaryCopy => 'Kopyala';
+
+  @override
+  String get horaryLocationWarning => 'Soruyu sormadan önce konumunuzu seçin.';
+
+  @override
+  String get horaryNoticeBody =>
+      'Horary fal değil, anın dilidir. Cevabı veren gökyüzüdür; soru anının haritası dökülür. Gerçekten bir cevaba ihtiyacın olduğunda, tek ve net sor. Radikalliği bekle — harita sınırda veya Ay boşlukta ise \"şu an akmıyor\" der, 1-2 gün sonra tekrar sor.';
+
+  @override
+  String get noticeDontShow => 'Bir daha gösterme';
+
+  @override
+  String get proPillarAnalysis => 'Fast Synastry';
+
+  @override
+  String get proPillarAnalysisDesc =>
+      'Tüm modlarda sınırsız tam PDF raporu indirme hakkı.';
+
+  @override
+  String get proPillarHorary => 'Horary Oracle';
+
+  @override
+  String get proPillarHoraryDesc =>
+      'Günde 3 soru sınırı kalkar; sınırsız horary sorusu.';
+
+  @override
+  String get proPillarSocial => 'Sosyal';
+
+  @override
+  String get proPillarSocialDesc =>
+      'Topluluk herkes için ücretsiz ve sınırsız — paylaş, hikâye ekle, etkileş.';
 }

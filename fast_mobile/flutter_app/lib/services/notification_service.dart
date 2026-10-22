@@ -30,7 +30,7 @@ class NotificationService {
   }
 
   /// Her gün [hour]:[minute]'te bildirim zamanlar.
-  Future<void> scheduleDaily(int hour, int minute, {String title = 'Fast Synastry', String body = 'Bugünün kısa vadeli ilerleme akışını keşfet'}) async {
+  Future<void> scheduleDaily(int hour, int minute, {String title = 'Holavon', String body = 'Bugünün kısa vadeli ilerleme akışını keşfet'}) async {
     if (!_initialized) return;
     final android = AndroidNotificationDetails(
       _channelId,

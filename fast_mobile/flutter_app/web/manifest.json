@@ -1,11 +1,11 @@
 {
-    "name": "fast_app",
-    "short_name": "fast_app",
+    "name": "Holavon",
+    "short_name": "Holavon",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Holavon — astrology, synastry and horary in one app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

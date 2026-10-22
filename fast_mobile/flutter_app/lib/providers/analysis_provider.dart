@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/analysis_request.dart';
 import '../services/api_service.dart';
+import '../services/social_service.dart';
 
 enum AnalysisStatus { idle, loading, success, error }
 
@@ -49,6 +50,13 @@ class AnalysisProvider extends ChangeNotifier {
       if (req.mod == 'es_sevgili' || req.mod == 'ebeveyn_cocuk') {
         _detayliResult = _result;
         notifyListeners();
+      }
+
+      // Natal analizde 5 gezegeni (Güneş/Ay/Merkür/Venüs/Mars) profil rozeti
+      // için Supabase'e kaydet. Giriş yoksa savePlanets sessizce no-op döner.
+      if (req.mod == 'bireysel_natal') {
+        final planets = SocialService.parseBadgePlanets(_result?['sabianlar'] as List<dynamic>?);
+        if (planets.isNotEmpty) SocialService.savePlanets(planets);
       }
 
       // Load simulation if applicable

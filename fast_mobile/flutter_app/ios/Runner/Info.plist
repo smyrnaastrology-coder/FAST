@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Fast App</string>
+	<string>Holavon</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>fast_app</string>
+	<string>Holavon</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -66,6 +66,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Horary soruları için konumunuz kullanılır.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -77,5 +79,9 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Holavon, gönderi ve hikâye için fotoğraf çekebilmeniz amacıyla kamerayı kullanır.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Holavon, gönderi ve hikâye paylaşabilmeniz için fotoğraf galerinize erişir.</string>
 </dict>
 </plist>
