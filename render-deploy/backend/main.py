@@ -6545,6 +6545,251 @@ def kunye(p: KunyeInput):
         "ay": _poz(swe.MOON),
     }
 
+# ── Anlık gökyüzü şeridi ────────────────────────────────────────────────
+# Ay fazı/derecesi/hızı, void-of-course ve gezegen saati. Süs katmanı:
+# hatası istemcide sessizce yutulur, ana akışı etkilemez.
+
+_SKY_CACHE = {}
+_SKY_CHALDEAN = ["saturn", "jupiter", "mars", "sun", "venus", "mercury", "moon"]
+# Python weekday: Pazartesi=0 ... Pazar=6 -> Chaldean sırasındaki gün yöneticisi
+_SKY_DAY_RULER = {0: 6, 1: 2, 2: 5, 3: 1, 4: 4, 5: 0, 6: 3}
+_SKY_ASPECTS = [0, 60, 90, 120, 180]
+_SKY_ASPECT_KEYS = {0: "conjunction", 60: "sextile", 90: "square", 120: "trine", 180: "opposition"}
+_SKY_VOC_PLANETS = [swe.SUN, swe.MERCURY, swe.VENUS, swe.MARS, swe.JUPITER, swe.SATURN]
+_SKY_RETRO = [
+    ("mercury", swe.MERCURY), ("venus", swe.VENUS), ("mars", swe.MARS),
+    ("jupiter", swe.JUPITER), ("saturn", swe.SATURN), ("uranus", swe.URANUS),
+    ("neptune", swe.NEPTUNE), ("pluto", swe.PLUTO),
+]
+_SKY_ASPECT_PLANETS = [
+    ("sun", swe.SUN), ("mercury", swe.MERCURY), ("venus", swe.VENUS),
+    ("mars", swe.MARS), ("jupiter", swe.JUPITER), ("saturn", swe.SATURN),
+    ("uranus", swe.URANUS), ("neptune", swe.NEPTUNE), ("pluto", swe.PLUTO),
+]
+
+
+def _sky_pos(jd, pid):
+    try:
+        arr, _ = swe.calc_ut(jd, pid, swe.FLG_SWIEPH | swe.FLG_SPEED)
+    except Exception:
+        arr, _ = swe.calc_ut(jd, pid, swe.FLG_MOSEPH | swe.FLG_SPEED)
+    hiz = float(arr[3]) if len(arr) > 3 else 0.0
+    return float(arr[0]) % 360.0, hiz
+
+
+def _sky_wrap180(deg):
+    d = float(deg) % 360.0
+    return d - 360.0 if d > 180.0 else d
+
+
+def _sky_epoch(jd):
+    return int(round((float(jd) - 2440587.5) * 86400.0))
+
+
+def _sky_sign_exit(jd, moon):
+    """Ay'ın mevcut burcunu terk ettiği an (JD)."""
+    burc = int(moon // 30)
+    hi = jd + 1.0
+    for _ in range(80):
+        d, _s = _sky_pos(hi, swe.MOON)
+        if int(d // 30) != burc:
+            break
+        hi += 1.0
+    lo = hi - 1.0
+    for _ in range(32):
+        mid = (lo + hi) / 2.0
+        d, _s = _sky_pos(mid, swe.MOON)
+        if int(d // 30) == burc:
+            lo = mid
+        else:
+            hi = mid
+    return hi
+
+
+def _sky_is_void(jd, exit_jd):
+    """Ay, burcunu terk etmeden önce majör bir açıyı tamamlamayacaksa boşluktadır."""
+    step = 15.0 / (24.0 * 60.0)  # 15 dakika (gün cinsinden)
+    prev = {}
+    t = jd
+    first = True
+    while t <= exit_jd:
+        md, _sp = _sky_pos(t, swe.MOON)
+        for pid in _SKY_VOC_PLANETS:
+            pd, _pp = _sky_pos(t, pid)
+            for a in _SKY_ASPECTS:
+                targets = (a,) if a in (0, 180) else (a, -a)
+                for target in targets:
+                    sd = _sky_wrap180(md - pd - target)
+                    key = (pid, target)
+                    p = prev.get(key)
+                    if not first and p is not None and p * sd <= 0 and abs(p - sd) < 5.0:
+                        return False
+                    prev[key] = sd
+        first = False
+        t += step
+    return True
+
+
+def _sky_rise_set(jd_start, lat, lon, rsmi):
+    try:
+        res, tret = swe.rise_trans(
+            jd_start, swe.SUN, rsmi, (float(lon), float(lat), 0.0),
+            flags=swe.FLG_SWIEPH,
+        )
+        if res == 0 and tret and tret[0] > 0:
+            return float(tret[0])
+    except Exception:
+        pass
+    return None
+
+
+def _sky_hour(jd_now, utc_offset, lat, lon):
+    from datetime import timedelta
+    ts = (jd_now - 2440587.5) * 86400.0
+    ldt = datetime.utcfromtimestamp(ts + utc_offset * 3600.0)
+    y, m, d = ldt.year, ldt.month, ldt.day
+    jd0 = swe.julday(y, m, d, -float(utc_offset))
+    rise = _sky_rise_set(jd0, lat, lon, swe.CALC_RISE)
+    sett = _sky_rise_set(jd0, lat, lon, swe.CALC_SET)
+    next_rise = _sky_rise_set(jd0 + 1.0, lat, lon, swe.CALC_RISE)
+    if rise is None:
+        rise = swe.julday(y, m, d, 6.0 - float(utc_offset))
+    if sett is None or sett <= rise:
+        sett = swe.julday(y, m, d, 18.0 - float(utc_offset))
+    if next_rise is None or next_rise <= sett:
+        next_rise = rise + 1.0
+
+    day_idx = _SKY_DAY_RULER[ldt.weekday()]
+    if jd_now < rise:
+        prev = ldt - timedelta(days=1)
+        pjd0 = swe.julday(prev.year, prev.month, prev.day, -float(utc_offset))
+        prev_set = _sky_rise_set(pjd0, lat, lon, swe.CALC_SET)
+        if prev_set is None:
+            prev_set = swe.julday(prev.year, prev.month, prev.day, 18.0 - float(utc_offset))
+        start, end = prev_set, rise
+        base = _SKY_DAY_RULER[prev.weekday()] + 12
+        is_day = False
+    elif jd_now < sett:
+        start, end = rise, sett
+        base = day_idx
+        is_day = True
+    else:
+        start, end = sett, next_rise
+        base = day_idx + 12
+        is_day = False
+
+    span = max(end - start, 1.0 / 24.0)
+    step = span / 12.0
+    idx = int((jd_now - start) / step)
+    idx = max(0, min(11, idx))
+    ruler = _SKY_CHALDEAN[(base + idx) % 7]
+    nxt = _SKY_CHALDEAN[(base + idx + 1) % 7]
+    return {
+        "yonetici": ruler,
+        "sonraki": nxt,
+        "index": idx + 1,
+        "gunduz": is_day,
+        "baslangic": _sky_epoch(start + idx * step),
+        "bitis": _sky_epoch(start + (idx + 1) * step),
+    }
+
+
+def _sky_aspects(jd, moon):
+    out = []
+    nxt_moon, _ = _sky_pos(jd + 1.0 / 24.0, swe.MOON)
+    for key, pid in _SKY_ASPECT_PLANETS:
+        pd, _sp = _sky_pos(jd, pid)
+        nd, _sp2 = _sky_pos(jd + 1.0 / 24.0, pid)
+        for a in _SKY_ASPECTS:
+            orb = 8.0 if a in (0, 180) else 6.0
+            diff = abs(_sky_wrap180(moon - pd - a))
+            if diff <= orb:
+                nxt = abs(_sky_wrap180(nxt_moon - nd - a))
+                out.append({
+                    "gezegen": key,
+                    "tip": _SKY_ASPECT_KEYS[a],
+                    "orb": round(diff, 1),
+                    "uygulama": nxt < diff,
+                })
+    out.sort(key=lambda x: (not x["uygulama"], x["orb"]))
+    return out[:3]
+
+
+def _sky_retro(jd):
+    out = []
+    for key, pid in _SKY_RETRO:
+        _d, hiz = _sky_pos(jd, pid)
+        if hiz < 0:
+            out.append(key)
+    return out
+
+
+@app_fast.get("/api/sky")
+def sky(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float] = None):
+    """Anlık gökyüzü: Ay burcu/derecesi/hızı, faz, VOC, gezegen saati."""
+    import math
+    lat = max(-89.0, min(89.0, float(lat)))
+    lon = ((float(lon) + 180.0) % 360.0) - 180.0
+    uo = 3.0 if tz is None else max(-14.0, min(14.0, float(tz)))
+    cache_key = (int(time.time() // 300), round(lat, 1), round(lon, 1), round(uo, 1))
+    cached = _SKY_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    now = datetime.utcnow()
+    jd = swe.julday(now.year, now.month, now.day,
+                    now.hour + now.minute / 60.0 + now.second / 3600.0)
+
+    sun, _sun_hiz = _sky_pos(jd, swe.SUN)
+    moon, moon_hiz = _sky_pos(jd, swe.MOON)
+
+    elong = (moon - sun) % 360.0
+    aydinlanma = (1.0 - math.cos(math.radians(elong))) * 50.0
+    faz_isimleri = [
+        "new", "waxing_crescent", "first_quarter", "waxing_gibbous",
+        "full", "waning_gibbous", "last_quarter", "waning_crescent",
+    ]
+    faz_idx = int(((elong + 22.5) % 360.0) // 45.0)
+
+    if moon_hiz < 12.5:
+        hiz_durumu = "slow"
+    elif moon_hiz > 13.8:
+        hiz_durumu = "fast"
+    else:
+        hiz_durumu = "normal"
+
+    exit_jd = _sky_sign_exit(jd, moon)
+    boslukta = _sky_is_void(jd, exit_jd)
+
+    sonuc = {
+        "ok": True,
+        "utc_offset": round(uo, 2),
+        "sunucu_zamani": _sky_epoch(jd),
+        "gunes": {"mutlak": round(sun, 4), "burc": int(sun // 30), "derece": round(sun % 30, 2)},
+        "ay": {
+            "mutlak": round(moon, 4), "burc": int(moon // 30), "derece": round(moon % 30, 2),
+            "hiz": round(moon_hiz, 2), "hiz_durumu": hiz_durumu,
+        },
+        "faz": {
+            "isim": faz_isimleri[faz_idx],
+            "aydinlanma": round(aydinlanma, 1),
+            "buyuyor": elong < 180.0,
+        },
+        "boslukta": boslukta,
+        "bosluk_biter": _sky_epoch(exit_jd),
+        "gezegen_saati": _sky_hour(jd, uo, lat, lon),
+        "acilar": _sky_aspects(jd, moon),
+        "retrolar": _sky_retro(jd),
+    }
+    if len(_SKY_CACHE) > 64:
+        _SKY_CACHE.clear()
+    _SKY_CACHE[cache_key] = sonuc
+    return sonuc
+
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
     """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
