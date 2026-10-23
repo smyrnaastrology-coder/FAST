@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chart_data.dart';
@@ -19,6 +20,12 @@ class ReturnState {
   ReturnState({required this.data, required this.type, required this.year, this.month});
 }
 
+class SolarArcState {
+  final Map<String, dynamic> data;
+  final String targetDate;
+  SolarArcState({required this.data, required this.targetDate});
+}
+
 class ChartProvider extends ChangeNotifier {
   final ChartService _service = ChartService();
 
@@ -36,6 +43,10 @@ class ChartProvider extends ChangeNotifier {
   bool _retLoading = false;
   String? _retError;
 
+  SolarArcState? _arc;
+  bool _arcLoading = false;
+  String? _arcError;
+
   double? _returnLat;
   double? _returnLon;
   String _returnLocMode = 'natal'; // natal | device | manual
@@ -51,6 +62,9 @@ class ChartProvider extends ChangeNotifier {
   ReturnState? get ret => _ret;
   bool get retLoading => _retLoading;
   String? get retError => _retError;
+  SolarArcState? get arc => _arc;
+  bool get arcLoading => _arcLoading;
+  String? get arcError => _arcError;
   double? get returnLat => _returnLat;
   double? get returnLon => _returnLon;
   String get returnLocMode => _returnLocMode;
@@ -62,8 +76,30 @@ class ChartProvider extends ChangeNotifier {
   }
 
   Future<void> loadSaved() async {
-    _saved = await _service.loadLocal();
+    final local = await _service.loadLocal();
+    final cloud = await _service.cloudList();
+    final merged = <ChartData>[...cloud, ...local];
+    final seen = <String>{};
+    _saved = merged.where((e) {
+      final key = '${e.meta.name}|${e.meta.date}|${e.meta.time}';
+      if (seen.contains(key)) return false;
+      seen.add(key);
+      return true;
+    }).toList();
     notifyListeners();
+  }
+
+  Future<void> delete(ChartData data) async {
+    final remaining = _saved.where(
+      (e) =>
+          !(e.meta.name == data.meta.name &&
+              e.meta.date == data.meta.date &&
+              e.meta.time == data.meta.time),
+    ).toList();
+    _saved = remaining;
+    notifyListeners();
+    await _service.saveLocal(data);
+    await _service.cloudDelete(data);
   }
 
   void setHouseSystem(String hs) {
@@ -109,6 +145,7 @@ class ChartProvider extends ChangeNotifier {
       _current = data;
       await _service.saveLocal(data);
       await loadSaved();
+      unawaited(_service.cloudSave(data));
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -199,6 +236,22 @@ class ChartProvider extends ChangeNotifier {
   void loadBiwheelDebounced({required DateTime when, double? lat, double? lon, int ms = 200}) {
     _biTimer?.cancel();
     _biTimer = Timer(Duration(milliseconds: ms), () => loadBiwheel(when: when, lat: lat, lon: lon));
+  }
+
+  Future<void> loadSolarArc(String hedefTarih) async {
+    if (_current == null) return;
+    _arcLoading = true;
+    _arcError = null;
+    notifyListeners();
+    try {
+      final res = await _service.solarArc(natal: _current!, hedefTarih: hedefTarih);
+      _arc = SolarArcState(data: res, targetDate: hedefTarih);
+    } catch (e) {
+      _arcError = e.toString();
+    } finally {
+      _arcLoading = false;
+      notifyListeners();
+    }
   }
 }
 

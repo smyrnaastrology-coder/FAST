@@ -82,6 +82,7 @@ class ApiConfig {
   static const String chartsBiwheel = '$baseUrl/api/charts/biwheel';
   static const String chartsSolarReturn = '$baseUrl/api/charts/solar-return';
   static const String chartsLunarReturn = '$baseUrl/api/charts/lunar-return';
+  static const String chartsSolarArc = '$baseUrl/api/charts/solar-arc';
 
   static const Duration timeout = Duration(seconds: 60);
   static const Duration longTimeout = Duration(seconds: 120);

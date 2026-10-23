@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../config/api_config.dart';
 import '../models/chart_data.dart';
+import 'auth_service.dart';
 
 class ChartService {
   final http.Client _client;
@@ -158,6 +161,33 @@ class ChartService {
     return jsonDecode(r.body) as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> solarArc({
+    required ChartData natal,
+    required String hedefTarih,
+  }) async {
+    final body = <String, dynamic>{
+      if (natal.meta.name != null && natal.meta.name!.isNotEmpty) 'isim': natal.meta.name,
+      'natal_tarih': natal.meta.date,
+      'natal_saat': natal.meta.time,
+      'natal_lat': natal.meta.lat,
+      'natal_lon': natal.meta.lng,
+      if (natal.meta.tz != null) 'natal_tz': natal.meta.tz,
+      'hedef_tarih': hedefTarih,
+      'house_system': natal.houseSystem,
+    };
+    final r = await _client
+        .post(
+          Uri.parse(ApiConfig.chartsSolarArc),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        )
+        .timeout(ApiConfig.timeout);
+    if (r.statusCode != 200) {
+      throw Exception('HTTP ${r.statusCode}');
+    }
+    return jsonDecode(r.body) as Map<String, dynamic>;
+  }
+
   static const _key = 'holavon_charts_list_v1';
 
   Future<List<ChartData>> loadLocal() async {
@@ -187,6 +217,78 @@ class ChartService {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(merged.map((e) => _toJson(e)).toList());
     await prefs.setString(_key, encoded);
+  }
+
+  bool get cloudEnabled => ApiConfig.supabaseEnabled && AuthService.enabled;
+
+  Map<String, dynamic> _cloudRow(ChartData data) {
+    final meta = data.meta;
+    return {
+      'user_id': AuthService.userId,
+      'name': meta.name ?? '',
+      'chart_data': _toJson(data),
+      'house_system': data.houseSystem,
+      'birth_date': meta.date,
+      'birth_time': meta.time,
+      'lat': meta.lat,
+      'lon': meta.lng,
+      'tz': meta.tz,
+      'place': meta.place,
+    };
+  }
+
+  Future<List<ChartData>> cloudList() async {
+    if (!cloudEnabled || AuthService.userId.isEmpty) return [];
+    try {
+      final rows = await Supabase.instance.client
+          .from('user_charts')
+          .select()
+          .eq('user_id', AuthService.userId)
+          .order('updated_at', ascending: false);
+      return (rows as List)
+          .whereType<Map>()
+          .map((e) {
+            final m = e.cast<String, dynamic>();
+            final raw = m['chart_data'];
+            final data = raw is Map
+                ? raw.cast<String, dynamic>()
+                : <String, dynamic>{};
+            return ChartData.fromJson(data);
+          })
+          .toList();
+    } catch (e) {
+      if (kDebugMode) print('[Charts] cloudList err $e');
+      return [];
+    }
+  }
+
+  Future<void> cloudSave(ChartData data) async {
+    if (!cloudEnabled || AuthService.userId.isEmpty) return;
+    try {
+      await Supabase.instance.client
+          .from('user_charts')
+          .upsert(
+            _cloudRow(data),
+            onConflict: 'user_id,name,birth_date,birth_time',
+          );
+    } catch (e) {
+      if (kDebugMode) print('[Charts] cloudSave err $e');
+    }
+  }
+
+  Future<void> cloudDelete(ChartData data) async {
+    if (!cloudEnabled || AuthService.userId.isEmpty) return;
+    try {
+      await Supabase.instance.client
+          .from('user_charts')
+          .delete()
+          .eq('user_id', AuthService.userId)
+          .eq('name', data.meta.name ?? '')
+          .eq('birth_date', data.meta.date)
+          .eq('birth_time', data.meta.time);
+    } catch (e) {
+      if (kDebugMode) print('[Charts] cloudDelete err $e');
+    }
   }
 
   Map<String, dynamic> _toJson(ChartData c) => {
