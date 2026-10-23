@@ -7087,6 +7087,7 @@ class ChartNatalIn(BaseModel):
     lon: float = 28.9784
     tz: Optional[float] = None
     house_system: str = "P"
+    sehir: Optional[str] = None
 
 
 @app_fast.post("/api/charts/natal")
@@ -7165,7 +7166,7 @@ def charts_natal(inp: ChartNatalIn):
             "gezegenler": planets,
             "evler": evler,
             "acilar": aspects,
-            "meta": {"isim": inp.isim, "tarih": inp.tarih, "saat": inp.saat, "lat": inp.lat, "lon": inp.lon}
+            "meta": {"isim": inp.isim, "tarih": inp.tarih, "saat": inp.saat, "lat": inp.lat, "lon": inp.lon, "sehir": inp.sehir}
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

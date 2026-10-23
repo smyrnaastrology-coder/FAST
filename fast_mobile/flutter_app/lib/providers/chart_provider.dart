@@ -38,6 +38,8 @@ class ChartProvider extends ChangeNotifier {
   bool _biLoading = false;
   String? _biError;
   Timer? _biTimer;
+  final Map<String, Map<String, dynamic>> _biCache = {};
+  int _biSeq = 0;
 
   ReturnState? _ret;
   bool _retLoading = false;
@@ -110,6 +112,7 @@ class ChartProvider extends ChangeNotifier {
   void open(ChartData data) {
     _current = data;
     _houseSystem = data.houseSystem;
+    _biCache.clear();
     _biwheel = null;
     _biError = null;
     _ret = null;
@@ -141,6 +144,7 @@ class ChartProvider extends ChangeNotifier {
         houseSystem: _houseSystem,
         isim: name,
         tz: tz,
+        place: place,
       );
       _current = data;
       await _service.saveLocal(data);
@@ -156,12 +160,25 @@ class ChartProvider extends ChangeNotifier {
 
   Future<void> loadBiwheel({required DateTime when, double? lat, double? lon}) async {
     if (_current == null) return;
+    final d = '${when.year.toString().padLeft(4, '0')}-${when.month.toString().padLeft(2, '0')}-${when.day.toString().padLeft(2, '0')}';
+    final t = '${when.hour.toString().padLeft(2, '0')}:${when.minute.toString().padLeft(2, '0')}';
+    final key = '${_current!.meta.date}|${_current!.meta.time}|'
+        '${lat ?? _current!.meta.lat}|${lon ?? _current!.meta.lng}|$d|$t';
+
+    final cached = _biCache[key];
+    if (cached != null) {
+      _biwheel = BiwheelState(data: cached, when: when);
+      _biError = null;
+      _biLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    final seq = ++_biSeq;
     _biLoading = true;
     _biError = null;
     notifyListeners();
     try {
-      final d = '${when.year.toString().padLeft(4, '0')}-${when.month.toString().padLeft(2, '0')}-${when.day.toString().padLeft(2, '0')}';
-      final t = '${when.hour.toString().padLeft(2, '0')}:${when.minute.toString().padLeft(2, '0')}';
       final res = await _service.biwheel(
         natal: _current!,
         hedefTarih: d,
@@ -169,12 +186,18 @@ class ChartProvider extends ChangeNotifier {
         lat: lat,
         lon: lon,
       );
+      if (seq != _biSeq) return;
+      if (_biCache.length > 160) _biCache.clear();
+      _biCache[key] = res;
       _biwheel = BiwheelState(data: res, when: when);
     } catch (e) {
+      if (seq != _biSeq) return;
       _biError = e.toString();
     } finally {
-      _biLoading = false;
-      notifyListeners();
+      if (seq == _biSeq) {
+        _biLoading = false;
+        notifyListeners();
+      }
     }
   }
 

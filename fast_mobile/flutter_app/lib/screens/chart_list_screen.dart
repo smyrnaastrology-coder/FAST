@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/theme.dart';
+import '../models/chart_labels.dart';
 import '../providers/chart_provider.dart';
 import 'chart_create_screen.dart';
 import 'chart_detail_screen.dart';
@@ -97,7 +98,9 @@ class _ChartListScreenState extends State<ChartListScreen> {
                         style: TextStyle(
                             color: FastTheme.text, fontWeight: FontWeight.w600)),
                     subtitle: Text(
-                        '${c.meta.date} ${c.meta.time} • ${c.houseSystem}',
+                        '${c.meta.date} ${c.meta.time} • '
+                        '${chartHouseSystemLabel(c.houseSystem)}'
+                        '${c.meta.place.isNotEmpty ? ' • ${c.meta.place}' : ''}',
                         style: TextStyle(
                             color: FastTheme.textMuted.withValues(alpha: 0.7))),
                     onTap: () {

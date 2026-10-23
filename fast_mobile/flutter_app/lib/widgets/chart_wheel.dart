@@ -4,27 +4,19 @@ import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
 import '../models/chart_data.dart';
+import '../models/chart_labels.dart';
 
-const _planetGlyphs = {
-  'sun': '☉',
-  'moon': '☾',
-  'mercury': '☿',
-  'venus': '♀',
-  'mars': '♂',
-  'jupiter': '♃',
-  'saturn': '♄',
-  'uranus': '♅',
-  'neptune': '♆',
-  'pluto': '♇',
-  'north_node': '☊',
-  'chiron': '⚷',
-};
-
+/// SolarFire tarzı çok katmanlı natal / bi-wheel çarkı.
+///
+/// Yükselen (ASC) her zaman sol-orta noktaya (doğu ufku) kilitlenir; burçlar
+/// saat yönünün tersine ilerler. Dış halkada burç sembolleri, içeride natal
+/// gezegenler, bi-wheel modunda transit gezegenler natalın DIŞINDA çizilir.
 class ChartWheel extends StatelessWidget {
   final ChartData data;
   final double size;
   final List<PlanetPos>? outerPlanets;
   final List<HouseCusp>? outerHouses;
+  final bool showAspectLines;
 
   const ChartWheel({
     super.key,
@@ -32,6 +24,7 @@ class ChartWheel extends StatelessWidget {
     this.size = 320,
     this.outerPlanets,
     this.outerHouses,
+    this.showAspectLines = true,
   });
 
   @override
@@ -44,132 +37,467 @@ class ChartWheel extends StatelessWidget {
           data: data,
           outerPlanets: outerPlanets,
           outerHouses: outerHouses,
+          showAspectLines: showAspectLines,
         ),
       ),
     );
   }
 }
 
+class _Glyph {
+  final PlanetPos planet;
+  final double actual;
+  double display;
+  _Glyph(this.planet, this.actual) : display = actual;
+}
+
 class _WheelPainter extends CustomPainter {
   final ChartData data;
   final List<PlanetPos>? outerPlanets;
   final List<HouseCusp>? outerHouses;
+  final bool showAspectLines;
 
-  _WheelPainter({required this.data, this.outerPlanets, this.outerHouses});
+  _WheelPainter({
+    required this.data,
+    this.outerPlanets,
+    this.outerHouses,
+    this.showAspectLines = true,
+  });
+
+  static const _fire = Color(0xFFFF8A65);
+  static const _earth = Color(0xFF81C784);
+  static const _air = Color(0xFFFFD54F);
+  static const _water = Color(0xFF4FC3F7);
+
+  static Color _signColor(int sign) {
+    switch (sign % 12) {
+      case 0:
+      case 4:
+      case 8:
+        return _fire;
+      case 1:
+      case 5:
+      case 9:
+        return _earth;
+      case 2:
+      case 6:
+      case 10:
+        return _air;
+      default:
+        return _water;
+    }
+  }
+
+  static Color _aspectColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'trine':
+        return const Color(0xFF81C784);
+      case 'sextile':
+        return const Color(0xFF4DD0E1);
+      case 'square':
+        return const Color(0xFFE57373);
+      case 'opposition':
+        return const Color(0xFFFF8A65);
+      case 'conjunction':
+        return FastTheme.accentGold;
+      default:
+        return Colors.white70;
+    }
+  }
+
+  double _theta(double lon, double ascLon) {
+    // 180° = sol (ASC). Zodiac boylamı arttıkça saat yönünün tersine gider.
+    return math.pi + (ascLon - lon) * math.pi / 180.0;
+  }
+
+  Offset _pos(double lon, double r, Offset c, double ascLon) {
+    final a = _theta(lon, ascLon);
+    return Offset(c.dx + r * math.cos(a), c.dy + r * math.sin(a));
+  }
+
+  /// Gezegenleri çakışmayacak şekilde en büyük boşluktan başlayarak açar.
+  List<_Glyph> _layout(List<PlanetPos> planets, double minSep) {
+    if (planets.isEmpty) return const [];
+    final items = planets.map((p) => _Glyph(p, p.lon)).toList()
+      ..sort((a, b) => a.actual.compareTo(b.actual));
+    final n = items.length;
+    int gapIdx = 0;
+    double gap = -1;
+    for (var i = 0; i < n; i++) {
+      final next = i == n - 1 ? items[0].actual + 360 : items[i + 1].actual;
+      final g = next - items[i].actual;
+      if (g > gap) {
+        gap = g;
+        gapIdx = i;
+      }
+    }
+    final ordered = <_Glyph>[];
+    for (var k = 1; k <= n; k++) {
+      ordered.add(items[(gapIdx + k) % n]);
+    }
+    final base = ordered.first.actual;
+    var prev = double.negativeInfinity;
+    for (final it in ordered) {
+      var l = it.actual;
+      while (l < base) {
+        l += 360;
+      }
+      if (l < prev + minSep) l = prev + minSep;
+      it.display = l;
+      prev = l;
+    }
+    return ordered;
+  }
+
+  TextPainter _tp(
+    String text,
+    Color color,
+    double fontSize, {
+    FontWeight weight = FontWeight.w600,
+    double letterSpacing = 0,
+  }) {
+    return TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: weight,
+          letterSpacing: letterSpacing,
+          height: 1.0,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+  }
+
+  void _glyphAt(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double lon,
+    String text,
+    Color color,
+    double size, {
+    double ascLon = 0,
+    FontWeight weight = FontWeight.w600,
+  }) {
+    final tp = _tp(text, color, size, weight: weight);
+    final p = _pos(lon, radius, center, ascLon);
+    tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 14;
-    final ring1 = radius - 16;
-    final ring2 = radius - 36;
-    final ring3 = radius - 58;
+    final r = size.shortestSide / 2 - 2;
+    if (r < 70) return;
 
-    final outer = Paint()
-      ..color = FastTheme.border.withValues(alpha: 0.8)
+    final ascLon = data.asc.lon;
+
+    final signOuter = r;
+    final signInner = r * 0.86;
+    final transitR = r * 0.755;
+    final natalR = r * 0.575;
+    final houseNumR = r * 0.455;
+    final aspectR = r * 0.40;
+    final hubR = r * 0.14;
+
+    final circleOuter = Paint()
+      ..color = FastTheme.border.withValues(alpha: 0.85)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final inner = Paint()
-      ..color = FastTheme.border.withValues(alpha: 0.6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final housePaint = Paint()
-      ..color = FastTheme.accentGold.withValues(alpha: 0.4)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-    final housePaint2 = Paint()
-      ..color = Colors.white.withValues(alpha: 0.25)
+      ..strokeWidth = 1.2;
+    final circleInner = Paint()
+      ..color = FastTheme.border.withValues(alpha: 0.55)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    canvas.drawCircle(center, radius, outer);
-    canvas.drawCircle(center, ring1, inner);
-    canvas.drawCircle(center, ring2, inner);
-    if (outerPlanets != null || outerHouses != null) {
-      canvas.drawCircle(center, ring3, inner);
+    // --- Burç halkası zemin ---
+    for (var i = 0; i < 12; i++) {
+      final start = i * 30.0;
+      final rect = Rect.fromCircle(center: center, radius: (signOuter + signInner) / 2);
+      final paint = Paint()
+        ..color = _signColor(i).withValues(alpha: 0.10)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = signOuter - signInner;
+      canvas.drawArc(
+        rect,
+        _theta(start, ascLon),
+        -30 * math.pi / 180.0,
+        false,
+        paint,
+      );
     }
 
-    for (int i = 0; i < 12; i++) {
-      final ang = (i * 30 - 90) * math.pi / 180.0;
-      final p1 = Offset(center.dx + radius * math.cos(ang), center.dy + radius * math.sin(ang));
-      final p2 = Offset(center.dx + ring1 * math.cos(ang), center.dy + ring1 * math.sin(ang));
-      canvas.drawLine(p1, p2, inner);
+    canvas.drawCircle(center, signOuter, circleOuter);
+    canvas.drawCircle(center, signInner, circleInner);
+
+    // --- Derece çentikleri ---
+    final tickPaint = Paint()
+      ..color = FastTheme.textMuted.withValues(alpha: 0.55)
+      ..strokeWidth = 0.7;
+    final tickMajor = Paint()
+      ..color = FastTheme.accentGold.withValues(alpha: 0.75)
+      ..strokeWidth = 1.1;
+    for (var d = 0; d < 360; d++) {
+      final len = d % 30 == 0
+          ? (signOuter - signInner) * 0.55
+          : d % 5 == 0
+              ? (signOuter - signInner) * 0.32
+              : (signOuter - signInner) * 0.16;
+      final p1 = _pos(d.toDouble(), signInner, center, ascLon);
+      final p2 = _pos(d.toDouble(), signInner + len, center, ascLon);
+      canvas.drawLine(p1, p2, d % 30 == 0 ? tickMajor : tickPaint);
     }
 
-    for (final h in data.houses) {
-      final ang = (h.lon - 90) * math.pi / 180.0;
-      final p1 = Offset(center.dx + ring1 * math.cos(ang), center.dy + ring1 * math.sin(ang));
-      final p2 = Offset(center.dx + ring2 * math.cos(ang), center.dy + ring2 * math.sin(ang));
-      canvas.drawLine(p1, p2, housePaint);
-      _text(canvas, center, ring2 - 10, ang, TextSpan(
-        text: h.number.toString(),
-        style: TextStyle(color: FastTheme.accentGold.withValues(alpha: 0.8), fontSize: 9),
-      ));
+    // --- Burç sembolleri ---
+    final signGlyphSize = (r * 0.085).clamp(12.0, 24.0);
+    for (var i = 0; i < 12; i++) {
+      _glyphAt(
+        canvas,
+        center,
+        (signOuter + signInner) / 2,
+        i * 30.0 + 15,
+        chartSignGlyphs[i],
+        _signColor(i),
+        signGlyphSize,
+        ascLon: ascLon,
+        weight: FontWeight.w400,
+      );
     }
 
-    if (outerHouses != null) {
+    // --- Ev çizgileri ve numaraları ---
+    final cuspPaint = Paint()
+      ..color = FastTheme.accentGold.withValues(alpha: 0.35)
+      ..strokeWidth = 1;
+    final houses = [...data.houses]..sort((a, b) => a.number.compareTo(b.number));
+    for (var i = 0; i < houses.length; i++) {
+      final h = houses[i];
+      final p1 = _pos(h.lon, signInner, center, ascLon);
+      final p2 = _pos(h.lon, aspectR, center, ascLon);
+      canvas.drawLine(p1, p2, cuspPaint);
+
+      final next = houses[(i + 1) % houses.length];
+      var delta = next.lon - h.lon;
+      while (delta <= 0) {
+        delta += 360;
+      }
+      final mid = h.lon + delta / 2;
+      _glyphAt(
+        canvas,
+        center,
+        houseNumR,
+        mid,
+        h.number.toString(),
+        FastTheme.accentGold.withValues(alpha: 0.85),
+        (r * 0.036).clamp(9.0, 14.0),
+        ascLon: ascLon,
+        weight: FontWeight.w700,
+      );
+    }
+
+    // --- Bi-wheel dış ev çizgileri (transit) ---
+    if (outerHouses != null && outerHouses!.isNotEmpty) {
+      final outerCusp = Paint()
+        ..color = Colors.white.withValues(alpha: 0.20)
+        ..strokeWidth = 0.8;
       for (final h in outerHouses!) {
-        final ang = (h.lon - 90) * math.pi / 180.0;
-        final p1 = Offset(center.dx + ring2 * math.cos(ang), center.dy + ring2 * math.sin(ang));
-        final p2 = Offset(center.dx + ring3 * math.cos(ang), center.dy + ring3 * math.sin(ang));
-        canvas.drawLine(p1, p2, housePaint2);
+        final p1 = _pos(h.lon, signInner, center, ascLon);
+        final p2 = _pos(h.lon, transitR - (r * 0.05), center, ascLon);
+        canvas.drawLine(p1, p2, outerCusp);
       }
     }
 
-    for (final p in data.planets) {
-      final ang = (p.lon - 90) * math.pi / 180.0;
-      final pt = Offset(center.dx + ring2 * math.cos(ang), center.dy + ring2 * math.sin(ang));
-      final tp = TextPainter(
-        text: TextSpan(
-          text: _planetGlyphs[p.name] ?? p.name.substring(0, 1),
-          style: TextStyle(
-            color: p.retrograde ? FastTheme.accentGoldLight : FastTheme.text,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      tp.paint(canvas, pt - Offset(tp.width / 2, tp.height / 2));
-    }
-
-    if (outerPlanets != null) {
-      for (final p in outerPlanets!) {
-        final ang = (p.lon - 90) * math.pi / 180.0;
-        final pt = Offset(center.dx + ring3 * math.cos(ang), center.dy + ring3 * math.sin(ang));
-        final tp = TextPainter(
-          text: TextSpan(
-            text: _planetGlyphs[p.name] ?? p.name.substring(0, 1),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout();
-        tp.paint(canvas, pt - Offset(tp.width / 2, tp.height / 2));
+    // --- Açı çizgileri (natal) ---
+    if (showAspectLines) {
+      final byName = <String, double>{};
+      for (final p in data.planets) {
+        byName[p.name] = p.lon;
+      }
+      for (final a in data.aspects) {
+        final l1 = byName[a.p1];
+        final l2 = byName[a.p2];
+        if (l1 == null || l2 == null) continue;
+        if (a.type.toLowerCase() == 'conjunction') continue;
+        final color = _aspectColor(a.type);
+        final alpha = (0.45 - a.orb * 0.035).clamp(0.12, 0.45);
+        final paint = Paint()
+          ..color = color.withValues(alpha: alpha)
+          ..strokeWidth = a.type.toLowerCase() == 'trine' ||
+                  a.type.toLowerCase() == 'opposition'
+              ? 1.2
+              : 0.9;
+        canvas.drawLine(
+          _pos(l1, aspectR, center, ascLon),
+          _pos(l2, aspectR, center, ascLon),
+          paint,
+        );
       }
     }
 
-    final ascAng = (data.asc.lon - 90) * math.pi / 180.0;
-    final ascP = Offset(center.dx + radius * math.cos(ascAng), center.dy + radius * math.sin(ascAng));
-    final ascLine = Paint()
-      ..color = FastTheme.accentGold.withValues(alpha: 0.6)
-      ..strokeWidth = 1;
-    canvas.drawLine(center, ascP, ascLine);
-    _text(canvas, center, radius + 4, ascAng, TextSpan(
-      text: 'ASC',
-      style: TextStyle(color: FastTheme.accentGold, fontSize: 9, fontWeight: FontWeight.w700),
-    ));
+    canvas.drawCircle(
+      center,
+      aspectR,
+      Paint()
+        ..color = FastTheme.border.withValues(alpha: 0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8,
+    );
+    canvas.drawCircle(
+      center,
+      hubR,
+      Paint()
+        ..color = FastTheme.border.withValues(alpha: 0.35)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8,
+    );
+
+    // --- ASC / DSC / MC / IC eksenleri ---
+    _axis(canvas, center, signInner, aspectR, ascLon, ascLon + 180, ascLon);
+    _axis(canvas, center, signInner, aspectR, data.mc.lon, data.mc.lon + 180,
+        ascLon);
+
+    // --- Gezegen halkaları ---
+    final natalGlyphSize = (r * 0.078).clamp(12.0, 22.0);
+    final natal = _layout(data.planets, 8.0);
+    for (final g in natal) {
+      final color = g.planet.retrograde ? FastTheme.accentGoldLight : FastTheme.text;
+      // gerçek konum işareti
+      canvas.drawCircle(
+        _pos(g.actual, natalR + natalGlyphSize * 0.9, center, ascLon),
+        1.2,
+        Paint()..color = color.withValues(alpha: 0.7),
+      );
+      _glyphAt(
+        canvas,
+        center,
+        natalR,
+        g.display,
+        chartPlanetGlyphs[g.planet.name] ?? '·',
+        color,
+        natalGlyphSize,
+        ascLon: ascLon,
+        weight: FontWeight.w500,
+      );
+      if (g.planet.retrograde) {
+        _glyphAt(
+          canvas,
+          center,
+          natalR - natalGlyphSize * 0.85,
+          g.display,
+          'R',
+          FastTheme.accentGoldLight,
+          (nativeSmall(natalGlyphSize)),
+          ascLon: ascLon,
+          weight: FontWeight.w700,
+        );
+      }
+    }
+
+    if (outerPlanets != null && outerPlanets!.isNotEmpty) {
+      final transitGlyphSize = (r * 0.062).clamp(10.0, 18.0);
+      final trans = _layout(outerPlanets!, 7.0);
+      for (final g in trans) {
+        final color = const Color(0xFF8FD8FF);
+        canvas.drawCircle(
+          _pos(g.actual, transitR + transitGlyphSize * 0.9, center, ascLon),
+          1.1,
+          Paint()..color = color.withValues(alpha: 0.8),
+        );
+        _glyphAt(
+          canvas,
+          center,
+          transitR,
+          g.display,
+          chartPlanetGlyphs[g.planet.name] ?? '·',
+          color,
+          transitGlyphSize,
+          ascLon: ascLon,
+          weight: FontWeight.w500,
+        );
+        if (g.planet.retrograde) {
+          _glyphAt(
+            canvas,
+            center,
+            transitR - transitGlyphSize * 0.85,
+            g.display,
+            'R',
+            color,
+            nativeSmall(transitGlyphSize),
+            ascLon: ascLon,
+            weight: FontWeight.w700,
+          );
+        }
+      }
+    }
+
+    // --- Açı etiketleri ---
+    _angleLabel(canvas, center, signInner, data.asc.lon, 'ASC', ascLon);
+    _angleLabel(canvas, center, signInner, data.asc.lon + 180, 'DSC', ascLon);
+    _angleLabel(canvas, center, signInner, data.mc.lon, 'MC', ascLon);
+    _angleLabel(canvas, center, signInner, data.mc.lon + 180, 'IC', ascLon);
+
+    // merkez noktası
+    canvas.drawCircle(
+      center,
+      2,
+      Paint()..color = FastTheme.accentGold.withValues(alpha: 0.6),
+    );
   }
 
-  void _text(Canvas canvas, Offset center, double r, double ang, TextSpan span) {
-    final tp = TextPainter(text: span, textDirection: TextDirection.ltr)..layout();
-    final pt = Offset(center.dx + r * math.cos(ang), center.dy + r * math.sin(ang));
-    tp.paint(canvas, pt - Offset(tp.width / 2, tp.height / 2));
+  double nativeSmall(double base) => (base * 0.62).clamp(6.0, 11.0);
+
+  void _axis(
+    Canvas canvas,
+    Offset center,
+    double outer,
+    double inner,
+    double lon1,
+    double lon2,
+    double ascLon,
+  ) {
+    final paint = Paint()
+      ..color = FastTheme.accentGold.withValues(alpha: 0.55)
+      ..strokeWidth = 1.3;
+    canvas.drawLine(
+      _pos(lon1, outer, center, ascLon),
+      _pos(lon1, inner, center, ascLon),
+      paint,
+    );
+    canvas.drawLine(
+      _pos(lon2, outer, center, ascLon),
+      _pos(lon2, inner, center, ascLon),
+      paint,
+    );
+  }
+
+  void _angleLabel(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double lon,
+    String label,
+    double ascLon,
+  ) {
+    final tp = _tp(label, FastTheme.accentGold, 9, weight: FontWeight.w700);
+    final p = _pos(lon, radius - 10, center, ascLon);
+    final origin = p - Offset(tp.width / 2, tp.height / 2);
+    final bg = Rect.fromLTWH(
+      origin.dx - 2,
+      origin.dy - 1,
+      tp.width + 4,
+      tp.height + 2,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(bg, const Radius.circular(3)),
+      Paint()..color = FastTheme.bg.withValues(alpha: 0.85),
+    );
+    tp.paint(canvas, origin);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _WheelPainter old) =>
+      old.data != data ||
+      old.outerPlanets != outerPlanets ||
+      old.outerHouses != outerHouses;
 }

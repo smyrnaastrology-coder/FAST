@@ -22,6 +22,7 @@ class ChartService {
     String houseSystem = 'P',
     String? isim,
     double? tz,
+    String? place,
   }) async {
     final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
     final body = <String, dynamic>{
@@ -31,6 +32,7 @@ class ChartService {
       'lon': lon,
       'house_system': houseSystem,
       if (isim != null && isim.isNotEmpty) 'isim': isim,
+      if (place != null && place.isNotEmpty) 'sehir': place,
       'tz': offset,
     };
     final r = await _client
@@ -51,6 +53,7 @@ class ChartService {
     meta['lat'] = lat;
     meta['lon'] = lon;
     meta['tz'] = offset;
+    if (place != null && place.isNotEmpty) meta['sehir'] = place;
     final merged = Map<String, dynamic>.from(json)..['meta'] = meta;
     return ChartData.fromJson(merged);
   }
