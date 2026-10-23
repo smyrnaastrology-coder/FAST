@@ -291,7 +291,7 @@ class _MainShellState extends State<MainShell> {
                     _PillarCard(
                       icon: Icons.people_alt_outlined,
                       activeIcon: Icons.people_alt,
-                      asset: 'assets/holavon_logo.png',
+                      asset: 'assets/fast_synastry_logo.png',
                       title: l10n.hubSocialTitle,
                       desc: l10n.hubSocialDesc,
                       colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
