@@ -7481,6 +7481,141 @@ def charts_lunar_return(inp: ChartReturnIn):
 
 
 
+
+
+class ChartSolarArcIn(BaseModel):
+    isim: Optional[str] = None
+    natal_tarih: str
+    natal_saat: str = "12:00"
+    natal_lat: float = 41.0082
+    natal_lon: float = 28.9784
+    natal_tz: Optional[float] = None
+    hedef_tarih: Optional[str] = None
+    house_system: str = "P"
+
+
+@app_fast.post("/api/charts/solar-arc")
+def charts_solar_arc(inp: ChartSolarArcIn):
+    try:
+        from datetime import datetime, date
+        hsys = (inp.house_system or "P").upper().strip()
+        if hsys not in _CHART_HSYS_MAP:
+            hsys = "P"
+
+        ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+        if os.path.isdir(ephe_yolu):
+            swe.set_ephe_path(ephe_yolu)
+
+        nt = inp.natal_tarih.split("-")
+        ns = inp.natal_saat.split(":")
+        ny = int(nt[0]); nm = int(nt[1]); nd = int(nt[2])
+        nhh = int(ns[0]); nmm = int(ns[1]) if len(ns) > 1 else 0
+        nuo = 3.0 if inp.natal_tz is None else float(inp.natal_tz)
+        jd_n = swe.julday(ny, nm, nd, nhh + nmm / 60.0 - nuo)
+
+        cusps, ascmc = swe.houses_ex(jd_n, float(inp.natal_lat), float(inp.natal_lon), _CHART_HSYS_MAP[hsys])
+        cusps_list = [float(cusps[i]) for i in range(12)]
+
+        natal_planets = []
+        for key, pid in _CHART_PLANETS:
+            try:
+                arr, _ = swe.calc_ut(jd_n, pid, swe.FLG_SWIEPH | swe.FLG_SPEED)
+                lonv = _chart_normalize_deg(arr[0])
+                speed = float(arr[3]) if len(arr) > 3 else 0.0
+                info = _chart_sign_info(lonv)
+                h = _chart_house_of(lonv, cusps_list)
+                natal_planets.append({
+                    "ad": key, "lon": round(lonv, 4), "burc": info["burc"],
+                    "derece": info["derece"], "ev": h, "hiz": round(speed, 4),
+                    "retro": speed < 0,
+                })
+            except Exception:
+                continue
+
+        n_asc_deg = _chart_normalize_deg(ascmc[0]); n_mc_deg = _chart_normalize_deg(ascmc[1])
+        natal_evler = []
+        for i in range(12):
+            c = _chart_normalize_deg(cusps_list[i])
+            natal_evler.append({"no": i + 1, "lon": round(c, 4), **_chart_sign_info(c)})
+
+        if inp.hedef_tarih:
+            ht = inp.hedef_tarih.split("-")
+            hy = int(ht[0]); hm = int(ht[1]); hd = int(ht[2])
+        else:
+            today = date.today()
+            hy, hm, hd = today.year, today.month, today.day
+
+        jd_t = swe.julday(hy, hm, hd, 12.0 - nuo)
+        age_days = jd_t - jd_n
+        prog_jd = jd_n + age_days / 365.2422
+
+        natal_sun_arr, _ = swe.calc_ut(jd_n, swe.SUN, swe.FLG_SWIEPH)
+        prog_sun_arr, _ = swe.calc_ut(prog_jd, swe.SUN, swe.FLG_SWIEPH)
+        natal_sun = _chart_normalize_deg(natal_sun_arr[0])
+        prog_sun = _chart_normalize_deg(prog_sun_arr[0])
+        arc = _chart_normalize_deg(prog_sun - natal_sun)
+
+        arc_planets = []
+        for p in natal_planets:
+            lonv = _chart_normalize_deg(p["lon"] + arc)
+            info = _chart_sign_info(lonv)
+            h = _chart_house_of(lonv, cusps_list)
+            arc_planets.append({
+                "ad": p["ad"], "lon": round(lonv, 4), "burc": info["burc"],
+                "derece": info["derece"], "ev": h, "hiz": p["hiz"], "retro": p["retro"],
+            })
+
+        arc_evler = []
+        for i in range(12):
+            c = _chart_normalize_deg(cusps_list[i] + arc)
+            arc_evler.append({"no": i + 1, "lon": round(c, 4), **_chart_sign_info(c)})
+
+        a_asc_deg = _chart_normalize_deg(n_asc_deg + arc)
+        a_mc_deg = _chart_normalize_deg(n_mc_deg + arc)
+        arc_chart = {
+            "house_system": hsys,
+            "julian_day_ut": round(prog_jd, 6),
+            "asc": {"lon": round(a_asc_deg, 4), **_chart_sign_info(a_asc_deg)},
+            "mc": {"lon": round(a_mc_deg, 4), **_chart_sign_info(a_mc_deg)},
+            "gezegenler": arc_planets,
+            "evler": arc_evler,
+        }
+
+        aspects = []
+        for ap in arc_planets:
+            for np in natal_planets:
+                for ang, atype, orb_max in _CHART_MAJOR_ASPECTS:
+                    diff = abs(_chart_wrap180(ap["lon"] - np["lon"] - ang))
+                    if diff <= orb_max:
+                        aspects.append({
+                            "p1": ap["ad"], "p2": np["ad"], "tip": atype,
+                            "orb": round(diff, 2), "katman": "solar-arc-natal",
+                        })
+                        break
+        aspects.sort(key=lambda x: x["orb"])
+
+        return {
+            "ok": True,
+            "type": "solar_arc",
+            "house_system": hsys,
+            "hedef_tarih": f"{hy:04d}-{hm:02d}-{hd:02d}",
+            "arc": round(arc, 4),
+            "natal": {
+                "julian_day_ut": round(jd_n, 6),
+                "asc": {"lon": round(n_asc_deg, 4), **_chart_sign_info(n_asc_deg)},
+                "mc": {"lon": round(n_mc_deg, 4), **_chart_sign_info(n_mc_deg)},
+                "gezegenler": natal_planets,
+                "evler": natal_evler,
+            },
+            "arc_chart": arc_chart,
+            "acilar_arasi": aspects,
+            "meta": {"isim": inp.isim, "natal_tarih": inp.natal_tarih, "hedef_tarih": f"{hy:04d}-{hm:02d}-{hd:02d}"},
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
     """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
