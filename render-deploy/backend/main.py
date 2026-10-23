@@ -7010,6 +7010,167 @@ def sky_calendar(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float]
     _SKY_CAL_CACHE[cache_key] = sonuc
     return sonuc
 
+
+
+# ── Haritalar (SolarFire tarzı) ─────────────────────────────────────────
+# Paralel modül. Mevcut analiz akışına dokunmaz.
+
+_CHART_HSYS_MAP = {
+    "P": b"P",  # Placidus
+    "W": b"W",  # Whole Sign
+    "R": b"R",  # Regiomontanus
+    "K": b"K",  # Koch
+    "E": b"E",  # Equal
+}
+
+_CHART_PLANETS = [
+    ("sun", swe.SUN),
+    ("moon", swe.MOON),
+    ("mercury", swe.MERCURY),
+    ("venus", swe.VENUS),
+    ("mars", swe.MARS),
+    ("jupiter", swe.JUPITER),
+    ("saturn", swe.SATURN),
+    ("uranus", swe.URANUS),
+    ("neptune", swe.NEPTUNE),
+    ("pluto", swe.PLUTO),
+    ("north_node", swe.MEAN_NODE),
+    ("chiron", getattr(swe, "CHIRON", 15)),
+]
+
+_CHART_MAJOR_ASPECTS = [
+    (0, "conjunction", 8.0),
+    (60, "sextile", 6.0),
+    (90, "square", 7.0),
+    (120, "trine", 7.0),
+    (180, "opposition", 8.0),
+]
+
+
+def _chart_normalize_deg(d):
+    x = float(d) % 360.0
+    return x
+
+
+def _chart_wrap180(d):
+    x = float(d) % 360.0
+    if x > 180.0:
+        x -= 360.0
+    return x
+
+
+def _chart_sign_info(deg):
+    d = _chart_normalize_deg(deg)
+    sidx = int(d // 30) % 12
+    return {"burc": sidx, "derece": round(d % 30.0, 3), "mutlak": round(d, 4)}
+
+
+def _chart_house_of(deg, cusps):
+    d = _chart_normalize_deg(deg)
+    for i in range(12):
+        c1 = float(cusps[i])
+        c2 = float(cusps[(i + 1) % 12])
+        if c2 < c1:
+            if d >= c1 or d < c2:
+                return i + 1
+        else:
+            if c1 <= d < c2:
+                return i + 1
+    return 1
+
+
+class ChartNatalIn(BaseModel):
+    isim: Optional[str] = None
+    tarih: str
+    saat: str = "12:00"
+    lat: float = 41.0082
+    lon: float = 28.9784
+    tz: Optional[float] = None
+    house_system: str = "P"
+
+
+@app_fast.post("/api/charts/natal")
+def charts_natal(inp: ChartNatalIn):
+    try:
+        from datetime import datetime
+        hsys = (inp.house_system or "P").upper().strip()
+        if hsys not in _CHART_HSYS_MAP:
+            hsys = "P"
+
+        tarih_parca = inp.tarih.split("-")
+        saat_parca = inp.saat.split(":")
+        y = int(tarih_parca[0]); m = int(tarih_parca[1]); d = int(tarih_parca[2])
+        hh = int(saat_parca[0]); mm = int(saat_parca[1]) if len(saat_parca) > 1 else 0
+
+        uo = 3.0 if inp.tz is None else float(inp.tz)
+        jd_ut = swe.julday(y, m, d, hh + mm / 60.0 - uo)
+
+        ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+        if os.path.isdir(ephe_yolu):
+            swe.set_ephe_path(ephe_yolu)
+
+        cusps, ascmc = swe.houses_ex(jd_ut, float(inp.lat), float(inp.lon), _CHART_HSYS_MAP[hsys])
+        cusps_list = [float(cusps[i]) for i in range(12)]
+
+        planets = []
+        for key, pid in _CHART_PLANETS:
+            try:
+                arr, _ = swe.calc_ut(jd_ut, pid, swe.FLG_SWIEPH | swe.FLG_SPEED)
+                lonv = _chart_normalize_deg(arr[0])
+                speed = float(arr[3]) if len(arr) > 3 else 0.0
+                info = _chart_sign_info(lonv)
+                h = _chart_house_of(lonv, cusps_list)
+                planets.append({
+                    "ad": key,
+                    "lon": round(lonv, 4),
+                    "burc": info["burc"],
+                    "derece": info["derece"],
+                    "ev": h,
+                    "hiz": round(speed, 4),
+                    "retro": speed < 0,
+                })
+            except Exception:
+                continue
+
+        asc_deg = _chart_normalize_deg(ascmc[0])
+        mc_deg = _chart_normalize_deg(ascmc[1])
+        asc_info = _chart_sign_info(asc_deg)
+        mc_info = _chart_sign_info(mc_deg)
+
+        aspects = []
+        for i in range(len(planets)):
+            for j in range(i + 1, len(planets)):
+                p1 = planets[i]; p2 = planets[j]
+                for ang, atype, orb_max in _CHART_MAJOR_ASPECTS:
+                    diff = abs(_chart_wrap180(p1["lon"] - p2["lon"] - ang))
+                    if diff <= orb_max:
+                        aspects.append({
+                            "p1": p1["ad"], "p2": p2["ad"], "tip": atype,
+                            "orb": round(diff, 2), "uygulama": None
+                        })
+                        break
+        aspects.sort(key=lambda x: x["orb"])
+
+        evler = []
+        for i in range(12):
+            c = _chart_normalize_deg(cusps_list[i])
+            evler.append({"no": i + 1, "lon": round(c, 4), **_chart_sign_info(c)})
+
+        return {
+            "ok": True,
+            "house_system": hsys,
+            "julian_day_ut": round(jd_ut, 6),
+            "asc": {"lon": round(asc_deg, 4), **asc_info},
+            "mc": {"lon": round(mc_deg, 4), **mc_info},
+            "gezegenler": planets,
+            "evler": evler,
+            "acilar": aspects,
+            "meta": {"isim": inp.isim, "tarih": inp.tarih, "saat": inp.saat, "lat": inp.lat, "lon": inp.lon}
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
     """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
