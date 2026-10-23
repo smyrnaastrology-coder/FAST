@@ -291,7 +291,7 @@ class _MainShellState extends State<MainShell> {
                     _PillarCard(
                       icon: Icons.people_alt_outlined,
                       activeIcon: Icons.people_alt,
-                      asset: 'assets/fast_synastry_logo.png',
+                      asset: 'assets/holavon_logo.png',
                       title: l10n.hubSocialTitle,
                       desc: l10n.hubSocialDesc,
                       colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
@@ -300,9 +300,23 @@ class _MainShellState extends State<MainShell> {
                     ),
                     const SizedBox(height: 16),
                     _PillarCard(
+                      icon: Icons.auto_awesome_outlined,
+                      activeIcon: Icons.auto_awesome,
+                      asset: 'assets/fast_synastry_logo.png',
+                      title: l10n.hubAnalysisTitle,
+                      desc: l10n.hubAnalysisDesc,
+                      colors: [FastTheme.secondary, FastTheme.accent],
+                      onTap: () => _pushWithNotice(
+                        prefKey: 'holavon_synastry_notice_v1',
+                        title: l10n.warningTitle,
+                        body: l10n.warningBody,
+                        screen: const AnalyzerScreen(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _PillarCard(
                       icon: Icons.auto_graph_outlined,
                       activeIcon: Icons.auto_graph,
-                      asset: 'assets/holavon_logo.png',
                       title: 'Haritalarım',
                       desc: 'Natal haritanı oluştur ve incele',
                       colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
