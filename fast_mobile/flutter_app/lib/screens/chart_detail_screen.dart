@@ -37,11 +37,12 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   final _latCtrl = TextEditingController();
   final _lonCtrl = TextEditingController();
   bool _locating = false;
+  DateTime _arcDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -122,10 +123,12 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           indicatorColor: FastTheme.accentGold,
           labelColor: FastTheme.accentGold,
           unselectedLabelColor: FastTheme.textMuted,
+          isScrollable: true,
           tabs: const [
             Tab(text: 'Natal'),
             Tab(text: 'Zaman Makinesi'),
             Tab(text: 'Dönüşler'),
+            Tab(text: 'Solar Arc'),
           ],
         ),
       ),
@@ -135,6 +138,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           _natalTab(c),
           _timeMachineTab(cp, c),
           _returnsTab(cp, c),
+          _solarArcTab(cp, c),
         ],
       ),
     );
@@ -500,6 +504,110 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           Text(right, style: TextStyle(color: FastTheme.textMuted)),
         ],
       ),
+    );
+  }
+
+  Widget _solarArcTab(ChartProvider cp, ChartData c) {
+    final now = DateTime.now();
+    final arc = cp.arc;
+    ChartData? arcChart;
+    if (arc != null) {
+      try {
+        final j = Map<String, dynamic>.from(arc.data)
+          ..['house_system'] = arc.data['house_system'] ?? c.houseSystem;
+        arcChart = ChartData.fromJson(j);
+      } catch (_) {}
+    }
+
+    String fmt(DateTime d) =>
+        '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+      children: [
+        _section('Solar Arc', [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Hedef Tarih: ${fmt(_arcDate)}',
+                    style: TextStyle(color: FastTheme.text),
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _arcDate,
+                      firstDate: DateTime(
+                          c.meta.date.isNotEmpty && c.meta.date.contains('-')
+                              ? int.tryParse(c.meta.date.split('-')[0]) ??
+                                  now.year - 100
+                              : now.year - 100),
+                      lastDate: DateTime(now.year + 60),
+                    );
+                    if (picked != null) {
+                      setState(() => _arcDate = picked);
+                    }
+                  },
+                  child: const Text('Tarih Seç'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed:
+                      cp.arcLoading ? null : () => cp.loadSolarArc(fmt(_arcDate)),
+                  style: FilledButton.styleFrom(
+                      backgroundColor: FastTheme.accentGold),
+                  child: const Text('Hesapla'),
+                ),
+              ],
+            ),
+          ),
+          if (cp.arcLoading)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: CircularProgressIndicator(color: FastTheme.accentGold),
+              ),
+            ),
+          if (cp.arcError != null)
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(cp.arcError!,
+                  style: const TextStyle(color: Colors.redAccent)),
+            ),
+          if (arcChart != null) ...[
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            Center(child: ChartWheel(data: arcChart, size: 300)),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                'Solar Arc - ${arc!.targetDate}',
+                style: TextStyle(
+                    color: FastTheme.text, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...arcChart.planets.map((p) => _row(
+                  p.name,
+                  '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° ${p.retrograde ? 'R' : ''} • Ev ${p.house}',
+                )),
+          ],
+          if (arcChart == null && !cp.arcLoading)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: Text(
+                  'Solar Arc haritasını hesaplamak için tarih seç ve Hesapla.',
+                  style: TextStyle(color: FastTheme.textMuted),
+                ),
+              ),
+            ),
+        ]),
+      ],
     );
   }
 }
