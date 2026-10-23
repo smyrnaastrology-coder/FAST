@@ -17,6 +17,7 @@ import 'horary_screen.dart';
 import 'landing_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
+import 'chart_list_screen.dart';
 
 /// Uygulama kabuÄŸu (Hub): tek giriÅŸten 3 sÃ¼tuna eriÅŸim â€”
 /// Sosyal Â· Fast Synastry Â· Horary Oracle. Ãœstte profil.
@@ -299,18 +300,13 @@ class _MainShellState extends State<MainShell> {
                     ),
                     const SizedBox(height: 16),
                     _PillarCard(
-                      icon: Icons.auto_awesome_outlined,
-                      activeIcon: Icons.auto_awesome,
-                      asset: 'assets/fast_synastry_logo.png',
-                      title: l10n.hubAnalysisTitle,
-                      desc: l10n.hubAnalysisDesc,
-                      colors: [FastTheme.secondary, FastTheme.accent],
-                      onTap: () => _pushWithNotice(
-                        prefKey: 'holavon_synastry_notice_v1',
-                        title: l10n.warningTitle,
-                        body: l10n.warningBody,
-                        screen: const AnalyzerScreen(),
-                      ),
+                      icon: Icons.auto_graph_outlined,
+                      activeIcon: Icons.auto_graph,
+                      asset: 'assets/holavon_logo.png',
+                      title: 'Haritalarım',
+                      desc: 'Natal haritanı oluştur ve incele',
+                      colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
+                      onTap: () => _push(const ChartListScreen()),
                     ),
                     const SizedBox(height: 16),
                     _PillarCard(
@@ -467,8 +463,8 @@ class _PillarCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 56,
-                  height: 56,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(colors: colors),
@@ -477,12 +473,14 @@ class _PillarCard extends StatelessWidget {
                   child: asset == null
                       ? Icon(activeIcon, color: FastTheme.bg, size: 28)
                       : Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Image.asset(
-                            asset!,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, _, _) =>
-                                Icon(activeIcon, color: FastTheme.bg, size: 28),
+                          padding: const EdgeInsets.all(4),
+                          child: ClipOval(
+                            child: Image.asset(
+                              asset!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) =>
+                                  Icon(activeIcon, color: FastTheme.bg, size: 28),
+                            ),
                           ),
                         ),
                 ),
