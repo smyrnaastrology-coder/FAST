@@ -1,10 +1,65 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:share_plus/share_plus.dart';
 
 import '../config/astro_signs.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_calendar.dart';
 import '../services/api_service.dart';
+import '../models/sky_event_export.dart';
+
+String _calendarText(BuildContext context, String tr, String en, String es) =>
+    switch (Localizations.localeOf(context).languageCode) {
+      'tr' => tr,
+      'es' => es,
+      _ => en,
+    };
+
+Future<void> _exportEvent(
+  BuildContext context,
+  DateTime time,
+  String title,
+  String description,
+) async {
+  try {
+    final ics = buildSkyEventIcs(
+      time: time,
+      title: title,
+      description: description,
+    );
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.shareXFiles(
+      [
+        XFile.fromData(
+          utf8.encode(ics),
+          mimeType: 'text/calendar',
+          name: 'holavon-event.ics',
+        ),
+      ],
+      fileNameOverrides: const ['holavon-event.ics'],
+      subject: title,
+      sharePositionOrigin: box == null
+          ? null
+          : box.localToGlobal(Offset.zero) & box.size,
+    );
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _calendarText(
+              context,
+              'Takvim dosyası paylaşılamadı.',
+              'Unable to share calendar file.',
+              'No se pudo compartir el calendario.',
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
 
 const _phaseGlyphs = {'new_moon': '🌑', 'full_moon': '🌕'};
 
@@ -58,6 +113,7 @@ class SkyCalendarScreen extends StatefulWidget {
 
 class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
   late Future<SkyCalendar> _future;
+  String _filter = 'all';
 
   @override
   void initState() {
@@ -136,6 +192,12 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
               ),
             );
           }
+          final events = <(DateTime, Widget)>[
+            if (_filter != 'eclipses')
+              ...cal.phases.map((e) => (e.time, _PhaseTile(event: e))),
+            if (_filter != 'phases')
+              ...cal.eclipses.map((e) => (e.time, _EclipseTile(eclipse: e))),
+          ]..sort((a, b) => a.$1.compareTo(b.$1));
           return ListView(
             padding: EdgeInsets.fromLTRB(
               20,
@@ -144,34 +206,39 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
               32 + MediaQuery.of(context).viewPadding.bottom,
             ),
             children: [
-              if (cal.phases.isNotEmpty) ...[
-                _section(l.skyCalendarPhases),
-                ...cal.phases.map((e) => _PhaseTile(event: e)),
-                const SizedBox(height: 12),
-              ],
-              if (cal.eclipses.isNotEmpty) ...[
-                _section(l.skyCalendarEclipses),
-                ...cal.eclipses.map((e) => _EclipseTile(eclipse: e)),
-              ],
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (final entry in {
+                    'all': _calendarText(context, 'Tümü', 'All', 'Todo'),
+                    'phases': l.skyCalendarPhases,
+                    'eclipses': l.skyCalendarEclipses,
+                  }.entries)
+                    ChoiceChip(
+                      label: Text(entry.value),
+                      selected: _filter == entry.key,
+                      onSelected: (_) => setState(() => _filter = entry.key),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _calendarText(
+                  context,
+                  'Olaylar tarih sırasıyla • Takvime eklemek için dokun',
+                  'Events in date order • Tap to add to your calendar',
+                  'Eventos por fecha • Toca para añadir al calendario',
+                ),
+                style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              ...events.map((event) => event.$2),
             ],
           );
         },
       ),
     );
   }
-
-  Widget _section(String title) => Padding(
-    padding: const EdgeInsets.only(bottom: 10, top: 4),
-    child: Text(
-      title.toUpperCase(),
-      style: TextStyle(
-        color: FastTheme.accentGold.withValues(alpha: 0.85),
-        fontSize: 11.5,
-        letterSpacing: 1.4,
-        fontWeight: FontWeight.w700,
-      ),
-    ),
-  );
 }
 
 class _PhaseTile extends StatelessWidget {
@@ -192,6 +259,12 @@ class _PhaseTile extends StatelessWidget {
       title: '${_phaseName(l, event.type)} · ${_deg(event.moon.degree)}° $sign',
       subtitle: _dateLine(context, event.time),
       trailing: _countdown(l, event.time),
+      onTap: () => _exportEvent(
+        context,
+        event.time,
+        _phaseName(l, event.type),
+        '${_deg(event.moon.degree)}° $sign • Holavon',
+      ),
     );
   }
 }
@@ -235,6 +308,12 @@ class _EclipseTile extends StatelessWidget {
       title: title,
       subtitle: '$subtitle\n${parts.join(' · ')}',
       trailing: _countdown(l, eclipse.time),
+      onTap: () => _exportEvent(
+        context,
+        eclipse.time,
+        title,
+        '$subtitle\n${parts.join(' · ')}\nHolavon',
+      ),
     );
   }
 }
@@ -245,54 +324,59 @@ Widget _card(
   required String title,
   required String subtitle,
   required String trailing,
+  VoidCallback? onTap,
 }) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 10),
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    decoration: BoxDecoration(
-      color: FastTheme.cardBg,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: FastTheme.border.withValues(alpha: 0.5)),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(width: 34, child: Center(child: leading)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  color: FastTheme.text,
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(14),
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: FastTheme.border.withValues(alpha: 0.5)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 34, child: Center(child: leading)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: FastTheme.text,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: FastTheme.textMuted.withValues(alpha: 0.7),
-                  fontSize: 12.5,
-                  height: 1.35,
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: FastTheme.textMuted.withValues(alpha: 0.7),
+                    fontSize: 12.5,
+                    height: 1.35,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          trailing,
-          style: TextStyle(
-            color: FastTheme.accentGoldLight,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+          const SizedBox(width: 8),
+          Text(
+            trailing,
+            style: TextStyle(
+              color: FastTheme.accentGoldLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

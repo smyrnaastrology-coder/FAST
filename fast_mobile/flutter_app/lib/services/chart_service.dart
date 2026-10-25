@@ -65,9 +65,9 @@ class ChartService {
     double? lon,
     double? tz,
   }) async {
-    final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
     final body = <String, dynamic>{
-      if (natal.meta.name != null && natal.meta.name!.isNotEmpty) 'isim': natal.meta.name,
+      if (natal.meta.name != null && natal.meta.name!.isNotEmpty)
+        'isim': natal.meta.name,
       'natal_tarih': natal.meta.date,
       'natal_saat': natal.meta.time,
       'natal_lat': natal.meta.lat,
@@ -77,7 +77,7 @@ class ChartService {
       'hedef_saat': hedefSaat,
       'lat': lat ?? natal.meta.lat,
       'lon': lon ?? natal.meta.lng,
-      'tz': offset,
+      'tz': ?tz,
       'house_system': natal.houseSystem,
     };
     final r = await _client
@@ -102,7 +102,8 @@ class ChartService {
   }) async {
     final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
     final body = <String, dynamic>{
-      if (natal.meta.name != null && natal.meta.name!.isNotEmpty) 'isim': natal.meta.name,
+      if (natal.meta.name != null && natal.meta.name!.isNotEmpty)
+        'isim': natal.meta.name,
       'natal_tarih': natal.meta.date,
       'natal_saat': natal.meta.time,
       'natal_lat': natal.meta.lat,
@@ -137,7 +138,8 @@ class ChartService {
   }) async {
     final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
     final body = <String, dynamic>{
-      if (natal.meta.name != null && natal.meta.name!.isNotEmpty) 'isim': natal.meta.name,
+      if (natal.meta.name != null && natal.meta.name!.isNotEmpty)
+        'isim': natal.meta.name,
       'natal_tarih': natal.meta.date,
       'natal_saat': natal.meta.time,
       'natal_lat': natal.meta.lat,
@@ -168,7 +170,8 @@ class ChartService {
     required String hedefTarih,
   }) async {
     final body = <String, dynamic>{
-      if (natal.meta.name != null && natal.meta.name!.isNotEmpty) 'isim': natal.meta.name,
+      if (natal.meta.name != null && natal.meta.name!.isNotEmpty)
+        'isim': natal.meta.name,
       'natal_tarih': natal.meta.date,
       'natal_saat': natal.meta.time,
       'natal_lat': natal.meta.lat,
@@ -190,16 +193,30 @@ class ChartService {
     return jsonDecode(r.body) as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> progression({required ChartData natal,
-    required String targetDate, required String method}) async {
-    final r = await _client.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/charts/progression'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'natal': {...natal.meta.toJson(),
-        'house_system': natal.houseSystem}, 'target_date': targetDate,
-        'method': method}),
-    ).timeout(ApiConfig.timeout);
-    if (r.statusCode != 200) throw Exception('Progresyon: HTTP ${r.statusCode}');
+  Future<Map<String, dynamic>> progression({
+    required ChartData natal,
+    required String targetDate,
+    required String method,
+    String targetTime = '00:00',
+  }) async {
+    final r = await _client
+        .post(
+          Uri.parse('${ApiConfig.baseUrl}/api/charts/progression'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'natal': {
+              ...natal.meta.toJson(),
+              'house_system': natal.houseSystem,
+            },
+            'target_date': targetDate,
+            'method': method,
+            'target_time': targetTime,
+          }),
+        )
+        .timeout(ApiConfig.timeout);
+    if (r.statusCode != 200) {
+      throw Exception('Progresyon: HTTP ${r.statusCode}');
+    }
     return jsonDecode(r.body) as Map<String, dynamic>;
   }
 
@@ -224,10 +241,12 @@ class ChartService {
     final list = await loadLocal();
     final merged = [
       data,
-      ...list.where((e) =>
-          !(e.meta.date == data.meta.date &&
-              e.meta.time == data.meta.time &&
-              e.meta.name == data.meta.name)),
+      ...list.where(
+        (e) =>
+            !(e.meta.date == data.meta.date &&
+                e.meta.time == data.meta.time &&
+                e.meta.name == data.meta.name),
+      ),
     ];
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(merged.map((e) => _toJson(e)).toList());
@@ -236,8 +255,12 @@ class ChartService {
 
   Future<void> deleteLocal(ChartData data) async {
     final list = await loadLocal();
-    list.removeWhere((e) => e.meta.name == data.meta.name &&
-        e.meta.date == data.meta.date && e.meta.time == data.meta.time);
+    list.removeWhere(
+      (e) =>
+          e.meta.name == data.meta.name &&
+          e.meta.date == data.meta.date &&
+          e.meta.time == data.meta.time,
+    );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, jsonEncode(list.map(_toJson).toList()));
   }
@@ -268,17 +291,14 @@ class ChartService {
           .select()
           .eq('user_id', AuthService.userId)
           .order('updated_at', ascending: false);
-      return (rows as List)
-          .whereType<Map>()
-          .map((e) {
-            final m = e.cast<String, dynamic>();
-            final raw = m['chart_data'];
-            final data = raw is Map
-                ? raw.cast<String, dynamic>()
-                : <String, dynamic>{};
-            return ChartData.fromJson(data);
-          })
-          .toList();
+      return (rows as List).whereType<Map>().map((e) {
+        final m = e.cast<String, dynamic>();
+        final raw = m['chart_data'];
+        final data = raw is Map
+            ? raw.cast<String, dynamic>()
+            : <String, dynamic>{};
+        return ChartData.fromJson(data);
+      }).toList();
     } catch (e) {
       if (kDebugMode) print('[Charts] cloudList err $e');
       return [];
@@ -315,40 +335,44 @@ class ChartService {
   }
 
   Map<String, dynamic> _toJson(ChartData c) => {
-        'house_system': c.houseSystem,
-        'julian_day_ut': c.julianDay,
-        'asc': {'lon': c.asc.lon, 'burc': c.asc.sign, 'derece': c.asc.degree},
-        'mc': {'lon': c.mc.lon, 'burc': c.mc.sign, 'derece': c.mc.degree},
-        'gezegenler': c.planets
-            .map((p) => {
-                  'ad': p.name,
-                  'lon': p.lon,
-                  'burc': p.sign,
-                  'derece': p.degree,
-                  'ev': p.house,
-                  'hiz': p.speed,
-                  'retro': p.retrograde,
-                })
-            .toList(),
-        'evler': c.houses
-            .map((h) => {
-                  'no': h.number,
-                  'lon': h.lon,
-                  'burc': h.sign,
-                  'derece': h.degree
-                })
-            .toList(),
-        'acilar': c.aspects
-            .map((a) => {'p1': a.p1, 'p2': a.p2, 'tip': a.type, 'orb': a.orb})
-            .toList(),
-        'meta': {
-          if (c.meta.name != null && c.meta.name!.isNotEmpty) 'isim': c.meta.name,
-          'tarih': c.meta.date,
-          'saat': c.meta.time,
-          'lat': c.meta.lat,
-          'lon': c.meta.lng,
-          if (c.meta.tz != null) 'tz': c.meta.tz,
-          if (c.meta.place.isNotEmpty) 'sehir': c.meta.place,
-        },
-      };
+    'house_system': c.houseSystem,
+    'julian_day_ut': c.julianDay,
+    'asc': {'lon': c.asc.lon, 'burc': c.asc.sign, 'derece': c.asc.degree},
+    'mc': {'lon': c.mc.lon, 'burc': c.mc.sign, 'derece': c.mc.degree},
+    'gezegenler': c.planets
+        .map(
+          (p) => {
+            'ad': p.name,
+            'lon': p.lon,
+            'burc': p.sign,
+            'derece': p.degree,
+            'ev': p.house,
+            'hiz': p.speed,
+            'retro': p.retrograde,
+          },
+        )
+        .toList(),
+    'evler': c.houses
+        .map(
+          (h) => {
+            'no': h.number,
+            'lon': h.lon,
+            'burc': h.sign,
+            'derece': h.degree,
+          },
+        )
+        .toList(),
+    'acilar': c.aspects
+        .map((a) => {'p1': a.p1, 'p2': a.p2, 'tip': a.type, 'orb': a.orb})
+        .toList(),
+    'meta': {
+      if (c.meta.name != null && c.meta.name!.isNotEmpty) 'isim': c.meta.name,
+      'tarih': c.meta.date,
+      'saat': c.meta.time,
+      'lat': c.meta.lat,
+      'lon': c.meta.lng,
+      if (c.meta.tz != null) 'tz': c.meta.tz,
+      if (c.meta.place.isNotEmpty) 'sehir': c.meta.place,
+    },
+  };
 }

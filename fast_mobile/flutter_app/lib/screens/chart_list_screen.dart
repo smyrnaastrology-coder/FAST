@@ -6,6 +6,7 @@ import '../models/chart_labels.dart';
 import '../providers/chart_provider.dart';
 import 'chart_create_screen.dart';
 import 'chart_detail_screen.dart';
+import '../widgets/chart_mark.dart';
 
 class ChartListScreen extends StatefulWidget {
   const ChartListScreen({super.key});
@@ -95,7 +96,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                   child: ListTile(
                     trailing: IconButton(tooltip: 'Sil', icon: const Icon(Icons.delete_outline),
                       onPressed: () => cp.delete(c)),
-                    leading: Icon(Icons.auto_graph, color: FastTheme.accentGold),
+                    leading: const ChartMark(size: 40),
                     title: Text(name,
                         style: TextStyle(
                             color: FastTheme.text, fontWeight: FontWeight.w600)),

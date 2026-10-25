@@ -17,7 +17,12 @@ class ReturnState {
   final String type; // solar | lunar
   final int year;
   final int? month;
-  ReturnState({required this.data, required this.type, required this.year, this.month});
+  ReturnState({
+    required this.data,
+    required this.type,
+    required this.year,
+    this.month,
+  });
 }
 
 class SolarArcState {
@@ -46,6 +51,7 @@ class ChartProvider extends ChangeNotifier {
   ReturnState? _ret;
   bool _retLoading = false;
   String? _retError;
+  int _returnSequence = 0;
 
   SolarArcState? _arc;
   bool _arcLoading = false;
@@ -54,6 +60,8 @@ class ChartProvider extends ChangeNotifier {
   double? _returnLat;
   double? _returnLon;
   String _returnLocMode = 'natal'; // natal | device | manual
+  bool _returnLocationConfirmed = false;
+  String _returnPlace = '';
 
   List<ChartData> get saved => _saved;
   ChartData? get current => _current;
@@ -72,6 +80,8 @@ class ChartProvider extends ChangeNotifier {
   double? get returnLat => _returnLat;
   double? get returnLon => _returnLon;
   String get returnLocMode => _returnLocMode;
+  bool get returnLocationConfirmed => _returnLocationConfirmed;
+  String get returnPlace => _returnPlace;
 
   @override
   void dispose() {
@@ -94,12 +104,14 @@ class ChartProvider extends ChangeNotifier {
   }
 
   Future<void> delete(ChartData data) async {
-    final remaining = _saved.where(
-      (e) =>
-          !(e.meta.name == data.meta.name &&
-              e.meta.date == data.meta.date &&
-              e.meta.time == data.meta.time),
-    ).toList();
+    final remaining = _saved
+        .where(
+          (e) =>
+              !(e.meta.name == data.meta.name &&
+                  e.meta.date == data.meta.date &&
+                  e.meta.time == data.meta.time),
+        )
+        .toList();
     _saved = remaining;
     notifyListeners();
     await _service.deleteLocal(data);
@@ -135,6 +147,10 @@ class ChartProvider extends ChangeNotifier {
     _returnLat = data.meta.lat;
     _returnLon = data.meta.lng;
     _returnLocMode = 'natal';
+    _returnLocationConfirmed = false;
+    ++_returnSequence;
+    _retLoading = false;
+    _returnPlace = data.meta.place;
     notifyListeners();
   }
 
@@ -170,11 +186,18 @@ class ChartProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loadBiwheel({required DateTime when, double? lat, double? lon}) async {
+  Future<void> loadBiwheel({
+    required DateTime when,
+    double? lat,
+    double? lon,
+  }) async {
     if (_current == null) return;
-    final d = '${when.year.toString().padLeft(4, '0')}-${when.month.toString().padLeft(2, '0')}-${when.day.toString().padLeft(2, '0')}';
-    final t = '${when.hour.toString().padLeft(2, '0')}:${when.minute.toString().padLeft(2, '0')}';
-    final key = '${_current!.meta.date}|${_current!.meta.time}|'
+    final d =
+        '${when.year.toString().padLeft(4, '0')}-${when.month.toString().padLeft(2, '0')}-${when.day.toString().padLeft(2, '0')}';
+    final t =
+        '${when.hour.toString().padLeft(2, '0')}:${when.minute.toString().padLeft(2, '0')}';
+    final key =
+        '${_current!.meta.date}|${_current!.meta.time}|'
         '${lat ?? _current!.meta.lat}|${lon ?? _current!.meta.lng}|$d|$t';
 
     final cached = _biCache[key];
@@ -213,7 +236,23 @@ class ChartProvider extends ChangeNotifier {
     }
   }
 
-  void setReturnLocation({required String mode, double? lat, double? lon}) {
+  void invalidateReturnLocation() {
+    ++_returnSequence;
+    _retLoading = false;
+    _returnLocationConfirmed = false;
+    _ret = null;
+    _retError = null;
+    notifyListeners();
+  }
+
+  void setReturnLocation({
+    required String mode,
+    double? lat,
+    double? lon,
+    String? place,
+  }) {
+    ++_returnSequence;
+    _retLoading = false;
     _returnLocMode = mode;
     if (mode == 'natal' && _current != null) {
       _returnLat = _current!.meta.lat;
@@ -222,11 +261,26 @@ class ChartProvider extends ChangeNotifier {
       _returnLat = lat;
       _returnLon = lon;
     }
+    _returnPlace =
+        place ??
+        (mode == 'natal'
+            ? _current?.meta.place ?? 'Natal yeri'
+            : mode == 'device'
+            ? 'Cihaz konumu'
+            : 'Manuel konum');
+    _returnLocationConfirmed =
+        _returnLat != null &&
+        _returnLon != null &&
+        _returnLat!.abs() <= 90 &&
+        _returnLon!.abs() <= 180;
+    _ret = null;
+    _retError = null;
     notifyListeners();
   }
 
   Future<void> loadSolarReturn(int year) async {
-    if (_current == null) return;
+    if (_current == null || !_returnLocationConfirmed) return;
+    final sequence = ++_returnSequence;
     _retLoading = true;
     _retError = null;
     notifyListeners();
@@ -237,17 +291,22 @@ class ChartProvider extends ChangeNotifier {
         lat: _returnLat,
         lon: _returnLon,
       );
+      if (sequence != _returnSequence) return;
       _ret = ReturnState(data: res, type: 'solar', year: year);
     } catch (e) {
+      if (sequence != _returnSequence) return;
       _retError = e.toString();
     } finally {
-      _retLoading = false;
-      notifyListeners();
+      if (sequence == _returnSequence) {
+        _retLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   Future<void> loadLunarReturn(int year, int month) async {
-    if (_current == null) return;
+    if (_current == null || !_returnLocationConfirmed) return;
+    final sequence = ++_returnSequence;
     _retLoading = true;
     _retError = null;
     notifyListeners();
@@ -259,27 +318,46 @@ class ChartProvider extends ChangeNotifier {
         lat: _returnLat,
         lon: _returnLon,
       );
+      if (sequence != _returnSequence) return;
       _ret = ReturnState(data: res, type: 'lunar', year: year, month: month);
     } catch (e) {
+      if (sequence != _returnSequence) return;
       _retError = e.toString();
     } finally {
-      _retLoading = false;
-      notifyListeners();
+      if (sequence == _returnSequence) {
+        _retLoading = false;
+        notifyListeners();
+      }
     }
   }
 
-  void loadBiwheelDebounced({required DateTime when, double? lat, double? lon, int ms = 200}) {
+  void loadBiwheelDebounced({
+    required DateTime when,
+    double? lat,
+    double? lon,
+    int ms = 200,
+  }) {
     _biTimer?.cancel();
-    _biTimer = Timer(Duration(milliseconds: ms), () => loadBiwheel(when: when, lat: lat, lon: lon));
+    _biTimer = Timer(
+      Duration(milliseconds: ms),
+      () => loadBiwheel(when: when, lat: lat, lon: lon),
+    );
   }
 
-  Future<void> loadSolarArc(String hedefTarih, {String method = 'secondary'}) async {
+  Future<void> loadSolarArc(
+    String hedefTarih, {
+    String method = 'secondary',
+  }) async {
     if (_current == null) return;
     _arcLoading = true;
     _arcError = null;
     notifyListeners();
     try {
-      final res = await _service.progression(natal: _current!, targetDate: hedefTarih, method: method);
+      final res = await _service.progression(
+        natal: _current!,
+        targetDate: hedefTarih,
+        method: method,
+      );
       _arc = SolarArcState(data: res, targetDate: hedefTarih);
     } catch (e) {
       _arcError = e.toString();

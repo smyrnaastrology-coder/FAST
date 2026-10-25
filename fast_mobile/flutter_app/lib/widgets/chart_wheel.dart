@@ -2,9 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../config/theme.dart';
 import '../models/chart_data.dart';
 import '../models/chart_labels.dart';
+import '../models/chart_frame.dart';
+import '../screens/chart_explorer_screen.dart';
 
 /// SolarFire tarzı çok katmanlı natal / bi-wheel çarkı.
 ///
@@ -17,6 +18,13 @@ class ChartWheel extends StatelessWidget {
   final List<PlanetPos>? outerPlanets;
   final List<HouseCusp>? outerHouses;
   final bool showAspectLines;
+  final bool lightTheme;
+  final bool showControls;
+  final DateTime? initialDate;
+  final ChartFrameLoader? loadFrame;
+  final String title;
+  final String subtitle;
+  final List<ChartTimeUnit> timeUnits;
 
   const ChartWheel({
     super.key,
@@ -25,6 +33,13 @@ class ChartWheel extends StatelessWidget {
     this.outerPlanets,
     this.outerHouses,
     this.showAspectLines = true,
+    this.lightTheme = false,
+    this.showControls = true,
+    this.initialDate,
+    this.loadFrame,
+    this.title = 'Natal',
+    this.subtitle = '',
+    this.timeUnits = ChartTimeUnit.values,
   });
 
   @override
@@ -32,30 +47,58 @@ class ChartWheel extends StatelessWidget {
     Widget drawing(double extent) => SizedBox(
       width: extent,
       height: extent,
-      child: CustomPaint(
-        painter: _WheelPainter(
-          data: data,
-          outerPlanets: outerPlanets,
-          outerHouses: outerHouses,
-          showAspectLines: showAspectLines,
+      child: ColoredBox(
+        color: lightTheme ? Colors.white : const Color(0xFF0D1017),
+        child: CustomPaint(
+          painter: _WheelPainter(
+            data: data,
+            outerPlanets: outerPlanets,
+            outerHouses: outerHouses,
+            showAspectLines: showAspectLines,
+            lightTheme: lightTheme,
+          ),
         ),
       ),
     );
-    return Stack(alignment: Alignment.topRight, children: [
-      InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(size)),
-      IconButton(tooltip: 'Tam ekran • iki parmakla yakınlaştır',
-        icon: const Icon(Icons.fullscreen), onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => Scaffold(
-            backgroundColor: FastTheme.bg,
-            appBar: AppBar(title: const Text('Harita • Yakınlaştır / Uzaklaştır')),
-            body: LayoutBuilder(builder: (context, constraints) {
-              final extent = math.min(constraints.maxWidth, constraints.maxHeight);
-              return Center(child: InteractiveViewer(minScale: 0.75, maxScale: 8,
-                boundaryMargin: const EdgeInsets.all(160), child: drawing(extent)));
-            }),
-          )));
-        }),
-    ]);
+    if (!showControls) return drawing(size);
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(size)),
+        if (showControls)
+          IconButton(
+            tooltip: 'Tam ekran • zaman / tema / paylaş',
+            icon: Icon(
+              Icons.fullscreen,
+              color: lightTheme ? Colors.black : Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ChartExplorerScreen(
+                    initial: ChartFrame(
+                      data: data,
+                      outerPlanets: outerPlanets,
+                      outerHouses: outerHouses,
+                      title: title,
+                      subtitle: subtitle,
+                    ),
+                    initialDate:
+                        initialDate ??
+                        DateTime.tryParse(
+                          '${data.meta.date} ${data.meta.time}',
+                        ) ??
+                        DateTime.now(),
+                    loadFrame: loadFrame,
+                    lightTheme: lightTheme,
+                    timeUnits: timeUnits,
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
+    );
   }
 }
 
@@ -71,12 +114,25 @@ class _WheelPainter extends CustomPainter {
   final List<PlanetPos>? outerPlanets;
   final List<HouseCusp>? outerHouses;
   final bool showAspectLines;
+  final bool lightTheme;
+  Color get _ink =>
+      lightTheme ? const Color(0xFF131722) : const Color(0xFFF2F4FA);
+  Color get _gold =>
+      lightTheme ? const Color(0xFF795400) : const Color(0xFFE6C57A);
+  Color get _border =>
+      lightTheme ? const Color(0xFF545E70) : const Color(0xFF8290A7);
+  Color get _muted =>
+      lightTheme ? const Color(0xFF374151) : const Color(0xFFBBC4D4);
+  Color get _bg => lightTheme ? Colors.white : const Color(0xFF0D1017);
+  Color get _retro =>
+      lightTheme ? const Color(0xFF9D261A) : const Color(0xFFFFBF80);
 
   _WheelPainter({
     required this.data,
     this.outerPlanets,
     this.outerHouses,
     this.showAspectLines = true,
+    this.lightTheme = false,
   });
 
   static const _fire = Color(0xFFFF8A65);
@@ -84,7 +140,15 @@ class _WheelPainter extends CustomPainter {
   static const _air = Color(0xFFFFD54F);
   static const _water = Color(0xFF4FC3F7);
 
-  static Color _signColor(int sign) {
+  Color _signColor(int sign) {
+    if (lightTheme) {
+      return const [
+        Color(0xFFB0371B),
+        Color(0xFF286B30),
+        Color(0xFF826200),
+        Color(0xFF005A95),
+      ][sign % 4];
+    }
     switch (sign % 12) {
       case 0:
       case 4:
@@ -103,7 +167,7 @@ class _WheelPainter extends CustomPainter {
     }
   }
 
-  static Color _aspectColor(String type) {
+  Color _aspectColor(String type) {
     switch (type.toLowerCase()) {
       case 'trine':
         return const Color(0xFF81C784);
@@ -114,7 +178,7 @@ class _WheelPainter extends CustomPainter {
       case 'opposition':
         return const Color(0xFFFF8A65);
       case 'conjunction':
-        return FastTheme.accentGold;
+        return _gold;
       default:
         return Colors.white70;
     }
@@ -219,18 +283,21 @@ class _WheelPainter extends CustomPainter {
     final hubR = r * 0.14;
 
     final circleOuter = Paint()
-      ..color = FastTheme.border.withValues(alpha: 0.85)
+      ..color = _border.withValues(alpha: 0.85)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
     final circleInner = Paint()
-      ..color = FastTheme.border.withValues(alpha: 0.55)
+      ..color = _border.withValues(alpha: 0.55)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
     // --- Burç halkası zemin ---
     for (var i = 0; i < 12; i++) {
       final start = i * 30.0;
-      final rect = Rect.fromCircle(center: center, radius: (signOuter + signInner) / 2);
+      final rect = Rect.fromCircle(
+        center: center,
+        radius: (signOuter + signInner) / 2,
+      );
       final paint = Paint()
         ..color = _signColor(i).withValues(alpha: 0.10)
         ..style = PaintingStyle.stroke
@@ -249,17 +316,17 @@ class _WheelPainter extends CustomPainter {
 
     // --- Derece çentikleri ---
     final tickPaint = Paint()
-      ..color = FastTheme.textMuted.withValues(alpha: 0.55)
+      ..color = _muted.withValues(alpha: 0.55)
       ..strokeWidth = 0.7;
     final tickMajor = Paint()
-      ..color = FastTheme.accentGold.withValues(alpha: 0.75)
+      ..color = _gold.withValues(alpha: 0.75)
       ..strokeWidth = 1.1;
     for (var d = 0; d < 360; d++) {
       final len = d % 30 == 0
           ? (signOuter - signInner) * 0.55
           : d % 5 == 0
-              ? (signOuter - signInner) * 0.32
-              : (signOuter - signInner) * 0.16;
+          ? (signOuter - signInner) * 0.32
+          : (signOuter - signInner) * 0.16;
       final p1 = _pos(d.toDouble(), signInner, center, ascLon);
       final p2 = _pos(d.toDouble(), signInner + len, center, ascLon);
       canvas.drawLine(p1, p2, d % 30 == 0 ? tickMajor : tickPaint);
@@ -283,9 +350,10 @@ class _WheelPainter extends CustomPainter {
 
     // --- Ev çizgileri ve numaraları ---
     final cuspPaint = Paint()
-      ..color = FastTheme.accentGold.withValues(alpha: 0.35)
+      ..color = _gold.withValues(alpha: 0.35)
       ..strokeWidth = 1;
-    final houses = [...data.houses]..sort((a, b) => a.number.compareTo(b.number));
+    final houses = [...data.houses]
+      ..sort((a, b) => a.number.compareTo(b.number));
     for (var i = 0; i < houses.length; i++) {
       final h = houses[i];
       final p1 = _pos(h.lon, signInner, center, ascLon);
@@ -304,7 +372,7 @@ class _WheelPainter extends CustomPainter {
         houseNumR,
         mid,
         h.number.toString(),
-        FastTheme.accentGold.withValues(alpha: 0.85),
+        _gold.withValues(alpha: 0.85),
         (r * 0.036).clamp(9.0, 14.0),
         ascLon: ascLon,
         weight: FontWeight.w700,
@@ -314,7 +382,7 @@ class _WheelPainter extends CustomPainter {
     // --- Bi-wheel dış ev çizgileri (transit) ---
     if (outerHouses != null && outerHouses!.isNotEmpty) {
       final outerCusp = Paint()
-        ..color = Colors.white.withValues(alpha: 0.20)
+        ..color = _muted.withValues(alpha: 0.30)
         ..strokeWidth = 0.8;
       for (final h in outerHouses!) {
         final p1 = _pos(h.lon, signInner, center, ascLon);
@@ -338,7 +406,8 @@ class _WheelPainter extends CustomPainter {
         final alpha = (0.45 - a.orb * 0.035).clamp(0.12, 0.45);
         final paint = Paint()
           ..color = color.withValues(alpha: alpha)
-          ..strokeWidth = a.type.toLowerCase() == 'trine' ||
+          ..strokeWidth =
+              a.type.toLowerCase() == 'trine' ||
                   a.type.toLowerCase() == 'opposition'
               ? 1.2
               : 0.9;
@@ -354,7 +423,7 @@ class _WheelPainter extends CustomPainter {
       center,
       aspectR,
       Paint()
-        ..color = FastTheme.border.withValues(alpha: 0.5)
+        ..color = _border.withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.8,
     );
@@ -362,21 +431,28 @@ class _WheelPainter extends CustomPainter {
       center,
       hubR,
       Paint()
-        ..color = FastTheme.border.withValues(alpha: 0.35)
+        ..color = _border.withValues(alpha: 0.35)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.8,
     );
 
     // --- ASC / DSC / MC / IC eksenleri ---
     _axis(canvas, center, signInner, aspectR, ascLon, ascLon + 180, ascLon);
-    _axis(canvas, center, signInner, aspectR, data.mc.lon, data.mc.lon + 180,
-        ascLon);
+    _axis(
+      canvas,
+      center,
+      signInner,
+      aspectR,
+      data.mc.lon,
+      data.mc.lon + 180,
+      ascLon,
+    );
 
     // --- Gezegen halkaları ---
     final natalGlyphSize = (r * 0.078).clamp(12.0, 22.0);
     final natal = _layout(data.planets, 8.0);
     for (final g in natal) {
-      final color = g.planet.retrograde ? FastTheme.accentGoldLight : FastTheme.text;
+      final color = g.planet.retrograde ? _retro : _ink;
       // gerçek konum işareti
       canvas.drawCircle(
         _pos(g.actual, natalR + natalGlyphSize * 0.9, center, ascLon),
@@ -401,7 +477,7 @@ class _WheelPainter extends CustomPainter {
           natalR - natalGlyphSize * 0.85,
           g.display,
           'R',
-          FastTheme.accentGoldLight,
+          _retro,
           (nativeSmall(natalGlyphSize)),
           ascLon: ascLon,
           weight: FontWeight.w700,
@@ -413,7 +489,9 @@ class _WheelPainter extends CustomPainter {
       final transitGlyphSize = (r * 0.062).clamp(10.0, 18.0);
       final trans = _layout(outerPlanets!, 7.0);
       for (final g in trans) {
-        final color = const Color(0xFF8FD8FF);
+        final color = lightTheme
+            ? const Color(0xFF005C99)
+            : const Color(0xFF8FD8FF);
         canvas.drawCircle(
           _pos(g.actual, transitR + transitGlyphSize * 0.9, center, ascLon),
           1.1,
@@ -453,11 +531,7 @@ class _WheelPainter extends CustomPainter {
     _angleLabel(canvas, center, signInner, data.mc.lon + 180, 'IC', ascLon);
 
     // merkez noktası
-    canvas.drawCircle(
-      center,
-      2,
-      Paint()..color = FastTheme.accentGold.withValues(alpha: 0.6),
-    );
+    canvas.drawCircle(center, 2, Paint()..color = _gold.withValues(alpha: 0.6));
   }
 
   double nativeSmall(double base) => (base * 0.62).clamp(6.0, 11.0);
@@ -472,7 +546,7 @@ class _WheelPainter extends CustomPainter {
     double ascLon,
   ) {
     final paint = Paint()
-      ..color = FastTheme.accentGold.withValues(alpha: 0.55)
+      ..color = _gold.withValues(alpha: 0.55)
       ..strokeWidth = 1.3;
     canvas.drawLine(
       _pos(lon1, outer, center, ascLon),
@@ -494,7 +568,7 @@ class _WheelPainter extends CustomPainter {
     String label,
     double ascLon,
   ) {
-    final tp = _tp(label, FastTheme.accentGold, 9, weight: FontWeight.w700);
+    final tp = _tp(label, _gold, 9, weight: FontWeight.w700);
     final p = _pos(lon, radius - 10, center, ascLon);
     final origin = p - Offset(tp.width / 2, tp.height / 2);
     final bg = Rect.fromLTWH(
@@ -505,13 +579,15 @@ class _WheelPainter extends CustomPainter {
     );
     canvas.drawRRect(
       RRect.fromRectAndRadius(bg, const Radius.circular(3)),
-      Paint()..color = FastTheme.bg.withValues(alpha: 0.85),
+      Paint()..color = _bg.withValues(alpha: 0.85),
     );
     tp.paint(canvas, origin);
   }
 
   @override
   bool shouldRepaint(covariant _WheelPainter old) =>
+      old.lightTheme != lightTheme ||
+      old.showAspectLines != showAspectLines ||
       old.data != data ||
       old.outerPlanets != outerPlanets ||
       old.outerHouses != outerHouses;

@@ -18,6 +18,7 @@ import 'landing_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import 'chart_list_screen.dart';
+import '../widgets/chart_mark.dart';
 
 /// Uygulama kabuÄŸu (Hub): tek giriÅŸten 3 sÃ¼tuna eriÅŸim â€”
 /// Sosyal Â· Fast Synastry Â· Horary Oracle. Ãœstte profil.
@@ -72,9 +73,9 @@ class _MainShellState extends State<MainShell> {
       color: FastTheme.bgSecondary,
       itemBuilder: (_) => [
         for (final e in const [
-          ('tr', 'TÃ¼rkÃ§e'),
+          ('tr', 'Türkçe'),
           ('en', 'English'),
-          ('es', 'EspaÃ±ol'),
+          ('es', 'Español'),
         ])
           CheckedPopupMenuItem(
             value: e.$1,
@@ -317,6 +318,7 @@ class _MainShellState extends State<MainShell> {
                     _PillarCard(
                       icon: Icons.auto_graph_outlined,
                       activeIcon: Icons.auto_graph,
+                      emblem: const ChartMark(),
                       title: 'Haritalarım',
                       desc: 'Natal haritanı oluştur ve incele',
                       colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
@@ -433,6 +435,7 @@ class _PillarCard extends StatelessWidget {
   final IconData icon;
   final IconData activeIcon;
   final String? asset;
+  final Widget? emblem;
   final String title;
   final String desc;
   final List<Color> colors;
@@ -442,6 +445,7 @@ class _PillarCard extends StatelessWidget {
     required this.icon,
     required this.activeIcon,
     this.asset,
+    this.emblem,
     required this.title,
     required this.desc,
     required this.colors,
@@ -484,7 +488,7 @@ class _PillarCard extends StatelessWidget {
                     gradient: LinearGradient(colors: colors),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: asset == null
+                  child: emblem ?? (asset == null
                       ? Icon(activeIcon, color: FastTheme.bg, size: 28)
                       : Padding(
                           padding: const EdgeInsets.all(4),
@@ -496,7 +500,7 @@ class _PillarCard extends StatelessWidget {
                                   Icon(activeIcon, color: FastTheme.bg, size: 28),
                             ),
                           ),
-                        ),
+                        )),
                 ),
                 const SizedBox(width: 18),
                 Expanded(

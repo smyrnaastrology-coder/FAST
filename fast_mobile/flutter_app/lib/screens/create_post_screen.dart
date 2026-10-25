@@ -148,7 +148,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.memory(_bytes!, fit: BoxFit.contain, color: Colors.black, colorBlendMode: BlendMode.multiply),
+                      Image.memory(_bytes!, fit: BoxFit.contain),
                       Positioned(
                         top: 10,
                         left: 10,

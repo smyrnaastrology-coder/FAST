@@ -139,6 +139,28 @@ def sehir_bul(arama_metni):
     Önce yerel cities_db.json içinde aksan duyarsız arar, bulamazsa
     geopy (Nominatim) ile çevrimiçi çözmeyi dener.
     """
+    # Resolve a qualified selection locally: same-named cities in different
+    # countries must not silently select the first global search result.
+    if ',' in arama_metni:
+        qualified_query = _normalize_metin(arama_metni)
+        try:
+            db = sehir_veritabani_yukle()
+            for country, cities in db.items():
+                suffix = next((separator + _normalize_metin(country)
+                    for separator in (', ', ',')
+                    if qualified_query.endswith(separator + _normalize_metin(country))), None)
+                if suffix is None:
+                    continue
+                city_query = qualified_query[:-len(suffix)].strip()
+                for city, coordinates in cities.items():
+                    if _normalize_metin(city) != city_query:
+                        continue
+                    lat = coordinates['lat'] if isinstance(coordinates, dict) else coordinates[0]
+                    lon = coordinates['lon'] if isinstance(coordinates, dict) else coordinates[1]
+                    return {'lat': lat, 'lon': lon, 'sehir': city, 'ulke': country,
+                            'tam_ad': f'{city}, {country}', 'kaynak': 'yerel'}
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
     yerel = sehir_ara(arama_metni, limit=1)
     if yerel:
         s = yerel[0]

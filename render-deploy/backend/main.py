@@ -7079,6 +7079,16 @@ def _chart_house_of(deg, cusps):
     return 1
 
 
+def _chart_utc_offset(explicit, lat, lon, year, month, day, hour, minute):
+    if explicit is not None:
+        return float(explicit)
+    from ashtakoot_utc import tzdb_ofset
+    resolved = tzdb_ofset(float(lat), float(lon), year, month, day, hour, minute)
+    if resolved is None:
+        raise ValueError('Historical timezone could not be resolved; supply tz explicitly')
+    return resolved['offset']
+
+
 class ChartNatalIn(BaseModel):
     isim: Optional[str] = None
     tarih: str
@@ -7103,14 +7113,7 @@ def charts_natal(inp: ChartNatalIn):
         y = int(tarih_parca[0]); m = int(tarih_parca[1]); d = int(tarih_parca[2])
         hh = int(saat_parca[0]); mm = int(saat_parca[1]) if len(saat_parca) > 1 else 0
 
-        if inp.tz is None:
-            from ashtakoot_utc import tzdb_ofset
-            resolved = tzdb_ofset(float(inp.lat), float(inp.lon), y, m, d, hh, mm)
-            if resolved is None:
-                raise ValueError("Historical timezone could not be resolved; supply tz explicitly")
-            uo = resolved['offset']
-        else:
-            uo = float(inp.tz)
+        uo = _chart_utc_offset(inp.tz, inp.lat, inp.lon, y, m, d, hh, mm)
         ss = float(saat_parca[2]) if len(saat_parca) > 2 else 0.0
         jd_ut = swe.julday(y, m, d, hh + mm / 60.0 + ss / 3600.0 - uo)
 
@@ -7186,6 +7189,7 @@ class ChartProgressionIn(BaseModel):
     natal: ChartNatalIn
     target_date: str
     method: str = 'secondary'
+    target_time: str = '00:00'
 
 
 @app_fast.post('/api/charts/progression')
@@ -7194,7 +7198,7 @@ def charts_progression(inp: ChartProgressionIn):
     birth = charts_natal(inp.natal)
     local_birth = datetime.strptime(inp.natal.tarih + ' ' + inp.natal.saat, '%Y-%m-%d %H:%M')
     birth_utc = local_birth - timedelta(hours=birth['meta']['tz'])
-    target = datetime.strptime(inp.target_date, '%Y-%m-%d')
+    target = datetime.strptime(inp.target_date + ' ' + inp.target_time, '%Y-%m-%d %H:%M')
     age_years = (target - local_birth).total_seconds() / (365.242189 * 86400)
     if age_years < 0:
         raise HTTPException(400, 'Target date must not precede birth')
@@ -7208,6 +7212,7 @@ def charts_progression(inp: ChartProgressionIn):
         saat=progressed.strftime('%H:%M:%S.%f'), lat=inp.natal.lat, lon=inp.natal.lon,
         tz=0, house_system=inp.natal.house_system, sehir=inp.natal.sehir))
     chart['progression'] = {'method': inp.method, 'target_date': inp.target_date,
+                            'target_time': inp.target_time,
                             'age_years': age_years, 'days_per_year': factor,
                             'angles_method': 'quotidian', 'ephemeris_utc': progressed.isoformat()}
     return chart
@@ -7244,7 +7249,7 @@ def charts_biwheel(inp: ChartBiwheelIn):
         ns = inp.natal_saat.split(":")
         ny = int(nt[0]); nm = int(nt[1]); nd = int(nt[2])
         nhh = int(ns[0]); nmm = int(ns[1]) if len(ns) > 1 else 0
-        nuo = 3.0 if inp.natal_tz is None else float(inp.natal_tz)
+        nuo = _chart_utc_offset(inp.natal_tz, inp.natal_lat, inp.natal_lon, ny, nm, nd, nhh, nmm)
         jd_n = swe.julday(ny, nm, nd, nhh + nmm / 60.0 - nuo)
         ncusps, nasc = swe.houses_ex(jd_n, float(inp.natal_lat), float(inp.natal_lon), _CHART_HSYS_MAP[hsys])
         ncusps_list = [float(ncusps[i]) for i in range(12)]
@@ -7282,7 +7287,7 @@ def charts_biwheel(inp: ChartBiwheelIn):
         ts = inp.hedef_saat.split(":")
         ty = int(tt[0]); tm = int(tt[1]); td = int(tt[2])
         thh = int(ts[0]); tmm = int(ts[1]) if len(ts) > 1 else 0
-        tuo = 3.0 if inp.tz is None else float(inp.tz)
+        tuo = _chart_utc_offset(inp.tz, inp.lat, inp.lon, ty, tm, td, thh, tmm)
         jd_t = swe.julday(ty, tm, td, thh + tmm / 60.0 - tuo)
         tcusps, tasc = swe.houses_ex(jd_t, float(inp.lat), float(inp.lon), _CHART_HSYS_MAP[hsys])
         tcusps_list = [float(tcusps[i]) for i in range(12)]
