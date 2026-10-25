@@ -7103,8 +7103,16 @@ def charts_natal(inp: ChartNatalIn):
         y = int(tarih_parca[0]); m = int(tarih_parca[1]); d = int(tarih_parca[2])
         hh = int(saat_parca[0]); mm = int(saat_parca[1]) if len(saat_parca) > 1 else 0
 
-        uo = 3.0 if inp.tz is None else float(inp.tz)
-        jd_ut = swe.julday(y, m, d, hh + mm / 60.0 - uo)
+        if inp.tz is None:
+            from ashtakoot_utc import tzdb_ofset
+            resolved = tzdb_ofset(float(inp.lat), float(inp.lon), y, m, d, hh, mm)
+            if resolved is None:
+                raise ValueError("Historical timezone could not be resolved; supply tz explicitly")
+            uo = resolved['offset']
+        else:
+            uo = float(inp.tz)
+        ss = float(saat_parca[2]) if len(saat_parca) > 2 else 0.0
+        jd_ut = swe.julday(y, m, d, hh + mm / 60.0 + ss / 3600.0 - uo)
 
         ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
         if os.path.isdir(ephe_yolu):
@@ -7166,12 +7174,43 @@ def charts_natal(inp: ChartNatalIn):
             "gezegenler": planets,
             "evler": evler,
             "acilar": aspects,
-            "meta": {"isim": inp.isim, "tarih": inp.tarih, "saat": inp.saat, "lat": inp.lat, "lon": inp.lon, "sehir": inp.sehir}
+            "meta": {"isim": inp.isim, "tarih": inp.tarih, "saat": inp.saat, "lat": inp.lat, "lon": inp.lon, "sehir": inp.sehir, "tz": uo}
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
+
+
+class ChartProgressionIn(BaseModel):
+    natal: ChartNatalIn
+    target_date: str
+    method: str = 'secondary'
+
+
+@app_fast.post('/api/charts/progression')
+def charts_progression(inp: ChartProgressionIn):
+    from datetime import datetime, timedelta
+    birth = charts_natal(inp.natal)
+    local_birth = datetime.strptime(inp.natal.tarih + ' ' + inp.natal.saat, '%Y-%m-%d %H:%M')
+    birth_utc = local_birth - timedelta(hours=birth['meta']['tz'])
+    target = datetime.strptime(inp.target_date, '%Y-%m-%d')
+    age_years = (target - local_birth).total_seconds() / (365.242189 * 86400)
+    if age_years < 0:
+        raise HTTPException(400, 'Target date must not precede birth')
+    if inp.method not in ('secondary', 'minor'):
+        raise HTTPException(400, 'Unknown progression method')
+    # Secondary: one ephemeris day/year. Minor: one sidereal lunar month/year.
+    factor = 1.0 if inp.method == 'secondary' else 27.321582
+    progressed = birth_utc + timedelta(days=age_years * factor)
+    chart = charts_natal(ChartNatalIn(
+        isim=inp.natal.isim, tarih=progressed.strftime('%Y-%m-%d'),
+        saat=progressed.strftime('%H:%M:%S.%f'), lat=inp.natal.lat, lon=inp.natal.lon,
+        tz=0, house_system=inp.natal.house_system, sehir=inp.natal.sehir))
+    chart['progression'] = {'method': inp.method, 'target_date': inp.target_date,
+                            'age_years': age_years, 'days_per_year': factor,
+                            'angles_method': 'quotidian', 'ephemeris_utc': progressed.isoformat()}
+    return chart
 
 
 class ChartBiwheelIn(BaseModel):

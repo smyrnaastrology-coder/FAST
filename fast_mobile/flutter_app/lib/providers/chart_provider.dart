@@ -27,7 +27,9 @@ class SolarArcState {
 }
 
 class ChartProvider extends ChangeNotifier {
-  final ChartService _service = ChartService();
+  final ChartService _service;
+
+  ChartProvider({ChartService? service}) : _service = service ?? ChartService();
 
   List<ChartData> _saved = [];
   ChartData? _current;
@@ -100,8 +102,16 @@ class ChartProvider extends ChangeNotifier {
     ).toList();
     _saved = remaining;
     notifyListeners();
-    await _service.saveLocal(data);
+    await _service.deleteLocal(data);
     await _service.cloudDelete(data);
+  }
+
+  Future<void> saveCurrent() async {
+    final data = _current;
+    if (data == null) return;
+    await _service.saveLocal(data);
+    await _service.cloudSave(data);
+    await loadSaved();
   }
 
   void setHouseSystem(String hs) {
@@ -110,6 +120,9 @@ class ChartProvider extends ChangeNotifier {
   }
 
   void open(ChartData data) {
+    _biTimer?.cancel();
+    _biSeq++;
+    _biLoading = false;
     _current = data;
     _houseSystem = data.houseSystem;
     _biCache.clear();
@@ -117,6 +130,8 @@ class ChartProvider extends ChangeNotifier {
     _biError = null;
     _ret = null;
     _retError = null;
+    _arc = null;
+    _arcError = null;
     _returnLat = data.meta.lat;
     _returnLon = data.meta.lng;
     _returnLocMode = 'natal';
@@ -146,10 +161,7 @@ class ChartProvider extends ChangeNotifier {
         tz: tz,
         place: place,
       );
-      _current = data;
-      await _service.saveLocal(data);
-      await loadSaved();
-      unawaited(_service.cloudSave(data));
+      open(data);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -261,13 +273,13 @@ class ChartProvider extends ChangeNotifier {
     _biTimer = Timer(Duration(milliseconds: ms), () => loadBiwheel(when: when, lat: lat, lon: lon));
   }
 
-  Future<void> loadSolarArc(String hedefTarih) async {
+  Future<void> loadSolarArc(String hedefTarih, {String method = 'secondary'}) async {
     if (_current == null) return;
     _arcLoading = true;
     _arcError = null;
     notifyListeners();
     try {
-      final res = await _service.solarArc(natal: _current!, hedefTarih: hedefTarih);
+      final res = await _service.progression(natal: _current!, targetDate: hedefTarih, method: method);
       _arc = SolarArcState(data: res, targetDate: hedefTarih);
     } catch (e) {
       _arcError = e.toString();
@@ -277,4 +289,3 @@ class ChartProvider extends ChangeNotifier {
     }
   }
 }
-

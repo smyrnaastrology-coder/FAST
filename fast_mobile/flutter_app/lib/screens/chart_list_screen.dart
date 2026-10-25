@@ -93,6 +93,8 @@ class _ChartListScreenState extends State<ChartListScreen> {
                         Border.all(color: FastTheme.border.withValues(alpha: 0.5)),
                   ),
                   child: ListTile(
+                    trailing: IconButton(tooltip: 'Sil', icon: const Icon(Icons.delete_outline),
+                      onPressed: () => cp.delete(c)),
                     leading: Icon(Icons.auto_graph, color: FastTheme.accentGold),
                     title: Text(name,
                         style: TextStyle(

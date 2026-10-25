@@ -24,7 +24,6 @@ class ChartService {
     double? tz,
     String? place,
   }) async {
-    final offset = tz ?? DateTime.now().timeZoneOffset.inMinutes / 60.0;
     final body = <String, dynamic>{
       'tarih': tarih,
       'saat': saat,
@@ -33,7 +32,7 @@ class ChartService {
       'house_system': houseSystem,
       if (isim != null && isim.isNotEmpty) 'isim': isim,
       if (place != null && place.isNotEmpty) 'sehir': place,
-      'tz': offset,
+      'tz': ?tz,
     };
     final r = await _client
         .post(
@@ -52,7 +51,7 @@ class ChartService {
     meta['saat'] = saat;
     meta['lat'] = lat;
     meta['lon'] = lon;
-    meta['tz'] = offset;
+    if (tz != null) meta['tz'] = tz;
     if (place != null && place.isNotEmpty) meta['sehir'] = place;
     final merged = Map<String, dynamic>.from(json)..['meta'] = meta;
     return ChartData.fromJson(merged);
@@ -191,6 +190,19 @@ class ChartService {
     return jsonDecode(r.body) as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> progression({required ChartData natal,
+    required String targetDate, required String method}) async {
+    final r = await _client.post(
+      Uri.parse('${ApiConfig.baseUrl}/api/charts/progression'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'natal': {...natal.meta.toJson(),
+        'house_system': natal.houseSystem}, 'target_date': targetDate,
+        'method': method}),
+    ).timeout(ApiConfig.timeout);
+    if (r.statusCode != 200) throw Exception('Progresyon: HTTP ${r.statusCode}');
+    return jsonDecode(r.body) as Map<String, dynamic>;
+  }
+
   static const _key = 'holavon_charts_list_v1';
 
   Future<List<ChartData>> loadLocal() async {
@@ -220,6 +232,14 @@ class ChartService {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(merged.map((e) => _toJson(e)).toList());
     await prefs.setString(_key, encoded);
+  }
+
+  Future<void> deleteLocal(ChartData data) async {
+    final list = await loadLocal();
+    list.removeWhere((e) => e.meta.name == data.meta.name &&
+        e.meta.date == data.meta.date && e.meta.time == data.meta.time);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, jsonEncode(list.map(_toJson).toList()));
   }
 
   bool get cloudEnabled => ApiConfig.supabaseEnabled && AuthService.enabled;

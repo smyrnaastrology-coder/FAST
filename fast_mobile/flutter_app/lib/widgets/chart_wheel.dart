@@ -29,9 +29,9 @@ class ChartWheel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
+    Widget drawing(double extent) => SizedBox(
+      width: extent,
+      height: extent,
       child: CustomPaint(
         painter: _WheelPainter(
           data: data,
@@ -41,6 +41,21 @@ class ChartWheel extends StatelessWidget {
         ),
       ),
     );
+    return Stack(alignment: Alignment.topRight, children: [
+      InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(size)),
+      IconButton(tooltip: 'Tam ekran • iki parmakla yakınlaştır',
+        icon: const Icon(Icons.fullscreen), onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => Scaffold(
+            backgroundColor: FastTheme.bg,
+            appBar: AppBar(title: const Text('Harita • Yakınlaştır / Uzaklaştır')),
+            body: LayoutBuilder(builder: (context, constraints) {
+              final extent = math.min(constraints.maxWidth, constraints.maxHeight);
+              return Center(child: InteractiveViewer(minScale: 0.75, maxScale: 8,
+                boundaryMargin: const EdgeInsets.all(160), child: drawing(extent)));
+            }),
+          )));
+        }),
+    ]);
   }
 }
 

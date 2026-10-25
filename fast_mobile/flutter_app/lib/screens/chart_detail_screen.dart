@@ -24,6 +24,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   final _lonCtrl = TextEditingController();
   bool _locating = false;
   DateTime _arcDate = DateTime.now();
+  String _progressionMethod = 'secondary';
+  int _returnYear = DateTime.now().year;
+  int _returnMonth = DateTime.now().month;
 
   @override
   void initState() {
@@ -108,6 +111,19 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       backgroundColor: FastTheme.bg,
       appBar: AppBar(
         backgroundColor: FastTheme.bg,
+        actions: [
+          TextButton.icon(icon: const Icon(Icons.save_outlined), label: const Text('Kaydet'),
+            onPressed: () async {
+              await cp.saveCurrent();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Harita kaydedildi')));
+              }
+            }),
+          IconButton(tooltip: 'Sil', icon: const Icon(Icons.delete_outline),
+            onPressed: () async { await cp.delete(c);
+              if (context.mounted) Navigator.of(context).pop(); }),
+        ],
         title: Text(
           name,
           style: TextStyle(
@@ -126,7 +142,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Tab(text: 'Natal'),
             Tab(text: 'Zaman Makinesi'),
             Tab(text: 'Dönüşler'),
-            Tab(text: 'Solar Arc'),
+            Tab(text: 'Progresyonlar'),
           ],
         ),
       ),
@@ -150,6 +166,11 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         const SizedBox(height: 16),
         _section('Bilgiler', [
           _row('Tarih / Saat', '${c.meta.date} • ${c.meta.time}'),
+          _row('Tarihsel UTC farkı', c.meta.tz == null ? 'Bilinmiyor — yeniden hesapla' : 'UTC ${c.meta.tz! >= 0 ? '+' : ''}${c.meta.tz}'),
+          TextButton.icon(icon: const Icon(Icons.refresh), label: const Text('Tarihsel saat dilimiyle yeniden hesapla'),
+            onPressed: () => context.read<ChartProvider>().create(
+              name: c.meta.name ?? '', date: c.meta.date, time: c.meta.time,
+              lat: c.meta.lat, lng: c.meta.lng, place: c.meta.place)),
           _row('Ev Sistemi', chartHouseSystemLabel(c.houseSystem)),
           if (c.meta.place.isNotEmpty) _row('Yer', c.meta.place),
         ]),
@@ -400,7 +421,6 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _returnPanel(ChartProvider cp, ChartData c) {
-    final now = DateTime.now();
     final ret = cp.ret;
     ChartData? retChart;
     if (ret != null) {
@@ -412,6 +432,18 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     }
 
     return _section('Solar / Lunar Return', [
+      Padding(padding: const EdgeInsets.all(12), child: Row(children: [
+        Expanded(child: DropdownButtonFormField<int>(initialValue: _returnYear,
+          decoration: const InputDecoration(labelText: 'Yıl'),
+          items: List.generate(201, (i) => DateTime.now().year - 100 + i)
+            .map((y) => DropdownMenuItem(value: y, child: Text('$y'))).toList(),
+          onChanged: (v) { if(v != null) setState(() => _returnYear = v); })),
+        const SizedBox(width: 12),
+        Expanded(child: DropdownButtonFormField<int>(initialValue: _returnMonth,
+          decoration: const InputDecoration(labelText: 'Lunar ayı'),
+          items: List.generate(12, (i) => DropdownMenuItem(value: i+1, child: Text('${i+1}'))),
+          onChanged: (v) { if(v != null) setState(() => _returnMonth = v); })),
+      ])),
       Padding(
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
         child: Wrap(
@@ -420,19 +452,19 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           children: [
             FilledButton(
               onPressed:
-                  cp.retLoading ? null : () => cp.loadSolarReturn(now.year),
+                  cp.retLoading ? null : () => cp.loadSolarReturn(_returnYear),
               style:
                   FilledButton.styleFrom(backgroundColor: FastTheme.accentGold),
-              child: Text('Solar Return ${now.year}'),
+              child: Text('Solar Return $_returnYear'),
             ),
             FilledButton(
               onPressed: cp.retLoading
                   ? null
-                  : () => cp.loadLunarReturn(now.year, now.month),
+                  : () => cp.loadLunarReturn(_returnYear, _returnMonth),
               style: FilledButton.styleFrom(
                   backgroundColor: FastTheme.accentGoldLight),
               child: Text(
-                  'Lunar Return ${now.year}-${now.month.toString().padLeft(2, '0')}'),
+                  'Lunar Return $_returnYear-${_returnMonth.toString().padLeft(2, '0')}'),
             ),
           ],
         ),
@@ -510,7 +542,14 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
       children: [
-        _section('Solar Arc', [
+        _section('Progresyonlar', [
+          Padding(padding: const EdgeInsets.all(12), child: Wrap(spacing: 8, children: [
+            ChoiceChip(label: const Text('Secondary Progress'), selected: _progressionMethod == 'secondary',
+              onSelected: (_) => setState(() => _progressionMethod = 'secondary')),
+            ChoiceChip(label: const Text('Minor Progress'), selected: _progressionMethod == 'minor',
+              onSelected: (_) => setState(() => _progressionMethod = 'minor')),
+            const Text('Secondary: 1 gün/yıl • Minor: 27.321582 gün/yıl\nEksenler: quotidian'),
+          ])),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
             child: Row(
@@ -542,7 +581,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed:
-                      cp.arcLoading ? null : () => cp.loadSolarArc(fmt(_arcDate)),
+                      cp.arcLoading ? null : () => cp.loadSolarArc(fmt(_arcDate), method: _progressionMethod),
                   style: FilledButton.styleFrom(
                       backgroundColor: FastTheme.accentGold),
                   child: const Text('Hesapla'),
@@ -570,7 +609,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             const SizedBox(height: 8),
             Center(
               child: Text(
-                'Solar Arc – ${arc!.targetDate}',
+                '${arc!.data['progression']?['method'] == 'minor' ? 'Minor' : 'Secondary'} Progress – ${arc.targetDate}',
                 style: TextStyle(
                     color: FastTheme.text, fontWeight: FontWeight.w600),
               ),
@@ -587,7 +626,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               padding: const EdgeInsets.all(16),
               child: Center(
                 child: Text(
-                  'Solar Arc haritasını hesaplamak için tarih seç ve Hesapla.',
+                  'Progresyon için hedef tarih ve yöntemi seçip Hesapla düğmesine bas.',
                   style: TextStyle(color: FastTheme.textMuted),
                 ),
               ),
