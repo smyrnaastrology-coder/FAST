@@ -141,13 +141,22 @@ async def admin_create(email: str, key: str = ""):
     return {"email":email, "password":pwd, "expiry": "1 yil"}
 
 def _require_account(email):
-    """cast icin kimlik kapisi: email yoksa/kayitlis degilse 401.
+    """cast icin kimlik kapisi: email yoksa 401; kayitli degilse OTOMATIK hesap acilir.
+    Holavon tek-giris modeli: Supabase ile giren kullanici horary tarafinda ayri kayit
+    yapmaz. E-posta ilk kez geliyorsa varsayilan kredili hesap olusturulur.
     Selif: kredisi olan kayitli kullanici dict'i (credits None ise varsayilana cekilir)."""
     import auth as _a
     e = (email or "").strip().lower()
     if not e:
         raise HTTPException(401, "login gerekli - once uygulamadan giris yap")
     u = _a.get_user(e)
+    if u is None:
+        # Otomatik kayit: 1 yil gecerli, varsayilan kredi (DEFAULT_CREDITS).
+        try:
+            _a.create_user(e, days=365, credits=_a.DEFAULT_CREDITS)
+        except Exception:
+            pass
+        u = _a.get_user(e)
     if u is None:
         raise HTTPException(401, "kayitli kullanici degil - once giris yap")
     if u.get("credits") is None:
@@ -721,24 +730,23 @@ async def cast(req: CastRequest):
             if _u and _u.get("plan"):
                 engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
     except: pass
-    # kredi kontrolu (100 soru paketleri: oracle 200TL, premium 360TL, elite 600TL)
-    # Kimlik zaten cast basinda zorunlu; burada sadece dusen var (sohbet/selam bedava).
-    import auth as _auth3
-    _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
-    _u3 = _auth3.get_user(_email3) or _acct
-    _credits = _u3.get("credits")
-    if _credits is None: _credits = _auth3.DEFAULT_CREDITS
-    if _credits <= 0:
-        # 200 + NO_CREDITS: eski APK bunu yakalayip guzel "kredi bitti" dialogu gosteriyor
-        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
-    _left = _auth3.spend_credit(_email3)
-    if _left is not None:
-        engine_json["credits_left"] = _left
+    # (eski 100-kredi sistemi kaldirildi; gunluk 3 soru limiti istemci tarafinda)
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
+    _lang = (getattr(req, "lang", "tr") or "tr").lower()
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
-        engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
+        if _lang == "tr":
+            engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
+        elif _lang == "es":
+            engine_json["tone_instruction"] = "Estilo: cálido, natural, como una conversación entre amigos, párrafos cortos, evita términos técnicos, habla como persona. Cuando pregunten por una persona, indica el lugar/ambiente (casa, trabajo, escuela, hospital, camino, parque, café, casa de un familiar), no 'al lado de una caja'."
+        else:
+            engine_json["tone_instruction"] = "Style: warm, natural, like a friendly chat, short paragraphs, avoid technical jargon, speak like a person. When asked where someone is, describe the place/environment (home, work, school, hospital, road, park, cafe, relative's house), not 'next to a box'."
     # anlama öncesi özet - ne anladığını tek cümlede özetle, teyit sorma
-    engine_json["pre_summary_instruction"] = "ÖNCE tek cümlede ne anladığını özetle: 'Anladığım: [kim] [ne] [nerede/ne zaman].' diye belirt, 'doğru mu?' diye sorma, doğrudan hükme geç."
+    if _lang == "tr":
+        engine_json["pre_summary_instruction"] = "ÖNCE tek cümlede ne anladığını özetle: 'Anladığım: [kim] [ne] [nerede/ne zaman].' diye belirt, 'doğru mu?' diye sorma, doğrudan hükme geç."
+    elif _lang == "es":
+        engine_json["pre_summary_instruction"] = "PRIMERO resume en una frase lo que entendiste: 'Entendí: [quién] [qué] [dónde/cuándo].' No preguntes '¿verdad?', pasa directo al veredicto."
+    else:
+        engine_json["pre_summary_instruction"] = "FIRST, in one sentence, summarize what you understood: 'I understood: [who] [what] [where/when].' Do not ask 'is that right?', go straight to the verdict."
     # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
     if is_visitor_who or is_visitor_why or is_dream:
         hidden = []

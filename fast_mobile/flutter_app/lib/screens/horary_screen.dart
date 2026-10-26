@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
@@ -54,6 +56,7 @@ class _HoraryScreenState extends State<HoraryScreen> {
     super.initState();
     _determinePosition();
     _loadQuota();
+    _loadChat();
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowIntro());
   }
 
@@ -174,6 +177,7 @@ class _HoraryScreenState extends State<HoraryScreen> {
     if (!await _confirmQuota(l10n)) return;
     setState(() {
       _chat.add(_ChatMsg('user', q));
+      _persistChat();
       _lastQuestion = q;
       _busy = true;
       _error = null;
@@ -200,29 +204,19 @@ class _HoraryScreenState extends State<HoraryScreen> {
           _busy = false;
           _error = res.authError ? l10n.horaryAuthError : l10n.horaryError;
           _chat.add(_ChatMsg('assistant', res.authError ? l10n.horaryAuthError : l10n.horaryError));
+          _persistChat();
         });
         _scrollDown();
         return;
       }
       final data = res.data;
-      final credits = data['credits_left'];
       final verdict = (data['verdict'] ?? '').toString();
-      if (verdict == 'NO_CREDITS') {
-        setState(() {
-          _busy = false;
-          _creditsLeft = 0;
-          _chat.add(_ChatMsg('assistant', l10n.horaryNoCredits));
-        });
-        _scrollDown();
-        await _showLimitDialog(l10n);
-        return;
-      }
       final ans = (data['answer'] ?? verdict).toString();
       setState(() {
         _busy = false;
         _lastChart = data;
-        if (credits is int) _creditsLeft = credits;
         _chat.add(_ChatMsg('assistant', ans, meta: data));
+        _persistChat();
       });
       _scrollDown();
       await _bumpQuota();
@@ -232,6 +226,7 @@ class _HoraryScreenState extends State<HoraryScreen> {
         _busy = false;
         _error = l10n.horaryError;
         _chat.add(_ChatMsg('assistant', l10n.horaryError));
+        _persistChat();
       });
       _scrollDown();
     }
@@ -301,6 +296,36 @@ class _HoraryScreenState extends State<HoraryScreen> {
     if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.horaryCopy} ✓')));
+  }
+
+  Future<void> _persistChat() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = _chat.map((m) => {'role': m.role, 'content': m.content}).toList();
+      await prefs.setString('horary_chat_history', jsonEncode(list));
+    } catch (_) {}
+  }
+
+  Future<void> _loadChat() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('horary_chat_history');
+      if (raw == null || raw.isEmpty) return;
+      final list = jsonDecode(raw) as List;
+      if (!mounted) return;
+      setState(() {
+        _chat.clear();
+        for (final e in list) {
+          _chat.add(_ChatMsg((e['role'] ?? 'assistant').toString(), (e['content'] ?? '').toString()));
+        }
+        _showLanding = _chat.isEmpty;
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _shareText(String text) async {
+    if (text.trim().isEmpty) return;
+    await Share.share(text);
   }
 
   /// "Doğru Soru Sormak" öğretisini bir kez göster.
@@ -422,30 +447,20 @@ class _HoraryScreenState extends State<HoraryScreen> {
         iconTheme: IconThemeData(color: FastTheme.accentGold),
         title: Text(l10n.horaryTitle, style: TextStyle(color: FastTheme.accentGold, fontWeight: FontWeight.w700)),
         actions: [
-          if (_creditsLeft >= 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 4, top: 12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: FastTheme.cardBg,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.4)),
-                ),
-                child: Center(child: Text('$_creditsLeft ${l10n.horaryCredits}', style: TextStyle(color: FastTheme.accentGold, fontSize: 10, fontWeight: FontWeight.bold))),
-              ),
-            ),
           if (_chat.isNotEmpty)
             IconButton(
               tooltip: l10n.horaryClear,
-              onPressed: () => setState(() {
-                _chat.clear();
-                _lastChart = null;
-                _showLanding = true;
-                _showDetails = false;
-                _lastQuestion = '';
-                _questionCtrl.clear();
-              }),
+              onPressed: () {
+                setState(() {
+                  _chat.clear();
+                  _lastChart = null;
+                  _showLanding = true;
+                  _showDetails = false;
+                  _lastQuestion = '';
+                  _questionCtrl.clear();
+                });
+                SharedPreferences.getInstance().then((p) => p.remove('horary_chat_history'));
+              },
               icon: Icon(Icons.delete_outline, color: FastTheme.textDim),
             ),
         ],
@@ -626,8 +641,8 @@ class _HoraryScreenState extends State<HoraryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(m.content, style: TextStyle(color: isUser ? FastTheme.bg : FastTheme.textLight, height: 1.5, fontWeight: isUser ? FontWeight.bold : FontWeight.normal)),
-            if (!isUser) ...[
-              const SizedBox(height: 6),
+            const SizedBox(height: 6),
+            Row(mainAxisSize: MainAxisSize.min, children: [
               GestureDetector(
                 onTap: () => _copy(m.content),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -636,7 +651,16 @@ class _HoraryScreenState extends State<HoraryScreen> {
                   Builder(builder: (ctx) => Text(AppLocalizations.of(ctx).horaryCopy, style: TextStyle(color: FastTheme.textDim, fontSize: 11))),
                 ]),
               ),
-            ],
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () => _shareText(m.content),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.share_outlined, size: 14, color: FastTheme.textDim),
+                  const SizedBox(width: 4),
+                  Text('Paylaş', style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                ]),
+              ),
+            ]),
           ],
         ),
       ),
