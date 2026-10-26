@@ -9437,23 +9437,24 @@ def privacy_policy():
     """Gizlilik politikasi (Play Store listesi icin herkese acik sayfa)."""
     return """<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fast Synastry - Gizlilik Politikasi</title></head>
+<title>Holavon - Gizlilik Politikasi</title></head>
 <body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
-<h1>Fast Synastry Gizlilik Politikasi</h1>
-<p><b>Son guncelleme:</b> Eylul 2026</p>
+<h1>Holavon - Gizlilik Politikasi</h1>
+<p><b>Uygulama:</b> Holavon: Astroloji & Sinastri &nbsp;|&nbsp; <b>Gelistirici:</b> Smyrna Astrology (Fatih Asartepe) &nbsp;|&nbsp; <b>Son guncelleme:</b> Ekim 2026</p>
 <h2>1. Topladigimiz Veriler</h2>
 <ul>
 <li><b>Analiz girdileri:</b> girdiginiz dogum bilgileri (isim, tarih, saat, sehir) yalnizca analiz uretmek icin kullanilir.</li>
 <li><b>Cihaz kimligi:</b> ucretsiz hak ve abonelik durumunu takip etmek icin rastgele uretilmis anonim bir cihaz kimligi saklanir. E-posta veya sifre istemeyiz, uyelik yoktur.</li>
 <li><b>Bildirim jetonu:</b> gunluk hatirlatmalar icin Firebase bildirim jetonu (izin verirseniz).</li>
 <li><b>Satin alma bilgisi:</b> odemeler Google Play ve RevenueCat uzerinden islenir; kredi karti bilgisi bize ulasmaz.</li>
+<li><b>Profil ve sosyal veriler:</b> Holavon toplulugunda paylastiginiz gonderi, yorum, takip ve profil bilgileri.</li>
 </ul>
 <h2>2. Verilerin Kullanimi</h2>
-<p>Veriler yalnizca uygulamayi calistirmak (analiz, PDF raporu, abonelik dogrulama, bildirimler) icin kullanilir. Verileriniz satilmaz, reklam amaciyla paylasilmaz.</p>
+<p>Veriler yalnizca uygulamayi calistirmak (analiz, PDF raporu, abonelik dogrulama, bildirimler, topluluk) icin kullanilir. Verileriniz satilmaz, reklam amaciyla paylasilmaz.</p>
 <h2>3. Ucuncu Taraflar</h2>
 <ul><li>Google Play (odeme), RevenueCat (abonelik yonetimi), Firebase (bildirimler), Supabase (guvenli veri depolama).</li></ul>
 <h2>4. Veri Saklama ve Silme</h2>
-<p>Analiz verileri cihazinizda ve sunucumuzda gecici olarak tutulur. Tum verilerinizin silinmesini isterseniz <b>smyrnaastrology@gmail.com</b> adresine yazin; talebiniz 30 gun icinde yerine getirilir.</p>
+<p>Analiz verileri cihazinizda ve sunucumuzda gecici olarak tutulur. Tum verilerinizin silinmesini isterseniz <b>smyrnaastrology@gmail.com</b> adresine yazin; talebiniz 30 gun icinde yerine getirilir. Ayrintili veri silme talebi icin: <a href="/delete">Veri Silme Talebi</a>.</p>
 <h2>5. Cocuklar</h2>
 <p>Uygulama 13 yas alti cocuklara yonelik degildir.</p>
 <h2>6. Iletisim</h2>
