@@ -2229,6 +2229,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hubHoraryDesc => 'Una respuesta clara desde la carta del momento';
 
   @override
+  String get hubChartsTitle => 'Mis cartas';
+
+  @override
+  String get hubChartsDesc => 'Crea y explora tu carta natal';
+
+  @override
   String get horaryTitle => 'Horary Oracle';
 
   @override

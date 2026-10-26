@@ -755,6 +755,8 @@
   "hubAnalysisDesc": "Sinastri, natal ve potansiyel analizleri",
   "hubHoraryTitle": "Horary Oracle",
   "hubHoraryDesc": "Soru anının haritasıyla net cevap",
+  "hubChartsTitle": "Haritalarım",
+  "hubChartsDesc": "Natal haritanı oluştur ve incele",
   "horaryTitle": "Horary Oracle",
   "horarySubtitle": "Aklındaki tek soruyu yaz; soru anının haritasını dökeyim.",
   "horaryQuestionHint": "Sorunu yaz... (örn. bu işe girecek miyim?)",

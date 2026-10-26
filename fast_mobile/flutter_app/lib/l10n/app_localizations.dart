@@ -4114,6 +4114,18 @@ abstract class AppLocalizations {
   /// **'A clear answer from the chart of the moment'**
   String get hubHoraryDesc;
 
+  /// No description provided for @hubChartsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Charts'**
+  String get hubChartsTitle;
+
+  /// No description provided for @hubChartsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create and explore your natal chart'**
+  String get hubChartsDesc;
+
   /// No description provided for @horaryTitle.
   ///
   /// In en, this message translates to:

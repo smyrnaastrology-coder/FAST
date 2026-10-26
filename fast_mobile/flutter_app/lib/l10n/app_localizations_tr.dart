@@ -2200,6 +2200,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hubHoraryDesc => 'Soru anının haritasıyla net cevap';
 
   @override
+  String get hubChartsTitle => 'Haritalarım';
+
+  @override
+  String get hubChartsDesc => 'Natal haritanı oluştur ve incele';
+
+  @override
   String get horaryTitle => 'Horary Oracle';
 
   @override

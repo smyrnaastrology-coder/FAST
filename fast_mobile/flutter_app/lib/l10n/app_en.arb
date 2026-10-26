@@ -759,6 +759,8 @@
   "hubAnalysisDesc": "Synastry, natal and potential analyses",
   "hubHoraryTitle": "Horary Oracle",
   "hubHoraryDesc": "A clear answer from the chart of the moment",
+  "hubChartsTitle": "My Charts",
+  "hubChartsDesc": "Create and explore your natal chart",
   "horaryTitle": "Horary Oracle",
   "horarySubtitle": "Type your one question; I'll cast the chart of the moment.",
   "horaryQuestionHint": "Write your question... (e.g. will I get this job?)",

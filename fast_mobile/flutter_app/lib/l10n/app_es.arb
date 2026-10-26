@@ -748,6 +748,8 @@
   "hubAnalysisDesc": "Análisis de sinastría, natal y potencial",
   "hubHoraryTitle": "Horary Oracle",
   "hubHoraryDesc": "Una respuesta clara desde la carta del momento",
+  "hubChartsTitle": "Mis cartas",
+  "hubChartsDesc": "Crea y explora tu carta natal",
   "horaryTitle": "Horary Oracle",
   "horarySubtitle": "Escribe tu única pregunta; lanzaré la carta del momento.",
   "horaryQuestionHint": "Escribe tu pregunta... (ej. ¿conseguiré este trabajo?)",
