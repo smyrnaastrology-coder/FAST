@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../models/chart_data.dart';
 import '../models/chart_frame.dart';
 import '../models/chart_labels.dart';
@@ -47,7 +48,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       data: natal,
       outerPlanets: transit.planets,
       outerHouses: transit.houses,
-      title: 'Natal + Transit',
+      title: _l10n.chartNatalTransitTitle,
       subtitle: '${natal.meta.name ?? ''} • ${natal.meta.place}',
     );
   }
@@ -80,8 +81,10 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
 
   String _sign(int i) {
     if (i < 0 || i > 11) return '-';
-    return chartSignNames[i];
+    return chartSignNames(_l10n)[i];
   }
+
+  AppLocalizations get _l10n => AppLocalizations.of(context);
 
   Future<void> _useDeviceLocation() async {
     final cp = context.read<ChartProvider>();
@@ -121,7 +124,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         appBar: AppBar(backgroundColor: FastTheme.bg),
         body: Center(
           child: Text(
-            'Harita bulunamadı',
+            _l10n.chartNotFound,
             style: TextStyle(color: FastTheme.textMuted),
           ),
         ),
@@ -130,7 +133,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
 
     final name = c.meta.name?.isNotEmpty == true
         ? c.meta.name!
-        : 'Natal Haritası';
+        : _l10n.chartDefaultName;
 
     return Scaffold(
       backgroundColor: FastTheme.bg,
@@ -139,18 +142,18 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         actions: [
           TextButton.icon(
             icon: const Icon(Icons.save_outlined),
-            label: const Text('Kaydet'),
+            label: Text(_l10n.chartSave),
             onPressed: () async {
               await cp.saveCurrent();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Harita kaydedildi')),
+                  SnackBar(content: Text(_l10n.chartSaved)),
                 );
               }
             },
           ),
           IconButton(
-            tooltip: 'Sil',
+            tooltip: _l10n.chartDelete,
             icon: const Icon(Icons.delete_outline),
             onPressed: () async {
               await cp.delete(c);
@@ -172,11 +175,11 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           labelColor: FastTheme.accentGold,
           unselectedLabelColor: FastTheme.textMuted,
           isScrollable: true,
-          tabs: const [
-            Tab(text: 'Natal'),
-            Tab(text: 'Zaman Makinesi'),
-            Tab(text: 'Dönüşler'),
-            Tab(text: 'Progresyonlar'),
+          tabs: [
+            Tab(text: _l10n.chartTabNatal),
+            Tab(text: _l10n.chartTabTimeMachine),
+            Tab(text: _l10n.chartTabReturns),
+            Tab(text: _l10n.chartTabProgressions),
           ],
         ),
       ),
@@ -193,6 +196,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _natalTab(ChartData c) {
+    final l10n = _l10n;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
       children: [
@@ -200,7 +204,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           child: ChartWheel(
             data: c,
             size: 340,
-            title: 'Natal • ${c.meta.name ?? ''}',
+            title: l10n.chartNatalWithName(c.meta.name ?? ''),
             subtitle: c.meta.place,
             loadFrame: (date) async => ChartFrame(
               data: await _charts.natal(
@@ -212,23 +216,23 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 isim: c.meta.name,
                 place: c.meta.place,
               ),
-              title: 'Natal • ${c.meta.name ?? ''}',
+              title: l10n.chartNatalWithName(c.meta.name ?? ''),
               subtitle: c.meta.place,
             ),
           ),
         ),
         const SizedBox(height: 16),
-        _section('Bilgiler', [
-          _row('Tarih / Saat', '${c.meta.date} • ${c.meta.time}'),
+        _section(l10n.chartSectionInfo, [
+          _row(l10n.chartLabelDateTime, '${c.meta.date} • ${c.meta.time}'),
           _row(
-            'Tarihsel UTC farkı',
+            l10n.chartLabelHistoricalTz,
             c.meta.tz == null
-                ? 'Bilinmiyor — yeniden hesapla'
+                ? l10n.chartTzUnknown
                 : 'UTC ${c.meta.tz! >= 0 ? '+' : ''}${c.meta.tz}',
           ),
           TextButton.icon(
             icon: const Icon(Icons.refresh),
-            label: const Text('Tarihsel saat dilimiyle yeniden hesapla'),
+            label: Text(l10n.chartRecalculateTz),
             onPressed: () => context.read<ChartProvider>().create(
               name: c.meta.name ?? '',
               date: c.meta.date,
@@ -238,33 +242,37 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               place: c.meta.place,
             ),
           ),
-          _row('Ev Sistemi', chartHouseSystemLabel(c.houseSystem)),
-          if (c.meta.place.isNotEmpty) _row('Yer', c.meta.place),
+          _row(
+            l10n.chartLabelHouseSystem,
+            chartHouseSystemLabel(l10n, c.houseSystem),
+          ),
+          if (c.meta.place.isNotEmpty) _row(l10n.chartLabelPlace, c.meta.place),
         ]),
         const SizedBox(height: 14),
-        _section('Gezegenler', [
+        _section(l10n.chartSectionPlanets, [
           for (final p in c.planets)
             _row(
-              chartPlanetLabel(p.name),
+              chartPlanetLabel(l10n, p.name),
               '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° '
-              '${p.retrograde ? 'R' : ''} • Ev ${p.house}',
+              '${p.retrograde ? 'R' : ''} • ${l10n.chartHouseNumber(p.house)}',
             ),
         ]),
         const SizedBox(height: 14),
-        _section('Evler', [
+        _section(l10n.chartSectionHouses, [
           for (final h in c.houses)
             _row(
-              'Ev ${h.number}',
+              l10n.chartHouseNumber(h.number),
               '${_sign(h.sign)} ${h.degree.toStringAsFixed(2)}°',
             ),
         ]),
         if (c.aspects.isNotEmpty) ...[
           const SizedBox(height: 14),
-          _section('Açılar', [
+          _section(l10n.chartSectionAspects, [
             for (final a in c.aspects)
               _row(
-                '${chartPlanetLabel(a.p1)} – ${chartPlanetLabel(a.p2)}',
-                '${chartAspectLabel(a.type)} • orb ${a.orb.toStringAsFixed(2)}',
+                '${chartPlanetLabel(l10n, a.p1)} – ${chartPlanetLabel(l10n, a.p2)}',
+                '${chartAspectLabel(l10n, a.type)} • '
+                    '${l10n.chartOrb(a.orb.toStringAsFixed(2))}',
               ),
           ]),
         ],
@@ -273,6 +281,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _timeMachineTab(ChartProvider cp, ChartData c) {
+    final l10n = _l10n;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
       children: [
@@ -297,9 +306,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _legendDot(FastTheme.text, 'Natal (iç)'),
+              _legendDot(FastTheme.text, l10n.chartNatalInner),
               const SizedBox(width: 14),
-              _legendDot(const Color(0xFF8FD8FF), 'Transit (dış)'),
+              _legendDot(const Color(0xFF8FD8FF), l10n.chartTransitOuter),
             ],
           ),
         ),
@@ -313,18 +322,20 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           ),
         const SizedBox(height: 10),
         if (cp.biwheel != null)
-          _section('Natal–Transit Açılar', [
+          _section(l10n.chartSectionNatalTransitAspects, [
             ...((cp.biwheel!.data['acilar_arasi'] as List?) ?? []).take(40).map((
               a,
             ) {
               final m = (a as Map).cast<String, dynamic>();
               return _row(
-                '${chartPlanetLabel('${m['p1']}')} – ${chartPlanetLabel('${m['p2']}')}',
-                '${chartAspectLabel('${m['tip']}')} • orb ${m['orb']}',
+                '${chartPlanetLabel(l10n, '${m['p1']}')} – '
+                '${chartPlanetLabel(l10n, '${m['p2']}')}',
+                '${chartAspectLabel(l10n, '${m['tip']}')} • '
+                    '${l10n.chartOrb('${m['orb']}')}',
               );
             }),
             if (((cp.biwheel!.data['acilar_arasi'] as List?) ?? []).isEmpty)
-              _row('Açı yok', '—'),
+              _row(l10n.chartNoAspects, '—'),
           ]),
       ],
     );
@@ -352,7 +363,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         height: 340,
         child: Center(
           child: Text(
-            'Zamanı değiştirerek transit haritasını gör',
+            _l10n.chartTimeMachineHint,
             textAlign: TextAlign.center,
             style: TextStyle(color: FastTheme.textMuted),
           ),
@@ -379,7 +390,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       size: 340,
       outerPlanets: outerP,
       outerHouses: outerH,
-      title: 'Natal + Transit',
+      title: _l10n.chartNatalTransitTitle,
       subtitle: '${c.meta.name ?? ''} • ${c.meta.place}',
       initialDate: cp.biwheel!.when,
       loadFrame: (date) async => _transitFrame(
@@ -405,11 +416,12 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _returnLocationCard(ChartProvider cp, ChartData c) {
+    final l10n = _l10n;
     if (_latCtrl.text.isEmpty) {
       _latCtrl.text = (cp.returnLat ?? c.meta.lat).toStringAsFixed(4);
       _lonCtrl.text = (cp.returnLon ?? c.meta.lng).toStringAsFixed(4);
     }
-    return _section('Hesaplama Yeri', [
+    return _section(l10n.chartSectionReturnLocation, [
       Padding(
         padding: const EdgeInsets.all(12),
         child: ChartLocationPicker(
@@ -430,8 +442,12 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Text(
           cp.returnLocationConfirmed
-              ? 'Hesaplama yeri: ${cp.returnPlace} (${cp.returnLat!.toStringAsFixed(4)}, ${cp.returnLon!.toStringAsFixed(4)})'
-              : 'Önce dönüşü yaşayacağın şehri seç veya aşağıdan konumu doğrula.',
+              ? l10n.chartReturnLocationSelected(
+                  cp.returnPlace,
+                  cp.returnLat!.toStringAsFixed(4),
+                  cp.returnLon!.toStringAsFixed(4),
+                )
+              : l10n.chartReturnLocationPrompt,
           style: TextStyle(color: FastTheme.text),
         ),
       ),
@@ -442,7 +458,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           runSpacing: 6,
           children: [
             ChoiceChip(
-              label: const Text('Natal Yeri'),
+              label: Text(l10n.chartReturnNatalPlace),
               selected: cp.returnLocMode == 'natal',
               onSelected: (_) {
                 _latCtrl.text = c.meta.lat.toStringAsFixed(4);
@@ -451,12 +467,16 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               },
             ),
             ChoiceChip(
-              label: Text(_locating ? 'Konum alınıyor...' : 'Cihaz Konumu'),
+              label: Text(
+                _locating
+                    ? l10n.chartReturnLocating
+                    : l10n.chartReturnDeviceLocation,
+              ),
               selected: cp.returnLocMode == 'device',
               onSelected: (_) => _useDeviceLocation(),
             ),
             ChoiceChip(
-              label: const Text('Manuel'),
+              label: Text(l10n.chartReturnManual),
               selected: cp.returnLocMode == 'manual',
               onSelected: (_) => cp.setReturnLocation(
                 mode: 'manual',
@@ -480,7 +500,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 ),
                 style: TextStyle(color: FastTheme.text),
                 decoration: InputDecoration(
-                  labelText: 'Enlem',
+                  labelText: l10n.chartLabelLatitude,
                   labelStyle: TextStyle(color: FastTheme.textMuted),
                   isDense: true,
                 ),
@@ -498,7 +518,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 ),
                 style: TextStyle(color: FastTheme.text),
                 decoration: InputDecoration(
-                  labelText: 'Boylam',
+                  labelText: l10n.chartLabelLongitude,
                   labelStyle: TextStyle(color: FastTheme.textMuted),
                   isDense: true,
                 ),
@@ -520,8 +540,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
         child: Text(
-          'Dönüş haritasında mekan; ASC/MC, ev yerleşimleri ve yöneticileri belirler. '
-          'Güneş/Ay dönüşünü yaşadığın şehri seçmen en doğru sonucu verir.',
+          l10n.chartReturnLocationExplainer,
           style: TextStyle(
             color: FastTheme.textMuted.withValues(alpha: 0.8),
             fontSize: 12,
@@ -543,6 +562,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _returnPanel(ChartProvider cp, ChartData c) {
+    final l10n = _l10n;
     final returnLat = cp.returnLat;
     final returnLon = cp.returnLon;
     final returnPlace = cp.returnPlace;
@@ -556,7 +576,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       } catch (_) {}
     }
 
-    return _section('Solar / Lunar Return', [
+    return _section(l10n.chartSectionSolarLunarReturn, [
       Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -564,7 +584,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: _returnYear,
-                decoration: const InputDecoration(labelText: 'Yıl'),
+                decoration: InputDecoration(labelText: l10n.chartLabelYear),
                 items: List.generate(201, (i) => DateTime.now().year - 100 + i)
                     .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
                     .toList(),
@@ -577,7 +597,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Expanded(
               child: DropdownButtonFormField<int>(
                 initialValue: _returnMonth,
-                decoration: const InputDecoration(labelText: 'Lunar ayı'),
+                decoration: InputDecoration(labelText: l10n.chartLabelLunarMonth),
                 items: List.generate(
                   12,
                   (i) =>
@@ -604,7 +624,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               style: FilledButton.styleFrom(
                 backgroundColor: FastTheme.accentGold,
               ),
-              child: Text('Solar Return $_returnYear'),
+              child: Text(l10n.chartSolarReturnYear(_returnYear)),
             ),
             FilledButton(
               onPressed: cp.retLoading || !cp.returnLocationConfirmed
@@ -614,7 +634,10 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 backgroundColor: FastTheme.accentGoldLight,
               ),
               child: Text(
-                'Lunar Return $_returnYear-${_returnMonth.toString().padLeft(2, '0')}',
+                l10n.chartLunarReturnYm(
+                  _returnYear,
+                  _returnMonth.toString().padLeft(2, '0'),
+                ),
               ),
             ),
           ],
@@ -642,7 +665,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           child: ChartWheel(
             data: retChart,
             size: 320,
-            title: ret!.type == 'solar' ? 'Solar Return' : 'Lunar Return',
+            title: ret!.type == 'solar'
+                ? l10n.chartSolarReturn
+                : l10n.chartLunarReturn,
             subtitle: cp.returnPlace,
             initialDate: DateTime(ret.year, ret.month ?? 1, 1),
             timeUnits: ret.type == 'solar'
@@ -665,7 +690,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                         lon: returnLon,
                       ),
               ),
-              title: ret.type == 'solar' ? 'Solar Return' : 'Lunar Return',
+              title: ret.type == 'solar'
+                  ? l10n.chartSolarReturn
+                  : l10n.chartLunarReturn,
               subtitle: returnPlace,
             ),
           ),
@@ -674,8 +701,11 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         Center(
           child: Text(
             ret.type == 'solar'
-                ? 'Solar Return ${ret.year}'
-                : 'Lunar Return ${ret.year}-${ret.month.toString().padLeft(2, '0')}',
+                ? l10n.chartSolarReturnYear(ret.year)
+                : l10n.chartLunarReturnYm(
+                    ret.year,
+                    ret.month.toString().padLeft(2, '0'),
+                  ),
             style: TextStyle(
               color: FastTheme.text,
               fontWeight: FontWeight.w600,
@@ -693,9 +723,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         const SizedBox(height: 12),
         ...retChart.planets.map(
           (p) => _row(
-            chartPlanetLabel(p.name),
+            chartPlanetLabel(l10n, p.name),
             '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° '
-            '${p.retrograde ? 'R' : ''} • Ev ${p.house}',
+            '${p.retrograde ? 'R' : ''} • ${l10n.chartHouseNumber(p.house)}',
           ),
         ),
       ],
@@ -704,7 +734,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           padding: const EdgeInsets.all(16),
           child: Center(
             child: Text(
-              'Yıllık dönüş haritasını hesaplamak için bir dönüş seç.',
+              l10n.chartReturnPrompt,
               style: TextStyle(color: FastTheme.textMuted),
             ),
           ),
@@ -713,6 +743,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   }
 
   Widget _solarArcTab(ChartProvider cp, ChartData c) {
+    final l10n = _l10n;
     final now = DateTime.now();
     final arc = cp.arc;
     ChartData? arcChart;
@@ -727,30 +758,33 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     String fmt(DateTime d) =>
         '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
+    final bool isMinor = _progressionMethod == 'minor';
+    String methodLabel(String? method) => method == 'minor'
+        ? l10n.chartMinorProgress
+        : l10n.chartSecondaryProgress;
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
       children: [
-        _section('Progresyonlar', [
+        _section(l10n.chartSectionProgressions, [
           Padding(
             padding: const EdgeInsets.all(12),
             child: Wrap(
               spacing: 8,
               children: [
                 ChoiceChip(
-                  label: const Text('Secondary Progress'),
+                  label: Text(l10n.chartSecondaryProgress),
                   selected: _progressionMethod == 'secondary',
                   onSelected: (_) =>
                       setState(() => _progressionMethod = 'secondary'),
                 ),
                 ChoiceChip(
-                  label: const Text('Minor Progress'),
-                  selected: _progressionMethod == 'minor',
+                  label: Text(l10n.chartMinorProgress),
+                  selected: isMinor,
                   onSelected: (_) =>
                       setState(() => _progressionMethod = 'minor'),
                 ),
-                const Text(
-                  'Secondary: 1 gün/yıl • Minor: 27.321582 gün/yıl\nEksenler: quotidian',
-                ),
+                Text(l10n.chartProgressHelp),
               ],
             ),
           ),
@@ -760,7 +794,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               children: [
                 Expanded(
                   child: Text(
-                    'Hedef Tarih: ${fmt(_arcDate)}',
+                    l10n.chartTargetDate(fmt(_arcDate)),
                     style: TextStyle(color: FastTheme.text),
                   ),
                 ),
@@ -781,7 +815,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                       setState(() => _arcDate = picked);
                     }
                   },
-                  child: const Text('Tarih Seç'),
+                  child: Text(l10n.chartPickDate),
                 ),
                 const SizedBox(width: 8),
                 FilledButton(
@@ -794,7 +828,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                   style: FilledButton.styleFrom(
                     backgroundColor: FastTheme.accentGold,
                   ),
-                  child: const Text('Hesapla'),
+                  child: Text(l10n.chartCalculate),
                 ),
               ],
             ),
@@ -821,8 +855,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               child: ChartWheel(
                 data: arcChart,
                 size: 320,
-                title:
-                    '${arc!.data['progression']?['method'] == 'minor' ? 'Minor' : 'Secondary'} Progress',
+                title: methodLabel(
+                  '${arc!.data['progression']?['method']}',
+                ),
                 subtitle: c.meta.place,
                 initialDate: DateTime.parse(arc.targetDate),
                 loadFrame: (date) async => ChartFrame(
@@ -835,8 +870,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                           '${arc.data['progression']?['method'] ?? 'secondary'}',
                     ),
                   ),
-                  title:
-                      '${arc.data['progression']?['method'] == 'minor' ? 'Minor' : 'Secondary'} Progress',
+                  title: methodLabel(
+                    '${arc.data['progression']?['method']}',
+                  ),
                   subtitle: c.meta.place,
                 ),
               ),
@@ -844,7 +880,10 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             const SizedBox(height: 8),
             Center(
               child: Text(
-                '${arc.data['progression']?['method'] == 'minor' ? 'Minor' : 'Secondary'} Progress – ${arc.targetDate}',
+                l10n.chartProgressTitleWithDate(
+                  methodLabel('${arc.data['progression']?['method']}'),
+                  arc.targetDate,
+                ),
                 style: TextStyle(
                   color: FastTheme.text,
                   fontWeight: FontWeight.w600,
@@ -854,9 +893,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             const SizedBox(height: 12),
             ...arcChart.planets.map(
               (p) => _row(
-                chartPlanetLabel(p.name),
+                chartPlanetLabel(l10n, p.name),
                 '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° '
-                '${p.retrograde ? 'R' : ''} • Ev ${p.house}',
+                '${p.retrograde ? 'R' : ''} • ${l10n.chartHouseNumber(p.house)}',
               ),
             ),
           ],
@@ -865,7 +904,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               padding: const EdgeInsets.all(16),
               child: Center(
                 child: Text(
-                  'Progresyon için hedef tarih ve yöntemi seçip Hesapla düğmesine bas.',
+                  l10n.chartProgressHint,
                   style: TextStyle(color: FastTheme.textMuted),
                 ),
               ),

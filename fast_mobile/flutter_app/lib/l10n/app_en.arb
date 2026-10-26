@@ -840,5 +840,232 @@
         "type": "int"
       }
     }
-  }
+  },
+  "chartSignAries": "Aries",
+  "chartSignTaurus": "Taurus",
+  "chartSignGemini": "Gemini",
+  "chartSignCancer": "Cancer",
+  "chartSignLeo": "Leo",
+  "chartSignVirgo": "Virgo",
+  "chartSignLibra": "Libra",
+  "chartSignScorpio": "Scorpio",
+  "chartSignSagittarius": "Sagittarius",
+  "chartSignCapricorn": "Capricorn",
+  "chartSignAquarius": "Aquarius",
+  "chartSignPisces": "Pisces",
+  "chartPlanetSun": "Sun",
+  "chartPlanetMoon": "Moon",
+  "chartPlanetMercury": "Mercury",
+  "chartPlanetVenus": "Venus",
+  "chartPlanetMars": "Mars",
+  "chartPlanetJupiter": "Jupiter",
+  "chartPlanetSaturn": "Saturn",
+  "chartPlanetUranus": "Uranus",
+  "chartPlanetNeptune": "Neptune",
+  "chartPlanetPluto": "Pluto",
+  "chartPlanetNorthNode": "North Node",
+  "chartPlanetChiron": "Chiron",
+  "chartAspectConjunction": "Conjunction",
+  "chartAspectSextile": "Sextile",
+  "chartAspectSquare": "Square",
+  "chartAspectTrine": "Trine",
+  "chartAspectOpposition": "Opposition",
+  "chartHousePlacidus": "Placidus",
+  "chartHouseWholeSign": "Whole Sign",
+  "chartHouseRegiomontanus": "Regiomontanus",
+  "chartHouseKoch": "Koch",
+  "chartHouseEqual": "Equal House",
+  "chartListTitle": "My Charts",
+  "chartMarkSemantics": "My charts",
+  "chartListEmpty": "No charts yet",
+  "chartListCreateFirst": "Create your first chart",
+  "chartDefaultName": "Natal Chart",
+  "chartDelete": "Delete",
+  "chartSave": "Save",
+  "chartSaved": "Chart saved",
+  "chartNotFound": "Chart not found",
+  "chartTabNatal": "Natal",
+  "chartTabTimeMachine": "Time Machine",
+  "chartTabReturns": "Returns",
+  "chartTabProgressions": "Progressions",
+  "chartSectionInfo": "Info",
+  "chartLabelDateTime": "Date / Time",
+  "chartLabelHistoricalTz": "Historical UTC offset",
+  "chartTzUnknown": "Unknown — recalculate",
+  "chartRecalculateTz": "Recalculate with historical timezone",
+  "chartLabelHouseSystem": "House System",
+  "chartLabelPlace": "Place",
+  "chartSectionPlanets": "Planets",
+  "chartSectionHouses": "Houses",
+  "chartHouseNumber": "House {n}",
+  "@chartHouseNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chartSectionAspects": "Aspects",
+  "chartOrb": "orb {value}",
+  "@chartOrb": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "chartNatalWithName": "Natal • {name}",
+  "@chartNatalWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "chartNatalInner": "Natal (inner)",
+  "chartTransitOuter": "Transit (outer)",
+  "chartSectionNatalTransitAspects": "Natal–Transit Aspects",
+  "chartNoAspects": "No aspects",
+  "chartTimeMachineHint": "Change the time to see the transit chart",
+  "chartNatalTransitTitle": "Natal + Transit",
+  "chartSectionReturnLocation": "Calculation Place",
+  "chartReturnLocationSelected": "Calculation place: {place} ({lat}, {lon})",
+  "@chartReturnLocationSelected": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "lat": {
+        "type": "String"
+      },
+      "lon": {
+        "type": "String"
+      }
+    }
+  },
+  "chartReturnLocationPrompt": "First choose the city where you will experience the return, or confirm the location below.",
+  "chartReturnNatalPlace": "Natal Place",
+  "chartReturnDeviceLocation": "Device Location",
+  "chartReturnLocating": "Getting location...",
+  "chartReturnManual": "Manual",
+  "chartLabelLatitude": "Latitude",
+  "chartLabelLongitude": "Longitude",
+  "chartReturnLocationExplainer": "In the return chart, the place determines the ASC/MC, house distribution and rulers. Choosing the city where you will experience the solar/lunar return gives the most accurate result.",
+  "chartSectionSolarLunarReturn": "Solar / Lunar Return",
+  "chartLabelYear": "Year",
+  "chartLabelLunarMonth": "Lunar month",
+  "chartSolarReturnYear": "Solar Return {year}",
+  "@chartSolarReturnYear": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "chartLunarReturnYm": "Lunar Return {year}-{month}",
+  "@chartLunarReturnYm": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "chartReturnPrompt": "Select a return to calculate the yearly return chart.",
+  "chartSolarReturn": "Solar Return",
+  "chartLunarReturn": "Lunar Return",
+  "chartSectionProgressions": "Progressions",
+  "chartSecondaryProgress": "Secondary Progress",
+  "chartMinorProgress": "Minor Progress",
+  "chartProgressHelp": "Secondary: 1 day/year • Minor: 27.321582 days/year\nAxes: quotidian",
+  "chartTargetDate": "Target Date: {date}",
+  "@chartTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "chartPickDate": "Pick Date",
+  "chartCalculate": "Calculate",
+  "chartProgressHint": "Choose a target date and method, then press Calculate.",
+  "chartCalculating": "Calculating...",
+  "chartProgressTitleWithDate": "{method} – {date}",
+  "@chartProgressTitleWithDate": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "chartCreateTitle": "New Chart",
+  "chartLabelNameOptional": "Name (optional)",
+  "chartNameHint": "e.g. Alex",
+  "chartLabelBirthDate": "Birth Date",
+  "chartLabelBirthTime": "Birth Time",
+  "chartLabelBirthPlace": "Birth Place",
+  "chartLabelCountry": "Country",
+  "chartLabelCity": "City",
+  "chartErrorLocationNotFound": "Location not found, try a different city.",
+  "chartErrorDateRequired": "Birth date is required.",
+  "chartErrorCountryCity": "The chart cannot be calculated correctly without selecting a country and city.",
+  "chartErrorCoordinates": "Could not get location coordinates.",
+  "chartCreateButton": "Create Chart",
+  "chartExplorerCalcError": "Calculation could not be completed. Try again.",
+  "chartExplorerShareError": "Could not open chart sharing: {error}",
+  "@chartExplorerShareError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chartExplorerSocialUnavailable": "Holavon connection unavailable.",
+  "chartExplorerThemeTooltip": "Chart: black / white",
+  "chartExplorerResetZoom": "Reset zoom",
+  "chartExplorerShare": "Share on Holavon",
+  "chartExplorerBack": "Back",
+  "chartExplorerForward": "Forward",
+  "chartExplorerCalculating": "Calculating: {date}",
+  "@chartExplorerCalculating": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "chartUnitMinute": "Minute",
+  "chartUnitHour": "Hour",
+  "chartUnitDay": "Day",
+  "chartUnitMonth": "Month",
+  "chartUnitYear": "Year",
+  "chartWheelFullscreenTooltip": "Full screen • time / theme / share",
+  "timeMachineNow": "Now",
+  "timeMachineBack10": "Back 10",
+  "timeMachineBack": "Back",
+  "timeMachineForward": "Forward",
+  "timeMachineForward10": "Forward 10",
+  "timeMachinePlay": "Play",
+  "timeMachinePause": "Pause",
+  "timeMachineOneDay": "1 Day",
+  "timeMachineOneMonth": "1 Month",
+  "timeMachineOneYear": "1 Year",
+  "timeMachineToday": "today",
+  "timeMachineDayCount": "{days} days",
+  "@timeMachineDayCount": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "chartLocationCountry": "Country where you will experience the return",
+  "chartLocationCity": "City where you will experience the return",
+  "chartLocationLoadError": "City list could not be loaded.",
+  "chartLocationResolveError": "Could not find the city location. Select again."
 }

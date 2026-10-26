@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fast_app/config/theme.dart';
+import 'package:fast_app/l10n/app_localizations.dart';
 import 'package:fast_app/models/chart_data.dart';
 import 'package:fast_app/models/chart_frame.dart';
 import 'package:fast_app/screens/chart_explorer_screen.dart';
@@ -43,6 +45,14 @@ void main() {
       final appBg = FastTheme.bg;
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('tr'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           home: ChartExplorerScreen(
             initial: ChartFrame(data: data, title: 'Natal'),
             initialDate: DateTime(2024, 1, 31),

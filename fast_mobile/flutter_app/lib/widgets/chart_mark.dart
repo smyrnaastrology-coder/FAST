@@ -1,13 +1,15 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 /// Vector emblem: zodiac rim, horizon and aspect triangle. Sharp at every size.
 class ChartMark extends StatelessWidget {
   final double size;
   const ChartMark({super.key, this.size = 52});
   @override
   Widget build(BuildContext context) => Semantics(
-    label: 'Haritalarım',
+    label: AppLocalizations.of(context).chartMarkSemantics,
     image: true,
     child: SizedBox.square(
       dimension: size,

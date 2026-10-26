@@ -4557,6 +4557,834 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The community is free and unlimited for everyone — share, add stories, interact.'**
   String get proPillarSocialDesc;
+
+  /// No description provided for @chartSignAries.
+  ///
+  /// In en, this message translates to:
+  /// **'Aries'**
+  String get chartSignAries;
+
+  /// No description provided for @chartSignTaurus.
+  ///
+  /// In en, this message translates to:
+  /// **'Taurus'**
+  String get chartSignTaurus;
+
+  /// No description provided for @chartSignGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini'**
+  String get chartSignGemini;
+
+  /// No description provided for @chartSignCancer.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancer'**
+  String get chartSignCancer;
+
+  /// No description provided for @chartSignLeo.
+  ///
+  /// In en, this message translates to:
+  /// **'Leo'**
+  String get chartSignLeo;
+
+  /// No description provided for @chartSignVirgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Virgo'**
+  String get chartSignVirgo;
+
+  /// No description provided for @chartSignLibra.
+  ///
+  /// In en, this message translates to:
+  /// **'Libra'**
+  String get chartSignLibra;
+
+  /// No description provided for @chartSignScorpio.
+  ///
+  /// In en, this message translates to:
+  /// **'Scorpio'**
+  String get chartSignScorpio;
+
+  /// No description provided for @chartSignSagittarius.
+  ///
+  /// In en, this message translates to:
+  /// **'Sagittarius'**
+  String get chartSignSagittarius;
+
+  /// No description provided for @chartSignCapricorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Capricorn'**
+  String get chartSignCapricorn;
+
+  /// No description provided for @chartSignAquarius.
+  ///
+  /// In en, this message translates to:
+  /// **'Aquarius'**
+  String get chartSignAquarius;
+
+  /// No description provided for @chartSignPisces.
+  ///
+  /// In en, this message translates to:
+  /// **'Pisces'**
+  String get chartSignPisces;
+
+  /// No description provided for @chartPlanetSun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get chartPlanetSun;
+
+  /// No description provided for @chartPlanetMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get chartPlanetMoon;
+
+  /// No description provided for @chartPlanetMercury.
+  ///
+  /// In en, this message translates to:
+  /// **'Mercury'**
+  String get chartPlanetMercury;
+
+  /// No description provided for @chartPlanetVenus.
+  ///
+  /// In en, this message translates to:
+  /// **'Venus'**
+  String get chartPlanetVenus;
+
+  /// No description provided for @chartPlanetMars.
+  ///
+  /// In en, this message translates to:
+  /// **'Mars'**
+  String get chartPlanetMars;
+
+  /// No description provided for @chartPlanetJupiter.
+  ///
+  /// In en, this message translates to:
+  /// **'Jupiter'**
+  String get chartPlanetJupiter;
+
+  /// No description provided for @chartPlanetSaturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn'**
+  String get chartPlanetSaturn;
+
+  /// No description provided for @chartPlanetUranus.
+  ///
+  /// In en, this message translates to:
+  /// **'Uranus'**
+  String get chartPlanetUranus;
+
+  /// No description provided for @chartPlanetNeptune.
+  ///
+  /// In en, this message translates to:
+  /// **'Neptune'**
+  String get chartPlanetNeptune;
+
+  /// No description provided for @chartPlanetPluto.
+  ///
+  /// In en, this message translates to:
+  /// **'Pluto'**
+  String get chartPlanetPluto;
+
+  /// No description provided for @chartPlanetNorthNode.
+  ///
+  /// In en, this message translates to:
+  /// **'North Node'**
+  String get chartPlanetNorthNode;
+
+  /// No description provided for @chartPlanetChiron.
+  ///
+  /// In en, this message translates to:
+  /// **'Chiron'**
+  String get chartPlanetChiron;
+
+  /// No description provided for @chartAspectConjunction.
+  ///
+  /// In en, this message translates to:
+  /// **'Conjunction'**
+  String get chartAspectConjunction;
+
+  /// No description provided for @chartAspectSextile.
+  ///
+  /// In en, this message translates to:
+  /// **'Sextile'**
+  String get chartAspectSextile;
+
+  /// No description provided for @chartAspectSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'Square'**
+  String get chartAspectSquare;
+
+  /// No description provided for @chartAspectTrine.
+  ///
+  /// In en, this message translates to:
+  /// **'Trine'**
+  String get chartAspectTrine;
+
+  /// No description provided for @chartAspectOpposition.
+  ///
+  /// In en, this message translates to:
+  /// **'Opposition'**
+  String get chartAspectOpposition;
+
+  /// No description provided for @chartHousePlacidus.
+  ///
+  /// In en, this message translates to:
+  /// **'Placidus'**
+  String get chartHousePlacidus;
+
+  /// No description provided for @chartHouseWholeSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole Sign'**
+  String get chartHouseWholeSign;
+
+  /// No description provided for @chartHouseRegiomontanus.
+  ///
+  /// In en, this message translates to:
+  /// **'Regiomontanus'**
+  String get chartHouseRegiomontanus;
+
+  /// No description provided for @chartHouseKoch.
+  ///
+  /// In en, this message translates to:
+  /// **'Koch'**
+  String get chartHouseKoch;
+
+  /// No description provided for @chartHouseEqual.
+  ///
+  /// In en, this message translates to:
+  /// **'Equal House'**
+  String get chartHouseEqual;
+
+  /// No description provided for @chartListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Charts'**
+  String get chartListTitle;
+
+  /// No description provided for @chartMarkSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'My charts'**
+  String get chartMarkSemantics;
+
+  /// No description provided for @chartListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No charts yet'**
+  String get chartListEmpty;
+
+  /// No description provided for @chartListCreateFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first chart'**
+  String get chartListCreateFirst;
+
+  /// No description provided for @chartDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal Chart'**
+  String get chartDefaultName;
+
+  /// No description provided for @chartDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get chartDelete;
+
+  /// No description provided for @chartSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get chartSave;
+
+  /// No description provided for @chartSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart saved'**
+  String get chartSaved;
+
+  /// No description provided for @chartNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart not found'**
+  String get chartNotFound;
+
+  /// No description provided for @chartTabNatal.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal'**
+  String get chartTabNatal;
+
+  /// No description provided for @chartTabTimeMachine.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Machine'**
+  String get chartTabTimeMachine;
+
+  /// No description provided for @chartTabReturns.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns'**
+  String get chartTabReturns;
+
+  /// No description provided for @chartTabProgressions.
+  ///
+  /// In en, this message translates to:
+  /// **'Progressions'**
+  String get chartTabProgressions;
+
+  /// No description provided for @chartSectionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get chartSectionInfo;
+
+  /// No description provided for @chartLabelDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Date / Time'**
+  String get chartLabelDateTime;
+
+  /// No description provided for @chartLabelHistoricalTz.
+  ///
+  /// In en, this message translates to:
+  /// **'Historical UTC offset'**
+  String get chartLabelHistoricalTz;
+
+  /// No description provided for @chartTzUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown — recalculate'**
+  String get chartTzUnknown;
+
+  /// No description provided for @chartRecalculateTz.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate with historical timezone'**
+  String get chartRecalculateTz;
+
+  /// No description provided for @chartLabelHouseSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'House System'**
+  String get chartLabelHouseSystem;
+
+  /// No description provided for @chartLabelPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get chartLabelPlace;
+
+  /// No description provided for @chartSectionPlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'Planets'**
+  String get chartSectionPlanets;
+
+  /// No description provided for @chartSectionHouses.
+  ///
+  /// In en, this message translates to:
+  /// **'Houses'**
+  String get chartSectionHouses;
+
+  /// No description provided for @chartHouseNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'House {n}'**
+  String chartHouseNumber(int n);
+
+  /// No description provided for @chartSectionAspects.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspects'**
+  String get chartSectionAspects;
+
+  /// No description provided for @chartOrb.
+  ///
+  /// In en, this message translates to:
+  /// **'orb {value}'**
+  String chartOrb(String value);
+
+  /// No description provided for @chartNatalWithName.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal • {name}'**
+  String chartNatalWithName(String name);
+
+  /// No description provided for @chartNatalInner.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal (inner)'**
+  String get chartNatalInner;
+
+  /// No description provided for @chartTransitOuter.
+  ///
+  /// In en, this message translates to:
+  /// **'Transit (outer)'**
+  String get chartTransitOuter;
+
+  /// No description provided for @chartSectionNatalTransitAspects.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal–Transit Aspects'**
+  String get chartSectionNatalTransitAspects;
+
+  /// No description provided for @chartNoAspects.
+  ///
+  /// In en, this message translates to:
+  /// **'No aspects'**
+  String get chartNoAspects;
+
+  /// No description provided for @chartTimeMachineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the time to see the transit chart'**
+  String get chartTimeMachineHint;
+
+  /// No description provided for @chartNatalTransitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal + Transit'**
+  String get chartNatalTransitTitle;
+
+  /// No description provided for @chartSectionReturnLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation Place'**
+  String get chartSectionReturnLocation;
+
+  /// No description provided for @chartReturnLocationSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation place: {place} ({lat}, {lon})'**
+  String chartReturnLocationSelected(String place, String lat, String lon);
+
+  /// No description provided for @chartReturnLocationPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'First choose the city where you will experience the return, or confirm the location below.'**
+  String get chartReturnLocationPrompt;
+
+  /// No description provided for @chartReturnNatalPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Natal Place'**
+  String get chartReturnNatalPlace;
+
+  /// No description provided for @chartReturnDeviceLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Location'**
+  String get chartReturnDeviceLocation;
+
+  /// No description provided for @chartReturnLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting location...'**
+  String get chartReturnLocating;
+
+  /// No description provided for @chartReturnManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get chartReturnManual;
+
+  /// No description provided for @chartLabelLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get chartLabelLatitude;
+
+  /// No description provided for @chartLabelLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get chartLabelLongitude;
+
+  /// No description provided for @chartReturnLocationExplainer.
+  ///
+  /// In en, this message translates to:
+  /// **'In the return chart, the place determines the ASC/MC, house distribution and rulers. Choosing the city where you will experience the solar/lunar return gives the most accurate result.'**
+  String get chartReturnLocationExplainer;
+
+  /// No description provided for @chartSectionSolarLunarReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar / Lunar Return'**
+  String get chartSectionSolarLunarReturn;
+
+  /// No description provided for @chartLabelYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get chartLabelYear;
+
+  /// No description provided for @chartLabelLunarMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar month'**
+  String get chartLabelLunarMonth;
+
+  /// No description provided for @chartSolarReturnYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar Return {year}'**
+  String chartSolarReturnYear(int year);
+
+  /// No description provided for @chartLunarReturnYm.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar Return {year}-{month}'**
+  String chartLunarReturnYm(int year, String month);
+
+  /// No description provided for @chartReturnPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a return to calculate the yearly return chart.'**
+  String get chartReturnPrompt;
+
+  /// No description provided for @chartSolarReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Solar Return'**
+  String get chartSolarReturn;
+
+  /// No description provided for @chartLunarReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar Return'**
+  String get chartLunarReturn;
+
+  /// No description provided for @chartSectionProgressions.
+  ///
+  /// In en, this message translates to:
+  /// **'Progressions'**
+  String get chartSectionProgressions;
+
+  /// No description provided for @chartSecondaryProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Progress'**
+  String get chartSecondaryProgress;
+
+  /// No description provided for @chartMinorProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Minor Progress'**
+  String get chartMinorProgress;
+
+  /// No description provided for @chartProgressHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary: 1 day/year • Minor: 27.321582 days/year\nAxes: quotidian'**
+  String get chartProgressHelp;
+
+  /// No description provided for @chartTargetDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Target Date: {date}'**
+  String chartTargetDate(String date);
+
+  /// No description provided for @chartPickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Date'**
+  String get chartPickDate;
+
+  /// No description provided for @chartCalculate.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate'**
+  String get chartCalculate;
+
+  /// No description provided for @chartProgressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a target date and method, then press Calculate.'**
+  String get chartProgressHint;
+
+  /// No description provided for @chartCalculating.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating...'**
+  String get chartCalculating;
+
+  /// No description provided for @chartProgressTitleWithDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{method} – {date}'**
+  String chartProgressTitleWithDate(String method, String date);
+
+  /// No description provided for @chartCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Chart'**
+  String get chartCreateTitle;
+
+  /// No description provided for @chartLabelNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (optional)'**
+  String get chartLabelNameOptional;
+
+  /// No description provided for @chartNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Alex'**
+  String get chartNameHint;
+
+  /// No description provided for @chartLabelBirthDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Date'**
+  String get chartLabelBirthDate;
+
+  /// No description provided for @chartLabelBirthTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Time'**
+  String get chartLabelBirthTime;
+
+  /// No description provided for @chartLabelBirthPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Place'**
+  String get chartLabelBirthPlace;
+
+  /// No description provided for @chartLabelCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get chartLabelCountry;
+
+  /// No description provided for @chartLabelCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get chartLabelCity;
+
+  /// No description provided for @chartErrorLocationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Location not found, try a different city.'**
+  String get chartErrorLocationNotFound;
+
+  /// No description provided for @chartErrorDateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth date is required.'**
+  String get chartErrorDateRequired;
+
+  /// No description provided for @chartErrorCountryCity.
+  ///
+  /// In en, this message translates to:
+  /// **'The chart cannot be calculated correctly without selecting a country and city.'**
+  String get chartErrorCountryCity;
+
+  /// No description provided for @chartErrorCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get location coordinates.'**
+  String get chartErrorCoordinates;
+
+  /// No description provided for @chartCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Chart'**
+  String get chartCreateButton;
+
+  /// No description provided for @chartExplorerCalcError.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation could not be completed. Try again.'**
+  String get chartExplorerCalcError;
+
+  /// No description provided for @chartExplorerShareError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open chart sharing: {error}'**
+  String chartExplorerShareError(String error);
+
+  /// No description provided for @chartExplorerSocialUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Holavon connection unavailable.'**
+  String get chartExplorerSocialUnavailable;
+
+  /// No description provided for @chartExplorerThemeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart: black / white'**
+  String get chartExplorerThemeTooltip;
+
+  /// No description provided for @chartExplorerResetZoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset zoom'**
+  String get chartExplorerResetZoom;
+
+  /// No description provided for @chartExplorerShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share on Holavon'**
+  String get chartExplorerShare;
+
+  /// No description provided for @chartExplorerBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get chartExplorerBack;
+
+  /// No description provided for @chartExplorerForward.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward'**
+  String get chartExplorerForward;
+
+  /// No description provided for @chartExplorerCalculating.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating: {date}'**
+  String chartExplorerCalculating(String date);
+
+  /// No description provided for @chartUnitMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Minute'**
+  String get chartUnitMinute;
+
+  /// No description provided for @chartUnitHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Hour'**
+  String get chartUnitHour;
+
+  /// No description provided for @chartUnitDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get chartUnitDay;
+
+  /// No description provided for @chartUnitMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get chartUnitMonth;
+
+  /// No description provided for @chartUnitYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get chartUnitYear;
+
+  /// No description provided for @chartWheelFullscreenTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Full screen • time / theme / share'**
+  String get chartWheelFullscreenTooltip;
+
+  /// No description provided for @timeMachineNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get timeMachineNow;
+
+  /// No description provided for @timeMachineBack10.
+  ///
+  /// In en, this message translates to:
+  /// **'Back 10'**
+  String get timeMachineBack10;
+
+  /// No description provided for @timeMachineBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get timeMachineBack;
+
+  /// No description provided for @timeMachineForward.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward'**
+  String get timeMachineForward;
+
+  /// No description provided for @timeMachineForward10.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward 10'**
+  String get timeMachineForward10;
+
+  /// No description provided for @timeMachinePlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get timeMachinePlay;
+
+  /// No description provided for @timeMachinePause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get timeMachinePause;
+
+  /// No description provided for @timeMachineOneDay.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Day'**
+  String get timeMachineOneDay;
+
+  /// No description provided for @timeMachineOneMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Month'**
+  String get timeMachineOneMonth;
+
+  /// No description provided for @timeMachineOneYear.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Year'**
+  String get timeMachineOneYear;
+
+  /// No description provided for @timeMachineToday.
+  ///
+  /// In en, this message translates to:
+  /// **'today'**
+  String get timeMachineToday;
+
+  /// No description provided for @timeMachineDayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days'**
+  String timeMachineDayCount(String days);
+
+  /// No description provided for @chartLocationCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country where you will experience the return'**
+  String get chartLocationCountry;
+
+  /// No description provided for @chartLocationCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City where you will experience the return'**
+  String get chartLocationCity;
+
+  /// No description provided for @chartLocationLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'City list could not be loaded.'**
+  String get chartLocationLoadError;
+
+  /// No description provided for @chartLocationResolveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not find the city location. Select again.'**
+  String get chartLocationResolveError;
 }
 
 class _AppLocalizationsDelegate

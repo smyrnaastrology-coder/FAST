@@ -2438,4 +2438,451 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get proPillarSocialDesc =>
       'Topluluk herkes için ücretsiz ve sınırsız — paylaş, hikâye ekle, etkileş.';
+
+  @override
+  String get chartSignAries => 'Koç';
+
+  @override
+  String get chartSignTaurus => 'Boğa';
+
+  @override
+  String get chartSignGemini => 'İkizler';
+
+  @override
+  String get chartSignCancer => 'Yengeç';
+
+  @override
+  String get chartSignLeo => 'Aslan';
+
+  @override
+  String get chartSignVirgo => 'Başak';
+
+  @override
+  String get chartSignLibra => 'Terazi';
+
+  @override
+  String get chartSignScorpio => 'Akrep';
+
+  @override
+  String get chartSignSagittarius => 'Yay';
+
+  @override
+  String get chartSignCapricorn => 'Oğlak';
+
+  @override
+  String get chartSignAquarius => 'Kova';
+
+  @override
+  String get chartSignPisces => 'Balık';
+
+  @override
+  String get chartPlanetSun => 'Güneş';
+
+  @override
+  String get chartPlanetMoon => 'Ay';
+
+  @override
+  String get chartPlanetMercury => 'Merkür';
+
+  @override
+  String get chartPlanetVenus => 'Venüs';
+
+  @override
+  String get chartPlanetMars => 'Mars';
+
+  @override
+  String get chartPlanetJupiter => 'Jüpiter';
+
+  @override
+  String get chartPlanetSaturn => 'Satürn';
+
+  @override
+  String get chartPlanetUranus => 'Uranüs';
+
+  @override
+  String get chartPlanetNeptune => 'Neptün';
+
+  @override
+  String get chartPlanetPluto => 'Plüton';
+
+  @override
+  String get chartPlanetNorthNode => 'Kuzey Ay Düğümü';
+
+  @override
+  String get chartPlanetChiron => 'Şiron';
+
+  @override
+  String get chartAspectConjunction => 'Kavuşum';
+
+  @override
+  String get chartAspectSextile => 'Altmışlık';
+
+  @override
+  String get chartAspectSquare => 'Kare';
+
+  @override
+  String get chartAspectTrine => 'Üçgen';
+
+  @override
+  String get chartAspectOpposition => 'Karşıt';
+
+  @override
+  String get chartHousePlacidus => 'Placidus';
+
+  @override
+  String get chartHouseWholeSign => 'Tüm Burç';
+
+  @override
+  String get chartHouseRegiomontanus => 'Regiomontanus';
+
+  @override
+  String get chartHouseKoch => 'Koch';
+
+  @override
+  String get chartHouseEqual => 'Eşit Ev';
+
+  @override
+  String get chartListTitle => 'Haritalarım';
+
+  @override
+  String get chartMarkSemantics => 'Haritalarım';
+
+  @override
+  String get chartListEmpty => 'Henüz haritan yok';
+
+  @override
+  String get chartListCreateFirst => 'İlk haritanı oluştur';
+
+  @override
+  String get chartDefaultName => 'Natal Haritası';
+
+  @override
+  String get chartDelete => 'Sil';
+
+  @override
+  String get chartSave => 'Kaydet';
+
+  @override
+  String get chartSaved => 'Harita kaydedildi';
+
+  @override
+  String get chartNotFound => 'Harita bulunamadı';
+
+  @override
+  String get chartTabNatal => 'Natal';
+
+  @override
+  String get chartTabTimeMachine => 'Zaman Makinesi';
+
+  @override
+  String get chartTabReturns => 'Dönüşler';
+
+  @override
+  String get chartTabProgressions => 'Progresyonlar';
+
+  @override
+  String get chartSectionInfo => 'Bilgiler';
+
+  @override
+  String get chartLabelDateTime => 'Tarih / Saat';
+
+  @override
+  String get chartLabelHistoricalTz => 'Tarihsel UTC farkı';
+
+  @override
+  String get chartTzUnknown => 'Bilinmiyor — yeniden hesapla';
+
+  @override
+  String get chartRecalculateTz => 'Tarihsel saat dilimiyle yeniden hesapla';
+
+  @override
+  String get chartLabelHouseSystem => 'Ev Sistemi';
+
+  @override
+  String get chartLabelPlace => 'Yer';
+
+  @override
+  String get chartSectionPlanets => 'Gezegenler';
+
+  @override
+  String get chartSectionHouses => 'Evler';
+
+  @override
+  String chartHouseNumber(int n) {
+    return 'Ev $n';
+  }
+
+  @override
+  String get chartSectionAspects => 'Açılar';
+
+  @override
+  String chartOrb(String value) {
+    return 'orb $value';
+  }
+
+  @override
+  String chartNatalWithName(String name) {
+    return 'Natal • $name';
+  }
+
+  @override
+  String get chartNatalInner => 'Natal (iç)';
+
+  @override
+  String get chartTransitOuter => 'Transit (dış)';
+
+  @override
+  String get chartSectionNatalTransitAspects => 'Natal–Transit Açılar';
+
+  @override
+  String get chartNoAspects => 'Açı yok';
+
+  @override
+  String get chartTimeMachineHint =>
+      'Zamanı değiştirerek transit haritasını gör';
+
+  @override
+  String get chartNatalTransitTitle => 'Natal + Transit';
+
+  @override
+  String get chartSectionReturnLocation => 'Hesaplama Yeri';
+
+  @override
+  String chartReturnLocationSelected(String place, String lat, String lon) {
+    return 'Hesaplama yeri: $place ($lat, $lon)';
+  }
+
+  @override
+  String get chartReturnLocationPrompt =>
+      'Önce dönüşü yaşayacağın şehri seç veya aşağıdan konumu doğrula.';
+
+  @override
+  String get chartReturnNatalPlace => 'Natal Yeri';
+
+  @override
+  String get chartReturnDeviceLocation => 'Cihaz Konumu';
+
+  @override
+  String get chartReturnLocating => 'Konum alınıyor...';
+
+  @override
+  String get chartReturnManual => 'Manuel';
+
+  @override
+  String get chartLabelLatitude => 'Enlem';
+
+  @override
+  String get chartLabelLongitude => 'Boylam';
+
+  @override
+  String get chartReturnLocationExplainer =>
+      'Dönüş haritasında mekan; ASC/MC, ev yerleşimleri ve yöneticileri belirler. Güneş/Ay dönüşünü yaşadığın şehri seçmen en doğru sonucu verir.';
+
+  @override
+  String get chartSectionSolarLunarReturn => 'Solar / Lunar Return';
+
+  @override
+  String get chartLabelYear => 'Yıl';
+
+  @override
+  String get chartLabelLunarMonth => 'Lunar ayı';
+
+  @override
+  String chartSolarReturnYear(int year) {
+    return 'Solar Return $year';
+  }
+
+  @override
+  String chartLunarReturnYm(int year, String month) {
+    return 'Lunar Return $year-$month';
+  }
+
+  @override
+  String get chartReturnPrompt =>
+      'Yıllık dönüş haritasını hesaplamak için bir dönüş seç.';
+
+  @override
+  String get chartSolarReturn => 'Solar Return';
+
+  @override
+  String get chartLunarReturn => 'Lunar Return';
+
+  @override
+  String get chartSectionProgressions => 'Progresyonlar';
+
+  @override
+  String get chartSecondaryProgress => 'Secondary Progress';
+
+  @override
+  String get chartMinorProgress => 'Minor Progress';
+
+  @override
+  String get chartProgressHelp =>
+      'Secondary: 1 gün/yıl • Minor: 27.321582 gün/yıl\nEksenler: quotidian';
+
+  @override
+  String chartTargetDate(String date) {
+    return 'Hedef Tarih: $date';
+  }
+
+  @override
+  String get chartPickDate => 'Tarih Seç';
+
+  @override
+  String get chartCalculate => 'Hesapla';
+
+  @override
+  String get chartProgressHint =>
+      'Progresyon için hedef tarih ve yöntemi seçip Hesapla düğmesine bas.';
+
+  @override
+  String get chartCalculating => 'Hesaplanıyor...';
+
+  @override
+  String chartProgressTitleWithDate(String method, String date) {
+    return '$method – $date';
+  }
+
+  @override
+  String get chartCreateTitle => 'Yeni Harita';
+
+  @override
+  String get chartLabelNameOptional => 'İsim (opsiyonel)';
+
+  @override
+  String get chartNameHint => 'Örn. Ali';
+
+  @override
+  String get chartLabelBirthDate => 'Doğum Tarihi';
+
+  @override
+  String get chartLabelBirthTime => 'Doğum Saati';
+
+  @override
+  String get chartLabelBirthPlace => 'Doğum Yeri';
+
+  @override
+  String get chartLabelCountry => 'Ülke';
+
+  @override
+  String get chartLabelCity => 'Şehir';
+
+  @override
+  String get chartErrorLocationNotFound =>
+      'Konum bulunamadı, farklı bir şehir deneyin.';
+
+  @override
+  String get chartErrorDateRequired => 'Doğum tarihi gerekli.';
+
+  @override
+  String get chartErrorCountryCity =>
+      'Ülke ve şehir seçmeden harita doğru hesaplanamaz.';
+
+  @override
+  String get chartErrorCoordinates => 'Konum koordinatları alınamadı.';
+
+  @override
+  String get chartCreateButton => 'Haritayı Oluştur';
+
+  @override
+  String get chartExplorerCalcError =>
+      'Hesaplama tamamlanamadı. Tekrar deneyin.';
+
+  @override
+  String chartExplorerShareError(String error) {
+    return 'Harita paylaşımı açılamadı: $error';
+  }
+
+  @override
+  String get chartExplorerSocialUnavailable =>
+      'Holavon bağlantısı kullanılamıyor.';
+
+  @override
+  String get chartExplorerThemeTooltip => 'Harita: siyah / beyaz';
+
+  @override
+  String get chartExplorerResetZoom => 'Yakınlaştırmayı sıfırla';
+
+  @override
+  String get chartExplorerShare => 'Holavon\'da paylaş';
+
+  @override
+  String get chartExplorerBack => 'Geri';
+
+  @override
+  String get chartExplorerForward => 'İleri';
+
+  @override
+  String chartExplorerCalculating(String date) {
+    return 'Hesaplanıyor: $date';
+  }
+
+  @override
+  String get chartUnitMinute => 'Dakika';
+
+  @override
+  String get chartUnitHour => 'Saat';
+
+  @override
+  String get chartUnitDay => 'Gün';
+
+  @override
+  String get chartUnitMonth => 'Ay';
+
+  @override
+  String get chartUnitYear => 'Yıl';
+
+  @override
+  String get chartWheelFullscreenTooltip => 'Tam ekran • zaman / tema / paylaş';
+
+  @override
+  String get timeMachineNow => 'Şimdi';
+
+  @override
+  String get timeMachineBack10 => 'Geri al';
+
+  @override
+  String get timeMachineBack => 'Geri';
+
+  @override
+  String get timeMachineForward => 'İleri';
+
+  @override
+  String get timeMachineForward10 => 'İleri al';
+
+  @override
+  String get timeMachinePlay => 'Oynat';
+
+  @override
+  String get timeMachinePause => 'Durdur';
+
+  @override
+  String get timeMachineOneDay => '1 Gün';
+
+  @override
+  String get timeMachineOneMonth => '1 Ay';
+
+  @override
+  String get timeMachineOneYear => '1 Yıl';
+
+  @override
+  String get timeMachineToday => 'bugün';
+
+  @override
+  String timeMachineDayCount(String days) {
+    return '$days gün';
+  }
+
+  @override
+  String get chartLocationCountry => 'Dönüşü yaşayacağın ülke';
+
+  @override
+  String get chartLocationCity => 'Dönüşü yaşayacağın şehir';
+
+  @override
+  String get chartLocationLoadError => 'Şehir listesi yüklenemedi.';
+
+  @override
+  String get chartLocationResolveError =>
+      'Şehrin konumu bulunamadı. Tekrar seçin.';
 }

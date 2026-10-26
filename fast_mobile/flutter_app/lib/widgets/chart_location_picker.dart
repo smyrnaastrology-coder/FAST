@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../config/country_labels.dart';
+import '../l10n/app_localizations.dart';
 
 /// A country-qualified city lookup; stale responses never replace a newer city.
 class ChartLocationPicker extends StatefulWidget {
@@ -38,7 +39,12 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
       final db = await _api.getUlkelerRaw();
       if (mounted) setState(() => _db = db);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Şehir listesi yüklenemedi.');
+      if (mounted) {
+        setState(
+          () => _error =
+              AppLocalizations.of(context).chartLocationLoadError,
+        );
+      }
     }
   }
 
@@ -60,7 +66,10 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
       );
     } catch (_) {
       if (mounted && request == _request) {
-        setState(() => _error = 'Şehrin konumu bulunamadı. Tekrar seçin.');
+        setState(
+          () => _error =
+              AppLocalizations.of(context).chartLocationResolveError,
+        );
       }
     } finally {
       if (mounted && request == _request) setState(() => _busy = false);
@@ -83,13 +92,14 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
         ((_db!['sehirler'] as Map)[_country] as List?)?.cast<String>() ??
         <String>[];
     final labels = countryLabels(Localizations.localeOf(context).languageCode);
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         DropdownButtonFormField<String>(
           initialValue: _country,
           isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: 'Dönüşü yaşayacağın ülke',
+          decoration: InputDecoration(
+            labelText: l10n.chartLocationCountry,
           ),
           items: countries
               .map(
@@ -112,8 +122,8 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
           key: ValueKey(_country),
           initialValue: _city,
           isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: 'Dönüşü yaşayacağın şehir',
+          decoration: InputDecoration(
+            labelText: l10n.chartLocationCity,
           ),
           items: cities
               .map((c) => DropdownMenuItem(value: c, child: Text(c)))

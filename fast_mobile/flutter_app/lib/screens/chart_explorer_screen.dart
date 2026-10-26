@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import '../models/chart_frame.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/social_provider.dart';
 import '../widgets/chart_wheel.dart';
 import 'auth_screen.dart';
@@ -101,7 +102,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
         if (!mounted || sequence != _sequence) return;
         setState(() {
           _requested = _date;
-          _error = 'Hesaplama tamamlanamadı. Tekrar deneyin.';
+          _error = AppLocalizations.of(context).chartExplorerCalcError;
         });
       } finally {
         if (mounted && sequence == _sequence) setState(() => _busy = false);
@@ -135,11 +136,17 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
   }
 
   Future<void> _share() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _sharing = true);
     try {
       final social = context.read<SocialProvider>();
       if (!social.enabled) {
-        throw StateError('Holavon bağlantısı kullanılamıyor.');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.chartExplorerSocialUnavailable)),
+          );
+        }
+        return;
       }
       if (!social.signedIn) {
         await Navigator.of(context).push(
@@ -183,7 +190,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Harita paylaşımı açılamadı: $e')),
+          SnackBar(content: Text(l10n.chartExplorerShareError('$e'))),
         );
       }
     } finally {
@@ -193,6 +200,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final bg = _light ? Colors.white : const Color(0xFF0D1017);
     final fg = _light ? Colors.black87 : Colors.white;
     final theme = _light ? ThemeData.light() : ThemeData.dark();
@@ -206,17 +214,17 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
           title: Text(_frame.title, style: const TextStyle(fontSize: 16)),
           actions: [
             IconButton(
-              tooltip: 'Harita: siyah / beyaz',
+              tooltip: l10n.chartExplorerThemeTooltip,
               icon: Icon(_light ? Icons.dark_mode : Icons.light_mode),
               onPressed: () => setState(() => _light = !_light),
             ),
             IconButton(
-              tooltip: 'Yakınlaştırmayı sıfırla',
+              tooltip: l10n.chartExplorerResetZoom,
               icon: const Icon(Icons.fit_screen),
               onPressed: () => _transform.value = Matrix4.identity(),
             ),
             IconButton(
-              tooltip: 'Holavon’da paylaş',
+              tooltip: l10n.chartExplorerShare,
               icon: const Icon(Icons.share_outlined),
               onPressed: _busy || _sharing ? null : _share,
             ),
@@ -231,7 +239,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        tooltip: 'Geri',
+                        tooltip: l10n.chartExplorerBack,
                         icon: const Icon(Icons.chevron_left),
                         onPressed: () =>
                             _request(stepChartTime(_requested, _unit, -_count)),
@@ -258,29 +266,28 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
                         child: DropdownButton<ChartTimeUnit>(
                           isExpanded: true,
                           value: _unit,
-                          items:
-                              const [
-                                    DropdownMenuItem(
-                                      value: ChartTimeUnit.minute,
-                                      child: Text('Dakika'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: ChartTimeUnit.hour,
-                                      child: Text('Saat'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: ChartTimeUnit.day,
-                                      child: Text('Gün'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: ChartTimeUnit.month,
-                                      child: Text('Ay'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: ChartTimeUnit.year,
-                                      child: Text('Yıl'),
-                                    ),
-                                  ]
+                          items: [
+                            DropdownMenuItem(
+                              value: ChartTimeUnit.minute,
+                              child: Text(l10n.chartUnitMinute),
+                            ),
+                            DropdownMenuItem(
+                              value: ChartTimeUnit.hour,
+                              child: Text(l10n.chartUnitHour),
+                            ),
+                            DropdownMenuItem(
+                              value: ChartTimeUnit.day,
+                              child: Text(l10n.chartUnitDay),
+                            ),
+                            DropdownMenuItem(
+                              value: ChartTimeUnit.month,
+                              child: Text(l10n.chartUnitMonth),
+                            ),
+                            DropdownMenuItem(
+                              value: ChartTimeUnit.year,
+                              child: Text(l10n.chartUnitYear),
+                            ),
+                          ]
                                   .where(
                                     (item) =>
                                         widget.timeUnits.contains(item.value),
@@ -292,7 +299,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'İleri',
+                        tooltip: l10n.chartExplorerForward,
                         icon: const Icon(Icons.chevron_right),
                         onPressed: () =>
                             _request(stepChartTime(_requested, _unit, _count)),
@@ -302,7 +309,7 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
                 ),
               if (_busy || _sharing)
                 const LinearProgressIndicator(minHeight: 2),
-              if (_busy) Text('Hesaplanıyor: ${_format(_requested)}'),
+              if (_busy) Text(l10n.chartExplorerCalculating(_format(_requested))),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.all(8),

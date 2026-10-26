@@ -1,8 +1,22 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:fast_app/l10n/app_localizations.dart';
 import 'package:fast_app/models/chart_data.dart';
 import 'package:fast_app/widgets/chart_wheel.dart';
+
+Widget _wrap(Widget child) => MaterialApp(
+      locale: const Locale('tr'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: Center(child: child)),
+    );
 
 ChartData _sample() {
   const meta = ChartBody(
@@ -67,9 +81,7 @@ ChartData _sample() {
 void main() {
   testWidgets('ChartWheel natal çizilir', (tester) async {
     final data = _sample();
-    await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: Center(child: ChartWheel(data: data)))),
-    );
+    await tester.pumpWidget(_wrap(ChartWheel(data: data)));
     expect(find.byType(ChartWheel), findsOneWidget);
   });
 
@@ -77,16 +89,12 @@ void main() {
     final data = _sample();
     final outer = _sample().planets;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: ChartWheel(
-              data: data,
-              size: 340,
-              outerPlanets: outer,
-              outerHouses: data.houses,
-            ),
-          ),
+      _wrap(
+        ChartWheel(
+          data: data,
+          size: 340,
+          outerPlanets: outer,
+          outerHouses: data.houses,
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 
 /// Zaman makinesi: hızlı adım butonları, oynat/durdur ve gün kaydırıcısı.
 class TimeMachineBar extends StatefulWidget {
@@ -79,6 +80,7 @@ class _TimeMachineBarState extends State<TimeMachineBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final offsetDays = _dt.difference(_anchor).inDays;
     final sliderVal = offsetDays.clamp(-730, 730).toDouble();
 
@@ -114,7 +116,7 @@ class _TimeMachineBarState extends State<TimeMachineBar> {
                   minimumSize: const Size(0, 32),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
-                child: Text('Şimdi',
+                child: Text(l10n.timeMachineNow,
                     style:
                         TextStyle(color: FastTheme.accentGold, fontSize: 12)),
               ),
@@ -124,13 +126,13 @@ class _TimeMachineBarState extends State<TimeMachineBar> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                tooltip: 'Geri al',
+                tooltip: l10n.timeMachineBack10,
                 icon: Icon(Icons.keyboard_double_arrow_left,
                     color: FastTheme.textMuted),
                 onPressed: () => _shiftDays(-_stepDays * 10),
               ),
               IconButton(
-                tooltip: 'Geri',
+                tooltip: l10n.timeMachineBack,
                 icon: Icon(Icons.chevron_left, color: FastTheme.text, size: 28),
                 onPressed: () => _shiftDays(-_stepDays),
               ),
@@ -143,19 +145,20 @@ class _TimeMachineBarState extends State<TimeMachineBar> {
                   ]),
                 ),
                 child: IconButton(
-                  tooltip: _playing ? 'Durdur' : 'Oynat',
+                  tooltip:
+                      _playing ? l10n.timeMachinePause : l10n.timeMachinePlay,
                   icon: Icon(_playing ? Icons.pause : Icons.play_arrow,
                       color: FastTheme.bg),
                   onPressed: _togglePlay,
                 ),
               ),
               IconButton(
-                tooltip: 'İleri',
+                tooltip: l10n.timeMachineForward,
                 icon: Icon(Icons.chevron_right, color: FastTheme.text, size: 28),
                 onPressed: () => _shiftDays(_stepDays),
               ),
               IconButton(
-                tooltip: 'İleri al',
+                tooltip: l10n.timeMachineForward10,
                 icon: Icon(Icons.keyboard_double_arrow_right,
                     color: FastTheme.textMuted),
                 onPressed: () => _shiftDays(_stepDays * 10),
@@ -164,16 +167,17 @@ class _TimeMachineBarState extends State<TimeMachineBar> {
           ),
           Row(
             children: [
-              _stepChip('1 Gün', 1),
+              _stepChip(l10n.timeMachineOneDay, 1),
               const SizedBox(width: 6),
-              _stepChip('1 Ay', 30),
+              _stepChip(l10n.timeMachineOneMonth, 30),
               const SizedBox(width: 6),
-              _stepChip('1 Yıl', 365),
+              _stepChip(l10n.timeMachineOneYear, 365),
               const Spacer(),
               Text(
                 offsetDays == 0
-                    ? 'bugün'
-                    : '${offsetDays > 0 ? '+' : ''}$offsetDays gün',
+                    ? l10n.timeMachineToday
+                    : l10n.timeMachineDayCount(
+                        '${offsetDays > 0 ? '+' : ''}$offsetDays'),
                 style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
               ),
             ],

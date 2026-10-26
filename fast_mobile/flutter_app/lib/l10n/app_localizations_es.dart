@@ -2471,4 +2471,454 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get proPillarSocialDesc =>
       'La comunidad es gratis e ilimitada para todos — comparte, añade historias, interactúa.';
+
+  @override
+  String get chartSignAries => 'Aries';
+
+  @override
+  String get chartSignTaurus => 'Tauro';
+
+  @override
+  String get chartSignGemini => 'Géminis';
+
+  @override
+  String get chartSignCancer => 'Cáncer';
+
+  @override
+  String get chartSignLeo => 'Leo';
+
+  @override
+  String get chartSignVirgo => 'Virgo';
+
+  @override
+  String get chartSignLibra => 'Libra';
+
+  @override
+  String get chartSignScorpio => 'Escorpio';
+
+  @override
+  String get chartSignSagittarius => 'Sagitario';
+
+  @override
+  String get chartSignCapricorn => 'Capricornio';
+
+  @override
+  String get chartSignAquarius => 'Acuario';
+
+  @override
+  String get chartSignPisces => 'Piscis';
+
+  @override
+  String get chartPlanetSun => 'Sol';
+
+  @override
+  String get chartPlanetMoon => 'Luna';
+
+  @override
+  String get chartPlanetMercury => 'Mercurio';
+
+  @override
+  String get chartPlanetVenus => 'Venus';
+
+  @override
+  String get chartPlanetMars => 'Marte';
+
+  @override
+  String get chartPlanetJupiter => 'Júpiter';
+
+  @override
+  String get chartPlanetSaturn => 'Saturno';
+
+  @override
+  String get chartPlanetUranus => 'Urano';
+
+  @override
+  String get chartPlanetNeptune => 'Neptuno';
+
+  @override
+  String get chartPlanetPluto => 'Plutón';
+
+  @override
+  String get chartPlanetNorthNode => 'Nodo Norte';
+
+  @override
+  String get chartPlanetChiron => 'Quirón';
+
+  @override
+  String get chartAspectConjunction => 'Conjunción';
+
+  @override
+  String get chartAspectSextile => 'Sextil';
+
+  @override
+  String get chartAspectSquare => 'Cuadratura';
+
+  @override
+  String get chartAspectTrine => 'Trígono';
+
+  @override
+  String get chartAspectOpposition => 'Oposición';
+
+  @override
+  String get chartHousePlacidus => 'Placidus';
+
+  @override
+  String get chartHouseWholeSign => 'Signo completo';
+
+  @override
+  String get chartHouseRegiomontanus => 'Regiomontano';
+
+  @override
+  String get chartHouseKoch => 'Koch';
+
+  @override
+  String get chartHouseEqual => 'Casas iguales';
+
+  @override
+  String get chartListTitle => 'Mis cartas';
+
+  @override
+  String get chartMarkSemantics => 'Mis cartas';
+
+  @override
+  String get chartListEmpty => 'Aún no tienes cartas';
+
+  @override
+  String get chartListCreateFirst => 'Crea tu primera carta';
+
+  @override
+  String get chartDefaultName => 'Carta natal';
+
+  @override
+  String get chartDelete => 'Eliminar';
+
+  @override
+  String get chartSave => 'Guardar';
+
+  @override
+  String get chartSaved => 'Carta guardada';
+
+  @override
+  String get chartNotFound => 'Carta no encontrada';
+
+  @override
+  String get chartTabNatal => 'Natal';
+
+  @override
+  String get chartTabTimeMachine => 'Máquina del tiempo';
+
+  @override
+  String get chartTabReturns => 'Retornos';
+
+  @override
+  String get chartTabProgressions => 'Progresiones';
+
+  @override
+  String get chartSectionInfo => 'Información';
+
+  @override
+  String get chartLabelDateTime => 'Fecha / Hora';
+
+  @override
+  String get chartLabelHistoricalTz => 'Desfase UTC histórico';
+
+  @override
+  String get chartTzUnknown => 'Desconocido — recalcular';
+
+  @override
+  String get chartRecalculateTz => 'Recalcular con la zona horaria histórica';
+
+  @override
+  String get chartLabelHouseSystem => 'Sistema de casas';
+
+  @override
+  String get chartLabelPlace => 'Lugar';
+
+  @override
+  String get chartSectionPlanets => 'Planetas';
+
+  @override
+  String get chartSectionHouses => 'Casas';
+
+  @override
+  String chartHouseNumber(int n) {
+    return 'Casa $n';
+  }
+
+  @override
+  String get chartSectionAspects => 'Aspectos';
+
+  @override
+  String chartOrb(String value) {
+    return 'orbe $value';
+  }
+
+  @override
+  String chartNatalWithName(String name) {
+    return 'Natal • $name';
+  }
+
+  @override
+  String get chartNatalInner => 'Natal (interior)';
+
+  @override
+  String get chartTransitOuter => 'Tránsito (exterior)';
+
+  @override
+  String get chartSectionNatalTransitAspects => 'Aspectos Natal–Tránsito';
+
+  @override
+  String get chartNoAspects => 'Sin aspectos';
+
+  @override
+  String get chartTimeMachineHint =>
+      'Cambia la hora para ver la carta de tránsito';
+
+  @override
+  String get chartNatalTransitTitle => 'Natal + Tránsito';
+
+  @override
+  String get chartSectionReturnLocation => 'Lugar de cálculo';
+
+  @override
+  String chartReturnLocationSelected(String place, String lat, String lon) {
+    return 'Lugar de cálculo: $place ($lat, $lon)';
+  }
+
+  @override
+  String get chartReturnLocationPrompt =>
+      'Primero elige la ciudad donde vivirás el retorno o confirma la ubicación abajo.';
+
+  @override
+  String get chartReturnNatalPlace => 'Lugar natal';
+
+  @override
+  String get chartReturnDeviceLocation => 'Ubicación del dispositivo';
+
+  @override
+  String get chartReturnLocating => 'Obteniendo ubicación...';
+
+  @override
+  String get chartReturnManual => 'Manual';
+
+  @override
+  String get chartLabelLatitude => 'Latitud';
+
+  @override
+  String get chartLabelLongitude => 'Longitud';
+
+  @override
+  String get chartReturnLocationExplainer =>
+      'En la carta de retorno, el lugar determina el ASC/MC, la distribución de las casas y sus regentes. Elegir la ciudad donde vivirás el retorno solar/lunar da el resultado más preciso.';
+
+  @override
+  String get chartSectionSolarLunarReturn => 'Retorno solar / lunar';
+
+  @override
+  String get chartLabelYear => 'Año';
+
+  @override
+  String get chartLabelLunarMonth => 'Mes lunar';
+
+  @override
+  String chartSolarReturnYear(int year) {
+    return 'Retorno solar $year';
+  }
+
+  @override
+  String chartLunarReturnYm(int year, String month) {
+    return 'Retorno lunar $year-$month';
+  }
+
+  @override
+  String get chartReturnPrompt =>
+      'Selecciona un retorno para calcular la carta del retorno anual.';
+
+  @override
+  String get chartSolarReturn => 'Retorno solar';
+
+  @override
+  String get chartLunarReturn => 'Retorno lunar';
+
+  @override
+  String get chartSectionProgressions => 'Progresiones';
+
+  @override
+  String get chartSecondaryProgress => 'Progresión secundaria';
+
+  @override
+  String get chartMinorProgress => 'Progresión menor';
+
+  @override
+  String get chartProgressHelp =>
+      'Secundaria: 1 día/año • Menor: 27,321582 días/año\nEjes: quotidiana';
+
+  @override
+  String chartTargetDate(String date) {
+    return 'Fecha objetivo: $date';
+  }
+
+  @override
+  String get chartPickDate => 'Elegir fecha';
+
+  @override
+  String get chartCalculate => 'Calcular';
+
+  @override
+  String get chartProgressHint =>
+      'Elige la fecha objetivo y el método, luego pulsa Calcular.';
+
+  @override
+  String get chartCalculating => 'Calculando...';
+
+  @override
+  String chartProgressTitleWithDate(String method, String date) {
+    return '$method – $date';
+  }
+
+  @override
+  String get chartCreateTitle => 'Nueva carta';
+
+  @override
+  String get chartLabelNameOptional => 'Nombre (opcional)';
+
+  @override
+  String get chartNameHint => 'p. ej. Alex';
+
+  @override
+  String get chartLabelBirthDate => 'Fecha de nacimiento';
+
+  @override
+  String get chartLabelBirthTime => 'Hora de nacimiento';
+
+  @override
+  String get chartLabelBirthPlace => 'Lugar de nacimiento';
+
+  @override
+  String get chartLabelCountry => 'País';
+
+  @override
+  String get chartLabelCity => 'Ciudad';
+
+  @override
+  String get chartErrorLocationNotFound =>
+      'Ubicación no encontrada, prueba con otra ciudad.';
+
+  @override
+  String get chartErrorDateRequired => 'La fecha de nacimiento es obligatoria.';
+
+  @override
+  String get chartErrorCountryCity =>
+      'La carta no se puede calcular correctamente sin seleccionar un país y una ciudad.';
+
+  @override
+  String get chartErrorCoordinates =>
+      'No se pudieron obtener las coordenadas de la ubicación.';
+
+  @override
+  String get chartCreateButton => 'Crear carta';
+
+  @override
+  String get chartExplorerCalcError =>
+      'No se pudo completar el cálculo. Inténtalo de nuevo.';
+
+  @override
+  String chartExplorerShareError(String error) {
+    return 'No se pudo abrir el uso compartido de la carta: $error';
+  }
+
+  @override
+  String get chartExplorerSocialUnavailable =>
+      'Conexión de Holavon no disponible.';
+
+  @override
+  String get chartExplorerThemeTooltip => 'Carta: blanco / negro';
+
+  @override
+  String get chartExplorerResetZoom => 'Restablecer zoom';
+
+  @override
+  String get chartExplorerShare => 'Compartir en Holavon';
+
+  @override
+  String get chartExplorerBack => 'Atrás';
+
+  @override
+  String get chartExplorerForward => 'Adelante';
+
+  @override
+  String chartExplorerCalculating(String date) {
+    return 'Calculando: $date';
+  }
+
+  @override
+  String get chartUnitMinute => 'Minuto';
+
+  @override
+  String get chartUnitHour => 'Hora';
+
+  @override
+  String get chartUnitDay => 'Día';
+
+  @override
+  String get chartUnitMonth => 'Mes';
+
+  @override
+  String get chartUnitYear => 'Año';
+
+  @override
+  String get chartWheelFullscreenTooltip =>
+      'Pantalla completa • tiempo / tema / compartir';
+
+  @override
+  String get timeMachineNow => 'Ahora';
+
+  @override
+  String get timeMachineBack10 => 'Retroceder 10';
+
+  @override
+  String get timeMachineBack => 'Atrás';
+
+  @override
+  String get timeMachineForward => 'Adelante';
+
+  @override
+  String get timeMachineForward10 => 'Avanzar 10';
+
+  @override
+  String get timeMachinePlay => 'Reproducir';
+
+  @override
+  String get timeMachinePause => 'Pausar';
+
+  @override
+  String get timeMachineOneDay => '1 día';
+
+  @override
+  String get timeMachineOneMonth => '1 mes';
+
+  @override
+  String get timeMachineOneYear => '1 año';
+
+  @override
+  String get timeMachineToday => 'hoy';
+
+  @override
+  String timeMachineDayCount(String days) {
+    return '$days días';
+  }
+
+  @override
+  String get chartLocationCountry => 'País donde vivirás el retorno';
+
+  @override
+  String get chartLocationCity => 'Ciudad donde vivirás el retorno';
+
+  @override
+  String get chartLocationLoadError =>
+      'No se pudo cargar la lista de ciudades.';
+
+  @override
+  String get chartLocationResolveError =>
+      'No se encontró la ubicación de la ciudad. Selecciona de nuevo.';
 }

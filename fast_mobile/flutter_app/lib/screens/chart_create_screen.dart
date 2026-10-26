@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../config/country_labels.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../models/chart_labels.dart';
 import '../providers/chart_provider.dart';
 import '../services/api_service.dart';
@@ -97,7 +98,9 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _geoHint = 'Konum bulunamadı, farklı bir şehir deneyin.');
+      setState(
+        () => _geoHint = AppLocalizations.of(context).chartErrorLocationNotFound,
+      );
     } finally {
       if (mounted) setState(() => _geoLoading = false);
     }
@@ -105,19 +108,19 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
 
   Future<void> _create() async {
     final cp = context.read<ChartProvider>();
+    final l10n = AppLocalizations.of(context);
     if (_date.text.trim().isEmpty) {
-      setState(() => _formError = 'Doğum tarihi gerekli.');
+      setState(() => _formError = l10n.chartErrorDateRequired);
       return;
     }
     if (_ulke.isEmpty || _sehir.isEmpty) {
-      setState(() => _formError =
-          'Ülke ve şehir seçmeden harita doğru hesaplanamaz.');
+      setState(() => _formError = l10n.chartErrorCountryCity);
       return;
     }
     final lat = double.tryParse(_lat.text.replaceAll(',', '.'));
     final lon = double.tryParse(_lon.text.replaceAll(',', '.'));
     if (lat == null || lon == null) {
-      setState(() => _formError = 'Konum koordinatları alınamadı.');
+      setState(() => _formError = l10n.chartErrorCoordinates);
       return;
     }
     setState(() => _formError = null);
@@ -140,13 +143,14 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final cp = context.watch<ChartProvider>();
+    final l10n = AppLocalizations.of(context);
     final cl = countryLabels(Localizations.localeOf(context).languageCode);
 
     return Scaffold(
       backgroundColor: FastTheme.bg,
       appBar: AppBar(
         backgroundColor: FastTheme.bg,
-        title: Text('Yeni Harita',
+        title: Text(l10n.chartCreateTitle,
             style: TextStyle(
                 color: FastTheme.accentGold,
                 fontSize: 18,
@@ -155,14 +159,14 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _label('İsim (opsiyonel)'),
+          _label(l10n.chartLabelNameOptional),
           TextField(
             controller: _name,
             style: TextStyle(color: FastTheme.text),
-            decoration: const InputDecoration(hintText: 'Örn. Ali'),
+            decoration: InputDecoration(hintText: l10n.chartNameHint),
           ),
           const SizedBox(height: 14),
-          _label('Doğum Tarihi'),
+          _label(l10n.chartLabelBirthDate),
           TextField(
             controller: _date,
             readOnly: true,
@@ -174,7 +178,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          _label('Doğum Saati'),
+          _label(l10n.chartLabelBirthTime),
           TextField(
             controller: _time,
             readOnly: true,
@@ -186,7 +190,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          _label('Doğum Yeri'),
+          _label(l10n.chartLabelBirthPlace),
           if (_dbLoading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
@@ -199,7 +203,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
               isExpanded: true,
               dropdownColor: FastTheme.cardBg,
               style: TextStyle(color: FastTheme.text),
-              decoration: const InputDecoration(labelText: 'Ülke'),
+              decoration: InputDecoration(labelText: l10n.chartLabelCountry),
               items: _ulkeler
                   .map((u) => DropdownMenuItem(
                         value: u,
@@ -225,7 +229,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
               isExpanded: true,
               dropdownColor: FastTheme.cardBg,
               style: TextStyle(color: FastTheme.text),
-              decoration: const InputDecoration(labelText: 'Şehir'),
+              decoration: InputDecoration(labelText: l10n.chartLabelCity),
               items: _sehirler
                   .map((s) => DropdownMenuItem(
                         value: s,
@@ -250,7 +254,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
                   height: 14,
                   child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 8),
-              Text('Konum alınıyor...',
+              Text(l10n.chartReturnLocating,
                   style: TextStyle(color: FastTheme.textMuted)),
             ])
           else if (_geoHint != null)
@@ -262,7 +266,8 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
                 child: TextField(
                   controller: _lat,
                   style: TextStyle(color: FastTheme.text),
-                  decoration: const InputDecoration(labelText: 'Enlem'),
+                  decoration: InputDecoration(
+                      labelText: l10n.chartLabelLatitude),
                   keyboardType: const TextInputType.numberWithOptions(
                       decimal: true, signed: true),
                 ),
@@ -272,7 +277,8 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
                 child: TextField(
                   controller: _lon,
                   style: TextStyle(color: FastTheme.text),
-                  decoration: const InputDecoration(labelText: 'Boylam'),
+                  decoration: InputDecoration(
+                      labelText: l10n.chartLabelLongitude),
                   keyboardType: const TextInputType.numberWithOptions(
                       decimal: true, signed: true),
                 ),
@@ -280,19 +286,19 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _label('Ev Sistemi'),
+          _label(l10n.chartLabelHouseSystem),
           const SizedBox(height: 6),
           Wrap(
             spacing: 8,
             runSpacing: 6,
-            children: chartHouseSystemNames.entries.map((e) {
-              final sel = _hs == e.key;
+            children: chartHouseSystemCodes.map((code) {
+              final sel = _hs == code;
               return ChoiceChip(
-                label: Text(e.value),
+                label: Text(chartHouseSystemLabel(l10n, code)),
                 selected: sel,
                 onSelected: (_) {
-                  setState(() => _hs = e.key);
-                  cp.setHouseSystem(e.key);
+                  setState(() => _hs = code);
+                  cp.setHouseSystem(code);
                 },
                 selectedColor: FastTheme.accentGold,
                 labelStyle: TextStyle(
@@ -308,7 +314,8 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
               backgroundColor: FastTheme.accentGold,
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
-            child: Text(cp.loading ? 'Hesaplanıyor...' : 'Haritayı Oluştur',
+            child: Text(
+                cp.loading ? l10n.chartCalculating : l10n.chartCreateButton,
                 style: TextStyle(
                     color: FastTheme.bg,
                     fontWeight: FontWeight.w700,

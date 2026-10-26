@@ -6,6 +6,7 @@ import '../models/chart_data.dart';
 import '../models/chart_labels.dart';
 import '../models/chart_frame.dart';
 import '../screens/chart_explorer_screen.dart';
+import '../l10n/app_localizations.dart';
 
 /// SolarFire tarzı çok katmanlı natal / bi-wheel çarkı.
 ///
@@ -67,7 +68,7 @@ class ChartWheel extends StatelessWidget {
         InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(size)),
         if (showControls)
           IconButton(
-            tooltip: 'Tam ekran • zaman / tema / paylaş',
+            tooltip: AppLocalizations.of(context).chartWheelFullscreenTooltip,
             icon: Icon(
               Icons.fullscreen,
               color: lightTheme ? Colors.black : Colors.white,

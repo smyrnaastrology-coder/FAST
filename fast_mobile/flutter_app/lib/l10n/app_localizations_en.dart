@@ -2451,4 +2451,452 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get proPillarSocialDesc =>
       'The community is free and unlimited for everyone — share, add stories, interact.';
+
+  @override
+  String get chartSignAries => 'Aries';
+
+  @override
+  String get chartSignTaurus => 'Taurus';
+
+  @override
+  String get chartSignGemini => 'Gemini';
+
+  @override
+  String get chartSignCancer => 'Cancer';
+
+  @override
+  String get chartSignLeo => 'Leo';
+
+  @override
+  String get chartSignVirgo => 'Virgo';
+
+  @override
+  String get chartSignLibra => 'Libra';
+
+  @override
+  String get chartSignScorpio => 'Scorpio';
+
+  @override
+  String get chartSignSagittarius => 'Sagittarius';
+
+  @override
+  String get chartSignCapricorn => 'Capricorn';
+
+  @override
+  String get chartSignAquarius => 'Aquarius';
+
+  @override
+  String get chartSignPisces => 'Pisces';
+
+  @override
+  String get chartPlanetSun => 'Sun';
+
+  @override
+  String get chartPlanetMoon => 'Moon';
+
+  @override
+  String get chartPlanetMercury => 'Mercury';
+
+  @override
+  String get chartPlanetVenus => 'Venus';
+
+  @override
+  String get chartPlanetMars => 'Mars';
+
+  @override
+  String get chartPlanetJupiter => 'Jupiter';
+
+  @override
+  String get chartPlanetSaturn => 'Saturn';
+
+  @override
+  String get chartPlanetUranus => 'Uranus';
+
+  @override
+  String get chartPlanetNeptune => 'Neptune';
+
+  @override
+  String get chartPlanetPluto => 'Pluto';
+
+  @override
+  String get chartPlanetNorthNode => 'North Node';
+
+  @override
+  String get chartPlanetChiron => 'Chiron';
+
+  @override
+  String get chartAspectConjunction => 'Conjunction';
+
+  @override
+  String get chartAspectSextile => 'Sextile';
+
+  @override
+  String get chartAspectSquare => 'Square';
+
+  @override
+  String get chartAspectTrine => 'Trine';
+
+  @override
+  String get chartAspectOpposition => 'Opposition';
+
+  @override
+  String get chartHousePlacidus => 'Placidus';
+
+  @override
+  String get chartHouseWholeSign => 'Whole Sign';
+
+  @override
+  String get chartHouseRegiomontanus => 'Regiomontanus';
+
+  @override
+  String get chartHouseKoch => 'Koch';
+
+  @override
+  String get chartHouseEqual => 'Equal House';
+
+  @override
+  String get chartListTitle => 'My Charts';
+
+  @override
+  String get chartMarkSemantics => 'My charts';
+
+  @override
+  String get chartListEmpty => 'No charts yet';
+
+  @override
+  String get chartListCreateFirst => 'Create your first chart';
+
+  @override
+  String get chartDefaultName => 'Natal Chart';
+
+  @override
+  String get chartDelete => 'Delete';
+
+  @override
+  String get chartSave => 'Save';
+
+  @override
+  String get chartSaved => 'Chart saved';
+
+  @override
+  String get chartNotFound => 'Chart not found';
+
+  @override
+  String get chartTabNatal => 'Natal';
+
+  @override
+  String get chartTabTimeMachine => 'Time Machine';
+
+  @override
+  String get chartTabReturns => 'Returns';
+
+  @override
+  String get chartTabProgressions => 'Progressions';
+
+  @override
+  String get chartSectionInfo => 'Info';
+
+  @override
+  String get chartLabelDateTime => 'Date / Time';
+
+  @override
+  String get chartLabelHistoricalTz => 'Historical UTC offset';
+
+  @override
+  String get chartTzUnknown => 'Unknown — recalculate';
+
+  @override
+  String get chartRecalculateTz => 'Recalculate with historical timezone';
+
+  @override
+  String get chartLabelHouseSystem => 'House System';
+
+  @override
+  String get chartLabelPlace => 'Place';
+
+  @override
+  String get chartSectionPlanets => 'Planets';
+
+  @override
+  String get chartSectionHouses => 'Houses';
+
+  @override
+  String chartHouseNumber(int n) {
+    return 'House $n';
+  }
+
+  @override
+  String get chartSectionAspects => 'Aspects';
+
+  @override
+  String chartOrb(String value) {
+    return 'orb $value';
+  }
+
+  @override
+  String chartNatalWithName(String name) {
+    return 'Natal • $name';
+  }
+
+  @override
+  String get chartNatalInner => 'Natal (inner)';
+
+  @override
+  String get chartTransitOuter => 'Transit (outer)';
+
+  @override
+  String get chartSectionNatalTransitAspects => 'Natal–Transit Aspects';
+
+  @override
+  String get chartNoAspects => 'No aspects';
+
+  @override
+  String get chartTimeMachineHint => 'Change the time to see the transit chart';
+
+  @override
+  String get chartNatalTransitTitle => 'Natal + Transit';
+
+  @override
+  String get chartSectionReturnLocation => 'Calculation Place';
+
+  @override
+  String chartReturnLocationSelected(String place, String lat, String lon) {
+    return 'Calculation place: $place ($lat, $lon)';
+  }
+
+  @override
+  String get chartReturnLocationPrompt =>
+      'First choose the city where you will experience the return, or confirm the location below.';
+
+  @override
+  String get chartReturnNatalPlace => 'Natal Place';
+
+  @override
+  String get chartReturnDeviceLocation => 'Device Location';
+
+  @override
+  String get chartReturnLocating => 'Getting location...';
+
+  @override
+  String get chartReturnManual => 'Manual';
+
+  @override
+  String get chartLabelLatitude => 'Latitude';
+
+  @override
+  String get chartLabelLongitude => 'Longitude';
+
+  @override
+  String get chartReturnLocationExplainer =>
+      'In the return chart, the place determines the ASC/MC, house distribution and rulers. Choosing the city where you will experience the solar/lunar return gives the most accurate result.';
+
+  @override
+  String get chartSectionSolarLunarReturn => 'Solar / Lunar Return';
+
+  @override
+  String get chartLabelYear => 'Year';
+
+  @override
+  String get chartLabelLunarMonth => 'Lunar month';
+
+  @override
+  String chartSolarReturnYear(int year) {
+    return 'Solar Return $year';
+  }
+
+  @override
+  String chartLunarReturnYm(int year, String month) {
+    return 'Lunar Return $year-$month';
+  }
+
+  @override
+  String get chartReturnPrompt =>
+      'Select a return to calculate the yearly return chart.';
+
+  @override
+  String get chartSolarReturn => 'Solar Return';
+
+  @override
+  String get chartLunarReturn => 'Lunar Return';
+
+  @override
+  String get chartSectionProgressions => 'Progressions';
+
+  @override
+  String get chartSecondaryProgress => 'Secondary Progress';
+
+  @override
+  String get chartMinorProgress => 'Minor Progress';
+
+  @override
+  String get chartProgressHelp =>
+      'Secondary: 1 day/year • Minor: 27.321582 days/year\nAxes: quotidian';
+
+  @override
+  String chartTargetDate(String date) {
+    return 'Target Date: $date';
+  }
+
+  @override
+  String get chartPickDate => 'Pick Date';
+
+  @override
+  String get chartCalculate => 'Calculate';
+
+  @override
+  String get chartProgressHint =>
+      'Choose a target date and method, then press Calculate.';
+
+  @override
+  String get chartCalculating => 'Calculating...';
+
+  @override
+  String chartProgressTitleWithDate(String method, String date) {
+    return '$method – $date';
+  }
+
+  @override
+  String get chartCreateTitle => 'New Chart';
+
+  @override
+  String get chartLabelNameOptional => 'Name (optional)';
+
+  @override
+  String get chartNameHint => 'e.g. Alex';
+
+  @override
+  String get chartLabelBirthDate => 'Birth Date';
+
+  @override
+  String get chartLabelBirthTime => 'Birth Time';
+
+  @override
+  String get chartLabelBirthPlace => 'Birth Place';
+
+  @override
+  String get chartLabelCountry => 'Country';
+
+  @override
+  String get chartLabelCity => 'City';
+
+  @override
+  String get chartErrorLocationNotFound =>
+      'Location not found, try a different city.';
+
+  @override
+  String get chartErrorDateRequired => 'Birth date is required.';
+
+  @override
+  String get chartErrorCountryCity =>
+      'The chart cannot be calculated correctly without selecting a country and city.';
+
+  @override
+  String get chartErrorCoordinates => 'Could not get location coordinates.';
+
+  @override
+  String get chartCreateButton => 'Create Chart';
+
+  @override
+  String get chartExplorerCalcError =>
+      'Calculation could not be completed. Try again.';
+
+  @override
+  String chartExplorerShareError(String error) {
+    return 'Could not open chart sharing: $error';
+  }
+
+  @override
+  String get chartExplorerSocialUnavailable =>
+      'Holavon connection unavailable.';
+
+  @override
+  String get chartExplorerThemeTooltip => 'Chart: black / white';
+
+  @override
+  String get chartExplorerResetZoom => 'Reset zoom';
+
+  @override
+  String get chartExplorerShare => 'Share on Holavon';
+
+  @override
+  String get chartExplorerBack => 'Back';
+
+  @override
+  String get chartExplorerForward => 'Forward';
+
+  @override
+  String chartExplorerCalculating(String date) {
+    return 'Calculating: $date';
+  }
+
+  @override
+  String get chartUnitMinute => 'Minute';
+
+  @override
+  String get chartUnitHour => 'Hour';
+
+  @override
+  String get chartUnitDay => 'Day';
+
+  @override
+  String get chartUnitMonth => 'Month';
+
+  @override
+  String get chartUnitYear => 'Year';
+
+  @override
+  String get chartWheelFullscreenTooltip =>
+      'Full screen • time / theme / share';
+
+  @override
+  String get timeMachineNow => 'Now';
+
+  @override
+  String get timeMachineBack10 => 'Back 10';
+
+  @override
+  String get timeMachineBack => 'Back';
+
+  @override
+  String get timeMachineForward => 'Forward';
+
+  @override
+  String get timeMachineForward10 => 'Forward 10';
+
+  @override
+  String get timeMachinePlay => 'Play';
+
+  @override
+  String get timeMachinePause => 'Pause';
+
+  @override
+  String get timeMachineOneDay => '1 Day';
+
+  @override
+  String get timeMachineOneMonth => '1 Month';
+
+  @override
+  String get timeMachineOneYear => '1 Year';
+
+  @override
+  String get timeMachineToday => 'today';
+
+  @override
+  String timeMachineDayCount(String days) {
+    return '$days days';
+  }
+
+  @override
+  String get chartLocationCountry =>
+      'Country where you will experience the return';
+
+  @override
+  String get chartLocationCity => 'City where you will experience the return';
+
+  @override
+  String get chartLocationLoadError => 'City list could not be loaded.';
+
+  @override
+  String get chartLocationResolveError =>
+      'Could not find the city location. Select again.';
 }

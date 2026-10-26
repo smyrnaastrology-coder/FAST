@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../models/chart_labels.dart';
 import '../providers/chart_provider.dart';
 import 'chart_create_screen.dart';
@@ -27,14 +28,14 @@ class _ChartListScreenState extends State<ChartListScreen> {
   @override
   Widget build(BuildContext context) {
     final cp = context.watch<ChartProvider>();
-
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: FastTheme.bg,
       appBar: AppBar(
         backgroundColor: FastTheme.bg,
         title: Text(
-          'Haritalarım',
+          l10n.chartListTitle,
           style: TextStyle(
             color: FastTheme.accentGold,
             fontSize: 18,
@@ -60,7 +61,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                       size: 42),
                   const SizedBox(height: 10),
                   Text(
-                    'Henüz haritan yok',
+                    l10n.chartListEmpty,
                     style: TextStyle(
                         color: FastTheme.textMuted.withValues(alpha: 0.7)),
                   ),
@@ -72,7 +73,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                     ),
                     style: FilledButton.styleFrom(
                         backgroundColor: FastTheme.accentGold),
-                    child: const Text('İlk haritanı oluştur'),
+                    child: Text(l10n.chartListCreateFirst),
                   ),
                 ],
               ),
@@ -84,7 +85,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                 final c = cp.saved[i];
                 final name = c.meta.name?.isNotEmpty == true
                     ? c.meta.name!
-                    : 'Natal Haritası';
+                    : l10n.chartDefaultName;
                 return Container(
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: BoxDecoration(
@@ -94,7 +95,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                         Border.all(color: FastTheme.border.withValues(alpha: 0.5)),
                   ),
                   child: ListTile(
-                    trailing: IconButton(tooltip: 'Sil', icon: const Icon(Icons.delete_outline),
+                    trailing: IconButton(tooltip: l10n.chartDelete, icon: const Icon(Icons.delete_outline),
                       onPressed: () => cp.delete(c)),
                     leading: const ChartMark(size: 40),
                     title: Text(name,
@@ -102,7 +103,7 @@ class _ChartListScreenState extends State<ChartListScreen> {
                             color: FastTheme.text, fontWeight: FontWeight.w600)),
                     subtitle: Text(
                         '${c.meta.date} ${c.meta.time} • '
-                        '${chartHouseSystemLabel(c.houseSystem)}'
+                        '${chartHouseSystemLabel(l10n, c.houseSystem)}'
                         '${c.meta.place.isNotEmpty ? ' • ${c.meta.place}' : ''}',
                         style: TextStyle(
                             color: FastTheme.textMuted.withValues(alpha: 0.7))),
