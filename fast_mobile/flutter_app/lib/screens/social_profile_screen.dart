@@ -388,6 +388,7 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                     color: FastTheme.accentGold,
                     degree: p.sunDeg,
                     degreeKnown: p.birthTimeSet,
+                    l10n: l10n,
                   ),
                 if ((p?.moonSign ?? '').isNotEmpty)
                   AstroSigns.chip(
@@ -396,6 +397,7 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                     degree: p.moonDeg,
                     degreeKnown: p.birthTimeSet,
                     planetSymbol: '☽',
+                    l10n: l10n,
                   ),
               ],
             ),
