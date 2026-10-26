@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../config/country_labels.dart';
@@ -23,6 +24,8 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
   final _time = TextEditingController(text: '12:00');
   final _lat = TextEditingController();
   final _lon = TextEditingController();
+  TextEditingController? _countryCtrl;
+  TextEditingController? _cityCtrl;
 
   String _hs = 'P';
   String _ulke = '';
@@ -71,8 +74,18 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
     );
     if (d != null) {
       _date.text =
-          '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+          '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year.toString().padLeft(4, '0')}';
     }
+  }
+
+  String? _toIsoDate(String input) {
+    final t = input.trim();
+    final m = RegExp(r'^(\d{2})\.(\d{2})\.(\d{4})$').firstMatch(t);
+    if (m != null) {
+      return '${m.group(3)}-${m.group(2)}-${m.group(1)}';
+    }
+    if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(t)) return t;
+    return null;
   }
 
   Future<void> _pickTime() async {
@@ -109,9 +122,23 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
   Future<void> _create() async {
     final cp = context.read<ChartProvider>();
     final l10n = AppLocalizations.of(context);
-    if (_date.text.trim().isEmpty) {
+    final cl = countryLabels(Localizations.localeOf(context).languageCode);
+    final isoDate = _toIsoDate(_date.text);
+    if (isoDate == null) {
       setState(() => _formError = l10n.chartErrorDateRequired);
       return;
+    }
+    if (_ulke.isEmpty && _countryCtrl != null) {
+      final v = _countryCtrl!.text.trim().toLowerCase();
+      final match = _ulkeler.firstWhere(
+        (u) => (cl[u] ?? u).toLowerCase() == v || u.toLowerCase() == v,
+        orElse: () => '',
+      );
+      if (match.isNotEmpty) _ulke = match;
+    }
+    if (_sehir.isEmpty && _cityCtrl != null) {
+      final v = _cityCtrl!.text.trim();
+      if (_sehirler.contains(v)) _sehir = v;
     }
     if (_ulke.isEmpty || _sehir.isEmpty) {
       setState(() => _formError = l10n.chartErrorCountryCity);
@@ -127,7 +154,7 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
     cp.setHouseSystem(_hs);
     await cp.create(
       name: _name.text.trim(),
-      date: _date.text.trim(),
+      date: isoDate,
       time: _time.text.trim(),
       lat: lat,
       lng: lon,
@@ -169,12 +196,15 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
           _label(l10n.chartLabelBirthDate),
           TextField(
             controller: _date,
-            readOnly: true,
-            onTap: _pickDate,
+            keyboardType: TextInputType.number,
+            inputFormatters: [_DateDotFormatter()],
             style: TextStyle(color: FastTheme.text),
-            decoration: const InputDecoration(
-              hintText: 'YYYY-MM-DD',
-              suffixIcon: Icon(Icons.calendar_today, size: 18),
+            decoration: InputDecoration(
+              hintText: 'DD.MM.YYYY',
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.calendar_today, size: 18),
+                onPressed: _pickDate,
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -197,53 +227,85 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
               child: LinearProgressIndicator(minHeight: 2),
             )
           else ...[
-            DropdownButtonFormField<String>(
+            Autocomplete<String>(
               key: ValueKey('ulke-$_ulke'),
-              initialValue: _ulke.isEmpty ? null : _ulke,
-              isExpanded: true,
-              dropdownColor: FastTheme.cardBg,
-              style: TextStyle(color: FastTheme.text),
-              decoration: InputDecoration(labelText: l10n.chartLabelCountry),
-              items: _ulkeler
-                  .map((u) => DropdownMenuItem(
-                        value: u,
-                        child: Text(cl[u] ?? u,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: FastTheme.text)),
-                      ))
-                  .toList(),
-              onChanged: (v) {
+              optionsBuilder: (tev) {
+                final q = tev.text.trim().toLowerCase();
+                if (q.isEmpty) return _ulkeler;
+                return _ulkeler.where((u) {
+                  final label = (cl[u] ?? u).toLowerCase();
+                  return label.contains(q) || u.toLowerCase().contains(q);
+                });
+              },
+              displayStringForOption: (o) => cl[o] ?? o,
+              onSelected: (o) {
                 setState(() {
-                  _ulke = v ?? '';
+                  _ulke = o;
                   _sehir = '';
                   _geoHint = null;
                   _lat.clear();
                   _lon.clear();
                 });
+                if (_cityCtrl != null) _cityCtrl!.clear();
+              },
+              fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
+                _countryCtrl = controller;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  style: TextStyle(color: FastTheme.text),
+                  decoration: InputDecoration(labelText: l10n.chartLabelCountry),
+                  onChanged: (_) {
+                    final v = controller.text.trim().toLowerCase();
+                    final match = _ulkeler.firstWhere(
+                      (u) =>
+                          (cl[u] ?? u).toLowerCase() == v ||
+                          u.toLowerCase() == v,
+                      orElse: () => '',
+                    );
+                    if (match.isNotEmpty && _ulke != match) {
+                      setState(() {
+                        _ulke = match;
+                        _sehir = '';
+                        _geoHint = null;
+                        _lat.clear();
+                        _lon.clear();
+                      });
+                    }
+                  },
+                );
               },
             ),
             const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              key: ValueKey('sehir-$_ulke-$_sehir'),
-              initialValue: _sehir.isEmpty ? null : _sehir,
-              isExpanded: true,
-              dropdownColor: FastTheme.cardBg,
-              style: TextStyle(color: FastTheme.text),
-              decoration: InputDecoration(labelText: l10n.chartLabelCity),
-              items: _sehirler
-                  .map((s) => DropdownMenuItem(
-                        value: s,
-                        child: Text(s,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: FastTheme.text)),
-                      ))
-                  .toList(),
-              onChanged: _ulke.isEmpty
-                  ? null
-                  : (v) {
-                      setState(() => _sehir = v ?? '');
-                      _geocode();
-                    },
+            Autocomplete<String>(
+              key: ValueKey('sehir-$_ulke'),
+              optionsBuilder: (tev) {
+                final q = tev.text.trim().toLowerCase();
+                if (q.isEmpty) return _sehirler;
+                return _sehirler.where((s) => s.toLowerCase().contains(q));
+              },
+              displayStringForOption: (o) => o,
+              onSelected: (o) {
+                setState(() => _sehir = o);
+                _geocode();
+              },
+              fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
+                _cityCtrl = controller;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  style: TextStyle(color: FastTheme.text),
+                  decoration: InputDecoration(labelText: l10n.chartLabelCity),
+                  onChanged: (v) {
+                    if (_sehirler.contains(v) && _sehir != v) {
+                      setState(() => _sehir = v);
+                    }
+                  },
+                  onEditingComplete: () {
+                    if (_sehir.isNotEmpty) _geocode();
+                  },
+                );
+              },
             ),
           ],
           const SizedBox(height: 10),
@@ -346,4 +408,24 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
                 fontSize: 12,
                 fontWeight: FontWeight.w600)),
       );
+}
+
+class _DateDotFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final buf = StringBuffer();
+    for (var i = 0; i < digits.length && i < 8; i++) {
+      if (i == 2 || i == 4) buf.write('.');
+      buf.write(digits[i]);
+    }
+    final text = buf.toString();
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
 }

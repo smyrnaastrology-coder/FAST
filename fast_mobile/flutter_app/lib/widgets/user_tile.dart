@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../config/astro_signs.dart';
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../services/social_service.dart';
 import '../screens/social_profile_screen.dart';
 
@@ -47,6 +48,7 @@ class _UserTileState extends State<UserTile> {
   @override
   Widget build(BuildContext context) {
     final p = widget.profile;
+    final l10n = AppLocalizations.of(context);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SocialProfileScreen(userId: p.userId))),
@@ -68,7 +70,7 @@ class _UserTileState extends State<UserTile> {
           ),
           if (p.sunSign != null && p.sunSign!.isNotEmpty) ...[
             const SizedBox(width: 6),
-            AstroSigns.chip(p.sunSign, color: FastTheme.accentGold),
+            AstroSigns.chip(p.sunSign, color: FastTheme.accentGold, l10n: l10n),
           ],
         ],
       ),

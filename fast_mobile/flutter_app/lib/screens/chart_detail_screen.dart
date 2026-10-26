@@ -84,6 +84,14 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     return chartSignNames(_l10n)[i];
   }
 
+  /// Ondalık dereceyi D°MM' biçiminde gösterir (örn. 15.29° → 15°17').
+  String _degMin(double deg) {
+    final total = (deg * 60).round();
+    final d = total ~/ 60;
+    final m = total % 60;
+    return '$d°${m.toString().padLeft(2, '0')}′';
+  }
+
   AppLocalizations get _l10n => AppLocalizations.of(context);
 
   Future<void> _useDeviceLocation() async {
@@ -253,7 +261,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           for (final p in c.planets)
             _row(
               chartPlanetLabel(l10n, p.name),
-              '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° '
+              '${_sign(p.sign)} ${_degMin(p.degree)} '
               '${p.retrograde ? 'R' : ''} • ${l10n.chartHouseNumber(p.house)}',
             ),
         ]),
@@ -262,7 +270,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           for (final h in c.houses)
             _row(
               l10n.chartHouseNumber(h.number),
-              '${_sign(h.sign)} ${h.degree.toStringAsFixed(2)}°',
+              '${_sign(h.sign)} ${_degMin(h.degree)}',
             ),
         ]),
         if (c.aspects.isNotEmpty) ...[
@@ -715,8 +723,8 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         const SizedBox(height: 4),
         Center(
           child: Text(
-            'ASC ${_sign(retChart.asc.sign)} ${retChart.asc.degree.toStringAsFixed(2)}° • '
-            'MC ${_sign(retChart.mc.sign)} ${retChart.mc.degree.toStringAsFixed(2)}°',
+            'ASC ${_sign(retChart.asc.sign)} ${_degMin(retChart.asc.degree)} • '
+            'MC ${_sign(retChart.mc.sign)} ${_degMin(retChart.mc.degree)}',
             style: TextStyle(color: FastTheme.textMuted),
           ),
         ),
@@ -894,7 +902,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             ...arcChart.planets.map(
               (p) => _row(
                 chartPlanetLabel(l10n, p.name),
-                '${_sign(p.sign)} ${p.degree.toStringAsFixed(2)}° '
+                '${_sign(p.sign)} ${_degMin(p.degree)} '
                 '${p.retrograde ? 'R' : ''} • ${l10n.chartHouseNumber(p.house)}',
               ),
             ),

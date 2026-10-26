@@ -249,7 +249,7 @@ class _PhaseTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final sign = AstroSigns.signNameFromLongitude(event.moon.longitude);
+    final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(event.moon.longitude), l);
     return _card(
       context,
       leading: Text(
@@ -278,7 +278,7 @@ class _EclipseTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final body = eclipse.isSolar ? eclipse.sun : eclipse.moon;
-    final sign = AstroSigns.signNameFromLongitude(body.longitude);
+    final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(body.longitude), l);
     final title =
         '${_eclipseName(l, eclipse.isSolar)} · ${_eclipseVariant(l, eclipse.variant)}';
     final subtitle =

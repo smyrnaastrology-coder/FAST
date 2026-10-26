@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 /// Güneş burcu hesaplama ve sunucu-erişilebilir yardımcılar.
 ///
 /// Burç yalnızca profil kartında gösterilir. Doğum tarihinin kendisi
@@ -51,6 +53,37 @@ class AstroSigns {
   /// Mutlak boylam → burç sembolü.
   static String signSymbolFromLongitude(double deg) => symbols[indexFromLongitude(deg)];
 
+  /// AstroSigns indeksini (0=Oğlak..11=Yay) aktif dile çevirir.
+  static String localizedName(int index, AppLocalizations l10n) {
+    final ecliptic = (index - 3 + 12) % 12;
+    switch (ecliptic) {
+      case 0: return l10n.chartSignAries;
+      case 1: return l10n.chartSignTaurus;
+      case 2: return l10n.chartSignGemini;
+      case 3: return l10n.chartSignCancer;
+      case 4: return l10n.chartSignLeo;
+      case 5: return l10n.chartSignVirgo;
+      case 6: return l10n.chartSignLibra;
+      case 7: return l10n.chartSignScorpio;
+      case 8: return l10n.chartSignSagittarius;
+      case 9: return l10n.chartSignCapricorn;
+      case 10: return l10n.chartSignAquarius;
+      default: return l10n.chartSignPisces;
+    }
+  }
+
+  /// Türkçeye kaydedilmiş burç adını aktif dile çevirir (bilinmiyorsa aynen).
+  static String localizedNameOf(String? sign, AppLocalizations l10n) {
+    if (sign == null || sign.isEmpty) return sign ?? '';
+    final i = names.indexOf(sign);
+    if (i < 0) return sign;
+    return localizedName(i, l10n);
+  }
+
+  /// Aktif dile göre burç listesi (AstroSigns.names sırasıyla).
+  static List<String> localizedNames(AppLocalizations l10n) =>
+      List.generate(12, (i) => localizedName(i, l10n));
+
   /// 'YYYY-MM-DD' → burç adı. Geçersizse null.
   static String? fromIsoDate(String? iso) {
     if (iso == null || iso.isEmpty) return null;
@@ -90,9 +123,13 @@ class AstroSigns {
     double? degree,
     bool degreeKnown = false,
     String planetSymbol = '☉',
+    AppLocalizations? l10n,
   }) {
-    final b = badge(sign);
-    if (b.isEmpty) return const SizedBox.shrink();
+    if (sign == null || sign.isEmpty) return const SizedBox.shrink();
+    final i = names.indexOf(sign);
+    final displayName = (l10n != null && i >= 0) ? localizedName(i, l10n) : sign;
+    final symbol = i >= 0 ? symbols[i] : '';
+    final b = symbol.isEmpty ? displayName : '$symbol $displayName';
     final d = degreeKnown && degree != null ? ' ${degree.toStringAsFixed(1)}°' : '';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),

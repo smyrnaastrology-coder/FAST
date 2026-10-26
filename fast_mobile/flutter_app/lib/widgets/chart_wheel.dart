@@ -168,6 +168,13 @@ class _WheelPainter extends CustomPainter {
     }
   }
 
+  String _degMinStr(double deg) {
+    final total = (deg * 60).round();
+    final d = total ~/ 60;
+    final m = total % 60;
+    return '$d°${m.toString().padLeft(2, '0')}′';
+  }
+
   Color _aspectColor(String type) {
     switch (type.toLowerCase()) {
       case 'trine':
@@ -374,9 +381,20 @@ class _WheelPainter extends CustomPainter {
         mid,
         h.number.toString(),
         _gold.withValues(alpha: 0.85),
-        (r * 0.036).clamp(9.0, 14.0),
+        (r * 0.040).clamp(10.0, 15.0),
         ascLon: ascLon,
         weight: FontWeight.w700,
+      );
+      _glyphAt(
+        canvas,
+        center,
+        houseNumR - (r * 0.055).clamp(8.0, 12.0),
+        mid,
+        _degMinStr(h.degree),
+        _gold.withValues(alpha: 0.70),
+        (r * 0.028).clamp(7.0, 10.0),
+        ascLon: ascLon,
+        weight: FontWeight.w600,
       );
     }
 
@@ -450,14 +468,14 @@ class _WheelPainter extends CustomPainter {
     );
 
     // --- Gezegen halkaları ---
-    final natalGlyphSize = (r * 0.078).clamp(12.0, 22.0);
+    final natalGlyphSize = (r * 0.095).clamp(14.0, 26.0);
     final natal = _layout(data.planets, 8.0);
     for (final g in natal) {
-      final color = g.planet.retrograde ? _retro : _ink;
+      final color = _signColor(g.planet.sign);
       // gerçek konum işareti
       canvas.drawCircle(
         _pos(g.actual, natalR + natalGlyphSize * 0.9, center, ascLon),
-        1.2,
+        1.4,
         Paint()..color = color.withValues(alpha: 0.7),
       );
       _glyphAt(
@@ -469,7 +487,19 @@ class _WheelPainter extends CustomPainter {
         color,
         natalGlyphSize,
         ascLon: ascLon,
-        weight: FontWeight.w500,
+        weight: FontWeight.w600,
+      );
+      // derece/dakika
+      _glyphAt(
+        canvas,
+        center,
+        natalR - natalGlyphSize * 1.35,
+        g.display,
+        _degMinStr(g.planet.degree),
+        color.withValues(alpha: 0.85),
+        (natalGlyphSize * 0.42).clamp(7.0, 11.0),
+        ascLon: ascLon,
+        weight: FontWeight.w600,
       );
       if (g.planet.retrograde) {
         _glyphAt(
@@ -487,7 +517,7 @@ class _WheelPainter extends CustomPainter {
     }
 
     if (outerPlanets != null && outerPlanets!.isNotEmpty) {
-      final transitGlyphSize = (r * 0.062).clamp(10.0, 18.0);
+      final transitGlyphSize = (r * 0.078).clamp(12.0, 20.0);
       final trans = _layout(outerPlanets!, 7.0);
       for (final g in trans) {
         final color = lightTheme
@@ -495,7 +525,7 @@ class _WheelPainter extends CustomPainter {
             : const Color(0xFF8FD8FF);
         canvas.drawCircle(
           _pos(g.actual, transitR + transitGlyphSize * 0.9, center, ascLon),
-          1.1,
+          1.2,
           Paint()..color = color.withValues(alpha: 0.8),
         );
         _glyphAt(
@@ -507,7 +537,18 @@ class _WheelPainter extends CustomPainter {
           color,
           transitGlyphSize,
           ascLon: ascLon,
-          weight: FontWeight.w500,
+          weight: FontWeight.w600,
+        );
+        _glyphAt(
+          canvas,
+          center,
+          transitR - transitGlyphSize * 1.35,
+          g.display,
+          _degMinStr(g.planet.degree),
+          color.withValues(alpha: 0.85),
+          (transitGlyphSize * 0.42).clamp(7.0, 10.0),
+          ascLon: ascLon,
+          weight: FontWeight.w600,
         );
         if (g.planet.retrograde) {
           _glyphAt(

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/astro_signs.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -112,6 +113,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Widget _tile(CommentItem c) {
     final a = c.author;
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () {
         if (c.userId.isNotEmpty) {
@@ -147,12 +149,33 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       ),
                       if (a?.sunSign != null && a!.sunSign!.isNotEmpty) ...[
                         const SizedBox(width: 6),
-                        AstroSigns.chip(a.sunSign, color: FastTheme.accentGold),
+                        AstroSigns.chip(a.sunSign, color: FastTheme.accentGold, l10n: l10n),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(c.text, style: TextStyle(color: FastTheme.text, fontSize: 13, height: 1.4)),
+                  const SizedBox(height: 4),
+                  GestureDetector(
+                    onTap: () async {
+                      if (c.text.trim().isEmpty) return;
+                      final lang = Localizations.localeOf(context).languageCode;
+                      final uri = Uri.parse(
+                        'https://translate.google.com/?sl=auto&tl=$lang&text=${Uri.encodeComponent(c.text)}&op=translate',
+                      );
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.translate, size: 14, color: FastTheme.textMuted),
+                        const SizedBox(width: 4),
+                        Text('Çevir', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -197,7 +197,7 @@ class _SkyStripState extends State<SkyStrip> {
     if (sky == null) return const SizedBox.shrink();
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
-    final sign = AstroSigns.signNameFromLongitude(sky.moonLongitude);
+    final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(sky.moonLongitude), l);
     final phase = _phaseName(l, sky.phaseKey);
     final hour = _planetName(sky.hourRuler, lang);
 
@@ -312,8 +312,8 @@ class SkyDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
-    final moonSign = AstroSigns.signNameFromLongitude(sky.moonLongitude);
-    final sunSign = AstroSigns.names[(sky.sunSign + 3) % 12];
+    final moonSign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(sky.moonLongitude), l);
+    final sunSign = AstroSigns.localizedName((sky.sunSign + 3) % 12, l);
     final phase = _phaseName(l, sky.phaseKey);
     final hour = _planetName(sky.hourRuler, lang);
     final nextHour = _planetName(sky.nextHourRuler, lang);
