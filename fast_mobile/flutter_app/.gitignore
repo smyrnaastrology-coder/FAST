@@ -31,6 +31,7 @@ migrate_working_dir/
 # Supabase degerleri - makineye ozel, repoya girmez
 tool/supabase.local.ps1
 tool/*.local.ps1
+tool/*.local.sh
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/

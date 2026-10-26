@@ -83,5 +83,7 @@
 	<string>Holavon, gönderi ve hikâye için fotoğraf çekebilmeniz amacıyla kamerayı kullanır.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Holavon, gönderi ve hikâye paylaşabilmeniz için fotoğraf galerinize erişir.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Holavon, oluşturduğunuz harita görsellerini fotoğraf galerinize kaydedebilmek için izin ister.</string>
 </dict>
 </plist>
