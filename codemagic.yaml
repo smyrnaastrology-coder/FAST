@@ -90,8 +90,12 @@ workflows:
           [ "$(/usr/libexec/PlistBuddy -c 'Print :BUNDLE_ID' "$PLIST")" = "$BUNDLE_ID" ] || { echo 'Firebase iOS bundle ID mismatch'; exit 1; }
       - name: Flutter build ipa
         script: |
+          set -eu
           cd "$CM_BUILD_DIR/$PROJECT_PATH"
           flutter pub get
+          # Tum iOS eklentileri SwiftPM destekliyor. Yalnizca CI kopyasinda
+          # Podfile'i uzaklastirarak bos CocoaPods entegrasyonunu onle.
+          mv ios/Podfile "$HOME/holavon-ci-Podfile"
           flutter build ipa --release \
             --export-options-plist="$HOME/export_options.plist" \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
