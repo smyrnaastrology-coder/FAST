@@ -29,7 +29,7 @@ class _ChatMsg {
   _ChatMsg(this.role, this.content, {this.meta});
 }
 
-class _HoraryScreenState extends State<HoraryScreen> {
+class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver {
   final _questionCtrl = TextEditingController();
   final _scroll = ScrollController();
   final List<_ChatMsg> _chat = [];
@@ -49,11 +49,13 @@ class _HoraryScreenState extends State<HoraryScreen> {
   static const _freeDailyLimit = 3;
   bool _isPro = false;
   int _usedToday = 0;
+  int _quotaLoadVersion = 0;
   int _creditsLeft = -1; // API credits_left (>=0 ise göster)
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _determinePosition();
     _loadQuota();
     _loadChat();
@@ -62,9 +64,15 @@ class _HoraryScreenState extends State<HoraryScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _questionCtrl.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _loadQuota(refresh: true);
   }
 
   String get _dayKey {
@@ -74,28 +82,33 @@ class _HoraryScreenState extends State<HoraryScreen> {
 
   String get _quotaKey => 'horary_q_${AuthService.userId}_$_dayKey';
 
-  Future<void> _loadQuota() async {
-    final pro = await ProService.isPro();
+  Future<({bool pro, int used})> _loadQuota({bool refresh = false}) async {
+    final version = ++_quotaLoadVersion;
+    final pro = await ProService.isPro(refresh: refresh);
     int used = 0;
     try {
       final prefs = await SharedPreferences.getInstance();
       used = prefs.getInt(_quotaKey) ?? 0;
     } catch (_) {}
-    if (!mounted) return;
-    setState(() {
-      _isPro = pro;
-      _usedToday = used;
-    });
+    if (mounted && version == _quotaLoadVersion) {
+      setState(() {
+        _isPro = pro;
+        _usedToday = used;
+      });
+    }
+    return (pro: pro, used: used);
   }
 
   int get _remaining => (_freeDailyLimit - _usedToday).clamp(0, _freeDailyLimit);
 
   Future<void> _bumpQuota() async {
+    var used = _usedToday + 1;
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_quotaKey, _usedToday + 1);
+      used = (prefs.getInt(_quotaKey) ?? 0) + 1;
+      await prefs.setInt(_quotaKey, used);
     } catch (_) {}
-    if (mounted) setState(() => _usedToday++);
+    if (mounted) setState(() => _usedToday = used);
   }
 
   void _openPaywall() {
@@ -105,8 +118,10 @@ class _HoraryScreenState extends State<HoraryScreen> {
   }
 
   Future<bool> _confirmQuota(AppLocalizations l10n) async {
-    if (_isPro) return true;
-    if (_remaining > 0) return true;
+    final quota = await _loadQuota(refresh: true);
+    if (!mounted) return false;
+    if (quota.pro) return true;
+    if (quota.used < _freeDailyLimit) return true;
     await _showLimitDialog(l10n);
     return false;
   }
@@ -174,12 +189,16 @@ class _HoraryScreenState extends State<HoraryScreen> {
   Future<void> _ask(AppLocalizations l10n) async {
     final q = _questionCtrl.text.trim();
     if (q.length < 2 || _busy) return;
-    if (!await _confirmQuota(l10n)) return;
+    setState(() => _busy = true);
+    if (!await _confirmQuota(l10n)) {
+      if (mounted) setState(() => _busy = false);
+      return;
+    }
+    if (!mounted) return;
     setState(() {
       _chat.add(_ChatMsg('user', q));
       _persistChat();
       _lastQuestion = q;
-      _busy = true;
       _error = null;
       _questionCtrl.clear();
       _showLanding = false;
@@ -213,13 +232,13 @@ class _HoraryScreenState extends State<HoraryScreen> {
       final verdict = (data['verdict'] ?? '').toString();
       final ans = (data['answer'] ?? verdict).toString();
       setState(() {
-        _busy = false;
         _lastChart = data;
         _chat.add(_ChatMsg('assistant', ans, meta: data));
         _persistChat();
       });
       _scrollDown();
       await _bumpQuota();
+      if (mounted) setState(() => _busy = false);
     } catch (_) {
       if (!mounted) return;
       setState(() {

@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
 import '../config/astro_signs.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
+import '../providers/social_provider.dart';
 import '../services/social_service.dart';
 import 'social_profile_screen.dart';
 
@@ -42,12 +43,29 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final text = _ctrl.text.trim();
     if (text.isEmpty || _sending) return;
     setState(() => _sending = true);
-    await SocialService.addComment(widget.postId, text);
-    _ctrl.clear();
-    await _load();
-    if (mounted) setState(() => _sending = false);
-    if (mounted && _scroll.hasClients) {
-      _scroll.animateTo(_scroll.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    try {
+      final added = await SocialService.addComment(widget.postId, text);
+      if (!mounted) return;
+      if (!added) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).socialErrorServer)),
+        );
+        return;
+      }
+      context.read<SocialProvider>().incrementCommentCount(widget.postId);
+      _ctrl.clear();
+      await _load();
+      if (mounted && _scroll.hasClients) {
+        _scroll.animateTo(_scroll.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).socialErrorServer)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _sending = false);
     }
   }
 
@@ -155,27 +173,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(c.text, style: TextStyle(color: FastTheme.text, fontSize: 13, height: 1.4)),
-                  const SizedBox(height: 4),
-                  GestureDetector(
-                    onTap: () async {
-                      if (c.text.trim().isEmpty) return;
-                      final lang = Localizations.localeOf(context).languageCode;
-                      final uri = Uri.parse(
-                        'https://translate.google.com/?sl=auto&tl=$lang&text=${Uri.encodeComponent(c.text)}&op=translate',
-                      );
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      }
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.translate, size: 14, color: FastTheme.textMuted),
-                        const SizedBox(width: 4),
-                        Text('Çevir', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),

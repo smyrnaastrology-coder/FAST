@@ -1431,13 +1431,14 @@ class SocialService {
     }
   }
 
-  static Future<void> addComment(String postId, String text) async {
-    if (!enabled || _me.isEmpty) return;
+  static Future<bool> addComment(String postId, String text) async {
+    if (!enabled || _me.isEmpty) return false;
     await _c.from('comments').insert({
       'post_id': postId,
       'user_id': _me,
       'text': text.trim(),
     });
+    return true;
   }
 
   static Future<void> deleteComment(String id) async {

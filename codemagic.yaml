@@ -1,9 +1,7 @@
-# FAST (fast_mobile/flutter_app) — iOS Release (App Store / TestFlight)
-# Gerekli Codemagic ayarlari (Teams > Integrations + bu workflow'un Environment variables):
-#   APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_KEY_IDENTIFIER,
-#   APP_STORE_CONNECT_PRIVATE_KEY, CERTIFICATE_PRIVATE_KEY (hepsi Encrypted)
-#   REVENUECAT_IOS_KEY (RevenueCat iOS public key, appl_...) (Encrypted)
-# Secure files'a yuklenecek: GoogleService-Info.plist (Firebase iOS uygulamasi)
+# Holavon iOS: Codemagic Developer Portal entegrasyonu adi holavon_appstore.
+# holavon_ios degisken grubu: SUPABASE_URL, SUPABASE_ANON_KEY,
+# REVENUECAT_IOS_KEY (appl_...), IOS_FIREBASE_PLIST (plist icerigi).
+# App Store signing sertifikasi ve profili Codemagic Code signing identities'e eklenmeli.
 
 workflows:
   horary-ios:
@@ -56,43 +54,50 @@ workflows:
         recipients:
           - smyrnaastrology@gmail.com
   fast-ios-release:
-    name: FAST iOS Release
+    name: Holavon iOS Release
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: holavon_appstore
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_ids:
-          - com.fastastrology.fast
+        bundle_identifier: com.fastastrology.fastApp
+      groups:
+        - holavon_ios
       vars:
-        BUNDLE_ID: com.fastastrology.fast
+        BUNDLE_ID: com.fastastrology.fastApp
         PROJECT_PATH: fast_mobile/flutter_app
       flutter: 3.44.8
       xcode: latest
       cocoapods: default
     scripts:
-      - name: Keychain initialize
-        script: |
-          keychain initialize
-      - name: Fetch signing files
-        script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
       - name: Set up signing
         script: |
-          keychain add-certificates
           xcode-project use-profiles --project "$CM_BUILD_DIR/$PROJECT_PATH/ios/Runner.xcodeproj"
-      - name: Copy GoogleService-Info.plist
+      - name: Validate configuration and load Firebase plist
         script: |
-          cp "$CM_FILE_GOOGLESERVICE_INFO_PLIST" "$CM_BUILD_DIR/$PROJECT_PATH/ios/Runner/GoogleService-Info.plist"
+          set -eu
+          : "${SUPABASE_URL:?SUPABASE_URL is missing}"
+          : "${SUPABASE_ANON_KEY:?SUPABASE_ANON_KEY is missing}"
+          : "${REVENUECAT_IOS_KEY:?REVENUECAT_IOS_KEY is missing}"
+          : "${IOS_FIREBASE_PLIST:?IOS_FIREBASE_PLIST is missing}"
+          case "$SUPABASE_ANON_KEY" in sb_secret_*) echo 'Use a Supabase publishable or anon key, not a secret key'; exit 1;; esac
+          case "$REVENUECAT_IOS_KEY" in appl_*) ;; *) echo 'Use the RevenueCat iOS public API key'; exit 1;; esac
+          PLIST="$CM_BUILD_DIR/$PROJECT_PATH/ios/Runner/GoogleService-Info.plist"
+          printf '%s' "$IOS_FIREBASE_PLIST" > "$PLIST"
+          /usr/bin/plutil -lint "$PLIST"
+          [ "$(/usr/libexec/PlistBuddy -c 'Print :BUNDLE_ID' "$PLIST")" = "$BUNDLE_ID" ] || { echo 'Firebase iOS bundle ID mismatch'; exit 1; }
       - name: Flutter build ipa
         script: |
           cd "$CM_BUILD_DIR/$PROJECT_PATH"
           flutter pub get
           flutter build ipa --release \
             --export-options-plist="$HOME/export_options.plist" \
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
             --dart-define=REVENUECAT_API_KEY="$REVENUECAT_IOS_KEY" \
-            --build-name=1.0.11 \
-            --build-number=49
+            --build-number="${IOS_BUILD_NUMBER:-65}"
     artifacts:
       - fast_mobile/flutter_app/build/ios/ipa/*.ipa
     publishing:

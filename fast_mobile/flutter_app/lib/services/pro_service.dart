@@ -7,28 +7,33 @@ import 'revenuecat_service.dart';
 class ProService {
   static bool? _cached;
   static bool _syncTried = false;
+  static int _requestVersion = 0;
 
-  /// Oturumda bir kez döner, sonucu önbellekler.
-  static Future<bool> isPro() async {
-    if (_cached != null) return _cached!;
+  /// İstenirse RevenueCat durumunu önbelleği atlayarak yeniden kontrol eder.
+  static Future<bool> isPro({bool refresh = false}) async {
+    if (!refresh && _cached != null) return _cached!;
+    final version = ++_requestVersion;
     try {
-      var pro = await RevenueCatService.isSubscribed();
+      final pro = await RevenueCatService.isSubscribed(refresh: refresh);
       // Webhook kaçağı / uid değişimi için oturumda bir kez sunucu kurtarması.
       if (!pro && !_syncTried) {
         _syncTried = true;
-        final r = await BillingService.syncEntitlement();
-        pro = r['ok'] == true && (r['synced'] == true || r['granted'] == true);
-        if (pro && kDebugMode) print('[Pro] entitlement sync ile kurtarıldı');
+        // Sunucu eşitlemesi PDF gibi abonelik dışı haklar da döndürebilir.
+        // Bu nedenle sonucu Pro yetkisi olarak kullanma.
+        await BillingService.syncEntitlement();
+        if (kDebugMode) print('[Pro] sunucu hakları eşitlendi');
       }
-      _cached = pro;
+      if (version == _requestVersion) _cached = pro;
+      return pro;
     } catch (_) {
-      _cached = false;
+      if (version == _requestVersion) _cached = false;
+      return false;
     }
-    return _cached!;
   }
 
   /// Satın alma / çıkış sonrası bayrağı tazele.
   static void invalidate() {
+    _requestVersion++;
     _cached = null;
     _syncTried = false;
   }

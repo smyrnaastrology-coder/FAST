@@ -117,12 +117,13 @@ class RevenueCatService {
     }
   }
 
-  static Future<bool> isSubscribed() async {
+  static Future<bool> isSubscribed({bool refresh = false}) async {
     if (!_inited) {
       final s = await BillingService.getStatus();
       return s['is_subscribed'] == true;
     }
     try {
+      if (refresh) await Purchases.invalidateCustomerInfoCache();
       final info = await Purchases.getCustomerInfo();
       return info.entitlements.active.isNotEmpty;
     } catch (_) {

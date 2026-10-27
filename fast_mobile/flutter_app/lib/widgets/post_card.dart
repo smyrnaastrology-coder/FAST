@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../config/astro_signs.dart';
 import '../config/theme.dart';
@@ -47,25 +46,12 @@ class _PostCardState extends State<PostCard> {
     if (mounted) setState(() => _busy = false);
   }
 
-  Future<void> _translateText(
-      BuildContext context, String text, AppLocalizations l10n) async {
-    if (text.trim().isEmpty) return;
-    final lang = Localizations.localeOf(context).languageCode;
-    final uri = Uri.parse(
-      'https://translate.google.com/?sl=auto&tl=$lang&text=${Uri.encodeComponent(text)}&op=translate',
-    );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
   Future<void> _openComments() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => CommentsScreen(postId: widget.post.id)),
     );
-    // Yorum sayısı CommentsScreen'de artırıldı; önizlemeyi ve feed'i tazele.
+    // Sayaç yalnızca başarılı yorum gönderiminde güncellenir.
     if (mounted) {
-      context.read<SocialProvider>().incrementCommentCount(widget.post.id);
       _loadComments();
     }
   }
@@ -372,11 +358,6 @@ class _PostCardState extends State<PostCard> {
                       size: 19,
                     ),
                     tooltip: l10n.postShareTitle,
-                  ),
-                  IconButton(
-                    onPressed: () => _translateText(context, p.caption ?? '', l10n),
-                    icon: Icon(Icons.translate, color: FastTheme.textMuted, size: 19),
-                    tooltip: 'Çevir',
                   ),
                   const Spacer(),
                   if (p.isChart)
