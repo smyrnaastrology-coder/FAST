@@ -7404,7 +7404,7 @@ def charts_solar_return(inp: ChartReturnIn):
         jd0 = swe.julday(target_year, nm, nd, 12.0 - (3.0 if inp.tz is None else float(inp.tz)))
         best_jd = jd0
         best_diff = 1e9
-        for h in range(0, 48):
+        for h in range(0, 72):
             jd_cand = jd0 + h / 24.0
             arr, _ = swe.calc_ut(jd_cand, swe.SUN, swe.FLG_SWIEPH)
             lon_cand = _chart_normalize_deg(arr[0])
@@ -7412,6 +7412,17 @@ def charts_solar_return(inp: ChartReturnIn):
             if diff < best_diff:
                 best_diff = diff
                 best_jd = jd_cand
+        # Hassaslastir: saatlik adimdan sonra dakika hassasiyetinde arama.
+        for step in (1.0 / 24.0, 1.0 / (24.0 * 60.0)):
+            span = 1.5 / 24.0 if step > 1e-4 else 2.0 / (24.0 * 60.0)
+            for i in range(-int(span / step), int(span / step) + 1):
+                jd_cand = best_jd + i * step
+                arr, _ = swe.calc_ut(jd_cand, swe.SUN, swe.FLG_SWIEPH)
+                lon_cand = _chart_normalize_deg(arr[0])
+                diff = abs((lon_cand - sun_n + 180) % 360 - 180)
+                if diff < best_diff:
+                    best_diff = diff
+                    best_jd = jd_cand
         jd_r = best_jd
         cusps, ascmc = swe.houses_ex(jd_r, float(inp.lat), float(inp.lon), _CHART_HSYS_MAP[hsys])
         cusps_list = [float(cusps[i]) for i in range(12)]
