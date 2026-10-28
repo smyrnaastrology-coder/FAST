@@ -27,7 +27,20 @@ class _HandleClaimScreenState extends State<HandleClaimScreen> {
   bool _busy = false;
   String? _error;
 
-  static const _fields = ['Karma', 'Vedik', 'Uranyen', 'Klasik', 'Modern / Batı', 'Horary'];
+  static const _fields = [
+    'Karma',
+    'Vedik',
+    'Uranyen',
+    'Klasik',
+    'Modern / Batı',
+    'Horary',
+    'İslami Astroloji',
+    'Kabala',
+    'Numeroloji',
+    'Tarot',
+    'Ruhsal Danışmanlık',
+    'Diğer',
+  ];
 
   @override
   void dispose() {
@@ -284,7 +297,7 @@ class _HandleClaimScreenState extends State<HandleClaimScreen> {
                   .map((f) => ChoiceChip(
                         label: Text(f),
                         selected: _astroField == f,
-                        onSelected: (v) => setState(() => _astroField = v ? f : null),
+                        onSelected: (v) => setState(() => _astroField = v ? f : (_astroField == f ? null : _astroField)),
                       ))
                   .toList(),
             ),

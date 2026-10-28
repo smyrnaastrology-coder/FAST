@@ -92,22 +92,34 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: FastTheme.bg,
-      appBar: AppBar(
+    return PopScope(
+      canPop: !widget.force,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop || !widget.force) return;
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      },
+      child: Scaffold(
         backgroundColor: FastTheme.bg,
-        foregroundColor: FastTheme.text,
-        elevation: 0,
-        automaticallyImplyLeading: !widget.force,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+        appBar: AppBar(
+          backgroundColor: FastTheme.bg,
+          foregroundColor: FastTheme.text,
+          elevation: 0,
+          automaticallyImplyLeading: !widget.force,
+          leading: widget.force
+              ? IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+                )
+              : null,
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Text(_isSignup ? l10n.signupButton : l10n.loginTitle,
                     textAlign: TextAlign.center,
                     style:  TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: FastTheme.accentGold)),
@@ -177,7 +189,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     style:  TextStyle(fontSize: 13, color: FastTheme.accentGold),
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -41,6 +41,12 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
     'Klasik',
     'Modern / Batı',
     'Horary',
+    'İslami Astroloji',
+    'Kabala',
+    'Numeroloji',
+    'Tarot',
+    'Ruhsal Danışmanlık',
+    'Diğer',
   ];
 
   @override
@@ -327,7 +333,7 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
                             label: Text(f),
                             selected: _astroField == f,
                             onSelected: (v) =>
-                                setState(() => _astroField = v ? f : null),
+                                setState(() => _astroField = v ? f : (_astroField == f ? null : _astroField)),
                           ),
                         )
                         .toList(),

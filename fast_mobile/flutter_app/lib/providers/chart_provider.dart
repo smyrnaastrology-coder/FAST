@@ -281,6 +281,7 @@ class ChartProvider extends ChangeNotifier {
   Future<void> loadSolarReturn(int year) async {
     if (_current == null || !_returnLocationConfirmed) return;
     final sequence = ++_returnSequence;
+    _ret = null;
     _retLoading = true;
     _retError = null;
     notifyListeners();

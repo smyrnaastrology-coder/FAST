@@ -219,130 +219,133 @@ class _MainShellState extends State<MainShell> {
     final ap = context.watch<AuthProvider>();
     final sp = context.watch<SocialProvider>();
 
-    return Scaffold(
-      backgroundColor: FastTheme.bg,
-      appBar: AppBar(
-        backgroundColor: FastTheme.bgSecondary,
-        elevation: 0,
-        title: Text(
-          l10n.appTitle,
-          style: TextStyle(
-            color: FastTheme.accentGold,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1,
-          ),
-        ),
-        actions: [
-          _languageButton(context.watch<LocaleProvider>()),
-          IconButton(
-            tooltip: l10n.settingsTitle,
-            onPressed: () => _push(const SettingsScreen()),
-            icon: Icon(Icons.settings_outlined, color: FastTheme.accentGold),
-          ),
-          IconButton(
-            tooltip: l10n.themeAppearanceTitle,
-            onPressed: () => showThemePaletteSheet(context),
-            icon: Icon(Icons.palette_outlined, color: FastTheme.accentGold),
-          ),
-          IconButton(
-            tooltip: l10n.proEntry,
-            onPressed: () => _push(const LandingScreen(asPaywall: true)),
-            icon: Icon(
-              Icons.workspace_premium_outlined,
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
+        backgroundColor: FastTheme.bg,
+        appBar: AppBar(
+          backgroundColor: FastTheme.bgSecondary,
+          elevation: 0,
+          title: Text(
+            l10n.appTitle,
+            style: TextStyle(
               color: FastTheme.accentGold,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
             ),
           ),
-          IconButton(
-            tooltip: l10n.navProfile,
-            onPressed: () => _push(const ProfileScreen()),
-            icon: Icon(Icons.person_outline, color: FastTheme.accentGold),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                ap.email.isNotEmpty
-                    ? '${l10n.hubWelcome}\n${ap.email}'
-                    : l10n.hubWelcome,
-                style: TextStyle(
-                  color: FastTheme.textMuted,
-                  fontSize: 14,
-                  height: 1.4,
-                ),
+          actions: [
+            _languageButton(context.watch<LocaleProvider>()),
+            IconButton(
+              tooltip: l10n.settingsTitle,
+              onPressed: () => _push(const SettingsScreen()),
+              icon: Icon(Icons.settings_outlined, color: FastTheme.accentGold),
+            ),
+            IconButton(
+              tooltip: l10n.themeAppearanceTitle,
+              onPressed: () => showThemePaletteSheet(context),
+              icon: Icon(Icons.palette_outlined, color: FastTheme.accentGold),
+            ),
+            IconButton(
+              tooltip: l10n.proEntry,
+              onPressed: () => _push(const LandingScreen(asPaywall: true)),
+              icon: Icon(
+                Icons.workspace_premium_outlined,
+                color: FastTheme.accentGold,
               ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.hubChoose,
-                style: TextStyle(
-                  color: FastTheme.textLight,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
+            ),
+            IconButton(
+              tooltip: l10n.navProfile,
+              onPressed: () => _push(const ProfileScreen()),
+              icon: Icon(Icons.person_outline, color: FastTheme.accentGold),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ap.email.isNotEmpty
+                      ? '${l10n.hubWelcome}\n${ap.email}'
+                      : l10n.hubWelcome,
+                  style: TextStyle(
+                    color: FastTheme.textMuted,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: ListView(
-                  children: [
-                    const SkyStrip(),
-                    _PillarCard(
-                      icon: Icons.people_alt_outlined,
-                      activeIcon: Icons.people_alt,
-                      asset: 'assets/holavon_logo.png',
-                      title: l10n.hubSocialTitle,
-                      desc: l10n.hubSocialDesc,
-                      colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
-                      onTap: () =>
-                          _push(_SocialGate(l10n: l10n, enabled: sp.enabled)),
-                    ),
-                    const SizedBox(height: 16),
-                    _PillarCard(
-                      icon: Icons.auto_awesome_outlined,
-                      activeIcon: Icons.auto_awesome,
-                      asset: 'assets/horary_oracle_logo.png',
-                      title: l10n.hubAnalysisTitle,
-                      desc: l10n.hubAnalysisDesc,
-                      colors: [FastTheme.secondary, FastTheme.accent],
-                      onTap: () => _pushWithNotice(
-                        prefKey: 'holavon_synastry_notice_v1',
-                        title: l10n.warningTitle,
-                        body: l10n.warningBody,
-                        screen: const AnalyzerScreen(),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.hubChoose,
+                  style: TextStyle(
+                    color: FastTheme.textLight,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      const SkyStrip(),
+                      _PillarCard(
+                        icon: Icons.people_alt_outlined,
+                        activeIcon: Icons.people_alt,
+                        asset: 'assets/holavon_logo.png',
+                        title: l10n.hubSocialTitle,
+                        desc: l10n.hubSocialDesc,
+                        colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
+                        onTap: () =>
+                            _push(_SocialGate(l10n: l10n, enabled: sp.enabled)),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _PillarCard(
-                      icon: Icons.auto_graph_outlined,
-                      activeIcon: Icons.auto_graph,
-                      emblem: const ChartMark(),
-                      title: l10n.hubChartsTitle,
-                      desc: l10n.hubChartsDesc,
-                      colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
-                      onTap: () => _push(const ChartListScreen()),
-                    ),
-                    const SizedBox(height: 16),
-                    _PillarCard(
-                      icon: Icons.auto_stories_outlined,
-                      activeIcon: Icons.auto_stories,
-                      asset: 'assets/fast_synastry_logo.png',
-                      title: l10n.hubHoraryTitle,
-                      desc: l10n.hubHoraryDesc,
-                      colors: [FastTheme.rose, FastTheme.secondary],
-                      onTap: () => _pushWithNotice(
-                        prefKey: 'holavon_horary_notice_v1',
-                        title: l10n.horaryIntroTitle,
-                        body: l10n.horaryNoticeBody,
-                        screen: const HoraryScreen(),
+                      const SizedBox(height: 16),
+                      _PillarCard(
+                        icon: Icons.auto_awesome_outlined,
+                        activeIcon: Icons.auto_awesome,
+                        asset: 'assets/horary_oracle_logo.png',
+                        title: l10n.hubAnalysisTitle,
+                        desc: l10n.hubAnalysisDesc,
+                        colors: [FastTheme.secondary, FastTheme.accent],
+                        onTap: () => _pushWithNotice(
+                          prefKey: 'holavon_synastry_notice_v1',
+                          title: l10n.warningTitle,
+                          body: l10n.warningBody,
+                          screen: const AnalyzerScreen(),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      _PillarCard(
+                        icon: Icons.auto_graph_outlined,
+                        activeIcon: Icons.auto_graph,
+                        emblem: const ChartMark(),
+                        title: l10n.hubChartsTitle,
+                        desc: l10n.hubChartsDesc,
+                        colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
+                        onTap: () => _push(const ChartListScreen()),
+                      ),
+                      const SizedBox(height: 16),
+                      _PillarCard(
+                        icon: Icons.auto_stories_outlined,
+                        activeIcon: Icons.auto_stories,
+                        asset: 'assets/fast_synastry_logo.png',
+                        title: l10n.hubHoraryTitle,
+                        desc: l10n.hubHoraryDesc,
+                        colors: [FastTheme.rose, FastTheme.secondary],
+                        onTap: () => _pushWithNotice(
+                          prefKey: 'holavon_horary_notice_v1',
+                          title: l10n.horaryIntroTitle,
+                          body: l10n.horaryNoticeBody,
+                          screen: const HoraryScreen(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

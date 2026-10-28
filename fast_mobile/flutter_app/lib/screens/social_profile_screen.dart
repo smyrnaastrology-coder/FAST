@@ -15,6 +15,7 @@ import '../widgets/story_bar.dart';
 import 'auth_screen.dart';
 import 'dm_screen.dart';
 import 'edit_social_profile_screen.dart';
+import 'follow_list_screen.dart';
 
 /// Bir kullanıcının @handle profil sayfası (kendi profili de buradan yönetilir).
 ///
@@ -405,9 +406,11 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
           if (p?.isAstrologer == true) ...[
             const SizedBox(height: 6),
             Text(
-              (p?.astroField ?? '').isEmpty
-                  ? l10n.kunyeRoleAstrolog
-                  : '${l10n.kunyeRoleAstrolog} · ${p!.astroField}',
+              (p?.astroFields.isNotEmpty == true)
+                  ? '${l10n.kunyeRoleAstrolog} · ${p!.astroFields.join(', ')}'
+                  : ((p?.astroField ?? '').isEmpty
+                      ? l10n.kunyeRoleAstrolog
+                      : '${l10n.kunyeRoleAstrolog} · ${p!.astroField}'),
               style: TextStyle(
                 color: FastTheme.accentGold,
                 fontSize: 12,
@@ -538,19 +541,35 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
   }
 
   Widget _stat(String label, int value) {
-    return Column(
-      children: [
-        Text(
-          '$value',
-          style: TextStyle(
-            color: FastTheme.text,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+    final isFollowStat = label == AppLocalizations.of(context).profileFollowers || label == AppLocalizations.of(context).profileFollowing;
+    return GestureDetector(
+      onTap: isFollowStat
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => FollowListScreen(
+                    userId: _uid,
+                    showFollowers: label == AppLocalizations.of(context).profileFollowers,
+                  ),
+                ),
+              );
+            }
+          : null,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          Text(
+            '$value',
+            style: TextStyle(
+              color: FastTheme.text,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
-        const SizedBox(height: 2),
-        Text(label, style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
-      ],
+          const SizedBox(height: 2),
+          Text(label, style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+        ],
+      ),
     );
   }
 

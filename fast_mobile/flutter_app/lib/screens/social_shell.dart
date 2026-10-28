@@ -28,22 +28,31 @@ class _SocialShellState extends State<SocialShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FastTheme.bg,
-      body: IndexedStack(
-        index: _index,
-        children: [
-          _page(SocialNavBar.tabHome),
-          _page(SocialNavBar.tabReels),
-          _page(SocialNavBar.tabDm),
-          _page(SocialNavBar.tabSearch),
-          _page(SocialNavBar.tabProfile),
-        ],
-      ),
-      bottomNavigationBar: SocialNavBar(
-        index: _index,
-        onTap: _onTab,
-        onCreate: _create,
+    return PopScope(
+      canPop: _index == SocialNavBar.tabHome,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_index != SocialNavBar.tabHome) {
+          setState(() => _index = SocialNavBar.tabHome);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: FastTheme.bg,
+        body: IndexedStack(
+          index: _index,
+          children: [
+            _page(SocialNavBar.tabHome),
+            _page(SocialNavBar.tabReels),
+            _page(SocialNavBar.tabDm),
+            _page(SocialNavBar.tabSearch),
+            _page(SocialNavBar.tabProfile),
+          ],
+        ),
+        bottomNavigationBar: SocialNavBar(
+          index: _index,
+          onTap: _onTab,
+          onCreate: _create,
+        ),
       ),
     );
   }

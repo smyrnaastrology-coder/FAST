@@ -43,6 +43,7 @@ class SocialProfile {
   /// Astrolog mu (false: astroloji sever) + uzmanlık alanı.
   final bool isAstrologer;
   final String? astroField;
+  final List<String> astroFields;
 
   /// Pro abonelik rozeti (profildeki altın tik). `social_profiles.is_pro`.
   final bool isPro;
@@ -60,24 +61,37 @@ class SocialProfile {
     this.birthTimeSet = false,
     this.isAstrologer = false,
     this.astroField,
+    this.astroFields = const [],
     this.isPro = false,
   });
 
-  factory SocialProfile.fromMap(Map<String, dynamic> m) => SocialProfile(
-    userId: (m['user_id'] ?? '').toString(),
-    username: (m['username'] ?? '').toString(),
-    displayName: m['display_name']?.toString(),
-    bio: m['bio']?.toString(),
-    avatarUrl: m['avatar_url']?.toString(),
-    sunSign: m['sun_sign']?.toString(),
-    moonSign: m['moon_sign']?.toString(),
-    sunDeg: (m['sun_deg'] as num?)?.toDouble(),
-    moonDeg: (m['moon_deg'] as num?)?.toDouble(),
-    birthTimeSet: m['birth_time_set'] == true,
-    isAstrologer: m['is_astrologer'] == true,
-    astroField: m['astro_field']?.toString(),
-    isPro: m['is_pro'] == true,
-  );
+  factory SocialProfile.fromMap(Map<String, dynamic> m) {
+    List<String> fields = [];
+    final af = m['astro_fields'];
+    if (af is List) {
+      fields = af.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+    }
+    final single = m['astro_field']?.toString();
+    if (fields.isEmpty && single != null && single.isNotEmpty) {
+      fields = single.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    }
+    return SocialProfile(
+      userId: (m['user_id'] ?? '').toString(),
+      username: (m['username'] ?? '').toString(),
+      displayName: m['display_name']?.toString(),
+      bio: m['bio']?.toString(),
+      avatarUrl: m['avatar_url']?.toString(),
+      sunSign: m['sun_sign']?.toString(),
+      moonSign: m['moon_sign']?.toString(),
+      sunDeg: (m['sun_deg'] as num?)?.toDouble(),
+      moonDeg: (m['moon_deg'] as num?)?.toDouble(),
+      birthTimeSet: m['birth_time_set'] == true,
+      isAstrologer: m['is_astrologer'] == true || fields.isNotEmpty,
+      astroField: single ?? (fields.isNotEmpty ? fields.join(', ') : null),
+      astroFields: fields,
+      isPro: m['is_pro'] == true,
+    );
+  }
 }
 
 /// Kullanıcının doğum bilgisi (özel tablo `user_birthdates`).
@@ -1458,6 +1472,58 @@ class SocialService {
           .from('follows')
           .select('followee_id')
           .eq('follower_id', _me)
+          .limit(limit);
+      final ids = <String>[
+        for (final r in (rows as List)) (r['followee_id'] ?? '').toString(),
+      ]..removeWhere((e) => e.isEmpty);
+      if (ids.isEmpty) return const [];
+      final profs = await profilesByIds(ids.toSet());
+      return [
+        for (final id in ids)
+          if (profs[id] != null) profs[id]!,
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Belirli bir kullanıcının takipçileri.
+  static Future<List<SocialProfile>> fetchFollowers(
+    String userId, {
+    int limit = 200,
+  }) async {
+    if (!enabled || userId.isEmpty) return const [];
+    try {
+      final rows = await _c
+          .from('follows')
+          .select('follower_id')
+          .eq('followee_id', userId)
+          .limit(limit);
+      final ids = <String>[
+        for (final r in (rows as List)) (r['follower_id'] ?? '').toString(),
+      ]..removeWhere((e) => e.isEmpty);
+      if (ids.isEmpty) return const [];
+      final profs = await profilesByIds(ids.toSet());
+      return [
+        for (final id in ids)
+          if (profs[id] != null) profs[id]!,
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Belirli bir kullanıcının takip ettikleri.
+  static Future<List<SocialProfile>> fetchFollowing(
+    String userId, {
+    int limit = 200,
+  }) async {
+    if (!enabled || userId.isEmpty) return const [];
+    try {
+      final rows = await _c
+          .from('follows')
+          .select('followee_id')
+          .eq('follower_id', userId)
           .limit(limit);
       final ids = <String>[
         for (final r in (rows as List)) (r['followee_id'] ?? '').toString(),
