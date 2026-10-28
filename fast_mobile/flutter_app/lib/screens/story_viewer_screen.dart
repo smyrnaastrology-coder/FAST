@@ -191,6 +191,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
               child: CachedNetworkImage(
                 imageUrl: story.mediaUrl,
                 fit: BoxFit.contain,
+                fadeInDuration: const Duration(milliseconds: 150),
+                fadeOutDuration: const Duration(milliseconds: 150),
                 placeholder: (_, __) => Center(child: CircularProgressIndicator(color: FastTheme.accentGold)),
                 errorWidget: (_, __, ___) => Center(child: Icon(Icons.broken_image, color: Colors.white54, size: 40)),
               ),
