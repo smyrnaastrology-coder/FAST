@@ -153,11 +153,38 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  bool _translating = false;
+  bool _showTranslated = false;
+  String _translatedCaption = '';
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final locale = context.watch<LocaleProvider>().locale;
     final p = widget.post;
     final author = p.author;
+
+  Future<void> _translateCaption() async {
+    if (p.caption == null || p.caption!.isEmpty) return;
+    if (_showTranslated) {
+      setState(() => _showTranslated = false);
+      return;
+    }
+    setState(() => _translating = true);
+    try {
+      final target = locale.languageCode;
+      final res = await TranslationService.instance.translate(text: p.caption!, targetLanguageCode: target);
+      if (mounted) {
+        setState(() {
+          _translatedCaption = res;
+          _showTranslated = true;
+          _translating = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _translating = false);
+    }
+  }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
@@ -377,27 +404,40 @@ class _PostCardState extends State<PostCard> {
             if (p.caption != null && p.caption!.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '@${author?.username ?? ''} ',
-                        style: TextStyle(
-                          color: FastTheme.accentGold,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '@${author?.username ?? ''} ',
+                            style: TextStyle(
+                              color: FastTheme.accentGold,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                          TextSpan(
+                            text: _showTranslated ? _translatedCaption : p.caption,
+                            style: TextStyle(
+                              color: FastTheme.text,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
-                      TextSpan(
-                        text: p.caption,
-                        style: TextStyle(
-                          color: FastTheme.text,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: _translating ? null : _translateCaption,
+                      child: Text(
+                        _translating ? 'Çeviriliyor...' : (_showTranslated ? 'Orijinali göster' : 'Çevir'),
+                        style: TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
 

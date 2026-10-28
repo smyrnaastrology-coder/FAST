@@ -7,7 +7,9 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/social_provider.dart';
+import '../providers/locale_provider.dart';
 import '../services/social_service.dart';
+import '../services/translation_service.dart';
 import '../widgets/planet_strip.dart';
 import '../widgets/post_card.dart';
 import '../widgets/pro_badge.dart';
@@ -420,14 +422,7 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
           ],
           if (p?.bio != null && p!.bio!.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Text(
-              p.bio!,
-              style: TextStyle(
-                color: FastTheme.textMuted,
-                fontSize: 13,
-                height: 1.45,
-              ),
-            ),
+            _BioWithTranslate(bio: p.bio!),
           ],
           const SizedBox(height: 14),
 
@@ -782,6 +777,69 @@ class _PostDetail extends StatelessWidget {
         title: const SizedBox.shrink(),
       ),
       body: ListView(children: [PostCard(post: post)]),
+    );
+  }
+}
+
+class _BioWithTranslate extends StatefulWidget {
+  final String bio;
+  const _BioWithTranslate({required this.bio});
+
+  @override
+  State<_BioWithTranslate> createState() => _BioWithTranslateState();
+}
+
+class _BioWithTranslateState extends State<_BioWithTranslate> {
+  bool _translating = false;
+  bool _showTranslated = false;
+  String _translated = '';
+
+  Future<void> _translate() async {
+    if (_showTranslated) {
+      setState(() => _showTranslated = false);
+      return;
+    }
+    setState(() => _translating = true);
+    try {
+      final locale = context.read<LocaleProvider>().locale;
+      final res = await TranslationService.instance.translate(text: widget.bio, targetLanguageCode: locale.languageCode);
+      if (mounted) {
+        setState(() {
+          _translated = res;
+          _showTranslated = true;
+          _translating = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _translating = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Text(
+            _showTranslated ? _translated : widget.bio,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: FastTheme.textMuted,
+              fontSize: 13,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 4),
+          GestureDetector(
+            onTap: _translating ? null : _translate,
+            child: Text(
+              _translating ? 'Çeviriliyor...' : (_showTranslated ? 'Orijinali göster' : 'Çevir'),
+              style: TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
