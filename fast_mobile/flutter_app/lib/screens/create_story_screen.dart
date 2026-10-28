@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
@@ -7,8 +8,8 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/social_provider.dart';
 import '../services/social_service.dart';
-import '../widgets/image_editor.dart';
 import '../widgets/media_source_sheet.dart';
+import 'story_editor_screen.dart';
 
 /// Hikâye oluşturma: 9:16 foto düzenle + isteğe bağlı kullanıcı etiketle.
 class CreateStoryScreen extends StatefulWidget {
@@ -19,7 +20,6 @@ class CreateStoryScreen extends StatefulWidget {
 }
 
 class _CreateStoryScreenState extends State<CreateStoryScreen> {
-  final _editorKey = GlobalKey<ImageEditorState>();
   Uint8List? _bytes;
   bool _busy = false;
   String? _error;
@@ -36,7 +36,13 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     try {
       final file = await ImagePicker().pickImage(source: source, maxWidth: 1600, imageQuality: 85);
       if (file == null) return;
-      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      // Open in editor
+      final edited = await Navigator.of(context).push<File>(
+        MaterialPageRoute(builder: (_) => StoryEditorScreen(imageFile: file)),
+      );
+      if (edited == null) return;
+      final bytes = await edited.readAsBytes();
       if (!mounted) return;
       setState(() {
         _bytes = bytes;
@@ -74,8 +80,7 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       _error = null;
     });
     try {
-      Uint8List out = _bytes!;
-      if (_editorKey.currentState != null) out = await _editorKey.currentState!.render();
+      final Uint8List out = _bytes!;
       await SocialService.uploadStory(out, mentionIds: [for (final m in _mentions) m.userId]);
       if (!mounted) return;
       context.read<SocialProvider>().refreshStories();
@@ -131,11 +136,17 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
               ),
             )
           else ...[
-            ImageEditor(key: _editorKey, bytes: _bytes!, aspect: 9 / 16, outputWidth: 1080),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: AspectRatio(
+                aspectRatio: 9 / 16,
+                child: Image.memory(_bytes!, fit: BoxFit.cover),
+              ),
+            ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: _chooseSource,
-              icon: Icon(Icons.photo_camera_outlined, color: FastTheme.accentGold, size: 20),
+              icon: Icon(Icons.edit_outlined, color: FastTheme.accentGold, size: 20),
               label: Text(l10n.mediaChange, style: TextStyle(color: FastTheme.accentGold)),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: FastTheme.border),
