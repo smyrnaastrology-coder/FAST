@@ -22,6 +22,8 @@ import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
 import 'widgets/splash_logo.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
@@ -97,6 +99,7 @@ class FastApp extends StatelessWidget {
         return Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) {
             return MaterialApp(
+              navigatorKey: rootNavigatorKey,
               key: ValueKey('theme-${themeProvider.palette}-${themeProvider.mode}'),
               title: 'Holavon',
               debugShowCheckedModeBanner: false,

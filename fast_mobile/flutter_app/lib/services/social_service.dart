@@ -1007,6 +1007,7 @@ class SocialService {
       'recipient_id': peerId,
       'text': t,
     });
+    // Lokal bildirim tetikleme burada yapılmaz; push bildirimleri backend tarafından gönderilebilir.
   }
 
   /// İki kullanıcı arasındaki mesajları kronolojik (eskiden yeniye) çeker.
