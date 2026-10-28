@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_language_id/google_mlkit_language_id.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TranslationService {
   static final TranslationService instance = TranslationService._();
@@ -36,14 +35,18 @@ class TranslationService {
         return text;
       }
 
+      final sourceLanguage = BCP47Code.fromRawValue(source);
+      final targetLanguage = BCP47Code.fromRawValue(targetLanguageCode);
+      if (sourceLanguage == null || targetLanguage == null) return text;
+
       final translatorKey = '$source-$targetLanguageCode';
       if (!_translators.containsKey(translatorKey)) {
         final modelManager = OnDeviceTranslatorModelManager();
         await modelManager.downloadModel(source);
         await modelManager.downloadModel(targetLanguageCode);
         _translators[translatorKey] = OnDeviceTranslator(
-          sourceLanguage: TranslateLanguage.fromBcpCode(source) ?? TranslateLanguage.ENGLISH,
-          targetLanguage: TranslateLanguage.fromBcpCode(targetLanguageCode) ?? TranslateLanguage.ENGLISH,
+          sourceLanguage: sourceLanguage,
+          targetLanguage: targetLanguage,
         );
       }
 
