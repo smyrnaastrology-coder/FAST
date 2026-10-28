@@ -88,6 +88,13 @@ workflows:
           printf '%s' "$IOS_FIREBASE_PLIST" > "$PLIST"
           /usr/bin/plutil -lint "$PLIST"
           [ "$(/usr/libexec/PlistBuddy -c 'Print :BUNDLE_ID' "$PLIST")" = "$BUNDLE_ID" ] || { echo 'Firebase iOS bundle ID mismatch'; exit 1; }
+      - name: CocoaPods install
+        script: |
+          set -eu
+          cd "$CM_BUILD_DIR/$PROJECT_PATH"
+          flutter pub get
+          cd ios
+          pod install --repo-update
       - name: Flutter build ipa
         script: |
           set -eu
