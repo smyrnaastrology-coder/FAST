@@ -93,15 +93,13 @@ workflows:
           set -eu
           cd "$CM_BUILD_DIR/$PROJECT_PATH"
           flutter pub get
-          # Tum iOS eklentileri SwiftPM destekliyor. Yalnizca CI kopyasinda
-          # Podfile'i uzaklastirarak bos CocoaPods entegrasyonunu onle.
-          mv ios/Podfile "$HOME/holavon-ci-Podfile"
+          # ML Kit eklentileri SwiftPM desteklemedigi icin CocoaPods zorunlu.
+          # Podfile korunur ve ios/Podfile icindeki 15.5 deployment target kullanilir.
           flutter build ipa --release \
             --export-options-plist="$HOME/export_options.plist" \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
             --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
-            --dart-define=REVENUECAT_API_KEY="$REVENUECAT_IOS_KEY" \
-            --build-number="${IOS_BUILD_NUMBER:-65}"
+            --dart-define=REVENUECAT_API_KEY="$REVENUECAT_IOS_KEY"
     artifacts:
       - fast_mobile/flutter_app/build/ios/ipa/*.ipa
     publishing:
