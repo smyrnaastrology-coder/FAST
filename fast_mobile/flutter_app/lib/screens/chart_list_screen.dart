@@ -17,11 +17,24 @@ class ChartListScreen extends StatefulWidget {
 }
 
 class _ChartListScreenState extends State<ChartListScreen> {
+  bool _autoOpened = false;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChartProvider>().loadSaved();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final cp = context.read<ChartProvider>();
+      await cp.loadSaved();
+      if (!mounted) return;
+      // Kayıtlı harita varsa listeyi atlayıp doğrudan ilk haritayı aç.
+      if (!_autoOpened && cp.saved.isNotEmpty) {
+        _autoOpened = true;
+        cp.open(cp.saved.first);
+        if (mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ChartDetailScreen()),
+          );
+        }
+      }
     });
   }
 
