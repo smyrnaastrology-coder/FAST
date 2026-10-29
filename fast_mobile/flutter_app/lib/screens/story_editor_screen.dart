@@ -1,15 +1,29 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+
 import '../config/theme.dart';
 import '../models/story_element.dart';
 import '../widgets/story_drawing_canvas.dart';
 import '../widgets/story_text_layer.dart';
 
+/// Hikâye editörü.
+///
+/// Tasarım:
+///  - Tuval her zaman 9:16 (hikâye oranı) ve tam ekranı kaplar; görsel
+///    `BoxFit.cover` ile tuvali doldurur, altta siyah boşluk kalmaz.
+///  - "Taşı" modunda iki parmakla büyüt/küçült/döndür, tek parmakla kaydır.
+///  - "Çizim" modunda tek parmak fotoğrafın üzerine çizer (neon/pastel).
+///  - Metinler parmakla taşınır, iki parmakla büyütülür/döndürülür; font,
+///    renk ve boyut alt panelden seçilir.
+///  - Tüm katmanlar tek bir RepaintBoundary içinde olduğu için paylaşılan
+///    görsel ekranda görünenin birebir aynısıdır (WYSIWYG).
 class StoryEditorScreen extends StatefulWidget {
   final XFile imageFile;
   const StoryEditorScreen({super.key, required this.imageFile});
@@ -18,18 +32,27 @@ class StoryEditorScreen extends StatefulWidget {
   State<StoryEditorScreen> createState() => _StoryEditorScreenState();
 }
 
+enum _EditorMode { move, draw }
+
 class _StoryEditorScreenState extends State<StoryEditorScreen> {
   final GlobalKey _repaintKey = GlobalKey();
   final List<DrawingStroke> _strokes = [];
   final List<TextElement> _textElements = [];
   String? _selectedTextId;
-  bool _drawingMode = false;
+  _EditorMode _mode = _EditorMode.move;
   double _strokeWidth = 6.0;
   Color _currentColor = const Color(0xFF00E0FF);
   int _colorTab = 0; // 0 = neon, 1 = pastel
   bool _rendering = false;
 
-  final TransformationController _transformCtrl = TransformationController();
+  // Görsel dönüşümü
+  Offset _offset = Offset.zero;
+  double _scale = 1.0;
+  double _rotation = 0.0;
+  late Offset _startFocal;
+  late double _startScale;
+  late double _startRotation;
+  Size _canvasSize = Size.zero;
 
   final List<Color> _neonColors = [
     const Color(0xFF00E0FF), const Color(0xFFFF3366), const Color(0xFF39FF14),
@@ -53,101 +76,84 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   List<Color> get _colors => _colorTab == 0 ? _neonColors : _pastelColors;
 
-  @override
-  void dispose() {
-    _transformCtrl.dispose();
-    super.dispose();
+  TextElement? get _selectedText {
+    if (_selectedTextId == null) return null;
+    for (final e in _textElements) {
+      if (e.id == _selectedTextId) return e;
+    }
+    return null;
   }
 
   void _addText() {
     final newText = TextElement(
       id: const Uuid().v4(),
       text: 'Metin',
-      position: const Offset(120, 200),
+      position: const Offset(60, 120),
       color: Colors.white,
     );
     setState(() {
       _textElements.add(newText);
       _selectedTextId = newText.id;
-      _drawingMode = false;
+      _mode = _EditorMode.move;
     });
     _editText(newText);
   }
 
   void _editText(TextElement element) {
     final ctrl = TextEditingController(text: element.text);
-    Color color = element.color;
-    String font = element.fontFamily;
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setD) => AlertDialog(
-          backgroundColor: FastTheme.bg,
-          title: Text('Metni Düzenle', style: TextStyle(color: FastTheme.accentGold)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: ctrl,
-                  autofocus: true,
-                  style: TextStyle(color: FastTheme.text, fontFamily: font),
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.border)),
-                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.accentGold)),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButton<String>(
-                  value: font,
-                  dropdownColor: FastTheme.bg,
-                  style: TextStyle(color: FastTheme.text),
-                  items: const [
-                    DropdownMenuItem(value: 'Roboto', child: Text('Roboto')),
-                    DropdownMenuItem(value: 'serif', child: Text('Serif')),
-                    DropdownMenuItem(value: 'monospace', child: Text('Monospace')),
-                    DropdownMenuItem(value: 'cursive', child: Text('Cursive')),
-                  ],
-                  onChanged: (v) => setD(() => font = v ?? font),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  children: _textColors.map((c) => GestureDetector(
-                    onTap: () => setD(() => color = c),
-                    child: Container(
-                      width: 32, height: 32,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: color == c ? FastTheme.accentGold : Colors.white38, width: color == c ? 3 : 1),
-                      ),
-                    ),
-                  )).toList(),
-                ),
-              ],
+      builder: (ctx) => AlertDialog(
+        backgroundColor: FastTheme.bgSecondary,
+        title: Text(
+          'Yazını düzenle',
+          style: TextStyle(color: FastTheme.accentGold),
+        ),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: null,
+          style: TextStyle(color: FastTheme.text),
+          decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: FastTheme.border),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: FastTheme.accentGold),
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text('İptal', style: TextStyle(color: FastTheme.textMuted)),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  element.text = ctrl.text.isEmpty ? 'Metin' : ctrl.text;
-                  element.fontFamily = font;
-                  element.color = color;
-                });
-                Navigator.pop(ctx);
-              },
-              child: Text('Tamam', style: TextStyle(color: FastTheme.accentGold)),
-            ),
-          ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('İptal', style: TextStyle(color: FastTheme.textMuted)),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                element.text = ctrl.text.trim().isEmpty
+                    ? 'Metin'
+                    : ctrl.text.trim();
+              });
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              'Tamam',
+              style: TextStyle(color: FastTheme.accentGold),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _updateSelectedText(TextElement Function(TextElement) fn) {
+    final e = _selectedText;
+    if (e == null) return;
+    setState(() {
+      final idx = _textElements.indexWhere((x) => x.id == e.id);
+      if (idx >= 0) _textElements[idx] = fn(_textElements[idx]);
+    });
   }
 
   void _deleteSelectedText() {
@@ -160,16 +166,70 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _undo() {
     setState(() {
-      if (_strokes.isNotEmpty) _strokes.removeLast();
+      if (_mode == _EditorMode.draw && _strokes.isNotEmpty) {
+        _strokes.removeLast();
+      } else if (_textElements.isNotEmpty) {
+        _textElements.removeLast();
+      } else if (_strokes.isNotEmpty) {
+        _strokes.removeLast();
+      }
+    });
+  }
+
+  void _resetImageTransform() {
+    setState(() {
+      _offset = Offset.zero;
+      _scale = 1.0;
+      _rotation = 0.0;
+    });
+  }
+
+  Matrix4 _imageMatrix() {
+    final c = Offset(_canvasSize.width / 2, _canvasSize.height / 2);
+    return Matrix4.identity()
+      ..translate(_offset.dx, _offset.dy)
+      ..translate(c.dx, c.dy)
+      ..rotateZ(_rotation)
+      ..scale(_scale)
+      ..translate(-c.dx, -c.dy);
+  }
+
+  void _onScaleStart(ScaleStartDetails d) {
+    _startFocal = d.localFocalPoint;
+    _startScale = _scale;
+    _startRotation = _rotation;
+  }
+
+  void _onScaleUpdate(ScaleUpdateDetails d) {
+    final newScale = (_startScale * d.scale).clamp(0.7, 5.0);
+    final newRotation = _startRotation + d.rotation;
+    final c = Offset(_canvasSize.width / 2, _canvasSize.height / 2);
+    final p = _startFocal - c;
+    final cosR = math.cos(newRotation);
+    final sinR = math.sin(newRotation);
+    final rotated = Offset(
+      newScale * (p.dx * cosR - p.dy * sinR),
+      newScale * (p.dx * sinR + p.dy * cosR),
+    );
+    setState(() {
+      _scale = newScale;
+      _rotation = newRotation;
+      _offset = (d.localFocalPoint - c) - rotated;
     });
   }
 
   Future<void> _finish() async {
-    setState(() => _rendering = true);
+    setState(() {
+      _rendering = true;
+      _selectedTextId = null;
+    });
+    // Seçim çerçevesinin çizilmemesi için bir kare bekle.
+    await Future<void>.delayed(const Duration(milliseconds: 40));
     try {
-      final boundary = _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final boundary =
+          _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) throw Exception('Render error');
-      final image = await boundary.toImage(pixelRatio: 2.0);
+      final image = await boundary.toImage(pixelRatio: 2.5);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) throw Exception('ByteData error');
       final bytes = byteData.buffer.asUint8List();
@@ -180,7 +240,11 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
       if (mounted) Navigator.of(context).pop(file);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _rendering = false);
     }
@@ -190,195 +254,375 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
+      body: SafeArea(
+        child: Column(
+          children: [
+            _topBar(),
+            Expanded(child: _canvasArea()),
+            _bottomPanel(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _topBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 4, 8, 0),
+      child: Row(
         children: [
-          // Canvas area (zoomable/rotatable)
-          Positioned.fill(
-            child: InteractiveViewer(
-              transformationController: _transformCtrl,
-              minScale: 0.5,
-              maxScale: 4.0,
-              panEnabled: !_drawingMode && _selectedTextId == null,
-              scaleEnabled: _selectedTextId == null,
-              child: RepaintBoundary(
-                key: _repaintKey,
-                child: Stack(
-                  children: [
-                    // Background image
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close, color: Colors.white, size: 26),
+          ),
+          const Spacer(),
+          IconButton(
+            tooltip: 'Geri al',
+            onPressed: _undo,
+            icon: const Icon(Icons.undo, color: Colors.white),
+          ),
+          IconButton(
+            tooltip: 'Görseli sıfırla',
+            onPressed: _resetImageTransform,
+            icon: const Icon(Icons.restart_alt, color: Colors.white),
+          ),
+          const SizedBox(width: 4),
+          TextButton(
+            onPressed: _rendering ? null : _finish,
+            child: _rendering
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    'Paylaş',
+                    style: TextStyle(
+                      color: FastTheme.accentGold,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _canvasArea() {
+    return Center(
+      child: LayoutBuilder(
+        builder: (context, cons) {
+          const aspect = 9 / 16;
+          var w = cons.maxWidth;
+          var h = w / aspect;
+          if (h > cons.maxHeight) {
+            h = cons.maxHeight;
+            w = h * aspect;
+          }
+          _canvasSize = Size(w, h);
+          return SizedBox(
+            width: w,
+            height: h,
+            child: RepaintBoundary(
+              key: _repaintKey,
+              child: Stack(
+                clipBehavior: Clip.hardEdge,
+                fit: StackFit.expand,
+                children: [
+                  // 1) Fotoğraf (cover — tuvali tamamen doldurur)
+                  Transform(
+                    transform: _imageMatrix(),
+                    child: Image.file(
+                      File(widget.imageFile.path),
+                      fit: BoxFit.cover,
+                      width: w,
+                      height: h,
+                      gaplessPlayback: true,
+                    ),
+                  ),
+                  // 2) Çizim katmanı
+                  Positioned.fill(
+                    child: _mode == _EditorMode.draw
+                        ? StoryDrawingCanvas(
+                            strokes: _strokes,
+                            onStrokesChanged: (strokes) {
+                              setState(() {
+                                _strokes
+                                  ..clear()
+                                  ..addAll(strokes);
+                              });
+                            },
+                            currentColor: _currentColor,
+                            strokeWidth: _strokeWidth,
+                          )
+                        : CustomPaint(
+                            painter: StoryDrawingPainter(strokes: _strokes),
+                          ),
+                  ),
+                  // 3) Taşı modunda jest katmanı (fotoğrafı döndür/büyüt)
+                  if (_mode == _EditorMode.move)
                     Positioned.fill(
-                      child: Image.file(
-                        File(widget.imageFile.path),
-                        fit: BoxFit.cover,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onScaleStart: _onScaleStart,
+                        onScaleUpdate: _onScaleUpdate,
+                        onTap: () => setState(() => _selectedTextId = null),
                       ),
                     ),
-                    // Drawing layer
-                    Positioned.fill(
-                      child: _drawingMode
-                          ? StoryDrawingCanvas(
-                              strokes: _strokes,
-                              onStrokesChanged: (strokes) {
-                                setState(() {
-                                  _strokes.clear();
-                                  _strokes.addAll(strokes);
-                                });
-                              },
-                              currentColor: _currentColor,
-                              strokeWidth: _strokeWidth,
-                            )
-                          : CustomPaint(
-                              painter: StoryDrawingPainter(strokes: _strokes),
-                            ),
-                    ),
-                    // Text layers
-                    ..._textElements.map((element) => StoryTextLayerWidget(
-                      element: element,
-                      selected: _selectedTextId == element.id,
-                      onTap: () {
-                        setState(() {
+                  // 4) Metin katmanları
+                  ..._textElements.map(
+                    (element) => IgnorePointer(
+                      ignoring: _mode == _EditorMode.draw,
+                      child: StoryTextLayerWidget(
+                        element: element,
+                        selected: _selectedTextId == element.id,
+                        onTap: () => setState(() {
                           _selectedTextId = element.id;
-                          _drawingMode = false;
-                        });
-                      },
-                      onChanged: (updated) {
-                        setState(() {
-                          final idx = _textElements.indexWhere((e) => e.id == updated.id);
-                          if (idx >= 0) _textElements[idx] = updated;
-                        });
-                      },
-                      onDelete: _deleteSelectedText,
-                    )),
-                  ],
+                        }),
+                        onChanged: (updated) {
+                          setState(() {
+                            final idx = _textElements.indexWhere(
+                              (e) => e.id == updated.id,
+                            );
+                            if (idx >= 0) _textElements[idx] = updated;
+                          });
+                        },
+                        onDelete: _deleteSelectedText,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _bottomPanel() {
+    final sel = _selectedText;
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF11151C),
+        border: Border(
+          top: BorderSide(color: FastTheme.border.withValues(alpha: 0.4)),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_mode == _EditorMode.draw) _drawControls(),
+          if (sel != null) _textControls(sel),
+          _mainTools(),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawControls() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.brush, color: Colors.white70, size: 16),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 2,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 8),
+                  ),
+                  child: Slider(
+                    value: _strokeWidth,
+                    min: 2,
+                    max: 20,
+                    activeColor: _currentColor,
+                    inactiveColor: Colors.white24,
+                    onChanged: (v) => setState(() => _strokeWidth = v),
+                  ),
                 ),
               ),
-            ),
-          ),
-          // Top bar
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                  ),
-                  const Spacer(),
-                  if (_selectedTextId != null && !_drawingMode)
-                    IconButton(
-                      onPressed: () {
-                        final element = _textElements.firstWhere((e) => e.id == _selectedTextId);
-                        _editText(element);
-                      },
-                      icon: const Icon(Icons.edit, color: Colors.white),
-                    ),
-                  if (_selectedTextId != null && !_drawingMode)
-                    IconButton(
-                      onPressed: _deleteSelectedText,
-                      icon: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                  IconButton(
-                    onPressed: _undo,
-                    icon: const Icon(Icons.undo, color: Colors.white),
-                  ),
-                  TextButton(
-                    onPressed: _rendering ? null : _finish,
-                    child: _rendering
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : Text('Paylaş', style: TextStyle(color: FastTheme.accentGold, fontWeight: FontWeight.bold, fontSize: 16)),
-                  ),
-                ],
+              SizedBox(
+                width: 26,
+                child: Text(
+                  _strokeWidth.toInt().toString(),
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
               ),
+              const SizedBox(width: 10),
+              _tabButton('Neon', 0),
+              const SizedBox(width: 6),
+              _tabButton('Pastel', 1),
+            ],
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _colors.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (_, i) => _colorButton(_colors[i]),
             ),
           ),
-          // Bottom toolbar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Stroke width slider
-                  if (_drawingMode)
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(30),
+        ],
+      ),
+    );
+  }
+
+  Widget _textControls(TextElement sel) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 32,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: kStoryFonts.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, i) {
+                final f = kStoryFonts[i];
+                final active = sel.fontFamily == f.key;
+                return GestureDetector(
+                  onTap: () => _updateSelectedText(
+                    (e) => e.copyWith(fontFamily: f.key),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: active
+                          ? FastTheme.accentGold
+                          : Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      f.value,
+                      style: storyFontStyle(
+                        f.key,
+                        color: active ? Colors.black : Colors.white,
+                        fontSize: 13,
+                        weight: FontWeight.w600,
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.brush, color: Colors.white, size: 18),
-                          Expanded(
-                            child: Slider(
-                              value: _strokeWidth,
-                              min: 2,
-                              max: 14,
-                              activeColor: _currentColor,
-                              inactiveColor: Colors.white38,
-                              onChanged: (v) => setState(() => _strokeWidth = v),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _textColors.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (_, i) {
+                      final c = _textColors[i];
+                      final active = sel.color == c;
+                      return GestureDetector(
+                        onTap: () =>
+                            _updateSelectedText((e) => e.copyWith(color: c)),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: active ? FastTheme.accentGold : Colors.white38,
+                              width: active ? 3 : 1,
                             ),
                           ),
-                          Text(_strokeWidth.toInt().toString(), style: const TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  // Color palette
-                  if (_drawingMode)
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _tabButton('Neon', 0),
-                              const SizedBox(width: 8),
-                              _tabButton('Pastel', 1),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            alignment: WrapAlignment.center,
-                            children: _colors.map((c) => _colorButton(c)).toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  // Main toolbar
-                  Container(
-                    margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _toolButton(Icons.text_fields, 'Metin', () => _addText()),
-                        _toolButton(Icons.brush, 'Çizim', () {
-                          setState(() {
-                            _drawingMode = !_drawingMode;
-                            _selectedTextId = null;
-                          });
-                        }, active: _drawingMode),
-                      ],
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                ],
+                ),
               ),
-            ),
+              IconButton(
+                tooltip: 'Yazıyı düzenle',
+                onPressed: () => _editText(sel),
+                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+              ),
+              IconButton(
+                tooltip: 'Sil',
+                onPressed: _deleteSelectedText,
+                icon: const Icon(Icons.delete_outline,
+                    color: Colors.white, size: 20),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(Icons.format_size, color: Colors.white54, size: 16),
+              Expanded(
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 2,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 8),
+                  ),
+                  child: Slider(
+                    value: sel.fontSize.clamp(12, 72),
+                    min: 12,
+                    max: 72,
+                    activeColor: FastTheme.accentGold,
+                    inactiveColor: Colors.white24,
+                    onChanged: (v) =>
+                        _updateSelectedText((e) => e.copyWith(fontSize: v)),
+                  ),
+                ),
+              ),
+              Text(
+                sel.fontSize.toInt().toString(),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _mainTools() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _toolButton(Icons.text_fields, 'Metin', _addText),
+          _toolButton(
+            Icons.open_with,
+            'Taşı',
+            () => setState(() {
+              _mode = _EditorMode.move;
+              _selectedTextId = null;
+            }),
+            active: _mode == _EditorMode.move && _selectedTextId == null,
+          ),
+          _toolButton(
+            Icons.draw,
+            'Çizim',
+            () => setState(() {
+              _mode = _EditorMode.draw;
+              _selectedTextId = null;
+            }),
+            active: _mode == _EditorMode.draw,
           ),
         ],
       ),
@@ -390,12 +634,19 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     return GestureDetector(
       onTap: () => setState(() => _colorTab = tab),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: active ? FastTheme.accentGold : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          color: active ? FastTheme.accentGold : Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
         ),
-        child: Text(label, style: TextStyle(color: active ? Colors.black : Colors.white, fontWeight: FontWeight.w600)),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.black : Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 11,
+          ),
+        ),
       ),
     );
   }
@@ -405,28 +656,52 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     return GestureDetector(
       onTap: () => setState(() => _currentColor = color),
       child: Container(
-        width: 36,
-        height: 36,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
-          border: Border.all(color: active ? Colors.white : Colors.white38, width: active ? 3 : 1),
-          boxShadow: active ? [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 8)] : null,
+          border: Border.all(
+            color: active ? Colors.white : Colors.white24,
+            width: active ? 3 : 1,
+          ),
+          boxShadow: active
+              ? [BoxShadow(color: color.withValues(alpha: 0.7), blurRadius: 10)]
+              : null,
         ),
       ),
     );
   }
 
-  Widget _toolButton(IconData icon, String label, VoidCallback onTap, {bool active = false}) {
+  Widget _toolButton(
+    IconData icon,
+    String label,
+    VoidCallback onTap, {
+    bool active = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: active ? FastTheme.accentGold : Colors.white, size: 28),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: active ? FastTheme.accentGold : Colors.white, fontSize: 11)),
-        ],
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: active ? FastTheme.accentGold : Colors.white,
+              size: 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: active ? FastTheme.accentGold : Colors.white,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

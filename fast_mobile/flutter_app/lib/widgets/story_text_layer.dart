@@ -1,5 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/story_element.dart';
+
+/// Hikâye metin katmanları. Google Fonts ile gerçek font çeşitleri sunar.
+const List<MapEntry<String, String>> kStoryFonts = [
+  MapEntry('Poppins', 'Poppins'),
+  MapEntry('Playfair Display', 'Playfair'),
+  MapEntry('Caveat', 'El yazısı'),
+  MapEntry('Bebas Neue', 'Bebas'),
+  MapEntry('Montserrat', 'Montserrat'),
+];
+
+TextStyle storyFontStyle(
+  String family, {
+  required Color color,
+  required double fontSize,
+  FontWeight weight = FontWeight.w700,
+}) {
+  TextStyle base;
+  switch (family) {
+    case 'Playfair Display':
+      base = GoogleFonts.playfairDisplay();
+      break;
+    case 'Caveat':
+      base = GoogleFonts.caveat();
+      break;
+    case 'Bebas Neue':
+      base = GoogleFonts.bebasNeue();
+      break;
+    case 'Montserrat':
+      base = GoogleFonts.montserrat();
+      break;
+    default:
+      base = GoogleFonts.poppins();
+  }
+  return base.copyWith(
+    color: color,
+    fontSize: fontSize,
+    fontWeight: weight,
+    height: 1.2,
+    shadows: const [
+      Shadow(blurRadius: 6, color: Colors.black54, offset: Offset(1, 2)),
+    ],
+  );
+}
 
 class StoryTextLayerWidget extends StatefulWidget {
   final TextElement element;
@@ -22,47 +66,58 @@ class StoryTextLayerWidget extends StatefulWidget {
 }
 
 class _StoryTextLayerWidgetState extends State<StoryTextLayerWidget> {
-  Offset _startOffset = Offset.zero;
   Offset _startPos = Offset.zero;
+  Offset _startFocal = Offset.zero;
+  double _startScale = 1;
+  double _startRotation = 0;
 
   @override
   Widget build(BuildContext context) {
+    final e = widget.element;
     return Positioned(
-      left: widget.element.position.dx,
-      top: widget.element.position.dy,
+      left: e.position.dx,
+      top: e.position.dy,
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: widget.onTap,
-        onPanStart: (d) {
-          _startOffset = d.globalPosition;
-          _startPos = widget.element.position;
+        onScaleStart: (d) {
+          widget.onTap();
+          _startPos = e.position;
+          _startFocal = d.focalPoint;
+          _startScale = e.scale;
+          _startRotation = e.rotation;
         },
-        onPanUpdate: (d) {
-          final delta = d.globalPosition - _startOffset;
-          widget.onChanged(widget.element.copyWith(position: _startPos + delta));
+        onScaleUpdate: (d) {
+          final nextScale = (_startScale * d.scale).clamp(0.3, 6.0);
+          final nextRotation = _startRotation + d.rotation;
+          final nextPos = _startPos + (d.focalPoint - _startFocal);
+          widget.onChanged(
+            e.copyWith(
+              position: nextPos,
+              scale: nextScale,
+              rotation: nextRotation,
+            ),
+          );
         },
         child: Transform.rotate(
-          angle: widget.element.rotation,
+          angle: e.rotation,
           child: Transform.scale(
-            scale: widget.element.scale,
+            scale: e.scale,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: widget.selected
                   ? BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 1),
-                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.white70, width: 1),
+                      borderRadius: BorderRadius.circular(6),
                     )
                   : null,
               child: Text(
-                widget.element.text,
+                e.text,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: widget.element.color,
-                  fontSize: widget.element.fontSize,
-                  fontFamily: widget.element.fontFamily,
-                  fontWeight: FontWeight.bold,
-                  shadows: const [
-                    Shadow(blurRadius: 4, color: Colors.black54, offset: Offset(1, 1)),
-                  ],
+                style: storyFontStyle(
+                  e.fontFamily,
+                  color: e.color,
+                  fontSize: e.fontSize,
                 ),
               ),
             ),

@@ -13,6 +13,7 @@ import '../screens/comments_screen.dart';
 import '../screens/dm_screen.dart';
 import '../screens/social_profile_screen.dart';
 import 'post_share_sheet.dart';
+import 'venus_like.dart';
 
 /// Feed'deki tek bir post kartı.
 class PostCard extends StatefulWidget {
@@ -339,18 +340,23 @@ class _PostCardState extends State<PostCard> {
                   IconButton(
                     onPressed: _toggleLike,
                     icon: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 180),
-                      transitionBuilder: (child, anim) =>
-                          ScaleTransition(scale: anim, child: child),
-                      child: Text(
-                        '♀',
+                      duration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, anim) => ScaleTransition(
+                        scale: CurvedAnimation(
+                          parent: anim,
+                          curve: Curves.easeOutBack,
+                        ),
+                        child: child,
+                      ),
+                      child: Padding(
                         key: ValueKey(p.likedByMe),
-                        style: TextStyle(
-                          fontSize: 22,
+                        padding: const EdgeInsets.all(2),
+                        child: VenusLikeIcon(
+                          size: 22,
+                          liked: p.likedByMe,
                           color: p.likedByMe
                               ? FastTheme.rose
                               : FastTheme.textMuted,
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),

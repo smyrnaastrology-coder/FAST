@@ -14,6 +14,7 @@ import '../widgets/planet_strip.dart';
 import '../widgets/post_card.dart';
 import '../widgets/pro_badge.dart';
 import '../widgets/story_bar.dart';
+import '../widgets/venus_like.dart';
 import 'auth_screen.dart';
 import 'dm_screen.dart';
 import 'edit_social_profile_screen.dart';
@@ -704,13 +705,10 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '♀',
-                          style: TextStyle(
-                            color: FastTheme.accentGold,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        VenusLikeIcon(
+                          size: 10,
+                          liked: true,
+                          color: FastTheme.accentGold,
                         ),
                         const SizedBox(width: 3),
                         Text(

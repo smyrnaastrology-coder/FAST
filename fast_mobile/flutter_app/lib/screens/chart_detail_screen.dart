@@ -18,6 +18,7 @@ import '../widgets/chart_wheel.dart';
 import '../widgets/time_machine_bar.dart';
 import '../widgets/chart_location_picker.dart';
 import '../services/chart_service.dart';
+import 'chart_create_screen.dart';
 
 class ChartDetailScreen extends StatefulWidget {
   const ChartDetailScreen({super.key});
@@ -41,6 +42,80 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   int _returnYear = DateTime.now().year;
   int _returnMonth = DateTime.now().month;
   final _charts = ChartService();
+
+  // ── 2 harita (bi-wheel) modu ────────────────────────────────────────────
+  // İç ve dış harita BİRBİRİNDEN BAĞIMSIZ seçilir: natal + transit,
+  // natal + solar return, natal + progress, iki natal... Yerleri değiştirilir.
+  String _innerSource = 'current';
+  ChartData? _innerChart;
+  String _innerLabel = '';
+  String _outerSource = 'transit';
+  ChartData? _outerChart;
+  String _outerLabel = '';
+
+  ChartData? _parseChart(Map<String, dynamic>? j, {String? houseSystem}) {
+    if (j == null) return null;
+    try {
+      final m = Map<String, dynamic>.from(j);
+      m['house_system'] = m['house_system'] ?? houseSystem ?? 'P';
+      return ChartData.fromJson(m);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  ChartData? _resolveChart(
+    String source,
+    ChartData? data,
+    ChartProvider cp,
+    ChartData c,
+  ) {
+    switch (source) {
+      case 'current':
+        return c;
+      case 'transit':
+        return _parseChart(
+          (cp.biwheel?.data['transit'] as Map?)?.cast<String, dynamic>(),
+          houseSystem: c.houseSystem,
+        );
+      case 'return':
+        return _parseChart(cp.ret?.data, houseSystem: c.houseSystem);
+      case 'arc':
+        return _parseChart(cp.arc?.data, houseSystem: c.houseSystem);
+      default:
+        return data;
+    }
+  }
+
+  String _sourceLabel(
+    String source,
+    ChartProvider cp,
+    ChartData c, {
+    String fallback = 'Harita',
+  }) {
+    switch (source) {
+      case 'current':
+        final n = c.meta.name;
+        return n != null && n.isNotEmpty ? n : _l10n.chartDefaultName;
+      case 'transit':
+        return 'Transit';
+      case 'return':
+        final r = cp.ret;
+        if (r == null) return 'Return';
+        return r.type == 'solar'
+            ? 'Solar Return ${r.year}'
+            : 'Lunar Return ${r.year}/${r.month.toString().padLeft(2, '0')}';
+      case 'arc':
+        final a = cp.arc;
+        final method = '${a?.data['progression']?['method'] ?? 'secondary'}';
+        final label = method == 'minor'
+            ? _l10n.chartMinorProgress
+            : _l10n.chartSecondaryProgress;
+        return a == null ? label : '$label • ${a.targetDate}';
+      default:
+        return fallback;
+    }
+  }
 
   String _dateText(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-'
@@ -96,6 +171,336 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             fontWeight: FontWeight.w600,
             fontSize: 12,
           ),
+        ),
+      ),
+    );
+  }
+
+  // ── 2 harita modu yardımcıları ──────────────────────────────────────────
+  void _setTwoCharts(ChartData c, ChartProvider cp) {
+    setState(() {
+      _twoCharts = true;
+      _innerLabel = _sourceLabel(_innerSource, cp, c, fallback: _innerLabel);
+      _outerLabel = _sourceLabel(_outerSource, cp, c, fallback: _outerLabel);
+    });
+    if ((_innerSource == 'transit' || _outerSource == 'transit') &&
+        cp.biwheel == null &&
+        !cp.biLoading) {
+      cp.loadBiwheel(when: _now);
+    }
+  }
+
+  void _swapCharts(ChartData c, ChartProvider cp) {
+    setState(() {
+      final src = _innerSource;
+      final chart = _innerChart;
+      final label = _innerLabel;
+      _innerSource = _outerSource;
+      _innerChart = _outerChart;
+      _innerLabel = _outerLabel;
+      _outerSource = src;
+      _outerChart = chart;
+      _outerLabel = label;
+      _innerLabel = _sourceLabel(_innerSource, cp, c, fallback: _innerLabel);
+      _outerLabel = _sourceLabel(_outerSource, cp, c, fallback: _outerLabel);
+    });
+  }
+
+  Future<void> _refreshTwoCharts(ChartProvider cp) async {
+    Future<void> refresh(String source) async {
+      switch (source) {
+        case 'transit':
+          await cp.loadBiwheel(when: DateTime.now());
+          break;
+        case 'return':
+          final r = cp.ret;
+          if (r == null) return;
+          if (r.type == 'solar') {
+            await cp.loadSolarReturn(r.year);
+          } else if (r.month != null) {
+            await cp.loadLunarReturn(r.year, r.month!);
+          }
+          break;
+        case 'arc':
+          final a = cp.arc;
+          if (a == null) return;
+          await cp.loadSolarArc(
+            a.targetDate,
+            method: '${a.data['progression']?['method'] ?? 'secondary'}',
+          );
+          break;
+      }
+    }
+
+    await refresh(_innerSource);
+    await refresh(_outerSource);
+    if (mounted) {
+      setState(() => _now = DateTime.now());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Haritalar yenilendi')),
+      );
+    }
+  }
+
+  void _applySlot(
+    bool innerSlot,
+    String source,
+    ChartData? chart,
+    String label,
+  ) {
+    setState(() {
+      if (innerSlot) {
+        _innerSource = source;
+        _innerChart = chart;
+        _innerLabel = label;
+      } else {
+        _outerSource = source;
+        _outerChart = chart;
+        _outerLabel = label;
+      }
+    });
+    final cp = context.read<ChartProvider>();
+    if (source == 'transit' && cp.biwheel == null && !cp.biLoading) {
+      cp.loadBiwheel(when: _now);
+    }
+  }
+
+  void _pickSlot(ChartData c, ChartProvider cp, bool innerSlot) {
+    final l10n = _l10n;
+    final currentName = c.meta.name?.isNotEmpty == true
+        ? c.meta.name!
+        : l10n.chartDefaultName;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.72,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: FastTheme.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
+                child: Row(
+                  children: [
+                    Icon(
+                      innerSlot ? Icons.filter_1 : Icons.filter_2,
+                      color: FastTheme.accentGold,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      innerSlot ? 'İç harita seç' : 'Dış harita seç',
+                      style: TextStyle(
+                        color: FastTheme.accentGold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Flexible(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        Icons.my_location,
+                        color: FastTheme.accentGold,
+                      ),
+                      title: Text(
+                        'Geçerli harita',
+                        style: TextStyle(color: FastTheme.text),
+                      ),
+                      subtitle: Text(
+                        currentName,
+                        style: TextStyle(color: FastTheme.textMuted),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _applySlot(innerSlot, 'current', null, currentName);
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.autorenew, color: FastTheme.accentGold),
+                      title: Text(
+                        'Transit (şimdi)',
+                        style: TextStyle(color: FastTheme.text),
+                      ),
+                      subtitle: Text(
+                        _now.toString().substring(0, 16),
+                        style: TextStyle(color: FastTheme.textMuted),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _applySlot(innerSlot, 'transit', null, 'Transit');
+                      },
+                    ),
+                    if (cp.ret != null)
+                      ListTile(
+                        leading: Icon(
+                          Icons.wb_sunny_outlined,
+                          color: FastTheme.accentGold,
+                        ),
+                        title: Text(
+                          'Hesaplanan Return',
+                          style: TextStyle(color: FastTheme.text),
+                        ),
+                        subtitle: Text(
+                          _sourceLabel('return', cp, c),
+                          style: TextStyle(color: FastTheme.textMuted),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _applySlot(
+                            innerSlot,
+                            'return',
+                            null,
+                            _sourceLabel('return', cp, c),
+                          );
+                        },
+                      ),
+                    if (cp.arc != null)
+                      ListTile(
+                        leading: Icon(
+                          Icons.trending_up,
+                          color: FastTheme.accentGold,
+                        ),
+                        title: Text(
+                          'Hesaplanan Progress',
+                          style: TextStyle(color: FastTheme.text),
+                        ),
+                        subtitle: Text(
+                          _sourceLabel('arc', cp, c),
+                          style: TextStyle(color: FastTheme.textMuted),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _applySlot(
+                            innerSlot,
+                            'arc',
+                            null,
+                            _sourceLabel('arc', cp, c),
+                          );
+                        },
+                      ),
+                    if (cp.saved.isNotEmpty) ...[
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
+                        child: Text(
+                          'Kayıtlı haritalar',
+                          style: TextStyle(
+                            color: FastTheme.textMuted,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      ...cp.saved.map((s) {
+                        final nm = s.meta.name?.isNotEmpty == true
+                            ? s.meta.name!
+                            : l10n.chartDefaultName;
+                        return ListTile(
+                          leading: Icon(
+                            Icons.auto_awesome_outlined,
+                            color: FastTheme.textMuted,
+                          ),
+                          title: Text(nm, style: TextStyle(color: FastTheme.text)),
+                          subtitle: Text(
+                            '${s.meta.date} • ${s.meta.time}',
+                            style: TextStyle(color: FastTheme.textMuted),
+                          ),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _applySlot(innerSlot, 'saved', s, nm);
+                          },
+                        );
+                      }),
+                    ],
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: Icon(Icons.add, color: FastTheme.accentGold),
+                      title: Text(
+                        'Yeni harita oluştur',
+                        style: TextStyle(
+                          color: FastTheme.accentGold,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ChartCreateScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _slotCard(String title, String value, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: FastTheme.cardBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: FastTheme.border.withValues(alpha: 0.6)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 10),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: FastTheme.text,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(Icons.expand_more, size: 16, color: FastTheme.accentGold),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -355,6 +760,13 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         backgroundColor: FastTheme.bg,
         actions: [
           IconButton(
+            tooltip: 'Yeni harita',
+            icon: Icon(Icons.add, color: FastTheme.accentGold),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ChartCreateScreen()),
+            ),
+          ),
+          IconButton(
             tooltip: 'Paylaş',
             icon: const Icon(Icons.share_outlined),
             onPressed: _shareChart,
@@ -447,10 +859,29 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                   _chartCountBtn('1 Chart', !_twoCharts, () => setState(() => _twoCharts = false)),
                   const SizedBox(width: 8),
                   _chartCountBtn('2 Charts', _twoCharts, () {
-                    setState(() => _twoCharts = true);
-                    final cp = context.read<ChartProvider>();
-                    if (cp.biwheel == null && !cp.biLoading) cp.loadBiwheel(when: _now);
+                    if (!_twoCharts) {
+                      _setTwoCharts(c, cp);
+                    } else {
+                      setState(() => _twoCharts = false);
+                    }
                   }),
+                  if (_twoCharts) ...[
+                    const Spacer(),
+                    IconButton(
+                      tooltip: 'Haritaları yer değiştir',
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(Icons.swap_horiz, color: FastTheme.accentGold),
+                      onPressed: () => _swapCharts(c, cp),
+                    ),
+                    IconButton(
+                      tooltip: 'Haritaları yenile',
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(Icons.refresh, color: FastTheme.accentGold),
+                      onPressed: cp.biLoading || cp.retLoading || cp.arcLoading
+                          ? null
+                          : () => _refreshTwoCharts(cp),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -474,13 +905,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     final l10n = _l10n;
     final cp = context.read<ChartProvider>();
     if (_twoCharts) {
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-        children: [
-          Center(child: _biwheel(cp, c)),
-          const SizedBox(height: 16),
-        ],
-      );
+      return _twoChartView(cp, c);
     }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
@@ -558,6 +983,115 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 '${chartPlanetLabel(l10n, a.p1)} – ${chartPlanetLabel(l10n, a.p2)}',
                 '${chartAspectLabel(l10n, a.type)} • '
                     '${l10n.chartOrb(a.orb.toStringAsFixed(2))}',
+              ),
+          ]),
+        ],
+      ],
+    );
+  }
+
+  Widget _twoChartView(ChartProvider cp, ChartData c) {
+    final inner = _resolveChart(_innerSource, _innerChart, cp, c) ?? c;
+    final outer = _resolveChart(_outerSource, _outerChart, cp, c);
+    final innerLabel = _sourceLabel(_innerSource, cp, c, fallback: _innerLabel);
+    final outerLabel = _sourceLabel(_outerSource, cp, c, fallback: _outerLabel);
+    final loading = cp.biLoading || cp.retLoading || cp.arcLoading;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 28),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _slotCard(
+                'İç harita',
+                innerLabel,
+                () => _pickSlot(c, cp, true),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: IconButton(
+                tooltip: 'Yer değiştir',
+                visualDensity: VisualDensity.compact,
+                icon: Icon(Icons.swap_horiz, color: FastTheme.accentGold),
+                onPressed: () => _swapCharts(c, cp),
+              ),
+            ),
+            Expanded(
+              child: _slotCard(
+                'Dış harita',
+                outer == null ? 'Seç…' : outerLabel,
+                () => _pickSlot(c, cp, false),
+              ),
+            ),
+          ],
+        ),
+        if (loading)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: LinearProgressIndicator(
+              minHeight: 2,
+              color: FastTheme.accentGold,
+              backgroundColor: FastTheme.border.withValues(alpha: 0.3),
+            ),
+          ),
+        const SizedBox(height: 6),
+        if (outer == null)
+          _section('Dış harita', [
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Dış haritayı seçin: Transit (şimdi), hesaplanmış Solar/Lunar Return, '
+                    'Progress veya kayıtlı bir harita.',
+                    style: TextStyle(color: FastTheme.textMuted, height: 1.4),
+                  ),
+                  const SizedBox(height: 10),
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: FastTheme.accentGold,
+                    ),
+                    onPressed: () => _pickSlot(c, cp, false),
+                    icon: const Icon(Icons.addchart),
+                    label: const Text('Harita seç'),
+                  ),
+                ],
+              ),
+            ),
+          ])
+        else
+          Center(
+            child: ChartWheel(
+              data: inner,
+              outerPlanets: outer.planets,
+              outerHouses: outer.houses,
+              size: 360,
+              title: '$innerLabel • $outerLabel',
+              subtitle: c.meta.place,
+            ),
+          ),
+        if (outer != null) ...[
+          const SizedBox(height: 6),
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _legendDot(FastTheme.text, 'İç: $innerLabel'),
+                const SizedBox(width: 14),
+                _legendDot(const Color(0xFF8FD8FF), 'Dış: $outerLabel'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          _section('Dış harita gezegenleri', [
+            for (final p in outer.planets)
+              _row(
+                chartPlanetLabel(_l10n, p.name),
+                '${_sign(p.sign)} ${_degMin(p.degree)} '
+                '${p.retrograde ? 'R' : ''} • ${_l10n.chartHouseNumber(p.house)}',
               ),
           ]),
         ],

@@ -6,6 +6,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/social_provider.dart';
 import '../services/social_service.dart';
+import '../widgets/venus_like.dart';
 
 /// Tam ekran hikâye izleyici: otomatik ilerleme, sağa/sola dokunma,
 /// etiket + görüntülenme sayısı. İzlenen hikâye ring'i "görüldü" yapar.
@@ -364,13 +365,10 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
                               color: Colors.black54,
                               shape: BoxShape.circle,
                             ),
-                            child: Text(
-                              '♀',
-                              style: TextStyle(
-                                color: _liked ? FastTheme.rose : Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            child: VenusLikeIcon(
+                              size: 22,
+                              liked: _liked,
+                              color: _liked ? FastTheme.rose : Colors.white,
                             ),
                           ),
                         ),

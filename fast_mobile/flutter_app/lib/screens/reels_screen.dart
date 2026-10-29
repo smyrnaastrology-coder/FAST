@@ -8,6 +8,7 @@ import '../services/social_service.dart';
 import '../screens/comments_screen.dart';
 import '../screens/dm_screen.dart';
 import '../screens/social_profile_screen.dart';
+import '../widgets/venus_like.dart';
 
 /// Instagram tarzı dikey "Reels" akışı.
 ///
@@ -143,7 +144,7 @@ class _ReelPageState extends State<_ReelPage> {
           child: Column(
             children: [
               _action(
-                Text('♀', style: TextStyle(color: p.likedByMe ? FastTheme.rose : FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700)),
+                VenusLikeIcon(size: 32, liked: p.likedByMe, color: p.likedByMe ? FastTheme.rose : FastTheme.accentGold),
                 '${p.likeCount}',
                 FastTheme.accentGold,
                 _toggleLike,

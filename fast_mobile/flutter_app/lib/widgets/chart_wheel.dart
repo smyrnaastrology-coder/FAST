@@ -8,11 +8,11 @@ import '../models/chart_frame.dart';
 import '../screens/chart_explorer_screen.dart';
 import '../l10n/app_localizations.dart';
 
-/// SolarFire tarzı çok katmanlı natal / bi-wheel çarkı.
+/// AstroGold tarzı çok katmanlı natal / bi-wheel çarkı.
 ///
 /// Yükselen (ASC) her zaman sol-orta noktaya (doğu ufku) kilitlenir; burçlar
-/// saat yönünün tersine ilerler. Dış halkada burç sembolleri, içeride natal
-/// gezegenler, bi-wheel modunda transit gezegenler natalın DIŞINDA çizilir.
+/// saat yönünün tersine ilerler. Bi-wheel modunda natal ve transit gezegenler
+/// AYRI halkalarda çizilir; iki halka arasında çift çizgi (sınır) bulunur.
 class ChartWheel extends StatelessWidget {
   final ChartData data;
   final double size;
@@ -45,6 +45,9 @@ class ChartWheel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dar ekranlarda taşmayı önle.
+    final maxWidth = MediaQuery.of(context).size.width - 24;
+    final extent = size > maxWidth && maxWidth > 100 ? maxWidth : size;
     Widget drawing(double extent) => SizedBox(
       width: extent,
       height: extent,
@@ -61,11 +64,11 @@ class ChartWheel extends StatelessWidget {
         ),
       ),
     );
-    if (!showControls) return drawing(size);
+    if (!showControls) return drawing(extent);
     return Stack(
       alignment: Alignment.topRight,
       children: [
-        InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(size)),
+        InteractiveViewer(minScale: 1, maxScale: 5, child: drawing(extent)),
         if (showControls)
           IconButton(
             tooltip: AppLocalizations.of(context).chartWheelFullscreenTooltip,
@@ -116,8 +119,6 @@ class _WheelPainter extends CustomPainter {
   final List<HouseCusp>? outerHouses;
   final bool showAspectLines;
   final bool lightTheme;
-  Color get _ink =>
-      lightTheme ? const Color(0xFF131722) : const Color(0xFFF2F4FA);
   Color get _gold =>
       lightTheme ? const Color(0xFF795400) : const Color(0xFFE6C57A);
   Color get _border =>
@@ -125,8 +126,8 @@ class _WheelPainter extends CustomPainter {
   Color get _muted =>
       lightTheme ? const Color(0xFF374151) : const Color(0xFFBBC4D4);
   Color get _bg => lightTheme ? Colors.white : const Color(0xFF0D1017);
-  Color get _retro =>
-      lightTheme ? const Color(0xFF9D261A) : const Color(0xFFFFBF80);
+  Color get _transit =>
+      lightTheme ? const Color(0xFF005C99) : const Color(0xFF8FD8FF);
 
   _WheelPainter({
     required this.data,
@@ -203,6 +204,9 @@ class _WheelPainter extends CustomPainter {
   }
 
   /// Gezegenleri çakışmayacak şekilde en büyük boşluktan başlayarak açar.
+  ///
+  /// [minSep] derece cinsinden minimum açısal ayrımdır; piksel bazlı
+  /// hesaplandığı için sembol ve derece yazısı hiçbir zaman üst üste binmez.
   List<_Glyph> _layout(List<PlanetPos> planets, double minSep) {
     if (planets.isEmpty) return const [];
     final items = planets.map((p) => _Glyph(p, p.lon)).toList()
@@ -252,6 +256,13 @@ class _WheelPainter extends CustomPainter {
           fontWeight: weight,
           letterSpacing: letterSpacing,
           height: 1.0,
+          shadows: [
+            Shadow(
+              color: _bg.withValues(alpha: 0.9),
+              blurRadius: 2,
+              offset: const Offset(0.5, 0.5),
+            ),
+          ],
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -274,6 +285,27 @@ class _WheelPainter extends CustomPainter {
     tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));
   }
 
+  /// Verilen halka yarıçapında, [needPx] piksel genişliğinde bir etiketin
+  /// çakışmaması için gereken minimum açısal ayrım (derece).
+  double _minSepDeg(double radiusPx, double needPx) {
+    if (radiusPx <= 0) return 30;
+    return (needPx / radiusPx) * 180 / math.pi;
+  }
+
+  /// Derece etiketlerinin en geniş olanının piksel genişliği.
+  double _maxLabelWidth(List<PlanetPos> planets, double fontSize) {
+    var w = 0.0;
+    for (final p in planets) {
+      final tp = _tp(
+        _degMinStr(p.degree) + (p.retrograde ? ' R' : ''),
+        _muted,
+        fontSize,
+      );
+      if (tp.width > w) w = tp.width;
+    }
+    return w;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
@@ -282,13 +314,27 @@ class _WheelPainter extends CustomPainter {
 
     final ascLon = data.asc.lon;
 
+    // --- Halka yarıçapları (tek yerden yönetilir) ---
     final signOuter = r;
-    final signInner = r * 0.86;
-    final transitR = r * 0.755;
-    final natalR = r * 0.575;
-    final houseNumR = r * 0.455;
-    final aspectR = r * 0.40;
-    final hubR = r * 0.14;
+    final signInner = r * 0.855;
+
+    final transitOuter = r * 0.845;
+    final transitInner = r * 0.735;
+    final transitGlyphR = (transitOuter + transitInner) / 2 + r * 0.012;
+
+    final separatorA = r * 0.728;
+    final separatorB = r * 0.720;
+
+    final natalOuter = r * 0.712;
+    final natalInner = r * 0.572;
+    final natalGlyphR = (natalOuter + natalInner) / 2 + r * 0.014;
+
+    final aspectR = r * 0.515;
+    final houseNumR = r * 0.548;
+    final hubR = r * 0.13;
+
+    final hasOuter = outerPlanets != null && outerPlanets!.isNotEmpty;
+    final bool light = lightTheme;
 
     final circleOuter = Paint()
       ..color = _border.withValues(alpha: 0.85)
@@ -298,6 +344,29 @@ class _WheelPainter extends CustomPainter {
       ..color = _border.withValues(alpha: 0.55)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
+
+    // --- Halka zeminleri ---
+    canvas.drawCircle(
+      center,
+      (natalOuter + natalInner) / 2,
+      Paint()
+        ..color = (light ? const Color(0xFFF3F5FA) : const Color(0xFF121721))
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = natalOuter - natalInner,
+    );
+    if (hasOuter) {
+      canvas.drawCircle(
+        center,
+        (transitOuter + transitInner) / 2,
+        Paint()
+          ..color = (light
+                  ? const Color(0xFFEFF6FE)
+                  : const Color(0xFF152238))
+              .withValues(alpha: light ? 1 : 0.75)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = transitOuter - transitInner,
+      );
+    }
 
     // --- Burç halkası zemin ---
     for (var i = 0; i < 12; i++) {
@@ -322,31 +391,44 @@ class _WheelPainter extends CustomPainter {
     canvas.drawCircle(center, signOuter, circleOuter);
     canvas.drawCircle(center, signInner, circleInner);
 
+    // Burç sınır çizgileri
+    final signDivider = Paint()
+      ..color = _border.withValues(alpha: 0.35)
+      ..strokeWidth = 0.8;
+    for (var i = 0; i < 12; i++) {
+      canvas.drawLine(
+        _pos(i * 30.0, signInner, center, ascLon),
+        _pos(i * 30.0, signOuter, center, ascLon),
+        signDivider,
+      );
+    }
+
     // --- Derece çentikleri ---
     final tickPaint = Paint()
-      ..color = _muted.withValues(alpha: 0.55)
+      ..color = _muted.withValues(alpha: 0.4)
       ..strokeWidth = 0.7;
     final tickMajor = Paint()
-      ..color = _gold.withValues(alpha: 0.75)
+      ..color = _gold.withValues(alpha: 0.7)
       ..strokeWidth = 1.1;
     for (var d = 0; d < 360; d++) {
       final len = d % 30 == 0
-          ? (signOuter - signInner) * 0.55
+          ? (signOuter - signInner) * 0.40
           : d % 5 == 0
-          ? (signOuter - signInner) * 0.32
-          : (signOuter - signInner) * 0.16;
+          ? (signOuter - signInner) * 0.20
+          : (signOuter - signInner) * 0.10;
       final p1 = _pos(d.toDouble(), signInner, center, ascLon);
       final p2 = _pos(d.toDouble(), signInner + len, center, ascLon);
       canvas.drawLine(p1, p2, d % 30 == 0 ? tickMajor : tickPaint);
     }
 
     // --- Burç sembolleri ---
-    final signGlyphSize = (r * 0.085).clamp(12.0, 24.0);
+    final signGlyphSize = (r * 0.086).clamp(13.0, 25.0);
+    final signGlyphR = signInner + (signOuter - signInner) * 0.58;
     for (var i = 0; i < 12; i++) {
       _glyphAt(
         canvas,
         center,
-        (signOuter + signInner) / 2,
+        signGlyphR,
         i * 30.0 + 15,
         chartSignGlyphs[i],
         _signColor(i),
@@ -358,7 +440,7 @@ class _WheelPainter extends CustomPainter {
 
     // --- Ev çizgileri ve numaraları ---
     final cuspPaint = Paint()
-      ..color = _gold.withValues(alpha: 0.35)
+      ..color = _gold.withValues(alpha: 0.32)
       ..strokeWidth = 1;
     final houses = [...data.houses]
       ..sort((a, b) => a.number.compareTo(b.number));
@@ -380,33 +462,53 @@ class _WheelPainter extends CustomPainter {
         houseNumR,
         mid,
         h.number.toString(),
-        _gold.withValues(alpha: 0.85),
-        (r * 0.040).clamp(10.0, 15.0),
+        _gold.withValues(alpha: 0.9),
+        (r * 0.040).clamp(10.0, 16.0),
         ascLon: ascLon,
         weight: FontWeight.w700,
       );
+    }
+
+    // --- Ev giriş dereceleri: EN DIŞTA (burç halkasının iç kenarı) ---
+    // AstroGold'da olduğu gibi her evin giriş derecesi çarkın dışına yakın,
+    // burç sembollerinin hemen altında gösterilir.
+    final cuspDegSize = (r * 0.024).clamp(6.0, 9.0);
+    final cuspTier0 = signInner + (signOuter - signInner) * 0.10;
+    final cuspTier1 = signInner + (signOuter - signInner) * 0.26;
+    final cuspSorted = [...houses]..sort((a, b) => a.lon.compareTo(b.lon));
+    var prevCuspLon = double.negativeInfinity;
+    var cuspTier = 0;
+    for (final h in cuspSorted) {
+      if (h.lon - prevCuspLon < 9.0) {
+        cuspTier = 1 - cuspTier;
+      } else {
+        cuspTier = 0;
+      }
+      prevCuspLon = h.lon;
       _glyphAt(
         canvas,
         center,
-        houseNumR - (r * 0.055).clamp(8.0, 12.0),
-        mid,
+        cuspTier == 0 ? cuspTier0 : cuspTier1,
+        h.lon,
         _degMinStr(h.degree),
-        _gold.withValues(alpha: 0.70),
-        (r * 0.028).clamp(7.0, 10.0),
+        _gold.withValues(alpha: 0.92),
+        cuspDegSize,
         ascLon: ascLon,
         weight: FontWeight.w600,
       );
     }
 
     // --- Bi-wheel dış ev çizgileri (transit) ---
-    if (outerHouses != null && outerHouses!.isNotEmpty) {
+    if (hasOuter && outerHouses != null && outerHouses!.isNotEmpty) {
       final outerCusp = Paint()
-        ..color = _muted.withValues(alpha: 0.30)
+        ..color = _transit.withValues(alpha: 0.22)
         ..strokeWidth = 0.8;
       for (final h in outerHouses!) {
-        final p1 = _pos(h.lon, signInner, center, ascLon);
-        final p2 = _pos(h.lon, transitR - (r * 0.05), center, ascLon);
-        canvas.drawLine(p1, p2, outerCusp);
+        canvas.drawLine(
+          _pos(h.lon, signInner, center, ascLon),
+          _pos(h.lon, transitOuter - (r * 0.012), center, ascLon),
+          outerCusp,
+        );
       }
     }
 
@@ -450,38 +552,44 @@ class _WheelPainter extends CustomPainter {
       center,
       hubR,
       Paint()
-        ..color = _border.withValues(alpha: 0.35)
+        ..color = _border.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.8,
     );
 
     // --- ASC / DSC / MC / IC eksenleri ---
-    _axis(canvas, center, signInner, aspectR, ascLon, ascLon + 180, ascLon);
-    _axis(
-      canvas,
-      center,
-      signInner,
-      aspectR,
-      data.mc.lon,
-      data.mc.lon + 180,
-      ascLon,
-    );
+    _axis(canvas, center, signInner, aspectR, ascLon + 180, ascLon);
+    _axis(canvas, center, signInner, aspectR, data.mc.lon, ascLon);
 
     // --- Gezegen halkaları ---
-    final natalGlyphSize = (r * 0.095).clamp(14.0, 26.0);
-    final natal = _layout(data.planets, 8.0);
+    final natalGlyphSize = (r * 0.082).clamp(12.0, 22.0);
+    final natalDegSize = (natalGlyphSize * 0.46).clamp(6.5, 10.0);
+    final natal = _layout(
+      data.planets,
+      _minSepDeg(
+            natalGlyphR,
+            math.max(
+              natalGlyphSize,
+              _maxLabelWidth(data.planets, natalDegSize),
+            ),
+          ) *
+          1.08,
+    );
     for (final g in natal) {
       final color = _signColor(g.planet.sign);
-      // gerçek konum işareti
-      canvas.drawCircle(
-        _pos(g.actual, natalR + natalGlyphSize * 0.9, center, ascLon),
-        1.4,
-        Paint()..color = color.withValues(alpha: 0.7),
+      _drawLeader(
+        canvas,
+        center,
+        ascLon,
+        g,
+        natalGlyphR,
+        natalGlyphSize,
+        color.withValues(alpha: 0.45),
       );
       _glyphAt(
         canvas,
         center,
-        natalR,
+        natalGlyphR,
         g.display,
         chartPlanetGlyphs[g.planet.name] ?? '·',
         color,
@@ -489,49 +597,49 @@ class _WheelPainter extends CustomPainter {
         ascLon: ascLon,
         weight: FontWeight.w600,
       );
-      // derece/dakika
+      final deg = _degMinStr(g.planet.degree) + (g.planet.retrograde ? ' R' : '');
       _glyphAt(
         canvas,
         center,
-        natalR - natalGlyphSize * 1.35,
+        natalGlyphR - natalGlyphSize * 0.95,
         g.display,
-        _degMinStr(g.planet.degree),
-        color.withValues(alpha: 0.85),
-        (natalGlyphSize * 0.42).clamp(7.0, 11.0),
+        deg,
+        g.planet.retrograde ? _retroColor : color.withValues(alpha: 0.88),
+        natalDegSize,
         ascLon: ascLon,
         weight: FontWeight.w600,
       );
-      if (g.planet.retrograde) {
-        _glyphAt(
-          canvas,
-          center,
-          natalR - natalGlyphSize * 0.85,
-          g.display,
-          'R',
-          _retro,
-          (nativeSmall(natalGlyphSize)),
-          ascLon: ascLon,
-          weight: FontWeight.w700,
-        );
-      }
     }
 
-    if (outerPlanets != null && outerPlanets!.isNotEmpty) {
-      final transitGlyphSize = (r * 0.078).clamp(12.0, 20.0);
-      final trans = _layout(outerPlanets!, 7.0);
+    if (hasOuter) {
+      final transitGlyphSize = (r * 0.070).clamp(10.0, 18.0);
+      final transitDegSize = (transitGlyphSize * 0.46).clamp(6.0, 9.0);
+      final trans = _layout(
+        outerPlanets!,
+        _minSepDeg(
+              transitGlyphR,
+              math.max(
+                transitGlyphSize,
+                _maxLabelWidth(outerPlanets!, transitDegSize),
+              ),
+            ) *
+            1.08,
+      );
       for (final g in trans) {
-        final color = lightTheme
-            ? const Color(0xFF005C99)
-            : const Color(0xFF8FD8FF);
-        canvas.drawCircle(
-          _pos(g.actual, transitR + transitGlyphSize * 0.9, center, ascLon),
-          1.2,
-          Paint()..color = color.withValues(alpha: 0.8),
+        final color = _transit;
+        _drawLeader(
+          canvas,
+          center,
+          ascLon,
+          g,
+          transitGlyphR,
+          transitGlyphSize,
+          color.withValues(alpha: 0.35),
         );
         _glyphAt(
           canvas,
           center,
-          transitR,
+          transitGlyphR,
           g.display,
           chartPlanetGlyphs[g.planet.name] ?? '·',
           color,
@@ -539,31 +647,40 @@ class _WheelPainter extends CustomPainter {
           ascLon: ascLon,
           weight: FontWeight.w600,
         );
+        final deg =
+            _degMinStr(g.planet.degree) + (g.planet.retrograde ? ' R' : '');
         _glyphAt(
           canvas,
           center,
-          transitR - transitGlyphSize * 1.35,
+          transitGlyphR - transitGlyphSize * 0.95,
           g.display,
-          _degMinStr(g.planet.degree),
+          deg,
           color.withValues(alpha: 0.85),
-          (transitGlyphSize * 0.42).clamp(7.0, 10.0),
+          transitDegSize,
           ascLon: ascLon,
           weight: FontWeight.w600,
         );
-        if (g.planet.retrograde) {
-          _glyphAt(
-            canvas,
-            center,
-            transitR - transitGlyphSize * 0.85,
-            g.display,
-            'R',
-            color,
-            nativeSmall(transitGlyphSize),
-            ascLon: ascLon,
-            weight: FontWeight.w700,
-          );
-        }
       }
+    }
+
+    // --- İki halka arasındaki sınır: ÇİFT DAİRE ---
+    if (hasOuter) {
+      canvas.drawCircle(
+        center,
+        separatorA,
+        Paint()
+          ..color = _gold.withValues(alpha: 0.55)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1,
+      );
+      canvas.drawCircle(
+        center,
+        separatorB,
+        Paint()
+          ..color = _gold.withValues(alpha: 0.32)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.9,
+      );
     }
 
     // --- Açı etiketleri ---
@@ -576,28 +693,59 @@ class _WheelPainter extends CustomPainter {
     canvas.drawCircle(center, 2, Paint()..color = _gold.withValues(alpha: 0.6));
   }
 
-  double nativeSmall(double base) => (base * 0.62).clamp(6.0, 11.0);
+  Color get _retroColor =>
+      lightTheme ? const Color(0xFF9D261A) : const Color(0xFFFFBF80);
+
+  /// Gerçek konumdan kaydırılmış sembole ince kılavuz çizgisi.
+  void _drawLeader(
+    Canvas canvas,
+    Offset center,
+    double ascLon,
+    _Glyph g,
+    double radius,
+    double glyphSize,
+    Color color,
+  ) {
+    var drift = g.display - g.actual;
+    if (drift.abs() < 1.0) return;
+    final lineR = radius - glyphSize * 0.92;
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 0.7
+      ..style = PaintingStyle.stroke;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: lineR),
+      _theta(g.actual, ascLon),
+      -drift * math.pi / 180.0,
+      false,
+      paint,
+    );
+    canvas.drawCircle(
+      _pos(g.actual, radius, center, ascLon),
+      1.3,
+      Paint()..color = color,
+    );
+  }
 
   void _axis(
     Canvas canvas,
     Offset center,
     double outer,
     double inner,
-    double lon1,
-    double lon2,
+    double lon,
     double ascLon,
   ) {
     final paint = Paint()
-      ..color = _gold.withValues(alpha: 0.55)
+      ..color = _gold.withValues(alpha: 0.6)
       ..strokeWidth = 1.3;
     canvas.drawLine(
-      _pos(lon1, outer, center, ascLon),
-      _pos(lon1, inner, center, ascLon),
+      _pos(lon, outer, center, ascLon),
+      _pos(lon, inner, center, ascLon),
       paint,
     );
     canvas.drawLine(
-      _pos(lon2, outer, center, ascLon),
-      _pos(lon2, inner, center, ascLon),
+      _pos(lon + 180, outer, center, ascLon),
+      _pos(lon + 180, inner, center, ascLon),
       paint,
     );
   }
