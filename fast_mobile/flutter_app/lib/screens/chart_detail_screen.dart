@@ -340,7 +340,13 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _bottomNavIndex,
-        onTap: (i) => setState(() => _bottomNavIndex = i),
+        onTap: (i) {
+          if (i == 0) {
+            Navigator.of(context).pop();
+            return;
+          }
+          setState(() => _bottomNavIndex = i);
+        },
         backgroundColor: FastTheme.bgSecondary,
         selectedItemColor: FastTheme.accentGold,
         unselectedItemColor: FastTheme.textMuted,
