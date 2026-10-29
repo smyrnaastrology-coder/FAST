@@ -24,11 +24,15 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _obscure = true;
   bool _remember = true;
   bool _busy = false;
+  bool _awaitingVerification = false;
+  String _pendingEmail = '';
+  final _otpCtrl = TextEditingController();
 
   @override
   void dispose() {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _otpCtrl.dispose();
     super.dispose();
   }
 
@@ -36,6 +40,10 @@ class _AuthScreenState extends State<AuthScreen> {
     final email = _emailCtrl.text.trim();
     final pass = _passwordCtrl.text;
     if (email.isEmpty || pass.isEmpty) return;
+    if (pass.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Şifre en az 6 karakter olmalı.')));
+      return;
+    }
     setState(() => _busy = true);
     final ok = _isSignup
         ? await ap.signUp(email: email, password: pass)
@@ -44,6 +52,16 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() => _busy = false);
     final l10n = AppLocalizations.of(context);
     if (ok) {
+      if (_isSignup && ap.signupNeedsVerification) {
+        setState(() {
+          _awaitingVerification = true;
+          _pendingEmail = email;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Doğrulama kodu $email adresine gönderildi.')),
+        );
+        return;
+      }
       if (!widget.force) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.loginSuccess)));
         Navigator.of(context).pop();
@@ -52,6 +70,33 @@ class _AuthScreenState extends State<AuthScreen> {
     } else {
       final msg = _friendlyError(ap.error, l10n);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  Future<void> _verify() async {
+    final code = _otpCtrl.text.trim();
+    if (code.isEmpty || _pendingEmail.isEmpty) return;
+    setState(() => _busy = true);
+    try {
+      await AuthService.verifyOtp(emailOrPhone: _pendingEmail, token: code, type: OtpType.signup);
+      if (!mounted) return;
+      setState(() => _busy = false);
+      final ap = context.read<AuthProvider>();
+      await ap.restore();
+      if (!mounted) return;
+      if (ap.isLoggedIn) {
+        if (!widget.force) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Hesabın doğrulandı!')));
+          Navigator.of(context).pop();
+        }
+        widget.onSignedIn?.call();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Doğrulama başarısız. Kodu kontrol et.')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
     }
   }
 
@@ -130,7 +175,28 @@ class _AuthScreenState extends State<AuthScreen> {
                 _emailField(l10n),
                 const SizedBox(height: 12),
                 _passwordField(l10n),
-                if (!_isSignup) ...[
+                if (_awaitingVerification) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _otpCtrl,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: FastTheme.text),
+                    decoration: _decoration(hint: 'Doğrulama kodu', icon: Icons.verified_outlined),
+                  ),
+                  const SizedBox(height: 12),
+                  _goldButton('Doğrula', _verify, busy: _busy),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        await AuthService.resendSignupEmail(_pendingEmail);
+                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kod yeniden gönderildi.')));
+                      } catch (_) {}
+                    },
+                    child: Text('Kodu yeniden gönder', style: TextStyle(color: FastTheme.accentGold, fontSize: 12)),
+                  ),
+                ],
+                if (!_isSignup && !_awaitingVerification) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -159,7 +225,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                _goldButton(_isSignup ? l10n.signupButton : l10n.loginButton, () => _submit(context.read<AuthProvider>()), busy: _busy),
+                if (!_awaitingVerification)
+                  _goldButton(_isSignup ? l10n.signupButton : l10n.loginButton, () => _submit(context.read<AuthProvider>()), busy: _busy),
                 const SizedBox(height: 20),
                 Row(
                   children: [

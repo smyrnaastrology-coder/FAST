@@ -57,8 +57,20 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> signUp({required String email, required String password}) =>
-      _run(() => AuthService.signUp(email: email, password: password));
+  bool _signupNeedsVerification = false;
+  bool get signupNeedsVerification => _signupNeedsVerification;
+
+  Future<bool> signUp({required String email, required String password}) async {
+    _signupNeedsVerification = false;
+    final ok = await _run(() => AuthService.signUp(email: email, password: password));
+    if (!ok && AuthService.signupNeedsEmailConfirmation) {
+      _signupNeedsVerification = true;
+      _error = null;
+      notifyListeners();
+      return true; // "başarılı" — doğrulama bekleniyor
+    }
+    return ok;
+  }
 
   Future<bool> signIn({required String email, required String password, bool remember = true}) =>
       _run(() => AuthService.signIn(email: email, password: password, remember: remember));

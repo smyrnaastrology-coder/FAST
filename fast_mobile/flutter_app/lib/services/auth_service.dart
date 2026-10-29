@@ -133,13 +133,59 @@ class AuthService {
         if (json) 'Content-Type': 'application/json',
       };
 
+  /// Kayıt sonucu.
+  static bool _signupNeedsEmailConfirmation = false;
+  static bool get signupNeedsEmailConfirmation => _signupNeedsEmailConfirmation;
+
   /// E-posta + şifre ile kayıt.
+  ///
+  /// Supabase'de e-posta doğrulaması açıksa oturum hemen kurulmaz; bu durumda
+  /// [signupNeedsEmailConfirmation] true olur ve kullanıcıya doğrulama e-postası
+  /// gönderildiği bildirilir.
   static Future<void> signUp({required String email, required String password, String? fullName}) async {
     if (!enabled) throw StateError('supabase_disabled');
+    _signupNeedsEmailConfirmation = false;
     final res = await Supabase.instance.client.auth.signUp(
       email: email,
       password: password,
       data: {'full_name': fullName ?? ''},
+    );
+    if (res.session == null) {
+      _signupNeedsEmailConfirmation = true;
+      return;
+    }
+    _applySession(res.session);
+  }
+
+  /// Telefon numarası ile kayıt (Supabase phone auth açık olmalı).
+  static Future<void> signUpWithPhone({required String phone, required String password}) async {
+    if (!enabled) throw StateError('supabase_disabled');
+    _signupNeedsEmailConfirmation = false;
+    final res = await Supabase.instance.client.auth.signUp(
+      phone: phone,
+      password: password,
+    );
+    if (res.session == null) {
+      _signupNeedsEmailConfirmation = true;
+      return;
+    }
+    _applySession(res.session);
+  }
+
+  /// Doğrulama e-postasını yeniden gönder.
+  static Future<void> resendSignupEmail(String email) async {
+    if (!enabled) throw StateError('supabase_disabled');
+    await Supabase.instance.client.auth.resend(type: OtpType.signup, email: email);
+  }
+
+  /// OTP kodu ile doğrulama (telefon veya e-posta).
+  static Future<void> verifyOtp({required String emailOrPhone, required String token, required OtpType type}) async {
+    if (!enabled) throw StateError('supabase_disabled');
+    final res = await Supabase.instance.client.auth.verifyOTP(
+      email: emailOrPhone.contains('@') ? emailOrPhone : null,
+      phone: emailOrPhone.contains('@') ? null : emailOrPhone,
+      token: token,
+      type: type,
     );
     _applySession(res.session);
   }
