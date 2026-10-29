@@ -31,6 +31,8 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   late TabController _tab;
   final GlobalKey _shareKey = GlobalKey();
   DateTime _now = DateTime.now();
+  bool _twoCharts = false;
+  int _bottomNavIndex = 1; // 0=Charts,1=View,2=Reports,3=Settings,4=Info
   final _latCtrl = TextEditingController();
   final _lonCtrl = TextEditingController();
   bool _locating = false;
@@ -75,6 +77,115 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       }
     }
     setState(() {});
+  }
+
+  Widget _chartCountBtn(String label, bool active, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? FastTheme.accentGold : FastTheme.cardBg,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: FastTheme.border),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? FastTheme.bg : FastTheme.text,
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showSubsidiary() {
+    final cp = context.read<ChartProvider>();
+    final c = cp.current;
+    if (c == null) return;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(width: 36, height: 4, decoration: BoxDecoration(color: FastTheme.border, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: const Icon(Icons.trending_up, color: FastTheme.accentGold),
+              title: const Text('Secondary Progress', style: TextStyle(color: FastTheme.text)),
+              onTap: () { Navigator.pop(ctx); _tab.animateTo(3); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.trending_flat, color: FastTheme.accentGold),
+              title: const Text('Minor Progress', style: TextStyle(color: FastTheme.text)),
+              onTap: () { Navigator.pop(ctx); _tab.animateTo(3); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.wb_sunny_outlined, color: FastTheme.accentGold),
+              title: const Text('Solar Return', style: TextStyle(color: FastTheme.text)),
+              onTap: () { Navigator.pop(ctx); _tab.animateTo(2); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.nightlight_outlined, color: FastTheme.accentGold),
+              title: const Text('Lunar Return', style: TextStyle(color: FastTheme.text)),
+              onTap: () { Navigator.pop(ctx); _tab.animateTo(2); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.merge_type, color: FastTheme.accentGold),
+              title: const Text('Combined', style: TextStyle(color: FastTheme.text)),
+              onTap: () {
+                Navigator.pop(ctx);
+                if (!_twoCharts) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Combined için 2 harita seçmelisiniz.')),
+                  );
+                  return;
+                }
+                _showCombined();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCombined() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(width: 36, height: 4, decoration: BoxDecoration(color: FastTheme.border, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 12),
+            ListTile(
+              leading: const Icon(Icons.center_focus_strong, color: FastTheme.accentGold),
+              title: const Text('Composite (Midpoint)', style: TextStyle(color: FastTheme.text)),
+              onTap: () => Navigator.pop(ctx),
+            ),
+            ListTile(
+              leading: const Icon(Icons.people, color: FastTheme.accentGold),
+              title: const Text('Relationship (Davison)', style: TextStyle(color: FastTheme.text)),
+              onTap: () => Navigator.pop(ctx),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _shareChart() async {
@@ -179,6 +290,11 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             icon: const Icon(Icons.share_outlined),
             onPressed: _shareChart,
           ),
+          IconButton(
+            tooltip: 'Subsidiary',
+            icon: const Icon(Icons.account_tree_outlined),
+            onPressed: _showSubsidiary,
+          ),
           TextButton.icon(
             icon: const Icon(Icons.save_outlined),
             label: Text(_l10n.chartSave),
@@ -208,19 +324,54 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             fontWeight: FontWeight.w700,
           ),
         ),
-        bottom: TabBar(
-          controller: _tab,
-          indicatorColor: FastTheme.accentGold,
-          labelColor: FastTheme.accentGold,
-          unselectedLabelColor: FastTheme.textMuted,
-          isScrollable: true,
-          tabs: [
-            Tab(text: _l10n.chartTabNatal),
-            Tab(text: _l10n.chartTabTimeMachine),
-            Tab(text: _l10n.chartTabReturns),
-            Tab(text: _l10n.chartTabProgressions),
+        bottom: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _chartCountBtn('1 Chart', !_twoCharts, () => setState(() => _twoCharts = false)),
+                  const SizedBox(width: 8),
+                  _chartCountBtn('2 Charts', _twoCharts, () {
+                    setState(() => _twoCharts = true);
+                    final cp = context.read<ChartProvider>();
+                    if (cp.biwheel == null && !cp.biLoading) cp.loadBiwheel(when: _now);
+                  }),
+                ],
+              ),
+            ),
+            TabBar(
+              controller: _tab,
+              indicatorColor: FastTheme.accentGold,
+              labelColor: FastTheme.accentGold,
+              unselectedLabelColor: FastTheme.textMuted,
+              isScrollable: true,
+              tabs: [
+                Tab(text: _l10n.chartTabNatal),
+                Tab(text: _l10n.chartTabTimeMachine),
+                Tab(text: _l10n.chartTabReturns),
+                Tab(text: _l10n.chartTabProgressions),
+              ],
+            ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _bottomNavIndex,
+        onTap: (i) => setState(() => _bottomNavIndex = i),
+        backgroundColor: FastTheme.bgSecondary,
+        selectedItemColor: FastTheme.accentGold,
+        unselectedItemColor: FastTheme.textMuted,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Charts'),
+          BottomNavigationBarItem(icon: Icon(Icons.visibility), label: 'View'),
+          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Reports'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Info'),
+        ],
       ),
       body: RepaintBoundary(
         key: _shareKey,
@@ -239,6 +390,16 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
 
   Widget _natalTab(ChartData c) {
     final l10n = _l10n;
+    final cp = context.read<ChartProvider>();
+    if (_twoCharts) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+        children: [
+          Center(child: _biwheel(cp, c)),
+          const SizedBox(height: 16),
+        ],
+      );
+    }
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
       children: [
