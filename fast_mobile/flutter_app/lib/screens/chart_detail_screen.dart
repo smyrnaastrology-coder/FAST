@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:uuid/uuid.dart';
 
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
@@ -23,6 +29,7 @@ class ChartDetailScreen extends StatefulWidget {
 class _ChartDetailScreenState extends State<ChartDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
+  final GlobalKey _shareKey = GlobalKey();
   DateTime _now = DateTime.now();
   final _latCtrl = TextEditingController();
   final _lonCtrl = TextEditingController();
@@ -68,6 +75,25 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       }
     }
     setState(() {});
+  }
+
+  Future<void> _shareChart() async {
+    try {
+      final boundary = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final image = await boundary.toImage(pixelRatio: 2.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final bytes = byteData.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/chart_${const Uuid().v4()}.png');
+      await file.writeAsBytes(bytes);
+      await Share.shareXFiles([XFile(file.path)], text: 'Holavon astroloji haritam');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Paylaşım hatası: $e')));
+      }
+    }
   }
 
   @override
@@ -148,6 +174,11 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       appBar: AppBar(
         backgroundColor: FastTheme.bg,
         actions: [
+          IconButton(
+            tooltip: 'Paylaş',
+            icon: const Icon(Icons.share_outlined),
+            onPressed: _shareChart,
+          ),
           TextButton.icon(
             icon: const Icon(Icons.save_outlined),
             label: Text(_l10n.chartSave),
@@ -191,7 +222,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           ],
         ),
       ),
-      body: TabBarView(
+      body: RepaintBoundary(
+        key: _shareKey,
+        child: TabBarView(
         controller: _tab,
         children: [
           _natalTab(c),
@@ -199,6 +232,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           _returnsTab(cp, c),
           _solarArcTab(cp, c),
         ],
+      ),
       ),
     );
   }
