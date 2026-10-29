@@ -342,12 +342,16 @@ class _PostCardState extends State<PostCard> {
                       duration: const Duration(milliseconds: 180),
                       transitionBuilder: (child, anim) =>
                           ScaleTransition(scale: anim, child: child),
-                      child: Icon(
-                        p.likedByMe ? Icons.favorite : Icons.favorite_border,
+                      child: Text(
+                        '♀',
                         key: ValueKey(p.likedByMe),
-                        color: p.likedByMe
-                            ? FastTheme.error
-                            : FastTheme.textMuted,
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: p.likedByMe
+                              ? FastTheme.rose
+                              : FastTheme.textMuted,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),

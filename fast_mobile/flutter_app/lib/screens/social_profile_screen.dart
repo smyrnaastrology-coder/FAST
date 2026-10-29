@@ -704,10 +704,13 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.favorite,
-                          color: FastTheme.accentGold,
-                          size: 10,
+                        Text(
+                          '♀',
+                          style: TextStyle(
+                            color: FastTheme.accentGold,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(width: 3),
                         Text(

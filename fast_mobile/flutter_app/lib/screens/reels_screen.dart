@@ -143,14 +143,14 @@ class _ReelPageState extends State<_ReelPage> {
           child: Column(
             children: [
               _action(
-                p.likedByMe ? Icons.favorite : Icons.favorite_border,
+                Text('♀', style: TextStyle(color: p.likedByMe ? FastTheme.rose : FastTheme.accentGold, fontSize: 30, fontWeight: FontWeight.w700)),
                 '${p.likeCount}',
                 FastTheme.accentGold,
                 _toggleLike,
               ),
-              _action(Icons.chat_bubble_outline, '${p.commentCount}', Colors.white, _openComments),
+              _action(Icon(Icons.chat_bubble_outline, color: Colors.white, size: 30), '${p.commentCount}', Colors.white, _openComments),
               if (p.userId != SocialService.currentUserId)
-                _action(Icons.send_outlined, '', Colors.white, _openDm),
+                _action(Icon(Icons.send_outlined, color: Colors.white, size: 30), '', Colors.white, _openDm),
             ],
           ),
         ),
@@ -206,14 +206,14 @@ class _ReelPageState extends State<_ReelPage> {
     );
   }
 
-  Widget _action(IconData icon, String label, Color color, VoidCallback onTap) => GestureDetector(
+  Widget _action(Widget icon, String label, Color color, VoidCallback onTap) => GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(
             children: [
-              Icon(icon, color: color, size: 30),
+              icon,
               if (label.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
