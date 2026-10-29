@@ -28,44 +28,43 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   Color _currentColor = const Color(0xFF00E0FF);
   int _colorTab = 0; // 0 = neon, 1 = pastel
   bool _rendering = false;
-  
+
+  final TransformationController _transformCtrl = TransformationController();
+
   final List<Color> _neonColors = [
-    const Color(0xFF00E0FF),
-    const Color(0xFFFF3366),
-    const Color(0xFF39FF14),
-    const Color(0xFFFF00FF),
-    const Color(0xFFFFAE00),
-    const Color(0xFFFFFF00),
-    const Color(0xFF00FF88),
-    const Color(0xFFFF4D4D),
-    const Color(0xFF4D79FF),
-    const Color(0xFFFF66CC),
-    const Color(0xFF00FFFF),
-    const Color(0xFFFFD700),
+    const Color(0xFF00E0FF), const Color(0xFFFF3366), const Color(0xFF39FF14),
+    const Color(0xFFFF00FF), const Color(0xFFFFAE00), const Color(0xFFFFFF00),
+    const Color(0xFF00FF88), const Color(0xFFFF4D4D), const Color(0xFF4D79FF),
+    const Color(0xFFFF66CC), const Color(0xFF00FFFF), const Color(0xFFFFD700),
   ];
-  
+
   final List<Color> _pastelColors = [
-    const Color(0xFFF6A6C1),
-    const Color(0xFFC9DEEE),
-    const Color(0xFFB8E0D2),
-    const Color(0xFFF7D6E0),
-    const Color(0xFFFFD6A5),
-    const Color(0xFFCAFFBF),
-    const Color(0xFFD4C5F9),
-    const Color(0xFFFFE0E0),
-    const Color(0xFFE0F7FA),
-    const Color(0xFFFFF3C4),
-    const Color(0xFFE8D5C4),
-    const Color(0xFFCCE5FF),
+    const Color(0xFFF6A6C1), const Color(0xFFC9DEEE), const Color(0xFFB8E0D2),
+    const Color(0xFFF7D6E0), const Color(0xFFFFD6A5), const Color(0xFFCAFFBF),
+    const Color(0xFFD4C5F9), const Color(0xFFFFE0E0), const Color(0xFFE0F7FA),
+    const Color(0xFFFFF3C4), const Color(0xFFE8D5C4), const Color(0xFFCCE5FF),
+  ];
+
+  final List<Color> _textColors = [
+    Colors.white, Colors.black, const Color(0xFFFF3366), const Color(0xFF00E0FF),
+    const Color(0xFF39FF14), const Color(0xFFFFAE00), const Color(0xFFFF00FF),
+    const Color(0xFFFFFF00), const Color(0xFF4D79FF),
   ];
 
   List<Color> get _colors => _colorTab == 0 ? _neonColors : _pastelColors;
+
+  @override
+  void dispose() {
+    _transformCtrl.dispose();
+    super.dispose();
+  }
 
   void _addText() {
     final newText = TextElement(
       id: const Uuid().v4(),
       text: 'Metin',
-      position: Offset(MediaQuery.of(context).size.width / 2 - 50, MediaQuery.of(context).size.height / 2 - 20),
+      position: const Offset(120, 200),
+      color: Colors.white,
     );
     setState(() {
       _textElements.add(newText);
@@ -77,6 +76,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _editText(TextElement element) {
     final ctrl = TextEditingController(text: element.text);
+    Color color = element.color;
     String font = element.fontFamily;
     showDialog(
       context: context,
@@ -84,32 +84,49 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
         builder: (ctx, setD) => AlertDialog(
           backgroundColor: FastTheme.bg,
           title: Text('Metni Düzenle', style: TextStyle(color: FastTheme.accentGold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: ctrl,
-                autofocus: true,
-                style: TextStyle(color: FastTheme.text, fontFamily: font),
-                decoration: InputDecoration(
-                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.border)),
-                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.accentGold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: ctrl,
+                  autofocus: true,
+                  style: TextStyle(color: FastTheme.text, fontFamily: font),
+                  decoration: InputDecoration(
+                    enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.border)),
+                    focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.accentGold)),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              DropdownButton<String>(
-                value: font,
-                dropdownColor: FastTheme.bg,
-                style: TextStyle(color: FastTheme.text),
-                items: const [
-                  DropdownMenuItem(value: 'Roboto', child: Text('Roboto')),
-                  DropdownMenuItem(value: 'serif', child: Text('Serif')),
-                  DropdownMenuItem(value: 'monospace', child: Text('Monospace')),
-                  DropdownMenuItem(value: 'cursive', child: Text('Cursive')),
-                ],
-                onChanged: (v) => setD(() => font = v ?? font),
-              ),
-            ],
+                const SizedBox(height: 12),
+                DropdownButton<String>(
+                  value: font,
+                  dropdownColor: FastTheme.bg,
+                  style: TextStyle(color: FastTheme.text),
+                  items: const [
+                    DropdownMenuItem(value: 'Roboto', child: Text('Roboto')),
+                    DropdownMenuItem(value: 'serif', child: Text('Serif')),
+                    DropdownMenuItem(value: 'monospace', child: Text('Monospace')),
+                    DropdownMenuItem(value: 'cursive', child: Text('Cursive')),
+                  ],
+                  onChanged: (v) => setD(() => font = v ?? font),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  children: _textColors.map((c) => GestureDetector(
+                    onTap: () => setD(() => color = c),
+                    child: Container(
+                      width: 32, height: 32,
+                      decoration: BoxDecoration(
+                        color: c,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: color == c ? FastTheme.accentGold : Colors.white38, width: color == c ? 3 : 1),
+                      ),
+                    ),
+                  )).toList(),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -121,6 +138,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 setState(() {
                   element.text = ctrl.text.isEmpty ? 'Metin' : ctrl.text;
                   element.fontFamily = font;
+                  element.color = color;
                 });
                 Navigator.pop(ctx);
               },
@@ -142,12 +160,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _undo() {
     setState(() {
-      if (_drawingMode && _strokes.isNotEmpty) {
-        _strokes.removeLast();
-      } else if (!_drawingMode && _textElements.isNotEmpty) {
-        _textElements.removeLast();
-        _selectedTextId = null;
-      }
+      if (_strokes.isNotEmpty) _strokes.removeLast();
     });
   }
 
@@ -160,18 +173,14 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) throw Exception('ByteData error');
       final bytes = byteData.buffer.asUint8List();
-      
+
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/story_${const Uuid().v4()}.png');
       await file.writeAsBytes(bytes);
-      
-      if (mounted) {
-        Navigator.of(context).pop(file);
-      }
+
+      if (mounted) Navigator.of(context).pop(file);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
-      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
     } finally {
       if (mounted) setState(() => _rendering = false);
     }
@@ -183,58 +192,64 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Canvas area
-          RepaintBoundary(
-            key: _repaintKey,
-            child: Stack(
-              children: [
-                // Background image
-                Positioned.fill(
-                  child: Image.file(
-                    File(widget.imageFile.path),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                // Drawing layer
-                if (_drawingMode)
-                  Positioned.fill(
-                    child: StoryDrawingCanvas(
-                      strokes: _strokes,
-                      onStrokesChanged: (strokes) {
+          // Canvas area (zoomable/rotatable)
+          Positioned.fill(
+            child: InteractiveViewer(
+              transformationController: _transformCtrl,
+              minScale: 0.5,
+              maxScale: 4.0,
+              panEnabled: !_drawingMode && _selectedTextId == null,
+              scaleEnabled: _selectedTextId == null,
+              child: RepaintBoundary(
+                key: _repaintKey,
+                child: Stack(
+                  children: [
+                    // Background image
+                    Positioned.fill(
+                      child: Image.file(
+                        File(widget.imageFile.path),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    // Drawing layer
+                    Positioned.fill(
+                      child: _drawingMode
+                          ? StoryDrawingCanvas(
+                              strokes: _strokes,
+                              onStrokesChanged: (strokes) {
+                                setState(() {
+                                  _strokes.clear();
+                                  _strokes.addAll(strokes);
+                                });
+                              },
+                              currentColor: _currentColor,
+                              strokeWidth: _strokeWidth,
+                            )
+                          : CustomPaint(
+                              painter: StoryDrawingPainter(strokes: _strokes),
+                            ),
+                    ),
+                    // Text layers
+                    ..._textElements.map((element) => StoryTextLayerWidget(
+                      element: element,
+                      selected: _selectedTextId == element.id,
+                      onTap: () {
                         setState(() {
-                          _strokes.clear();
-                          _strokes.addAll(strokes);
+                          _selectedTextId = element.id;
+                          _drawingMode = false;
                         });
                       },
-                      currentColor: _currentColor,
-                      strokeWidth: _strokeWidth,
-                    ),
-                  )
-                else
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: StoryDrawingPainter(strokes: _strokes),
-                    ),
-                  ),
-                // Text layers
-                ..._textElements.map((element) => StoryTextLayerWidget(
-                  element: element,
-                  selected: _selectedTextId == element.id,
-                  onTap: () {
-                    setState(() {
-                      _selectedTextId = element.id;
-                      _drawingMode = false;
-                    });
-                  },
-                  onChanged: (updated) {
-                    setState(() {
-                      final idx = _textElements.indexWhere((e) => e.id == updated.id);
-                      if (idx >= 0) _textElements[idx] = updated;
-                    });
-                  },
-                  onDelete: _deleteSelectedText,
-                )),
-              ],
+                      onChanged: (updated) {
+                        setState(() {
+                          final idx = _textElements.indexWhere((e) => e.id == updated.id);
+                          if (idx >= 0) _textElements[idx] = updated;
+                        });
+                      },
+                      onDelete: _deleteSelectedText,
+                    )),
+                  ],
+                ),
+              ),
             ),
           ),
           // Top bar
@@ -290,7 +305,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: Colors.black54,
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
@@ -310,7 +325,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                         ],
                       ),
                     ),
-                  // Color palette (compact, only when drawing)
+                  // Color palette
                   if (_drawingMode)
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -345,7 +360,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black54,
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Row(
@@ -396,7 +411,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(color: active ? Colors.white : Colors.white38, width: active ? 3 : 1),
-          boxShadow: active ? [BoxShadow(color: color.withOpacity(0.6), blurRadius: 8)] : null,
+          boxShadow: active ? [BoxShadow(color: color.withValues(alpha: 0.6), blurRadius: 8)] : null,
         ),
       ),
     );
