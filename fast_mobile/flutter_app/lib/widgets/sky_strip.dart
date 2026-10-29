@@ -205,7 +205,7 @@ class _SkyStripState extends State<SkyStrip> {
     final detail = StringBuffer(phase);
     detail.write(' · ${_speedName(l, sky.speedKey)}');
     if (sky.voidOfCourse) detail.write(' · ${l.skyVoid}');
-    if (sky.isCombust) detail.write(' · Ay yanık');
+    if (sky.isYanikYol) detail.write(' · Yanık yol');
     detail.write(' · ${_planetGlyphs[sky.hourRuler] ?? ''} $hour');
 
     return Padding(
@@ -402,12 +402,12 @@ class SkyDetailSheet extends StatelessWidget {
               highlight: sky.voidOfCourse,
             ),
             _InfoRow(
-              glyph: sky.isCombust ? '☉' : '☾',
-              title: sky.isCombust ? 'Ay yanık (combust)' : 'Ay yanık değil',
-              subtitle: sky.isCombust
-                  ? 'Güneş ile çok yakın; ay enerjisi baskılanır'
-                  : 'Ay özgür hareket ediyor',
-              highlight: sky.isCombust,
+              glyph: sky.isYanikYol ? '☉' : '☾',
+              title: sky.isYanikYol ? 'Yanık yol' : 'Yanık yol değil',
+              subtitle: sky.isYanikYol
+                  ? 'Ay 15° Terazi–15° Akrep arasında; enerji baskılanır'
+                  : 'Ay yanık yolda değil',
+              highlight: sky.isYanikYol,
             ),
             Builder(builder: (ctx) {
               final m = mansionForLongitude(sky.moonLongitude);

@@ -29,7 +29,7 @@ class SkySnapshot {
   final double illumination;
   final bool waxing;
   final bool voidOfCourse;
-  final bool isCombust;
+  final bool isYanikYol;
   final int lunarMansionIndex;
   final DateTime? voidUntil;
   final int sunSign;
@@ -54,7 +54,7 @@ class SkySnapshot {
     required this.illumination,
     required this.waxing,
     required this.voidOfCourse,
-    required this.isCombust,
+    required this.isYanikYol,
     required this.lunarMansionIndex,
     required this.voidUntil,
     required this.sunSign,
@@ -86,10 +86,8 @@ class SkySnapshot {
       illumination: (phase['aydinlanma'] as num?)?.toDouble() ?? 0,
       waxing: phase['buyuyor'] == true,
       voidOfCourse: j['boslukta'] == true,
-      isCombust: _isCombust(
+      isYanikYol: _isYanikYol(
         (moon['mutlak'] as num?)?.toDouble() ?? 0,
-        ((sun['burc'] as num?)?.toInt() ?? 0) * 30.0 +
-            ((sun['derece'] as num?)?.toDouble() ?? 0),
       ),
       lunarMansionIndex: (((moon['mutlak'] as num?)?.toDouble() ?? 0) % 360) ~/
           (360 / 28),
@@ -113,10 +111,10 @@ class SkySnapshot {
     );
   }
 
-  static bool _isCombust(double moonLon, double sunLon) {
-    var d = (moonLon - sunLon).abs() % 360;
-    if (d > 180) d = 360 - d;
-    return d <= 8.5;
+  static bool _isYanikYol(double moonLon) {
+    final lon = moonLon % 360;
+    // 15° Terazi (195°) ile 15° Akrep (225°) arasında
+    return lon >= 195 && lon <= 225;
   }
 
   static DateTime? _epoch(dynamic v) {
