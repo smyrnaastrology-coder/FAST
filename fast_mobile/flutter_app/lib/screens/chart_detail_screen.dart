@@ -188,6 +188,75 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     );
   }
 
+  void _showSettings() {
+    final cp = context.read<ChartProvider>();
+    final c = cp.current;
+    if (c == null) return;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Ayarlar', style: TextStyle(color: FastTheme.accentGold, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Text('Ev sistemi: ${c.houseSystem}', style: TextStyle(color: FastTheme.text)),
+              Text('Zaman dilimi: UTC ${c.meta.tz ?? "?"}', style: TextStyle(color: FastTheme.text)),
+              Text('Konum: ${c.meta.place}', style: TextStyle(color: FastTheme.text)),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Kapat', style: TextStyle(color: FastTheme.accentGold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showInfo() {
+    final cp = context.read<ChartProvider>();
+    final c = cp.current;
+    if (c == null) return;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Bilgi', style: TextStyle(color: FastTheme.accentGold, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              Text('Ad: ${c.meta.name ?? "—"}', style: TextStyle(color: FastTheme.text)),
+              Text('Tarih: ${c.meta.date} ${c.meta.time}', style: TextStyle(color: FastTheme.text)),
+              Text('Yer: ${c.meta.place}', style: TextStyle(color: FastTheme.text)),
+              Text('Koordinatlar: ${c.meta.lat.toStringAsFixed(4)}, ${c.meta.lng.toStringAsFixed(4)}', style: TextStyle(color: FastTheme.text)),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Kapat', style: TextStyle(color: FastTheme.accentGold)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _shareChart() async {
     try {
       final boundary = _shareKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
@@ -345,6 +414,14 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Navigator.of(context).pop();
             return;
           }
+          if (i == 2) {
+            _showSettings();
+            return;
+          }
+          if (i == 3) {
+            _showInfo();
+            return;
+          }
           setState(() => _bottomNavIndex = i);
         },
         backgroundColor: FastTheme.bgSecondary,
@@ -354,7 +431,6 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Charts'),
           BottomNavigationBarItem(icon: Icon(Icons.visibility), label: 'View'),
-          BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Reports'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
           BottomNavigationBarItem(icon: Icon(Icons.info_outline), label: 'Info'),
         ],
