@@ -119,28 +119,28 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Container(width: 36, height: 4, decoration: BoxDecoration(color: FastTheme.border, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 12),
             ListTile(
-              leading: const Icon(Icons.trending_up, color: FastTheme.accentGold),
-              title: const Text('Secondary Progress', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.trending_up, color: FastTheme.accentGold),
+              title: Text('Secondary Progress', style: TextStyle(color: FastTheme.text)),
               onTap: () { Navigator.pop(ctx); _tab.animateTo(3); },
             ),
             ListTile(
-              leading: const Icon(Icons.trending_flat, color: FastTheme.accentGold),
-              title: const Text('Minor Progress', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.trending_flat, color: FastTheme.accentGold),
+              title: Text('Minor Progress', style: TextStyle(color: FastTheme.text)),
               onTap: () { Navigator.pop(ctx); _tab.animateTo(3); },
             ),
             ListTile(
-              leading: const Icon(Icons.wb_sunny_outlined, color: FastTheme.accentGold),
-              title: const Text('Solar Return', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.wb_sunny_outlined, color: FastTheme.accentGold),
+              title: Text('Solar Return', style: TextStyle(color: FastTheme.text)),
               onTap: () { Navigator.pop(ctx); _tab.animateTo(2); },
             ),
             ListTile(
-              leading: const Icon(Icons.nightlight_outlined, color: FastTheme.accentGold),
-              title: const Text('Lunar Return', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.nightlight_outlined, color: FastTheme.accentGold),
+              title: Text('Lunar Return', style: TextStyle(color: FastTheme.text)),
               onTap: () { Navigator.pop(ctx); _tab.animateTo(2); },
             ),
             ListTile(
-              leading: const Icon(Icons.merge_type, color: FastTheme.accentGold),
-              title: const Text('Combined', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.merge_type, color: FastTheme.accentGold),
+              title: Text('Combined', style: TextStyle(color: FastTheme.text)),
               onTap: () {
                 Navigator.pop(ctx);
                 if (!_twoCharts) {
@@ -173,13 +173,13 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Container(width: 36, height: 4, decoration: BoxDecoration(color: FastTheme.border, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 12),
             ListTile(
-              leading: const Icon(Icons.center_focus_strong, color: FastTheme.accentGold),
-              title: const Text('Composite (Midpoint)', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.center_focus_strong, color: FastTheme.accentGold),
+              title: Text('Composite (Midpoint)', style: TextStyle(color: FastTheme.text)),
               onTap: () => Navigator.pop(ctx),
             ),
             ListTile(
-              leading: const Icon(Icons.people, color: FastTheme.accentGold),
-              title: const Text('Relationship (Davison)', style: TextStyle(color: FastTheme.text)),
+              leading: Icon(Icons.people, color: FastTheme.accentGold),
+              title: Text('Relationship (Davison)', style: TextStyle(color: FastTheme.text)),
               onTap: () => Navigator.pop(ctx),
             ),
           ],
@@ -324,37 +324,17 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             fontWeight: FontWeight.w700,
           ),
         ),
-        bottom: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _chartCountBtn('1 Chart', !_twoCharts, () => setState(() => _twoCharts = false)),
-                  const SizedBox(width: 8),
-                  _chartCountBtn('2 Charts', _twoCharts, () {
-                    setState(() => _twoCharts = true);
-                    final cp = context.read<ChartProvider>();
-                    if (cp.biwheel == null && !cp.biLoading) cp.loadBiwheel(when: _now);
-                  }),
-                ],
-              ),
-            ),
-            TabBar(
-              controller: _tab,
-              indicatorColor: FastTheme.accentGold,
-              labelColor: FastTheme.accentGold,
-              unselectedLabelColor: FastTheme.textMuted,
-              isScrollable: true,
-              tabs: [
-                Tab(text: _l10n.chartTabNatal),
-                Tab(text: _l10n.chartTabTimeMachine),
-                Tab(text: _l10n.chartTabReturns),
-                Tab(text: _l10n.chartTabProgressions),
-              ],
-            ),
+        bottom: TabBar(
+          controller: _tab,
+          indicatorColor: FastTheme.accentGold,
+          labelColor: FastTheme.accentGold,
+          unselectedLabelColor: FastTheme.textMuted,
+          isScrollable: true,
+          tabs: [
+            Tab(text: _l10n.chartTabNatal),
+            Tab(text: _l10n.chartTabTimeMachine),
+            Tab(text: _l10n.chartTabReturns),
+            Tab(text: _l10n.chartTabProgressions),
           ],
         ),
       ),
@@ -375,7 +355,24 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       ),
       body: RepaintBoundary(
         key: _shareKey,
-        child: TabBarView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _chartCountBtn('1 Chart', !_twoCharts, () => setState(() => _twoCharts = false)),
+                  const SizedBox(width: 8),
+                  _chartCountBtn('2 Charts', _twoCharts, () {
+                    setState(() => _twoCharts = true);
+                    final cp = context.read<ChartProvider>();
+                    if (cp.biwheel == null && !cp.biLoading) cp.loadBiwheel(when: _now);
+                  }),
+                ],
+              ),
+            ),
+            Expanded(child: TabBarView(
         controller: _tab,
         children: [
           _natalTab(c),
@@ -385,9 +382,12 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         ],
       ),
       ),
-    );
+    ],
+  ),
+  ),
+)
+;
   }
-
   Widget _natalTab(ChartData c) {
     final l10n = _l10n;
     final cp = context.read<ChartProvider>();
