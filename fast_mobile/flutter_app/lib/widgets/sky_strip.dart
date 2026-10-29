@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../config/astro_signs.dart';
+import '../config/lunar_mansions.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_snapshot.dart';
@@ -204,6 +205,7 @@ class _SkyStripState extends State<SkyStrip> {
     final detail = StringBuffer(phase);
     detail.write(' · ${_speedName(l, sky.speedKey)}');
     if (sky.voidOfCourse) detail.write(' · ${l.skyVoid}');
+    if (sky.isCombust) detail.write(' · Ay yanık');
     detail.write(' · ${_planetGlyphs[sky.hourRuler] ?? ''} $hour');
 
     return Padding(
@@ -399,6 +401,37 @@ class SkyDetailSheet extends StatelessWidget {
                   : null,
               highlight: sky.voidOfCourse,
             ),
+            _InfoRow(
+              glyph: sky.isCombust ? '☉' : '☾',
+              title: sky.isCombust ? 'Ay yanık (combust)' : 'Ay yanık değil',
+              subtitle: sky.isCombust
+                  ? 'Güneş ile çok yakın; ay enerjisi baskılanır'
+                  : 'Ay özgür hareket ediyor',
+              highlight: sky.isCombust,
+            ),
+            Builder(builder: (ctx) {
+              final m = mansionForLongitude(sky.moonLongitude);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _InfoRow(
+                    glyph: '☽',
+                    title: 'Menzil: ${m.name}',
+                    subtitle: m.meaning,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 34, bottom: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Yap: ${m.doText}', style: TextStyle(color: FastTheme.success, fontSize: 12)),
+                        Text('Kaçın: ${m.avoidText}', style: TextStyle(color: FastTheme.error, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
             _InfoRow(
               glyph: _planetGlyphs[sky.hourRuler] ?? '♃',
               title: l.skyPlanetHour(hour),

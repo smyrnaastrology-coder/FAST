@@ -235,6 +235,9 @@ class StoryItem {
   /// değer imzalı (signed) bir URL'dir ve periyodik olarak yenilenir.
   String mediaUrl;
 
+  int likeCount;
+  bool likedByMe;
+
   StoryItem({
     required this.id,
     required this.userId,
@@ -242,6 +245,8 @@ class StoryItem {
     required this.createdAt,
     this.mediaPath = '',
     this.mentionIds = const [],
+    this.likeCount = 0,
+    this.likedByMe = false,
   });
 
   factory StoryItem.fromMap(Map<String, dynamic> m) => StoryItem(
@@ -251,6 +256,7 @@ class StoryItem {
     mediaPath: (m['media_path'] ?? '').toString(),
     createdAt:
         DateTime.tryParse((m['created_at'] ?? '').toString()) ?? DateTime.now(),
+    likeCount: (m['like_count'] as num?)?.toInt() ?? 0,
   );
 }
 
@@ -841,6 +847,46 @@ class SocialService {
           .single();
       return (r as Map).cast<String, dynamic>();
     }
+  }
+
+  /// Hikâyeyi beğen / beğeniyi geri al. Döner: yeni beğeni durumu.
+  static Future<bool> toggleStoryLike(String storyId) async {
+    if (!enabled || _me.isEmpty || storyId.isEmpty) return false;
+    try {
+      final existing = await _c
+          .from('story_likes')
+          .select('story_id')
+          .eq('story_id', storyId)
+          .eq('user_id', _me)
+          .maybeSingle();
+      if (existing != null) {
+        await _c.from('story_likes').delete().eq('story_id', storyId).eq('user_id', _me);
+        return false;
+      }
+      await _c.from('story_likes').insert({'story_id': storyId, 'user_id': _me});
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Hikâyeye yanıt (DM olarak gönderilir).
+  static Future<void> replyToStory(String storyId, String ownerId, String text) async {
+    if (!enabled || _me.isEmpty) return;
+    final t = text.trim();
+    if (t.isEmpty) return;
+    try {
+      await _c.from('story_replies').insert({
+        'story_id': storyId,
+        'sender_id': _me,
+        'owner_id': ownerId,
+        'text': t,
+      });
+    } catch (_) {}
+    // DM olarak da gönder (karşı tarafa mesaj düşsün).
+    try {
+      await sendMessage(ownerId, '📸 Hikâyene yanıt: $t');
+    } catch (_) {}
   }
 
   /// Aktif (süresi dolmamış) tüm hikâyeleri kullanıcı bazında gruplu çeker.

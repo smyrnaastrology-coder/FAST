@@ -29,6 +29,8 @@ class SkySnapshot {
   final double illumination;
   final bool waxing;
   final bool voidOfCourse;
+  final bool isCombust;
+  final int lunarMansionIndex;
   final DateTime? voidUntil;
   final int sunSign;
   final double sunDegree;
@@ -52,6 +54,8 @@ class SkySnapshot {
     required this.illumination,
     required this.waxing,
     required this.voidOfCourse,
+    required this.isCombust,
+    required this.lunarMansionIndex,
     required this.voidUntil,
     required this.sunSign,
     required this.sunDegree,
@@ -82,6 +86,13 @@ class SkySnapshot {
       illumination: (phase['aydinlanma'] as num?)?.toDouble() ?? 0,
       waxing: phase['buyuyor'] == true,
       voidOfCourse: j['boslukta'] == true,
+      isCombust: _isCombust(
+        (moon['mutlak'] as num?)?.toDouble() ?? 0,
+        ((sun['burc'] as num?)?.toInt() ?? 0) * 30.0 +
+            ((sun['derece'] as num?)?.toDouble() ?? 0),
+      ),
+      lunarMansionIndex: (((moon['mutlak'] as num?)?.toDouble() ?? 0) % 360) ~/
+          (360 / 28),
       voidUntil: _epoch(j['bosluk_biter']),
       sunSign: (sun['burc'] as num?)?.toInt() ?? 0,
       sunDegree: (sun['derece'] as num?)?.toDouble() ?? 0,
@@ -100,6 +111,12 @@ class SkySnapshot {
           .toList(),
       fetchedAt: DateTime.now(),
     );
+  }
+
+  static bool _isCombust(double moonLon, double sunLon) {
+    var d = (moonLon - sunLon).abs() % 360;
+    if (d > 180) d = 360 - d;
+    return d <= 8.5;
   }
 
   static DateTime? _epoch(dynamic v) {

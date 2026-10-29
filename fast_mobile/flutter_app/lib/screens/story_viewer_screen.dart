@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
   late final AnimationController _prog;
   int _viewCount = 0;
   List<String> _mentions = [];
+  final _replyCtrl = TextEditingController();
+  bool _liked = false;
 
   /// groups degismez (unmodifiable) gelir; silme islemi icin kopyalanir.
   late final List<UserStories> _groups;
@@ -51,12 +54,14 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
   @override
   void dispose() {
     _prog.dispose();
+    _replyCtrl.dispose();
     super.dispose();
   }
 
   void _onShow() {
     _prog.duration = const Duration(seconds: storySeconds);
     _prog.forward(from: 0);
+    _liked = _story.likedByMe;
     _loadMeta();
     _markViewed();
   }
@@ -73,6 +78,25 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
       _viewCount = count;
       _mentions = mentions;
     });
+  }
+
+  Future<void> _toggleLike() async {
+    final was = _liked;
+    setState(() => _liked = !was);
+    final now = await SocialService.toggleStoryLike(_story.id);
+    if (mounted) setState(() => _liked = now);
+  }
+
+  Future<void> _sendReply(String text) async {
+    final t = text.trim();
+    if (t.isEmpty) return;
+    _replyCtrl.clear();
+    _prog.stop();
+    await SocialService.replyToStory(_story.id, _story.userId, t);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Yanıt gönderildi.')));
+      if (_prog.value < 1.0) _prog.forward();
+    }
   }
 
   void _next() {
@@ -276,7 +300,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
               ),
             ),
 
-            // ── Alt: etiketler + görüntülenme ──
+            // ── Alt: etiketler + görüntülenme + beğeni/yanıt ──
             Positioned(
               left: 16,
               right: 16,
@@ -312,6 +336,47 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
                         Text('$_viewCount', style: const TextStyle(color: Colors.white70, fontSize: 13)),
                       ],
                     ),
+                  if (story.userId != SocialService.currentUserId) ...[
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _replyCtrl,
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Yanıtla...',
+                              hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+                              filled: true,
+                              fillColor: Colors.black54,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                            ),
+                            onSubmitted: _sendReply,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: _toggleLike,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '♀',
+                              style: TextStyle(
+                                color: _liked ? FastTheme.rose : Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
