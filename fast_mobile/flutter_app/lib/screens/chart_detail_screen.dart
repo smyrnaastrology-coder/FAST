@@ -548,12 +548,6 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               title: Text('Combined', style: TextStyle(color: FastTheme.text)),
               onTap: () {
                 Navigator.pop(ctx);
-                if (!_twoCharts) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Combined için 2 harita seçmelisiniz.')),
-                  );
-                  return;
-                }
                 _showCombined();
               },
             ),
@@ -578,13 +572,34 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             Container(width: 36, height: 4, decoration: BoxDecoration(color: FastTheme.border, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 12),
             ListTile(
-              leading: Icon(Icons.center_focus_strong, color: FastTheme.accentGold),
-              title: Text('Composite (Midpoint)', style: TextStyle(color: FastTheme.text)),
-              onTap: () => Navigator.pop(ctx),
+              leading: Icon(Icons.layers_outlined, color: FastTheme.accentGold),
+              title: Text(
+                'İki haritayı üst üste göster',
+                style: TextStyle(color: FastTheme.text),
+              ),
+              subtitle: Text(
+                'İç ve dış haritayı ayrı ayrı seçin (natal, transit, return, progress)',
+                style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+              ),
+              onTap: () {
+                Navigator.pop(ctx);
+                final cp = context.read<ChartProvider>();
+                final c = cp.current;
+                if (c == null) return;
+                _setTwoCharts(c, cp);
+                _tab.animateTo(0);
+              },
             ),
             ListTile(
               leading: Icon(Icons.people, color: FastTheme.accentGold),
-              title: Text('Relationship (Davison)', style: TextStyle(color: FastTheme.text)),
+              title: Text(
+                'Sinastri / ilişki yorumu',
+                style: TextStyle(color: FastTheme.text),
+              ),
+              subtitle: Text(
+                'İki harita arasındaki açılar Sosyal > Sinastri bölümünde',
+                style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+              ),
               onTap: () => Navigator.pop(ctx),
             ),
           ],
@@ -1041,25 +1056,46 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           _section('Dış harita', [
             Padding(
               padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Dış haritayı seçin: Transit (şimdi), hesaplanmış Solar/Lunar Return, '
-                    'Progress veya kayıtlı bir harita.',
-                    style: TextStyle(color: FastTheme.textMuted, height: 1.4),
-                  ),
-                  const SizedBox(height: 10),
-                  FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: FastTheme.accentGold,
+              child: loading
+                  ? Row(
+                      children: [
+                        SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: FastTheme.accentGold,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Harita hesaplanıyor…',
+                          style: TextStyle(color: FastTheme.textMuted),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Dış haritayı seçin: Transit (şimdi), hesaplanmış Solar/Lunar Return, '
+                          'Progress veya kayıtlı bir harita.',
+                          style: TextStyle(
+                            color: FastTheme.textMuted,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: FastTheme.accentGold,
+                          ),
+                          onPressed: () => _pickSlot(c, cp, false),
+                          icon: const Icon(Icons.addchart),
+                          label: const Text('Harita seç'),
+                        ),
+                      ],
                     ),
-                    onPressed: () => _pickSlot(c, cp, false),
-                    icon: const Icon(Icons.addchart),
-                    label: const Text('Harita seç'),
-                  ),
-                ],
-              ),
             ),
           ])
         else
@@ -1170,7 +1206,15 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 5),
-        Text(label, style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 150),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+          ),
+        ),
       ],
     );
   }
