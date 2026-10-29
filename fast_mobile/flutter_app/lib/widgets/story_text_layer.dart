@@ -58,6 +58,7 @@ class _StoryTextLayerWidgetState extends State<StoryTextLayerWidget> {
                 style: TextStyle(
                   color: widget.element.color,
                   fontSize: widget.element.fontSize,
+                  fontFamily: widget.element.fontFamily,
                   fontWeight: FontWeight.bold,
                   shadows: const [
                     Shadow(blurRadius: 4, color: Colors.black54, offset: Offset(1, 1)),

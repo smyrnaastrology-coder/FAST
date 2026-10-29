@@ -36,6 +36,12 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     const Color(0xFFFF00FF),
     const Color(0xFFFFAE00),
     const Color(0xFFFFFF00),
+    const Color(0xFF00FF88),
+    const Color(0xFFFF4D4D),
+    const Color(0xFF4D79FF),
+    const Color(0xFFFF66CC),
+    const Color(0xFF00FFFF),
+    const Color(0xFFFFD700),
   ];
   
   final List<Color> _pastelColors = [
@@ -45,6 +51,12 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     const Color(0xFFF7D6E0),
     const Color(0xFFFFD6A5),
     const Color(0xFFCAFFBF),
+    const Color(0xFFD4C5F9),
+    const Color(0xFFFFE0E0),
+    const Color(0xFFE0F7FA),
+    const Color(0xFFFFF3C4),
+    const Color(0xFFE8D5C4),
+    const Color(0xFFCCE5FF),
   ];
 
   List<Color> get _colors => _colorTab == 0 ? _neonColors : _pastelColors;
@@ -65,35 +77,57 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _editText(TextElement element) {
     final ctrl = TextEditingController(text: element.text);
+    String font = element.fontFamily;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: FastTheme.bg,
-        title: Text('Metni Düzenle', style: TextStyle(color: FastTheme.accentGold)),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          style: TextStyle(color: FastTheme.text),
-          decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.border)),
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.accentGold)),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          backgroundColor: FastTheme.bg,
+          title: Text('Metni Düzenle', style: TextStyle(color: FastTheme.accentGold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: ctrl,
+                autofocus: true,
+                style: TextStyle(color: FastTheme.text, fontFamily: font),
+                decoration: InputDecoration(
+                  enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.border)),
+                  focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: FastTheme.accentGold)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButton<String>(
+                value: font,
+                dropdownColor: FastTheme.bg,
+                style: TextStyle(color: FastTheme.text),
+                items: const [
+                  DropdownMenuItem(value: 'Roboto', child: Text('Roboto')),
+                  DropdownMenuItem(value: 'serif', child: Text('Serif')),
+                  DropdownMenuItem(value: 'monospace', child: Text('Monospace')),
+                  DropdownMenuItem(value: 'cursive', child: Text('Cursive')),
+                ],
+                onChanged: (v) => setD(() => font = v ?? font),
+              ),
+            ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('İptal', style: TextStyle(color: FastTheme.textMuted)),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  element.text = ctrl.text.isEmpty ? 'Metin' : ctrl.text;
+                  element.fontFamily = font;
+                });
+                Navigator.pop(ctx);
+              },
+              child: Text('Tamam', style: TextStyle(color: FastTheme.accentGold)),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('İptal', style: TextStyle(color: FastTheme.textMuted)),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                element.text = ctrl.text.isEmpty ? 'Metin' : ctrl.text;
-              });
-              Navigator.pop(ctx);
-            },
-            child: Text('Tamam', style: TextStyle(color: FastTheme.accentGold)),
-          ),
-        ],
       ),
     );
   }
@@ -276,14 +310,14 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                         ],
                       ),
                     ),
-                  // Color palette
+                  // Color palette (compact, only when drawing)
                   if (_drawingMode)
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(30),
+                        color: Colors.black.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -292,13 +326,15 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               _tabButton('Neon', 0),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               _tabButton('Pastel', 1),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            alignment: WrapAlignment.center,
                             children: _colors.map((c) => _colorButton(c)).toList(),
                           ),
                         ],
