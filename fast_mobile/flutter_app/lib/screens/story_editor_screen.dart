@@ -43,10 +43,15 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   TextEditingController? _textCtrl;
   FocusNode? _textFocus;
   _EditorMode _mode = _EditorMode.move;
+  PenTool _tool = PenTool.pen;
   double _strokeWidth = 6.0;
   Color _currentColor = const Color(0xFF00E0FF);
-  int _colorTab = 0; // 0 = neon, 1 = pastel
+  int _colorTab = 0; // 0 = canlı, 1 = pastel
   bool _rendering = false;
+
+  /// Geri alma geçmişi (çizimler + metinler).
+  final List<_UndoSnapshot> _history = [];
+  static const int _historyLimit = 60;
 
   // Görsel dönüşümü
   Offset _offset = Offset.zero;
@@ -88,6 +93,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   }
 
   void _addText() {
+    _pushHistory();
     final newText = TextElement(
       id: const Uuid().v4(),
       text: 'Metin',
@@ -166,6 +172,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _deleteSelectedText() {
     if (_selectedTextId == null) return;
+    _pushHistory();
     if (_editingTextId == _selectedTextId) {
       _textFocus?.unfocus();
       _editingTextId = null;
@@ -176,15 +183,42 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     });
   }
 
+  /// Bir sonraki adımdan önce mevcut durumu yığına alır.
+  void _pushHistory() {
+    if (_history.length >= _historyLimit) _history.removeAt(0);
+    _history.add(
+      _UndoSnapshot(
+        strokes: List<DrawingStroke>.of(_strokes),
+        texts: List<TextElement>.of(_textElements),
+      ),
+    );
+  }
+
   void _undo() {
+    if (_history.isEmpty) return;
+    final snap = _history.removeLast();
+    _textFocus?.unfocus();
     setState(() {
-      if (_mode == _EditorMode.draw && _strokes.isNotEmpty) {
-        _strokes.removeLast();
-      } else if (_textElements.isNotEmpty) {
-        _textElements.removeLast();
-      } else if (_strokes.isNotEmpty) {
-        _strokes.removeLast();
-      }
+      _strokes
+        ..clear()
+        ..addAll(snap.strokes);
+      _textElements
+        ..clear()
+        ..addAll(snap.texts);
+      _selectedTextId = null;
+      _editingTextId = null;
+    });
+  }
+
+  void _clearAll() {
+    if (_strokes.isEmpty && _textElements.isEmpty) return;
+    _pushHistory();
+    _textFocus?.unfocus();
+    setState(() {
+      _strokes.clear();
+      _textElements.clear();
+      _selectedTextId = null;
+      _editingTextId = null;
     });
   }
 
@@ -274,16 +308,81 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Klavye açılınca tuvalin küçülmesini engelle: klavye panelin üstüne biner,
+    // metin alanı ise klavyenin hemen üstünde yüzer. Böylece fotoğraf hiçbir
+    // zaman beyaz bir katmanla / kırpılmış bir alanla kapanmaz.
+    final keyboard = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            _topBar(),
-            Expanded(child: _canvasArea()),
-            _bottomPanel(),
+            Column(
+              children: [
+                _topBar(),
+                Expanded(child: _canvasArea()),
+                _bottomPanel(),
+              ],
+            ),
+            if (_editingTextId != null)
+              Positioned(
+                left: 10,
+                right: 10,
+                bottom: keyboard + 10,
+                child: _inlineTextEditor(),
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _inlineTextEditor() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 6, 4, 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF11151C).withValues(alpha: 0.97),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.55)),
+        boxShadow: const [
+          BoxShadow(color: Colors.black54, blurRadius: 12, offset: Offset(0, 4)),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _textCtrl,
+              focusNode: _textFocus,
+              autofocus: true,
+              maxLines: 3,
+              minLines: 1,
+              cursorColor: FastTheme.accentGold,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              onSubmitted: (_) => _finishInlineEdit(),
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: 'Yazı yaz… fotoğrafın üstünde canlı görünür',
+                hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                filled: true,
+                fillColor: const Color(0xFF1B1F2A),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Tamam',
+            onPressed: _finishInlineEdit,
+            icon: Icon(Icons.check_circle, color: FastTheme.accentGold),
+          ),
+        ],
       ),
     );
   }
@@ -300,8 +399,22 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
           const Spacer(),
           IconButton(
             tooltip: 'Geri al',
-            onPressed: _undo,
-            icon: const Icon(Icons.undo, color: Colors.white),
+            onPressed: _history.isEmpty ? null : _undo,
+            icon: Icon(
+              Icons.undo,
+              color: _history.isEmpty ? Colors.white24 : Colors.white,
+            ),
+          ),
+          IconButton(
+            tooltip: 'Tüm çizimleri/yazıları sil',
+            onPressed:
+                (_strokes.isEmpty && _textElements.isEmpty) ? null : _clearAll,
+            icon: Icon(
+              Icons.delete_sweep_outlined,
+              color: (_strokes.isEmpty && _textElements.isEmpty)
+                  ? Colors.white24
+                  : Colors.white,
+            ),
           ),
           IconButton(
             tooltip: 'Görseli sıfırla',
@@ -371,6 +484,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                     child: _mode == _EditorMode.draw
                         ? StoryDrawingCanvas(
                             strokes: _strokes,
+                            onGestureStart: _pushHistory,
                             onStrokesChanged: (strokes) {
                               setState(() {
                                 _strokes
@@ -380,6 +494,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                             },
                             currentColor: _currentColor,
                             strokeWidth: _strokeWidth,
+                            tool: _tool,
                           )
                         : CustomPaint(
                             painter: StoryDrawingPainter(strokes: _strokes),
@@ -458,9 +573,25 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          SizedBox(
+            height: 34,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _penChip('Kalem', PenTool.pen, Icons.edit),
+                _penChip('Neon', PenTool.neon, Icons.auto_awesome),
+                _penChip('Fosforlu', PenTool.highlight, Icons.brush),
+                _penChip('Silgi', PenTool.eraser, Icons.cleaning_services),
+              ],
+            ),
+          ),
           Row(
             children: [
-              const Icon(Icons.brush, color: Colors.white70, size: 16),
+              Icon(
+                _tool == PenTool.eraser ? Icons.cleaning_services : Icons.brush,
+                color: Colors.white70,
+                size: 16,
+              ),
               Expanded(
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
@@ -487,7 +618,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              _tabButton('Neon', 0),
+              _tabButton('Canlı', 0),
               const SizedBox(width: 6),
               _tabButton('Pastel', 1),
             ],
@@ -507,6 +638,37 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     );
   }
 
+  Widget _penChip(String label, PenTool tool, IconData icon) {
+    final active = _tool == tool;
+    return GestureDetector(
+      onTap: () => setState(() => _tool = tool),
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: active ? FastTheme.accentGold : Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: active ? Colors.black : Colors.white),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: active ? Colors.black : Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _textControls(TextElement sel) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -514,47 +676,12 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_editingTextId == sel.id)
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _textCtrl,
-                    focusNode: _textFocus,
-                    autofocus: true,
-                    maxLines: 3,
-                    minLines: 1,
-                    textInputAction: TextInputAction.done,
-                    cursorColor: FastTheme.accentGold,
-                    style: const TextStyle(color: Colors.white, fontSize: 15),
-                    onSubmitted: (_) => _finishInlineEdit(),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: 'Yazı yaz…',
-                      hintStyle: const TextStyle(color: Colors.white38),
-                      filled: true,
-                      fillColor: const Color(0xFF1B1F2A),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.white24),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: FastTheme.accentGold),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                IconButton(
-                  tooltip: 'Tamam',
-                  onPressed: _finishInlineEdit,
-                  icon: Icon(Icons.check_circle, color: FastTheme.accentGold),
-                ),
-              ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Yazıyı klavyeden yaz — fotoğrafın üstünde canlı görünür',
+                style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
+              ),
             )
           else
             Align(
@@ -784,4 +911,12 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       ),
     );
   }
+}
+
+/// Geri alma için saklanan anlık görüntü.
+class _UndoSnapshot {
+  final List<DrawingStroke> strokes;
+  final List<TextElement> texts;
+
+  _UndoSnapshot({required this.strokes, required this.texts});
 }
