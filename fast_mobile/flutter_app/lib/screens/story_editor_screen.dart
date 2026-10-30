@@ -9,7 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../config/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../models/story_element.dart';
+import '../services/story_draft_service.dart';
 import '../widgets/story_drawing_canvas.dart';
 import '../widgets/story_text_layer.dart';
 
@@ -26,7 +28,8 @@ import '../widgets/story_text_layer.dart';
 ///    görsel ekranda görünenin birebir aynısıdır (WYSIWYG).
 class StoryEditorScreen extends StatefulWidget {
   final XFile imageFile;
-  const StoryEditorScreen({super.key, required this.imageFile});
+  final Map<String, dynamic>? draft;
+  const StoryEditorScreen({super.key, required this.imageFile, this.draft});
 
   @override
   State<StoryEditorScreen> createState() => _StoryEditorScreenState();
@@ -48,6 +51,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   Color _currentColor = const Color(0xFF00E0FF);
   int _colorTab = 0; // 0 = canlı, 1 = pastel
   bool _rendering = false;
+  bool _allowPop = false;
+  bool _exitDialogOpen = false;
+  double? _draftCanvasWidth;
 
   /// Geri alma geçmişi (çizimler + metinler).
   final List<_UndoSnapshot> _history = [];
@@ -62,24 +68,209 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   late double _startRotation;
   Size _canvasSize = Size.zero;
 
+  @override
+  void initState() {
+    super.initState();
+    final draft = widget.draft;
+    if (draft == null) return;
+    _draftCanvasWidth = (draft['canvasWidth'] as num).toDouble();
+    _scale = (draft['scale'] as num).toDouble();
+    _rotation = (draft['rotation'] as num).toDouble();
+    _offset = Offset(
+      (draft['offsetX'] as num).toDouble(),
+      (draft['offsetY'] as num).toDouble(),
+    );
+    for (final item in draft['strokes'] as List) {
+      final s = item as Map<String, dynamic>;
+      _strokes.add(
+        DrawingStroke(
+          points: (s['points'] as List)
+              .map(
+                (p) =>
+                    Offset((p[0] as num).toDouble(), (p[1] as num).toDouble()),
+              )
+              .toList(),
+          color: Color(s['color'] as int),
+          strokeWidth: (s['width'] as num).toDouble(),
+          neon: s['neon'] as bool,
+          highlight: s['highlight'] as bool,
+        ),
+      );
+    }
+    for (final item in draft['texts'] as List) {
+      final t = item as Map<String, dynamic>;
+      _textElements.add(
+        TextElement(
+          id: t['id'] as String,
+          text: t['text'] as String,
+          position: Offset(
+            (t['x'] as num).toDouble(),
+            (t['y'] as num).toDouble(),
+          ),
+          scale: (t['scale'] as num).toDouble(),
+          rotation: (t['rotation'] as num).toDouble(),
+          color: Color(t['color'] as int),
+          fontSize: (t['fontSize'] as num).toDouble(),
+          fontFamily: t['fontFamily'] as String,
+        ),
+      );
+    }
+  }
+
+  Map<String, dynamic> _draftState() => {
+    'canvasWidth': _canvasSize.width,
+    'scale': _scale,
+    'rotation': _rotation,
+    'offsetX': _offset.dx,
+    'offsetY': _offset.dy,
+    'strokes': [
+      for (final s in _strokes)
+        {
+          'points': [
+            for (final p in s.points) [p.dx, p.dy],
+          ],
+          'color': s.color.toARGB32(),
+          'width': s.strokeWidth,
+          'neon': s.neon,
+          'highlight': s.highlight,
+        },
+    ],
+    'texts': [
+      for (final t in _textElements)
+        {
+          'id': t.id,
+          'text': t.text,
+          'x': t.position.dx,
+          'y': t.position.dy,
+          'scale': t.scale,
+          'rotation': t.rotation,
+          'color': t.color.toARGB32(),
+          'fontSize': t.fontSize,
+          'fontFamily': t.fontFamily,
+        },
+    ],
+  };
+
+  void _popEditor([File? result]) {
+    setState(() => _allowPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.of(context).pop(result);
+    });
+  }
+
+  Future<void> _requestExit() async {
+    if (_exitDialogOpen || _rendering) return;
+    final l10n = AppLocalizations.of(context);
+    if (_editingTextId != null) _finishInlineEdit();
+    _exitDialogOpen = true;
+    final action = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1B1F2A),
+        title: Text(
+          l10n.storyDiscardTitle,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          l10n.storyDiscardMessage,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 'discard'),
+            child: Text(l10n.storyDiscardAction),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 'save'),
+            child: Text(l10n.storySaveDraft),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 'continue'),
+            child: Text(l10n.storyContinueEditing),
+          ),
+        ],
+      ),
+    );
+    _exitDialogOpen = false;
+    if (!mounted || action == null || action == 'continue') return;
+    try {
+      if (action == 'save') {
+        final existing = await StoryDraftService.load();
+        if (!mounted) return;
+        if (existing != null && widget.draft == null) {
+          final replace = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.storyReplaceDraftTitle),
+              content: Text(l10n.storyReplaceDraftMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(l10n.peopleCancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(l10n.storyReplaceDraftAction),
+                ),
+              ],
+            ),
+          );
+          if (replace != true || !mounted) return;
+        }
+        await StoryDraftService.save(widget.imageFile.path, _draftState());
+      } else if (action == 'discard' && widget.draft != null) {
+        await StoryDraftService.delete();
+      }
+      if (mounted) _popEditor();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.storyDraftFailure)));
+      }
+    }
+  }
+
   final List<Color> _neonColors = [
-    const Color(0xFF00E0FF), const Color(0xFFFF3366), const Color(0xFF39FF14),
-    const Color(0xFFFF00FF), const Color(0xFFFFAE00), const Color(0xFFFFFF00),
-    const Color(0xFF00FF88), const Color(0xFFFF4D4D), const Color(0xFF4D79FF),
-    const Color(0xFFFF66CC), const Color(0xFF00FFFF), const Color(0xFFFFD700),
+    const Color(0xFF00E0FF),
+    const Color(0xFFFF3366),
+    const Color(0xFF39FF14),
+    const Color(0xFFFF00FF),
+    const Color(0xFFFFAE00),
+    const Color(0xFFFFFF00),
+    const Color(0xFF00FF88),
+    const Color(0xFFFF4D4D),
+    const Color(0xFF4D79FF),
+    const Color(0xFFFF66CC),
+    const Color(0xFF00FFFF),
+    const Color(0xFFFFD700),
   ];
 
   final List<Color> _pastelColors = [
-    const Color(0xFFF6A6C1), const Color(0xFFC9DEEE), const Color(0xFFB8E0D2),
-    const Color(0xFFF7D6E0), const Color(0xFFFFD6A5), const Color(0xFFCAFFBF),
-    const Color(0xFFD4C5F9), const Color(0xFFFFE0E0), const Color(0xFFE0F7FA),
-    const Color(0xFFFFF3C4), const Color(0xFFE8D5C4), const Color(0xFFCCE5FF),
+    const Color(0xFFF6A6C1),
+    const Color(0xFFC9DEEE),
+    const Color(0xFFB8E0D2),
+    const Color(0xFFF7D6E0),
+    const Color(0xFFFFD6A5),
+    const Color(0xFFCAFFBF),
+    const Color(0xFFD4C5F9),
+    const Color(0xFFFFE0E0),
+    const Color(0xFFE0F7FA),
+    const Color(0xFFFFF3C4),
+    const Color(0xFFE8D5C4),
+    const Color(0xFFCCE5FF),
   ];
 
   final List<Color> _textColors = [
-    Colors.white, Colors.black, const Color(0xFFFF3366), const Color(0xFF00E0FF),
-    const Color(0xFF39FF14), const Color(0xFFFFAE00), const Color(0xFFFF00FF),
-    const Color(0xFFFFFF00), const Color(0xFF4D79FF),
+    Colors.white,
+    Colors.black,
+    const Color(0xFFFF3366),
+    const Color(0xFF00E0FF),
+    const Color(0xFF39FF14),
+    const Color(0xFFFFAE00),
+    const Color(0xFFFF00FF),
+    const Color(0xFFFFFF00),
+    const Color(0xFF4D79FF),
   ];
 
   List<Color> get _colors => _colorTab == 0 ? _neonColors : _pastelColors;
@@ -275,7 +466,8 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 40));
     try {
       final boundary =
-          _repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) throw Exception('Render error');
       final image = await boundary.toImage(pixelRatio: 2.5);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -286,12 +478,12 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       final file = File('${dir.path}/story_${const Uuid().v4()}.png');
       await file.writeAsBytes(bytes);
 
-      if (mounted) Navigator.of(context).pop(file);
+      if (mounted) _popEditor(file);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Hata: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Hata: $e')));
       }
     } finally {
       if (mounted) setState(() => _rendering = false);
@@ -312,27 +504,33 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     // metin alanı ise klavyenin hemen üstünde yüzer. Böylece fotoğraf hiçbir
     // zaman beyaz bir katmanla / kırpılmış bir alanla kapanmaz.
     final keyboard = MediaQuery.of(context).viewInsets.bottom;
-    return Scaffold(
-      backgroundColor: Colors.black,
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                _topBar(),
-                Expanded(child: _canvasArea()),
-                _bottomPanel(),
-              ],
-            ),
-            if (_editingTextId != null)
-              Positioned(
-                left: 10,
-                right: 10,
-                bottom: keyboard + 10,
-                child: _inlineTextEditor(),
+    return PopScope<File>(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _requestExit();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  _topBar(),
+                  Expanded(child: _canvasArea()),
+                  _bottomPanel(),
+                ],
               ),
-          ],
+              if (_editingTextId != null)
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: keyboard + 10,
+                  child: _inlineTextEditor(),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -346,7 +544,11 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.55)),
         boxShadow: const [
-          BoxShadow(color: Colors.black54, blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
@@ -368,8 +570,10 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
                 filled: true,
                 fillColor: const Color(0xFF1B1F2A),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -393,7 +597,7 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: _requestExit,
             icon: const Icon(Icons.close, color: Colors.white, size: 26),
           ),
           const Spacer(),
@@ -407,8 +611,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
           ),
           IconButton(
             tooltip: 'Tüm çizimleri/yazıları sil',
-            onPressed:
-                (_strokes.isEmpty && _textElements.isEmpty) ? null : _clearAll,
+            onPressed: (_strokes.isEmpty && _textElements.isEmpty)
+                ? null
+                : _clearAll,
             icon: Icon(
               Icons.delete_sweep_outlined,
               color: (_strokes.isEmpty && _textElements.isEmpty)
@@ -457,6 +662,25 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
           if (h > cons.maxHeight) {
             h = cons.maxHeight;
             w = h * aspect;
+          }
+          if (_draftCanvasWidth != null && _draftCanvasWidth! > 0 && w > 0) {
+            final ratio = w / _draftCanvasWidth!;
+            _offset *= ratio;
+            for (var i = 0; i < _strokes.length; i++) {
+              final s = _strokes[i];
+              _strokes[i] = s.copyWith(
+                points: s.points.map((p) => p * ratio).toList(),
+                strokeWidth: s.strokeWidth * ratio,
+              );
+            }
+            for (var i = 0; i < _textElements.length; i++) {
+              final t = _textElements[i];
+              _textElements[i] = t.copyWith(
+                position: t.position * ratio,
+                fontSize: t.fontSize * ratio,
+              );
+            }
+            _draftCanvasWidth = null;
           }
           _canvasSize = Size(w, h);
           return SizedBox(
@@ -512,30 +736,29 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                     ),
                   // 4) Metin katmanları
                   ..._textElements.map(
-                    (element) => IgnorePointer(
+                    (element) => StoryTextLayerWidget(
+                      key: ValueKey(element.id),
                       ignoring: _mode == _EditorMode.draw,
-                      child: StoryTextLayerWidget(
-                        element: element,
-                        selected: _selectedTextId == element.id,
-                        onTap: () {
-                          if (_editingTextId != null &&
-                              _editingTextId != element.id) {
-                            _finishInlineEdit();
-                          }
-                          setState(() {
-                            _selectedTextId = element.id;
-                          });
-                        },
-                        onChanged: (updated) {
-                          setState(() {
-                            final idx = _textElements.indexWhere(
-                              (e) => e.id == updated.id,
-                            );
-                            if (idx >= 0) _textElements[idx] = updated;
-                          });
-                        },
-                        onDelete: _deleteSelectedText,
-                      ),
+                      element: element,
+                      selected: _selectedTextId == element.id,
+                      onTap: () {
+                        if (_editingTextId != null &&
+                            _editingTextId != element.id) {
+                          _finishInlineEdit();
+                        }
+                        setState(() {
+                          _selectedTextId = element.id;
+                        });
+                      },
+                      onChanged: (updated) {
+                        setState(() {
+                          final idx = _textElements.indexWhere(
+                            (e) => e.id == updated.id,
+                          );
+                          if (idx >= 0) _textElements[idx] = updated;
+                        });
+                      },
+                      onDelete: _deleteSelectedText,
                     ),
                   ),
                 ],
@@ -596,8 +819,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 2,
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 8,
+                    ),
                   ),
                   child: Slider(
                     value: _strokeWidth,
@@ -647,7 +871,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: active ? FastTheme.accentGold : Colors.white.withValues(alpha: 0.08),
+          color: active
+              ? FastTheme.accentGold
+              : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -706,9 +932,8 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 final f = kStoryFonts[i];
                 final active = sel.fontFamily == f.key;
                 return GestureDetector(
-                  onTap: () => _updateSelectedText(
-                    (e) => e.copyWith(fontFamily: f.key),
-                  ),
+                  onTap: () =>
+                      _updateSelectedText((e) => e.copyWith(fontFamily: f.key)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     alignment: Alignment.center,
@@ -755,7 +980,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                             color: c,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: active ? FastTheme.accentGold : Colors.white38,
+                              color: active
+                                  ? FastTheme.accentGold
+                                  : Colors.white38,
                               width: active ? 3 : 1,
                             ),
                           ),
@@ -768,8 +995,11 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
               IconButton(
                 tooltip: 'Sil',
                 onPressed: _deleteSelectedText,
-                icon: const Icon(Icons.delete_outline,
-                    color: Colors.white, size: 20),
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ],
           ),
@@ -780,8 +1010,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 2,
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 8,
+                    ),
                   ),
                   child: Slider(
                     value: sel.fontSize.clamp(12, 72),
@@ -842,7 +1073,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: active ? FastTheme.accentGold : Colors.white.withValues(alpha: 0.08),
+          color: active
+              ? FastTheme.accentGold
+              : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Text(

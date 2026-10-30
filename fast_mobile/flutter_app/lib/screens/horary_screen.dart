@@ -9,8 +9,10 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../services/horary_service.dart';
+import '../services/horary_localization.dart';
 import '../services/pro_service.dart';
 import '../widgets/holavon_mark.dart';
+import '../widgets/horary_localized_detail.dart';
 import 'landing_screen.dart';
 
 /// Horary Oracle: soru anının haritasıyla chat gibi cevap.
@@ -232,7 +234,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       final verdict = (data['verdict'] ?? '').toString();
       final ans = (data['answer'] ?? verdict).toString();
       setState(() {
-        _lastChart = data;
+        if (data['houses'] is Map && (data['houses'] as Map).isNotEmpty) {
+          _lastChart = data;
+        }
         _chat.add(_ChatMsg('assistant', ans, meta: data));
         _persistChat();
       });
@@ -676,7 +680,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.share_outlined, size: 14, color: FastTheme.textDim),
                   const SizedBox(width: 4),
-                  Text('Paylaş', style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  Text(AppLocalizations.of(context).createPostShare, style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
                 ]),
               ),
             ]),
@@ -690,7 +694,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     final data = _lastChart!;
     final h = data['houses'] is Map ? data['houses'] as Map : const {};
     final p = data['planets'] is Map ? data['planets'] as Map : const {};
-    final ascSign = (h['asc_sign'] ?? '').toString();
+    final ascSign = localizeHorarySign((h['asc_sign'] ?? '').toString(), l10n);
     final ascDeg = h['asc'] != null ? ((h['asc'] as num) % 30).toStringAsFixed(1) : '';
     final moon = p['Moon'] is Map ? p['Moon'] as Map : const {};
     return Padding(
@@ -712,9 +716,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
                 children: [
                   Text('${l10n.horaryAsc}: $ascSign $ascDeg°', style: TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 3),
-                  Text('${l10n.horaryMoon}: ${(moon['sign'] ?? '').toString()} ${moon['deg'] != null ? (moon['deg'] as num).toStringAsFixed(1) : ''}°', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                  Text('${l10n.horaryMoon}: ${localizeHorarySign((moon['sign'] ?? '').toString(), l10n)} ${moon['deg'] != null ? (moon['deg'] as num).toStringAsFixed(1) : ''}°', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
                   const SizedBox(height: 3),
-                  Text('${(data['verdict'] ?? '').toString()}', style: TextStyle(color: _verdictColor((data['verdict'] ?? '').toString()), fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(localizeHoraryVerdict((data['verdict'] ?? '').toString(), l10n), style: TextStyle(color: _verdictColor((data['verdict'] ?? '').toString()), fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -724,7 +728,10 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     );
   }
 
-  Widget _timingCard(AppLocalizations l10n, DateTime target) {    final timingText = (_lastChart?['timing'] is Map) ? ((_lastChart!['timing'] as Map)['text'] ?? '').toString() : '';
+  Widget _timingCard(AppLocalizations l10n, DateTime target) {
+    final timing = (_lastChart!['timing'] as Map);
+    final timingText = (timing['text'] ?? '').toString();
+    final localizedTiming = localizeHoraryTiming(timing, l10n);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: Container(
@@ -737,7 +744,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
         child: Row(children: [
           Icon(Icons.timer_outlined, size: 16, color: FastTheme.accentGold),
           const SizedBox(width: 8),
-          Expanded(child: Text(timingText, style: TextStyle(color: FastTheme.textLight, fontSize: 11, fontWeight: FontWeight.w600))),
+          Expanded(child: localizedTiming != null
+              ? Text(localizedTiming, style: TextStyle(color: FastTheme.textLight, fontSize: 11, fontWeight: FontWeight.w600))
+              : HoraryLocalizedDetail(text: timingText, style: TextStyle(color: FastTheme.textLight, fontSize: 11, fontWeight: FontWeight.w600))),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(color: FastTheme.accentGold, borderRadius: BorderRadius.circular(20)),
@@ -791,7 +800,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(width: 6, height: 6, margin: const EdgeInsets.only(top: 5, right: 6), decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-                          Expanded(child: Text('${m['meaning'] ?? ''}', style: TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.4))),
+                          Expanded(child: HoraryLocalizedDetail(text: '${m['meaning'] ?? ''}', style: TextStyle(color: FastTheme.textMuted, fontSize: 12, height: 1.4))),
                         ],
                       ),
                     );

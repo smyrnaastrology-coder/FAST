@@ -9,6 +9,78 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get storyDiscardTitle => 'Discard edits?';
+
+  @override
+  String get storyDiscardMessage =>
+      'You can save your story as a draft or keep editing.';
+
+  @override
+  String get storyDiscardAction => 'Discard';
+
+  @override
+  String get storySaveDraft => 'Save draft';
+
+  @override
+  String get storyContinueEditing => 'Keep editing';
+
+  @override
+  String get storyReplaceDraftTitle => 'Replace the existing draft?';
+
+  @override
+  String get storyReplaceDraftMessage =>
+      'There is already a story draft on this device.';
+
+  @override
+  String get storyReplaceDraftAction => 'Replace';
+
+  @override
+  String get storyDraftFailure => 'Could not save or delete the draft.';
+
+  @override
+  String get storyDraftReadFailure => 'Could not load the story draft.';
+
+  @override
+  String get storyEditDraft => 'Edit draft';
+
+  @override
+  String get horaryMinute => 'minute';
+
+  @override
+  String get horaryHour => 'hour';
+
+  @override
+  String get horaryDay => 'day';
+
+  @override
+  String get horaryWeek => 'week';
+
+  @override
+  String get horaryMonth => 'month';
+
+  @override
+  String get horaryYear => 'year';
+
+  @override
+  String get horaryTranslating => 'Translating details…';
+
+  @override
+  String get horaryTranslationUnavailable =>
+      'Translation unavailable. Check your connection and try again.';
+
+  @override
+  String get horaryTranslationRetry => 'Retry';
+
+  @override
+  String get horaryVerdictYes => 'Yes';
+
+  @override
+  String get horaryVerdictNo => 'No';
+
+  @override
+  String get horaryVerdictUncertain => 'Uncertain';
+
+  @override
   String get editorPinchHint => 'Pinch to zoom • twist to rotate';
 
   @override
@@ -1845,6 +1917,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedDiscoverCta => 'Go to Discover';
+
+  @override
+  String get skyViaCombusta => 'Via Combusta';
+
+  @override
+  String get skyNotViaCombusta => 'Not in Via Combusta';
+
+  @override
+  String get skyViaCombustaDescription =>
+      'The Moon is between 15° Libra and 15° Scorpio; energy is constrained.';
+
+  @override
+  String get skyNotViaCombustaDescription => 'The Moon is not in Via Combusta.';
+
+  @override
+  String get skyLunarMansion => 'Lunar mansion';
+
+  @override
+  String get skyRecommended => 'Do';
+
+  @override
+  String get skyAvoid => 'Avoid';
 
   @override
   String get skyTitle => 'Sky';

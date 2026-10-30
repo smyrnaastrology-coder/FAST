@@ -8,6 +8,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/social_provider.dart';
 import '../services/social_service.dart';
+import '../services/story_draft_service.dart';
 import '../widgets/media_source_sheet.dart';
 import 'story_editor_screen.dart';
 
@@ -24,6 +25,38 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   bool _busy = false;
   String? _error;
   final List<SocialProfile> _mentions = [];
+  Map<String, dynamic>? _draft;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDraft();
+  }
+
+  Future<void> _loadDraft() async {
+    try {
+      final draft = await StoryDraftService.load();
+      if (mounted) setState(() => _draft = draft);
+    } catch (_) {
+      if (mounted) setState(() => _error = AppLocalizations.of(context).storyDraftReadFailure);
+    }
+  }
+
+  Future<void> _openEditor(XFile file, {Map<String, dynamic>? draft}) async {
+    final edited = await Navigator.of(context).push<File>(
+      MaterialPageRoute(
+        builder: (_) => StoryEditorScreen(imageFile: file, draft: draft),
+      ),
+    );
+    await _loadDraft();
+    if (edited == null) return;
+    final bytes = await edited.readAsBytes();
+    if (!mounted) return;
+    setState(() {
+      _bytes = bytes;
+      _error = null;
+    });
+  }
 
   Future<void> _chooseSource() async {
     final source = await showMediaSourceSheet(context);
@@ -34,24 +67,21 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
   Future<void> _pick(ImageSource source) async {
     final l10n = AppLocalizations.of(context);
     try {
-      final file = await ImagePicker().pickImage(source: source, maxWidth: 1600, imageQuality: 85);
+      final file = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
       if (file == null) return;
       if (!mounted) return;
-      // Open in editor
-      final edited = await Navigator.of(context).push<File>(
-        MaterialPageRoute(builder: (_) => StoryEditorScreen(imageFile: file)),
-      );
-      if (edited == null) return;
-      final bytes = await edited.readAsBytes();
-      if (!mounted) return;
-      setState(() {
-        _bytes = bytes;
-        _error = null;
-      });
+      await _openEditor(file);
     } catch (e) {
       if (!mounted) return;
-      final denied = e is PlatformException && e.code.toLowerCase().contains('camera');
-      setState(() => _error = denied ? l10n.mediaCameraDenied : l10n.mediaPickError);
+      final denied =
+          e is PlatformException && e.code.toLowerCase().contains('camera');
+      setState(
+        () => _error = denied ? l10n.mediaCameraDenied : l10n.mediaPickError,
+      );
     }
   }
 
@@ -60,7 +90,9 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       context: context,
       backgroundColor: FastTheme.cardBg,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (_) => const _MentionPicker(),
     );
     if (picked != null && mounted) {
@@ -81,7 +113,10 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     });
     try {
       final Uint8List out = _bytes!;
-      await SocialService.uploadStory(out, mentionIds: [for (final m in _mentions) m.userId]);
+      await SocialService.uploadStory(
+        out,
+        mentionIds: [for (final m in _mentions) m.userId],
+      );
       if (!mounted) return;
       context.read<SocialProvider>().refreshStories();
       if (!mounted) return;
@@ -89,7 +124,9 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
     } catch (e) {
       if (!mounted) return;
       final tooBig = e is StateError && e.message == 'file_too_large';
-      setState(() => _error = tooBig ? l10n.fileTooLarge : l10n.createPostError);
+      setState(
+        () => _error = tooBig ? l10n.fileTooLarge : l10n.createPostError,
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -102,19 +139,44 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
       backgroundColor: FastTheme.bg,
       appBar: AppBar(
         backgroundColor: FastTheme.bg,
-        title: Text(l10n.storyCreateTitle, style: TextStyle(color: FastTheme.accentGold, fontSize: 18)),
+        title: Text(
+          l10n.storyCreateTitle,
+          style: TextStyle(color: FastTheme.accentGold, fontSize: 18),
+        ),
         actions: [
           TextButton(
             onPressed: _busy ? null : _share,
             child: _busy
-                ? SizedBox(height: 18, width: 18, child: CircularProgressIndicator(color: FastTheme.accentGold, strokeWidth: 2))
-                : Text(l10n.createPostShare, style: TextStyle(color: FastTheme.accentGold, fontWeight: FontWeight.w700)),
+                ? SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(
+                      color: FastTheme.accentGold,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    l10n.createPostShare,
+                    style: TextStyle(
+                      color: FastTheme.accentGold,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_draft != null) ...[
+            OutlinedButton.icon(
+              onPressed: () =>
+                  _openEditor(XFile(_draft!['image'] as String), draft: _draft),
+              icon: const Icon(Icons.drafts_outlined),
+              label: Text(l10n.storyEditDraft),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (_bytes == null)
             GestureDetector(
               onTap: _chooseSource,
@@ -128,9 +190,19 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.auto_awesome, size: 56, color: FastTheme.accentGold),
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 56,
+                      color: FastTheme.accentGold,
+                    ),
                     const SizedBox(height: 12),
-                    Text(l10n.createPostPick, style: TextStyle(color: FastTheme.textMuted, fontSize: 14)),
+                    Text(
+                      l10n.createPostPick,
+                      style: TextStyle(
+                        color: FastTheme.textMuted,
+                        fontSize: 14,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -146,12 +218,21 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
             const SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: _chooseSource,
-              icon: Icon(Icons.edit_outlined, color: FastTheme.accentGold, size: 20),
-              label: Text(l10n.mediaChange, style: TextStyle(color: FastTheme.accentGold)),
+              icon: Icon(
+                Icons.edit_outlined,
+                color: FastTheme.accentGold,
+                size: 20,
+              ),
+              label: Text(
+                l10n.mediaChange,
+                style: TextStyle(color: FastTheme.accentGold),
+              ),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: FastTheme.border),
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],
@@ -159,12 +240,21 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
           // ── Etiketleme ──
           OutlinedButton.icon(
             onPressed: _pickMention,
-            icon: Icon(Icons.alternate_email, color: FastTheme.accentGold, size: 20),
-            label: Text(l10n.storyMention, style: TextStyle(color: FastTheme.accentGold)),
+            icon: Icon(
+              Icons.alternate_email,
+              color: FastTheme.accentGold,
+              size: 20,
+            ),
+            label: Text(
+              l10n.storyMention,
+              style: TextStyle(color: FastTheme.accentGold),
+            ),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: FastTheme.border),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
           if (_mentions.isNotEmpty) ...[
@@ -175,8 +265,13 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
               children: [
                 for (final m in _mentions)
                   Chip(
-                    label: Text('@${m.username}', style: TextStyle(color: FastTheme.text, fontSize: 12)),
-                    backgroundColor: FastTheme.accentGold.withValues(alpha: 0.15),
+                    label: Text(
+                      '@${m.username}',
+                      style: TextStyle(color: FastTheme.text, fontSize: 12),
+                    ),
+                    backgroundColor: FastTheme.accentGold.withValues(
+                      alpha: 0.15,
+                    ),
                     deleteIconColor: FastTheme.textDim,
                     onDeleted: () => setState(() => _mentions.remove(m)),
                   ),
@@ -185,7 +280,10 @@ class _CreateStoryScreenState extends State<CreateStoryScreen> {
           ],
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(_error!, style: TextStyle(color: FastTheme.error, fontSize: 13)),
+            Text(
+              _error!,
+              style: TextStyle(color: FastTheme.error, fontSize: 13),
+            ),
           ],
         ],
       ),
@@ -222,10 +320,11 @@ class _MentionPickerState extends State<_MentionPicker> {
   Future<void> _search(String q) async {
     setState(() => _loading = true);
     final r = await SocialService.searchUsers(q);
-    if (mounted) setState(() {
-      _res = r;
-      _loading = false;
-    });
+    if (mounted)
+      setState(() {
+        _res = r;
+        _loading = false;
+      });
   }
 
   @override
@@ -233,17 +332,24 @@ class _MentionPickerState extends State<_MentionPicker> {
     final l10n = AppLocalizations.of(context);
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
         child: Container(
           padding: const EdgeInsets.all(16),
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: _q,
                 style: TextStyle(color: FastTheme.text),
-                decoration: InputDecoration(hintText: l10n.searchHint, prefixIcon: Icon(Icons.search, color: FastTheme.textDim)),
+                decoration: InputDecoration(
+                  hintText: l10n.searchHint,
+                  prefixIcon: Icon(Icons.search, color: FastTheme.textDim),
+                ),
               ),
               const SizedBox(height: 8),
               if (_loading)
@@ -261,14 +367,32 @@ class _MentionPickerState extends State<_MentionPicker> {
                       return ListTile(
                         dense: true,
                         leading: CircleAvatar(
-                          backgroundColor: FastTheme.accentGold.withValues(alpha: 0.15),
-                          child: Text((p.username.isNotEmpty ? p.username[0] : '?').toUpperCase(),
-                              style: TextStyle(color: FastTheme.accentGold, fontWeight: FontWeight.w700)),
+                          backgroundColor: FastTheme.accentGold.withValues(
+                            alpha: 0.15,
+                          ),
+                          child: Text(
+                            (p.username.isNotEmpty ? p.username[0] : '?')
+                                .toUpperCase(),
+                            style: TextStyle(
+                              color: FastTheme.accentGold,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                        title: Text('@${p.username}', style: TextStyle(color: FastTheme.text)),
-                        subtitle: p.displayName == null || p.displayName!.isEmpty
+                        title: Text(
+                          '@${p.username}',
+                          style: TextStyle(color: FastTheme.text),
+                        ),
+                        subtitle:
+                            p.displayName == null || p.displayName!.isEmpty
                             ? null
-                            : Text(p.displayName!, style: TextStyle(color: FastTheme.textDim, fontSize: 12)),
+                            : Text(
+                                p.displayName!,
+                                style: TextStyle(
+                                  color: FastTheme.textDim,
+                                  fontSize: 12,
+                                ),
+                              ),
                         onTap: () => Navigator.pop(context, p),
                       );
                     },

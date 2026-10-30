@@ -48,6 +48,7 @@ TextStyle storyFontStyle(
 class StoryTextLayerWidget extends StatefulWidget {
   final TextElement element;
   final bool selected;
+  final bool ignoring;
   final VoidCallback onTap;
   final ValueChanged<TextElement> onChanged;
   final VoidCallback onDelete;
@@ -56,6 +57,7 @@ class StoryTextLayerWidget extends StatefulWidget {
     super.key,
     required this.element,
     required this.selected,
+    this.ignoring = false,
     required this.onTap,
     required this.onChanged,
     required this.onDelete,
@@ -77,47 +79,50 @@ class _StoryTextLayerWidgetState extends State<StoryTextLayerWidget> {
     return Positioned(
       left: e.position.dx,
       top: e.position.dy,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: widget.onTap,
-        onScaleStart: (d) {
-          widget.onTap();
-          _startPos = e.position;
-          _startFocal = d.focalPoint;
-          _startScale = e.scale;
-          _startRotation = e.rotation;
-        },
-        onScaleUpdate: (d) {
-          final nextScale = (_startScale * d.scale).clamp(0.3, 6.0);
-          final nextRotation = _startRotation + d.rotation;
-          final nextPos = _startPos + (d.focalPoint - _startFocal);
-          widget.onChanged(
-            e.copyWith(
-              position: nextPos,
-              scale: nextScale,
-              rotation: nextRotation,
-            ),
-          );
-        },
-        child: Transform.rotate(
-          angle: e.rotation,
-          child: Transform.scale(
-            scale: e.scale,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: widget.selected
-                  ? BoxDecoration(
-                      border: Border.all(color: Colors.white70, width: 1),
-                      borderRadius: BorderRadius.circular(6),
-                    )
-                  : null,
-              child: Text(
-                e.text,
-                textAlign: TextAlign.center,
-                style: storyFontStyle(
-                  e.fontFamily,
-                  color: e.color,
-                  fontSize: e.fontSize,
+      child: IgnorePointer(
+        ignoring: widget.ignoring,
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: widget.onTap,
+          onScaleStart: (d) {
+            widget.onTap();
+            _startPos = e.position;
+            _startFocal = d.focalPoint;
+            _startScale = e.scale;
+            _startRotation = e.rotation;
+          },
+          onScaleUpdate: (d) {
+            final nextScale = (_startScale * d.scale).clamp(0.3, 6.0);
+            final nextRotation = _startRotation + d.rotation;
+            final nextPos = _startPos + (d.focalPoint - _startFocal);
+            widget.onChanged(
+              e.copyWith(
+                position: nextPos,
+                scale: nextScale,
+                rotation: nextRotation,
+              ),
+            );
+          },
+          child: Transform.rotate(
+            angle: e.rotation,
+            child: Transform.scale(
+              scale: e.scale,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: widget.selected
+                    ? BoxDecoration(
+                        border: Border.all(color: Colors.white70, width: 1),
+                        borderRadius: BorderRadius.circular(6),
+                      )
+                    : null,
+                child: Text(
+                  e.text,
+                  textAlign: TextAlign.center,
+                  style: storyFontStyle(
+                    e.fontFamily,
+                    color: e.color,
+                    fontSize: e.fontSize,
+                  ),
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../config/astro_signs.dart';
 import '../config/lunar_mansions.dart';
+import '../config/lunar_mansions_localized.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_snapshot.dart';
@@ -205,7 +206,7 @@ class _SkyStripState extends State<SkyStrip> {
     final detail = StringBuffer(phase);
     detail.write(' · ${_speedName(l, sky.speedKey)}');
     if (sky.voidOfCourse) detail.write(' · ${l.skyVoid}');
-    if (sky.isYanikYol) detail.write(' · Yanık yol');
+    if (sky.isYanikYol) detail.write(' · ${l.skyViaCombusta}');
     detail.write(' · ${_planetGlyphs[sky.hourRuler] ?? ''} $hour');
 
     return Padding(
@@ -403,20 +404,20 @@ class SkyDetailSheet extends StatelessWidget {
             ),
             _InfoRow(
               glyph: sky.isYanikYol ? '☉' : '☾',
-              title: sky.isYanikYol ? 'Yanık yol' : 'Yanık yol değil',
+              title: sky.isYanikYol ? l.skyViaCombusta : l.skyNotViaCombusta,
               subtitle: sky.isYanikYol
-                  ? 'Ay 15° Terazi–15° Akrep arasında; enerji baskılanır'
-                  : 'Ay yanık yolda değil',
+                  ? l.skyViaCombustaDescription
+                  : l.skyNotViaCombustaDescription,
               highlight: sky.isYanikYol,
             ),
             Builder(builder: (ctx) {
-              final m = mansionForLongitude(sky.moonLongitude);
+              final m = localizedLunarMansion(mansionForLongitude(sky.moonLongitude), lang);
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _InfoRow(
                     glyph: '☽',
-                    title: 'Menzil: ${m.name}',
+                    title: '${l.skyLunarMansion}: ${m.name}',
                     subtitle: m.meaning,
                   ),
                   Padding(
@@ -424,8 +425,8 @@ class SkyDetailSheet extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Yap: ${m.doText}', style: TextStyle(color: FastTheme.success, fontSize: 12)),
-                        Text('Kaçın: ${m.avoidText}', style: TextStyle(color: FastTheme.error, fontSize: 12)),
+                        Text('${l.skyRecommended}: ${m.doText}', style: TextStyle(color: FastTheme.success, fontSize: 12)),
+                        Text('${l.skyAvoid}: ${m.avoidText}', style: TextStyle(color: FastTheme.error, fontSize: 12)),
                       ],
                     ),
                   ),

@@ -9,6 +9,78 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
+  String get storyDiscardTitle => 'Düzenlemeleri sil?';
+
+  @override
+  String get storyDiscardMessage =>
+      'Hikâyeyi taslak olarak kaydedebilir veya düzenlemeye devam edebilirsin.';
+
+  @override
+  String get storyDiscardAction => 'Sil';
+
+  @override
+  String get storySaveDraft => 'Taslağı kaydet';
+
+  @override
+  String get storyContinueEditing => 'Düzenlemeye devam et';
+
+  @override
+  String get storyReplaceDraftTitle => 'Mevcut taslak değiştirilsin mi?';
+
+  @override
+  String get storyReplaceDraftMessage =>
+      'Cihazda bir hikâye taslağı zaten var.';
+
+  @override
+  String get storyReplaceDraftAction => 'Değiştir';
+
+  @override
+  String get storyDraftFailure => 'Taslak kaydedilemedi veya silinemedi.';
+
+  @override
+  String get storyDraftReadFailure => 'Hikâye taslağı okunamadı.';
+
+  @override
+  String get storyEditDraft => 'Taslağı düzenle';
+
+  @override
+  String get horaryMinute => 'dakika';
+
+  @override
+  String get horaryHour => 'saat';
+
+  @override
+  String get horaryDay => 'gün';
+
+  @override
+  String get horaryWeek => 'hafta';
+
+  @override
+  String get horaryMonth => 'ay';
+
+  @override
+  String get horaryYear => 'yıl';
+
+  @override
+  String get horaryTranslating => 'Ayrıntılar çevriliyor…';
+
+  @override
+  String get horaryTranslationUnavailable =>
+      'Çeviri yapılamadı. Bağlantını kontrol edip tekrar dene.';
+
+  @override
+  String get horaryTranslationRetry => 'Tekrar dene';
+
+  @override
+  String get horaryVerdictYes => 'Evet';
+
+  @override
+  String get horaryVerdictNo => 'Hayır';
+
+  @override
+  String get horaryVerdictUncertain => 'Belirsiz';
+
+  @override
   String get editorPinchHint => 'Parmakla büyüt • iki parmakla döndür';
 
   @override
@@ -1835,6 +1907,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get feedDiscoverCta => 'Keşfet\'e geç';
+
+  @override
+  String get skyViaCombusta => 'Yanık yol';
+
+  @override
+  String get skyNotViaCombusta => 'Yanık yol değil';
+
+  @override
+  String get skyViaCombustaDescription =>
+      'Ay 15° Terazi–15° Akrep arasında; enerji baskılanır';
+
+  @override
+  String get skyNotViaCombustaDescription => 'Ay yanık yolda değil';
+
+  @override
+  String get skyLunarMansion => 'Menzil';
+
+  @override
+  String get skyRecommended => 'Yap';
+
+  @override
+  String get skyAvoid => 'Kaçın';
 
   @override
   String get skyTitle => 'Gökyüzü';

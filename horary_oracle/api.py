@@ -30,7 +30,7 @@ app.add_middleware(
 
 # ---------- Models ----------
 class CastRequest(BaseModel):
-    question: str = Field(..., min_length=3, max_length=500, example="babam nerede?")
+    question: str = Field(..., min_length=2, max_length=500, example="babam nerede?")
     lat: float = Field(..., ge=-90, le=90, example=38.4237)
     lon: float = Field(..., ge=-180, le=180, example=27.1428)
     lang: str = Field("tr", pattern="^(tr|en|es|ar|pt|fr|de|ru|it|hi)$")
@@ -191,21 +191,49 @@ async def cast(req: CastRequest):
         # takip: yeni chart açmadan önceki cevabın üzerine muhabbet devam (LLM'e history ver)
         pass  # aşağıda engine_json'a history eklenecek
     # Doğal sohbet yakalama - her yazılanı horary sanma
-    chat_greetings = ["merhaba","selam","selamlar","hey","hi","hello","günaydın","iyi akşamlar","iyi geceler","sa","mrb"]
-    if qlow in chat_greetings or (len(qlow)<=8 and any(qlow.startswith(g) for g in ["merhaba","selam","günaydın","iyi akşam","iyi geceler","hey","hello"])):
-        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Merhaba! Ben Horary Oracle — evrenle soru anının diliyle konuşuyorum. Aklındaki tek ve önemli soruyu sor, haritanı döküp muhabbet gibi anlatayım. Örn: *babam nerede?* / *bu işe girecek miyim?* / *bana yazacak mı?*","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
-    if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber","nasilsin"]):
-        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"İyiyim, seni dinliyorum! Biraz dertleşelim mi, yoksa aklındaki o tek önemli soruyu mu soralım? Örn: 'aklımdaki kişi beni seviyor mu?' gibi — net bir soru haritayı çok keskinleştirir.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+    def chat_reply(kind):
+        replies = {
+            "greeting": {
+                "tr": "Merhaba! Ben Horary Oracle. Aklındaki tek ve önemli soruyu sor; soru anının haritasını yorumlayayım. Örneğin: Bu işe girecek miyim?",
+                "en": "Hello! I'm Horary Oracle. Ask one important question and I'll interpret the chart of the moment. For example: Will I get this job?",
+                "es": "¡Hola! Soy Horary Oracle. Haz una pregunta importante y analizaré la carta del momento. Por ejemplo: ¿Conseguiré este trabajo?",
+            },
+            "how": {
+                "tr": "İyiyim, seni dinliyorum! Aklındaki önemli soruyu tek ve net bir cümleyle sorabilirsin.",
+                "en": "I'm well and listening! You can ask your important question in one clear sentence.",
+                "es": "¡Estoy bien y te escucho! Puedes hacer tu pregunta importante en una sola frase clara.",
+            },
+            "thanks": {
+                "tr": "Rica ederim! Başka bir sorun olursa buradayım; tek ve net bir soru haritayı keskinleştirir.",
+                "en": "You're welcome! I'm here if you have another question; a single clear question helps focus the chart.",
+                "es": "¡De nada! Estoy aquí si tienes otra pregunta; una pregunta clara ayuda a enfocar la carta.",
+            },
+            "prompt": {
+                "tr": "Seni dinliyorum. İstersen aklındaki soruyu tek ve net bir cümleyle sor.",
+                "en": "I'm listening. If you like, ask your question in one clear sentence.",
+                "es": "Te escucho. Si quieres, haz tu pregunta en una sola frase clara.",
+            },
+        }
+        return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":replies[kind].get(req.lang, replies[kind]["en"]),"meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+
+    greeting = qlow.strip(" \t\r\n.,!?¡¿")
+    chat_greetings = {"merhaba", "selam", "selamlar", "hey", "hi", "hello", "günaydın", "iyi akşamlar", "iyi geceler", "sa", "mrb", "hola", "buenos días", "buenas tardes", "buenas noches", "good morning", "good evening", "good night"}
+    if greeting in chat_greetings:
+        return chat_reply("greeting")
+    if any(k in qlow for k in ["nasılsın","nasil sin","ne haber","naber","nasilsin", "how are you", "cómo estás", "como estas"]):
+        return chat_reply("how")
+    if greeting in {"teşekkürler", "teşekkür ederim", "sağol", "sagol", "thank you", "thanks", "gracias"}:
+        return chat_reply("thanks")
     # Kısa sohbet / dertleşme / teşekkür - horary kelimesi yoksa sohbet et ve öneri sun
     # Follow-up ise bu guard atlanır (açıklama isteniyor)
     horary_keys = ["evlenecek","boşan","bosan","seviyor","arar mı","yazar mı","dönecek","gelcek","gelecek","işe girecek","ise girecek","kazanır","kaybol","kayıp","nerede","nerde","alacak","satacak","hasta","iyileşecek","hamile","sınav","okul","para","ev al","araba","kedi","köpek","rüya","ruya","borç","mahkeme","taşın","evlene","ayrıl","barış","neden geldi","kim bu","çalınd","calind","çalın","calin","çaldı","caldi","hırsız","hirsiz","soyuldu","soygun","aşırdı","asirdi","hangi","hangisi","ameliyat","tedavi","iyile","iyiles","kanser","şifa","sifa","doktor","cerrahi","sağlık","saglik"]
     is_horary = any(k in qlow for k in horary_keys) or "?" in req.question
     if not is_followup and not is_horary and len(qlow.split()) < 12:
         # sohbet modu - öneri sun
-        if any(k in qlow for k in ["teşekkür","sağol","sagol","eyvallah","tamam","anladım","anladim","haklısın","haklisin"]):
-            return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Rica ederim, ne demek! Aklına başka bir soru düşerse buradayım — tek ve net sorarsan harita daha keskin konuşur. Örn: 'o iş olacak mı?' gibi.","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+        if any(k in qlow for k in ["teşekkür","sağol","sagol","eyvallah","tamam","anladım","anladim","haklısın","haklisin", "thank you", "thanks", "gracias"]):
+            return chat_reply("thanks")
         if len(qlow) < 40 and "?" not in req.question:
-            return {"verdict":"CHAT","score":0,"perfection":{"type":"none"},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"answer":"Seni dinliyorum — biraz daha anlatır mısın? İstersen bunu horary sorusuna çevirelim: tek cümlede, net sor. Örn: 'bu evi alacak mıyım?' / 'bana dönecek mi?' / 'kaybolan nerede?' — hangisi kalbine yakın?","meta":{"tz":"chat","utc_offset":0,"local_dec":0,"ms":0}}
+            return chat_reply("prompt")
     # follow-up: önceki haritayı hatırla (history içinde son assistant charth olabilir, ama basit: client history gönderirse)
     # history varsa ve soru "açar mısın / neden / nasıl" ise önceki chart'a dair detay dön (horary_app.py:132)
     # Bu endpoint stateless olduğu için follow-up için history'de son chart'ı client göndermeli; şimdilik passthrough
@@ -1011,11 +1039,11 @@ async def cast(req: CastRequest):
     except Exception:
         pass
     answer = call_openai(engine_json, req.lang)
-    if engine_json.get("theft_verdict"):
+    if req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
-    if engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
+    if req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
         answer = "İki seçenek kararı (Ay açısı kuralı): " + engine_json["two_option_verdict"] + "\n\n" + answer
-    if engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
+    if req.lang == "tr" and engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
         answer = "Sağlık analizi: " + engine_json["health_verdict"] + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000

@@ -100,6 +100,144 @@ abstract class AppLocalizations {
     Locale('tr'),
   ];
 
+  /// No description provided for @storyDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard edits?'**
+  String get storyDiscardTitle;
+
+  /// No description provided for @storyDiscardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can save your story as a draft or keep editing.'**
+  String get storyDiscardMessage;
+
+  /// No description provided for @storyDiscardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get storyDiscardAction;
+
+  /// No description provided for @storySaveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get storySaveDraft;
+
+  /// No description provided for @storyContinueEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get storyContinueEditing;
+
+  /// No description provided for @storyReplaceDraftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the existing draft?'**
+  String get storyReplaceDraftTitle;
+
+  /// No description provided for @storyReplaceDraftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'There is already a story draft on this device.'**
+  String get storyReplaceDraftMessage;
+
+  /// No description provided for @storyReplaceDraftAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get storyReplaceDraftAction;
+
+  /// No description provided for @storyDraftFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save or delete the draft.'**
+  String get storyDraftFailure;
+
+  /// No description provided for @storyDraftReadFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the story draft.'**
+  String get storyDraftReadFailure;
+
+  /// No description provided for @storyEditDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit draft'**
+  String get storyEditDraft;
+
+  /// No description provided for @horaryMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'minute'**
+  String get horaryMinute;
+
+  /// No description provided for @horaryHour.
+  ///
+  /// In en, this message translates to:
+  /// **'hour'**
+  String get horaryHour;
+
+  /// No description provided for @horaryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get horaryDay;
+
+  /// No description provided for @horaryWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'week'**
+  String get horaryWeek;
+
+  /// No description provided for @horaryMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'month'**
+  String get horaryMonth;
+
+  /// No description provided for @horaryYear.
+  ///
+  /// In en, this message translates to:
+  /// **'year'**
+  String get horaryYear;
+
+  /// No description provided for @horaryTranslating.
+  ///
+  /// In en, this message translates to:
+  /// **'Translating details…'**
+  String get horaryTranslating;
+
+  /// No description provided for @horaryTranslationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation unavailable. Check your connection and try again.'**
+  String get horaryTranslationUnavailable;
+
+  /// No description provided for @horaryTranslationRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get horaryTranslationRetry;
+
+  /// No description provided for @horaryVerdictYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get horaryVerdictYes;
+
+  /// No description provided for @horaryVerdictNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get horaryVerdictNo;
+
+  /// No description provided for @horaryVerdictUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncertain'**
+  String get horaryVerdictUncertain;
+
   /// No description provided for @editorPinchHint.
   ///
   /// In en, this message translates to:
@@ -3453,6 +3591,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to Discover'**
   String get feedDiscoverCta;
+
+  /// No description provided for @skyViaCombusta.
+  ///
+  /// In en, this message translates to:
+  /// **'Via Combusta'**
+  String get skyViaCombusta;
+
+  /// No description provided for @skyNotViaCombusta.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in Via Combusta'**
+  String get skyNotViaCombusta;
+
+  /// No description provided for @skyViaCombustaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is between 15° Libra and 15° Scorpio; energy is constrained.'**
+  String get skyViaCombustaDescription;
+
+  /// No description provided for @skyNotViaCombustaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is not in Via Combusta.'**
+  String get skyNotViaCombustaDescription;
+
+  /// No description provided for @skyLunarMansion.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar mansion'**
+  String get skyLunarMansion;
+
+  /// No description provided for @skyRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Do'**
+  String get skyRecommended;
+
+  /// No description provided for @skyAvoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid'**
+  String get skyAvoid;
 
   /// No description provided for @skyTitle.
   ///

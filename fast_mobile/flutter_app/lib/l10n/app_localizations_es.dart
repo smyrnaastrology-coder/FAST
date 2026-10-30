@@ -9,6 +9,79 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get storyDiscardTitle => '¿Descartar los cambios?';
+
+  @override
+  String get storyDiscardMessage =>
+      'Puedes guardar la historia como borrador o seguir editándola.';
+
+  @override
+  String get storyDiscardAction => 'Descartar';
+
+  @override
+  String get storySaveDraft => 'Guardar borrador';
+
+  @override
+  String get storyContinueEditing => 'Seguir editando';
+
+  @override
+  String get storyReplaceDraftTitle => '¿Reemplazar el borrador existente?';
+
+  @override
+  String get storyReplaceDraftMessage =>
+      'Ya hay un borrador de historia en este dispositivo.';
+
+  @override
+  String get storyReplaceDraftAction => 'Reemplazar';
+
+  @override
+  String get storyDraftFailure => 'No se pudo guardar o eliminar el borrador.';
+
+  @override
+  String get storyDraftReadFailure =>
+      'No se pudo cargar el borrador de la historia.';
+
+  @override
+  String get storyEditDraft => 'Editar borrador';
+
+  @override
+  String get horaryMinute => 'minuto';
+
+  @override
+  String get horaryHour => 'hora';
+
+  @override
+  String get horaryDay => 'día';
+
+  @override
+  String get horaryWeek => 'semana';
+
+  @override
+  String get horaryMonth => 'mes';
+
+  @override
+  String get horaryYear => 'año';
+
+  @override
+  String get horaryTranslating => 'Traduciendo los detalles…';
+
+  @override
+  String get horaryTranslationUnavailable =>
+      'No se pudo traducir. Comprueba tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get horaryTranslationRetry => 'Reintentar';
+
+  @override
+  String get horaryVerdictYes => 'Sí';
+
+  @override
+  String get horaryVerdictNo => 'No';
+
+  @override
+  String get horaryVerdictUncertain => 'Incierto';
+
+  @override
   String get editorPinchHint => 'Pellizca para ampliar • gira para rotar';
 
   @override
@@ -1861,6 +1934,29 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get feedDiscoverCta => 'Ir a Descubrir';
+
+  @override
+  String get skyViaCombusta => 'Vía Combusta';
+
+  @override
+  String get skyNotViaCombusta => 'Fuera de la Vía Combusta';
+
+  @override
+  String get skyViaCombustaDescription =>
+      'La Luna está entre 15° de Libra y 15° de Escorpio; la energía se ve limitada.';
+
+  @override
+  String get skyNotViaCombustaDescription =>
+      'La Luna no está en la Vía Combusta.';
+
+  @override
+  String get skyLunarMansion => 'Mansión lunar';
+
+  @override
+  String get skyRecommended => 'Hacer';
+
+  @override
+  String get skyAvoid => 'Evitar';
 
   @override
   String get skyTitle => 'Cielo';
