@@ -42,6 +42,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   double? _arcLat;
   double? _arcLon;
   String? _arcPlace;
+  bool _arcAutoTried = false;
   int _returnYear = DateTime.now().year;
   int _returnMonth = DateTime.now().month;
   final _charts = ChartService();
@@ -1658,9 +1659,40 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     );
   }
 
+  DateTime _arcMoment(SolarArcState arc) {
+    final d = DateTime.tryParse(arc.targetDate) ?? DateTime.now();
+    final raw = '${arc.data['progression']?['target_time'] ?? ''}'.trim();
+    final parts = raw.split(':');
+    if (parts.length >= 2) {
+      final h = int.tryParse(parts[0]);
+      final m = int.tryParse(parts[1]);
+      if (h != null && m != null && h >= 0 && h < 24 && m >= 0 && m < 60) {
+        return DateTime(d.year, d.month, d.day, h, m);
+      }
+    }
+    final now = DateTime.now();
+    return DateTime(d.year, d.month, d.day, now.hour, now.minute);
+  }
+
   Widget _solarArcTab(ChartProvider cp, ChartData c) {
     final l10n = _l10n;
     final now = DateTime.now();
+    // Sekme ilk açıldığında "şu an" için otomatik hesapla.
+    if (!_arcAutoTried) {
+      _arcAutoTried = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final p = context.read<ChartProvider>();
+        if (p.arc != null || p.arcLoading) return;
+        p.loadSolarArc(
+          _dateText(DateTime.now()),
+          method: _progressionMethod,
+          lat: _arcLat,
+          lon: _arcLon,
+          place: _arcPlace,
+        );
+      });
+    }
     final arc = cp.arc;
     ChartData? arcChart;
     if (arc != null) {
@@ -1691,14 +1723,30 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 ChoiceChip(
                   label: Text(l10n.chartSecondaryProgress),
                   selected: _progressionMethod == 'secondary',
-                  onSelected: (_) =>
-                      setState(() => _progressionMethod = 'secondary'),
+                  onSelected: (_) {
+                    setState(() => _progressionMethod = 'secondary');
+                    cp.loadSolarArc(
+                      fmt(_arcDate),
+                      method: 'secondary',
+                      lat: _arcLat,
+                      lon: _arcLon,
+                      place: _arcPlace,
+                    );
+                  },
                 ),
                 ChoiceChip(
                   label: Text(l10n.chartMinorProgress),
                   selected: isMinor,
-                  onSelected: (_) =>
-                      setState(() => _progressionMethod = 'minor'),
+                  onSelected: (_) {
+                    setState(() => _progressionMethod = 'minor');
+                    cp.loadSolarArc(
+                      fmt(_arcDate),
+                      method: 'minor',
+                      lat: _arcLat,
+                      lon: _arcLon,
+                      place: _arcPlace,
+                    );
+                  },
                 ),
                 Text(l10n.chartProgressHelp),
               ],
@@ -1816,7 +1864,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                   '${arc!.data['progression']?['method']}',
                 ),
                 subtitle: _arcPlace ?? c.meta.place,
-                initialDate: DateTime.parse(arc.targetDate),
+                initialDate: _arcMoment(arc),
                 loadFrame: (date) async => ChartFrame(
                   data: ChartData.fromJson(
                     await _charts.progression(
