@@ -231,9 +231,11 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   }
 
   Future<void> _finish() async {
+    FocusScope.of(context).unfocus();
     setState(() {
       _rendering = true;
       _selectedTextId = null;
+      _editingTextId = null;
     });
     // Seçim çerçevesinin çizilmemesi için bir kare bekle.
     await Future<void>.delayed(const Duration(milliseconds: 40));
