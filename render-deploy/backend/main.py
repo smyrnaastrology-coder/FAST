@@ -7189,7 +7189,12 @@ class ChartProgressionIn(BaseModel):
     natal: ChartNatalIn
     target_date: str
     method: str = 'secondary'
-    target_time: str = '00:00'
+    # Boş bırakılırsa sunucunun o anki saati kullanılır (00:00 değil).
+    target_time: Optional[str] = None
+    # Relocate: verilirse ilerletilmiş haritanın açıları bu konumdan hesaplanır.
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    sehir: Optional[str] = None
 
 
 @app_fast.post('/api/charts/progression')
@@ -7198,23 +7203,86 @@ def charts_progression(inp: ChartProgressionIn):
     birth = charts_natal(inp.natal)
     local_birth = datetime.strptime(inp.natal.tarih + ' ' + inp.natal.saat, '%Y-%m-%d %H:%M')
     birth_utc = local_birth - timedelta(hours=birth['meta']['tz'])
-    target = datetime.strptime(inp.target_date + ' ' + inp.target_time, '%Y-%m-%d %H:%M')
+    target_time = (inp.target_time or '').strip() or datetime.now().strftime('%H:%M')
+    target = datetime.strptime(inp.target_date + ' ' + target_time, '%Y-%m-%d %H:%M')
     age_years = (target - local_birth).total_seconds() / (365.242189 * 86400)
     if age_years < 0:
         raise HTTPException(400, 'Target date must not precede birth')
     if inp.method not in ('secondary', 'minor'):
         raise HTTPException(400, 'Unknown progression method')
-    # Secondary: one ephemeris day/year. Minor: one sidereal lunar month/year.
+    # Secondary: one ephemeris day per year. Minor: one sidereal lunar month per year.
     factor = 1.0 if inp.method == 'secondary' else 27.321582
     progressed = birth_utc + timedelta(days=age_years * factor)
-    chart = charts_natal(ChartNatalIn(
-        isim=inp.natal.isim, tarih=progressed.strftime('%Y-%m-%d'),
-        saat=progressed.strftime('%H:%M:%S.%f'), lat=inp.natal.lat, lon=inp.natal.lon,
-        tz=0, house_system=inp.natal.house_system, sehir=inp.natal.sehir))
-    chart['progression'] = {'method': inp.method, 'target_date': inp.target_date,
-                            'target_time': inp.target_time,
-                            'age_years': age_years, 'days_per_year': factor,
-                            'angles_method': 'quotidian', 'ephemeris_utc': progressed.isoformat()}
+
+    # Konum: varsayılan doğum yeri, istenirse relocate.
+    use_lat = float(inp.lat) if inp.lat is not None else float(inp.natal.lat)
+    use_lon = float(inp.lon) if inp.lon is not None else float(inp.natal.lon)
+    use_sehir = inp.sehir or inp.natal.sehir
+    relocated = inp.lat is not None or inp.lon is not None
+
+    # 1) Gezegenler: tam ilerletilmiş andaki gerçek konumlar (Ay için doğru).
+    exact = charts_natal(ChartNatalIn(
+        isim=inp.natal.isim,
+        tarih=progressed.strftime('%Y-%m-%d'),
+        saat=progressed.strftime('%H:%M:%S'),
+        lat=use_lat, lon=use_lon, tz=0,
+        house_system=inp.natal.house_system, sehir=use_sehir))
+
+    # 2) Açılar / evler: ilerletilmiş tarihte, doğum saatiyle (aynı saat) ve
+    #    doğum yerinde. İkincil progresyonun klasik "aynı saat" kuralı.
+    prog_date = progressed.strftime('%Y-%m-%d')
+    py, pm, pd = (int(x) for x in prog_date.split('-'))
+    ph = local_birth.hour
+    pmin = local_birth.minute
+    ptz = _chart_utc_offset(
+        inp.natal.tz if not relocated else None,
+        use_lat, use_lon, py, pm, pd, ph, pmin)
+    angles = charts_natal(ChartNatalIn(
+        isim=inp.natal.isim, tarih=prog_date,
+        saat='%02d:%02d' % (ph, pmin),
+        lat=use_lat, lon=use_lon, tz=ptz,
+        house_system=inp.natal.house_system, sehir=use_sehir))
+
+    chart = angles
+    chart['gezegenler'] = exact['gezegenler']
+    cusps_list = [h['lon'] for h in chart['evler']]
+    for p in chart['gezegenler']:
+        p['ev'] = _chart_house_of(p['lon'], cusps_list)
+
+    # Açıları ilerletilmiş gezegenlerle yeniden hesapla.
+    aspects = []
+    planets = chart['gezegenler']
+    for i in range(len(planets)):
+        for j in range(i + 1, len(planets)):
+            p1 = planets[i]; p2 = planets[j]
+            for ang, atype, orb_max in _CHART_MAJOR_ASPECTS:
+                diff = abs(_chart_wrap180(p1['lon'] - p2['lon'] - ang))
+                if diff <= orb_max:
+                    aspects.append({
+                        'p1': p1['ad'], 'p2': p2['ad'], 'tip': atype,
+                        'orb': round(diff, 2), 'uygulama': None,
+                    })
+                    break
+    aspects.sort(key=lambda x: x['orb'])
+    chart['acilar'] = aspects
+
+    chart['progression'] = {
+        'method': inp.method, 'target_date': inp.target_date,
+        'target_time': target_time,
+        'age_years': age_years, 'days_per_year': factor,
+        'angles_method': 'same-clock-birthplace',
+        'relocated': relocated,
+        'place': use_sehir, 'lat': use_lat, 'lon': use_lon,
+        'ephemeris_utc': progressed.isoformat(),
+    }
+    chart['meta'] = {
+        'isim': inp.natal.isim,
+        'tarih': prog_date,
+        'saat': '%02d:%02d' % (ph, pmin),
+        'lat': use_lat, 'lon': use_lon,
+        'sehir': use_sehir,
+        'tz': ptz,
+    }
     return chart
 
 

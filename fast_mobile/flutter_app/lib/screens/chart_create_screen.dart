@@ -8,6 +8,7 @@ import '../l10n/app_localizations.dart';
 import '../models/chart_labels.dart';
 import '../providers/chart_provider.dart';
 import '../services/api_service.dart';
+import '../widgets/place_suggest_field.dart';
 import 'chart_detail_screen.dart';
 
 class ChartCreateScreen extends StatefulWidget {
@@ -24,8 +25,6 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
   final _time = TextEditingController(text: '12:00');
   final _lat = TextEditingController();
   final _lon = TextEditingController();
-  TextEditingController? _countryCtrl;
-  TextEditingController? _cityCtrl;
 
   String _hs = 'P';
   String _ulke = '';
@@ -122,23 +121,10 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
   Future<void> _create() async {
     final cp = context.read<ChartProvider>();
     final l10n = AppLocalizations.of(context);
-    final cl = countryLabels(Localizations.localeOf(context).languageCode);
     final isoDate = _toIsoDate(_date.text);
     if (isoDate == null) {
       setState(() => _formError = l10n.chartErrorDateRequired);
       return;
-    }
-    if (_ulke.isEmpty && _countryCtrl != null) {
-      final v = _countryCtrl!.text.trim().toLowerCase();
-      final match = _ulkeler.firstWhere(
-        (u) => (cl[u] ?? u).toLowerCase() == v || u.toLowerCase() == v,
-        orElse: () => '',
-      );
-      if (match.isNotEmpty) _ulke = match;
-    }
-    if (_sehir.isEmpty && _cityCtrl != null) {
-      final v = _cityCtrl!.text.trim();
-      if (_sehirler.contains(v)) _sehir = v;
     }
     if (_ulke.isEmpty || _sehir.isEmpty) {
       setState(() => _formError = l10n.chartErrorCountryCity);
@@ -227,17 +213,12 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
               child: LinearProgressIndicator(minHeight: 2),
             )
           else ...[
-            Autocomplete<String>(
-              key: ValueKey('ulke-$_ulke'),
-              optionsBuilder: (tev) {
-                final q = tev.text.trim().toLowerCase();
-                if (q.isEmpty) return _ulkeler;
-                return _ulkeler.where((u) {
-                  final label = (cl[u] ?? u).toLowerCase();
-                  return label.contains(q) || u.toLowerCase().contains(q);
-                });
-              },
-              displayStringForOption: (o) => cl[o] ?? o,
+            PlaceSuggestField(
+              label: l10n.chartLabelCountry,
+              options: _ulkeler,
+              displayOf: (u) => cl[u] ?? u,
+              searchOf: (u) => '${cl[u] ?? u} $u',
+              initialValue: _ulke.isEmpty ? '' : (cl[_ulke] ?? _ulke),
               onSelected: (o) {
                 setState(() {
                   _ulke = o;
@@ -246,65 +227,43 @@ class _ChartCreateScreenState extends State<ChartCreateScreen> {
                   _lat.clear();
                   _lon.clear();
                 });
-                if (_cityCtrl != null) _cityCtrl!.clear();
               },
-              fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
-                _countryCtrl = controller;
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  style: TextStyle(color: FastTheme.text),
-                  decoration: InputDecoration(labelText: l10n.chartLabelCountry),
-                  onChanged: (_) {
-                    final v = controller.text.trim().toLowerCase();
-                    final match = _ulkeler.firstWhere(
-                      (u) =>
-                          (cl[u] ?? u).toLowerCase() == v ||
-                          u.toLowerCase() == v,
-                      orElse: () => '',
-                    );
-                    if (match.isNotEmpty && _ulke != match) {
-                      setState(() {
-                        _ulke = match;
-                        _sehir = '';
-                        _geoHint = null;
-                        _lat.clear();
-                        _lon.clear();
-                      });
-                    }
-                  },
+              onTextChanged: (v) {
+                final q = v.trim().toLowerCase();
+                if (q.isEmpty) return;
+                final match = _ulkeler.firstWhere(
+                  (u) =>
+                      (cl[u] ?? u).toLowerCase() == q || u.toLowerCase() == q,
+                  orElse: () => '',
                 );
+                if (match.isNotEmpty && _ulke != match) {
+                  setState(() {
+                    _ulke = match;
+                    _sehir = '';
+                    _geoHint = null;
+                    _lat.clear();
+                    _lon.clear();
+                  });
+                }
               },
             ),
             const SizedBox(height: 12),
-            Autocomplete<String>(
+            PlaceSuggestField(
               key: ValueKey('sehir-$_ulke'),
-              optionsBuilder: (tev) {
-                final q = tev.text.trim().toLowerCase();
-                if (q.isEmpty) return _sehirler;
-                return _sehirler.where((s) => s.toLowerCase().contains(q));
-              },
-              displayStringForOption: (o) => o,
+              label: l10n.chartLabelCity,
+              options: _sehirler,
+              displayOf: (s) => s,
+              initialValue: _sehir,
+              enabled: _ulke.isNotEmpty,
+              hint: _ulke.isEmpty ? l10n.chartLabelCountry : null,
               onSelected: (o) {
                 setState(() => _sehir = o);
                 _geocode();
               },
-              fieldViewBuilder: (context, controller, focusNode, onSubmitted) {
-                _cityCtrl = controller;
-                return TextField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  style: TextStyle(color: FastTheme.text),
-                  decoration: InputDecoration(labelText: l10n.chartLabelCity),
-                  onChanged: (v) {
-                    if (_sehirler.contains(v) && _sehir != v) {
-                      setState(() => _sehir = v);
-                    }
-                  },
-                  onEditingComplete: () {
-                    if (_sehir.isNotEmpty) _geocode();
-                  },
-                );
+              onTextChanged: (v) {
+                if (_sehirler.contains(v.trim()) && _sehir != v.trim()) {
+                  setState(() => _sehir = v.trim());
+                }
               },
             ),
           ],

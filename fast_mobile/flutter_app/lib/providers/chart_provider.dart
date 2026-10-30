@@ -348,6 +348,9 @@ class ChartProvider extends ChangeNotifier {
   Future<void> loadSolarArc(
     String hedefTarih, {
     String method = 'secondary',
+    double? lat,
+    double? lon,
+    String? place,
   }) async {
     if (_current == null) return;
     _arcLoading = true;
@@ -358,6 +361,9 @@ class ChartProvider extends ChangeNotifier {
         natal: _current!,
         targetDate: hedefTarih,
         method: method,
+        lat: lat,
+        lon: lon,
+        place: place,
       );
       _arc = SolarArcState(data: res, targetDate: hedefTarih);
     } catch (e) {

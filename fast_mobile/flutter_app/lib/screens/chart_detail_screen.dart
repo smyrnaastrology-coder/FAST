@@ -39,6 +39,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
   bool _locating = false;
   DateTime _arcDate = DateTime.now();
   String _progressionMethod = 'secondary';
+  double? _arcLat;
+  double? _arcLon;
+  String? _arcPlace;
   int _returnYear = DateTime.now().year;
   int _returnMonth = DateTime.now().month;
   final _charts = ChartService();
@@ -1605,6 +1608,56 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
     ]);
   }
 
+  Future<void> _pickArcLocation(ChartData c) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                'İlerletilmiş harita konumu',
+                style: TextStyle(
+                  color: FastTheme.accentGold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Varsayılan doğum yeridir. Buradan isterseniz başka bir '
+                'ülke/şehir seçerek relocate yapabilirsiniz.',
+                style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+              ),
+              const SizedBox(height: 14),
+              ChartLocationPicker(
+                onPending: () {},
+                onSelected: (place, lat, lon) {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _arcLat = lat;
+                    _arcLon = lon;
+                    _arcPlace = place;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _solarArcTab(ChartProvider cp, ChartData c) {
     final l10n = _l10n;
     final now = DateTime.now();
@@ -1652,6 +1705,44 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
             ),
           ),
           Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 8, 0),
+            child: Row(
+              children: [
+                Icon(Icons.place_outlined,
+                    size: 16, color: FastTheme.accentGold),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    _arcPlace ??
+                        (c.meta.place.isEmpty ? 'Doğum yeri' : c.meta.place),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _pickArcLocation(c),
+                  child: Text(
+                    'Relocate',
+                    style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
+                  ),
+                ),
+                if (_arcPlace != null)
+                  IconButton(
+                    tooltip: 'Doğum yerine dön',
+                    visualDensity: VisualDensity.compact,
+                    icon: Icon(Icons.close,
+                        size: 16, color: FastTheme.textMuted),
+                    onPressed: () => setState(() {
+                      _arcLat = null;
+                      _arcLon = null;
+                      _arcPlace = null;
+                    }),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
             child: Row(
               children: [
@@ -1687,6 +1778,9 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                       : () => cp.loadSolarArc(
                           fmt(_arcDate),
                           method: _progressionMethod,
+                          lat: _arcLat,
+                          lon: _arcLon,
+                          place: _arcPlace,
                         ),
                   style: FilledButton.styleFrom(
                     backgroundColor: FastTheme.accentGold,
@@ -1721,7 +1815,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                 title: methodLabel(
                   '${arc!.data['progression']?['method']}',
                 ),
-                subtitle: c.meta.place,
+                subtitle: _arcPlace ?? c.meta.place,
                 initialDate: DateTime.parse(arc.targetDate),
                 loadFrame: (date) async => ChartFrame(
                   data: ChartData.fromJson(
@@ -1731,12 +1825,15 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
                       targetTime: _clockText(date),
                       method:
                           '${arc.data['progression']?['method'] ?? 'secondary'}',
+                      lat: _arcLat,
+                      lon: _arcLon,
+                      place: _arcPlace,
                     ),
                   ),
                   title: methodLabel(
                     '${arc.data['progression']?['method']}',
                   ),
-                  subtitle: c.meta.place,
+                  subtitle: _arcPlace ?? c.meta.place,
                 ),
               ),
             ),

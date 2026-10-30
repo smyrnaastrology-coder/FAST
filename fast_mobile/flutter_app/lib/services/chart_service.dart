@@ -197,8 +197,14 @@ class ChartService {
     required ChartData natal,
     required String targetDate,
     required String method,
-    String targetTime = '00:00',
+    String? targetTime,
+    double? lat,
+    double? lon,
+    String? place,
   }) async {
+    final now = DateTime.now();
+    final time =
+        targetTime ?? '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final r = await _client
         .post(
           Uri.parse('${ApiConfig.baseUrl}/api/charts/progression'),
@@ -210,7 +216,10 @@ class ChartService {
             },
             'target_date': targetDate,
             'method': method,
-            'target_time': targetTime,
+            'target_time': time,
+            if (lat != null) 'lat': lat,
+            if (lon != null) 'lon': lon,
+            if (place != null && place.isNotEmpty) 'sehir': place,
           }),
         )
         .timeout(ApiConfig.timeout);

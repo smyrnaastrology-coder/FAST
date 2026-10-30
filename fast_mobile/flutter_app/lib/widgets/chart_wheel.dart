@@ -315,23 +315,25 @@ class _WheelPainter extends CustomPainter {
     final ascLon = data.asc.lon;
 
     // --- Halka yarıçapları (tek yerden yönetilir) ---
+    // Merkez boşluğu küçük, gezegen bantları geniş: çarkın ağırlığı
+    // gezegen yerleşimlerinde olsun.
     final signOuter = r;
-    final signInner = r * 0.855;
+    final signInner = r * 0.875;
 
-    final transitOuter = r * 0.845;
-    final transitInner = r * 0.735;
-    final transitGlyphR = (transitOuter + transitInner) / 2 + r * 0.012;
+    final transitOuter = r * 0.868;
+    final transitInner = r * 0.742;
+    final transitGlyphR = (transitOuter + transitInner) / 2 + r * 0.010;
 
-    final separatorA = r * 0.728;
-    final separatorB = r * 0.720;
+    final separatorA = r * 0.734;
+    final separatorB = r * 0.725;
 
-    final natalOuter = r * 0.712;
-    final natalInner = r * 0.572;
-    final natalGlyphR = (natalOuter + natalInner) / 2 + r * 0.014;
+    final natalOuter = r * 0.717;
+    final natalInner = r * 0.545;
+    final natalGlyphR = (natalOuter + natalInner) / 2 + r * 0.012;
 
-    final aspectR = r * 0.515;
-    final houseNumR = r * 0.548;
-    final hubR = r * 0.13;
+    final aspectR = r * 0.405;
+    final houseNumR = r * 0.480;
+    final hubR = r * 0.072;
 
     final hasOuter = outerPlanets != null && outerPlanets!.isNotEmpty;
     final bool light = lightTheme;
@@ -562,7 +564,7 @@ class _WheelPainter extends CustomPainter {
     _axis(canvas, center, signInner, aspectR, data.mc.lon, ascLon);
 
     // --- Gezegen halkaları ---
-    final natalGlyphSize = (r * 0.082).clamp(12.0, 22.0);
+    final natalGlyphSize = (r * 0.090).clamp(13.0, 24.0);
     final natalDegSize = (natalGlyphSize * 0.46).clamp(6.5, 10.0);
     final natal = _layout(
       data.planets,
@@ -601,7 +603,7 @@ class _WheelPainter extends CustomPainter {
       _glyphAt(
         canvas,
         center,
-        natalGlyphR - natalGlyphSize * 0.95,
+        natalGlyphR - natalGlyphSize * 0.86,
         g.display,
         deg,
         g.planet.retrograde ? _retroColor : color.withValues(alpha: 0.88),
@@ -612,7 +614,7 @@ class _WheelPainter extends CustomPainter {
     }
 
     if (hasOuter) {
-      final transitGlyphSize = (r * 0.070).clamp(10.0, 18.0);
+      final transitGlyphSize = (r * 0.078).clamp(11.0, 20.0);
       final transitDegSize = (transitGlyphSize * 0.46).clamp(6.0, 9.0);
       final trans = _layout(
         outerPlanets!,
@@ -652,7 +654,7 @@ class _WheelPainter extends CustomPainter {
         _glyphAt(
           canvas,
           center,
-          transitGlyphR - transitGlyphSize * 0.95,
+          transitGlyphR - transitGlyphSize * 0.86,
           g.display,
           deg,
           color.withValues(alpha: 0.85),

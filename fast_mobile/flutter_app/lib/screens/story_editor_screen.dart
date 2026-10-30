@@ -39,6 +39,9 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
   final List<DrawingStroke> _strokes = [];
   final List<TextElement> _textElements = [];
   String? _selectedTextId;
+  String? _editingTextId;
+  TextEditingController? _textCtrl;
+  FocusNode? _textFocus;
   _EditorMode _mode = _EditorMode.move;
   double _strokeWidth = 6.0;
   Color _currentColor = const Color(0xFF00E0FF);
@@ -99,52 +102,57 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     _editText(newText);
   }
 
+  /// Metni fotoğrafın üstünü kapatmayan, alt paneldeki satır içi alanda
+  /// düzenler. (Eski tam ekran diyalog beyaz perde gibi görünüyordu.)
   void _editText(TextElement element) {
+    final old = _textCtrl;
+    if (old != null) {
+      old.removeListener(_onInlineTextChanged);
+      WidgetsBinding.instance.addPostFrameCallback((_) => old.dispose());
+    }
     final ctrl = TextEditingController(text: element.text);
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: FastTheme.bgSecondary,
-        title: Text(
-          'Yazını düzenle',
-          style: TextStyle(color: FastTheme.accentGold),
-        ),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          maxLines: null,
-          style: TextStyle(color: FastTheme.text),
-          decoration: InputDecoration(
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: FastTheme.border),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: FastTheme.accentGold),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('İptal', style: TextStyle(color: FastTheme.textMuted)),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                element.text = ctrl.text.trim().isEmpty
-                    ? 'Metin'
-                    : ctrl.text.trim();
-              });
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              'Tamam',
-              style: TextStyle(color: FastTheme.accentGold),
-            ),
-          ),
-        ],
-      ),
+    _textCtrl = ctrl;
+    _textFocus?.dispose();
+    _textFocus = FocusNode();
+    ctrl.addListener(_onInlineTextChanged);
+    ctrl.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: ctrl.text.length,
     );
+    setState(() {
+      _selectedTextId = element.id;
+      _editingTextId = element.id;
+      _mode = _EditorMode.move;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _textFocus?.requestFocus();
+    });
+  }
+
+  void _onInlineTextChanged() {
+    final id = _editingTextId;
+    final ctrl = _textCtrl;
+    if (id == null || ctrl == null) return;
+    final idx = _textElements.indexWhere((e) => e.id == id);
+    if (idx < 0) return;
+    setState(() {
+      _textElements[idx] = _textElements[idx].copyWith(text: ctrl.text);
+    });
+  }
+
+  void _finishInlineEdit() {
+    final id = _editingTextId;
+    if (id != null) {
+      final idx = _textElements.indexWhere((e) => e.id == id);
+      if (idx >= 0 && _textElements[idx].text.trim().isEmpty) {
+        setState(() {
+          _textElements[idx] = _textElements[idx].copyWith(text: 'Metin');
+        });
+      }
+    }
+    _textFocus?.unfocus();
+    setState(() => _editingTextId = null);
   }
 
   void _updateSelectedText(TextElement Function(TextElement) fn) {
@@ -158,6 +166,10 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
 
   void _deleteSelectedText() {
     if (_selectedTextId == null) return;
+    if (_editingTextId == _selectedTextId) {
+      _textFocus?.unfocus();
+      _editingTextId = null;
+    }
     setState(() {
       _textElements.removeWhere((e) => e.id == _selectedTextId);
       _selectedTextId = null;
@@ -248,6 +260,14 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
     } finally {
       if (mounted) setState(() => _rendering = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _textCtrl?.removeListener(_onInlineTextChanged);
+    _textCtrl?.dispose();
+    _textFocus?.dispose();
+    super.dispose();
   }
 
   @override
@@ -380,9 +400,15 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                       child: StoryTextLayerWidget(
                         element: element,
                         selected: _selectedTextId == element.id,
-                        onTap: () => setState(() {
-                          _selectedTextId = element.id;
-                        }),
+                        onTap: () {
+                          if (_editingTextId != null &&
+                              _editingTextId != element.id) {
+                            _finishInlineEdit();
+                          }
+                          setState(() {
+                            _selectedTextId = element.id;
+                          });
+                        },
                         onChanged: (updated) {
                           setState(() {
                             final idx = _textElements.indexWhere(
@@ -485,6 +511,62 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_editingTextId == sel.id)
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _textCtrl,
+                    focusNode: _textFocus,
+                    autofocus: true,
+                    maxLines: 3,
+                    minLines: 1,
+                    textInputAction: TextInputAction.done,
+                    cursorColor: FastTheme.accentGold,
+                    style: const TextStyle(color: Colors.white, fontSize: 15),
+                    onSubmitted: (_) => _finishInlineEdit(),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: 'Yazı yaz…',
+                      hintStyle: const TextStyle(color: Colors.white38),
+                      filled: true,
+                      fillColor: const Color(0xFF1B1F2A),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white24),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: FastTheme.accentGold),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  tooltip: 'Tamam',
+                  onPressed: _finishInlineEdit,
+                  icon: Icon(Icons.check_circle, color: FastTheme.accentGold),
+                ),
+              ],
+            )
+          else
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => _editText(sel),
+                icon: const Icon(Icons.edit, color: Colors.white70, size: 18),
+                label: const Text(
+                  'Yazıyı düzenle',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+              ),
+            ),
+          const SizedBox(height: 6),
           SizedBox(
             height: 32,
             child: ListView.separated(
@@ -553,11 +635,6 @@ class _StoryEditorScreenState extends State<StoryEditorScreen> {
                     },
                   ),
                 ),
-              ),
-              IconButton(
-                tooltip: 'Yazıyı düzenle',
-                onPressed: () => _editText(sel),
-                icon: const Icon(Icons.edit, color: Colors.white, size: 20),
               ),
               IconButton(
                 tooltip: 'Sil',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../config/country_labels.dart';
 import '../l10n/app_localizations.dart';
+import 'place_suggest_field.dart';
 
 /// A country-qualified city lookup; stale responses never replace a newer city.
 class ChartLocationPicker extends StatefulWidget {
@@ -95,18 +96,13 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
     final l10n = AppLocalizations.of(context);
     return Column(
       children: [
-        DropdownButtonFormField<String>(
-          initialValue: _country,
-          isExpanded: true,
-          decoration: InputDecoration(
-            labelText: l10n.chartLocationCountry,
-          ),
-          items: countries
-              .map(
-                (c) => DropdownMenuItem(value: c, child: Text(labels[c] ?? c)),
-              )
-              .toList(),
-          onChanged: (v) {
+        PlaceSuggestField(
+          label: l10n.chartLocationCountry,
+          options: countries,
+          displayOf: (c) => labels[c] ?? c,
+          searchOf: (c) => '${labels[c] ?? c} $c',
+          initialValue: _country == null ? '' : (labels[_country] ?? _country!),
+          onSelected: (v) {
             ++_request;
             widget.onPending();
             setState(() {
@@ -116,21 +112,37 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
               _error = null;
             });
           },
+          onTextChanged: (text) {
+            final q = text.trim().toLowerCase();
+            if (q.isEmpty) return;
+            final match = countries.firstWhere(
+              (c) =>
+                  (labels[c] ?? c).toLowerCase() == q ||
+                  c.toLowerCase() == q,
+              orElse: () => '',
+            );
+            if (match.isNotEmpty && match != _country) {
+              ++_request;
+              widget.onPending();
+              setState(() {
+                _country = match;
+                _city = null;
+                _busy = false;
+                _error = null;
+              });
+            }
+          },
         ),
         const SizedBox(height: 10),
-        DropdownButtonFormField<String>(
-          key: ValueKey(_country),
-          initialValue: _city,
-          isExpanded: true,
-          decoration: InputDecoration(
-            labelText: l10n.chartLocationCity,
-          ),
-          items: cities
-              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-              .toList(),
-          onChanged: (v) {
-            if (v != null) _resolve(v);
-          },
+        PlaceSuggestField(
+          key: ValueKey('return-city-$_country'),
+          label: l10n.chartLocationCity,
+          options: cities,
+          displayOf: (c) => c,
+          initialValue: _city ?? '',
+          enabled: _country != null,
+          hint: _country == null ? l10n.chartLocationCountry : null,
+          onSelected: _resolve,
         ),
         if (_busy) const LinearProgressIndicator(),
         if (_error != null)
