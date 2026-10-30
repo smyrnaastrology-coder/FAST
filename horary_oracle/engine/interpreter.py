@@ -285,17 +285,27 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     return prompt + ex_txt + f"\n\nFINAL LANGUAGE CHECK: Language={lang}. Answer in {lang} only."
     # FINAL CHECK: Gezegen burçları yukarıdaki GERÇEK listeden alınacak, halüsinasyon yasaktır.
 
-def _correct_planet_hallucination(text: str, engine_json: dict) -> str:
+def _correct_planet_hallucination(text: str, engine_json: dict, lang: str = "tr") -> str:
     """LLM gezegen burcunu halüsine ettiyse motor gerçeğiyle düzelt (Venüs Akrep→Terazi yazdıysa geri al)."""
     try:
         planets = engine_json.get("planets", {})
+        signs = {
+            "Koç": ("Aries", "Aries"), "Boğa": ("Taurus", "Tauro"),
+            "İkizler": ("Gemini", "Géminis"), "Yengeç": ("Cancer", "Cáncer"),
+            "Aslan": ("Leo", "Leo"), "Başak": ("Virgo", "Virgo"),
+            "Terazi": ("Libra", "Libra"), "Akrep": ("Scorpio", "Escorpio"),
+            "Yay": ("Sagittarius", "Sagitario"), "Oğlak": ("Capricorn", "Capricornio"),
+            "Kova": ("Aquarius", "Acuario"), "Balık": ("Pisces", "Piscis"),
+        }
         for p, info in planets.items():
             real_sign = info.get("sign")
             if not real_sign or p not in ("Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"):
                 continue
+            if lang in ("en", "es") and real_sign in signs:
+                real_sign = signs[real_sign][0 if lang == "en" else 1]
             # eğer metinde p + yanlış burç varsa düzelt
             import re
-            for wrong in ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık","Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"]:
+            for wrong in ["Koç","Boğa","İkizler","Yengeç","Aslan","Başak","Terazi","Akrep","Yay","Oğlak","Kova","Balık","Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces", "Tauro", "Géminis", "Cáncer", "Escorpio", "Sagitario", "Capricornio", "Acuario", "Piscis"]:
                 if wrong == real_sign: continue
                 # örn "Venüs Terazi" ama gerçek Akrep ise değiştir
                 text = re.sub(rf"\b{p}\s+{wrong}\b", f"{p} {real_sign}", text)
@@ -303,7 +313,7 @@ def _correct_planet_hallucination(text: str, engine_json: dict) -> str:
         return text
     except: return text
 
-def _correct_timing_hallucination(text: str, engine_json: dict) -> str:
+def _correct_timing_hallucination(text: str, engine_json: dict, lang: str = "tr") -> str:
     """LLM kendi sure uydurduysa motorun gercek suresiyle degistir.
 
     Olcum (2026-10): motor '40 YIL' derken gpt-5.6-terra '6 gün', gpt-5.6-sol '6 gün'
@@ -318,6 +328,21 @@ def _correct_timing_hallucination(text: str, engine_json: dict) -> str:
         real = ((engine_json.get("timing") or {}).get("text") or "").strip()
         if not real:
             return text
+        if lang in ("en", "es"):
+            units = {
+                "DAKİKA": ("minutes", "minutos"), "DAKIKA": ("minutes", "minutos"),
+                "SAAT": ("hours", "horas"), "GÜN": ("days", "días"),
+                "GUN": ("days", "días"), "HAFTA": ("weeks", "semanas"),
+                "AY": ("months", "meses"), "YIL": ("years", "años"),
+            }
+            match = re.fullmatch(r"(\d+(?:\s*[-–—]\s*\d+)?)\s+([\wİıÜüĞğŞşÖöÇç]+)", real)
+            if not match or match.group(2).upper() not in units:
+                return text
+            number = match.group(1)
+            unit = units[match.group(2).upper()][0 if lang == "en" else 1]
+            if number == "1":
+                unit = {"minutes":"minute", "minutos":"minuto", "hours":"hour", "horas":"hora", "days":"day", "días":"día", "weeks":"week", "semanas":"semana", "months":"month", "meses":"mes", "years":"year", "años":"año"}[unit]
+            real = f"{number} {unit}"
         # sure kaliplari: "6-16 gün", "17 gün", "40 yıl", "2 gün içinde", "30 YIL"
         pat = re.compile(
             r"\b\d{1,3}(?:\s*[-–—]\s*\d{1,3})?\s*"
@@ -335,7 +360,7 @@ def call_openai(engine_json: dict, lang="tr") -> str:
     Bos metin/hatada bir alt katmana dusulur; en altta yerel deterministik yorum vardir."""
     import os
     if not os.getenv("OPENAI_API_KEY"):
-        return mock_interpret(engine_json, lang)  # anahtar yok -> asla bos cevap yok
+        return _localized_fallback(engine_json, lang)
     try:
         from engine.tiers import run_ladder, plan_to_tier
         prompt = build_prompt(engine_json, lang)
@@ -343,15 +368,38 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         want = plan_to_tier(plan)
         txt, used = run_ladder(want, prompt, engine_json, lang)
         if not txt:
-            return mock_interpret(engine_json, lang) + "\n[LLM katmanlarinin hicbiri metin vermedi]"
+            return _localized_fallback(engine_json, lang)
+        if used == "local" and lang in ("en", "es"):
+            return _localized_fallback(engine_json, lang)
         # son dogrulama katmanlari: gezegen burc + sure uydurmasini motorla duzelt
-        txt = _correct_planet_hallucination(txt, engine_json)
-        txt = _correct_timing_hallucination(txt, engine_json)
+        txt = _correct_planet_hallucination(txt, engine_json, lang)
+        txt = _correct_timing_hallucination(txt, engine_json, lang)
         if used == "local":
             txt += "\n[LLM katmanlari kullanilamadi, yerel deterministik yorum verildi]"
         return txt
     except Exception as e:
-        return mock_interpret(engine_json, lang) + f"\n[OpenAI hata: {e}]"
+        return _localized_fallback(engine_json, lang)
+
+def _localized_fallback(engine_json: dict, lang: str) -> str:
+    if lang == "tr":
+        return mock_interpret(engine_json, lang)
+    verdict = engine_json.get("verdict", "UNCERTAIN")
+    messages = {
+        "en": {
+            "YES": "The chart's preliminary verdict is yes.",
+            "NO": "The chart's preliminary verdict is no.",
+            "UNCERTAIN": "The chart's preliminary verdict is uncertain.",
+            "notice": "The detailed interpretation is temporarily unavailable. Please try again later.",
+        },
+        "es": {
+            "YES": "El veredicto preliminar de la carta es sí.",
+            "NO": "El veredicto preliminar de la carta es no.",
+            "UNCERTAIN": "El veredicto preliminar de la carta es incierto.",
+            "notice": "La interpretación detallada no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+        },
+    }
+    localized = messages.get(lang, messages["en"])
+    return localized.get(verdict, localized["UNCERTAIN"]) + " " + localized["notice"]
 
 def mock_interpret(engine_json: dict, lang="tr") -> str:
     v = engine_json.get("verdict","UNCERTAIN")
