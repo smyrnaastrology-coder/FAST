@@ -9522,23 +9522,37 @@ def privacy_policy():
 <p><b>Uygulama:</b> Holavon: Astroloji & Sinastri &nbsp;|&nbsp; <b>Gelistirici:</b> Smyrna Astrology (Fatih Asartepe) &nbsp;|&nbsp; <b>Son guncelleme:</b> Ekim 2026</p>
 <h2>1. Topladigimiz Veriler</h2>
 <ul>
-<li><b>Analiz girdileri:</b> girdiginiz dogum bilgileri (isim, tarih, saat, sehir) yalnizca analiz uretmek icin kullanilir.</li>
-<li><b>Cihaz kimligi:</b> ucretsiz hak ve abonelik durumunu takip etmek icin rastgele uretilmis anonim bir cihaz kimligi saklanir. E-posta veya sifre istemeyiz, uyelik yoktur.</li>
-<li><b>Bildirim jetonu:</b> gunluk hatirlatmalar icin Firebase bildirim jetonu (izin verirseniz).</li>
-<li><b>Satin alma bilgisi:</b> odemeler Google Play ve RevenueCat uzerinden islenir; kredi karti bilgisi bize ulasmaz.</li>
-<li><b>Profil ve sosyal veriler:</b> Holavon toplulugunda paylastiginiz gonderi, yorum, takip ve profil bilgileri.</li>
+<li><b>Hesap bilgileri:</b> e-posta adresi, sifre (Supabase tarafinda geri donusturulemez bicimde saklanir), gorunen ad ve istege bagli profil fotografi. Google veya Facebook ile giris yaparsaniz, bu saglayicidan gelen ad ve e-posta bilgisi alinir.</li>
+<li><b>Dogum ve harita verileri:</b> kaydettiginiz isim, dogum tarihi, saati ve yeri; yalnizca harita ve analiz uretmek icin kullanilir.</li>
+<li><b>Sosyal icerik:</b> Holavon toplulugunda paylastiginiz gonderi, hikaye (fotograf/drawing), begeni, yorum, yanit, takip ve dogrudan mesajlar. Hikaye olusturmak icin kamera veya fotograf galerisi izni istenir; sectiginiz gorsel yalnizca sizin paylasiminiz icin yuklenir.</li>
+<li><b>Horary sorulari:</b> Horary sekmesinde yazdiginiz soru ve dogum/konum bilgisi, yanit uretmek uzere sunucumuzda islenir; hizmet kalitesi icin kayit altina alinabilir.</li>
+<li><b>Cihaz ve bildirim verileri:</b> ucretsiz hak ve abonelik durumunu takip etmek icin rastgele uretilmis anonim cihaz kimligi ve (izin verirseniz) Firebase bildirim jetonu.</li>
+<li><b>Satin alma bilgisi:</b> odemeler Google Play, App Store ve RevenueCat uzerinden islenir; kredi karti bilgisi bize ulasmaz.</li>
 </ul>
 <h2>2. Verilerin Kullanimi</h2>
-<p>Veriler yalnizca uygulamayi calistirmak (analiz, PDF raporu, abonelik dogrulama, bildirimler, topluluk) icin kullanilir. Verileriniz satilmaz, reklam amaciyla paylasilmaz.</p>
+<p>Veriler yalnizca uygulamayi calistirmak (harita ve analiz, horary yanitlari, abonelik dogrulama, bildirimler, topluluk ozellikleri) icin kullanilir. Verileriniz satilmaz, reklam amaciyla paylasilmaz ve reklam amaciyla izlenmez (tracking yapilmaz).</p>
 <h2>3. Ucuncu Taraflar</h2>
-<ul><li>Google Play (odeme), RevenueCat (abonelik yonetimi), Firebase (bildirimler), Supabase (guvenli veri depolama).</li></ul>
+<ul>
+<li><b>Supabase</b> - hesap, kimlik dogrulama ve veri depolama.</li>
+<li><b>RevenueCat</b> - abonelik yonetimi; <b>Google Play</b> ve <b>Apple App Store</b> - odeme isleme.</li>
+<li><b>Firebase Cloud Messaging</b> - bildirimler.</li>
+<li><b>Google / Facebook</b> - yalnizca bu secenegi kullanirsaniz sosyal giris.</li>
+<li><b>Render</b> - sunucu barindirma (analiz ve horary API).</li>
+<li><b>Google ML Kit</b> - ayrintili metinlerin cevirisi cihaz uzerinde yapilir; metin ucuncu tarafa gonderilmez.</li>
+</ul>
 <h2>4. Veri Saklama ve Silme</h2>
-<p>Analiz verileri cihazinizda ve sunucumuzda gecici olarak tutulur. Tum verilerinizin silinmesini isterseniz <b>smyrnaastrology@gmail.com</b> adresine yazin; talebiniz 30 gun icinde yerine getirilir. Ayrintili veri silme talebi icin: <a href="/delete">Veri Silme Talebi</a>.</p>
+<p>Hesabinizi ve iliskili tum verileri uygulama icinden silebilirsiniz: <b>Profil &gt; Hesabi sil</b> veya <b>Ayarlar &gt; Hesabi sil</b>. Silme islemi hesabinizi, kaydettiginiz haritalari, gonderi ve mesajlarinizi kaldirir. Dilerseniz <b>smyrnaastrology@gmail.com</b> adresine yazarak da talep edebilirsiniz; talebiniz en gec 30 gun icinde yerine getirilir. Ayrintili veri silme talebi icin: <a href="/delete">Veri Silme Talebi</a>.</p>
 <h2>5. Cocuklar</h2>
-<p>Uygulama 13 yas alti cocuklara yonelik degildir.</p>
-<h2>6. Iletisim</h2>
+<p>Uygulama 13 yas alti cocuklara yonelik degildir ve 13 yas alti kullanicilardan bilerek veri toplamaz.</p>
+<h2 id="haklar">6. Haklariniz</h2>
+<p>Verilerinize erisme, duzeltme, silme ve tasima haklariniz vardir. Talepleriniz icin <b>smyrnaastrology@gmail.com</b> adresine yazabilirsiniz. Gizlilik tercihleriniz: <a href="/privacy#haklar">Gizlilik tercihleri</a>.</p>
+<h2>7. Guvenlik</h2>
+<p>Veriler aktarim sirasinda HTTPS ile sifrelenir; erisim yetkileri en az yetki ilkesine gore sinirlandirilir.</p>
+<h2>8. Degisiklikler</h2>
+<p>Bu politika guncellendiginde sayfadaki "Son guncelleme" tarihi degisir ve onemli degisiklikler uygulama icinde duyurulur.</p>
+<h2>9. Iletisim</h2>
 <p>Gizlilik sorulariniz icin: <b>smyrnaastrology@gmail.com</b></p>
-<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a> &middot; <a href="/privacy-en">English version</a></p>
+<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a> &middot; <a href="/privacy-en">English version</a> &middot; <a href="/privacy-es">Version en espanol</a> &middot; <a href="/support">Destek</a></p>
 </body></html>"""
 
 @app_fast.get("/delete", response_class=HTMLResponse)
@@ -9568,26 +9582,130 @@ def privacy_policy_en():
 <title>Holavon - Privacy Policy</title></head>
 <body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
 <h1>Holavon Privacy Policy</h1>
-<p><b>Last updated:</b> September 2026</p>
+<p><b>Last updated:</b> October 2026</p>
 <h2>1. Data We Collect</h2>
 <ul>
-<li><b>Analysis inputs:</b> birth details you enter (name, date, time, city) are used only to generate analyses.</li>
-<li><b>Device identifier:</b> a randomly generated anonymous device ID to track free entitlement and subscription status. No email, no password, no accounts.</li>
-<li><b>Notification token:</b> Firebase messaging token for daily reminders (if you allow).</li>
-<li><b>Purchase info:</b> payments are processed by Google Play and RevenueCat; card details never reach us.</li>
+<li><b>Account data:</b> email address, password (stored by Supabase in irreversibly hashed form), display name and optional profile photo. If you sign in with Google or Facebook, we receive your name and email address from that provider.</li>
+<li><b>Birth and chart data:</b> names, birth dates, times and places you save, used only to generate charts and analyses.</li>
+<li><b>Social content:</b> posts, stories (photos/drawings), likes, comments, replies, follows and direct messages you share in the Holavon community. Camera or photo library access is requested only when you create a story; the image you select is uploaded solely for your own post.</li>
+<li><b>Horary questions:</b> the question you type in the Horary tab, together with birth/location details, is processed on our server to generate an answer and may be logged for service quality.</li>
+<li><b>Device and notification data:</b> a randomly generated anonymous device identifier used to track free entitlement and subscription status, plus a Firebase messaging token (if you allow notifications).</li>
+<li><b>Purchase data:</b> payments are processed by Google Play, the App Store and RevenueCat; card details never reach us.</li>
 </ul>
 <h2>2. Use of Data</h2>
-<p>Data is used solely to operate the app (analyses, PDF reports, subscription verification, notifications). Your data is never sold or shared for advertising.</p>
+<p>Data is used solely to operate the app (charts and analyses, horary answers, subscription verification, notifications, community features). Your data is never sold, never shared for advertising and never used to track you across other apps or websites.</p>
 <h2>3. Third Parties</h2>
-<ul><li>Google Play (payments), RevenueCat (subscription management), Firebase (notifications), Supabase (secure data storage).</li></ul>
+<ul>
+<li><b>Supabase</b> - accounts, authentication and data storage.</li>
+<li><b>RevenueCat</b> - subscription management; <b>Google Play</b> and <b>Apple App Store</b> - payment processing.</li>
+<li><b>Firebase Cloud Messaging</b> - push notifications.</li>
+<li><b>Google / Facebook</b> - social sign-in, only if you choose it.</li>
+<li><b>Render</b> - server hosting for the analysis and horary APIs.</li>
+<li><b>Google ML Kit</b> - detailed texts are translated on your device; text is not sent to a third party.</li>
+</ul>
 <h2>4. Retention and Deletion</h2>
-<p>To request deletion of all your data, write to <b>smyrnaastrology@gmail.com</b>; requests are fulfilled within 30 days.</p>
+<p>You can delete your account and all related data from inside the app: <b>Profile &gt; Delete account</b> or <b>Settings &gt; Delete account</b>. This removes your account, saved charts, posts and messages. You may also email <b>smyrnaastrology@gmail.com</b>; requests are fulfilled within 30 days. Detailed request page: <a href="/delete">Data Deletion Request</a>.</p>
 <h2>5. Children</h2>
-<p>The app is not directed at children under 13.</p>
-<h2>6. Contact</h2>
+<p>The app is not directed at children under 13 and does not knowingly collect data from them.</p>
+<h2 id="choices">6. Your Rights</h2>
+<p>You have the right to access, correct, delete and port your data. Contact <b>smyrnaastrology@gmail.com</b>. Privacy choices: <a href="/privacy-en#choices">Privacy choices</a>.</p>
+<h2>7. Security</h2>
+<p>Data is encrypted in transit with HTTPS and access is limited on a least-privilege basis.</p>
+<h2>8. Changes</h2>
+<p>When this policy changes, the "Last updated" date above changes and material changes are announced in the app.</p>
+<h2>9. Contact</h2>
 <p>For privacy questions: <b>smyrnaastrology@gmail.com</b></p>
-<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a></p>
+<hr><p><a href="/standards">Yayinlanmis Standartlar (Cocuk Guvenligi / CSAE Yasagi)</a> &middot; <a href="/standards-en">Published Standards (English)</a> &middot; <a href="/privacy">Turkce</a> &middot; <a href="/privacy-es">Espanol</a> &middot; <a href="/support">Support</a></p>
 </body></html>"""
+
+@app_fast.get("/privacy-es", response_class=HTMLResponse)
+def privacy_policy_es():
+    """Politica de privacidad (Espanol)."""
+    return """<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holavon - Politica de Privacidad</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Politica de Privacidad de Holavon</h1>
+<p><b>Ultima actualizacion:</b> octubre de 2026</p>
+<h2>1. Datos que recopilamos</h2>
+<ul>
+<li><b>Datos de la cuenta:</b> correo electronico, contrasena (almacenada por Supabase de forma irreversible), nombre visible y foto de perfil opcional. Si inicias sesion con Google o Facebook, recibimos tu nombre y correo electronico de ese proveedor.</li>
+<li><b>Datos de nacimiento y cartas:</b> nombres, fechas, horas y lugares que guardas; se usan solo para generar cartas y analisis.</li>
+<li><b>Contenido social:</b> publicaciones, historias (fotos/dibujos), me gusta, comentarios, respuestas, seguimientos y mensajes directos. El acceso a la camara o a la galeria se solicita solo al crear una historia.</li>
+<li><b>Preguntas de horaria:</b> la pregunta que escribes y los datos de nacimiento/ubicacion se procesan en nuestro servidor para generar la respuesta y pueden registrarse por calidad del servicio.</li>
+<li><b>Datos del dispositivo:</b> identificador anonimo generado aleatoriamente para el estado de suscripcion y token de Firebase (si permites notificaciones).</li>
+<li><b>Compras:</b> los pagos se procesan mediante Google Play, App Store y RevenueCat; los datos de la tarjeta nunca llegan a nosotros.</li>
+</ul>
+<h2>2. Uso de los datos</h2>
+<p>Los datos se usan solo para operar la app (cartas y analisis, respuestas de horaria, verificacion de suscripciones, notificaciones y funciones de la comunidad). Nunca se venden, no se comparten con fines publicitarios y no se usan para rastrearte.</p>
+<h2>3. Terceros</h2>
+<ul>
+<li><b>Supabase</b>: cuentas, autenticacion y almacenamiento.</li>
+<li><b>RevenueCat</b>: gestion de suscripciones; <b>Google Play</b> y <b>App Store</b>: procesamiento de pagos.</li>
+<li><b>Firebase Cloud Messaging</b>: notificaciones.</li>
+<li><b>Google / Facebook</b>: inicio de sesion social, solo si lo eliges.</li>
+<li><b>Render</b>: alojamiento de las API de analisis y horaria.</li>
+<li><b>Google ML Kit</b>: la traduccion se realiza en tu dispositivo; el texto no se envia a terceros.</li>
+</ul>
+<h2>4. Conservacion y eliminacion</h2>
+<p>Puedes eliminar tu cuenta y todos los datos desde la app: <b>Perfil &gt; Eliminar cuenta</b> o <b>Ajustes &gt; Eliminar cuenta</b>. Tambien puedes escribir a <b>smyrnaastrology@gmail.com</b>; las solicitudes se atienden en un plazo maximo de 30 dias. Pagina de solicitud: <a href="/delete">Solicitud de eliminacion de datos</a>.</p>
+<h2>5. Menores</h2>
+<p>La app no esta dirigida a menores de 13 anos y no recopila datos de ellos a sabiendas.</p>
+<h2>6. Tus derechos</h2>
+<p>Tienes derecho a acceder, corregir, eliminar y portar tus datos. Contacto: <b>smyrnaastrology@gmail.com</b>.</p>
+<h2>7. Seguridad</h2>
+<p>Los datos se cifran en transito con HTTPS y el acceso se limita al minimo necesario.</p>
+<h2>8. Cambios</h2>
+<p>Si esta politica cambia, se actualiza la fecha de "Ultima actualizacion" y los cambios importantes se anuncian en la app.</p>
+<h2>9. Contacto</h2>
+<p>Para consultas de privacidad: <b>smyrnaastrology@gmail.com</b></p>
+<hr><p><a href="/privacy">Turkce</a> &middot; <a href="/privacy-en">English</a> &middot; <a href="/support">Soporte</a></p>
+</body></html>"""
+
+
+@app_fast.get("/support", response_class=HTMLResponse)
+def support_page():
+    """Destek sayfasi (App Store / Play Store Support URL)."""
+    return """<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holavon - Destek / Support</title></head>
+<body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 16px;line-height:1.6;color:#333">
+<h1>Holavon - Destek / Support</h1>
+<p><b>Uygulama:</b> Holavon: Astroloji &amp; Sinastri &nbsp;|&nbsp; <b>Gelistirici:</b> Smyrna Astrology (Fatih Asartepe)</p>
+<p><b>E-posta:</b> <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a> &nbsp;|&nbsp;
+<b>Instagram:</b> <a href="https://instagram.com/holavonastrology">@holavonastrology</a></p>
+
+<h2>English</h2>
+<p>Need help with Holavon? Write to <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a> and we will reply within 2 business days.</p>
+<ul>
+<li><b>Account deletion:</b> in the app go to Profile &gt; Delete account, or Settings &gt; Delete account. You may also email us. Details: <a href="/delete">Data deletion request</a>.</li>
+<li><b>Subscription / refunds:</b> purchases are handled by Google Play or the App Store. Manage or cancel from your store account; refunds follow the store's policy.</li>
+<li><b>Horary takes long or fails:</b> the service runs on a free-tier server that sleeps when idle. The first request may take up to 60 seconds, please retry once.</li>
+<li><b>Story editor issues:</b> make sure camera/photo permission is granted in system settings.</li>
+<li><b>Translation of detail texts:</b> the first use may need a network connection to download the on-device language model.</li>
+</ul>
+
+<h2>Turkce</h2>
+<p>Holavon ile ilgili yardim icin <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a> adresine yazin; 2 is gunu icinde yanit veriyoruz.</p>
+<ul>
+<li><b>Hesap silme:</b> uygulamada Profil &gt; Hesabi sil veya Ayarlar &gt; Hesabi sil. Dilerseniz e-posta da atabilirsiniz. Ayrinti: <a href="/delete">Veri silme talebi</a>.</li>
+<li><b>Abonelik / iade:</b> satin almalar Google Play veya App Store uzerinden yurutulur. Iptal ve iade islemleri magaza hesabinizdan yapilir.</li>
+<li><b>Horary yavas veya hatali:</b> sunucu ucretsiz katmanda calisir ve bosken uyur. Ilk istek 60 saniye kadar surebilir; bir kez tekrar deneyin.</li>
+<li><b>Hikaye editoru:</b> kamera/fotograf izninin sistem ayarlarinda acik oldugundan emin olun.</li>
+<li><b>Ayrinti metinlerinin cevirisi:</b> ilk kullanimda cihaz uzerindeki dil modelinin indirilmesi icin internet gerekebilir.</li>
+</ul>
+
+<h2>Espanol</h2>
+<p>Si necesitas ayuda con Holavon, escribe a <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a> y respondemos en un plazo de 2 dias habiles.</p>
+<ul>
+<li><b>Eliminar la cuenta:</b> en la app, Perfil &gt; Eliminar cuenta o Ajustes &gt; Eliminar cuenta. Tambien puedes escribirnos. Detalles: <a href="/delete">Solicitud de eliminacion</a>.</li>
+<li><b>Suscripcion / reembolsos:</b> las compras se gestionan en Google Play o en el App Store; las cancelaciones y reembolsos siguen la politica de la tienda.</li>
+<li><b>La horaria tarda o falla:</b> el servidor gratuito se suspende cuando esta inactivo. La primera peticion puede tardar hasta 60 segundos; reintenta una vez.</li>
+<li><b>Editor de historias:</b> comprueba que el permiso de camara/galeria esta activo en los ajustes del sistema.</li>
+</ul>
+<hr><p><a href="/privacy">Gizlilik Politikasi</a> &middot; <a href="/privacy-en">Privacy Policy</a> &middot; <a href="/privacy-es">Politica de Privacidad</a></p>
+</body></html>"""
+
 
 @app_fast.get("/standards", response_class=HTMLResponse)
 def published_standards_tr():
