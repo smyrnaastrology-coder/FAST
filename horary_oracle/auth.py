@@ -106,6 +106,9 @@ def _load():
     Burada HICBIR sey kendiliginden geri yuklenmez. Gecmise donus yolu
     (legacy migrate) bilerek cikarildi: Render'in gecici diski DB'yi her
     deploy'da siliyor ve her yeniden yuklemede krediler 100'e donuyordu."""
+    if os.getenv('HORARY_DATABASE_URL', '').strip():
+        import legacy_users_postgres
+        return legacy_users_postgres.load()
     if not os.path.exists(DB):
         return {}
     try:
@@ -140,6 +143,9 @@ def _atomic_write(d):
 
 def _save(d):
     with _LOCK:
+        if os.getenv('HORARY_DATABASE_URL', '').strip():
+            import legacy_users_postgres
+            return legacy_users_postgres.save(d)
         _atomic_write(d)
 
 
@@ -151,6 +157,9 @@ def update(mutator):
     HESAPTA KALIR. Tek kilit bunu imkansiz kilar.
     """
     with _LOCK:
+        if os.getenv('HORARY_DATABASE_URL', '').strip():
+            import legacy_users_postgres
+            return legacy_users_postgres.update(mutator)
         db = _load()
         out = mutator(db)
         _atomic_write(db)
@@ -182,10 +191,12 @@ def get_user(email):
 def spend_credit(email, amount=1):
     """Kredi dusur + yeni bakiyeyi dondur. Ayni hesabin tum kayitlari (email +
     kullaniciadi alias'i) birlikte duser; aksi halde alias ile girip tekrar
-    kredi kazanilirdi. None = kullanici yok.
+    kredi kazanilirdi. None = kullanici yok veya yeterli kredi yok.
 
     Tum oku-degistir-yaz tek kilit icinde olur; yarista kayip yazma olmaz."""
     e = (email or "").strip().lower()
+    if type(amount) is not int or amount <= 0:
+        raise ValueError('amount must be a positive integer')
     before = after = None
 
     def _mut(db):
@@ -199,6 +210,7 @@ def spend_credit(email, amount=1):
         if u.get("alias_of"): keys.add(str(u["alias_of"]).lower())
         if "@" in e: keys.add(e.split("@")[0])
         seen = set()
+        records = []
         while True:
             new = set(keys) - seen
             if not new: break
@@ -208,8 +220,12 @@ def spend_credit(email, amount=1):
                 if rec is None: continue
                 if rec.get("alias_of"): keys.add(str(rec["alias_of"]).lower())
                 _resolve_credits(rec, k)
-                before = rec.get("credits")
-                rec["credits"] = max(0, before - amount)
+                records.append(rec)
+        if any(rec["credits"] < amount for rec in records):
+            return None
+        before = u["credits"]
+        for rec in records:
+            rec["credits"] -= amount
         after = u["credits"]
         return u["credits"]
 
@@ -225,11 +241,15 @@ def gen_pass(n=8): return ''.join(secrets.choice(string.ascii_letters+string.dig
 def create_user(email, days=365, credits=None):
     """Yeni kayit: 2 gun deneme (trial). 1 yil lisans icin extend() cagrilir.
     credits=None -> TRIAL_CREDITS (eskiden anahtar hic yazilmazdi => 'sinirsiz')."""
-    db=_load(); pwd=gen_pass()
+    pwd=gen_pass()
     if credits is None: credits = TRIAL_CREDITS
     e=(email or "").strip().lower()
-    db[e]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat(),"credits":credits}
-    _save(db); _audit("create_user", email=e, credits=credits, days=days)
+    def _create(db):
+        if e in db:
+            raise ValueError('user already exists')
+        db[e]={"pwd":hash_pass(pwd),"expiry":(datetime.now()+timedelta(days=days)).isoformat(),"created":datetime.now().isoformat(),"credits":credits}
+    update(_create)
+    _audit("create_user", email=e, credits=credits, days=days)
     return pwd
 
 HARDCODED={"smyrnaastrology@gmail.com": "Tuana21.", "gokturk_yildiz@hotmail.com": "Es1hMLCK"} # kalici, redeploy'da silinmez - deneme kullanicilari runtime DB'de 2 gun
@@ -265,7 +285,10 @@ def verify(email,pwd, device_id=None):
                  "created": datetime.now().isoformat(), "device_ids": [device_id],
                  "device_id": device_id, "credits": DEFAULT_CREDITS,
                  "plan": DEFAULT_PLAN.get(e, "")}
-            db[e] = u; _save(db)
+            def _create_hardcoded(current):
+                if e not in current:
+                    current[e] = u
+            update(_create_hardcoded)
             _audit("HARDCODED_RECREATED", email=e, credits=DEFAULT_CREDITS,
                    cause="kayit bulunamadi - DB dosyasi silinmis olabilir (gecici disk)")
             _log(f"KRITIK: {e} kaydi yoktu, {DEFAULT_CREDITS} krediyle yeniden olusturuldu. "

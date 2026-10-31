@@ -4,7 +4,7 @@ Horary Oracle FastAPI - Yüksek Performans
 - Async + orjson
 - Streamlit'ten bağımsız, Flutter APK direkt çağırır
 """
-import os, sys, time, copy
+import os, sys, time, copy, hmac
 from functools import lru_cache
 from datetime import datetime, date
 from typing import Optional
@@ -12,7 +12,7 @@ from typing import Optional
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "core"))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel, Field
@@ -132,22 +132,23 @@ async def admin_page():
     html = pathlib.Path("horary_oracle/admin.html").read_text(encoding="utf-8")
     return HTMLResponse(html)
 
+def _require_admin_key(provided: str | None):
+    expected = os.getenv("ADMIN_KEY", "").strip()
+    if not expected:
+        raise HTTPException(503, "admin access is not configured")
+    if not provided or not hmac.compare_digest(provided.encode('utf-8'), expected.encode('utf-8')):
+        raise HTTPException(403, "forbidden")
+
+
 @app.get("/admin/list")
-async def admin_list(key: str = ""):
-    import os, json
-    admin_key = os.getenv("ADMIN_KEY", "")
-    # Env set ise key zorunlu, yoksa geçici açık (ama logla)
-    if admin_key and key != admin_key:
-        raise HTTPException(403, "forbidden: admin key required")
+async def admin_list(key: str = "", x_admin_key: str | None = Header(None)):
+    _require_admin_key(x_admin_key or key)
     import auth as _adm
     return _adm._load()
 
 @app.post("/admin/create")
-async def admin_create(email: str, key: str = ""):
-    import os
-    admin_key = os.getenv("ADMIN_KEY", "")
-    if admin_key and key != admin_key:
-        raise HTTPException(403, "forbidden: admin key required")
+async def admin_create(email: str, key: str = "", x_admin_key: str | None = Header(None)):
+    _require_admin_key(x_admin_key or key)
     from auth import create_user
     pwd = create_user(email)
     return {"email":email, "password":pwd, "expiry": "1 yil"}
@@ -790,8 +791,11 @@ async def cast(req: CastRequest):
         # 200 + NO_CREDITS: eski APK bunu yakalayip guzel "kredi bitti" dialogu gosteriyor
         return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
     _left = _auth3.spend_credit(_email3)
-    if _left is not None:
-        engine_json["credits_left"] = _left
+    if _left is None:
+        # Concurrent requests may have consumed the last credit after the
+        # earlier balance check. Never call the LLM without a reservation.
+        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
+    engine_json["credits_left"] = _left
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
@@ -1235,9 +1239,7 @@ load();
 
 @app.get("/admin/users")
 def admin_users(x_admin_key: str = _Header(None)):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
-        return {"error": "unauthorized"}
+    _require_admin_key(x_admin_key)
     db=_auth._load()
     out=[]
     for k,v in db.items():
@@ -1246,9 +1248,7 @@ def admin_users(x_admin_key: str = _Header(None)):
 
 @app.post("/admin/create")
 def admin_create(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
-        return {"error": "unauthorized"}
+    _require_admin_key(x_admin_key)
     email=(payload.get("email") or payload.get("user") or "").strip().lower()
     if not email: return {"error": "email gerekli"}
     days=int(payload.get("days",2))
@@ -1274,9 +1274,7 @@ def admin_create(payload: dict, x_admin_key: str = _Header(None)):
 
 @app.post("/admin/add_credits")
 def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
-        return {"error": "unauthorized"}
+    _require_admin_key(x_admin_key)
     email=(payload.get("email") or payload.get("user") or "").strip().lower()
     if not email:
         return {"error": "email gerekli"}
@@ -1302,9 +1300,7 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
 
 @app.post("/admin/set_plan")
 def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
-        return {"error": "unauthorized"}
+    _require_admin_key(x_admin_key)
     email=(payload.get("user") or payload.get("email") or "").strip().lower()
     plan=(payload.get("plan") or "").strip()
     if not email:
@@ -1316,31 +1312,29 @@ def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
     if plan.lower() not in _PLAN_TIER:
         return {"error": "gecersiz plan", "allowed": sorted(_PLAN_TIER)}
     import auth as _auth6
-    db=_auth6._load()
-    u=db.get(email)
-    if not u:
-        return {"error": "kullanici yok"}
-    u["plan"]=plan
-    u["license"]=plan
-    _auth6._save(db)
-    return {"ok": True, "user": email, "plan": u["plan"]}
+    def _set(db):
+        u = db.get(email)
+        if not u:
+            return {"error": "kullanici yok"}
+        u["plan"] = plan
+        u["license"] = plan
+        return {"ok": True, "user": email, "plan": plan}
+    return _auth6.update(_set)
 
 @app.post("/admin/reset_devices")
 def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
-        return {"error": "unauthorized"}
+    _require_admin_key(x_admin_key)
     email=(payload.get("user") or payload.get("email") or "").strip().lower()
     if not email:
         return {"error": "user gerekli"}
     import auth as _auth5
-    db=_auth5._load()
-    u=db.get(email)
-    if not u:
-        return {"error": "kullanici yok"}
-    u["device_ids"]=[]
-    u.pop("device_id",None)
-    _auth5._save(db)
-    return {"ok": True, "user": email}
+    def _reset(db):
+        u = db.get(email)
+        if not u:
+            return {"error": "kullanici yok"}
+        u["device_ids"] = []
+        u.pop("device_id", None)
+        return {"ok": True, "user": email}
+    return _auth5.update(_reset)
 
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT

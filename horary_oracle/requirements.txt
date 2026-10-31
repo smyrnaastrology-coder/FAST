@@ -14,3 +14,4 @@ timezonefinder>=6.2.0
 # Responses API (engine.tiers reasoning modelleri: o1 / gpt-5.6) 1.66.0 ile geldi.
 openai>=1.66.0
 pytest>=7.4.0
+psycopg2-binary>=2.9
