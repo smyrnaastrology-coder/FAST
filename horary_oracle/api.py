@@ -5,8 +5,10 @@ Horary Oracle FastAPI - Yüksek Performans
 - Streamlit'ten bağımsız, Flutter APK direkt çağırır
 """
 import os, sys, time, copy, hmac
+from collections import OrderedDict
 from functools import lru_cache
 from datetime import datetime, date
+from threading import RLock
 from typing import Optional
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -28,6 +30,35 @@ app.add_middleware(
     allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
 
+# Temporary retry recovery only: answer content is not persisted to the quota
+# database. Bounded per-process cache; a restart may make an answer unavailable.
+_retry_cache = OrderedDict()
+_retry_cache_lock = RLock()
+_RETRY_CACHE_SECONDS = 900
+_RETRY_CACHE_MAX = 128
+
+
+def _retry_cache_get(user_id, request_id):
+    key = (user_id, request_id)
+    with _retry_cache_lock:
+        entry = _retry_cache.get(key)
+        if entry is None:
+            return None
+        if time.monotonic() - entry[0] >= _RETRY_CACHE_SECONDS:
+            del _retry_cache[key]
+            return None
+        _retry_cache.move_to_end(key)
+        return entry[1]
+
+
+def _retry_cache_put(user_id, request_id, response):
+    key = (user_id, request_id)
+    with _retry_cache_lock:
+        _retry_cache[key] = (time.monotonic(), response)
+        _retry_cache.move_to_end(key)
+        while len(_retry_cache) > _RETRY_CACHE_MAX:
+            _retry_cache.popitem(last=False)
+
 # ---------- Models ----------
 class CastRequest(BaseModel):
     question: str = Field(..., min_length=2, max_length=500, example="babam nerede?")
@@ -40,6 +71,8 @@ class CastRequest(BaseModel):
     history: Optional[list] = None
     # kredi düşmek için kimlik (login'de kaydedilen email) - ZORUNLU
     email: Optional[str] = None
+    # Holavon retries must reuse the same UUID so only one quota is reserved.
+    request_id: Optional[str] = None
     # opsiyonel: client kendi zamanını gönderirse
     year: Optional[int] = None
     month: Optional[int] = None
@@ -123,7 +156,14 @@ async def auth_login(req: AuthRequest):
     from auth import verify
     ok, info = verify(req.email, req.password, req.device_id)
     if not ok: raise HTTPException(401, str(info))
-    return {"ok":True, **info}
+    result = {"ok":True, **info}
+    secret = os.getenv('HORARY_SESSION_SECRET', '').strip()
+    if secret:
+        from engine.legacy_session import issue_session
+        result['session_token'] = issue_session(req.email, secret=secret)
+    elif os.getenv('HORARY_REQUIRE_LEGACY_SESSION', '').lower() == 'true':
+        raise HTTPException(503, 'session service not configured')
+    return result
 
 @app.get("/admin")
 async def admin_page():
@@ -178,11 +218,29 @@ def _require_account(email):
     return u
 
 @app.post("/api/horary/cast")
-async def cast(req: CastRequest):
+async def cast(req: CastRequest, authorization: str | None = Header(None)):
+    # This switch must only be enabled after standalone clients have been
+    # updated to send the short-lived token returned by /api/auth/login.
+    if os.getenv('HORARY_REQUIRE_LEGACY_SESSION', '').lower() == 'true':
+        from engine.legacy_session import SessionError, verify_session
+        secret = os.getenv('HORARY_SESSION_SECRET', '').strip()
+        if not secret:
+            raise HTTPException(503, 'session service not configured')
+        scheme, _, token = (authorization or '').partition(' ')
+        if scheme.lower() != 'bearer' or not token:
+            raise HTTPException(401, 'session required')
+        try:
+            req = req.model_copy(update={'email': verify_session(token, secret=secret)})
+        except SessionError:
+            raise HTTPException(401, 'invalid session')
+    return await _cast(req)
+
+
+async def _cast(req: CastRequest, *, holavon=None):
     # --- Kimlik kapisi (ucuz, motor/LLM calismadan once) ---
     # Once email gondermeden veya kayitli olmayan e-posta ile cast denenebiliyordu
     # => kredi kontrolu hic girmiyor, sınırsız bedava soru. Artık 401.
-    _acct = _require_account(req.email)
+    _acct = _require_account(req.email) if holavon is None else {}
     # --- Sohbet modülü (horary_app.py:118 ile birebir) ---
     qlow = req.question.strip().lower()
     # Sohbet sürekliliği: takip mi yeni soru mu?
@@ -760,42 +818,55 @@ async def cast(req: CastRequest):
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
     # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
-    try:
-        import auth as _auth2
-        _db=_auth2._load()
-        _email=getattr(req, 'email', None) or getattr(req, 'user', None) or ""
-        # horary_api.cast'da email req'de yoksa, location'dan da bak
-        if not _email:
-            _email=(req.dict().get("email") if hasattr(req,"dict") else "") or ""
-        if _email:
-            _u=_db.get(_email.lower())
-            if _u and _u.get("plan"):
-                engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
-    except: pass
+    if holavon is None:
+        try:
+            import auth as _auth2
+            _db=_auth2._load()
+            _email=getattr(req, 'email', None) or getattr(req, 'user', None) or ""
+            if not _email:
+                _email=(req.dict().get("email") if hasattr(req,"dict") else "") or ""
+            if _email:
+                _u=_db.get(_email.lower())
+                if _u and _u.get("plan"):
+                    engine_json["user_plan"]=_u["plan"]; engine_json["plan"]=_u["plan"]
+        except: pass
     # kredi kontrolu (100 soru paketleri: Temel 700TL, Gelismis 750TL, En iyi 1500TL)
     # Kimlik zaten cast basinda zorunlu; burada sadece dusen var (sohbet/selam bedava).
-    import auth as _auth3
-    _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
-    _u3 = _auth3.get_user(_email3) or _acct
-    # ONCEDEN: _credits None ise DEFAULT_CREDITS (100) yaziliyordu. Bozuk/eksik
-    # bir kayit aninda 100 bedava soruya donuyordu - kullanicinin "99 kredim
-    # geri 100 oldu" belirtisinin bir parcasi. Artik kirik kayit 0 sayilir ve
-    # kirik oldugu loglanir; sessizce kredi verilmez.
-    _credits = _u3.get("credits")
-    if _credits is None:
-        import sys as _s
-        print(f"[auth] UYARI: {_email3} icin credits okunamadi - soru REDDEDILDI "
-              f"(kayit bozuk olabilir)", file=_s.stderr, flush=True)
-        _credits = 0
-    if _credits <= 0:
-        # 200 + NO_CREDITS: eski APK bunu yakalayip guzel "kredi bitti" dialogu gosteriyor
-        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
-    _left = _auth3.spend_credit(_email3)
-    if _left is None:
-        # Concurrent requests may have consumed the last credit after the
-        # earlier balance check. Never call the LLM without a reservation.
-        return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
-    engine_json["credits_left"] = _left
+    quota_result = None
+    if holavon is not None:
+        try:
+            import asyncio
+            quota_result = await asyncio.to_thread(
+                holavon['store'].consume, holavon['user_id'],
+                is_pro=holavon['is_pro'], request_id=req.request_id,
+            )
+        except ValueError:
+            raise HTTPException(400, 'valid request ID required')
+        except Exception:
+            raise HTTPException(503, 'quota service unavailable')
+        if quota_result.duplicate:
+            cached = _retry_cache_get(holavon['user_id'], req.request_id)
+            if cached is not None:
+                return cached
+            # Never execute the LLM twice for the same quota reservation.
+            raise HTTPException(409, 'request already submitted')
+        if not quota_result.allowed:
+            return {"verdict":"NO_QUOTA", "answer":"", "remaining":0,
+                    "is_pro":holavon['is_pro'], "houses":{}}
+        holavon['reserved'] = True
+    else:
+        import auth as _auth3
+        _email3 = (getattr(req, 'email', None) or (req.dict().get("email") if hasattr(req, "dict") else "") or "").strip().lower()
+        _u3 = _auth3.get_user(_email3) or _acct
+        _credits = _u3.get("credits")
+        if _credits is None:
+            _credits = 0
+        if _credits <= 0:
+            return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
+        _left = _auth3.spend_credit(_email3)
+        if _left is None:
+            return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
+        engine_json["credits_left"] = _left
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
         engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
@@ -1109,7 +1180,7 @@ async def cast(req: CastRequest):
     dt = (time.perf_counter()-t0)*1000
     # planets for mini chart
     planets_out = {k:{"lon":v["lon"],"sign":v["sign"],"deg":round(v["deg"],2),"house":v["house"]} for k,v in res.get("planets",{}).items() if k in ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Pluto","Uranus","Neptune"]}
-    return {
+    response = {
         "verdict": res["verdict"], "score": res["score"],
         "perfection": res["perfection"], "timing": res.get("timing"),
         "querent": res["querent"], "quesited": res["quesited"],
@@ -1121,6 +1192,8 @@ async def cast(req: CastRequest):
         "derived_info": res.get("derived_info"),
         "answer": answer,
         "credits_left": engine_json.get("credits_left"),
+        "remaining": quota_result.remaining if quota_result is not None else None,
+        "is_pro": holavon['is_pro'] if holavon is not None else None,
         # GUVEN: yanitta konum guveni ne, cevabi kac kademe yazdi
         "trust": {
             "level": engine_json.get("trust_level"),
@@ -1136,6 +1209,99 @@ async def cast(req: CastRequest):
         ),
         "meta": {"tz": tzname, "utc_offset": off, "local_dec": round(local_dec,2), "ms": round(dt,1)}
     }
+    if holavon is not None:
+        try:
+            await asyncio.to_thread(holavon['store'].complete, holavon['user_id'], req.request_id)
+        except Exception:
+            raise HTTPException(503, 'quota service unavailable')
+        holavon['reserved'] = False
+        _retry_cache_put(holavon['user_id'], req.request_id, response)
+    return response
+
+
+def _holavon_context(authorization):
+    """Authenticate the account and independently verify Pro server-side."""
+    if os.getenv('HOLAVON_QUOTA_EXPERIMENTAL', '').lower() != 'true':
+        raise HTTPException(503, 'Holavon quota is not enabled')
+    from engine.holavon_identity import (
+        AuthenticationError, IdentityUnavailable, verify_identity, verify_pro,
+    )
+    from engine.holavon_quota_store import PostgresQuotaStore
+    import requests
+    import psycopg2
+    try:
+        identity = verify_identity(
+            authorization, supabase_url=os.getenv('SUPABASE_URL', ''),
+            anon_key=os.getenv('SUPABASE_ANON_KEY', ''), http=requests,
+        )
+        is_pro = verify_pro(
+            identity.user_id, api_secret=os.getenv('REVENUECAT_API_SECRET', ''),
+            http=requests,
+        )
+    except AuthenticationError:
+        raise HTTPException(401, 'invalid session')
+    except IdentityUnavailable:
+        raise HTTPException(503, 'account verification unavailable')
+    db_url = os.getenv('HORARY_DATABASE_URL', '').strip()
+    if not db_url:
+        raise HTTPException(503, 'quota database not configured')
+    store = PostgresQuotaStore(lambda: psycopg2.connect(db_url, connect_timeout=10))
+    try:
+        store.ensure_schema(db_url)
+    except Exception:
+        raise HTTPException(503, 'quota database unavailable')
+    return {
+        'user_id': identity.user_id, 'email': identity.email, 'is_pro': is_pro,
+        'store': store,
+    }
+
+
+@app.get('/api/holavon/quota')
+async def holavon_quota(authorization: str | None = Header(None)):
+    import asyncio
+    context = await asyncio.to_thread(_holavon_context, authorization)
+    try:
+        remaining = await asyncio.to_thread(
+            context['store'].remaining, context['user_id'], is_pro=context['is_pro'],
+        )
+    except Exception:
+        raise HTTPException(503, 'quota service unavailable')
+    return {'remaining': remaining, 'limit': 3, 'is_pro': context['is_pro'],
+            'reset_timezone': 'UTC' if context['is_pro'] else None}
+
+
+@app.post('/api/holavon/cast')
+async def holavon_cast(req: CastRequest, authorization: str | None = Header(None)):
+    import asyncio
+    from uuid import UUID
+    try:
+        UUID(req.request_id or '')
+    except (ValueError, TypeError, AttributeError):
+        raise HTTPException(400, 'valid request ID required')
+    history = req.history or []
+    if len(history) > 4:
+        raise HTTPException(400, 'history too long')
+    cleaned = []
+    for item in history:
+        if not isinstance(item, dict) or item.get('role') not in ('user', 'assistant') or not isinstance(item.get('content'), str):
+            raise HTTPException(400, 'invalid history')
+        # History is untrusted and reaches a metered model; bound its cost.
+        cleaned.append({'role': item['role'], 'content': item['content'][:4000]})
+    context = await asyncio.to_thread(_holavon_context, authorization)
+    req = req.model_copy(update={'email': context['email'], 'history': cleaned})
+    context['reserved'] = False
+    try:
+        return await _cast(req, holavon=context)
+    except Exception:
+        if context['reserved']:
+            try:
+                await asyncio.to_thread(context['store'].release, context['user_id'], req.request_id)
+            except Exception:
+                # Never silently report a successful refund on database failure.
+                import logging
+                logging.exception('Holavon quota refund failed')
+        raise
+
 
 def _fb_make(email, question, question_type, lat, lon, loc_info=None):
     """Cevapla donen tek kullanimlik geri bildirim jetonu."""

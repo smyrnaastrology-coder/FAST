@@ -15,3 +15,4 @@ timezonefinder>=6.2.0
 openai>=1.66.0
 pytest>=7.4.0
 psycopg2-binary>=2.9
+requests>=2.31

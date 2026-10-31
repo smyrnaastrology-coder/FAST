@@ -273,7 +273,10 @@ def verify(email,pwd, device_id=None):
         return True, ""
 
     e = (email or "").strip().lower()
-    if e in HARDCODED and pwd == HARDCODED[e]:
+    # Under the new authenticated API, committed legacy passwords must not
+    # bypass the database's password verification or recreate credit balances.
+    allow_legacy_passwords = os.getenv('HORARY_REQUIRE_LEGACY_SESSION', '').lower() != 'true'
+    if allow_legacy_passwords and e in HARDCODED and pwd == HARDCODED[e]:
         db = _load()
         u = db.get(e)
         if device_id and not u:
