@@ -389,7 +389,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planFreeFeat5 => 'Datos limitados de asteroides';
 
   @override
-  String get planFreeFeat6 => 'Horary: 3 preguntas al día';
+  String get planFreeFeat6 => 'Horary: 3 preguntas gratis en total';
 
   @override
   String get planFreeFeat7 => 'Feed social, historias y mensajes';
@@ -413,7 +413,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planFreeDisabled5 => 'PDF por correo';
 
   @override
-  String get planFreeDisabled6 => 'Horary ilimitado';
+  String get planFreeDisabled6 => '3 preguntas de Horary al día (Pro)';
 
   @override
   String get planFreeDisabled7 => 'Insignia dorada Pro';
@@ -476,7 +476,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get planProFeat4 => 'Soporte prioritario';
 
   @override
-  String get planProFeat8 => 'Preguntas de Horary ilimitadas';
+  String get planProFeat8 => '3 preguntas de Horary al día';
 
   @override
   String get planProFeat9 => 'Insignia dorada Pro en tu perfil social';
@@ -1888,6 +1888,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get profileShare => 'Compartir perfil';
 
   @override
+  String get profileLinkUnavailable =>
+      'No se pudo encontrar o cargar el perfil.';
+
+  @override
   String get postShareSend => 'Enviar';
 
   @override
@@ -2511,7 +2515,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get proPaywallTitle => 'Holavon Pro';
 
   @override
-  String get proBenefitHorary => 'Pro: preguntas horarias ilimitadas';
+  String get proBenefitHorary => 'Pro: 3 preguntas horarias al día';
 
   @override
   String get proBenefitAnalysis => 'Pro: informes PDF ilimitados';
@@ -2520,14 +2524,31 @@ class AppLocalizationsEs extends AppLocalizations {
   String get horaryQuota => 'Preguntas restantes hoy:';
 
   @override
-  String get horaryLimitTitle => 'Preguntas Gratis Diarias Agotadas';
+  String get horaryQuotaFree => 'Preguntas gratis restantes:';
+
+  @override
+  String get horaryQuotaPro => 'Preguntas Pro restantes hoy (UTC):';
+
+  @override
+  String get horaryQuotaLoading => 'Comprobando tus preguntas disponibles…';
+
+  @override
+  String get horaryQuotaUnavailable =>
+      'No se pudieron comprobar tus preguntas. Inténtalo de nuevo.';
+
+  @override
+  String get horaryLimitTitle => 'Preguntas agotadas';
 
   @override
   String get horaryLimitDesc =>
-      'En el plan gratuito puedes hacer 3 preguntas al día. Pro desbloquea preguntas ilimitadas y todos los informes PDF.';
+      'Has usado tus 3 preguntas gratis. Con Pro puedes hacer 3 preguntas cada día.';
 
   @override
-  String get horaryLimitLater => 'Vuelve mañana';
+  String get horaryProLimitDesc =>
+      'Has usado tus 3 preguntas Pro de hoy. Se renuevan a las 00:00 UTC.';
+
+  @override
+  String get horaryLimitLater => 'Aceptar';
 
   @override
   String get horaryAuthError =>
@@ -2565,7 +2586,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get proPillarHoraryDesc =>
-      'Se elimina el límite de 3 preguntas al día; preguntas horarias ilimitadas.';
+      '3 preguntas horarias al día; se renuevan a las 00:00 UTC.';
 
   @override
   String get proPillarSocial => 'Social';

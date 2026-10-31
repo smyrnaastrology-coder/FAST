@@ -153,7 +153,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
   }
 
   static const Map<String, dynamic> _fallbackDB = {
-    'ulkeler': ['Türkiye', 'Almanya', 'Fransa', 'İngiltere', 'ABD', 'Rusya', 'İtalya', 'İspanya', 'Hollanda', 'Belçika', 'Avusturya', 'İsviçre', 'Yunanistan', 'Mısır', 'Brezilya', 'Kanada', 'Avustralya', 'Japonya', 'Çin', 'Hindistan'],
+    'ulkeler': ['Türkiye', 'Almanya', 'Fransa', 'İngiltere', 'ABD', 'Rusya', 'İtalya', 'İspanya', 'Hollanda', 'Belçika', 'Avusturya', 'İsviçre', 'Yunanistan', 'Mısır', 'Brezilya', 'Kanada', 'Avustralya', 'Japonya', 'Çin', 'Hindistan', 'Kosova'],
     'sehirler': {
       'Türkiye': ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Mersin', 'Konya', 'Gaziantep', 'Diyarbakır', 'Eskişehir', 'Samsun', 'Trabzon', 'Erzurum', 'Malatya', 'Kayseri', 'Van', 'Şanlıurfa', 'Tekirdağ', 'Muğla', 'Aydın', 'Balıkesir', 'Denizli', 'Hatay', 'Sakarya', 'Manisa'],
       'Almanya': ['Berlin', 'Münih', 'Hamburg', 'Frankfurt', 'Köln', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Nürnberg'],
@@ -165,6 +165,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
       'İspanya': ['Madrid', 'Barselona', 'Valensiya', 'Sevilla', 'Bilbao', 'Malaga'],
       'Hollanda': ['Amsterdam', 'Rotterdam', 'Lahey', 'Utrecht', 'Eindhoven'],
       'Belçika': ['Brüksel', 'Anvers', 'Gent', 'Brugge', 'Liège'],
+      'Kosova': ['Priştine'],
     }
   };
 

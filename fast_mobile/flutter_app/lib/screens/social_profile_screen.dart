@@ -9,6 +9,7 @@ import '../providers/auth_provider.dart';
 import '../providers/social_provider.dart';
 import '../providers/locale_provider.dart';
 import '../services/social_service.dart';
+import '../services/profile_links.dart';
 import '../services/translation_service.dart';
 import '../widgets/planet_strip.dart';
 import '../widgets/post_card.dart';
@@ -282,6 +283,11 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
           ? Center(
               child: CircularProgressIndicator(color: FastTheme.accentGold),
             )
+          : (widget.userId?.isNotEmpty == true && p == null)
+          ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text(l10n.profileLinkUnavailable, style: TextStyle(color: FastTheme.textMuted)),
+              TextButton(onPressed: _load, child: Text(l10n.socialRetry)),
+            ]))
           : RefreshIndicator(
               color: FastTheme.accentGold,
               backgroundColor: FastTheme.cardBg,
@@ -442,24 +448,7 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                   }),
                 ),
                 const SizedBox(width: 8),
-                OutlinedButton(
-                  onPressed: () => _shareProfile(l10n, p),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: FastTheme.accentGold),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 13,
-                      horizontal: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.ios_share,
-                    color: FastTheme.accentGold,
-                    size: 20,
-                  ),
-                ),
+                _shareButton(l10n, p),
               ],
             )
           else
@@ -478,6 +467,8 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
                 ),
                 const SizedBox(width: 8),
                 _messageButton(l10n, p),
+                const SizedBox(width: 8),
+                _shareButton(l10n, p),
               ],
             ),
 
@@ -501,9 +492,24 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
   }
 
   void _shareProfile(AppLocalizations l10n, SocialProfile? p) {
-    final handle = p?.username ?? '';
-    final text = l10n.shareProfileMessage(handle);
-    Share.share(text, subject: l10n.profileShare);
+    if (p == null) return;
+    final url = ProfileLinks.publicUrl(p.userId);
+    if (url == null) return;
+    final text = l10n.shareProfileMessage(p.username);
+    Share.share('$text\n$url', subject: l10n.profileShare);
+  }
+
+  Widget _shareButton(AppLocalizations l10n, SocialProfile? p) {
+    final canShare = p != null && ProfileLinks.publicUrl(p.userId) != null;
+    return OutlinedButton(
+      onPressed: canShare ? () => _shareProfile(l10n, p) : null,
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: FastTheme.accentGold),
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      child: Icon(Icons.ios_share, color: FastTheme.accentGold, size: 20),
+    );
   }
 
   /// Karşı tarafa birebir mesaj gönderme düğmesi.

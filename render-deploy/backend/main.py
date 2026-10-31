@@ -9511,6 +9511,29 @@ TOTAL_ANALYSIS = 0  # incremented in handle_submit
 def get_stats():
     return {"total_analysis": TOTAL_ANALYSIS, "total_cities": 15000}
 
+@app_fast.get("/u/{profile_id}", response_class=HTMLResponse)
+def profile_link_landing(profile_id: str):
+    """Public link opens a profile in Holavon without publishing profile data."""
+    import uuid
+    try:
+        canonical = str(uuid.UUID(profile_id))
+        if canonical != profile_id.lower():
+            raise ValueError('non-canonical UUID')
+    except (ValueError, AttributeError):
+        raise HTTPException(status_code=404, detail='Profile link not found')
+    app_url = f'com.fastastrology.fast://profile/{canonical}'
+    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holavon profile</title></head>
+<body style="font-family:system-ui,sans-serif;max-width:560px;margin:10vh auto;padding:24px;background:#140f20;color:#f7f2e7;text-align:center;line-height:1.6">
+<h1>Holavon</h1><p>Profili uygulamada aç · Open this profile in the app · Abrir perfil en la aplicación</p>
+<p><a href="{app_url}" style="display:inline-block;background:#c9a96e;color:#140f20;padding:14px 22px;border-radius:12px;text-decoration:none;font-weight:bold">Holavon'u aç / Open Holavon / Abrir Holavon</a></p>
+<p>Uygulama yüklü değil mi? / Don't have the app? / ¿No tienes la aplicación?</p>
+<p><a style="color:#e4cc9b" href="https://play.google.com/store/apps/details?id=com.fastastrology.fast">Google Play</a>
+ · <a style="color:#e4cc9b" href="https://apps.apple.com/app/id6827527304">App Store</a></p>
+</body></html>'''
+
+
 @app_fast.get("/privacy", response_class=HTMLResponse)
 def privacy_policy():
     """Gizlilik politikasi (Play Store listesi icin herkese acik sayfa)."""

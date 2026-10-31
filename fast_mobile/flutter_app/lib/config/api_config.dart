@@ -21,7 +21,8 @@ class ApiConfig {
     'HORARY_API_URL',
     defaultValue: 'https://horary-oracle-api.onrender.com',
   );
-  static const String horaryCast = '$horaryBaseUrl/api/horary/cast';
+  static const String horaryCast = '$horaryBaseUrl/api/holavon/cast';
+  static const String horaryQuota = '$horaryBaseUrl/api/holavon/quota';
 
   // Health
   static const String health = '$baseUrl/api/health';

@@ -387,7 +387,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planFreeFeat5 => 'Sınırlı asteroid verisi';
 
   @override
-  String get planFreeFeat6 => 'Horary: günde 3 soru';
+  String get planFreeFeat6 => 'Horary: toplam 3 ücretsiz soru';
 
   @override
   String get planFreeFeat7 => 'Sosyal akış, hikâye ve mesajlar';
@@ -411,7 +411,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planFreeDisabled5 => 'E-posta PDF';
 
   @override
-  String get planFreeDisabled6 => 'Sınırsız Horary';
+  String get planFreeDisabled6 => 'Günde 3 Horary sorusu (Pro)';
 
   @override
   String get planFreeDisabled7 => 'Altın Pro rozeti';
@@ -474,7 +474,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get planProFeat4 => 'Öncelikli destek';
 
   @override
-  String get planProFeat8 => 'Sınırsız Horary sorusu';
+  String get planProFeat8 => 'Günde 3 Horary sorusu';
 
   @override
   String get planProFeat9 => 'Sosyal profilde altın Pro rozeti';
@@ -1861,6 +1861,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileShare => 'Profili paylaş';
 
   @override
+  String get profileLinkUnavailable => 'Profil bulunamadı veya yüklenemedi.';
+
+  @override
   String get postShareSend => 'Gönder';
 
   @override
@@ -2477,7 +2480,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get proPaywallTitle => 'Holavon Pro';
 
   @override
-  String get proBenefitHorary => 'Pro: sınırsız horary sorusu';
+  String get proBenefitHorary => 'Pro: günde 3 horary sorusu';
 
   @override
   String get proBenefitAnalysis => 'Pro: sınırsız PDF raporu';
@@ -2486,14 +2489,31 @@ class AppLocalizationsTr extends AppLocalizations {
   String get horaryQuota => 'Bugün kalan soru:';
 
   @override
-  String get horaryLimitTitle => 'Günlük Ücretsiz Soru Doldu';
+  String get horaryQuotaFree => 'Kalan ücretsiz soru:';
+
+  @override
+  String get horaryQuotaPro => 'Bugün kalan Pro sorusu (UTC):';
+
+  @override
+  String get horaryQuotaLoading => 'Soru hakkı kontrol ediliyor…';
+
+  @override
+  String get horaryQuotaUnavailable =>
+      'Soru hakkı kontrol edilemedi. Lütfen tekrar dene.';
+
+  @override
+  String get horaryLimitTitle => 'Soru hakkın doldu';
 
   @override
   String get horaryLimitDesc =>
-      'Ücretsiz planda günde 3 soru sorabilirsin. Pro ile sınırsız soru ve tüm PDF raporlar açılır.';
+      'Toplam 3 ücretsiz soru hakkını kullandın. Pro ile her gün 3 soru sorabilirsin.';
 
   @override
-  String get horaryLimitLater => 'Yarın tekrar gel';
+  String get horaryProLimitDesc =>
+      'Bugünkü 3 Pro soru hakkını kullandın. Hakların 00:00 UTC\'de yenilenir.';
+
+  @override
+  String get horaryLimitLater => 'Tamam';
 
   @override
   String get horaryAuthError =>
@@ -2530,7 +2550,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get proPillarHoraryDesc =>
-      'Günde 3 soru sınırı kalkar; sınırsız horary sorusu.';
+      'Her gün 3 horary sorusu; haklar 00:00 UTC\'de yenilenir.';
 
   @override
   String get proPillarSocial => 'Sosyal';

@@ -46,7 +46,9 @@ def sehir_veritabani_yukle():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(script_dir, "cities_db.json")
     with open(json_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        db = json.load(f)
+    db.setdefault("Kosova", {}).setdefault("Priştine", {"lat": 42.6629, "lon": 21.1655})
+    return db
 
 def _normalize_metin(metin):
     """Aksan ve büyük/küçük harf duyarsız karşılaştırma için sadeleştirir."""
@@ -55,13 +57,22 @@ def _normalize_metin(metin):
     metin = "".join(c for c in metin if not unicodedata.combining(c))
     return metin.lower().strip()
 
+
+def _sehir_arama_adi(metin):
+    q = _normalize_metin(metin)
+    if q.startswith('phri'):
+        q = 'pri' + q[4:]
+    if q.startswith('prish'):
+        q = 'pris' + q[5:]
+    return 'pristine' if q == 'pristina' else q
+
 def sehir_ara(arama_metni, limit=15):
     """cities_db.json içinde ülke ve şehir adlarında aksan duyarsız arama yapar.
 
     Önce ülke adında, sonra şehir adında eşleşme arar. Her sonuç
     {'sehir', 'ulke', 'lat', 'lon', 'tam_ad'} sözlüğü olarak döner.
     """
-    q = _normalize_metin(arama_metni)
+    q = _sehir_arama_adi(arama_metni)
     if not q or len(q) < 2:
         return []
     try:
@@ -127,6 +138,11 @@ def sehir_bul(arama_metni):
     Önce yerel cities_db.json içinde aksan duyarsız arar, bulamazsa
     geopy (Nominatim) ile çevrimiçi çözmeyi dener.
     """
+    if ',' in arama_metni:
+        city, country = arama_metni.rsplit(',', 1)
+        if _sehir_arama_adi(city) == 'pristine' and _normalize_metin(country) in ('kosova', 'kosovo'):
+            return {'lat': 42.6629, 'lon': 21.1655, 'sehir': 'Priştine',
+                    'ulke': 'Kosova', 'tam_ad': 'Priştine, Kosova', 'kaynak': 'yerel'}
     yerel = sehir_ara(arama_metni, limit=1)
     if yerel:
         s = yerel[0]
@@ -185,6 +201,7 @@ ULKE_SEHIR_DB = {
     "Sırbistan": ["Belgrad", "Novi Sad", "Niš"],
     "Hırvatistan": ["Zagreb", "Split", "Dubrovnik", "Zadar"],
     "Slovenya": ["Ljubljana", "Maribor", "Bled"],
+    "Kosova": ["Priştine"],
     "ABD": ["New York", "Los Angeles", "Chicago", "Miami", "San Francisco", "Las Vegas",
              "Boston", "Seattle", "Washington DC", "Atlanta", "Houston", "Denver", "Phoenix", "Honolulu"],
     "Kanada": ["Toronto", "Vancouver", "Montreal", "Ottawa", "Calgary", "Edmonton", "Quebec"],
@@ -1069,4 +1086,3 @@ def _resize_and_encode(filename, max_width=800):
         return base64.b64encode(buf.getvalue()).decode()
     except Exception:
         return None
-

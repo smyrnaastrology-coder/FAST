@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -17,9 +19,11 @@ import 'providers/theme_provider.dart';
 import 'screens/auth_screen.dart';
 import 'screens/language_intro_screen.dart';
 import 'screens/main_shell.dart';
+import 'screens/social_profile_screen.dart';
 import 'screens/warning_screen.dart';
 import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
+import 'services/profile_links.dart';
 import 'widgets/splash_logo.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -133,16 +137,53 @@ class StartupGate extends StatefulWidget {
 
 class _StartupGateState extends State<StartupGate> {
   bool _warningAccepted = true;
+  bool _startupReady = false;
+  StreamSubscription<Uri>? _profileLinks;
+  String? _pendingProfile;
+  String? _lastProfile;
+  DateTime? _lastProfileAt;
 
   @override
   void initState() {
     super.initState();
     _init();
+    _listenProfileLinks();
+  }
+
+  Future<void> _listenProfileLinks() async {
+    try {
+      final links = AppLinks();
+      _profileLinks = links.uriLinkStream.listen(_onProfileLink, onError: (Object _) {});
+      final initial = await links.getInitialLink();
+      if (initial != null) _onProfileLink(initial);
+    } catch (_) {
+      // OAuth and normal startup must keep working if a platform link is unavailable.
+    }
+  }
+
+  void _onProfileLink(Uri uri) {
+    final id = ProfileLinks.userIdFromUri(uri);
+    if (id == null || !mounted) return;
+    final now = DateTime.now();
+    if (id == _lastProfile && _lastProfileAt != null &&
+        now.difference(_lastProfileAt!) < const Duration(seconds: 2)) {
+      return;
+    }
+    _lastProfile = id;
+    _lastProfileAt = now;
+    setState(() => _pendingProfile = id);
+  }
+
+  @override
+  void dispose() {
+    _profileLinks?.cancel();
+    super.dispose();
   }
 
   Future<void> _init() async {
     final ap = context.read<AuthProvider>();
     await ap.restore();
+    if (!mounted) return;
     final tp = context.read<ThemeProvider>();
     await tp.restore();
     var accepted = true;
@@ -151,7 +192,10 @@ class _StartupGateState extends State<StartupGate> {
       accepted = prefs.getBool(WarningScreen.prefKey) ?? false;
     } catch (_) {}
     if (!mounted) return;
-    setState(() => _warningAccepted = accepted);
+    setState(() {
+      _warningAccepted = accepted;
+      _startupReady = true;
+    });
   }
 
   Widget _decideHome(LocaleProvider lp, AuthProvider ap) {
@@ -169,6 +213,20 @@ class _StartupGateState extends State<StartupGate> {
   Widget build(BuildContext context) {
     final lp = context.watch<LocaleProvider>();
     final ap = context.watch<AuthProvider>();
+    if (_startupReady && lp.ready && lp.hasChoice && _warningAccepted &&
+        ap.enabled && ap.isLoggedIn && _pendingProfile != null) {
+      final id = _pendingProfile!;
+      _pendingProfile = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final navigator = rootNavigatorKey.currentState;
+        if (navigator == null) {
+          setState(() => _pendingProfile = id);
+          return;
+        }
+        navigator.push(MaterialPageRoute(builder: (_) => SocialProfileScreen(userId: id)));
+      });
+    }
     return _decideHome(lp, ap);
   }
 }

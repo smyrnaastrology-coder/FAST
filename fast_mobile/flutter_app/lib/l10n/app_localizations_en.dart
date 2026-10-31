@@ -387,7 +387,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planFreeFeat5 => 'Limited asteroid data';
 
   @override
-  String get planFreeFeat6 => 'Horary: 3 questions per day';
+  String get planFreeFeat6 => 'Horary: 3 free questions in total';
 
   @override
   String get planFreeFeat7 => 'Social feed, stories and DMs';
@@ -411,7 +411,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planFreeDisabled5 => 'Email PDF';
 
   @override
-  String get planFreeDisabled6 => 'Unlimited Horary';
+  String get planFreeDisabled6 => '3 Horary questions per day (Pro)';
 
   @override
   String get planFreeDisabled7 => 'Gold Pro badge';
@@ -474,7 +474,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planProFeat4 => 'Priority support';
 
   @override
-  String get planProFeat8 => 'Unlimited Horary questions';
+  String get planProFeat8 => '3 Horary questions per day';
 
   @override
   String get planProFeat9 => 'Gold Pro badge on your social profile';
@@ -1871,6 +1871,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileShare => 'Share profile';
 
   @override
+  String get profileLinkUnavailable =>
+      'The profile could not be found or loaded.';
+
+  @override
   String get postShareSend => 'Send';
 
   @override
@@ -2489,7 +2493,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proPaywallTitle => 'Holavon Pro';
 
   @override
-  String get proBenefitHorary => 'Pro: unlimited horary questions';
+  String get proBenefitHorary => 'Pro: 3 horary questions per day';
 
   @override
   String get proBenefitAnalysis => 'Pro: unlimited PDF reports';
@@ -2498,14 +2502,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get horaryQuota => 'Questions left today:';
 
   @override
-  String get horaryLimitTitle => 'Free Daily Questions Used Up';
+  String get horaryQuotaFree => 'Free questions left:';
+
+  @override
+  String get horaryQuotaPro => 'Pro questions left today (UTC):';
+
+  @override
+  String get horaryQuotaLoading => 'Checking your question allowance…';
+
+  @override
+  String get horaryQuotaUnavailable =>
+      'Could not check your question allowance. Please try again.';
+
+  @override
+  String get horaryLimitTitle => 'Question allowance used up';
 
   @override
   String get horaryLimitDesc =>
-      'On the free plan you can ask 3 questions per day. Pro unlocks unlimited questions and all PDF reports.';
+      'You\'ve used your 3 free questions. Pro lets you ask 3 questions each day.';
 
   @override
-  String get horaryLimitLater => 'Come back tomorrow';
+  String get horaryProLimitDesc =>
+      'You\'ve used your 3 Pro questions for today. Your allowance resets at 00:00 UTC.';
+
+  @override
+  String get horaryLimitLater => 'OK';
 
   @override
   String get horaryAuthError =>
@@ -2543,7 +2564,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get proPillarHoraryDesc =>
-      'The 3-questions-a-day limit is lifted; unlimited horary questions.';
+      '3 horary questions each day; the allowance resets at 00:00 UTC.';
 
   @override
   String get proPillarSocial => 'Social';

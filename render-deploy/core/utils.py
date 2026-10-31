@@ -58,7 +58,10 @@ def sehir_veritabani_yukle():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(script_dir, "cities_db.json")
     with open(json_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        db = json.load(f)
+    # Kosovo's capital is absent from the upstream city dataset.
+    db.setdefault("Kosova", {}).setdefault("Priştine", {"lat": 42.6629, "lon": 21.1655})
+    return db
 
 def _normalize_metin(metin):
     """Aksan ve büyük/küçük harf duyarsız karşılaştırma için sadeleştirir."""
@@ -67,13 +70,22 @@ def _normalize_metin(metin):
     metin = "".join(c for c in metin if not unicodedata.combining(c))
     return metin.lower().strip()
 
+
+def _sehir_arama_adi(metin):
+    q = _normalize_metin(metin)
+    if q.startswith('phri'):
+        q = 'pri' + q[4:]
+    if q.startswith('prish'):
+        q = 'pris' + q[5:]
+    return 'pristine' if q == 'pristina' else q
+
 def sehir_ara(arama_metni, limit=15):
     """cities_db.json içinde ülke ve şehir adlarında aksan duyarsız arama yapar.
 
     Önce ülke adında, sonra şehir adında eşleşme arar. Her sonuç
     {'sehir', 'ulke', 'lat', 'lon', 'tam_ad'} sözlüğü olarak döner.
     """
-    q = _normalize_metin(arama_metni)
+    q = _sehir_arama_adi(arama_metni)
     if not q or len(q) < 2:
         return []
     try:
@@ -146,12 +158,15 @@ def sehir_bul(arama_metni):
         try:
             db = sehir_veritabani_yukle()
             for country, cities in db.items():
-                suffix = next((separator + _normalize_metin(country)
+                country_names = [_normalize_metin(country)]
+                if country == 'Kosova':
+                    country_names.append('kosovo')
+                suffix = next((separator + name for name in country_names
                     for separator in (', ', ',')
-                    if qualified_query.endswith(separator + _normalize_metin(country))), None)
+                    if qualified_query.endswith(separator + name)), None)
                 if suffix is None:
                     continue
-                city_query = qualified_query[:-len(suffix)].strip()
+                city_query = _sehir_arama_adi(qualified_query[:-len(suffix)].strip())
                 for city, coordinates in cities.items():
                     if _normalize_metin(city) != city_query:
                         continue
@@ -219,6 +234,7 @@ ULKE_SEHIR_DB = {
     "Sırbistan": ["Belgrad", "Novi Sad", "Niš"],
     "Hırvatistan": ["Zagreb", "Split", "Dubrovnik", "Zadar"],
     "Slovenya": ["Ljubljana", "Maribor", "Bled"],
+    "Kosova": ["Priştine"],
     "ABD": ["New York", "Los Angeles", "Chicago", "Miami", "San Francisco", "Las Vegas",
              "Boston", "Seattle", "Washington DC", "Atlanta", "Houston", "Denver", "Phoenix", "Honolulu"],
     "Kanada": ["Toronto", "Vancouver", "Montreal", "Ottawa", "Calgary", "Edmonton", "Quebec"],

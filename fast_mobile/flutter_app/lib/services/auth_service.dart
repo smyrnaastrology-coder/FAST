@@ -89,6 +89,9 @@ class AuthService {
 
   static String get userId => _userId ?? '';
 
+  /// Current Supabase access token for authenticated backend requests.
+  static String get accessToken => _sessionToken ?? '';
+
   static String? get refreshToken => _refreshToken;
 
   static String get email => _userEmail ?? '';

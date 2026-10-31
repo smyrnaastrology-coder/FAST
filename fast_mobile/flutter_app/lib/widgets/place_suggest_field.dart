@@ -58,6 +58,7 @@ String _fold(String input) {
     'â': 'a',
     'î': 'i',
     'û': 'u',
+    'ë': 'e',
   };
   final lower = input.toLowerCase();
   final b = StringBuffer();
@@ -104,8 +105,13 @@ class _PlaceSuggestFieldState extends State<PlaceSuggestField> {
     }
   }
 
-  String _search(String option) =>
-      (widget.searchOf ?? widget.displayOf)(option);
+  String _search(String option) {
+    final text = (widget.searchOf ?? widget.displayOf)(option);
+    if (_fold(widget.displayOf(option)) == 'pristine') {
+      return '$text pristina prishtina prishtine phristine';
+    }
+    return text;
+  }
 
   List<String> get _matches {
     final q = _fold(_ctrl.text.trim());

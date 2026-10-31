@@ -805,7 +805,7 @@ abstract class AppLocalizations {
   /// No description provided for @planFreeFeat6.
   ///
   /// In en, this message translates to:
-  /// **'Horary: 3 questions per day'**
+  /// **'Horary: 3 free questions in total'**
   String get planFreeFeat6;
 
   /// No description provided for @planFreeFeat7.
@@ -853,7 +853,7 @@ abstract class AppLocalizations {
   /// No description provided for @planFreeDisabled6.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Horary'**
+  /// **'3 Horary questions per day (Pro)'**
   String get planFreeDisabled6;
 
   /// No description provided for @planFreeDisabled7.
@@ -979,7 +979,7 @@ abstract class AppLocalizations {
   /// No description provided for @planProFeat8.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Horary questions'**
+  /// **'3 Horary questions per day'**
   String get planProFeat8;
 
   /// No description provided for @planProFeat9.
@@ -3502,6 +3502,12 @@ abstract class AppLocalizations {
   /// **'Share profile'**
   String get profileShare;
 
+  /// No description provided for @profileLinkUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The profile could not be found or loaded.'**
+  String get profileLinkUnavailable;
+
   /// No description provided for @postShareSend.
   ///
   /// In en, this message translates to:
@@ -4639,7 +4645,7 @@ abstract class AppLocalizations {
   /// No description provided for @proBenefitHorary.
   ///
   /// In en, this message translates to:
-  /// **'Pro: unlimited horary questions'**
+  /// **'Pro: 3 horary questions per day'**
   String get proBenefitHorary;
 
   /// No description provided for @proBenefitAnalysis.
@@ -4654,22 +4660,52 @@ abstract class AppLocalizations {
   /// **'Questions left today:'**
   String get horaryQuota;
 
+  /// No description provided for @horaryQuotaFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free questions left:'**
+  String get horaryQuotaFree;
+
+  /// No description provided for @horaryQuotaPro.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro questions left today (UTC):'**
+  String get horaryQuotaPro;
+
+  /// No description provided for @horaryQuotaLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking your question allowance…'**
+  String get horaryQuotaLoading;
+
+  /// No description provided for @horaryQuotaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check your question allowance. Please try again.'**
+  String get horaryQuotaUnavailable;
+
   /// No description provided for @horaryLimitTitle.
   ///
   /// In en, this message translates to:
-  /// **'Free Daily Questions Used Up'**
+  /// **'Question allowance used up'**
   String get horaryLimitTitle;
 
   /// No description provided for @horaryLimitDesc.
   ///
   /// In en, this message translates to:
-  /// **'On the free plan you can ask 3 questions per day. Pro unlocks unlimited questions and all PDF reports.'**
+  /// **'You\'ve used your 3 free questions. Pro lets you ask 3 questions each day.'**
   String get horaryLimitDesc;
+
+  /// No description provided for @horaryProLimitDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used your 3 Pro questions for today. Your allowance resets at 00:00 UTC.'**
+  String get horaryProLimitDesc;
 
   /// No description provided for @horaryLimitLater.
   ///
   /// In en, this message translates to:
-  /// **'Come back tomorrow'**
+  /// **'OK'**
   String get horaryLimitLater;
 
   /// No description provided for @horaryAuthError.
@@ -4735,7 +4771,7 @@ abstract class AppLocalizations {
   /// No description provided for @proPillarHoraryDesc.
   ///
   /// In en, this message translates to:
-  /// **'The 3-questions-a-day limit is lifted; unlimited horary questions.'**
+  /// **'3 horary questions each day; the allowance resets at 00:00 UTC.'**
   String get proPillarHoraryDesc;
 
   /// No description provided for @proPillarSocial.

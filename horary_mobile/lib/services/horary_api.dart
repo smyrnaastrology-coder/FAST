@@ -7,6 +7,7 @@ class HoraryApi {
   // Render prod: https://horary-oracle-api.onrender.com  (örnek)
   // Lokal test: http://10.0.2.2:8000  (emulator) veya http://localhost:8000
   static const String baseUrl = String.fromEnvironment('HORARY_API_URL', defaultValue: 'https://horary-oracle-api.onrender.com');
+  static String? _sessionToken;
 
   static Future<Map<String, dynamic>> cast({
     required String question,
@@ -16,6 +17,7 @@ class HoraryApi {
     String category = 'general',
     String asker = 'ben',
     List<Map<String, dynamic>>? history,
+    http.Client? client,
   }) async {
     final uri = Uri.parse('$baseUrl/api/horary/cast');
     final now = DateTime.now(); // yerel saat - transit için kritik
@@ -32,28 +34,41 @@ class HoraryApi {
     http.Response? res;
     for (var attempt = 0; attempt < 2; attempt++) {
       try {
-        res = await http.post(
-          uri,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(payload),
-        ).timeout(const Duration(seconds: 90));
+        final headers = {'Content-Type': 'application/json', if (_sessionToken != null) 'Authorization': 'Bearer $_sessionToken'};
+        final body = jsonEncode(payload);
+        res = await (client == null ? http.post(uri, headers: headers, body: body) : client.post(uri, headers: headers, body: body))
+            .timeout(const Duration(seconds: 90));
         break;
       } catch (e) {
         if (attempt == 1) rethrow;
         await Future.delayed(const Duration(seconds: 3));
       }
     }
-    final r = res!;
+    var r = res!;
+    if (r.statusCode == 401) {
+      final password = prefs.getString('pass');
+      if (email.isNotEmpty && password != null) {
+        await login(email: email, password: password, deviceId: prefs.getString('device_id'), client: client);
+        final headers = {'Content-Type': 'application/json', if (_sessionToken != null) 'Authorization': 'Bearer $_sessionToken'};
+        final body = jsonEncode(payload);
+        r = await (client == null ? http.post(uri, headers: headers, body: body) : client.post(uri, headers: headers, body: body))
+            .timeout(const Duration(seconds: 90));
+      }
+    }
     if (r.statusCode != 200) throw Exception('API ${r.statusCode}: ${r.body}');
     return jsonDecode(utf8.decode(r.bodyBytes)) as Map<String, dynamic>;
   }
 
-  static Future<Map<String, dynamic>> login({required String email, required String password, String? deviceId}) async {
+  static Future<Map<String, dynamic>> login({required String email, required String password, String? deviceId, http.Client? client}) async {
     final uri = Uri.parse('$baseUrl/api/auth/login');
     final body = {'email':email,'password':password, if(deviceId!=null) 'device_id':deviceId};
-    final res = await http.post(uri, headers:{'Content-Type':'application/json'}, body: jsonEncode(body)).timeout(const Duration(seconds:30));
+    final headers = {'Content-Type':'application/json'};
+    final encoded = jsonEncode(body);
+    final res = await (client == null ? http.post(uri, headers: headers, body: encoded) : client.post(uri, headers: headers, body: encoded)).timeout(const Duration(seconds:30));
     if(res.statusCode!=200) throw Exception(res.body);
-    return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String,dynamic>;
+    final result = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String,dynamic>;
+    _sessionToken = result['session_token'] as String?;
+    return result;
   }
 
   static Future<Map<String, dynamic>> health() async {

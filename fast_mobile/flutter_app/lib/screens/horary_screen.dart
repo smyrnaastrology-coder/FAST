@@ -7,10 +7,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
-import '../services/auth_service.dart';
 import '../services/horary_service.dart';
 import '../services/horary_localization.dart';
-import '../services/pro_service.dart';
 import '../widgets/holavon_mark.dart';
 import '../widgets/horary_localized_detail.dart';
 import 'landing_screen.dart';
@@ -18,7 +16,11 @@ import 'landing_screen.dart';
 /// Horary Oracle: soru anının haritasıyla chat gibi cevap.
 /// horary_mobile tam deneyiminin Holavon portu (TTS/STT hariç).
 class HoraryScreen extends StatefulWidget {
-  const HoraryScreen({super.key});
+  const HoraryScreen({super.key, this.quotaLoader});
+
+  /// Optional quota source for isolated widget tests.
+  @visibleForTesting
+  final Future<HoraryResult> Function()? quotaLoader;
 
   @override
   State<HoraryScreen> createState() => _HoraryScreenState();
@@ -48,11 +50,12 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   String _lastQuestion = '';
   String? _error;
 
-  static const _freeDailyLimit = 3;
   bool _isPro = false;
-  int _usedToday = 0;
+  bool _quotaReady = false;
+  bool _quotaError = false;
+  int _remaining = 0;
+  int _quotaLimit = 3;
   int _quotaLoadVersion = 0;
-  int _creditsLeft = -1; // API credits_left (>=0 ise göster)
 
   @override
   void initState() {
@@ -77,40 +80,21 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     if (state == AppLifecycleState.resumed) _loadQuota(refresh: true);
   }
 
-  String get _dayKey {
-    final n = DateTime.now();
-    return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
-  }
-
-  String get _quotaKey => 'horary_q_${AuthService.userId}_$_dayKey';
-
-  Future<({bool pro, int used})> _loadQuota({bool refresh = false}) async {
+  Future<HoraryResult> _loadQuota({bool refresh = false}) async {
     final version = ++_quotaLoadVersion;
-    final pro = await ProService.isPro(refresh: refresh);
-    int used = 0;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      used = prefs.getInt(_quotaKey) ?? 0;
-    } catch (_) {}
+    final result = await (widget.quotaLoader?.call() ?? HoraryService.quota());
     if (mounted && version == _quotaLoadVersion) {
       setState(() {
-        _isPro = pro;
-        _usedToday = used;
+        _quotaReady = result.ok;
+        _quotaError = !result.ok;
+        if (result.ok) {
+          _isPro = result.data['is_pro'] as bool;
+          _remaining = result.data['remaining'] as int;
+          _quotaLimit = result.data['limit'] as int;
+        }
       });
     }
-    return (pro: pro, used: used);
-  }
-
-  int get _remaining => (_freeDailyLimit - _usedToday).clamp(0, _freeDailyLimit);
-
-  Future<void> _bumpQuota() async {
-    var used = _usedToday + 1;
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      used = (prefs.getInt(_quotaKey) ?? 0) + 1;
-      await prefs.setInt(_quotaKey, used);
-    } catch (_) {}
-    if (mounted) setState(() => _usedToday = used);
+    return result;
   }
 
   void _openPaywall() {
@@ -122,8 +106,13 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   Future<bool> _confirmQuota(AppLocalizations l10n) async {
     final quota = await _loadQuota(refresh: true);
     if (!mounted) return false;
-    if (quota.pro) return true;
-    if (quota.used < _freeDailyLimit) return true;
+    if (!quota.ok) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(quota.authError ? l10n.horaryAuthError : l10n.horaryQuotaUnavailable),
+      ));
+      return false;
+    }
+    if ((quota.data['remaining'] as int) > 0) return true;
     await _showLimitDialog(l10n);
     return false;
   }
@@ -140,10 +129,10 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           const SizedBox(width: 8),
           Expanded(child: Text(l10n.horaryLimitTitle, style: TextStyle(color: FastTheme.accentGold, fontSize: 17, fontWeight: FontWeight.w700))),
         ]),
-        content: Text(l10n.horaryLimitDesc, style: TextStyle(color: FastTheme.textMuted, height: 1.4)),
+        content: Text(_isPro ? l10n.horaryProLimitDesc : l10n.horaryLimitDesc, style: TextStyle(color: FastTheme.textMuted, height: 1.4)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.horaryLimitLater, style: TextStyle(color: FastTheme.textDim))),
-          ElevatedButton(
+          if (!_isPro) ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               _openPaywall();
@@ -232,8 +221,22 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       }
       final data = res.data;
       final verdict = (data['verdict'] ?? '').toString();
+      if (verdict == 'NO_QUOTA') {
+        setState(() {
+          _busy = false;
+          _remaining = 0;
+          if (data['is_pro'] is bool) _isPro = data['is_pro'] as bool;
+          if (_chat.isNotEmpty && _chat.last.role == 'user') _chat.removeLast();
+          _questionCtrl.text = q;
+          _persistChat();
+        });
+        await _showLimitDialog(l10n);
+        return;
+      }
       final ans = (data['answer'] ?? verdict).toString();
       setState(() {
+        if (data['remaining'] is int) _remaining = data['remaining'] as int;
+        if (data['is_pro'] is bool) _isPro = data['is_pro'] as bool;
         if (data['houses'] is Map && (data['houses'] as Map).isNotEmpty) {
           _lastChart = data;
         }
@@ -241,7 +244,6 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
         _persistChat();
       });
       _scrollDown();
-      await _bumpQuota();
       if (mounted) setState(() => _busy = false);
     } catch (_) {
       if (!mounted) return;
@@ -956,15 +958,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   }
 
   Widget _quotaBadge(AppLocalizations l10n) {
-    if (_isPro) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.workspace_premium, size: 14, color: FastTheme.accentGold),
-          const SizedBox(width: 6),
-          Text(l10n.proBenefitHorary, style: TextStyle(color: FastTheme.accentGold, fontSize: 12)),
-        ],
-      );
+    if (!_quotaReady) {
+      return Text(_quotaError ? l10n.horaryQuotaUnavailable : l10n.horaryQuotaLoading,
+          style: TextStyle(color: FastTheme.textDim, fontSize: 12));
     }
     final out = _remaining <= 0;
     return Row(
@@ -972,8 +968,8 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       children: [
         Icon(out ? Icons.lock_outline : Icons.timelapse, size: 14, color: out ? FastTheme.danger : FastTheme.textDim),
         const SizedBox(width: 6),
-        Text('${l10n.horaryQuota} $_remaining/$_freeDailyLimit', style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12)),
-        if (out) ...[
+        Text('${_isPro ? l10n.horaryQuotaPro : l10n.horaryQuotaFree} $_remaining/$_quotaLimit', style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12)),
+        if (out && !_isPro) ...[
           const SizedBox(width: 6),
           GestureDetector(
             onTap: _openPaywall,
