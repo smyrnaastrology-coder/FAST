@@ -8,6 +8,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/social_provider.dart';
 import '../providers/locale_provider.dart';
+import '../services/auth_service.dart';
 import '../services/social_service.dart';
 import '../services/profile_links.dart';
 import '../services/translation_service.dart';
@@ -47,9 +48,10 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
 
   String get _uid => (widget.userId ?? '').isNotEmpty
       ? widget.userId!
-      : SocialService.currentUserId;
+      : (SocialService.currentUserId.isNotEmpty ? SocialService.currentUserId : AuthService.userId);
 
-  bool get _isMe => _uid.isNotEmpty && _uid == SocialService.currentUserId;
+  bool get _isMe => _uid.isNotEmpty &&
+      (_uid == SocialService.currentUserId || _uid == AuthService.userId);
 
   @override
   void initState() {
