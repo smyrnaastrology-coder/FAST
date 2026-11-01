@@ -7038,7 +7038,9 @@ def _sky_moon_next_change(jd_start):
                     lo = mid
                 else:
                     hi = mid
-            return (lo + hi) / 2.0
+            # hi her zaman yeni burcun tarafındadır; sınır anını bir önceki
+            # burca yazmamak için hi döndürülür.
+            return hi
         jd = nxt
     return None
 
@@ -7058,7 +7060,8 @@ def _sky_moon_prev_change(jd_start):
                     hi = mid
                 else:
                     lo = mid
-            return (lo + hi) / 2.0
+            # hi mevcut burcun başlangıcıdır.
+            return hi
         jd = prv
     return None
 
