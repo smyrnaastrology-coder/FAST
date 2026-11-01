@@ -7011,6 +7011,116 @@ def sky_calendar(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float]
     return sonuc
 
 
+# ── Ay takvimi: burç giriş/çıkış saatleri ───────────────────────────────
+# Ay'ın burç değiştirme anları (jeosentrik) tüm dünya için aynıdır; yerel
+# saat gösterimi istemcide yapılır. 5 dakikalık önbellek yeterlidir.
+
+_SKY_MOON_CACHE = {}
+
+
+def _sky_moon_sign(jd):
+    d, _h = _sky_pos(jd, swe.MOON)
+    return int(d // 30)
+
+
+def _sky_moon_next_change(jd_start):
+    """Ay'ın burç değiştirdiği bir sonraki an (JD)."""
+    cur = _sky_moon_sign(jd_start)
+    step = 2.0 / 24.0  # 2 saat
+    jd = jd_start
+    for _ in range(4 * 12 + 2):
+        nxt = jd + step
+        if _sky_moon_sign(nxt) != cur:
+            lo, hi = jd, nxt
+            for _ in range(40):
+                mid = (lo + hi) / 2.0
+                if _sky_moon_sign(mid) == cur:
+                    lo = mid
+                else:
+                    hi = mid
+            return (lo + hi) / 2.0
+        jd = nxt
+    return None
+
+
+def _sky_moon_prev_change(jd_start):
+    """Ay'ın mevcut burcuna girdiği an (JD)."""
+    cur = _sky_moon_sign(jd_start)
+    step = 2.0 / 24.0
+    jd = jd_start
+    for _ in range(4 * 12 + 2):
+        prv = jd - step
+        if _sky_moon_sign(prv) != cur:
+            lo, hi = prv, jd
+            for _ in range(40):
+                mid = (lo + hi) / 2.0
+                if _sky_moon_sign(mid) == cur:
+                    hi = mid
+                else:
+                    lo = mid
+            return (lo + hi) / 2.0
+        jd = prv
+    return None
+
+
+@app_fast.get("/api/sky/moon-calendar")
+def sky_moon_calendar(days: int = 30):
+    """Ay'ın mevcut burcu (giriş/çıkış) ve yaklaşan burç geçişleri."""
+    days = max(1, min(60, int(days)))
+    cache_key = (int(time.time() // 300), days)
+    cached = _SKY_MOON_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    now = datetime.utcnow()
+    jd_now = swe.julday(
+        now.year, now.month, now.day,
+        now.hour + now.minute / 60.0 + now.second / 3600.0,
+    )
+
+    moon_now, _mh = _sky_pos(jd_now, swe.MOON)
+    giris = _sky_moon_prev_change(jd_now)
+    cikis = _sky_moon_next_change(jd_now)
+
+    girisler = []
+    jd = cikis
+    limit = jd_now + days
+    while jd is not None and jd < limit and len(girisler) < 80:
+        body = _sky_body(jd, swe.MOON)
+        girisler.append({
+            "zaman": _sky_epoch(jd),
+            "burc": body["burc"],
+            "derece": body["derece"],
+            "mutlak": body["mutlak"],
+        })
+        jd = _sky_moon_next_change(jd + 1.0 / 24.0)
+
+    sonuc = {
+        "ok": True,
+        "sunucu_zamani": _sky_epoch(jd_now),
+        "ay": {
+            "mutlak": round(moon_now, 4),
+            "burc": int(moon_now // 30),
+            "derece": round(moon_now % 30, 2),
+            "giris": _sky_epoch(giris) if giris is not None else None,
+            "cikis": _sky_epoch(cikis) if cikis is not None else None,
+            "kalan_saniye": (
+                max(0, _sky_epoch(cikis) - _sky_epoch(jd_now))
+                if cikis is not None else None
+            ),
+        },
+        "girisler": girisler,
+    }
+    if len(_SKY_MOON_CACHE) > 64:
+        _SKY_MOON_CACHE.clear()
+    _SKY_MOON_CACHE[cache_key] = sonuc
+    return sonuc
+
+
 
 # ── Haritalar (SolarFire tarzı) ─────────────────────────────────────────
 # Paralel modül. Mevcut analiz akışına dokunmaz.
