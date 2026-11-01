@@ -5716,6 +5716,60 @@ abstract class AppLocalizations {
   /// **'Could not find the city location. Select again.'**
   String get chartLocationResolveError;
 
+  /// No description provided for @proLockBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRO'**
+  String get proLockBadge;
+
+  /// No description provided for @proLockCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Pro'**
+  String get proLockCta;
+
+  /// No description provided for @proLockNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Content unlocks automatically when your Pro subscription is active.'**
+  String get proLockNote;
+
+  /// No description provided for @proLockReadingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The daily reading, built from the Moon\'s sign, phase, strongest aspect and void-of-course state, is a Pro feature.'**
+  String get proLockReadingBody;
+
+  /// No description provided for @proLockMoonBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon\'s sign ingresses, live countdown and calendar export are available to Pro subscribers.'**
+  String get proLockMoonBody;
+
+  /// No description provided for @proLockSealsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The full fixed-star seals list unlocks with a Pro subscription.'**
+  String get proLockSealsBody;
+
+  /// No description provided for @proLockArabicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic parts and the synastry reading unlock with a Pro subscription.'**
+  String get proLockArabicBody;
+
+  /// No description provided for @proFeatureNewSky.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Calendar, daily sky reading and live Moon countdown'**
+  String get proFeatureNewSky;
+
+  /// No description provided for @planFreeDisabled8.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Calendar and daily reading'**
+  String get planFreeDisabled8;
+
   /// No description provided for @skyReadingTitle.
   ///
   /// In en, this message translates to:

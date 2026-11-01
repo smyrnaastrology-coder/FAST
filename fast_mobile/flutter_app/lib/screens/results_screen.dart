@@ -19,6 +19,7 @@ import '../widgets/score_display.dart';
 import '../widgets/language_switcher.dart';
 import '../widgets/section_card.dart';
 import '../widgets/premium_pdf_button.dart';
+import '../widgets/pro_gate.dart';
 import 'auth_screen.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -202,11 +203,26 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
           // Yildiz Muhurleri
           if (r['yildiz_muhurleri'] is List && (r['yildiz_muhurleri'] as List).isNotEmpty)
-            _buildYildizMuhurleri(r['yildiz_muhurleri'] as List),
+            ProGate(
+              section: true,
+              icon: Icons.stars,
+              title: l10n.analyzerSectionSeals,
+              body: l10n.proLockSealsBody,
+              child: _buildYildizMuhurleri(r['yildiz_muhurleri'] as List),
+            ),
 
           // Arap Noktalari
           if (r['arap_noktalari'] != null)
-            _buildArapNoktalari(r['arap_noktalari'] as Map, r['arap_sinastri']),
+            ProGate(
+              section: true,
+              icon: Icons.auto_awesome,
+              title: l10n.analyzerSectionArabic,
+              body: l10n.proLockArabicBody,
+              child: _buildArapNoktalari(
+                r['arap_noktalari'] as Map,
+                r['arap_sinastri'],
+              ),
+            ),
 
           // Asteroitler
           if (r['asteroitler'] is List && (r['asteroitler'] as List).isNotEmpty)

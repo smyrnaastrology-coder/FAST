@@ -3070,6 +3070,39 @@ class AppLocalizationsTr extends AppLocalizations {
       'Şehrin konumu bulunamadı. Tekrar seçin.';
 
   @override
+  String get proLockBadge => 'PRO';
+
+  @override
+  String get proLockCta => 'Pro\'ya Geç';
+
+  @override
+  String get proLockNote =>
+      'Aboneliğin aktif olduğunda içerik otomatik açılır.';
+
+  @override
+  String get proLockReadingBody =>
+      'Ay burcu, fazı, en güçlü açısı ve boşlukta olup olmadığına göre hazırlanan günlük yorum Pro abonelerine özeldir.';
+
+  @override
+  String get proLockMoonBody =>
+      'Ay\'ın burç geçişleri, canlı geri sayım ve takvime ekleme Pro abonelerine açıktır.';
+
+  @override
+  String get proLockSealsBody =>
+      'Tam yıldız mühürleri listesi Pro aboneliğiyle açılır.';
+
+  @override
+  String get proLockArabicBody =>
+      'Arap noktaları ve sinastri yorumu Pro aboneliğiyle açılır.';
+
+  @override
+  String get proFeatureNewSky =>
+      'Ay Takvimi, günlük gökyüzü yorumu ve canlı Ay geri sayımı';
+
+  @override
+  String get planFreeDisabled8 => 'Ay Takvimi ve günlük yorum';
+
+  @override
   String get skyReadingTitle => 'Bugünün Gökyüzü';
 
   @override

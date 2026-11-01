@@ -91,7 +91,7 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: SkyCalendarScreen(api: fake),
+        home: SkyCalendarScreen(api: fake, proLoader: () async => true),
       ),
     );
     await tester.pumpAndSettle();
@@ -123,7 +123,10 @@ void main() {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppLocalizations.supportedLocales,
-        home: SkyCalendarScreen(api: _FailingApi()),
+        home: SkyCalendarScreen(
+          api: _FailingApi(),
+          proLoader: () async => true,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -131,6 +134,47 @@ void main() {
     expect(find.text('Gökyüzü Takvimi'), findsOneWidget);
     expect(find.text('Ay Evreleri'), findsOneWidget);
     expect(find.text('Yaklaşan olay yok'), findsOneWidget);
+  });
+
+  testWidgets('Pro olmayan kullanıcı Ay Takvimi ve günlük yorumu göremez', (
+    tester,
+  ) async {
+    final now = DateTime.now();
+    final fake = _FakeApi({
+      'ok': true,
+      'sunucu_zamani': _epoch(now),
+      'ay': {
+        'burc': 4,
+        'derece': 12.3,
+        'giris': _epoch(now.subtract(const Duration(days: 1))),
+        'cikis': _epoch(now.add(const Duration(days: 2, hours: 3))),
+      },
+      'girisler': <Map<String, dynamic>>[],
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('tr'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: SkyCalendarScreen(api: fake, proLoader: () async => false),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Kilit kartları görünür, Pro'ya özel içerik çizilmez.
+    expect(find.text('PRO'), findsNWidgets(2));
+    expect(find.text('Pro\'ya Geç'), findsNWidgets(2));
+    expect(find.textContaining('Ay Aslan burcunda'), findsNothing);
+    expect(find.textContaining('Kalan:'), findsNothing);
+
+    // Temel takvim (ücretsiz) hâlâ çalışır.
+    expect(find.text('Gökyüzü Takvimi'), findsOneWidget);
   });
 }
 

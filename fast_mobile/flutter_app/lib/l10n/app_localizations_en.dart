@@ -3085,6 +3085,39 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not find the city location. Select again.';
 
   @override
+  String get proLockBadge => 'PRO';
+
+  @override
+  String get proLockCta => 'Go Pro';
+
+  @override
+  String get proLockNote =>
+      'Content unlocks automatically when your Pro subscription is active.';
+
+  @override
+  String get proLockReadingBody =>
+      'The daily reading, built from the Moon\'s sign, phase, strongest aspect and void-of-course state, is a Pro feature.';
+
+  @override
+  String get proLockMoonBody =>
+      'The Moon\'s sign ingresses, live countdown and calendar export are available to Pro subscribers.';
+
+  @override
+  String get proLockSealsBody =>
+      'The full fixed-star seals list unlocks with a Pro subscription.';
+
+  @override
+  String get proLockArabicBody =>
+      'Arabic parts and the synastry reading unlock with a Pro subscription.';
+
+  @override
+  String get proFeatureNewSky =>
+      'Moon Calendar, daily sky reading and live Moon countdown';
+
+  @override
+  String get planFreeDisabled8 => 'Moon Calendar and daily reading';
+
+  @override
   String get skyReadingTitle => 'Today\'s Sky';
 
   @override

@@ -10,6 +10,7 @@ import '../models/sky_calendar.dart';
 import '../models/sky_snapshot.dart';
 import '../services/api_service.dart';
 import '../models/sky_event_export.dart';
+import '../widgets/pro_gate.dart';
 import '../widgets/sky_daily_reading_card.dart';
 
 String _calendarText(BuildContext context, String tr, String en, String es) =>
@@ -123,7 +124,10 @@ class SkyCalendarScreen extends StatefulWidget {
   /// Test/önizleme için dışarıdan servis verilebilir.
   final ApiService? api;
 
-  const SkyCalendarScreen({super.key, this.api});
+  /// Test/önizleme için Pro durumu dışarıdan verilebilir.
+  final Future<bool> Function()? proLoader;
+
+  const SkyCalendarScreen({super.key, this.api, this.proLoader});
 
   @override
   State<SkyCalendarScreen> createState() => _SkyCalendarScreenState();
@@ -259,21 +263,33 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
               32 + MediaQuery.of(context).viewPadding.bottom,
             ),
             children: [
-              FutureBuilder<SkySnapshot?>(
-                future: _reading,
-                builder: (context, rs) {
-                  final sky = rs.data;
-                  if (sky == null) return const SizedBox.shrink();
-                  return SkyDailyReadingCard(sky: sky);
-                },
+              ProGate(
+                icon: Icons.nights_stay_outlined,
+                title: l.skyReadingTitle,
+                body: l.proLockReadingBody,
+                statusLoader: widget.proLoader,
+                child: FutureBuilder<SkySnapshot?>(
+                  future: _reading,
+                  builder: (context, rs) {
+                    final sky = rs.data;
+                    if (sky == null) return const SizedBox.shrink();
+                    return SkyDailyReadingCard(sky: sky);
+                  },
+                ),
               ),
-              FutureBuilder<SkyMoonCalendar?>(
-                future: _moon,
-                builder: (context, ms) {
-                  final moon = ms.data;
-                  if (moon == null) return const SizedBox.shrink();
-                  return _MoonSection(moon: moon, onElapsed: _reloadMoon);
-                },
+              ProGate(
+                icon: Icons.calendar_month_outlined,
+                title: l.skyMoonCalendarTitle,
+                body: l.proLockMoonBody,
+                statusLoader: widget.proLoader,
+                child: FutureBuilder<SkyMoonCalendar?>(
+                  future: _moon,
+                  builder: (context, ms) {
+                    final moon = ms.data;
+                    if (moon == null) return const SizedBox.shrink();
+                    return _MoonSection(moon: moon, onElapsed: _reloadMoon);
+                  },
+                ),
               ),
               Wrap(
                 spacing: 8,

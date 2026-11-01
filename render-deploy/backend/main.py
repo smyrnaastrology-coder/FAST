@@ -9607,11 +9607,30 @@ def verify_payment(session_id: str):
 class EmailRequest(BaseModel):
     session_id: str
     email: str
+    uid: str = ""
 
 @app_fast.post("/api/email/send-pdf")
 def send_pdf_email(req: EmailRequest):
     if not PAID_SESSIONS.get(req.session_id):
         raise HTTPException(402, "Ödeme yapılmamış")
+    # E-posta ile PDF teslimi yalnızca Pro abonelere açıktır
+    # (landing_screen.dart planFreeDisabled5 ile aynı kural).
+    uid = (req.uid or "").strip()
+    try:
+        from backend.billing import is_subscribed as _is_sub
+    except Exception:
+        try:
+            from billing import is_subscribed as _is_sub
+        except Exception:
+            _is_sub = None
+    if _is_sub is not None and not _is_sub(uid):
+        raise HTTPException(
+            status_code=402,
+            detail={
+                "code": "SUB_REQUIRED",
+                "msg": "E-posta ile PDF teslimi Pro aboneligi gerektirir",
+            },
+        )
     # TODO: integrate SendGrid / SMTP
     # For now, log and return success
     print(f"[EMAIL] PDF for session {req.session_id} would be sent to {req.email}")

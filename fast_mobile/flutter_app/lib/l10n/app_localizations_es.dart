@@ -3109,6 +3109,39 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se encontró la ubicación de la ciudad. Selecciona de nuevo.';
 
   @override
+  String get proLockBadge => 'PRO';
+
+  @override
+  String get proLockCta => 'Pasar a Pro';
+
+  @override
+  String get proLockNote =>
+      'El contenido se desbloquea automáticamente cuando tu suscripción Pro está activa.';
+
+  @override
+  String get proLockReadingBody =>
+      'La lectura diaria, basada en el signo, la fase, el aspecto más fuerte y el estado de la Luna, es exclusiva de Pro.';
+
+  @override
+  String get proLockMoonBody =>
+      'Los cambios de signo de la Luna, la cuenta atrás en vivo y la exportación al calendario son para suscriptores Pro.';
+
+  @override
+  String get proLockSealsBody =>
+      'La lista completa de sellos de estrellas fijas se desbloquea con la suscripción Pro.';
+
+  @override
+  String get proLockArabicBody =>
+      'Las partes árabes y la lectura de sinastría se desbloquean con la suscripción Pro.';
+
+  @override
+  String get proFeatureNewSky =>
+      'Calendario Lunar, lectura diaria del cielo y cuenta atrás lunar en vivo';
+
+  @override
+  String get planFreeDisabled8 => 'Calendario Lunar y lectura diaria';
+
+  @override
   String get skyReadingTitle => 'El Cielo de Hoy';
 
   @override
