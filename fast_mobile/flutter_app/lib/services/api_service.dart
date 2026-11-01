@@ -157,4 +157,12 @@ class ApiService {
       timeout: const Duration(seconds: 20),
     );
   }
+
+  /// Ay'ın mevcut burcu (giriş/çıkış) ve yaklaşan burç geçişleri.
+  Future<Map<String, dynamic>> skyMoonCalendar({int days = 30}) {
+    return _get(
+      '${ApiConfig.skyMoonCalendar}?days=$days',
+      timeout: const Duration(seconds: 20),
+    );
+  }
 }

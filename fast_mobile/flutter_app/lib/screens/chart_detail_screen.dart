@@ -136,8 +136,10 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
       data: natal,
       outerPlanets: transit.planets,
       outerHouses: transit.houses,
+      outerData: transit,
       title: _l10n.chartNatalTransitTitle,
       subtitle: '${natal.meta.name ?? ''} • ${natal.meta.place}',
+      outerTitle: _l10n.chartNatalTransitTitle,
     );
   }
 
@@ -1108,6 +1110,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
               data: inner,
               outerPlanets: outer.planets,
               outerHouses: outer.houses,
+              outerData: outer,
               size: 360,
               title: '$innerLabel • $outerLabel',
               subtitle: c.meta.place,
@@ -1242,6 +1245,7 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
         (bw['transit'] as Map?)?.cast<String, dynamic>() ?? const {};
     List<PlanetPos> outerP = [];
     List<HouseCusp> outerH = [];
+    ChartData? outerData;
     try {
       outerP = ((transit['gezegenler'] as List?) ?? [])
           .whereType<Map>()
@@ -1251,12 +1255,14 @@ class _ChartDetailScreenState extends State<ChartDetailScreen>
           .whereType<Map>()
           .map((e) => HouseCusp.fromJson(e.cast<String, dynamic>()))
           .toList();
+      outerData = ChartData.fromJson(Map<String, dynamic>.from(transit));
     } catch (_) {}
     return ChartWheel(
       data: c,
       size: 340,
       outerPlanets: outerP,
       outerHouses: outerH,
+      outerData: outerData,
       title: _l10n.chartNatalTransitTitle,
       subtitle: '${c.meta.name ?? ''} • ${c.meta.place}',
       initialDate: cp.biwheel!.when,

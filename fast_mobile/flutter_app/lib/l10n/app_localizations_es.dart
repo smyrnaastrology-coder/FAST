@@ -1840,6 +1840,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get kunyeRoleLover => 'Aficionado/a a la astrología';
 
   @override
+  String get kunyeRoleHidden => 'Ocultar';
+
+  @override
   String get kunyeFieldLabel => 'Tu especialidad';
 
   @override
@@ -2082,6 +2085,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String skyCalendarInHours(String hours) {
     return 'en $hours h';
   }
+
+  @override
+  String get skyMoonCalendarTitle => 'Calendario Lunar';
+
+  @override
+  String skyMoonInSign(String sign) {
+    return 'Luna en $sign';
+  }
+
+  @override
+  String skyMoonEnters(String sign) {
+    return 'La Luna entra en $sign';
+  }
+
+  @override
+  String skyMoonRemaining(String value) {
+    return 'Restante: $value';
+  }
+
+  @override
+  String skyMoonDaysHours(String days, String hours) {
+    return '$days d $hours h';
+  }
+
+  @override
+  String skyMoonHoursMinutes(String hours, String minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String skyMoonMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get skyMoonNextChanges => 'Próximos cambios de signo';
 
   @override
   String get skyNewMoon => 'Luna Nueva';
@@ -2970,6 +3009,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get chartExplorerForward => 'Adelante';
 
   @override
+  String get chartExplorerPlay => 'Reproducir';
+
+  @override
+  String get chartExplorerPause => 'Pausar';
+
+  @override
+  String get chartExplorerSpeed => 'Velocidad';
+
+  @override
+  String get chartExplorerTimeStep => 'Paso de tiempo';
+
+  @override
+  String get chartExplorerDone => 'Listo';
+
+  @override
   String chartExplorerCalculating(String date) {
     return 'Calculando: $date';
   }
@@ -2992,6 +3046,15 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get chartWheelFullscreenTooltip =>
       'Pantalla completa • tiempo / tema / compartir';
+
+  @override
+  String get chartInfoGeocentric => 'Geocéntrico';
+
+  @override
+  String get chartInfoTropical => 'Zodíaco tropical';
+
+  @override
+  String get chartInfoMeanNode => 'Nodo medio';
 
   @override
   String get timeMachineNow => 'Ahora';
@@ -3044,4 +3107,170 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get chartLocationResolveError =>
       'No se encontró la ubicación de la ciudad. Selecciona de nuevo.';
+
+  @override
+  String get skyReadingTitle => 'El Cielo de Hoy';
+
+  @override
+  String skyReadingHeadline(String sign, String mood) {
+    return 'Luna en $sign: $mood';
+  }
+
+  @override
+  String skyReadingAspectLine(String planet, String aspect, String text) {
+    return 'Luna–$planet $aspect: $text';
+  }
+
+  @override
+  String skyReadingRetroLine(String list) {
+    return 'Planetas retrógrados: $list. Revisar los asuntos relacionados pasa a primer plano.';
+  }
+
+  @override
+  String get skyReadingVoidNote =>
+      'Luna en vacío: no apresures los nuevos comienzos; las tareas rutinarias y terminar lo pendiente sientan mejor.';
+
+  @override
+  String get skyReadingSlowNote =>
+      'La Luna se mueve más lenta de lo habitual; pensar un poco más las decisiones ayuda.';
+
+  @override
+  String get skyReadingFastNote =>
+      'La Luna se mueve rápido; la agenda puede cambiar de golpe, mantente flexible.';
+
+  @override
+  String get skyReadingMoodAries => 'el valor de empezar';
+
+  @override
+  String get skyReadingMoodTaurus => 'calma y equilibrio corporal';
+
+  @override
+  String get skyReadingMoodGemini => 'conversación y curiosidad';
+
+  @override
+  String get skyReadingMoodCancer => 'cercanía emocional';
+
+  @override
+  String get skyReadingMoodLeo => 'momento de mostrarte';
+
+  @override
+  String get skyReadingMoodVirgo => 'orden y detalle';
+
+  @override
+  String get skyReadingMoodLibra => 'equilibrio y relaciones';
+
+  @override
+  String get skyReadingMoodScorpio => 'profundidad y transformación';
+
+  @override
+  String get skyReadingMoodSagittarius => 'expansión y búsqueda de sentido';
+
+  @override
+  String get skyReadingMoodCapricorn =>
+      'construir estructura y responsabilidad';
+
+  @override
+  String get skyReadingMoodAquarius => 'innovación y libertad';
+
+  @override
+  String get skyReadingMoodPisces => 'intuición y soltar';
+
+  @override
+  String get skyReadingSignAries =>
+      'En lugar de decidir con prisa, da hoy el primer paso con conciencia; tu energía rinde más cuando tiene dirección.';
+
+  @override
+  String get skyReadingSignTaurus =>
+      'Prioriza tus necesidades corporales; avanzar despacio pero con constancia te dará hoy más que la velocidad.';
+
+  @override
+  String get skyReadingSignGemini =>
+      'Despeja tu mente hablando, escribiendo o preguntando; la nueva información puede aliviar la confusión.';
+
+  @override
+  String get skyReadingSignCancer =>
+      'En vez de guardarte lo que sientes, compártelo con alguien de confianza; hoy mandan los temas de hogar y familia.';
+
+  @override
+  String get skyReadingSignLeo =>
+      'No te frenes al expresarte; dedica tiempo a un proyecto creativo o a una responsabilidad visible.';
+
+  @override
+  String get skyReadingSignVirgo =>
+      'Corregir pequeños detalles puede sentar bien, pero no pierdas la visión de conjunto por el perfeccionismo.';
+
+  @override
+  String get skyReadingSignLibra =>
+      'Habla con claridad para recuperar el equilibrio en una relación; aplazar la decisión solo aumenta la tensión.';
+
+  @override
+  String get skyReadingSignScorpio =>
+      'Las conversaciones que van más allá de la superficie revelan más hoy; intenta soltar el control.';
+
+  @override
+  String get skyReadingSignSagittarius =>
+      'Haz un plan que amplíe tu horizonte; mirar el panorama general puede reducir las preocupaciones diarias.';
+
+  @override
+  String get skyReadingSignCapricorn =>
+      'Céntrate en un objetivo a largo plazo; asumir responsabilidad hoy te fortalece.';
+
+  @override
+  String get skyReadingSignAquarius =>
+      'Prueba una solución poco convencional; intercambiar ideas con personas distintas abre nuevas puertas.';
+
+  @override
+  String get skyReadingSignPisces =>
+      'Escucha tu intuición, pero respalda tus decisiones con un paso concreto; deja también espacio para descansar.';
+
+  @override
+  String get skyReadingPhaseNew =>
+      'Luna Nueva: buen momento para empezar algo desde cero, fijar una intención y planear en silencio.';
+
+  @override
+  String get skyReadingPhaseWaxingCrescent =>
+      'Luna Creciente: los pequeños pasos constantes en lo que has iniciado valen más que los saltos.';
+
+  @override
+  String get skyReadingPhaseFirstQuarter =>
+      'Cuarto Creciente: hace falta determinación para superar obstáculos; terminar lo que quedó a medias puede ayudar.';
+
+  @override
+  String get skyReadingPhaseWaxingGibbous =>
+      'Gibosa Creciente: momento de revisar los detalles y madurar el plan.';
+
+  @override
+  String get skyReadingPhaseFull =>
+      'Luna Llena: emociones y relaciones se hacen visibles; bueno para aclarar un asunto, pero evita decisiones reactivas.';
+
+  @override
+  String get skyReadingPhaseWaningGibbous =>
+      'Gibosa Menguante: buen momento para compartir lo aprendido y simplificar el siguiente paso.';
+
+  @override
+  String get skyReadingPhaseLastQuarter =>
+      'Cuarto Menguante: soltar un hábito que ya no sirve y abrir espacio está en la agenda.';
+
+  @override
+  String get skyReadingPhaseWaningCrescent =>
+      'Luna Menguante: etapa propicia para descansar, retirarte y hacer una revisión interior.';
+
+  @override
+  String get skyReadingAspectConjunction =>
+      'aporta una energía concentrada y de fusión en la misma área.';
+
+  @override
+  String get skyReadingAspectSextile =>
+      'abre una oportunidad sencilla y una puerta a la cooperación.';
+
+  @override
+  String get skyReadingAspectSquare =>
+      'genera tensión interna; la paciencia funciona mejor que la prisa.';
+
+  @override
+  String get skyReadingAspectTrine => 'aporta una armonía fluida y de apoyo.';
+
+  @override
+  String get skyReadingAspectOpposition =>
+      'te pide equilibrar necesidades opuestas.';
 }

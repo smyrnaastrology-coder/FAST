@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'package:share_plus/share_plus.dart';
 
@@ -6,8 +7,10 @@ import '../config/astro_signs.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_calendar.dart';
+import '../models/sky_snapshot.dart';
 import '../services/api_service.dart';
 import '../models/sky_event_export.dart';
+import '../widgets/sky_daily_reading_card.dart';
 
 String _calendarText(BuildContext context, String tr, String en, String es) =>
     switch (Localizations.localeOf(context).languageCode) {
@@ -95,6 +98,18 @@ String _dateLine(BuildContext context, DateTime time) {
   return '$date · $clock';
 }
 
+/// Ay takvimi kartı için kısa tarih (ör. "1 Kas · 09:20").
+String _shortDateLine(BuildContext context, DateTime time) {
+  final local = time.toLocal();
+  final date = MaterialLocalizations.of(
+    context,
+  ).formatShortMonthDay(local);
+  final clock = MaterialLocalizations.of(
+    context,
+  ).formatTimeOfDay(TimeOfDay.fromDateTime(local), alwaysUse24HourFormat: true);
+  return '$date · $clock';
+}
+
 String _countdown(AppLocalizations l, DateTime time) {
   final diff = time.toLocal().difference(DateTime.now());
   if (diff.isNegative) return l.skyCalendarNow;
@@ -105,7 +120,10 @@ String _countdown(AppLocalizations l, DateTime time) {
 }
 
 class SkyCalendarScreen extends StatefulWidget {
-  const SkyCalendarScreen({super.key});
+  /// Test/önizleme için dışarıdan servis verilebilir.
+  final ApiService? api;
+
+  const SkyCalendarScreen({super.key, this.api});
 
   @override
   State<SkyCalendarScreen> createState() => _SkyCalendarScreenState();
@@ -113,19 +131,64 @@ class SkyCalendarScreen extends StatefulWidget {
 
 class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
   late Future<SkyCalendar> _future;
+  late Future<SkyMoonCalendar?> _moon;
+  late Future<SkySnapshot?> _reading;
+  Timer? _readingTimer;
   String _filter = 'all';
+
+  ApiService get _api => widget.api ?? ApiService();
 
   @override
   void initState() {
     super.initState();
     _future = _load();
+    _moon = _loadMoon();
+    _reading = _loadReading();
+    // Yorum, Ay burcu değiştiğinde kendiliğinden tazelensin.
+    _readingTimer = Timer.periodic(const Duration(minutes: 15), (_) {
+      if (!mounted) return;
+      setState(() => _reading = _loadReading());
+    });
+  }
+
+  @override
+  void dispose() {
+    _readingTimer?.cancel();
+    super.dispose();
   }
 
   Future<SkyCalendar> _load() async =>
-      SkyCalendar.fromJson(await ApiService().skyCalendar());
+      SkyCalendar.fromJson(await _api.skyCalendar());
+
+  /// Ay takvimi ucu henüz yayında değilse kart gizlenir; takvim çalışmaya
+  /// devam eder.
+  Future<SkyMoonCalendar?> _loadMoon() async {
+    try {
+      return SkyMoonCalendar.fromJson(await _api.skyMoonCalendar());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Günün yorumu `/api/sky`'den beslenir; hata durumunda kart gizlenir.
+  Future<SkySnapshot?> _loadReading() async {
+    try {
+      return SkySnapshot.fromJson(await _api.sky());
+    } catch (_) {
+      return null;
+    }
+  }
 
   void _reload() {
-    setState(() => _future = _load());
+    setState(() {
+      _future = _load();
+      _moon = _loadMoon();
+      _reading = _loadReading();
+    });
+  }
+
+  void _reloadMoon() {
+    if (mounted) setState(() => _moon = _loadMoon());
   }
 
   @override
@@ -182,16 +245,6 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
             );
           }
           final cal = snap.data!;
-          if (cal.phases.isEmpty && cal.eclipses.isEmpty) {
-            return Center(
-              child: Text(
-                l.skyCalendarEmpty,
-                style: TextStyle(
-                  color: FastTheme.textMuted.withValues(alpha: 0.7),
-                ),
-              ),
-            );
-          }
           final events = <(DateTime, Widget)>[
             if (_filter != 'eclipses')
               ...cal.phases.map((e) => (e.time, _PhaseTile(event: e))),
@@ -206,6 +259,22 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
               32 + MediaQuery.of(context).viewPadding.bottom,
             ),
             children: [
+              FutureBuilder<SkySnapshot?>(
+                future: _reading,
+                builder: (context, rs) {
+                  final sky = rs.data;
+                  if (sky == null) return const SizedBox.shrink();
+                  return SkyDailyReadingCard(sky: sky);
+                },
+              ),
+              FutureBuilder<SkyMoonCalendar?>(
+                future: _moon,
+                builder: (context, ms) {
+                  final moon = ms.data;
+                  if (moon == null) return const SizedBox.shrink();
+                  return _MoonSection(moon: moon, onElapsed: _reloadMoon);
+                },
+              ),
               Wrap(
                 spacing: 8,
                 children: [
@@ -232,11 +301,286 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
                 style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
               ),
               const SizedBox(height: 12),
-              ...events.map((event) => event.$2),
+              if (events.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      l.skyCalendarEmpty,
+                      style: TextStyle(
+                        color: FastTheme.textMuted.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ...events.map((event) => event.$2),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+class _MoonSection extends StatelessWidget {
+  final SkyMoonCalendar moon;
+  final VoidCallback onElapsed;
+
+  const _MoonSection({required this.moon, required this.onElapsed});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final signIndex = (moon.sign + 3) % 12; // AstroSigns sırası: Oğlak = 0
+    final signName = AstroSigns.localizedName(signIndex, l);
+    final window = [
+      if (moon.ingress != null) _shortDateLine(context, moon.ingress!),
+      if (moon.egress != null) _shortDateLine(context, moon.egress!),
+    ].join(' – ');
+    final next = moon.ingresses.take(4).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: moon.egress == null
+              ? null
+              : () => _exportEvent(
+                  context,
+                  moon.egress!,
+                  l.skyMoonInSign(signName),
+                  '$window • Holavon',
+                ),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  FastTheme.accentGold.withValues(alpha: 0.18),
+                  FastTheme.cardBg,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: FastTheme.accentGold.withValues(alpha: 0.35),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AstroSigns.symbols[signIndex],
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: FastTheme.accentGoldLight,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l.skyMoonCalendarTitle,
+                        style: TextStyle(
+                          color: FastTheme.accentGoldLight,
+                          fontSize: 10,
+                          letterSpacing: 1.6,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${l.skyMoonInSign(signName)} · ${_deg(moon.degree)}°',
+                        style: TextStyle(
+                          color: FastTheme.text,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (window.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          window,
+                          style: TextStyle(
+                            color: FastTheme.textMuted.withValues(alpha: 0.85),
+                            fontSize: 12,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                      if (moon.egress != null) ...[
+                        const SizedBox(height: 6),
+                        _LiveCountdown(
+                          endsAt: moon.egress!,
+                          onElapsed: onElapsed,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (next.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(
+            l.skyMoonNextChanges,
+            style: TextStyle(
+              color: FastTheme.textMuted,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final entry in next)
+            _MoonIngressTile(
+              entry: entry,
+              onTap: () {
+                final i = (entry.sign + 3) % 12;
+                final name = AstroSigns.localizedName(i, l);
+                _exportEvent(
+                  context,
+                  entry.time,
+                  l.skyMoonEnters(name),
+                  '${_shortDateLine(context, entry.time)} • Holavon',
+                );
+              },
+            ),
+        ],
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+class _MoonIngressTile extends StatelessWidget {
+  final SkyMoonIngress entry;
+  final VoidCallback onTap;
+
+  const _MoonIngressTile({required this.entry, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final i = (entry.sign + 3) % 12;
+    final name = AstroSigns.localizedName(i, l);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: FastTheme.cardBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: FastTheme.border.withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          children: [
+            Text(
+              AstroSigns.symbols[i],
+              style: TextStyle(
+                color: FastTheme.accentGoldLight,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l.skyMoonEnters(name),
+                style: TextStyle(
+                  color: FastTheme.text,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              _shortDateLine(context, entry.time),
+              style: TextStyle(
+                color: FastTheme.textMuted.withValues(alpha: 0.8),
+                fontSize: 11.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Burç değişimine kalan süre; 30 saniyede bir tazelenir.
+class _LiveCountdown extends StatefulWidget {
+  final DateTime endsAt;
+  final VoidCallback onElapsed;
+
+  const _LiveCountdown({required this.endsAt, required this.onElapsed});
+
+  @override
+  State<_LiveCountdown> createState() => _LiveCountdownState();
+}
+
+class _LiveCountdownState extends State<_LiveCountdown> {
+  Timer? _timer;
+  bool _fired = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (!mounted) return;
+      setState(() {});
+      if (!_fired && !widget.endsAt.isAfter(DateTime.now())) {
+        _fired = true;
+        widget.onElapsed();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final diff = widget.endsAt.difference(DateTime.now());
+    String value;
+    if (diff.inMinutes < 1) {
+      value = l.skyCalendarNow;
+    } else if (diff.inDays > 0) {
+      value = l.skyMoonDaysHours('${diff.inDays}', '${diff.inHours % 24}');
+    } else if (diff.inHours > 0) {
+      value = l.skyMoonHoursMinutes('${diff.inHours}', '${diff.inMinutes % 60}');
+    } else {
+      value = l.skyMoonMinutes('${diff.inMinutes}');
+    }
+    return Row(
+      children: [
+        Icon(
+          Icons.hourglass_bottom,
+          size: 14,
+          color: FastTheme.accentGoldLight,
+        ),
+        const SizedBox(width: 5),
+        Text(
+          l.skyMoonRemaining(value),
+          style: TextStyle(
+            color: FastTheme.accentGoldLight,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

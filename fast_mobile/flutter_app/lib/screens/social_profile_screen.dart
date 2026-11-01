@@ -475,7 +475,7 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
             ),
 
           // Holavon'a özel: doğum haritası
-          if (_planets.isNotEmpty) ...[
+          if (p?.showAstrology == true && _planets.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text(
               l10n.profilePlanets,

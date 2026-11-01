@@ -28,6 +28,7 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
   String? _country;
   String? _cityQuery;
   bool _isAstrologer = false;
+  bool _showAstrology = true;
   String? _astroField;
   String? _avatarUrl;
   Uint8List? _avatarBytes;
@@ -64,6 +65,7 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
       _bio.text = prof?.bio ?? '';
       _avatarUrl = prof?.avatarUrl;
       _isAstrologer = prof?.isAstrologer ?? false;
+      _showAstrology = prof?.showAstrology ?? false;
       _astroField = prof?.astroField;
       final bd = info?.date;
       if (bd != null && bd.isNotEmpty) _birthDate = DateTime.tryParse(bd);
@@ -175,8 +177,10 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
         lon: lon,
         isAstrologer: _isAstrologer,
         astroField: _astroField,
+        showAstrology: _showAstrology,
         avatarUrl: avatar,
       );
+      if (!_showAstrology) await SocialService.clearOwnProfilePlanets();
       if (!mounted) return;
       await context.read<SocialProvider>().refreshProfile();
       if (!mounted) return;
@@ -308,20 +312,33 @@ class _EditSocialProfileScreenState extends State<EditSocialProfileScreen> {
                   children: [
                     ChoiceChip(
                       label: Text(l10n.kunyeRoleAstrolog),
-                      selected: _isAstrologer,
-                      onSelected: (_) => setState(() => _isAstrologer = true),
+                      selected: _showAstrology && _isAstrologer,
+                      onSelected: (_) => setState(() {
+                        _showAstrology = true;
+                        _isAstrologer = true;
+                      }),
                     ),
                     ChoiceChip(
                       label: Text(l10n.kunyeRoleLover),
-                      selected: !_isAstrologer,
+                      selected: _showAstrology && !_isAstrologer,
                       onSelected: (_) => setState(() {
+                        _showAstrology = true;
+                        _isAstrologer = false;
+                        _astroField = null;
+                      }),
+                    ),
+                    ChoiceChip(
+                      label: Text(l10n.kunyeRoleHidden),
+                      selected: !_showAstrology,
+                      onSelected: (_) => setState(() {
+                        _showAstrology = false;
                         _isAstrologer = false;
                         _astroField = null;
                       }),
                     ),
                   ],
                 ),
-                if (_isAstrologer) ...[
+                if (_showAstrology && _isAstrologer) ...[
                   const SizedBox(height: 14),
                   _label(l10n.kunyeFieldLabel),
                   Wrap(

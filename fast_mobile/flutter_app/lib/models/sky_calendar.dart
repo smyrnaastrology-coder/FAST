@@ -153,3 +153,62 @@ class SkyCalendar {
         .toList(),
   );
 }
+
+/// Ay'ın bir burca giriş anı.
+class SkyMoonIngress {
+  final DateTime time;
+
+  /// 0 = Koç (mutlak ekliptik).
+  final int sign;
+  final double degree;
+
+  const SkyMoonIngress({
+    required this.time,
+    required this.sign,
+    required this.degree,
+  });
+
+  factory SkyMoonIngress.fromJson(Map<String, dynamic> j) => SkyMoonIngress(
+    time: _epochToDate(j['zaman']),
+    sign: (j['burc'] as num?)?.toInt() ?? 0,
+    degree: (j['derece'] as num?)?.toDouble() ?? 0,
+  );
+}
+
+/// Ay takvimi: şu anki burç penceresi ve yaklaşan geçişler.
+class SkyMoonCalendar {
+  final DateTime fetchedAt;
+  final int sign;
+  final double degree;
+  final DateTime? ingress;
+  final DateTime? egress;
+  final List<SkyMoonIngress> ingresses;
+
+  const SkyMoonCalendar({
+    required this.fetchedAt,
+    required this.sign,
+    required this.degree,
+    required this.ingress,
+    required this.egress,
+    required this.ingresses,
+  });
+
+  factory SkyMoonCalendar.fromJson(Map<String, dynamic> j) {
+    final moon = (j['ay'] as Map?)?.cast<String, dynamic>() ?? const {};
+    return SkyMoonCalendar(
+      fetchedAt: _epochToDate(j['sunucu_zamani']),
+      sign: (moon['burc'] as num?)?.toInt() ?? 0,
+      degree: (moon['derece'] as num?)?.toDouble() ?? 0,
+      ingress: moon['giris'] == null ? null : _epochToDate(moon['giris']),
+      egress: moon['cikis'] == null ? null : _epochToDate(moon['cikis']),
+      ingresses: ((j['girisler'] as List?) ?? const [])
+          .whereType<Map>()
+          .map((e) => SkyMoonIngress.fromJson(e.cast<String, dynamic>()))
+          .toList(),
+    );
+  }
+}
+
+DateTime _epochToDate(Object? value) => DateTime.fromMillisecondsSinceEpoch(
+  ((value as num?)?.toInt() ?? 0) * 1000,
+);

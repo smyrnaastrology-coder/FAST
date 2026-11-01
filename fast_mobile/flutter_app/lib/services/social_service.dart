@@ -42,6 +42,7 @@ class SocialProfile {
 
   /// Astrolog mu (false: astroloji sever) + uzmanlık alanı.
   final bool isAstrologer;
+  final bool showAstrology;
   final String? astroField;
   final List<String> astroFields;
 
@@ -60,6 +61,7 @@ class SocialProfile {
     this.moonDeg,
     this.birthTimeSet = false,
     this.isAstrologer = false,
+    this.showAstrology = false,
     this.astroField,
     this.astroFields = const [],
     this.isPro = false,
@@ -87,6 +89,7 @@ class SocialProfile {
       moonDeg: (m['moon_deg'] as num?)?.toDouble(),
       birthTimeSet: m['birth_time_set'] == true,
       isAstrologer: m['is_astrologer'] == true || fields.isNotEmpty,
+      showAstrology: m['show_astrology'] == true,
       astroField: single ?? (fields.isNotEmpty ? fields.join(', ') : null),
       astroFields: fields,
       isPro: m['is_pro'] == true,
@@ -475,6 +478,7 @@ class SocialService {
     double? lon,
     bool? isAstrologer,
     String? astroField,
+    bool? showAstrology,
   }) async {
     if (!enabled || _me.isEmpty) return;
     final base = <String, dynamic>{
@@ -503,6 +507,7 @@ class SocialService {
       ...?kunye,
       'is_astrologer': ?isAstrologer,
       if (isAstrologer != null) 'astro_field': isAstrologer ? astroField : null,
+      'show_astrology': ?showAstrology,
     };
     if (extra.isNotEmpty) {
       try {
@@ -510,7 +515,14 @@ class SocialService {
       } catch (_) {}
     }
     if (birthDate != null) {
+      final before = await myBirthInfo();
       await _saveBirthInfo(_me, info);
+      // Doğum tarihi/saati değiştiyse eski rozetler artık o kişiyi
+      // göstermiyordur; yanlış veri kalmasın diye temizle.
+      if (birthKey(date: before?.date, time: before?.time) !=
+          birthKey(date: info.date, time: info.time)) {
+        await clearOwnProfilePlanets();
+      }
     }
     if (kunye != null) await _markKunyeSynced(_me);
   }
@@ -699,6 +711,19 @@ class SocialService {
     'Mars',
   ];
 
+  /// Doğum verisinin kısa parmak izi (`tarih|saat`).
+  ///
+  /// Rozet gezegenleri bu anahtarla kaydedilir. Profil yalnızca kendi doğum
+  /// verisiyle eşleşen kayıtları gösterir; böylece Fast Sinastri'de kayıtlı
+  /// başka bir kişinin haritası profilde görünmez. Saat boşsa analizde
+  /// kullanılan 12:00 varsayımı yazılır.
+  static String birthKey({String? date, String? time}) {
+    final d = (date ?? '').trim();
+    final t = (time ?? '').trim();
+    final timeNorm = t.isEmpty ? '12:00' : t;
+    return '$d|$timeNorm';
+  }
+
   /// Natal analiz sonucundaki `sabianlar` listesinden 5 gezegeni çıkarır.
   /// Her satırda `gezegen` ve `derece` (mutlak boylam 0–360) bulunur.
   static List<PlanetPos> parseBadgePlanets(List<dynamic>? sabianlar) {
@@ -726,7 +751,13 @@ class SocialService {
   }
 
   /// 5 gezegeni `user_planets` tablosuna kaydeder (varsa günceller).
-  static Future<void> savePlanets(List<PlanetPos> planets) async {
+  ///
+  /// [provenance] gezegenlerin hangi doğum verisinden üretildiğini işaretler.
+  /// Profil okumasında bu alanı boş olan eski kayıtlar gösterilmez.
+  static Future<void> savePlanets(
+    List<PlanetPos> planets, {
+    String? provenance,
+  }) async {
     if (!enabled || _me.isEmpty || planets.isEmpty) return;
     try {
       final rows = [
@@ -738,6 +769,7 @@ class SocialService {
             'symbol': p.symbol,
             'degree': p.degree,
             'abs_degree': p.absDegree,
+            'birth_key': provenance,
             'updated_at': DateTime.now().toIso8601String(),
           },
       ];
@@ -747,13 +779,91 @@ class SocialService {
     }
   }
 
+  /// Profilde gösterilecek gezegenleri yalnızca analiz edilen harita
+  /// kullanıcının kendi kayıtlı doğum bilgileriyle birebir eşleşiyorsa ve
+  /// kullanıcı profilde göstermeyi açıkça seçtiyse kaydeder.
+  ///
+  /// Böylece "Fast Sinastri"de kayıtlı başka bir kişinin haritası hiçbir
+  /// zaman kullanıcının sosyal profilinde görünmez.
+  static Future<void> saveOwnProfilePlanets({
+    required String birthDate,
+    required String birthTime,
+    required String birthCity,
+    required String birthCountry,
+    required double lat,
+    required double lon,
+    required List<PlanetPos> planets,
+  }) async {
+    if (!enabled || _me.isEmpty || planets.isEmpty) return;
+    try {
+      final profile = await myProfile();
+      if (profile?.showAstrology != true) return;
+      final birth = await myBirthInfo();
+      if (birth == null) return;
+
+      // Tarih + saat her zaman, koordinatlar yalnızca kayıtlıysa doğrulanır.
+      // Böylece şehir girilmemiş profillerde de kendi haritası kaydedilebilir.
+      final sameMoment =
+          birthKey(date: birth.date, time: birth.time) ==
+          birthKey(date: birthDate, time: birthTime);
+      final sameCoords =
+          birth.lat == null ||
+          birth.lon == null ||
+          ((birth.lat! - lat).abs() <= 0.01 &&
+              (birth.lon! - lon).abs() <= 0.01);
+
+      if (!sameMoment || !sameCoords) return;
+      await savePlanets(
+        planets,
+        provenance: birthKey(date: birthDate, time: birthTime),
+      );
+    } catch (e) {
+      if (kDebugMode) print('[Social] saveOwnProfilePlanets err $e');
+    }
+  }
+
+  /// Profilde gezegen gösterimi kapatıldığında kayıtlı rozetleri siler.
+  static Future<void> clearOwnProfilePlanets() async {
+    if (!enabled || _me.isEmpty) return;
+    try {
+      await _c.from('user_planets').delete().eq('user_id', _me);
+    } catch (e) {
+      if (kDebugMode) print('[Social] clearOwnProfilePlanets err $e');
+    }
+  }
+
   /// Bir kullanıcının rozet gezegenlerini çeker (Güneş→Mars sırasıyla).
+  ///
+  /// Yalnızca doğum verisiyle işaretlenmiş ([birthKey]) kayıtlar döner; eski
+  /// sürümlerin kaynaksız kayıtları (ör. Fast Sinastri'de kayıtlı bir kişinin
+  /// haritası) gösterilmez. Kendi profilimizde anahtar güncel doğum bilgisiyle
+  /// uyuşmuyorsa kayıtlar temizlenir.
   static Future<List<PlanetPos>> fetchPlanets(String userId) async {
     if (!enabled || userId.isEmpty) return [];
     try {
       final raw = await _c.from('user_planets').select().eq('user_id', userId);
-      final list = (raw as List)
-          .map((e) => PlanetPos.fromMap(e as Map<String, dynamic>))
+      var rows = (raw as List).whereType<Map>().toList();
+
+      // Kaynaksız (eski) satırlar güvenilmez: hiç gösterme.
+      rows = rows.where((r) => (r['birth_key'] ?? '').toString().isNotEmpty)
+          .toList();
+
+      if (userId == _me) {
+        final birth = await myBirthInfo();
+        final expected = birthKey(date: birth?.date, time: birth?.time);
+        final matches = rows.where(
+          (r) => r['birth_key'].toString() == expected,
+        );
+        if (matches.isEmpty && rows.isNotEmpty) {
+          // Doğum bilgisi değişmiş: eski rozetler artık geçersiz.
+          await clearOwnProfilePlanets();
+          return [];
+        }
+        rows = matches.toList();
+      }
+
+      final list = rows
+          .map((e) => PlanetPos.fromMap(e.cast<String, dynamic>()))
           .where((p) => badgePlanets.contains(p.planet))
           .toList();
       final order = {

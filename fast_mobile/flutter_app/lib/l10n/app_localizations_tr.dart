@@ -1813,6 +1813,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get kunyeRoleLover => 'Astroloji sever';
 
   @override
+  String get kunyeRoleHidden => 'Gizle';
+
+  @override
   String get kunyeFieldLabel => 'Uzmanlık alanın';
 
   @override
@@ -2053,6 +2056,42 @@ class AppLocalizationsTr extends AppLocalizations {
   String skyCalendarInHours(String hours) {
     return '$hours sa sonra';
   }
+
+  @override
+  String get skyMoonCalendarTitle => 'Ay Takvimi';
+
+  @override
+  String skyMoonInSign(String sign) {
+    return 'Ay $sign burcunda';
+  }
+
+  @override
+  String skyMoonEnters(String sign) {
+    return 'Ay $sign burcuna geçiyor';
+  }
+
+  @override
+  String skyMoonRemaining(String value) {
+    return 'Kalan: $value';
+  }
+
+  @override
+  String skyMoonDaysHours(String days, String hours) {
+    return '$days gün $hours sa';
+  }
+
+  @override
+  String skyMoonHoursMinutes(String hours, String minutes) {
+    return '$hours sa $minutes dk';
+  }
+
+  @override
+  String skyMoonMinutes(String minutes) {
+    return '$minutes dk';
+  }
+
+  @override
+  String get skyMoonNextChanges => 'Sıradaki burç geçişleri';
 
   @override
   String get skyNewMoon => 'Yeni Ay';
@@ -2933,6 +2972,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get chartExplorerForward => 'İleri';
 
   @override
+  String get chartExplorerPlay => 'Oynat';
+
+  @override
+  String get chartExplorerPause => 'Duraklat';
+
+  @override
+  String get chartExplorerSpeed => 'Hız';
+
+  @override
+  String get chartExplorerTimeStep => 'Zaman adımı';
+
+  @override
+  String get chartExplorerDone => 'Tamam';
+
+  @override
   String chartExplorerCalculating(String date) {
     return 'Hesaplanıyor: $date';
   }
@@ -2954,6 +3008,15 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get chartWheelFullscreenTooltip => 'Tam ekran • zaman / tema / paylaş';
+
+  @override
+  String get chartInfoGeocentric => 'Yer merkezli';
+
+  @override
+  String get chartInfoTropical => 'Tropikal zodyak';
+
+  @override
+  String get chartInfoMeanNode => 'Ortalama Ay Düğümü';
 
   @override
   String get timeMachineNow => 'Şimdi';
@@ -3005,4 +3068,170 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get chartLocationResolveError =>
       'Şehrin konumu bulunamadı. Tekrar seçin.';
+
+  @override
+  String get skyReadingTitle => 'Bugünün Gökyüzü';
+
+  @override
+  String skyReadingHeadline(String sign, String mood) {
+    return '$sign burcunda Ay: $mood';
+  }
+
+  @override
+  String skyReadingAspectLine(String planet, String aspect, String text) {
+    return 'Ay ile $planet arasındaki $aspect: $text';
+  }
+
+  @override
+  String skyReadingRetroLine(String list) {
+    return 'Retro gezegenler: $list. İlgili konularda yeniden gözden geçirme öne çıkıyor.';
+  }
+
+  @override
+  String get skyReadingVoidNote =>
+      'Ay boşlukta: Yeni başlangıçlar için acele etme; rutin işler ve tamamlama daha uygun.';
+
+  @override
+  String get skyReadingSlowNote =>
+      'Ay normalden yavaş ilerliyor; kararları biraz daha düşünmek iyi gelir.';
+
+  @override
+  String get skyReadingFastNote =>
+      'Ay hızlı ilerliyor; gündem hızla değişebilir, esnek kal.';
+
+  @override
+  String get skyReadingMoodAries => 'başlatma cesareti';
+
+  @override
+  String get skyReadingMoodTaurus => 'sakinleşme ve bedensel denge';
+
+  @override
+  String get skyReadingMoodGemini => 'konuşma ve merak';
+
+  @override
+  String get skyReadingMoodCancer => 'duygusal yakınlık';
+
+  @override
+  String get skyReadingMoodLeo => 'görünür olma zamanı';
+
+  @override
+  String get skyReadingMoodVirgo => 'düzen ve ayrıntı';
+
+  @override
+  String get skyReadingMoodLibra => 'denge ve ilişkiler';
+
+  @override
+  String get skyReadingMoodScorpio => 'derinleşme ve dönüşüm';
+
+  @override
+  String get skyReadingMoodSagittarius => 'genişleme ve anlam arayışı';
+
+  @override
+  String get skyReadingMoodCapricorn => 'yapı kurma ve sorumluluk';
+
+  @override
+  String get skyReadingMoodAquarius => 'yenilik ve özgürlük';
+
+  @override
+  String get skyReadingMoodPisces => 'sezgi ve bırakma';
+
+  @override
+  String get skyReadingSignAries =>
+      'Hızlı karar vermek yerine bugün ilk adımı bilinçli at; enerjin yön verdiğinde daha verimli çalışır.';
+
+  @override
+  String get skyReadingSignTaurus =>
+      'Bedensel ihtiyaçlarını öne al; yavaş ama istikrarlı ilerlemek bugün acele etmekten daha çok kazandırır.';
+
+  @override
+  String get skyReadingSignGemini =>
+      'Konuşarak, yazarak veya soru sorarak zihnini boşalt; yeni bilgi kafa karışıklığını azaltabilir.';
+
+  @override
+  String get skyReadingSignCancer =>
+      'Duygularını bastırmak yerine güvendiğin biriyle paylaş; ev ve aile konuları bugün öncelikli.';
+
+  @override
+  String get skyReadingSignLeo =>
+      'Kendini ifade etmekten çekinme; yaratıcı bir işe veya görünür bir sorumluluğa zaman ayır.';
+
+  @override
+  String get skyReadingSignVirgo =>
+      'Küçük ayrıntıları düzeltmek iyi gelebilir, ama mükemmeliyetçilik yüzünden büyük resmi kaçırma.';
+
+  @override
+  String get skyReadingSignLibra =>
+      'Bir ilişkide dengeyi kurmak için açık konuş; karar vermeyi sürekli ertelemek gerginliği artırabilir.';
+
+  @override
+  String get skyReadingSignScorpio =>
+      'Yüzeyde kalmayan konuşmalar bugün daha çok şey açığa çıkarır; kontrolü bırakmayı dene.';
+
+  @override
+  String get skyReadingSignSagittarius =>
+      'Ufkunu genişletecek bir plan yap; büyük resme bakmak günlük sıkıntıları küçültebilir.';
+
+  @override
+  String get skyReadingSignCapricorn =>
+      'Uzun vadeli bir hedefe odaklan; sorumluluk almak bugün seni güçlendirir.';
+
+  @override
+  String get skyReadingSignAquarius =>
+      'Alışılmışın dışında bir çözüm dene; farklı insanlarla fikir alışverişi yeni kapılar açar.';
+
+  @override
+  String get skyReadingSignPisces =>
+      'Sezgilerine kulak ver ama kararlarını somut bir adımla destekle; dinlenmeye de yer aç.';
+
+  @override
+  String get skyReadingPhaseNew =>
+      'Yeni Ay: Bir konuyu sıfırdan başlatmak, niyet belirlemek ve sessizce plan yapmak için uygun bir zaman.';
+
+  @override
+  String get skyReadingPhaseWaxingCrescent =>
+      'Büyüyen hilal: İlk adımı attığın konuda küçük ama düzenli ilerlemeler kayda değer.';
+
+  @override
+  String get skyReadingPhaseFirstQuarter =>
+      'İlk dördün: Engelleri aşmak için kararlılık gerekiyor; yarım kalan işi tamamlamak iyi gelebilir.';
+
+  @override
+  String get skyReadingPhaseWaxingGibbous =>
+      'Büyüyen şişkin ay: Detayları gözden geçirip planını olgunlaştırma zamanı.';
+
+  @override
+  String get skyReadingPhaseFull =>
+      'Dolunay: Duygular ve ilişkiler görünür oluyor; bir konuyu netleştirmek için uygun, ama tepkisel kararlardan kaçın.';
+
+  @override
+  String get skyReadingPhaseWaningGibbous =>
+      'Küçülen şişkin ay: Öğrendiklerini paylaşmak ve bir sonraki adımı sadeleştirmek için iyi bir zaman.';
+
+  @override
+  String get skyReadingPhaseLastQuarter =>
+      'Son dördün: Artık işe yaramayan bir alışkanlığı bırakmak ve alan açmak gündemde.';
+
+  @override
+  String get skyReadingPhaseWaningCrescent =>
+      'Küçülen hilal: Dinlenmek, geri çekilmek ve içsel değerlendirme yapmak için uygun bir dönem.';
+
+  @override
+  String get skyReadingAspectConjunction =>
+      'aynı alanda yoğunlaşma ve birleşme enerjisi getirir.';
+
+  @override
+  String get skyReadingAspectSextile =>
+      'kolay bir fırsat ve iş birliği kapısı aralıyor.';
+
+  @override
+  String get skyReadingAspectSquare =>
+      'içsel bir gerilim yaratıyor; acele yerine sabırlı olmak faydalı.';
+
+  @override
+  String get skyReadingAspectTrine =>
+      'akışkan ve destekleyici bir uyum sağlıyor.';
+
+  @override
+  String get skyReadingAspectOpposition =>
+      'karşıt ihtiyaçları dengelemeni istiyor.';
 }

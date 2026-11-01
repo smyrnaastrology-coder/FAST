@@ -3406,6 +3406,12 @@ abstract class AppLocalizations {
   /// **'Astrology enthusiast'**
   String get kunyeRoleLover;
 
+  /// No description provided for @kunyeRoleHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get kunyeRoleHidden;
+
   /// No description provided for @kunyeFieldLabel.
   ///
   /// In en, this message translates to:
@@ -3849,6 +3855,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'in {hours} h'**
   String skyCalendarInHours(String hours);
+
+  /// No description provided for @skyMoonCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Calendar'**
+  String get skyMoonCalendarTitle;
+
+  /// No description provided for @skyMoonInSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon in {sign}'**
+  String skyMoonInSign(String sign);
+
+  /// No description provided for @skyMoonEnters.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon enters {sign}'**
+  String skyMoonEnters(String sign);
+
+  /// No description provided for @skyMoonRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining: {value}'**
+  String skyMoonRemaining(String value);
+
+  /// No description provided for @skyMoonDaysHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h'**
+  String skyMoonDaysHours(String days, String hours);
+
+  /// No description provided for @skyMoonHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String skyMoonHoursMinutes(String hours, String minutes);
+
+  /// No description provided for @skyMoonMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String skyMoonMinutes(String minutes);
+
+  /// No description provided for @skyMoonNextChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Next sign changes'**
+  String get skyMoonNextChanges;
 
   /// No description provided for @skyNewMoon.
   ///
@@ -5476,6 +5530,36 @@ abstract class AppLocalizations {
   /// **'Forward'**
   String get chartExplorerForward;
 
+  /// No description provided for @chartExplorerPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get chartExplorerPlay;
+
+  /// No description provided for @chartExplorerPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get chartExplorerPause;
+
+  /// No description provided for @chartExplorerSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get chartExplorerSpeed;
+
+  /// No description provided for @chartExplorerTimeStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Time step'**
+  String get chartExplorerTimeStep;
+
+  /// No description provided for @chartExplorerDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get chartExplorerDone;
+
   /// No description provided for @chartExplorerCalculating.
   ///
   /// In en, this message translates to:
@@ -5517,6 +5601,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full screen • time / theme / share'**
   String get chartWheelFullscreenTooltip;
+
+  /// No description provided for @chartInfoGeocentric.
+  ///
+  /// In en, this message translates to:
+  /// **'Geocentric'**
+  String get chartInfoGeocentric;
+
+  /// No description provided for @chartInfoTropical.
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical zodiac'**
+  String get chartInfoTropical;
+
+  /// No description provided for @chartInfoMeanNode.
+  ///
+  /// In en, this message translates to:
+  /// **'Mean Node'**
+  String get chartInfoMeanNode;
 
   /// No description provided for @timeMachineNow.
   ///
@@ -5613,6 +5715,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not find the city location. Select again.'**
   String get chartLocationResolveError;
+
+  /// No description provided for @skyReadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Sky'**
+  String get skyReadingTitle;
+
+  /// No description provided for @skyReadingHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon in {sign}: {mood}'**
+  String skyReadingHeadline(String sign, String mood);
+
+  /// No description provided for @skyReadingAspectLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon–{planet} {aspect}: {text}'**
+  String skyReadingAspectLine(String planet, String aspect, String text);
+
+  /// No description provided for @skyReadingRetroLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde planets: {list}. Reviewing related matters comes to the fore.'**
+  String skyReadingRetroLine(String list);
+
+  /// No description provided for @skyReadingVoidNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon void of course: don\'t rush new beginnings; routine work and finishing things suit better.'**
+  String get skyReadingVoidNote;
+
+  /// No description provided for @skyReadingSlowNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is moving slower than usual; taking a little more time with decisions helps.'**
+  String get skyReadingSlowNote;
+
+  /// No description provided for @skyReadingFastNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is moving fast; the agenda can shift quickly, so stay flexible.'**
+  String get skyReadingFastNote;
+
+  /// No description provided for @skyReadingMoodAries.
+  ///
+  /// In en, this message translates to:
+  /// **'the courage to start'**
+  String get skyReadingMoodAries;
+
+  /// No description provided for @skyReadingMoodTaurus.
+  ///
+  /// In en, this message translates to:
+  /// **'grounding and bodily balance'**
+  String get skyReadingMoodTaurus;
+
+  /// No description provided for @skyReadingMoodGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'conversation and curiosity'**
+  String get skyReadingMoodGemini;
+
+  /// No description provided for @skyReadingMoodCancer.
+  ///
+  /// In en, this message translates to:
+  /// **'emotional closeness'**
+  String get skyReadingMoodCancer;
+
+  /// No description provided for @skyReadingMoodLeo.
+  ///
+  /// In en, this message translates to:
+  /// **'a time to be seen'**
+  String get skyReadingMoodLeo;
+
+  /// No description provided for @skyReadingMoodVirgo.
+  ///
+  /// In en, this message translates to:
+  /// **'order and detail'**
+  String get skyReadingMoodVirgo;
+
+  /// No description provided for @skyReadingMoodLibra.
+  ///
+  /// In en, this message translates to:
+  /// **'balance and relationships'**
+  String get skyReadingMoodLibra;
+
+  /// No description provided for @skyReadingMoodScorpio.
+  ///
+  /// In en, this message translates to:
+  /// **'depth and transformation'**
+  String get skyReadingMoodScorpio;
+
+  /// No description provided for @skyReadingMoodSagittarius.
+  ///
+  /// In en, this message translates to:
+  /// **'expansion and the search for meaning'**
+  String get skyReadingMoodSagittarius;
+
+  /// No description provided for @skyReadingMoodCapricorn.
+  ///
+  /// In en, this message translates to:
+  /// **'building structure and responsibility'**
+  String get skyReadingMoodCapricorn;
+
+  /// No description provided for @skyReadingMoodAquarius.
+  ///
+  /// In en, this message translates to:
+  /// **'innovation and freedom'**
+  String get skyReadingMoodAquarius;
+
+  /// No description provided for @skyReadingMoodPisces.
+  ///
+  /// In en, this message translates to:
+  /// **'intuition and letting go'**
+  String get skyReadingMoodPisces;
+
+  /// No description provided for @skyReadingSignAries.
+  ///
+  /// In en, this message translates to:
+  /// **'Instead of rushing the decision, take the first step deliberately today; your energy works best when it has direction.'**
+  String get skyReadingSignAries;
+
+  /// No description provided for @skyReadingSignTaurus.
+  ///
+  /// In en, this message translates to:
+  /// **'Put your bodily needs first; steady progress will get you further today than speed.'**
+  String get skyReadingSignTaurus;
+
+  /// No description provided for @skyReadingSignGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear your mind by talking, writing or asking questions; new information can ease confusion.'**
+  String get skyReadingSignGemini;
+
+  /// No description provided for @skyReadingSignCancer.
+  ///
+  /// In en, this message translates to:
+  /// **'Rather than holding feelings in, share them with someone you trust; home and family matters take priority today.'**
+  String get skyReadingSignCancer;
+
+  /// No description provided for @skyReadingSignLeo.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t hold back from expressing yourself; make time for a creative project or a visible responsibility.'**
+  String get skyReadingSignLeo;
+
+  /// No description provided for @skyReadingSignVirgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixing small details may feel good, but don\'t lose the big picture to perfectionism.'**
+  String get skyReadingSignVirgo;
+
+  /// No description provided for @skyReadingSignLibra.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak openly to restore balance in a relationship; postponing the decision only builds tension.'**
+  String get skyReadingSignLibra;
+
+  /// No description provided for @skyReadingSignScorpio.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversations that go beyond the surface reveal more today; try letting go of control.'**
+  String get skyReadingSignScorpio;
+
+  /// No description provided for @skyReadingSignSagittarius.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a plan that widens your horizon; looking at the big picture can shrink daily worries.'**
+  String get skyReadingSignSagittarius;
+
+  /// No description provided for @skyReadingSignCapricorn.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on a long-term goal; taking responsibility will strengthen you today.'**
+  String get skyReadingSignCapricorn;
+
+  /// No description provided for @skyReadingSignAquarius.
+  ///
+  /// In en, this message translates to:
+  /// **'Try an unconventional solution; exchanging ideas with different people opens new doors.'**
+  String get skyReadingSignAquarius;
+
+  /// No description provided for @skyReadingSignPisces.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to your intuition, but support your decisions with a concrete step; leave room for rest too.'**
+  String get skyReadingSignPisces;
+
+  /// No description provided for @skyReadingPhaseNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon: a good time to start something from scratch, set an intention and plan quietly.'**
+  String get skyReadingPhaseNew;
+
+  /// No description provided for @skyReadingPhaseWaxingCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Crescent: small, steady steps on what you have begun are worth more than leaps.'**
+  String get skyReadingPhaseWaxingCrescent;
+
+  /// No description provided for @skyReadingPhaseFirstQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'First Quarter: determination is needed to overcome obstacles; finishing what was left half-done may help.'**
+  String get skyReadingPhaseFirstQuarter;
+
+  /// No description provided for @skyReadingPhaseWaxingGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Gibbous: time to review the details and let your plan mature.'**
+  String get skyReadingPhaseWaxingGibbous;
+
+  /// No description provided for @skyReadingPhaseFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon: emotions and relationships become visible; good for clarifying a matter, but avoid reactive decisions.'**
+  String get skyReadingPhaseFull;
+
+  /// No description provided for @skyReadingPhaseWaningGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Gibbous: a good time to share what you have learned and simplify the next step.'**
+  String get skyReadingPhaseWaningGibbous;
+
+  /// No description provided for @skyReadingPhaseLastQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Quarter: releasing a habit that no longer serves you and making space is on the agenda.'**
+  String get skyReadingPhaseLastQuarter;
+
+  /// No description provided for @skyReadingPhaseWaningCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Crescent: a period suited to rest, withdrawal and inner review.'**
+  String get skyReadingPhaseWaningCrescent;
+
+  /// No description provided for @skyReadingAspectConjunction.
+  ///
+  /// In en, this message translates to:
+  /// **'brings concentrated, merging energy in the same area.'**
+  String get skyReadingAspectConjunction;
+
+  /// No description provided for @skyReadingAspectSextile.
+  ///
+  /// In en, this message translates to:
+  /// **'opens an easy opportunity and a door for cooperation.'**
+  String get skyReadingAspectSextile;
+
+  /// No description provided for @skyReadingAspectSquare.
+  ///
+  /// In en, this message translates to:
+  /// **'creates inner tension; patience works better than rushing.'**
+  String get skyReadingAspectSquare;
+
+  /// No description provided for @skyReadingAspectTrine.
+  ///
+  /// In en, this message translates to:
+  /// **'brings a flowing, supportive harmony.'**
+  String get skyReadingAspectTrine;
+
+  /// No description provided for @skyReadingAspectOpposition.
+  ///
+  /// In en, this message translates to:
+  /// **'asks you to balance opposing needs.'**
+  String get skyReadingAspectOpposition;
 }
 
 class _AppLocalizationsDelegate

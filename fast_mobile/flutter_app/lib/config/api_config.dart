@@ -78,6 +78,9 @@ class ApiConfig {
   // Yaklaşan ay fazları ve tutulmalar
   static const String skyCalendar = '$baseUrl/api/sky/calendar';
 
+  // Ay'ın burç giriş/çıkış saatleri (ay takvimi)
+  static const String skyMoonCalendar = '$baseUrl/api/sky/moon-calendar';
+
   // Haritalar (SolarFire tarzı, paralel modül)
   static const String chartsNatal = '$baseUrl/api/charts/natal';
   static const String chartsBiwheel = '$baseUrl/api/charts/biwheel';

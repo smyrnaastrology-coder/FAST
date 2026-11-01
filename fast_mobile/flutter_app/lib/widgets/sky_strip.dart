@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../config/astro_lexicon.dart';
 import '../config/astro_signs.dart';
 import '../config/lunar_mansions.dart';
 import '../config/lunar_mansions_localized.dart';
@@ -10,128 +11,6 @@ import '../l10n/app_localizations.dart';
 import '../models/sky_snapshot.dart';
 import '../screens/sky_calendar_screen.dart';
 import '../services/api_service.dart';
-
-const _phaseGlyphs = {
-  'new': '🌑',
-  'waxing_crescent': '🌒',
-  'first_quarter': '🌓',
-  'waxing_gibbous': '🌔',
-  'full': '🌕',
-  'waning_gibbous': '🌖',
-  'last_quarter': '🌗',
-  'waning_crescent': '🌘',
-};
-
-const _planetGlyphs = {
-  'sun': '☉',
-  'moon': '☾',
-  'mercury': '☿',
-  'venus': '♀',
-  'mars': '♂',
-  'jupiter': '♃',
-  'saturn': '♄',
-  'uranus': '♅',
-  'neptune': '♆',
-  'pluto': '♇',
-};
-
-const _planetTr = {
-  'sun': 'Güneş',
-  'moon': 'Ay',
-  'mercury': 'Merkür',
-  'venus': 'Venüs',
-  'mars': 'Mars',
-  'jupiter': 'Jüpiter',
-  'saturn': 'Satürn',
-  'uranus': 'Uranüs',
-  'neptune': 'Neptün',
-  'pluto': 'Plüton',
-};
-
-const _planetEn = {
-  'sun': 'Sun',
-  'moon': 'Moon',
-  'mercury': 'Mercury',
-  'venus': 'Venus',
-  'mars': 'Mars',
-  'jupiter': 'Jupiter',
-  'saturn': 'Saturn',
-  'uranus': 'Uranus',
-  'neptune': 'Neptune',
-  'pluto': 'Pluto',
-};
-
-const _planetEs = {
-  'sun': 'Sol',
-  'moon': 'Luna',
-  'mercury': 'Mercurio',
-  'venus': 'Venus',
-  'mars': 'Marte',
-  'jupiter': 'Júpiter',
-  'saturn': 'Saturno',
-  'uranus': 'Urano',
-  'neptune': 'Neptuno',
-  'pluto': 'Plutón',
-};
-
-const _aspectTr = {
-  'conjunction': 'kavuşum',
-  'sextile': 'altmışlık',
-  'square': 'kare',
-  'trine': 'üçgen',
-  'opposition': 'karşıt',
-};
-
-const _aspectEn = {
-  'conjunction': 'conjunction',
-  'sextile': 'sextile',
-  'square': 'square',
-  'trine': 'trine',
-  'opposition': 'opposition',
-};
-
-const _aspectEs = {
-  'conjunction': 'conjunción',
-  'sextile': 'sextil',
-  'square': 'cuadratura',
-  'trine': 'trígono',
-  'opposition': 'oposición',
-};
-
-String _planetName(String key, String lang) {
-  final map = switch (lang) {
-    'en' => _planetEn,
-    'es' => _planetEs,
-    _ => _planetTr,
-  };
-  return map[key] ?? key;
-}
-
-String _aspectName(String key, String lang) {
-  final map = switch (lang) {
-    'en' => _aspectEn,
-    'es' => _aspectEs,
-    _ => _aspectTr,
-  };
-  return map[key] ?? key;
-}
-
-String _phaseName(AppLocalizations l, String key) => switch (key) {
-  'waxing_crescent' => l.skyPhaseWaxingCrescent,
-  'first_quarter' => l.skyPhaseFirstQuarter,
-  'waxing_gibbous' => l.skyPhaseWaxingGibbous,
-  'full' => l.skyPhaseFull,
-  'waning_gibbous' => l.skyPhaseWaningGibbous,
-  'last_quarter' => l.skyPhaseLastQuarter,
-  'waning_crescent' => l.skyPhaseWaningCrescent,
-  _ => l.skyPhaseNew,
-};
-
-String _speedName(AppLocalizations l, String key) => switch (key) {
-  'slow' => l.skySpeedSlow,
-  'fast' => l.skySpeedFast,
-  _ => l.skySpeedNormal,
-};
 
 String _deg(double value) {
   final rounded = (value * 10).round() / 10;
@@ -200,14 +79,14 @@ class _SkyStripState extends State<SkyStrip> {
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
     final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(sky.moonLongitude), l);
-    final phase = _phaseName(l, sky.phaseKey);
-    final hour = _planetName(sky.hourRuler, lang);
+    final phase = phaseLabel(l, sky.phaseKey);
+    final hour = planetLabel(sky.hourRuler, lang);
 
     final detail = StringBuffer(phase);
-    detail.write(' · ${_speedName(l, sky.speedKey)}');
+    detail.write(' · ${speedLabel(l, sky.speedKey)}');
     if (sky.voidOfCourse) detail.write(' · ${l.skyVoid}');
     if (sky.isYanikYol) detail.write(' · ${l.skyViaCombusta}');
-    detail.write(' · ${_planetGlyphs[sky.hourRuler] ?? ''} $hour');
+    detail.write(' · ${kPlanetGlyphs[sky.hourRuler] ?? ''} $hour');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -241,7 +120,7 @@ class _SkyStripState extends State<SkyStrip> {
             child: Row(
               children: [
                 Text(
-                  _phaseGlyphs[sky.phaseKey] ?? '☾',
+                  kPhaseGlyphs[sky.phaseKey] ?? '☾',
                   style: const TextStyle(fontSize: 22),
                 ),
                 const SizedBox(width: 10),
@@ -317,9 +196,9 @@ class SkyDetailSheet extends StatelessWidget {
     final lang = Localizations.localeOf(context).languageCode;
     final moonSign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(sky.moonLongitude), l);
     final sunSign = AstroSigns.localizedName((sky.sunSign + 3) % 12, l);
-    final phase = _phaseName(l, sky.phaseKey);
-    final hour = _planetName(sky.hourRuler, lang);
-    final nextHour = _planetName(sky.nextHourRuler, lang);
+    final phase = phaseLabel(l, sky.phaseKey);
+    final hour = planetLabel(sky.hourRuler, lang);
+    final nextHour = planetLabel(sky.nextHourRuler, lang);
     final period = sky.dayHour ? l.skyDayHour : l.skyNightHour;
     final range =
         '${_clock(context, sky.hourStart)}–${_clock(context, sky.hourEnd)}';
@@ -347,7 +226,7 @@ class SkyDetailSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  _phaseGlyphs[sky.phaseKey] ?? '☾',
+                  kPhaseGlyphs[sky.phaseKey] ?? '☾',
                   style: const TextStyle(fontSize: 42),
                 ),
                 const SizedBox(width: 14),
@@ -390,7 +269,7 @@ class SkyDetailSheet extends StatelessWidget {
               glyph: '☾',
               title: l.skyMoonLine(moonSign, _deg(sky.moonDegree)),
               subtitle:
-                  '${l.skyPerDay(sky.moonSpeed.toStringAsFixed(2))} · ${l.skyMoonSpeed}: ${_speedName(l, sky.speedKey)}',
+                  '${l.skyPerDay(sky.moonSpeed.toStringAsFixed(2))} · ${l.skyMoonSpeed}: ${speedLabel(l, sky.speedKey)}',
             ),
             _InfoRow(
               glyph: sky.voidOfCourse ? '◌' : '≈',
@@ -434,7 +313,7 @@ class SkyDetailSheet extends StatelessWidget {
               );
             }),
             _InfoRow(
-              glyph: _planetGlyphs[sky.hourRuler] ?? '♃',
+              glyph: kPlanetGlyphs[sky.hourRuler] ?? '♃',
               title: l.skyPlanetHour(hour),
               subtitle:
                   '${sky.hourIndex}. $period · $range\n${l.skyNextHour(nextHour)}',
@@ -469,7 +348,7 @@ class SkyDetailSheet extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        _planetGlyphs[a.planet] ?? '·',
+                        kPlanetGlyphs[a.planet] ?? '·',
                         style: TextStyle(
                           color: FastTheme.accentGoldLight,
                           fontSize: 16,
@@ -478,7 +357,7 @@ class SkyDetailSheet extends StatelessWidget {
                       const SizedBox(width: 9),
                       Expanded(
                         child: Text(
-                          '${_planetName(a.planet, lang)} · ${_aspectName(a.type, lang)} · ${a.orb.toStringAsFixed(1)}°',
+                          '${planetLabel(a.planet, lang)} · ${aspectLabel(a.type, lang)} · ${a.orb.toStringAsFixed(1)}°',
                           style: TextStyle(
                             color: FastTheme.text,
                             fontSize: 13.5,
@@ -499,7 +378,7 @@ class SkyDetailSheet extends StatelessWidget {
             if (sky.retrogrades.isNotEmpty) ...[
               const SizedBox(height: 10),
               Text(
-                '${l.skyRetro}: ${sky.retrogrades.map((p) => _planetName(p, lang)).join(', ')}',
+                '${l.skyRetro}: ${sky.retrogrades.map((p) => planetLabel(p, lang)).join(', ')}',
                 style: TextStyle(
                   color: FastTheme.textMuted.withValues(alpha: 0.7),
                   fontSize: 12,

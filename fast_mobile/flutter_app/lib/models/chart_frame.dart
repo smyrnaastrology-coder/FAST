@@ -4,15 +4,29 @@ class ChartFrame {
   final ChartData data;
   final List<PlanetPos>? outerPlanets;
   final List<HouseCusp>? outerHouses;
+
+  /// Dış (transit / olay) haritasının tam verisi. Bi-wheel bilgi panelinde
+  /// dış haritanın tarih, saat, yer ve ev sistemi bilgilerini göstermek için.
+  final ChartData? outerData;
+
   final String title;
   final String subtitle;
+
+  /// Dış haritanın panel başlığı (örn. "Transit Haritası").
+  final String outerTitle;
+  final String outerSubtitle;
   const ChartFrame({
     required this.data,
     this.outerPlanets,
     this.outerHouses,
+    this.outerData,
     required this.title,
     this.subtitle = '',
+    this.outerTitle = '',
+    this.outerSubtitle = '',
   });
+
+  bool get isBiWheel => outerPlanets != null && outerPlanets!.isNotEmpty;
 }
 
 typedef ChartFrameLoader = Future<ChartFrame> Function(DateTime date);

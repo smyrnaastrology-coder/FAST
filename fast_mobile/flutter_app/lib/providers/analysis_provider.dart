@@ -52,11 +52,21 @@ class AnalysisProvider extends ChangeNotifier {
         notifyListeners();
       }
 
-      // Natal analizde 5 gezegeni (Güneş/Ay/Merkür/Venüs/Mars) profil rozeti
-      // için Supabase'e kaydet. Giriş yoksa savePlanets sessizce no-op döner.
+      // Never publish a saved person's natal chart to the account profile.
+      // Saving is allowed only when this exactly matches opted-in owner data.
       if (req.mod == 'bireysel_natal') {
         final planets = SocialService.parseBadgePlanets(_result?['sabianlar'] as List<dynamic>?);
-        if (planets.isNotEmpty) SocialService.savePlanets(planets);
+        if (planets.isNotEmpty) {
+          SocialService.saveOwnProfilePlanets(
+            birthDate: req.p1Tarih,
+            birthTime: req.p1Saat.trim().isEmpty ? '12:00' : req.p1Saat.trim(),
+            birthCity: req.city,
+            birthCountry: req.country,
+            lat: req.lat,
+            lon: req.lon,
+            planets: planets,
+          );
+        }
       }
 
       // Load simulation if applicable

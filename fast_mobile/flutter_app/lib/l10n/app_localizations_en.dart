@@ -1823,6 +1823,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kunyeRoleLover => 'Astrology enthusiast';
 
   @override
+  String get kunyeRoleHidden => 'Hide';
+
+  @override
   String get kunyeFieldLabel => 'Your field';
 
   @override
@@ -2064,6 +2067,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String skyCalendarInHours(String hours) {
     return 'in $hours h';
   }
+
+  @override
+  String get skyMoonCalendarTitle => 'Moon Calendar';
+
+  @override
+  String skyMoonInSign(String sign) {
+    return 'Moon in $sign';
+  }
+
+  @override
+  String skyMoonEnters(String sign) {
+    return 'Moon enters $sign';
+  }
+
+  @override
+  String skyMoonRemaining(String value) {
+    return 'Remaining: $value';
+  }
+
+  @override
+  String skyMoonDaysHours(String days, String hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String skyMoonHoursMinutes(String hours, String minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String skyMoonMinutes(String minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String get skyMoonNextChanges => 'Next sign changes';
 
   @override
   String get skyNewMoon => 'New Moon';
@@ -2946,6 +2985,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chartExplorerForward => 'Forward';
 
   @override
+  String get chartExplorerPlay => 'Play';
+
+  @override
+  String get chartExplorerPause => 'Pause';
+
+  @override
+  String get chartExplorerSpeed => 'Speed';
+
+  @override
+  String get chartExplorerTimeStep => 'Time step';
+
+  @override
+  String get chartExplorerDone => 'Done';
+
+  @override
   String chartExplorerCalculating(String date) {
     return 'Calculating: $date';
   }
@@ -2968,6 +3022,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chartWheelFullscreenTooltip =>
       'Full screen • time / theme / share';
+
+  @override
+  String get chartInfoGeocentric => 'Geocentric';
+
+  @override
+  String get chartInfoTropical => 'Tropical zodiac';
+
+  @override
+  String get chartInfoMeanNode => 'Mean Node';
 
   @override
   String get timeMachineNow => 'Now';
@@ -3020,4 +3083,170 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get chartLocationResolveError =>
       'Could not find the city location. Select again.';
+
+  @override
+  String get skyReadingTitle => 'Today\'s Sky';
+
+  @override
+  String skyReadingHeadline(String sign, String mood) {
+    return 'Moon in $sign: $mood';
+  }
+
+  @override
+  String skyReadingAspectLine(String planet, String aspect, String text) {
+    return 'Moon–$planet $aspect: $text';
+  }
+
+  @override
+  String skyReadingRetroLine(String list) {
+    return 'Retrograde planets: $list. Reviewing related matters comes to the fore.';
+  }
+
+  @override
+  String get skyReadingVoidNote =>
+      'Moon void of course: don\'t rush new beginnings; routine work and finishing things suit better.';
+
+  @override
+  String get skyReadingSlowNote =>
+      'The Moon is moving slower than usual; taking a little more time with decisions helps.';
+
+  @override
+  String get skyReadingFastNote =>
+      'The Moon is moving fast; the agenda can shift quickly, so stay flexible.';
+
+  @override
+  String get skyReadingMoodAries => 'the courage to start';
+
+  @override
+  String get skyReadingMoodTaurus => 'grounding and bodily balance';
+
+  @override
+  String get skyReadingMoodGemini => 'conversation and curiosity';
+
+  @override
+  String get skyReadingMoodCancer => 'emotional closeness';
+
+  @override
+  String get skyReadingMoodLeo => 'a time to be seen';
+
+  @override
+  String get skyReadingMoodVirgo => 'order and detail';
+
+  @override
+  String get skyReadingMoodLibra => 'balance and relationships';
+
+  @override
+  String get skyReadingMoodScorpio => 'depth and transformation';
+
+  @override
+  String get skyReadingMoodSagittarius =>
+      'expansion and the search for meaning';
+
+  @override
+  String get skyReadingMoodCapricorn => 'building structure and responsibility';
+
+  @override
+  String get skyReadingMoodAquarius => 'innovation and freedom';
+
+  @override
+  String get skyReadingMoodPisces => 'intuition and letting go';
+
+  @override
+  String get skyReadingSignAries =>
+      'Instead of rushing the decision, take the first step deliberately today; your energy works best when it has direction.';
+
+  @override
+  String get skyReadingSignTaurus =>
+      'Put your bodily needs first; steady progress will get you further today than speed.';
+
+  @override
+  String get skyReadingSignGemini =>
+      'Clear your mind by talking, writing or asking questions; new information can ease confusion.';
+
+  @override
+  String get skyReadingSignCancer =>
+      'Rather than holding feelings in, share them with someone you trust; home and family matters take priority today.';
+
+  @override
+  String get skyReadingSignLeo =>
+      'Don\'t hold back from expressing yourself; make time for a creative project or a visible responsibility.';
+
+  @override
+  String get skyReadingSignVirgo =>
+      'Fixing small details may feel good, but don\'t lose the big picture to perfectionism.';
+
+  @override
+  String get skyReadingSignLibra =>
+      'Speak openly to restore balance in a relationship; postponing the decision only builds tension.';
+
+  @override
+  String get skyReadingSignScorpio =>
+      'Conversations that go beyond the surface reveal more today; try letting go of control.';
+
+  @override
+  String get skyReadingSignSagittarius =>
+      'Make a plan that widens your horizon; looking at the big picture can shrink daily worries.';
+
+  @override
+  String get skyReadingSignCapricorn =>
+      'Focus on a long-term goal; taking responsibility will strengthen you today.';
+
+  @override
+  String get skyReadingSignAquarius =>
+      'Try an unconventional solution; exchanging ideas with different people opens new doors.';
+
+  @override
+  String get skyReadingSignPisces =>
+      'Listen to your intuition, but support your decisions with a concrete step; leave room for rest too.';
+
+  @override
+  String get skyReadingPhaseNew =>
+      'New Moon: a good time to start something from scratch, set an intention and plan quietly.';
+
+  @override
+  String get skyReadingPhaseWaxingCrescent =>
+      'Waxing Crescent: small, steady steps on what you have begun are worth more than leaps.';
+
+  @override
+  String get skyReadingPhaseFirstQuarter =>
+      'First Quarter: determination is needed to overcome obstacles; finishing what was left half-done may help.';
+
+  @override
+  String get skyReadingPhaseWaxingGibbous =>
+      'Waxing Gibbous: time to review the details and let your plan mature.';
+
+  @override
+  String get skyReadingPhaseFull =>
+      'Full Moon: emotions and relationships become visible; good for clarifying a matter, but avoid reactive decisions.';
+
+  @override
+  String get skyReadingPhaseWaningGibbous =>
+      'Waning Gibbous: a good time to share what you have learned and simplify the next step.';
+
+  @override
+  String get skyReadingPhaseLastQuarter =>
+      'Last Quarter: releasing a habit that no longer serves you and making space is on the agenda.';
+
+  @override
+  String get skyReadingPhaseWaningCrescent =>
+      'Waning Crescent: a period suited to rest, withdrawal and inner review.';
+
+  @override
+  String get skyReadingAspectConjunction =>
+      'brings concentrated, merging energy in the same area.';
+
+  @override
+  String get skyReadingAspectSextile =>
+      'opens an easy opportunity and a door for cooperation.';
+
+  @override
+  String get skyReadingAspectSquare =>
+      'creates inner tension; patience works better than rushing.';
+
+  @override
+  String get skyReadingAspectTrine => 'brings a flowing, supportive harmony.';
+
+  @override
+  String get skyReadingAspectOpposition =>
+      'asks you to balance opposing needs.';
 }
