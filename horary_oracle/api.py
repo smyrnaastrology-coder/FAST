@@ -750,6 +750,11 @@ async def _cast(req: CastRequest, *, holavon=None):
     # Konum sorusu olduğu için karar "evet/hayır" değil; sorgulayan hep NO almamalı
     qlow3 = req.question.lower()
     is_where_q = any(k in qlow3 for k in ["nerede","nerde","nere","nereye","nere da","kaybol","kayıp","kayip","tutar mı","nere git","nereye gid","hangi yön","hangi yon","hangi taraf"]) or req.quesited_type in ("missing_person","missing_child","pet","lost_object")
+    from engine.location_safety import person_location_subject
+    person_where_target = (
+        person_location_subject(req.question, req.quesited_type)
+        if is_where_q else None
+    )
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
@@ -890,8 +895,24 @@ async def _cast(req: CastRequest, *, holavon=None):
             _trust_txt = _LT.prompt_text(_trust)
         except Exception as _e_tr:
             print(f"guven katmani hatasi: {_e_tr}")
+    if person_where_target:
+        # Strip horary-derived direction/distance/room guesses from the model
+        # context. A chart cannot verify a real person's live location.
+        engine_json["location"] = {
+            "subject_type": "person",
+            "subject": person_where_target["label"],
+            "urgency": loc_info.get("urgency", "merak"),
+            "real_time_location_available": False,
+        }
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
-    if res["verdict"] == "LOCATION" and loc_info.get("proximity"):
+    if person_where_target:
+        engine_json["loc_instruction"] = (
+            "Bu soru gerçek bir kişinin şu anki konumunu soruyor. Harita canlı konumu "
+            "doğrulayamaz. Yön, kilometre, şehir, oda, bina veya fiziksel ortam tahmini "
+            "üretme; mevcut location içindeki hiçbir astrolojik ipucunu gerçek konum gibi "
+            "sunma. Güvenli ve dürüst yanıt ver."
+        )
+    elif res["verdict"] == "LOCATION" and loc_info.get("proximity"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu ve gösterge bir açıya (ASC/MC/DSC/IC) çok yakın (" + str(loc_info.get("proximity_angle","")) + " ≤10°) — kural: KİŞİ SORANA ÇOK YAKINDIR. Cevabında kişinin hemen yakınlarda/aynı mekanda olduğunu söyle; km çarpım formülü bu durumda GEÇERSİZ, HİÇBİR km/metre rakamı verme. Yine de 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']' kısımlarını rapor et (kişinin hangi yönde durduğuna işaret eder). Gösterge: " + str(loc_info.get('_qr_ruler_klasik','')) + "."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
@@ -933,9 +954,9 @@ async def _cast(req: CastRequest, *, holavon=None):
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
-    if res["verdict"] == "LOCATION" and loc_info.get("ev_ici"):
+    if res["verdict"] == "LOCATION" and loc_info.get("ev_ici") and not person_where_target:
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
-    if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak":
+    if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak" and not person_where_target:
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " NOT: bu soru kayıp/çalınma değil, gündelik MERAK kategorisinde (manasızlık riski) — kişinin şu an nerede olabileceğini yön+mesafe ile NAZİKÇE söyle, 'gitmiş/dönmüyor/kayıp' gibi kesin telaşlı hüküm ve tehdit tespiti verme. Cevabının SONUNA şunu da ekle: 'Kişi gerçekten kayıpsa veya ulaşamıyorsan bunu ayrıca söyle, kayıp analizi açarım.'"
     # GUVEN KATMANI: rakam talimati uzmanlik taramasindan SONRA ve ustune eklenir,
     # boylece onceki kurallar onu ezmiyor.
@@ -1169,12 +1190,20 @@ async def _cast(req: CastRequest, *, holavon=None):
                 engine_json["multi_instruction"] = multi_instruction_text(engine_json, _mq_rows)
     except Exception:
         pass
-    answer = call_openai(engine_json, req.lang)
-    if req.lang == "tr" and engine_json.get("theft_verdict"):
+    if person_where_target:
+        from engine.location_safety import person_location_answer
+        answer = person_location_answer(
+            req.lang,
+            person_where_target["label"],
+            loc_info.get("urgency") == "kayip",
+        )
+    else:
+        answer = call_openai(engine_json, req.lang)
+    if not person_where_target and req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
-    if req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
+    if not person_where_target and req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
         answer = "İki seçenek kararı (Ay açısı kuralı): " + engine_json["two_option_verdict"] + "\n\n" + answer
-    if req.lang == "tr" and engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
+    if not person_where_target and req.lang == "tr" and engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
         answer = "Sağlık analizi: " + engine_json["health_verdict"] + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000
@@ -1188,7 +1217,15 @@ async def _cast(req: CastRequest, *, holavon=None):
         "planets": planets_out,
         "strictures": res["strictures"][:12],
         "lots": res.get("lots",{}),
-        "location": loc_info,
+        "location": (
+            {
+                "subject_type": "person",
+                "subject": person_where_target["label"],
+                "urgency": loc_info.get("urgency", "merak"),
+                "real_time_location_available": False,
+            }
+            if person_where_target else loc_info
+        ),
         "derived_info": res.get("derived_info"),
         "answer": answer,
         "credits_left": engine_json.get("credits_left"),
