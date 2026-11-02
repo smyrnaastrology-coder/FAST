@@ -100,4 +100,65 @@ void main() {
     );
     expect(find.byType(ChartWheel), findsOneWidget);
   });
+
+  testWidgets('Tüm gezegenler aynı burçta olsa da çizim bozulmaz', (
+    tester,
+  ) async {
+    // Şartname §15: tüm gezegenler aynı burçta + birbirine çok yakın.
+    final base = _sample();
+    final crowded = <PlanetPos>[
+      for (var i = 0; i < base.planets.length; i++)
+        PlanetPos(
+          name: base.planets[i].name,
+          lon: 100.0 + i * 0.6,
+          sign: 3,
+          degree: 10.0 + i * 0.6,
+          house: 1,
+          speed: 1,
+          retrograde: i.isOdd,
+        ),
+    ];
+    final data = ChartData(
+      houseSystem: base.houseSystem,
+      julianDay: base.julianDay,
+      asc: base.asc,
+      mc: base.mc,
+      planets: crowded,
+      houses: base.houses,
+      aspects: base.aspects,
+      meta: base.meta,
+    );
+
+    await tester.pumpWidget(_wrap(ChartWheel(data: data, size: 320)));
+    expect(find.byType(ChartWheel), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Çift çember yakın transit gezegenlerle çizilir', (tester) async {
+    final data = _sample();
+    final outer = <PlanetPos>[
+      for (var i = 0; i < 6; i++)
+        PlanetPos(
+          name: data.planets[i].name,
+          lon: 138.0 + i * 0.4,
+          sign: 4,
+          degree: 18.0 + i * 0.4,
+          house: 1,
+          speed: 1,
+          retrograde: false,
+        ),
+    ];
+    await tester.pumpWidget(
+      _wrap(
+        ChartWheel(
+          data: data,
+          size: 320,
+          outerPlanets: outer,
+          outerHouses: data.houses,
+        ),
+      ),
+    );
+    expect(find.byType(ChartWheel), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
