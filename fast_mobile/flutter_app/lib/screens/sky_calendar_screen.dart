@@ -8,12 +8,22 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_calendar.dart';
 import '../models/sky_moon_timing.dart';
+import '../models/sky_retro_calendar.dart';
+import '../models/sky_moon_guide.dart';
+import '../models/chart_data.dart';
+import '../models/chart_labels.dart';
+import '../models/eclipse_personal_impact.dart';
+import '../models/eclipse_personal_prompts.dart';
 import '../models/sky_snapshot.dart';
 import '../services/api_service.dart';
+import '../services/chart_service.dart';
+import '../services/social_service.dart';
 import '../models/sky_event_export.dart';
 import '../widgets/moon_timing_card.dart';
 import '../widgets/pro_gate.dart';
 import '../widgets/sky_daily_reading_card.dart';
+import '../widgets/retro_calendar_card.dart';
+import '../widgets/moon_guide_card.dart';
 
 String _calendarText(BuildContext context, String tr, String en, String es) =>
     switch (Localizations.localeOf(context).languageCode) {
@@ -67,7 +77,12 @@ Future<void> _exportEvent(
   }
 }
 
-const _phaseGlyphs = {'new_moon': '🌑', 'full_moon': '🌕'};
+const _phaseGlyphs = {
+  'new_moon': '🌑',
+  'first_quarter': '🌓',
+  'full_moon': '🌕',
+  'last_quarter': '🌗',
+};
 
 const _eclipseGlyphs = {'solar': '☉', 'lunar': '☾'};
 
@@ -78,8 +93,13 @@ String _deg(double value) {
       : rounded.toStringAsFixed(1);
 }
 
-String _phaseName(AppLocalizations l, String type) =>
-    type == 'full_moon' ? l.skyFullMoon : l.skyNewMoon;
+String _phaseName(AppLocalizations l, String type) => switch (type) {
+  'new_moon' => l.skyPhaseNew,
+  'first_quarter' => l.skyPhaseFirstQuarter,
+  'full_moon' => l.skyPhaseFull,
+  'last_quarter' => l.skyPhaseLastQuarter,
+  _ => l.skyFullMoon,
+};
 
 String _eclipseName(AppLocalizations l, bool solar) =>
     solar ? l.skyEclipseSolar : l.skyEclipseLunar;
@@ -104,9 +124,7 @@ String _dateLine(BuildContext context, DateTime time) {
 /// Ay takvimi kartı için kısa tarih (ör. "1 Kas · 09:20").
 String _shortDateLine(BuildContext context, DateTime time) {
   final local = time.toLocal();
-  final date = MaterialLocalizations.of(
-    context,
-  ).formatShortMonthDay(local);
+  final date = MaterialLocalizations.of(context).formatShortMonthDay(local);
   final clock = MaterialLocalizations.of(
     context,
   ).formatTimeOfDay(TimeOfDay.fromDateTime(local), alwaysUse24HourFormat: true);
@@ -139,6 +157,8 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
   late Future<SkyCalendar> _future;
   late Future<SkyMoonCalendar?> _moon;
   late Future<SkyMoonTiming?> _timing;
+  late Future<SkyRetroCalendar?> _retro;
+  late Future<SkyMoonGuide?> _guide;
   late Future<SkySnapshot?> _reading;
   Timer? _readingTimer;
   String _filter = 'all';
@@ -151,6 +171,8 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
     _future = _load();
     _moon = _loadMoon();
     _timing = _loadTiming();
+    _retro = _loadRetro();
+    _guide = _loadMoonGuide();
     _reading = _loadReading();
     // Yorum, Ay burcu değiştiğinde kendiliğinden tazelensin.
     _readingTimer = Timer.periodic(const Duration(minutes: 15), (_) {
@@ -196,11 +218,74 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
     }
   }
 
+  /// Retro durakları ve gölge tarihleri; uç erişilemezse diğer takvim sürer.
+  Future<SkyRetroCalendar?> _loadRetro() async {
+    try {
+      return SkyRetroCalendar.fromJson(await _api.skyRetroCalendar());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Faz ve menzil rehberi; hata alırsa temel takvim görünmeye devam eder.
+  Future<SkyMoonGuide?> _loadMoonGuide() async {
+    try {
+      return SkyMoonGuide.fromJson(await _api.skyMoonGuide());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Kişisel tutulma teması yalnızca oturum sahibinin kendi private doğum
+  /// kaydından, tam saat ve koordinat varsa hesaplanır. Başka kayıtlı profiller
+  /// veya ChartProvider'daki son açılmış harita asla kullanılmaz.
+  Future<ChartData?> _loadOwnNatalForEclipse() async {
+    try {
+      if (!SocialService.enabled) return null;
+      final birth = await SocialService.myBirthInfo();
+      final date = birth?.date;
+      final time = birth?.time;
+      final lat = birth?.lat;
+      final lon = birth?.lon;
+      if (date == null ||
+          DateTime.tryParse(date) == null ||
+          time == null ||
+          lat == null ||
+          lon == null ||
+          lat.abs() > 90 ||
+          lon.abs() > 180) {
+        return null;
+      }
+      final timeMatch = RegExp(r'^\d{1,2}:\d{2}').firstMatch(time);
+      if (timeMatch == null) return null;
+      final place = [
+        birth?.city,
+        birth?.country,
+      ].whereType<String>().where((part) => part.trim().isNotEmpty).join(', ');
+      final chartService = ChartService();
+      try {
+        return await chartService.natal(
+          tarih: date,
+          saat: timeMatch.group(0)!,
+          lat: lat,
+          lon: lon,
+          place: place.isEmpty ? null : place,
+        );
+      } finally {
+        chartService.dispose();
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
   void _reload() {
     setState(() {
       _future = _load();
       _moon = _loadMoon();
       _timing = _loadTiming();
+      _retro = _loadRetro();
+      _guide = _loadMoonGuide();
       _reading = _loadReading();
     });
   }
@@ -323,6 +408,45 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
                   },
                 ),
               ),
+              ProGate(
+                icon: Icons.sync,
+                title: l.skyRetroTitle,
+                body: l.proLockRetroBody,
+                statusLoader: widget.proLoader,
+                child: FutureBuilder<SkyRetroCalendar?>(
+                  future: _retro,
+                  builder: (context, rs) {
+                    final retro = rs.data;
+                    if (retro == null) return const SizedBox.shrink();
+                    return RetroCalendarCard(calendar: retro);
+                  },
+                ),
+              ),
+              ProGate(
+                icon: Icons.auto_awesome_outlined,
+                title: l.skyMoonGuideTitle,
+                body: l.proLockMoonGuideBody,
+                statusLoader: widget.proLoader,
+                child: FutureBuilder<SkyMoonGuide?>(
+                  future: _guide,
+                  builder: (context, gs) {
+                    final guide = gs.data;
+                    if (guide == null) return const SizedBox.shrink();
+                    return MoonGuideCard(guide: guide);
+                  },
+                ),
+              ),
+              if (cal.eclipses.isNotEmpty)
+                ProGate(
+                  icon: Icons.brightness_3_outlined,
+                  title: l.skyEclipseGuideTitle,
+                  body: l.proLockEclipseBody,
+                  statusLoader: widget.proLoader,
+                  child: _EclipseGuide(
+                    eclipses: cal.eclipses,
+                    loadOwnNatal: _loadOwnNatalForEclipse,
+                  ),
+                ),
               Wrap(
                 spacing: 8,
                 children: [
@@ -533,10 +657,7 @@ class _MoonIngressTile extends StatelessWidget {
           children: [
             Text(
               AstroSigns.symbols[i],
-              style: TextStyle(
-                color: FastTheme.accentGoldLight,
-                fontSize: 18,
-              ),
+              style: TextStyle(color: FastTheme.accentGoldLight, fontSize: 18),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -608,7 +729,10 @@ class _LiveCountdownState extends State<_LiveCountdown> {
     } else if (diff.inDays > 0) {
       value = l.skyMoonDaysHours('${diff.inDays}', '${diff.inHours % 24}');
     } else if (diff.inHours > 0) {
-      value = l.skyMoonHoursMinutes('${diff.inHours}', '${diff.inMinutes % 60}');
+      value = l.skyMoonHoursMinutes(
+        '${diff.inHours}',
+        '${diff.inMinutes % 60}',
+      );
     } else {
       value = l.skyMoonMinutes('${diff.inMinutes}');
     }
@@ -641,7 +765,10 @@ class _PhaseTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(event.moon.longitude), l);
+    final sign = AstroSigns.localizedNameOf(
+      AstroSigns.signNameFromLongitude(event.moon.longitude),
+      l,
+    );
     return _card(
       context,
       leading: Text(
@@ -670,7 +797,10 @@ class _EclipseTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final body = eclipse.isSolar ? eclipse.sun : eclipse.moon;
-    final sign = AstroSigns.localizedNameOf(AstroSigns.signNameFromLongitude(body.longitude), l);
+    final sign = AstroSigns.localizedNameOf(
+      AstroSigns.signNameFromLongitude(body.longitude),
+      l,
+    );
     final title =
         '${_eclipseName(l, eclipse.isSolar)} · ${_eclipseVariant(l, eclipse.variant)}';
     final subtitle =
@@ -683,11 +813,40 @@ class _EclipseTile extends StatelessWidget {
       if (vis.obscuration != null) {
         parts.add(l.skyEclipseObscuration(vis.obscuration!.round().toString()));
       }
+      if (vis.localStart != null && vis.localEnd != null) {
+        parts.add(
+          l.skyEclipseLocalWindow(
+            _shortDateLine(context, vis.localStart!),
+            _shortDateLine(context, vis.localEnd!),
+          ),
+        );
+      }
+      if (vis.saros != null && vis.sarosMember != null) {
+        parts.add(
+          l.skyEclipseSaros(vis.saros.toString(), vis.sarosMember.toString()),
+        );
+      }
     } else {
       parts.add(l.skyEclipseNotVisible);
       final next = vis.nextVisible;
       if (next != null) {
         parts.add(l.skyEclipseNextVisible(_dateLine(context, next.time)));
+        if (next.localStart != null && next.localEnd != null) {
+          parts.add(
+            l.skyEclipseLocalWindow(
+              _shortDateLine(context, next.localStart!),
+              _shortDateLine(context, next.localEnd!),
+            ),
+          );
+        }
+        if (next.saros != null && next.sarosMember != null) {
+          parts.add(
+            l.skyEclipseSaros(
+              next.saros.toString(),
+              next.sarosMember.toString(),
+            ),
+          );
+        }
       }
     }
 
@@ -706,6 +865,146 @@ class _EclipseTile extends StatelessWidget {
         title,
         '$subtitle\n${parts.join(' · ')}\nHolavon',
       ),
+    );
+  }
+}
+
+/// Temel tutulma tarihi/yerel görünürlüğü ücretsiz kalır. Pro kartı, yalnızca
+/// mevcut oturum sahibinin kendi tam doğum kaydı varsa natal ev/açı temasını
+/// ekler; yoksa başka bir kayıtlı kişinin haritasına düşmez.
+class _EclipseGuide extends StatefulWidget {
+  final List<SkyEclipse> eclipses;
+  final Future<ChartData?> Function() loadOwnNatal;
+
+  const _EclipseGuide({required this.eclipses, required this.loadOwnNatal});
+
+  @override
+  State<_EclipseGuide> createState() => _EclipseGuideState();
+}
+
+class _EclipseGuideState extends State<_EclipseGuide> {
+  late final Future<ChartData?> _ownNatal;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownNatal = widget.loadOwnNatal();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return FutureBuilder<ChartData?>(
+      future: _ownNatal,
+      builder: (context, snapshot) {
+        final natal = snapshot.data;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (snapshot.connectionState == ConnectionState.waiting)
+              const LinearProgressIndicator(minHeight: 2),
+            for (var i = 0; i < widget.eclipses.length; i++) ...[
+              if (i > 0) const SizedBox(height: 12),
+              _eclipsePrompt(l, widget.eclipses[i]),
+              if (natal != null) ...[
+                const SizedBox(height: 6),
+                _personalImpact(l, widget.eclipses[i], natal),
+              ],
+            ],
+            if (natal == null &&
+                snapshot.connectionState != ConnectionState.waiting) ...[
+              const SizedBox(height: 10),
+              Text(
+                l.skyEclipseBirthDataNeeded,
+                style: TextStyle(
+                  color: FastTheme.textMuted.withValues(alpha: 0.85),
+                  fontSize: 11,
+                  height: 1.35,
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Text(
+              l.skyEclipseReflectionNote,
+              style: TextStyle(
+                color: FastTheme.textMuted.withValues(alpha: 0.7),
+                fontSize: 11,
+                height: 1.35,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _personalImpact(
+    AppLocalizations l,
+    SkyEclipse eclipse,
+    ChartData natal,
+  ) {
+    final impact = EclipsePersonalImpact.calculate(eclipse, natal);
+    final language = Localizations.localeOf(context).languageCode;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (impact.house != null)
+          Text(
+            l.skyEclipseHouseImpact(
+              l.chartHouseNumber(impact.house!),
+              EclipsePersonalPrompts.houseTheme(impact.house!, language),
+            ),
+            style: TextStyle(color: FastTheme.text, fontSize: 12, height: 1.4),
+          ),
+        for (final aspect in impact.aspects)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              l.skyEclipsePersonalAspectLine(
+                chartAspectLabel(l, aspect.type),
+                chartPlanetLabel(l, aspect.planet),
+                aspect.orb.toStringAsFixed(1),
+              ),
+              style: TextStyle(
+                color: FastTheme.accentGoldLight,
+                fontSize: 11,
+                height: 1.3,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _eclipsePrompt(AppLocalizations l, SkyEclipse eclipse) {
+    final body = eclipse.isSolar ? eclipse.sun : eclipse.moon;
+    final sign = AstroSigns.localizedNameOf(
+      AstroSigns.signNameFromLongitude(body.longitude),
+      l,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${_eclipseName(l, eclipse.isSolar)} · ${_deg(body.degree)}° $sign',
+          style: TextStyle(
+            color: FastTheme.accentGoldLight,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          eclipse.isSolar
+              ? l.skyEclipseReflectionSolar
+              : l.skyEclipseReflectionLunar,
+          style: TextStyle(
+            color: FastTheme.textMuted,
+            fontSize: 12,
+            height: 1.4,
+          ),
+        ),
+      ],
     );
   }
 }

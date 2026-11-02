@@ -5761,8 +5761,170 @@ abstract class AppLocalizations {
   /// No description provided for @proFeatureNewSky.
   ///
   /// In en, this message translates to:
-  /// **'Moon Calendar, daily sky reading and live Moon countdown'**
+  /// **'Moon Calendar, 28 lunar mansions and phase guide, daily reading, VOC and practical timing windows; retrograde calendar and personal eclipse chart contacts'**
   String get proFeatureNewSky;
+
+  /// No description provided for @skyMoonGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Guide'**
+  String get skyMoonGuideTitle;
+
+  /// No description provided for @proLockMoonGuideBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The 28 lunar mansions, the meaning of the current phase and practical reflection/action prompts are available with Pro.'**
+  String get proLockMoonGuideBody;
+
+  /// No description provided for @skyMoonPhaseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon phase'**
+  String get skyMoonPhaseLabel;
+
+  /// No description provided for @skyMoonMansionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar mansion'**
+  String get skyMoonMansionLabel;
+
+  /// No description provided for @skyMoonPhaseEndsAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Current phase ends'**
+  String get skyMoonPhaseEndsAt;
+
+  /// No description provided for @skyMoonMansionLeavesAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Mansion changes'**
+  String get skyMoonMansionLeavesAt;
+
+  /// No description provided for @skyMoonMansionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Mansion {number}'**
+  String skyMoonMansionNumber(String number);
+
+  /// No description provided for @skyMoonMansionProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Mansion progress: {progress}%'**
+  String skyMoonMansionProgress(String progress);
+
+  /// No description provided for @skyMoonMansionNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming mansions'**
+  String get skyMoonMansionNext;
+
+  /// No description provided for @skyMoonMansionMethodNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation: 28 equal sectors from the Lahiri sidereal starting point (12°51′26″ each). This is not identical to historical boundaries defined star by star; the descriptions are traditional-inspired reflection prompts.'**
+  String get skyMoonMansionMethodNote;
+
+  /// No description provided for @skyMoonPhaseNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Moon'**
+  String get skyMoonPhaseNewTitle;
+
+  /// No description provided for @skyMoonPhaseCrescentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Crescent'**
+  String get skyMoonPhaseCrescentTitle;
+
+  /// No description provided for @skyMoonPhaseFirstQuarterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First Quarter'**
+  String get skyMoonPhaseFirstQuarterTitle;
+
+  /// No description provided for @skyMoonPhaseGibbousTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Gibbous'**
+  String get skyMoonPhaseGibbousTitle;
+
+  /// No description provided for @skyMoonPhaseFullTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Moon'**
+  String get skyMoonPhaseFullTitle;
+
+  /// No description provided for @skyMoonPhaseWaningGibbousTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Gibbous'**
+  String get skyMoonPhaseWaningGibbousTitle;
+
+  /// No description provided for @skyMoonPhaseLastQuarterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Quarter'**
+  String get skyMoonPhaseLastQuarterTitle;
+
+  /// No description provided for @skyMoonPhaseWaningCrescentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning Crescent'**
+  String get skyMoonPhaseWaningCrescentTitle;
+
+  /// No description provided for @skyMoonPhaseNewPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a goal; today, define just its first small step and put it on your calendar.'**
+  String get skyMoonPhaseNewPrompt;
+
+  /// No description provided for @skyMoonPhaseCrescentPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep a new habit small: prepare a short lesson, application draft or starter plan.'**
+  String get skyMoonPhaseCrescentPrompt;
+
+  /// No description provided for @skyMoonPhaseFirstQuarterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Put the plan into action; name one obstacle and choose a concrete step to address it.'**
+  String get skyMoonPhaseFirstQuarterPrompt;
+
+  /// No description provided for @skyMoonPhaseGibbousPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Before an application, presentation or purchase, review details, budget and missing items.'**
+  String get skyMoonPhaseGibbousPrompt;
+
+  /// No description provided for @skyMoonPhaseFullPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Show completed work, assess the result and make time for important conversations.'**
+  String get skyMoonPhaseFullPrompt;
+
+  /// No description provided for @skyMoonPhaseWaningGibbousPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Share what you learned, finish deliverables and note which method worked.'**
+  String get skyMoonPhaseWaningGibbousPrompt;
+
+  /// No description provided for @skyMoonPhaseLastQuarterPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Close open tasks, reduce unnecessary spending and clutter; avoid adding new commitments.'**
+  String get skyMoonPhaseLastQuarterPrompt;
+
+  /// No description provided for @skyMoonPhaseWaningCrescentPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Make room to rest and reset; choose one simple priority for the next cycle.'**
+  String get skyMoonPhaseWaningCrescentPrompt;
+
+  /// No description provided for @skyMoonGuideNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Phase and mansion prompts are planning notes inspired by traditional astrology, not guaranteed outcomes or event predictions.'**
+  String get skyMoonGuideNote;
 
   /// No description provided for @planFreeDisabled8.
   ///
@@ -6145,8 +6307,194 @@ abstract class AppLocalizations {
   /// No description provided for @proLockTimingBody.
   ///
   /// In en, this message translates to:
-  /// **'Moon void-of-course periods and right timing windows for haircuts, contracts, weddings and moving are available with Pro.'**
+  /// **'Moon void-of-course (VOC) periods and suitable timing windows for hair growth/thickness, trade, education, contracts, weddings, moving and planting are available with Pro.'**
   String get proLockTimingBody;
+
+  /// No description provided for @skyRetroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde Calendar'**
+  String get skyRetroTitle;
+
+  /// No description provided for @proLockRetroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The next 12 months of retrograde/direct stations, shadow dates and planet-specific review prompts are available with Pro.'**
+  String get proLockRetroBody;
+
+  /// No description provided for @skyRetroShadowStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow begins'**
+  String get skyRetroShadowStart;
+
+  /// No description provided for @skyRetroStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde begins'**
+  String get skyRetroStarts;
+
+  /// No description provided for @skyRetroDirectStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct station'**
+  String get skyRetroDirectStation;
+
+  /// No description provided for @skyRetroShadowEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Shadow ends'**
+  String get skyRetroShadowEnd;
+
+  /// No description provided for @skyRetroActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde now'**
+  String get skyRetroActive;
+
+  /// No description provided for @skyRetroShadowActive.
+  ///
+  /// In en, this message translates to:
+  /// **'In shadow period'**
+  String get skyRetroShadowActive;
+
+  /// No description provided for @skyRetroUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get skyRetroUpcoming;
+
+  /// No description provided for @skyRetroEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No retrograde period to show in this range.'**
+  String get skyRetroEmpty;
+
+  /// No description provided for @skyRetroNote.
+  ///
+  /// In en, this message translates to:
+  /// **'In astrological tradition, retrograde periods are a time to review. These interpretations do not promise specific events or outcomes.'**
+  String get skyRetroNote;
+
+  /// No description provided for @skyRetroStationInSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Station degree: {degree}° {sign}'**
+  String skyRetroStationInSign(String degree, String sign);
+
+  /// No description provided for @skyRetroReviewDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your plans and weigh important decisions against your circumstances and concrete information.'**
+  String get skyRetroReviewDefault;
+
+  /// No description provided for @skyRetroReviewMercury.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-check messages, appointments and contract details; back up important files.'**
+  String get skyRetroReviewMercury;
+
+  /// No description provided for @skyRetroReviewVenus.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisit relationship expectations and spending; you do not have to rush a decision.'**
+  String get skyRetroReviewVenus;
+
+  /// No description provided for @skyRetroReviewMars.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your goal and approach; focus your energy and avoid unnecessary confrontations.'**
+  String get skyRetroReviewMars;
+
+  /// No description provided for @skyRetroReviewJupiter.
+  ///
+  /// In en, this message translates to:
+  /// **'Reassess learning, travel or growth plans; check the details and budget.'**
+  String get skyRetroReviewJupiter;
+
+  /// No description provided for @skyRetroReviewSaturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Review responsibilities and long-term plans; reorganize commitments that are no longer sustainable.'**
+  String get skyRetroReviewSaturn;
+
+  /// No description provided for @skyRetroReviewUranus.
+  ///
+  /// In en, this message translates to:
+  /// **'Review technology and equipment plans; keep a backup plan for important tasks.'**
+  String get skyRetroReviewUranus;
+
+  /// No description provided for @skyRetroReviewNeptune.
+  ///
+  /// In en, this message translates to:
+  /// **'Clarify expectations and boundaries; verify rather than assume.'**
+  String get skyRetroReviewNeptune;
+
+  /// No description provided for @skyRetroReviewPluto.
+  ///
+  /// In en, this message translates to:
+  /// **'Review shared resources and control dynamics; do not rush major change plans.'**
+  String get skyRetroReviewPluto;
+
+  /// No description provided for @skyEclipseGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Eclipse Guide'**
+  String get skyEclipseGuideTitle;
+
+  /// No description provided for @proLockEclipseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Local eclipse contacts, the Saros cycle and personal house/aspect contacts to your own natal chart are available with Pro.'**
+  String get proLockEclipseBody;
+
+  /// No description provided for @skyEclipseLocalWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Local phases: {start} – {end}'**
+  String skyEclipseLocalWindow(String start, String end);
+
+  /// No description provided for @skyEclipseSaros.
+  ///
+  /// In en, this message translates to:
+  /// **'Saros {series} · member {member}'**
+  String skyEclipseSaros(String series, String member);
+
+  /// No description provided for @skyEclipseReflectionSolar.
+  ///
+  /// In en, this message translates to:
+  /// **'In traditional astrology, solar eclipses are associated with beginnings and visibility. Review a goal, role or next step using concrete information.'**
+  String get skyEclipseReflectionSolar;
+
+  /// No description provided for @skyEclipseReflectionLunar.
+  ///
+  /// In en, this message translates to:
+  /// **'In traditional astrology, lunar eclipses are associated with culmination and reviewing emotional habits. Identify something to complete or reorganize.'**
+  String get skyEclipseReflectionLunar;
+
+  /// No description provided for @skyEclipseReflectionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an astrological reflection prompt, not a personal event forecast or a promise of a specific outcome.'**
+  String get skyEclipseReflectionNote;
+
+  /// No description provided for @skyEclipseBirthDataNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'To show personal house and aspect contacts, save your own birth date, exact time and birthplace in your profile. Another person\'s saved chart is never used.'**
+  String get skyEclipseBirthDataNeeded;
+
+  /// No description provided for @skyEclipseHouseImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'In your natal chart, house {house} ({theme}): choose one concrete goal or task in this area to review.'**
+  String skyEclipseHouseImpact(String house, String theme);
+
+  /// No description provided for @skyEclipsePersonalAspectLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Eclipse · {aspect} · natal {planet} · orb {orb}°'**
+  String skyEclipsePersonalAspectLine(String aspect, String planet, String orb);
 
   /// No description provided for @skyActivityTrade.
   ///

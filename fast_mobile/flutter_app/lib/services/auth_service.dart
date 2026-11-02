@@ -119,7 +119,13 @@ class AuthService {
   }
 
   static void _applySession(Session? session) {
-    if (session == null) return;
+    if (session == null) {
+      _sessionToken = null;
+      _refreshToken = null;
+      _userId = null;
+      _userEmail = null;
+      return;
+    }
     _sessionToken = session.accessToken;
     _refreshToken = session.refreshToken;
     _userId = session.user.id;
@@ -132,7 +138,7 @@ class AuthService {
       _sessionToken == null ? null : 'Bearer $_sessionToken';
 
   static Map<String, String> _headers({bool json = false}) => {
-        if (_authorization != null) 'Authorization': _authorization!,
+        'Authorization': ?_authorization,
         if (json) 'Content-Type': 'application/json',
       };
 
@@ -286,7 +292,8 @@ class AuthService {
     _refreshToken = null;
     _userId = null;
     _userEmail = null;
-    RevenueCatService.reset();
+    await RevenueCatService.reset();
+    onSessionChanged?.call();
   }
 
   /// Hesabı ve tüm kişisel verileri kalıcı olarak siler.
@@ -351,8 +358,8 @@ class AuthService {
     if (!await _ensureToken()) return false;
     try {
       final body = <String, dynamic>{
-        if (displayName != null) 'display_name': displayName,
-        if (lang != null) 'lang': lang,
+        'display_name': ?displayName,
+        'lang': ?lang,
       };
       final r = await http.put(Uri.parse('${ApiConfig.baseUrl}/api/auth/me'),
           headers: _headers(json: true), body: jsonEncode(body)).timeout(const Duration(seconds: 12));

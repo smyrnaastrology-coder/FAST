@@ -51,6 +51,11 @@ class SkyVisibleEclipse {
   final String variant;
   final double? obscuration;
   final double? magnitude;
+  final DateTime? localStart;
+  final DateTime? localMaximum;
+  final DateTime? localEnd;
+  final int? saros;
+  final int? sarosMember;
 
   const SkyVisibleEclipse({
     required this.time,
@@ -58,6 +63,11 @@ class SkyVisibleEclipse {
     required this.variant,
     required this.obscuration,
     required this.magnitude,
+    required this.localStart,
+    required this.localMaximum,
+    required this.localEnd,
+    required this.saros,
+    required this.sarosMember,
   });
 
   factory SkyVisibleEclipse.fromJson(Map<String, dynamic> j) =>
@@ -69,6 +79,23 @@ class SkyVisibleEclipse {
         variant: j['alt_tip'] as String? ?? 'partial',
         obscuration: (j['ortulme'] as num?)?.toDouble(),
         magnitude: (j['buyukluk'] as num?)?.toDouble(),
+        localStart: j['yerel_baslangic'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                (j['yerel_baslangic'] as num).toInt() * 1000,
+              ),
+        localMaximum: j['yerel_maksimum'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                (j['yerel_maksimum'] as num).toInt() * 1000,
+              ),
+        localEnd: j['yerel_bitis'] == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                (j['yerel_bitis'] as num).toInt() * 1000,
+              ),
+        saros: (j['saros'] as num?)?.toInt(),
+        sarosMember: (j['saros_uyesi'] as num?)?.toInt(),
       );
 }
 
@@ -78,6 +105,11 @@ class SkyVisibility {
   final double? obscuration;
   final double? magnitude;
   final SkyVisibleEclipse? nextVisible;
+  final DateTime? localStart;
+  final DateTime? localMaximum;
+  final DateTime? localEnd;
+  final int? saros;
+  final int? sarosMember;
 
   const SkyVisibility({
     required this.visible,
@@ -85,6 +117,11 @@ class SkyVisibility {
     required this.obscuration,
     required this.magnitude,
     required this.nextVisible,
+    required this.localStart,
+    required this.localMaximum,
+    required this.localEnd,
+    required this.saros,
+    required this.sarosMember,
   });
 
   factory SkyVisibility.fromJson(Map<String, dynamic> j) {
@@ -95,6 +132,23 @@ class SkyVisibility {
       obscuration: (j['ortulme'] as num?)?.toDouble(),
       magnitude: (j['buyukluk'] as num?)?.toDouble(),
       nextVisible: next == null ? null : SkyVisibleEclipse.fromJson(next),
+      localStart: j['yerel_baslangic'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              (j['yerel_baslangic'] as num).toInt() * 1000,
+            ),
+      localMaximum: j['yerel_maksimum'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              (j['yerel_maksimum'] as num).toInt() * 1000,
+            ),
+      localEnd: j['yerel_bitis'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              (j['yerel_bitis'] as num).toInt() * 1000,
+            ),
+      saros: (j['saros'] as num?)?.toInt(),
+      sarosMember: (j['saros_uyesi'] as num?)?.toInt(),
     );
   }
 }
@@ -209,6 +263,5 @@ class SkyMoonCalendar {
   }
 }
 
-DateTime _epochToDate(Object? value) => DateTime.fromMillisecondsSinceEpoch(
-  ((value as num?)?.toInt() ?? 0) * 1000,
-);
+DateTime _epochToDate(Object? value) =>
+    DateTime.fromMillisecondsSinceEpoch(((value as num?)?.toInt() ?? 0) * 1000);

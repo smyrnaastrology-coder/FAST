@@ -3136,7 +3136,103 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get proFeatureNewSky =>
-      'Calendario Lunar, lectura diaria del cielo y cuenta atrás lunar en vivo';
+      'Calendario lunar, 28 mansiones y guía de fases, lectura diaria, VOC y momentos prácticos; calendario retrógrado y contactos personales de eclipses';
+
+  @override
+  String get skyMoonGuideTitle => 'Guía lunar';
+
+  @override
+  String get proLockMoonGuideBody =>
+      'Las 28 mansiones lunares, el significado de la fase actual y propuestas prácticas de reflexión/acción están disponibles con Pro.';
+
+  @override
+  String get skyMoonPhaseLabel => 'Fase lunar';
+
+  @override
+  String get skyMoonMansionLabel => 'Mansión lunar';
+
+  @override
+  String get skyMoonPhaseEndsAt => 'Fin de la fase actual';
+
+  @override
+  String get skyMoonMansionLeavesAt => 'Cambio de mansión';
+
+  @override
+  String skyMoonMansionNumber(String number) {
+    return 'Mansión $number';
+  }
+
+  @override
+  String skyMoonMansionProgress(String progress) {
+    return 'Progreso en la mansión: $progress%';
+  }
+
+  @override
+  String get skyMoonMansionNext => 'Próximas mansiones';
+
+  @override
+  String get skyMoonMansionMethodNote =>
+      'Cálculo: 28 sectores iguales desde el inicio sidéreo Lahiri (12°51′26″ cada uno). No equivale exactamente a los límites históricos definidos estrella por estrella; las descripciones son propuestas de reflexión inspiradas en la tradición.';
+
+  @override
+  String get skyMoonPhaseNewTitle => 'Luna nueva';
+
+  @override
+  String get skyMoonPhaseCrescentTitle => 'Luna creciente';
+
+  @override
+  String get skyMoonPhaseFirstQuarterTitle => 'Cuarto creciente';
+
+  @override
+  String get skyMoonPhaseGibbousTitle => 'Gibosa creciente';
+
+  @override
+  String get skyMoonPhaseFullTitle => 'Luna llena';
+
+  @override
+  String get skyMoonPhaseWaningGibbousTitle => 'Gibosa menguante';
+
+  @override
+  String get skyMoonPhaseLastQuarterTitle => 'Cuarto menguante';
+
+  @override
+  String get skyMoonPhaseWaningCrescentTitle => 'Luna menguante';
+
+  @override
+  String get skyMoonPhaseNewPrompt =>
+      'Elige una meta; hoy define solo el primer paso pequeño y anótalo en tu calendario.';
+
+  @override
+  String get skyMoonPhaseCrescentPrompt =>
+      'Mantén pequeño el nuevo hábito: prepara una lección breve, un borrador o un plan inicial.';
+
+  @override
+  String get skyMoonPhaseFirstQuarterPrompt =>
+      'Pon el plan en marcha; identifica un obstáculo y elige un paso concreto para resolverlo.';
+
+  @override
+  String get skyMoonPhaseGibbousPrompt =>
+      'Antes de una solicitud, presentación o compra, revisa detalles, presupuesto y pendientes.';
+
+  @override
+  String get skyMoonPhaseFullPrompt =>
+      'Muestra el trabajo terminado, evalúa el resultado y reserva tiempo para conversaciones importantes.';
+
+  @override
+  String get skyMoonPhaseWaningGibbousPrompt =>
+      'Comparte lo aprendido, termina entregas y anota qué método funcionó.';
+
+  @override
+  String get skyMoonPhaseLastQuarterPrompt =>
+      'Cierra tareas pendientes, reduce gastos y desorden innecesarios; evita asumir nuevos compromisos.';
+
+  @override
+  String get skyMoonPhaseWaningCrescentPrompt =>
+      'Haz espacio para descansar y recuperarte; elige una prioridad sencilla para el próximo ciclo.';
+
+  @override
+  String get skyMoonGuideNote =>
+      'Las propuestas de fases y mansiones son sugerencias de planificación inspiradas en la astrología tradicional, no predicciones ni resultados garantizados.';
 
   @override
   String get planFreeDisabled8 => 'Calendario Lunar y lectura diaria';
@@ -3368,7 +3464,131 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get proLockTimingBody =>
-      'Los períodos de Luna en vacío y las ventanas de buen momento para cortes de pelo, firmas, bodas y mudanzas están disponibles con Pro.';
+      'Los períodos de Luna en vacío (VOC) y los momentos adecuados para crecimiento/volumen del pelo, comercio, educación, contratos, bodas, mudanzas y siembra están disponibles con Pro.';
+
+  @override
+  String get skyRetroTitle => 'Calendario retrógrado';
+
+  @override
+  String get proLockRetroBody =>
+      'Las estaciones retrógradas/directas, las fechas de sombra y consejos de revisión por planeta para los próximos 12 meses están disponibles con Pro.';
+
+  @override
+  String get skyRetroShadowStart => 'Inicio de sombra';
+
+  @override
+  String get skyRetroStarts => 'Inicio del retroceso';
+
+  @override
+  String get skyRetroDirectStation => 'Estación directa';
+
+  @override
+  String get skyRetroShadowEnd => 'Fin de sombra';
+
+  @override
+  String get skyRetroActive => 'Retrógrado ahora';
+
+  @override
+  String get skyRetroShadowActive => 'En período de sombra';
+
+  @override
+  String get skyRetroUpcoming => 'Próximo';
+
+  @override
+  String get skyRetroEmpty =>
+      'No hay períodos retrógrados que mostrar en este intervalo.';
+
+  @override
+  String get skyRetroNote =>
+      'En la tradición astrológica, los períodos retrógrados invitan a revisar. Estas interpretaciones no garantizan sucesos ni resultados.';
+
+  @override
+  String skyRetroStationInSign(String degree, String sign) {
+    return 'Grado de estación: $degree° $sign';
+  }
+
+  @override
+  String get skyRetroReviewDefault =>
+      'Revisa tus planes y evalúa las decisiones importantes según tus circunstancias e información concreta.';
+
+  @override
+  String get skyRetroReviewMercury =>
+      'Comprueba mensajes, citas y detalles de contratos; haz copias de seguridad de tus archivos importantes.';
+
+  @override
+  String get skyRetroReviewVenus =>
+      'Revisa las expectativas en tus relaciones y tus gastos; no tienes que decidir con prisa.';
+
+  @override
+  String get skyRetroReviewMars =>
+      'Revisa tu objetivo y método; concentra tu energía y evita confrontaciones innecesarias.';
+
+  @override
+  String get skyRetroReviewJupiter =>
+      'Reevalúa tus planes de estudio, viaje o crecimiento; comprueba los detalles y el presupuesto.';
+
+  @override
+  String get skyRetroReviewSaturn =>
+      'Revisa responsabilidades y planes a largo plazo; reorganiza compromisos que ya no sean sostenibles.';
+
+  @override
+  String get skyRetroReviewUranus =>
+      'Revisa tus planes de tecnología y equipos; prepara una alternativa para tareas importantes.';
+
+  @override
+  String get skyRetroReviewNeptune =>
+      'Aclara expectativas y límites; confirma en vez de suponer.';
+
+  @override
+  String get skyRetroReviewPluto =>
+      'Revisa recursos compartidos y dinámicas de control; no apresures cambios importantes.';
+
+  @override
+  String get skyEclipseGuideTitle => 'Guía de eclipses';
+
+  @override
+  String get proLockEclipseBody =>
+      'Las fases locales, el ciclo Saros y los contactos por casas/aspectos con tu propia carta natal están disponibles con Pro.';
+
+  @override
+  String skyEclipseLocalWindow(String start, String end) {
+    return 'Fases locales: $start – $end';
+  }
+
+  @override
+  String skyEclipseSaros(String series, String member) {
+    return 'Saros $series · miembro $member';
+  }
+
+  @override
+  String get skyEclipseReflectionSolar =>
+      'En la astrología tradicional, los eclipses solares se asocian con comienzos y visibilidad. Revisa una meta, un papel o tu próximo paso con información concreta.';
+
+  @override
+  String get skyEclipseReflectionLunar =>
+      'En la astrología tradicional, los eclipses lunares se asocian con culminaciones y con revisar hábitos emocionales. Identifica algo que completar o reorganizar.';
+
+  @override
+  String get skyEclipseReflectionNote =>
+      'Es una propuesta astrológica de reflexión, no una predicción personal ni una promesa de un resultado concreto.';
+
+  @override
+  String get skyEclipseBirthDataNeeded =>
+      'Para mostrar contactos personales por casa y aspecto, guarda tu fecha, hora exacta y lugar de nacimiento en tu perfil. Nunca se usa la carta guardada de otra persona.';
+
+  @override
+  String skyEclipseHouseImpact(String house, String theme) {
+    return 'En tu carta natal, casa $house ($theme): elige un objetivo o tarea concreta de esta área para revisar.';
+  }
+
+  @override
+  String skyEclipsePersonalAspectLine(
+    String aspect,
+    String planet,
+    String orb,
+  ) {
+    return 'Eclipse · $aspect · natal $planet · orbe $orb°';
+  }
 
   @override
   String get skyActivityTrade => 'Comercio';

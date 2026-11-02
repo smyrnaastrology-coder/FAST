@@ -3097,7 +3097,103 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get proFeatureNewSky =>
-      'Ay Takvimi, günlük gökyüzü yorumu ve canlı Ay geri sayımı';
+      'Ay Takvimi, 28 menzil ve faz rehberi, günlük yorum, VOC ve eylem zamanları; retro takvimi ve kişisel tutulma temasları';
+
+  @override
+  String get skyMoonGuideTitle => 'Ay Rehberi';
+
+  @override
+  String get proLockMoonGuideBody =>
+      '28 Ay Menzili, mevcut fazın anlamı ve günlük hayata dönük düşünme/eylem önerileri Pro\'da.';
+
+  @override
+  String get skyMoonPhaseLabel => 'Ay fazı';
+
+  @override
+  String get skyMoonMansionLabel => 'Ay menzili';
+
+  @override
+  String get skyMoonPhaseEndsAt => 'Faz aralığının sonu';
+
+  @override
+  String get skyMoonMansionLeavesAt => 'Menzil geçişi';
+
+  @override
+  String skyMoonMansionNumber(String number) {
+    return '$number. menzil';
+  }
+
+  @override
+  String skyMoonMansionProgress(String progress) {
+    return 'Menzilde ilerleme: %$progress';
+  }
+
+  @override
+  String get skyMoonMansionNext => 'Sıradaki menziller';
+
+  @override
+  String get skyMoonMansionMethodNote =>
+      'Hesap: Lahiri sidereal başlangıçlı 28 eşit bölüm (her biri 12°51′26″). Bu, yıldızlara göre ayrı ayrı belirlenen tarihsel sınırların aynısı değildir; açıklamalar geleneksel esinli düşünme önerileridir.';
+
+  @override
+  String get skyMoonPhaseNewTitle => 'Yeni Ay';
+
+  @override
+  String get skyMoonPhaseCrescentTitle => 'Büyüyen Hilal';
+
+  @override
+  String get skyMoonPhaseFirstQuarterTitle => 'İlkdördün';
+
+  @override
+  String get skyMoonPhaseGibbousTitle => 'Büyüyen Şişkin Ay';
+
+  @override
+  String get skyMoonPhaseFullTitle => 'Dolunay';
+
+  @override
+  String get skyMoonPhaseWaningGibbousTitle => 'Küçülen Şişkin Ay';
+
+  @override
+  String get skyMoonPhaseLastQuarterTitle => 'Sondördün';
+
+  @override
+  String get skyMoonPhaseWaningCrescentTitle => 'Küçülen Hilal';
+
+  @override
+  String get skyMoonPhaseNewPrompt =>
+      'Yeni bir hedef seç; bugün yalnızca ilk küçük adımı ve takvimini belirle.';
+
+  @override
+  String get skyMoonPhaseCrescentPrompt =>
+      'Yeni alışkanlığı küçük tut: kısa bir ders, başvuru taslağı veya başlangıç planı hazırla.';
+
+  @override
+  String get skyMoonPhaseFirstQuarterPrompt =>
+      'Planı uygulamaya koy; karşılaştığın engeli belirle ve çözmek için tek bir somut iş seç.';
+
+  @override
+  String get skyMoonPhaseGibbousPrompt =>
+      'Başvuru, sunum veya alışveriş öncesi ayrıntıları, bütçeyi ve eksikleri gözden geçir.';
+
+  @override
+  String get skyMoonPhaseFullPrompt =>
+      'Tamamlanan işi görünür kıl, sonucu değerlendir ve önemli konuşmalara zaman ayır.';
+
+  @override
+  String get skyMoonPhaseWaningGibbousPrompt =>
+      'Öğrendiklerini paylaş, teslimleri tamamla ve işe yarayan yöntemi not et.';
+
+  @override
+  String get skyMoonPhaseLastQuarterPrompt =>
+      'Açık işleri kapat, gereksiz harcamaları ve dağınıklığı azalt; yeni yük ekleme.';
+
+  @override
+  String get skyMoonPhaseWaningCrescentPrompt =>
+      'Dinlenmeye ve toparlanmaya yer aç; bir sonraki döngü için sade bir öncelik belirle.';
+
+  @override
+  String get skyMoonGuideNote =>
+      'Faz önerileri ve menzil anlamları geleneksel astrolojiden esinlenen planlama notlarıdır; kesin sonuç veya olay tahmini değildir.';
 
   @override
   String get planFreeDisabled8 => 'Ay Takvimi ve günlük yorum';
@@ -3328,7 +3424,130 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get proLockTimingBody =>
-      'Ay boşta (VOC) dönemleri ve saç kesimi, imza, düğün, taşınma için doğru zaman pencereleri Pro\'da.';
+      'Ay boşlukları (VOC) ve saç uzatma/gürleştirme, ticaret, eğitim, imza, düğün, taşınma ve ekim için uygun zaman pencereleri Pro\'da.';
+
+  @override
+  String get skyRetroTitle => 'Retro Takvimi';
+
+  @override
+  String get proLockRetroBody =>
+      'Önümüzdeki 12 ayın retro/direkt durakları, gölge tarihleri ve gezegene özel gözden geçirme önerileri Pro\'da.';
+
+  @override
+  String get skyRetroShadowStart => 'Gölge başlangıcı';
+
+  @override
+  String get skyRetroStarts => 'Retro başlıyor';
+
+  @override
+  String get skyRetroDirectStation => 'Direkt durak';
+
+  @override
+  String get skyRetroShadowEnd => 'Gölge bitişi';
+
+  @override
+  String get skyRetroActive => 'Şu an retro';
+
+  @override
+  String get skyRetroShadowActive => 'Gölge döneminde';
+
+  @override
+  String get skyRetroUpcoming => 'Yaklaşıyor';
+
+  @override
+  String get skyRetroEmpty => 'Bu aralıkta listelenecek retro dönemi yok.';
+
+  @override
+  String get skyRetroNote =>
+      'Astrolojik gelenekte retro dönemleri gözden geçirme zamanı sayılır; bu yorumlar kesin olay veya sonuç vaadi değildir.';
+
+  @override
+  String skyRetroStationInSign(String degree, String sign) {
+    return 'Durağan derece: $degree° $sign';
+  }
+
+  @override
+  String get skyRetroReviewDefault =>
+      'Planlarını gözden geçir; önemli kararları kendi koşulların ve somut bilgilerle değerlendir.';
+
+  @override
+  String get skyRetroReviewMercury =>
+      'Mesajları, randevuları ve sözleşme ayrıntılarını yeniden kontrol et; önemli dosyaları yedekle.';
+
+  @override
+  String get skyRetroReviewVenus =>
+      'İlişkilerde beklentileri ve harcamaları gözden geçir; acele karar vermek zorunda değilsin.';
+
+  @override
+  String get skyRetroReviewMars =>
+      'Hedefini ve yöntemini gözden geçir; enerjini tek bir işe ver, gereksiz restleşmeleri azalt.';
+
+  @override
+  String get skyRetroReviewJupiter =>
+      'Eğitim, seyahat veya büyüme planlarını yeniden değerlendir; ayrıntıları ve bütçeyi kontrol et.';
+
+  @override
+  String get skyRetroReviewSaturn =>
+      'Sorumlulukları ve uzun vadeli planı gözden geçir; sürdürülemeyen yükleri düzenle.';
+
+  @override
+  String get skyRetroReviewUranus =>
+      'Teknoloji ve ekipman planlarını gözden geçir; önemli işler için yedek plan hazırla.';
+
+  @override
+  String get skyRetroReviewNeptune =>
+      'Beklentileri ve sınırları netleştir; varsayım yerine teyit kullan.';
+
+  @override
+  String get skyRetroReviewPluto =>
+      'Paylaşılan kaynakları ve kontrol alanlarını gözden geçir; değişim planlarını aceleye getirme.';
+
+  @override
+  String get skyEclipseGuideTitle => 'Tutulma Rehberi';
+
+  @override
+  String get proLockEclipseBody =>
+      'Tutulmanın yerel evreleri, Saros döngüsü ve kendi doğum haritandaki ev/açı temaslarıyla kişisel rehber Pro\'da.';
+
+  @override
+  String skyEclipseLocalWindow(String start, String end) {
+    return 'Yerel evreler: $start – $end';
+  }
+
+  @override
+  String skyEclipseSaros(String series, String member) {
+    return 'Saros $series · çevrim $member';
+  }
+
+  @override
+  String get skyEclipseReflectionSolar =>
+      'Geleneksel astrolojide Güneş tutulması başlangıçlar ve görünür rolle ilişkilendirilir. Hedefini, rolünü ve atmak istediğin adımı somut bilgilerle gözden geçir.';
+
+  @override
+  String get skyEclipseReflectionLunar =>
+      'Geleneksel astrolojide Ay tutulması tamamlanma ve duygusal alışkanlıkları gözden geçirmeyle ilişkilendirilir. Kapanması veya yeniden düzenlenmesi gereken bir konuyu belirle.';
+
+  @override
+  String get skyEclipseReflectionNote =>
+      'Bu, astrolojik bir öz değerlendirme önerisidir; kişisel olay tahmini veya kesin sonuç vaadi değildir.';
+
+  @override
+  String get skyEclipseBirthDataNeeded =>
+      'Kişisel ev ve açı temaslarını görmek için kendi doğum tarihi, kesin saati ve doğum yeri profilinde kayıtlı olmalı. Başkasının kayıtlı haritası kullanılmaz.';
+
+  @override
+  String skyEclipseHouseImpact(String house, String theme) {
+    return 'Kendi haritanda $house. ev ($theme): Bu alanda gözden geçirebileceğin tek bir somut hedef veya işi seç.';
+  }
+
+  @override
+  String skyEclipsePersonalAspectLine(
+    String aspect,
+    String planet,
+    String orb,
+  ) {
+    return 'Tutulma · $aspect · natal $planet · orb $orb°';
+  }
 
   @override
   String get skyActivityTrade => 'Ticaret';

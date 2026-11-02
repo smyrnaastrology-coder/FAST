@@ -6748,6 +6748,121 @@ def _sky_retro(jd):
     return out
 
 
+def _sky_station(pid, jd_start, jd_end, retro):
+    """Gezegen hızının işaret değiştirdiği durağan anı hassaslaştırır."""
+    step = 1.0
+    a = jd_start
+    _d, speed_a = _sky_pos(a, pid)
+    while a < jd_end:
+        b = min(a + step, jd_end)
+        _d, speed_b = _sky_pos(b, pid)
+        crossed = (speed_a > 0 >= speed_b) if retro else (speed_a < 0 <= speed_b)
+        if crossed:
+            lo, hi = a, b
+            for _ in range(36):
+                mid = (lo + hi) / 2.0
+                _md, speed_mid = _sky_pos(mid, pid)
+                if retro:
+                    if speed_mid > 0:
+                        lo = mid
+                    else:
+                        hi = mid
+                else:
+                    if speed_mid < 0:
+                        lo = mid
+                    else:
+                        hi = mid
+            return (lo + hi) / 2.0
+        a, speed_a = b, speed_b
+    return None
+
+
+def _sky_longitude_crossing(pid, target, jd_start, jd_end):
+    """Boylamın hedef dereceyi geçtiği an; gölge sınırı için kullanılır."""
+    step = 0.5
+    a = jd_start
+    da, _ = _sky_pos(a, pid)
+    fa = _sky_wrap180(da - target)
+    while a < jd_end:
+        b = min(a + step, jd_end)
+        db, _ = _sky_pos(b, pid)
+        fb = _sky_wrap180(db - target)
+        if fa == 0 or (fa * fb < 0 and abs(fa - fb) < 10.0):
+            lo, hi = a, b
+            flo = fa
+            for _ in range(36):
+                mid = (lo + hi) / 2.0
+                dm, _ = _sky_pos(mid, pid)
+                fm = _sky_wrap180(dm - target)
+                if flo * fm <= 0:
+                    hi = mid
+                else:
+                    lo, flo = mid, fm
+            return (lo + hi) / 2.0
+        a, fa = b, fb
+    return None
+
+
+def _sky_retro_periods(jd_now, jd_limit):
+    """Retro başlangıç/direkt durak ve gerçek boylamdan bulunan gölgeler."""
+    periods = []
+    # Bir yıl içindeki retro dönemlerin gölge başlangıçlarını ve şu an sürmekte
+    # olan döngüleri yakalamak için aralığın iki yanında yeterli pay bırak.
+    scan_start = jd_now - 180.0
+    scan_end = jd_limit + 185.0
+    for name, pid in _SKY_RETRO:
+        stations = []
+        cursor = scan_start
+        while cursor < scan_end:
+            retro_at = _sky_station(pid, cursor, scan_end, retro=True)
+            if retro_at is None:
+                break
+            stations.append((retro_at, True))
+            direct_at = _sky_station(pid, retro_at + 0.01, scan_end, retro=False)
+            if direct_at is None:
+                break
+            stations.append((direct_at, False))
+            cursor = direct_at + 0.01
+
+        retros = [t for t, is_retro in stations if is_retro]
+        directs = [t for t, is_retro in stations if not is_retro]
+        for retro_at in retros:
+            direct_at = next((t for t in directs if t > retro_at), None)
+            if direct_at is None:
+                continue
+            rd, _ = _sky_pos(retro_at, pid)
+            dd, _ = _sky_pos(direct_at, pid)
+            # Pre-shadow: retro sonrasında direkt durakta tamamlanacak dereceye
+            # ilk kez geliş. Post-shadow: retro başlangıç derecesini direkt
+            # hareketle yeniden geçiş. İki istasyon derecesi ters kullanılır.
+            pre_shadow = _sky_longitude_crossing(
+                pid, dd, retro_at - 180.0, retro_at - 0.05
+            )
+            post_shadow = _sky_longitude_crossing(
+                pid, rd, direct_at + 0.05, direct_at + 185.0
+            )
+            if post_shadow is not None and post_shadow < jd_now:
+                continue
+            if pre_shadow is not None and pre_shadow > jd_limit:
+                continue
+            periods.append({
+                "gezegen": name,
+                "golge_baslangic": _sky_epoch(pre_shadow) if pre_shadow else None,
+                "retro_baslangic": _sky_epoch(retro_at),
+                "direkt_durak": _sky_epoch(direct_at),
+                "golge_bitis": _sky_epoch(post_shadow) if post_shadow else None,
+                "retro_burcu": int(rd // 30),
+                "retro_derece": round(rd % 30, 2),
+                "aktif": retro_at <= jd_now < direct_at,
+                "golgede": (
+                    pre_shadow is not None and post_shadow is not None
+                    and pre_shadow <= jd_now < post_shadow
+                ),
+            })
+    periods.sort(key=lambda p: (p["golge_baslangic"] or p["retro_baslangic"], p["gezegen"]))
+    return periods
+
+
 @app_fast.get("/api/sky")
 def sky(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float] = None):
     """Anlık gökyüzü: Ay burcu/derecesi/hızı, faz, VOC, gezegen saati."""
@@ -6854,7 +6969,12 @@ def _sky_next_lunation(jd_start, target):
 
 def _sky_phase_events(jd_now):
     events = []
-    for target, tip in ((0.0, "new_moon"), (180.0, "full_moon")):
+    for target, tip in (
+        (0.0, "new_moon"),
+        (90.0, "first_quarter"),
+        (180.0, "full_moon"),
+        (270.0, "last_quarter"),
+    ):
         jd = jd_now
         for _ in range(3):
             e = _sky_next_lunation(jd, target)
@@ -6918,7 +7038,12 @@ def _sky_eclipse_local(jd_start, lat, lon, solar):
                 jd_start, (float(lon), float(lat), 0.0), swe.FLG_MOSEPH
             )
         if tret and tret[0] > 0:
-            return int(flag), float(tret[0]), tuple(float(x) for x in attr)
+            return (
+                int(flag),
+                float(tret[0]),
+                tuple(float(x) for x in tret),
+                tuple(float(x) for x in attr),
+            )
     except Exception:
         pass
     return None
@@ -6945,7 +7070,7 @@ def _sky_local_visible_summary(jd_now, lat, lon, solar):
     local = _sky_eclipse_local(jd_now, lat, lon, solar)
     if not local:
         return None
-    flag, t, attr = local
+    flag, t, tret, attr = local
     if t <= jd_now:
         return None
     ob, mag = _sky_eclipse_numbers(solar, attr)
@@ -6957,6 +7082,13 @@ def _sky_local_visible_summary(jd_now, lat, lon, solar):
         "gunes": _sky_body(t, swe.SUN),
         "ortulme": ob,
         "buyukluk": mag,
+        "yerel_baslangic": _sky_epoch(tret[6] if not solar else tret[1])
+        if (tret[6] if not solar else tret[1]) > 0 else None,
+        "yerel_maksimum": _sky_epoch(tret[0]),
+        "yerel_bitis": _sky_epoch(tret[7] if not solar else tret[4])
+        if (tret[7] if not solar else tret[4]) > 0 else None,
+        "saros": int(attr[9]) if len(attr) > 9 and attr[9] >= 0 else None,
+        "saros_uyesi": int(attr[10]) if len(attr) > 10 and attr[10] >= 0 else None,
     }
 
 
@@ -6972,14 +7104,33 @@ def _sky_eclipse_event(jd_now, lat, lon, solar):
         "yerel_tip": None,
         "ortulme": None,
         "buyukluk": None,
+        "yerel_baslangic": None,
+        "yerel_maksimum": None,
+        "yerel_bitis": None,
+        "saros": None,
+        "saros_uyesi": None,
         "sonraki_gorunur": None,
     }
     if visible:
-        lflag, _lt, lattr = local
+        lflag, _lt, ltret, lattr = local
         ob, mag = _sky_eclipse_numbers(solar, lattr)
         visibility["yerel_tip"] = _sky_eclipse_type(lflag, solar)
         visibility["ortulme"] = ob
         visibility["buyukluk"] = mag
+        start_idx, end_idx = (1, 4) if solar else (6, 7)
+        visibility["yerel_baslangic"] = (
+            _sky_epoch(ltret[start_idx]) if ltret[start_idx] > 0 else None
+        )
+        visibility["yerel_maksimum"] = _sky_epoch(ltret[0])
+        visibility["yerel_bitis"] = (
+            _sky_epoch(ltret[end_idx]) if ltret[end_idx] > 0 else None
+        )
+        visibility["saros"] = (
+            int(lattr[9]) if len(lattr) > 9 and lattr[9] >= 0 else None
+        )
+        visibility["saros_uyesi"] = (
+            int(lattr[10]) if len(lattr) > 10 and lattr[10] >= 0 else None
+        )
     else:
         visibility["sonraki_gorunur"] = _sky_local_visible_summary(
             jd_now, lat, lon, solar
@@ -7033,6 +7184,203 @@ def sky_calendar(lat: float = 41.0082, lon: float = 28.9784, tz: Optional[float]
         _SKY_CAL_CACHE.clear()
     _SKY_CAL_CACHE[cache_key] = sonuc
     return sonuc
+
+
+# ── Retrograde calendar: stations and ephemeris-derived shadow periods ───
+_SKY_RETRO_CAL_CACHE = {}
+
+
+@app_fast.get("/api/sky/retro-calendar")
+def sky_retro_calendar(days: int = 365):
+    """Gezegenlerin retro/direkt durakları ve boylamdan bulunan gölgeleri."""
+    days = max(30, min(730, int(days)))
+    cache_key = (int(time.time() // 21600), days)
+    cached = _SKY_RETRO_CAL_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe'
+    )
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    now = datetime.utcnow()
+    jd_now = swe.julday(
+        now.year, now.month, now.day,
+        now.hour + now.minute / 60.0 + now.second / 3600.0,
+    )
+    periods = _sky_retro_periods(jd_now, jd_now + days)
+    result = {
+        "ok": True,
+        "sunucu_zamani": _sky_epoch(jd_now),
+        "gun": days,
+        "donemler": periods,
+    }
+    if len(_SKY_RETRO_CAL_CACHE) > 32:
+        _SKY_RETRO_CAL_CACHE.clear()
+    _SKY_RETRO_CAL_CACHE[cache_key] = result
+    return result
+
+
+# ── Ay Rehberi: 8 faz aralığı + Lahiri sidereal 28 eşit menzil ──────────
+_SKY_MANSION_CACHE = {}
+_SKY_MANSION_WIDTH = 360.0 / 28.0
+_SKY_PHASE_NAMES = [
+    "new", "waxing_crescent", "first_quarter", "waxing_gibbous",
+    "full", "waning_gibbous", "last_quarter", "waning_crescent",
+]
+
+
+def _sky_sidereal_moon(jd):
+    """Swiss Ephemeris, Lahiri ayanamsa; 28 eşit menzil hesabı için."""
+    swe.set_sid_mode(swe.SIDM_LAHIRI)
+    flags = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
+    try:
+        arr, _ = swe.calc_ut(jd, swe.MOON, flags)
+    except Exception:
+        arr, _ = swe.calc_ut(
+            jd, swe.MOON, swe.FLG_MOSEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
+        )
+    return float(arr[0]) % 360.0, float(arr[3]) if len(arr) > 3 else 0.0
+
+
+def _sky_mansion_index(jd):
+    lon, _speed = _sky_sidereal_moon(jd)
+    return int(lon / _SKY_MANSION_WIDTH)
+
+
+def _sky_mansion_next_change(jd_start):
+    current = _sky_mansion_index(jd_start)
+    lo = jd_start
+    hi = jd_start
+    for _ in range(80):
+        hi += 0.125  # 3 saatlik örnekleme; Ay bir menzilde yaklaşık bir gün kalır.
+        if _sky_mansion_index(hi) != current:
+            break
+        lo = hi
+    else:
+        return None
+    for _ in range(40):
+        mid = (lo + hi) / 2.0
+        if _sky_mansion_index(mid) == current:
+            lo = mid
+        else:
+            hi = mid
+    return hi
+
+
+def _sky_mansion_previous_change(jd_now):
+    current = _sky_mansion_index(jd_now)
+    hi = jd_now
+    lo = jd_now
+    for _ in range(80):
+        lo -= 0.125
+        if _sky_mansion_index(lo) != current:
+            break
+        hi = lo
+    else:
+        return None
+    # lo eski menzilde, hi mevcut menzilde kalacak şekilde daralt.
+    for _ in range(40):
+        mid = (lo + hi) / 2.0
+        if _sky_mansion_index(mid) == current:
+            hi = mid
+        else:
+            lo = mid
+    return hi
+
+
+def _sky_phase_state(jd_now):
+    import math
+    sun, _ = _sky_pos(jd_now, swe.SUN)
+    moon, _ = _sky_pos(jd_now, swe.MOON)
+    elong = (moon - sun) % 360.0
+    idx = int(((elong + 22.5) % 360.0) // 45.0)
+    # _sky phase buckets are centered on 0/45/90... degrees, so boundaries
+    # are at -22.5 + 45*n (not at the phase centers themselves).
+    start_angle = (-22.5 + idx * 45.0) % 360.0
+    end_angle = (start_angle + 45.0) % 360.0
+
+    previous = None
+    cursor = jd_now - 70.0
+    for _ in range(4):
+        crossing = _sky_next_lunation(cursor, start_angle)
+        if crossing is None or crossing >= jd_now:
+            break
+        previous = crossing
+        cursor = crossing + 0.01
+    next_change = _sky_next_lunation(jd_now, end_angle)
+    illumination = (1.0 - math.cos(math.radians(elong))) * 50.0
+    return {
+        "faz": _SKY_PHASE_NAMES[idx],
+        "aydinlanma": round(illumination, 1),
+        "buyuyor": elong < 180.0,
+        "baslangic": _sky_epoch(previous) if previous is not None else None,
+        "bitis": _sky_epoch(next_change) if next_change is not None else None,
+    }
+
+
+@app_fast.get("/api/sky/moon-guide")
+def sky_moon_guide(days: int = 30):
+    """Ay faz rehberi ve Lahiri başlangıçlı eşit 28 menzil geçişleri."""
+    days = max(1, min(60, int(days)))
+    cache_key = (int(time.time() // 300), days)
+    cached = _SKY_MANSION_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe'
+    )
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+    now = datetime.utcnow()
+    jd_now = swe.julday(
+        now.year, now.month, now.day,
+        now.hour + now.minute / 60.0 + now.second / 3600.0,
+    )
+    sidereal_lon, _speed = _sky_sidereal_moon(jd_now)
+    mansion_idx = int(sidereal_lon / _SKY_MANSION_WIDTH)
+    mansion_start = _sky_mansion_previous_change(jd_now)
+    mansion_end = _sky_mansion_next_change(jd_now)
+
+    transitions = []
+    cursor = jd_now
+    jd_limit = jd_now + days
+    for _ in range(days + 2):
+        crossing = _sky_mansion_next_change(cursor)
+        if crossing is None or crossing > jd_limit:
+            break
+        new_idx = _sky_mansion_index(crossing + 1e-6)
+        transitions.append({
+            "zaman": _sky_epoch(crossing),
+            "menzil": new_idx + 1,
+        })
+        cursor = crossing + 1e-5
+
+    result = {
+        "ok": True,
+        "sunucu_zamani": _sky_epoch(jd_now),
+        "gun": days,
+        "menzil_modeli": "lahiri_equal_28",
+        "menzil": {
+            "sira": mansion_idx + 1,
+            "baslangic": _sky_epoch(mansion_start) if mansion_start else None,
+            "bitis": _sky_epoch(mansion_end) if mansion_end else None,
+            "derece": round(sidereal_lon % _SKY_MANSION_WIDTH, 3),
+            "ilerleme": round(
+                (sidereal_lon % _SKY_MANSION_WIDTH) / _SKY_MANSION_WIDTH * 100.0,
+                1,
+            ),
+        },
+        "faz": _sky_phase_state(jd_now),
+        "menzil_gecisleri": transitions,
+    }
+    if len(_SKY_MANSION_CACHE) > 64:
+        _SKY_MANSION_CACHE.clear()
+    _SKY_MANSION_CACHE[cache_key] = result
+    return result
 
 
 # ── Ay takvimi: burç giriş/çıkış saatleri ───────────────────────────────

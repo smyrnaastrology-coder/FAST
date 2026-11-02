@@ -33,13 +33,13 @@ void main() {
       expect(big.aspectR, closeTo(small.aspectR * 3, 1e-9));
     });
 
-    test('gezegen sembolü çapın ~%2,5-4,5 aralığında kalır', () {
+    test('gezegen sembolü tek haritada okunaklı oranda kalır', () {
       for (final r in [100.0, 160.0, 240.0, 400.0]) {
         final g = ChartWheelGeometry(r, biWheel: false);
         final ratio = g.natalGlyphSize / (2 * r);
         expect(
           ratio,
-          inInclusiveRange(0.024, 0.045),
+          inInclusiveRange(0.030, 0.050),
           reason: 'r=$r oran=$ratio',
         );
       }
@@ -74,6 +74,17 @@ void main() {
       final bi = ChartWheelGeometry(200, biWheel: true);
       expect(bi.natalGlyphR, lessThan(single.natalGlyphR));
       expect(bi.natalGlyphSize, lessThan(single.natalGlyphSize));
+    });
+
+    test('çift çemberde iki gezegen katmanı da büyütülmüş ve ayırt edilir', () {
+      for (final r in [160.0, 240.0, 400.0]) {
+        final g = ChartWheelGeometry(r, biWheel: true);
+        expect(g.natalGlyphSize / (2 * r), greaterThanOrEqualTo(0.030));
+        expect(g.outerGlyphSize / (2 * r), greaterThanOrEqualTo(0.029));
+        expect(g.natalLabelSize, lessThan(g.natalGlyphSize));
+        expect(g.outerLabelSize, lessThan(g.outerGlyphSize));
+        expect(g.isConsistent, isTrue, reason: 'r=$r');
+      }
     });
   });
 

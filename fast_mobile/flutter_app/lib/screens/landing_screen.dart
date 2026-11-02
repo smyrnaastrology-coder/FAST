@@ -76,12 +76,17 @@ class _LandingScreenState extends State<LandingScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final ok = await RevenueCatService.purchase(productId);
     if (!mounted) return;
-    if (ok) ProService.invalidate();
+    if (ok && !widget.asPaywall) ProService.invalidate();
     messenger.showSnackBar(
       SnackBar(
         content: Text(ok ? l10n.subscribeSuccess : l10n.subscribeCancelled),
       ),
     );
+    if (ok && widget.asPaywall) {
+      // ProGate bu sonucu bekler; yalnızca doğrulanmış satın alım true döner.
+      Navigator.of(context).pop(true);
+      return;
+    }
     if (ok) _startAnalysis();
   }
 

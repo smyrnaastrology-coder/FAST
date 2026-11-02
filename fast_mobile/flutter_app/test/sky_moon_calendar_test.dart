@@ -20,12 +20,7 @@ Map<String, dynamic> _skyJson() => {
   'faz': {'isim': 'full', 'aydinlanma': 0.99, 'buyuyor': false},
   'boslukta': false,
   'acilar': [
-    {
-      'gezegen': 'jupiter',
-      'tip': 'trine',
-      'orb': 1.2,
-      'uygulama': true,
-    },
+    {'gezegen': 'jupiter', 'tip': 'trine', 'orb': 1.2, 'uygulama': true},
   ],
   'retrolar': <String>[],
 };
@@ -48,6 +43,42 @@ class _FakeApi extends ApiService {
   @override
   Future<Map<String, dynamic>> skyMoonTiming({int days = 30}) async =>
       _timingJson(DateTime.now());
+
+  @override
+  Future<Map<String, dynamic>> skyRetroCalendar({int days = 365}) async => {
+    'ok': true,
+    'sunucu_zamani': _epoch(DateTime.now()),
+    'gun': days,
+    'donemler': [],
+  };
+
+  @override
+  Future<Map<String, dynamic>> skyMoonGuide({int days = 30}) async => {
+    'ok': true,
+    'sunucu_zamani': _epoch(DateTime.now()),
+    'gun': days,
+    'menzil_modeli': 'lahiri_equal_28',
+    'menzil': {
+      'sira': 1,
+      'baslangic': _epoch(DateTime.now().subtract(const Duration(hours: 12))),
+      'bitis': _epoch(DateTime.now().add(const Duration(hours: 12))),
+      'derece': 4.25,
+      'ilerleme': 33.1,
+    },
+    'faz': {
+      'faz': 'waxing_crescent',
+      'aydinlanma': 28.0,
+      'buyuyor': true,
+      'baslangic': _epoch(DateTime.now().subtract(const Duration(days: 1))),
+      'bitis': _epoch(DateTime.now().add(const Duration(days: 2))),
+    },
+    'menzil_gecisleri': [
+      {
+        'zaman': _epoch(DateTime.now().add(const Duration(hours: 12))),
+        'menzil': 2,
+      },
+    ],
+  };
 
   @override
   Future<Map<String, dynamic>> sky({
@@ -146,6 +177,13 @@ void main() {
     expect(find.text('Sıradaki burç geçişleri'), findsOneWidget);
     expect(find.text('Ay Başak burcuna geçiyor'), findsOneWidget);
     expect(find.text('Ay Terazi burcuna geçiyor'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('Al-Sharatain'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.textContaining('Al-Sharatain'), findsOneWidget);
+    expect(find.textContaining('küçük ve net'), findsOneWidget);
     // VOC + doğru zaman pencereleri kartı (listenin altında olduğu için
     // görünür alana kaydırılır).
     final scrollable = find.byType(Scrollable).first;
@@ -230,6 +268,21 @@ void main() {
     expect(find.textContaining('Ay Aslan burcunda'), findsNothing);
     expect(find.textContaining('Kalan:'), findsNothing);
 
+    await tester.scrollUntilVisible(
+      find.text('Retro Takvimi'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Retro Takvimi'), findsOneWidget);
+    expect(find.text('Pro\'ya Geç'), findsWidgets);
+
+    await tester.scrollUntilVisible(
+      find.text('Ay Rehberi'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Ay Rehberi'), findsOneWidget);
+
     // Temel takvim (ücretsiz) hâlâ çalışır.
     expect(find.text('Gökyüzü Takvimi'), findsOneWidget);
   });
@@ -249,6 +302,14 @@ class _FailingApi extends ApiService {
 
   @override
   Future<Map<String, dynamic>> skyMoonTiming({int days = 30}) async =>
+      throw Exception('not deployed');
+
+  @override
+  Future<Map<String, dynamic>> skyRetroCalendar({int days = 365}) async =>
+      throw Exception('not deployed');
+
+  @override
+  Future<Map<String, dynamic>> skyMoonGuide({int days = 30}) async =>
       throw Exception('not deployed');
 
   @override

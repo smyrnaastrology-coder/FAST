@@ -3112,7 +3112,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get proFeatureNewSky =>
-      'Moon Calendar, daily sky reading and live Moon countdown';
+      'Moon Calendar, 28 lunar mansions and phase guide, daily reading, VOC and practical timing windows; retrograde calendar and personal eclipse chart contacts';
+
+  @override
+  String get skyMoonGuideTitle => 'Moon Guide';
+
+  @override
+  String get proLockMoonGuideBody =>
+      'The 28 lunar mansions, the meaning of the current phase and practical reflection/action prompts are available with Pro.';
+
+  @override
+  String get skyMoonPhaseLabel => 'Moon phase';
+
+  @override
+  String get skyMoonMansionLabel => 'Lunar mansion';
+
+  @override
+  String get skyMoonPhaseEndsAt => 'Current phase ends';
+
+  @override
+  String get skyMoonMansionLeavesAt => 'Mansion changes';
+
+  @override
+  String skyMoonMansionNumber(String number) {
+    return 'Mansion $number';
+  }
+
+  @override
+  String skyMoonMansionProgress(String progress) {
+    return 'Mansion progress: $progress%';
+  }
+
+  @override
+  String get skyMoonMansionNext => 'Upcoming mansions';
+
+  @override
+  String get skyMoonMansionMethodNote =>
+      'Calculation: 28 equal sectors from the Lahiri sidereal starting point (12°51′26″ each). This is not identical to historical boundaries defined star by star; the descriptions are traditional-inspired reflection prompts.';
+
+  @override
+  String get skyMoonPhaseNewTitle => 'New Moon';
+
+  @override
+  String get skyMoonPhaseCrescentTitle => 'Waxing Crescent';
+
+  @override
+  String get skyMoonPhaseFirstQuarterTitle => 'First Quarter';
+
+  @override
+  String get skyMoonPhaseGibbousTitle => 'Waxing Gibbous';
+
+  @override
+  String get skyMoonPhaseFullTitle => 'Full Moon';
+
+  @override
+  String get skyMoonPhaseWaningGibbousTitle => 'Waning Gibbous';
+
+  @override
+  String get skyMoonPhaseLastQuarterTitle => 'Last Quarter';
+
+  @override
+  String get skyMoonPhaseWaningCrescentTitle => 'Waning Crescent';
+
+  @override
+  String get skyMoonPhaseNewPrompt =>
+      'Choose a goal; today, define just its first small step and put it on your calendar.';
+
+  @override
+  String get skyMoonPhaseCrescentPrompt =>
+      'Keep a new habit small: prepare a short lesson, application draft or starter plan.';
+
+  @override
+  String get skyMoonPhaseFirstQuarterPrompt =>
+      'Put the plan into action; name one obstacle and choose a concrete step to address it.';
+
+  @override
+  String get skyMoonPhaseGibbousPrompt =>
+      'Before an application, presentation or purchase, review details, budget and missing items.';
+
+  @override
+  String get skyMoonPhaseFullPrompt =>
+      'Show completed work, assess the result and make time for important conversations.';
+
+  @override
+  String get skyMoonPhaseWaningGibbousPrompt =>
+      'Share what you learned, finish deliverables and note which method worked.';
+
+  @override
+  String get skyMoonPhaseLastQuarterPrompt =>
+      'Close open tasks, reduce unnecessary spending and clutter; avoid adding new commitments.';
+
+  @override
+  String get skyMoonPhaseWaningCrescentPrompt =>
+      'Make room to rest and reset; choose one simple priority for the next cycle.';
+
+  @override
+  String get skyMoonGuideNote =>
+      'Phase and mansion prompts are planning notes inspired by traditional astrology, not guaranteed outcomes or event predictions.';
 
   @override
   String get planFreeDisabled8 => 'Moon Calendar and daily reading';
@@ -3343,7 +3439,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get proLockTimingBody =>
-      'Moon void-of-course periods and right timing windows for haircuts, contracts, weddings and moving are available with Pro.';
+      'Moon void-of-course (VOC) periods and suitable timing windows for hair growth/thickness, trade, education, contracts, weddings, moving and planting are available with Pro.';
+
+  @override
+  String get skyRetroTitle => 'Retrograde Calendar';
+
+  @override
+  String get proLockRetroBody =>
+      'The next 12 months of retrograde/direct stations, shadow dates and planet-specific review prompts are available with Pro.';
+
+  @override
+  String get skyRetroShadowStart => 'Shadow begins';
+
+  @override
+  String get skyRetroStarts => 'Retrograde begins';
+
+  @override
+  String get skyRetroDirectStation => 'Direct station';
+
+  @override
+  String get skyRetroShadowEnd => 'Shadow ends';
+
+  @override
+  String get skyRetroActive => 'Retrograde now';
+
+  @override
+  String get skyRetroShadowActive => 'In shadow period';
+
+  @override
+  String get skyRetroUpcoming => 'Upcoming';
+
+  @override
+  String get skyRetroEmpty => 'No retrograde period to show in this range.';
+
+  @override
+  String get skyRetroNote =>
+      'In astrological tradition, retrograde periods are a time to review. These interpretations do not promise specific events or outcomes.';
+
+  @override
+  String skyRetroStationInSign(String degree, String sign) {
+    return 'Station degree: $degree° $sign';
+  }
+
+  @override
+  String get skyRetroReviewDefault =>
+      'Review your plans and weigh important decisions against your circumstances and concrete information.';
+
+  @override
+  String get skyRetroReviewMercury =>
+      'Double-check messages, appointments and contract details; back up important files.';
+
+  @override
+  String get skyRetroReviewVenus =>
+      'Revisit relationship expectations and spending; you do not have to rush a decision.';
+
+  @override
+  String get skyRetroReviewMars =>
+      'Review your goal and approach; focus your energy and avoid unnecessary confrontations.';
+
+  @override
+  String get skyRetroReviewJupiter =>
+      'Reassess learning, travel or growth plans; check the details and budget.';
+
+  @override
+  String get skyRetroReviewSaturn =>
+      'Review responsibilities and long-term plans; reorganize commitments that are no longer sustainable.';
+
+  @override
+  String get skyRetroReviewUranus =>
+      'Review technology and equipment plans; keep a backup plan for important tasks.';
+
+  @override
+  String get skyRetroReviewNeptune =>
+      'Clarify expectations and boundaries; verify rather than assume.';
+
+  @override
+  String get skyRetroReviewPluto =>
+      'Review shared resources and control dynamics; do not rush major change plans.';
+
+  @override
+  String get skyEclipseGuideTitle => 'Eclipse Guide';
+
+  @override
+  String get proLockEclipseBody =>
+      'Local eclipse contacts, the Saros cycle and personal house/aspect contacts to your own natal chart are available with Pro.';
+
+  @override
+  String skyEclipseLocalWindow(String start, String end) {
+    return 'Local phases: $start – $end';
+  }
+
+  @override
+  String skyEclipseSaros(String series, String member) {
+    return 'Saros $series · member $member';
+  }
+
+  @override
+  String get skyEclipseReflectionSolar =>
+      'In traditional astrology, solar eclipses are associated with beginnings and visibility. Review a goal, role or next step using concrete information.';
+
+  @override
+  String get skyEclipseReflectionLunar =>
+      'In traditional astrology, lunar eclipses are associated with culmination and reviewing emotional habits. Identify something to complete or reorganize.';
+
+  @override
+  String get skyEclipseReflectionNote =>
+      'This is an astrological reflection prompt, not a personal event forecast or a promise of a specific outcome.';
+
+  @override
+  String get skyEclipseBirthDataNeeded =>
+      'To show personal house and aspect contacts, save your own birth date, exact time and birthplace in your profile. Another person\'s saved chart is never used.';
+
+  @override
+  String skyEclipseHouseImpact(String house, String theme) {
+    return 'In your natal chart, house $house ($theme): choose one concrete goal or task in this area to review.';
+  }
+
+  @override
+  String skyEclipsePersonalAspectLine(
+    String aspect,
+    String planet,
+    String orb,
+  ) {
+    return 'Eclipse · $aspect · natal $planet · orb $orb°';
+  }
 
   @override
   String get skyActivityTrade => 'Trade';

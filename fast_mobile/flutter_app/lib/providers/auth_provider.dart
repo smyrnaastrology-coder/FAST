@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/pro_service.dart';
 
 /// Üyelik durumunu takip eden ChangeNotifier.
 enum AuthStatus { unknown, signedOut, signedIn }
 
 class AuthProvider extends ChangeNotifier {
   AuthStatus _status = AuthStatus.unknown;
+  String _observedUserId = '';
   String? _error;
   bool _busy = false;
 
@@ -23,12 +25,21 @@ class AuthProvider extends ChangeNotifier {
   /// Uygulama açılışında çağrılır.
   Future<void> restore() async {
     AuthService.onSessionChanged = () {
+      _invalidateIfIdentityChanged();
       _status = AuthService.isLoggedIn ? AuthStatus.signedIn : AuthStatus.signedOut;
       notifyListeners();
     };
     await AuthService.init();
+    _invalidateIfIdentityChanged();
     _status = AuthService.isLoggedIn ? AuthStatus.signedIn : AuthStatus.signedOut;
     notifyListeners();
+  }
+
+  void _invalidateIfIdentityChanged() {
+    final userId = AuthService.userId;
+    if (userId == _observedUserId) return;
+    _observedUserId = userId;
+    ProService.invalidate();
   }
 
   Future<bool> _run(Future<void> Function() action) async {
@@ -81,6 +92,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     await AuthService.signOut();
+    _invalidateIfIdentityChanged();
     _status = AuthStatus.signedOut;
     _error = null;
     notifyListeners();

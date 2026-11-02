@@ -27,6 +27,9 @@ class ProGate extends StatefulWidget {
   /// Testlerde Pro durumunu dışarıdan vermek için.
   final Future<bool> Function()? statusLoader;
 
+  /// Testlerde paywall dönüşünü/satın alma sonucunu taklit etmek için.
+  final Future<bool?> Function()? paywallOpener;
+
   const ProGate({
     super.key,
     required this.child,
@@ -35,6 +38,7 @@ class ProGate extends StatefulWidget {
     required this.body,
     this.section = false,
     this.statusLoader,
+    this.paywallOpener,
   });
 
   @override
@@ -43,14 +47,29 @@ class ProGate extends StatefulWidget {
 
 class _ProGateState extends State<ProGate> {
   bool? _pro;
+  int _checkVersion = 0;
 
   @override
   void initState() {
     super.initState();
+    ProService.revision.addListener(_onProInvalidated);
+    _check();
+  }
+
+  @override
+  void dispose() {
+    ProService.revision.removeListener(_onProInvalidated);
+    super.dispose();
+  }
+
+  void _onProInvalidated() {
+    if (!mounted) return;
+    setState(() => _pro = null);
     _check();
   }
 
   Future<void> _check({bool refresh = false}) async {
+    final request = ++_checkVersion;
     final loader = widget.statusLoader;
     bool pro;
     try {
@@ -60,16 +79,26 @@ class _ProGateState extends State<ProGate> {
     } catch (_) {
       pro = false;
     }
-    if (mounted) setState(() => _pro = pro);
+    if (mounted && request == _checkVersion) setState(() => _pro = pro);
   }
 
   Future<void> _openPaywall() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const LandingScreen(asPaywall: true)),
-    );
+    final purchased = widget.paywallOpener != null
+        ? await widget.paywallOpener!()
+        : await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => const LandingScreen(asPaywall: true),
+            ),
+          );
     if (!mounted) return;
-    // Satın alma paywall içinde tamamlanmış olabilir; önbelleği tazele.
-    ProService.invalidate();
+    // Geri/iptal dönüşü hiçbir zaman içeriği açmamalı. Paywall yalnızca
+    // doğrulanmış Pro satın alımında true döndürür.
+    if (purchased != true) {
+      setState(() => _pro = false);
+      return;
+    }
+    // Satın alma paywall içinde tamamlandı; yetkiyi mağazadan yeniden doğrula.
+    ProService.invalidate(notify: false);
     await _check(refresh: true);
   }
 

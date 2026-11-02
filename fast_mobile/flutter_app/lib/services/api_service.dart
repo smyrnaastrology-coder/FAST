@@ -173,4 +173,20 @@ class ApiService {
       timeout: const Duration(seconds: 20),
     );
   }
+
+  /// Gezegen retrosu, durağan anlar ve gölge dönemleri.
+  Future<Map<String, dynamic>> skyRetroCalendar({int days = 365}) {
+    return _get(
+      '${ApiConfig.skyRetroCalendar}?days=$days',
+      timeout: const Duration(seconds: 30),
+    );
+  }
+
+  /// Ay'ın faz aralığı ve 28 eşit menzildeki geçişleri.
+  Future<Map<String, dynamic>> skyMoonGuide({int days = 30}) {
+    return _get(
+      '${ApiConfig.skyMoonGuide}?days=$days',
+      timeout: const Duration(seconds: 25),
+    );
+  }
 }

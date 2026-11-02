@@ -14,6 +14,8 @@ class ChartService {
 
   ChartService({http.Client? client}) : _client = client ?? http.Client();
 
+  void dispose() => _client.close();
+
   Future<ChartData> natal({
     required String tarih,
     required String saat,
@@ -217,8 +219,8 @@ class ChartService {
             'target_date': targetDate,
             'method': method,
             'target_time': time,
-            if (lat != null) 'lat': lat,
-            if (lon != null) 'lon': lon,
+            'lat': ?lat,
+            'lon': ?lon,
             if (place != null && place.isNotEmpty) 'sehir': place,
           }),
         )

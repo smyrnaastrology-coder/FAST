@@ -306,9 +306,29 @@ class _WheelPainter extends CustomPainter {
     double size, {
     double ascLon = 0,
     FontWeight weight = FontWeight.w600,
+    Color? haloColor,
   }) {
     final tp = _tp(text, color, size, weight: weight);
     final p = _pos(lon, radius, center, ascLon);
+    if (haloColor != null) {
+      final outline = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: _baseStyle(haloColor, size).copyWith(
+            foreground: Paint()
+              ..color = haloColor
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = size * 0.075
+              ..strokeJoin = StrokeJoin.round,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      outline.paint(
+        canvas,
+        p - Offset(outline.width / 2, outline.height / 2),
+      );
+    }
     tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));
   }
 
@@ -396,7 +416,7 @@ class _WheelPainter extends CustomPainter {
         _signColor(i),
         glyphSize,
         ascLon: ascLon,
-        weight: FontWeight.w400,
+        weight: FontWeight.w600,
       );
     }
   }
@@ -411,7 +431,10 @@ class _WheelPainter extends CustomPainter {
   ) {
     final outer = outerPlanets;
     if (outer == null || outer.isEmpty) return;
-    final base = stroke * 0.8;
+    // Bi-wheel'de açı çizgileri merkezde üst üste gelir. Daha büyük
+    // sembollere alan açmak ve açı ağının haritayı bastırmasını önlemek için
+    // çapraz (natal-transit) açıları natal açı çizgilerinden daha hafif çiz.
+    final base = stroke * 0.62;
     for (final o in outer) {
       for (final i in data.planets) {
         var diff = (o.lon - i.lon).abs() % 360;
@@ -421,12 +444,12 @@ class _WheelPainter extends CustomPainter {
           final delta = (diff - entry.value).abs();
           if (delta > transitOrb) continue;
           final color = _transitAspectColor(entry.key);
-          final alpha = (0.34 - delta * 0.11).clamp(0.08, 0.34);
+          final alpha = (0.22 - delta * 0.08).clamp(0.05, 0.22);
           final paint = Paint()
             ..color = color.withValues(alpha: alpha)
             ..strokeWidth =
                 (entry.key == 'trine' || entry.key == 'opposition')
-                ? base * 1.35
+                ? base * 1.20
                 : base;
           canvas.drawLine(
             _pos(i.lon, aspectR, center, ascLon),
@@ -510,15 +533,9 @@ class _WheelPainter extends CustomPainter {
         glyphSize: g.innerSignGlyphSize,
         unit: unit,
       );
-      // İki harita arasındaki ayırıcı çizgi.
-      canvas.drawCircle(
-        center,
-        innerSignOuter,
-        Paint()
-          ..color = _gold.withValues(alpha: 0.35)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = (unit * 0.0065).clamp(0.8, 1.4),
-      );
+      // Çift çemberde zodyak kuşaklarının kendi sınırları iki haritayı
+      // zaten ayırır. Ek altın vurgu çemberi çizilmez; gereksiz bir halka
+      // oluşturarak görseli kalabalıklaştırıyordu.
     }
 
     // --- Ev çizgileri ve numaraları ---
@@ -601,14 +618,19 @@ class _WheelPainter extends CustomPainter {
       }
     }
 
-    canvas.drawCircle(
-      center,
-      aspectR,
-      Paint()
-        ..color = _border.withValues(alpha: 0.35)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = (unit * 0.0050).clamp(0.7, 1.2),
-    );
+    // Tek haritada açı alanını daireyle çerçevele. Bi-wheel'de bu çizgi,
+    // iki zodyak kuşağının dört sınırı ve merkez sınırıyla birlikte gereksiz
+    // yedinci halka etkisi yaratır; açı çizgileri kendi başına yeterli sınırdır.
+    if (!hasOuter) {
+      canvas.drawCircle(
+        center,
+        aspectR,
+        Paint()
+          ..color = _border.withValues(alpha: 0.35)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = (unit * 0.0050).clamp(0.7, 1.2),
+      );
+    }
 
     // --- Merkezdeki boş daire ---
     canvas.drawCircle(
@@ -666,7 +688,8 @@ class _WheelPainter extends CustomPainter {
         color,
         natalGlyphSize,
         ascLon: ascLon,
-        weight: FontWeight.w600,
+        weight: FontWeight.w700,
+        haloColor: style.bandTint,
       );
       final tp = _planetLabel(g.planet, natalLabelSize);
       final p = _pos(g.display, natalLabelR, center, ascLon);
@@ -688,7 +711,10 @@ class _WheelPainter extends CustomPainter {
             1.06,
       );
       for (final g in trans) {
-        final color = _transit;
+        // Aynı gezegen iki halkada da aynı renkte: renk gezegeni, halka ise
+        // natal/transit katmanını anlatır. Tüm transitleri tek renge boyamak
+        // gezegen kimliğini ve sembol ayrımını kaybettiriyordu.
+        final color = _planetColor(g.planet.name);
         _drawLeader(
           canvas,
           center,
@@ -708,7 +734,8 @@ class _WheelPainter extends CustomPainter {
           color,
           transitGlyphSize,
           ascLon: ascLon,
-          weight: FontWeight.w600,
+          weight: FontWeight.w700,
+          haloColor: style.transitTint,
         );
         final tp = _planetLabel(g.planet, transitLabelSize);
         final p = _pos(g.display, outerLabelR, center, ascLon);

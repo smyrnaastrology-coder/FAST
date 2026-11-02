@@ -78,16 +78,22 @@ class ChartWheelGeometry {
       ((innerSignOuter - innerSignInner) * 0.62).clamp(9.0, 19.0);
 
   /// Doğum gezegeni sembolü.
-  double get natalGlyphSize => (r * (biWheel ? 0.046 : 0.058)).clamp(8.0, 22.0);
+  ///
+  /// Çift çemberde semboller daha önce 18–22 px tavanına takılıyor, telefon
+  /// ekranında iki harita birlikteyken okunamayacak kadar küçülüyordu. Hedef,
+  /// sembol çapını harita çapının yaklaşık %3–3,5'i tutmaktır.
+  double get natalGlyphSize =>
+      (r * (biWheel ? 0.062 : 0.070)).clamp(9.0, 30.0);
 
   /// Doğum gezegeni derece/dakika etiketi.
-  double get natalLabelSize => (r * (biWheel ? 0.030 : 0.038)).clamp(5.5, 11.0);
+  double get natalLabelSize =>
+      (r * (biWheel ? 0.036 : 0.042)).clamp(6.5, 14.0);
 
   /// Transit gezegen sembolü.
-  double get outerGlyphSize => (r * 0.042).clamp(8.0, 18.0);
+  double get outerGlyphSize => (r * 0.060).clamp(9.0, 28.0);
 
   /// Transit gezegeni derece/dakika etiketi.
-  double get outerLabelSize => (r * 0.028).clamp(5.5, 9.5);
+  double get outerLabelSize => (r * 0.034).clamp(6.5, 13.0);
 
   /// Ev numarası boyutu.
   double get houseNumSize => (r * 0.033).clamp(7.5, 14.0);

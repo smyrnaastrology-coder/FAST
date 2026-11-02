@@ -84,6 +84,12 @@ class ApiConfig {
   // Ay boşta (VOC) dönemleri ve doğru zaman pencereleri
   static const String skyMoonTiming = '$baseUrl/api/sky/moon-timing';
 
+  // Retro başlangıcı/direkt durak ve efemeristen hesaplanan gölge tarihleri
+  static const String skyRetroCalendar = '$baseUrl/api/sky/retro-calendar';
+
+  // Ay'ın faz rehberi ve Lahiri başlangıçlı 28 eşit menzil geçişleri
+  static const String skyMoonGuide = '$baseUrl/api/sky/moon-guide';
+
   // Haritalar (SolarFire tarzı, paralel modül)
   static const String chartsNatal = '$baseUrl/api/charts/natal';
   static const String chartsBiwheel = '$baseUrl/api/charts/biwheel';

@@ -6,6 +6,7 @@ import 'billing_service.dart';
 /// Gerçek ürünler: sub_daily ($14.99), sub_daily_yearly ($49.99), pdf_single ($9.99)
 class RevenueCatService {
   static bool _inited = false;
+  static String? _currentAppUserId;
 
   /// Ürün ID -> yerelleştirilmiş (bölgesel) fiyat etiketi.
   /// RevenueCat offering'inden getirilir; yoksa '14.99' gibi sabit düşer.
@@ -21,6 +22,15 @@ class RevenueCatService {
     final i = identifier.indexOf(':');
     return i < 0 ? identifier : identifier.substring(0, i);
   }
+
+  /// Pro erişimi yalnızca iki abonelik ürününden gelir. PDF gibi tek seferlik
+  /// satın alımların/başka entitlement'ların Pro kapısını açmasını engeller.
+  static bool _hasProSubscription(CustomerInfo info) =>
+      info.activeSubscriptions.any(
+        (id) =>
+            _matchesProduct(id, 'sub_daily') ||
+            _matchesProduct(id, 'sub_daily_yearly'),
+      );
 
   static Future<void> _loadPrices() async {
     if (!_inited) return;
@@ -65,6 +75,7 @@ class RevenueCatService {
       final uid = await BillingService.getBillingUid();
       PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
       await Purchases.configure(config);
+      _currentAppUserId = uid;
       _inited = true;
       await _loadPrices();
       if (kDebugMode) print('[RC] init ok uid=$uid prices=$_prices');
@@ -108,7 +119,7 @@ class RevenueCatService {
         return false;
       }
       final res = await Purchases.purchase(PurchaseParams.package(pkg));
-      return res.customerInfo.entitlements.active.isNotEmpty;
+      return _hasProSubscription(res.customerInfo);
     } catch (e) {
       final s = e.toString().toLowerCase();
       if (s.contains('already')) lastAlreadyOwned = true;
@@ -125,7 +136,7 @@ class RevenueCatService {
     try {
       if (refresh) await Purchases.invalidateCustomerInfoCache();
       final info = await Purchases.getCustomerInfo();
-      return info.entitlements.active.isNotEmpty;
+      return _hasProSubscription(info);
     } catch (_) {
       return false;
     }
@@ -145,9 +156,10 @@ class RevenueCatService {
   /// Giriş yapan kullanıcıyı RevenueCat'te kimliklendir (app_user_id = Supabase userId).
   /// Böylece abonelik hesaba bağlanır, cihaz değişse de kaybolmaz.
   static Future<void> identify(String userId) async {
-    if (!_inited || userId.isEmpty) return;
+    if (!_inited || userId.isEmpty || userId == _currentAppUserId) return;
     try {
       await Purchases.logIn(userId);
+      _currentAppUserId = userId;
       if (kDebugMode) print('[RC] identified $userId');
     } catch (e) {
       if (kDebugMode) print('[RC] identify err $e');
@@ -161,6 +173,7 @@ class RevenueCatService {
       await Purchases.logOut();
       final uid = await BillingService.getBillingUid();
       await Purchases.logIn(uid);
+      _currentAppUserId = uid;
     } catch (e) {
       if (kDebugMode) print('[RC] reset err $e');
     }
