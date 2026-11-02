@@ -1196,6 +1196,7 @@ async def _cast(req: CastRequest, *, holavon=None):
             req.lang,
             person_where_target["label"],
             loc_info.get("urgency") == "kayip",
+            loc_info,
         )
     else:
         answer = call_openai(engine_json, req.lang)

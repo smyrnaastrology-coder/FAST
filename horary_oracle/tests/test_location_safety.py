@@ -36,17 +36,31 @@ def test_student_where_is_detected_in_supported_languages():
 
 
 def test_person_location_answer_does_not_invent_details():
-    answer = person_location_answer("tr", "öğrencin", reported_missing=False).lower()
-    assert "gerçek zamanlı konumunu doğrulayamaz" in answer
+    answer = person_location_answer(
+        "tr",
+        "Öğrenci",
+        reported_missing=False,
+        context={
+            "_derived_house": 3,
+            "sig_planet": "Moon",
+            "sign": "Aslan",
+            "house": 4,
+            "trust_level": "zayif",
+        },
+    ).lower()
+    assert "3. ev göstergesi" in answer
+    assert "ay aslan burcunda, 4. evde" in answer
+    assert "ev, aile" in answer
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", answer)
     assert "kuzeydoğu" not in answer
-    assert "çatı katı" not in answer
+    assert "kiler" not in answer
 
 
 def test_explicit_missing_person_gets_practical_safety_guidance():
     answer = person_location_answer("tr", "öğrencin", reported_missing=True).lower()
-    assert "okul/veliyle hemen iletişime geç" in answer
-    assert "acil yardım" in answer
+    assert "öğrenciyi" in answer
+    assert "okul/veliyi" in answer
+    assert "acil riskte yerel yetkililere" in answer
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", answer)
 
 
@@ -73,7 +87,8 @@ def test_api_bypasses_llm_and_redacts_fake_geo_for_student(monkeypatch):
 
     assert response.status_code == 200
     body = response.json()
-    assert "gerçek zamanlı konumunu doğrulayamaz" in body["answer"]
+    assert "3. ev göstergesi" in body["answer"]
+    assert "sembolik olarak" in body["answer"]
     assert "kuzeydoğu" not in body["answer"].lower()
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", body["answer"].lower())
     assert body["location"] == {
