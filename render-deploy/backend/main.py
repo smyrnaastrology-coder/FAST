@@ -1148,10 +1148,13 @@ def _natal_minor_progress_6month(motor):
 
 app_fast = FastAPI(title="FAST — Asartepe Sinastri Tekniği API", version="4.0")
 
+# Not: allow_credentials KAPALI. "*" ile birlikte acik oldugunda Starlette
+# istegin Origin'ini aynen yansitiyor ve her site kimlikli istek atabiliyordu.
+# Mobil istemci Bearer token kullandigi icin cerez/credential gerekmiyor.
 app_fast.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -1181,7 +1184,7 @@ def _billing_baslangic_kontrolu():
     ok = ensure_schema_ready()
     print(f"[billing] depolama: {storage_mode()} (sema hazir: {ok})")
 
-_TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc", "/api/debug_ephe"}
+_TR_BLOCK_PATHS = {"/api/health", "/docs", "/openapi.json", "/redoc"}
 
 # ─── Rate limit (basit, in-memory) ───
 import time as _rl_time
@@ -1189,10 +1192,31 @@ _RL_BUCKET = {}
 _RL_LIMIT = int(os.getenv("RL_LIMIT", "30"))  # 30 req / 60s / IP
 _RL_WINDOW = 60
 
+
+def _client_ip(request: Request) -> str:
+    """Istemcinin gercek IP'si.
+
+    X-Forwarded-For'un ILK degeri istemci tarafindan yazilabildigi icin
+    guvenilmez: onu anahtar yapmak hem limiti atlatmaya (her istekte sahte
+    IP) hem de baska bir IP'nin kotasini doldurup o kullaniciyi bloklamaya
+    izin veriyordu. Cloudflare/Render zincirinde guvenilir basliklar once
+    denenir, XFF'te ise son eleman (proxy'nin ekledigi) kullanilir.
+    """
+    for baslik in ("cf-connecting-ip", "x-real-ip", "x-client-ip"):
+        deger = (request.headers.get(baslik) or "").strip()
+        if deger:
+            return deger.split(",")[0].strip()
+    xff = request.headers.get("x-forwarded-for") or ""
+    parcalar = [p.strip() for p in xff.split(",") if p.strip()]
+    if parcalar:
+        return parcalar[-1]
+    return request.client.host if request.client else "unknown"
+
+
 @app_fast.middleware("http")
 async def _rate_limit(request: Request, call_next):
     if request.url.path.startswith("/api/") and request.url.path not in _TR_BLOCK_PATHS:
-        ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.client.host if request.client else "unknown"
+        ip = _client_ip(request)
         now = _rl_time.time()
         bucket = _RL_BUCKET.get(ip)
         if bucket:
@@ -8078,7 +8102,17 @@ def charts_solar_arc(inp: ChartSolarArcIn):
 
 @app_fast.get("/api/debug_ephe")
 def debug_ephe():
-    """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı)."""
+    """Sunucudaki efemeris/star yeteneklerini raporlar (teşhis amaçlı).
+
+    Varsayılan olarak KAPALI: uç yirmi gök cismi hesapladığı için en ucuz
+    CPU doyurma kapısıydı ve efemeris envanterini herkese açık ediyordu.
+    Teşhis gerekirse Render'da DEBUG_EPHE_ENABLED=1 verilip yeniden deploy
+    edilir, iş bitince değişken kaldırılır (ve rate limit uygulanır).
+    """
+    if os.getenv("DEBUG_EPHE_ENABLED", "").strip().lower() not in (
+        "1", "true", "yes", "on"
+    ):
+        raise HTTPException(status_code=404, detail="Not Found")
     import os as _os
     sonuc = {}
     try:
