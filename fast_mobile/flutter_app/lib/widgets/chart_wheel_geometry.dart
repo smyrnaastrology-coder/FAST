@@ -25,13 +25,13 @@ class ChartWheelGeometry {
   double get signOuter => r * 0.99;
   double get signInner => biWheel ? r * 0.865 : r * 0.840;
 
-  /// İç zodyak kuşağı (yalnızca çift çemberde).
-  double get innerSignOuter => biWheel ? r * 0.665 : 0;
-  double get innerSignInner => biWheel ? r * 0.545 : 0;
+  /// Çift çemberde ikinci zodyak halkası çizilmez: iki harita aynı zodyak
+  /// yönünü paylaşır ve burç glifleri tek kez gösterilir.
+  double get innerSignOuter => 0;
+  double get innerSignInner => 0;
 
-  /// Burç sembollerinin yerleştiği yarıçap (kuşağın ortası).
+  /// Burç sembollerinin yerleştiği tek zodyak kuşağının yarıçapı.
   double get signGlyphR => (signOuter + signInner) / 2;
-  double get innerSignGlyphR => (innerSignOuter + innerSignInner) / 2;
 
   // --- Gezegen halkaları ----------------------------------------------------
 
@@ -58,8 +58,8 @@ class ChartWheelGeometry {
   /// Merkezdeki boş daire.
   double get hubR => biWheel ? r * 0.140 : r * 0.130;
 
-  /// Ev çizgilerinin dış ucu: en içteki zodyak kuşağının iç kenarı.
-  double get cuspOuterR => biWheel ? innerSignInner : signInner;
+  /// Ev çizgilerinin dış ucu: natal gezegen alanının dış sınırı.
+  double get cuspOuterR => biWheel ? natalBandOuter : signInner;
 
   /// Ev çizgilerinin iç ucu.
   double get cuspInnerR => hubR;
@@ -82,18 +82,16 @@ class ChartWheelGeometry {
   /// Çift çemberde semboller daha önce 18–22 px tavanına takılıyor, telefon
   /// ekranında iki harita birlikteyken okunamayacak kadar küçülüyordu. Hedef,
   /// sembol çapını harita çapının yaklaşık %3–3,5'i tutmaktır.
-  double get natalGlyphSize =>
-      (r * (biWheel ? 0.062 : 0.070)).clamp(9.0, 30.0);
+  double get natalGlyphSize => (r * 0.070).clamp(9.0, 32.0);
 
   /// Doğum gezegeni derece/dakika etiketi.
-  double get natalLabelSize =>
-      (r * (biWheel ? 0.036 : 0.042)).clamp(6.5, 14.0);
+  double get natalLabelSize => (r * (biWheel ? 0.038 : 0.042)).clamp(6.5, 14.0);
 
   /// Transit gezegen sembolü.
-  double get outerGlyphSize => (r * 0.060).clamp(9.0, 28.0);
+  double get outerGlyphSize => (r * 0.068).clamp(9.0, 32.0);
 
   /// Transit gezegeni derece/dakika etiketi.
-  double get outerLabelSize => (r * 0.034).clamp(6.5, 13.0);
+  double get outerLabelSize => (r * 0.036).clamp(6.5, 14.0);
 
   /// Ev numarası boyutu.
   double get houseNumSize => (r * 0.033).clamp(7.5, 14.0);
@@ -136,7 +134,6 @@ class ChartWheelGeometry {
       (hubR, hubR),
       (aspectR, aspectR),
       (natalBandInner, natalBandOuter),
-      if (biWheel) (innerSignInner, innerSignOuter),
       if (biWheel) (outerBandInner, outerBandOuter),
       (signInner, signOuter),
     ];

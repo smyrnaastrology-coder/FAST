@@ -252,10 +252,10 @@ class _WheelPainter extends CustomPainter {
     return TextPainter(
       text: TextSpan(
         text: text,
-        style: _baseStyle(color, fontSize).copyWith(
-          fontWeight: weight,
-          letterSpacing: letterSpacing,
-        ),
+        style: _baseStyle(
+          color,
+          fontSize,
+        ).copyWith(fontWeight: weight, letterSpacing: letterSpacing),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -324,10 +324,7 @@ class _WheelPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      outline.paint(
-        canvas,
-        p - Offset(outline.width / 2, outline.height / 2),
-      );
+      outline.paint(canvas, p - Offset(outline.width / 2, outline.height / 2));
     }
     tp.paint(canvas, p - Offset(tp.width / 2, tp.height / 2));
   }
@@ -363,10 +360,7 @@ class _WheelPainter extends CustomPainter {
     required double unit,
   }) {
     for (var i = 0; i < 12; i++) {
-      final rect = Rect.fromCircle(
-        center: center,
-        radius: (outer + inner) / 2,
-      );
+      final rect = Rect.fromCircle(center: center, radius: (outer + inner) / 2);
       final paint = Paint()
         ..color = _signColor(i).withValues(alpha: style.light ? 0.07 : 0.10)
         ..style = PaintingStyle.stroke
@@ -447,8 +441,7 @@ class _WheelPainter extends CustomPainter {
           final alpha = (0.22 - delta * 0.08).clamp(0.05, 0.22);
           final paint = Paint()
             ..color = color.withValues(alpha: alpha)
-            ..strokeWidth =
-                (entry.key == 'trine' || entry.key == 'opposition')
+            ..strokeWidth = (entry.key == 'trine' || entry.key == 'opposition')
                 ? base * 1.20
                 : base;
           canvas.drawLine(
@@ -481,8 +474,6 @@ class _WheelPainter extends CustomPainter {
     final outerLabelR = g.outerLabelR;
     final outerBandOuter = g.outerBandOuter;
     final outerBandInner = g.outerBandInner;
-    final innerSignOuter = g.innerSignOuter;
-    final innerSignInner = g.innerSignInner;
     final natalGlyphR = g.natalGlyphR;
     final natalLabelR = g.natalLabelR;
     final natalBandOuter = g.natalBandOuter;
@@ -493,23 +484,17 @@ class _WheelPainter extends CustomPainter {
     final cuspOuterR = g.cuspOuterR;
     final cuspInnerR = g.cuspInnerR;
     final houseNumSize = g.houseNumSize;
-    // --- Gezegen bantlarının zeminleri ---
-    canvas.drawCircle(
-      center,
-      (natalBandOuter + natalBandInner) / 2,
-      Paint()
-        ..color = style.bandTint
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = natalBandOuter - natalBandInner,
-    );
-    if (hasOuter) {
+    // Tek haritada gezegen bandı hafifçe doldurulur. Bi-wheel'de iki planet
+    // bandını tam halka gibi boyamak fazladan çemberler oluşturuyordu; iki
+    // katman artık ayrı yarıçap ve sembol konturuyla ayırt edilir.
+    if (!hasOuter) {
       canvas.drawCircle(
         center,
-        (outerBandOuter + outerBandInner) / 2,
+        (natalBandOuter + natalBandInner) / 2,
         Paint()
-          ..color = style.transitTint.withValues(alpha: style.light ? 1 : 0.75)
+          ..color = style.bandTint
           ..style = PaintingStyle.stroke
-          ..strokeWidth = outerBandOuter - outerBandInner,
+          ..strokeWidth = natalBandOuter - natalBandInner,
       );
     }
 
@@ -523,20 +508,8 @@ class _WheelPainter extends CustomPainter {
       glyphSize: g.signGlyphSize,
       unit: unit,
     );
-    if (hasOuter) {
-      _drawZodiacBand(
-        canvas,
-        center,
-        ascLon,
-        innerSignOuter,
-        innerSignInner,
-        glyphSize: g.innerSignGlyphSize,
-        unit: unit,
-      );
-      // Çift çemberde zodyak kuşaklarının kendi sınırları iki haritayı
-      // zaten ayırır. Ek altın vurgu çemberi çizilmez; gereksiz bir halka
-      // oluşturarak görseli kalabalıklaştırıyordu.
-    }
+    // Natal ve transit aynı ekliptik yönünü paylaştığı için burç glifleri
+    // çift çemberde de yalnızca bir kez, dış zodyak kuşağında çizilir.
 
     // --- Ev çizgileri ve numaraları ---
     // Ev giriş dereceleri artık yazılmaz: 12 ek metin haritayı
@@ -632,22 +605,25 @@ class _WheelPainter extends CustomPainter {
       );
     }
 
-    // --- Merkezdeki boş daire ---
-    canvas.drawCircle(
-      center,
-      hubR,
-      Paint()
-        ..color = _bg
-        ..style = PaintingStyle.fill,
-    );
-    canvas.drawCircle(
-      center,
-      hubR,
-      Paint()
-        ..color = _border.withValues(alpha: 0.5)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = (unit * 0.0060).clamp(0.8, 1.3),
-    );
+    // Tek çemberde merkez boşluğu çerçevelenir. Bi-wheel'de merkez çemberi
+    // kaldırılır; böylece görünür halkalar zodyak kuşağının iki sınırıyla kalır.
+    if (!hasOuter) {
+      canvas.drawCircle(
+        center,
+        hubR,
+        Paint()
+          ..color = _bg
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawCircle(
+        center,
+        hubR,
+        Paint()
+          ..color = _border.withValues(alpha: 0.5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = (unit * 0.0060).clamp(0.8, 1.3),
+      );
+    }
 
     // --- ASC / DSC / MC / IC eksenleri ---
     _axis(canvas, center, cuspOuterR, hubR, ascLon + 180, ascLon, unit);

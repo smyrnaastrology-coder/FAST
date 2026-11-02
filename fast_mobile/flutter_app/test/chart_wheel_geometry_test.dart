@@ -62,25 +62,28 @@ void main() {
     test('iç ve dış gezegen halkaları ayrı', () {
       final g = ChartWheelGeometry(200, biWheel: true);
       // Doğum gezegenleri içeride, transit gezegenleri dışarıda.
-      expect(g.natalGlyphR, lessThan(g.innerSignInner));
-      expect(g.outerGlyphR, greaterThan(g.innerSignOuter));
+      expect(g.natalGlyphR, lessThan(g.outerBandInner));
+      expect(g.outerGlyphR, greaterThan(g.natalGlyphR));
+      // Çift haritada burçlar ikinci kez yazılmaz.
+      expect(g.innerSignInner, 0);
+      expect(g.innerSignOuter, 0);
       // Etiketler kendi sembol halkasının içinde.
       expect(g.natalLabelR, lessThan(g.natalGlyphR));
       expect(g.outerLabelR, lessThan(g.outerGlyphR));
     });
 
-    test('çift çemberde doğum gezegeni halkası daralır', () {
+    test('çift çemberde natal sembol küçülmeden iç halkaya alınır', () {
       final single = ChartWheelGeometry(200, biWheel: false);
       final bi = ChartWheelGeometry(200, biWheel: true);
       expect(bi.natalGlyphR, lessThan(single.natalGlyphR));
-      expect(bi.natalGlyphSize, lessThan(single.natalGlyphSize));
+      expect(bi.natalGlyphSize, greaterThanOrEqualTo(single.natalGlyphSize));
     });
 
     test('çift çemberde iki gezegen katmanı da büyütülmüş ve ayırt edilir', () {
       for (final r in [160.0, 240.0, 400.0]) {
         final g = ChartWheelGeometry(r, biWheel: true);
-        expect(g.natalGlyphSize / (2 * r), greaterThanOrEqualTo(0.030));
-        expect(g.outerGlyphSize / (2 * r), greaterThanOrEqualTo(0.029));
+        expect(g.natalGlyphSize / (2 * r), greaterThanOrEqualTo(0.034));
+        expect(g.outerGlyphSize / (2 * r), greaterThanOrEqualTo(0.033));
         expect(g.natalLabelSize, lessThan(g.natalGlyphSize));
         expect(g.outerLabelSize, lessThan(g.outerGlyphSize));
         expect(g.isConsistent, isTrue, reason: 'r=$r');
