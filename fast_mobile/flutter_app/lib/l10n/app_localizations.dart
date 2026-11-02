@@ -6033,6 +6033,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'asks you to balance opposing needs.'**
   String get skyReadingAspectOpposition;
+
+  /// No description provided for @skyMoonTimingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Void of Course'**
+  String get skyMoonTimingTitle;
+
+  /// No description provided for @skyMoonTimingActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon is void now · until {time}'**
+  String skyMoonTimingActive(String time);
+
+  /// No description provided for @skyMoonTimingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming void periods'**
+  String get skyMoonTimingNext;
+
+  /// No description provided for @skyMoonTimingNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No void periods in the coming days.'**
+  String get skyMoonTimingNone;
+
+  /// No description provided for @skyMoonTimingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is \'void\' when it has completed its last major aspect before changing sign. Classical astrology advises against starting new ventures during these periods.'**
+  String get skyMoonTimingNote;
+
+  /// No description provided for @skyActivityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Right timing windows'**
+  String get skyActivityTitle;
+
+  /// No description provided for @skyActivityHairGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair growth'**
+  String get skyActivityHairGrowth;
+
+  /// No description provided for @skyActivityHairThicken.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair thickness'**
+  String get skyActivityHairThicken;
+
+  /// No description provided for @skyActivityWedding.
+  ///
+  /// In en, this message translates to:
+  /// **'Wedding'**
+  String get skyActivityWedding;
+
+  /// No description provided for @skyActivityContract.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract'**
+  String get skyActivityContract;
+
+  /// No description provided for @skyActivityMoving.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving'**
+  String get skyActivityMoving;
+
+  /// No description provided for @skyActivityRuleHairGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon, not void'**
+  String get skyActivityRuleHairGrowth;
+
+  /// No description provided for @skyActivityRuleHairThicken.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · Taurus, Leo, Virgo'**
+  String get skyActivityRuleHairThicken;
+
+  /// No description provided for @skyActivityRuleWedding.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · Taurus, Cancer, Libra, Pisces'**
+  String get skyActivityRuleWedding;
+
+  /// No description provided for @skyActivityRuleContract.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · cardinal signs'**
+  String get skyActivityRuleContract;
+
+  /// No description provided for @skyActivityRuleMoving.
+  ///
+  /// In en, this message translates to:
+  /// **'Earth signs · not void'**
+  String get skyActivityRuleMoving;
+
+  /// No description provided for @skyActivityEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No suitable window in this period.'**
+  String get skyActivityEmpty;
+
+  /// No description provided for @skyActivityTapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add to your calendar'**
+  String get skyActivityTapHint;
+
+  /// No description provided for @proLockTimingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon void-of-course periods and right timing windows for haircuts, contracts, weddings and moving are available with Pro.'**
+  String get proLockTimingBody;
+
+  /// No description provided for @skyActivityTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade'**
+  String get skyActivityTrade;
+
+  /// No description provided for @skyActivityEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get skyActivityEducation;
+
+  /// No description provided for @skyActivityPlanting.
+  ///
+  /// In en, this message translates to:
+  /// **'Planting'**
+  String get skyActivityPlanting;
+
+  /// No description provided for @skyActivityRuleTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · Taurus, Gemini, Virgo, Libra'**
+  String get skyActivityRuleTrade;
+
+  /// No description provided for @skyActivityRuleEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · Gemini, Virgo, Sagittarius, Pisces'**
+  String get skyActivityRuleEducation;
+
+  /// No description provided for @skyActivityRulePlanting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing Moon · Taurus, Cancer, Scorpio, Capricorn, Pisces'**
+  String get skyActivityRulePlanting;
+
+  /// No description provided for @skyActivityAboutHairGrowth.
+  ///
+  /// In en, this message translates to:
+  /// **'Hair cut under a waxing Moon is believed to grow faster. Use these windows if you want length.'**
+  String get skyActivityAboutHairGrowth;
+
+  /// No description provided for @skyActivityAboutHairThicken.
+  ///
+  /// In en, this message translates to:
+  /// **'Cuts in Taurus, Leo and Virgo are said to make hair thicker. Wait for these signs for fuller hair.'**
+  String get skyActivityAboutHairThicken;
+
+  /// No description provided for @skyActivityAboutTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping, bargaining and trade are lively in Mercury signs under a waxing Moon. A good base for sales, purchases and new clients.'**
+  String get skyActivityAboutTrade;
+
+  /// No description provided for @skyActivityAboutEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Mercury and Jupiter signs are considered clearer for learning, course applications and exam preparation.'**
+  String get skyActivityAboutEducation;
+
+  /// No description provided for @skyActivityAboutContract.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardinal signs support starting, and a waxing Moon supports growth. Favourable for signatures and agreements.'**
+  String get skyActivityAboutContract;
+
+  /// No description provided for @skyActivityAboutWedding.
+  ///
+  /// In en, this message translates to:
+  /// **'A waxing Moon in Taurus, Cancer, Libra and Pisces is considered favourable for bonding and strengthening partnership.'**
+  String get skyActivityAboutWedding;
+
+  /// No description provided for @skyActivityAboutMoving.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving under an earth sign and a Moon that is not void is associated with stability and settling in.'**
+  String get skyActivityAboutMoving;
+
+  /// No description provided for @skyActivityAboutPlanting.
+  ///
+  /// In en, this message translates to:
+  /// **'A waxing Moon and water/earth signs are considered fertile for sowing, planting and garden work.'**
+  String get skyActivityAboutPlanting;
+
+  /// No description provided for @skyMoonTimingVoidHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold off on new ventures, signatures or shopping; start once the void ends.'**
+  String get skyMoonTimingVoidHint;
+
+  /// No description provided for @skyMoonTimingClearHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon is not void. Pick an activity below and add a suitable window to your calendar.'**
+  String get skyMoonTimingClearHint;
 }
 
 class _AppLocalizationsDelegate

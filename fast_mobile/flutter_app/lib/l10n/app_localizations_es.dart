@@ -3306,4 +3306,128 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get skyReadingAspectOpposition =>
       'te pide equilibrar necesidades opuestas.';
+
+  @override
+  String get skyMoonTimingTitle => 'Luna en Vacío';
+
+  @override
+  String skyMoonTimingActive(String time) {
+    return 'La Luna está en vacío · hasta $time';
+  }
+
+  @override
+  String get skyMoonTimingNext => 'Próximos períodos de vacío';
+
+  @override
+  String get skyMoonTimingNone =>
+      'No hay períodos de vacío en los próximos días.';
+
+  @override
+  String get skyMoonTimingNote =>
+      'La Luna está \'en vacío\' cuando ya completó su último aspecto mayor antes de cambiar de signo. La astrología clásica desaconseja iniciar nuevos proyectos en estos períodos.';
+
+  @override
+  String get skyActivityTitle => 'Ventanas de buen momento';
+
+  @override
+  String get skyActivityHairGrowth => 'Crecimiento del pelo';
+
+  @override
+  String get skyActivityHairThicken => 'Grosor del pelo';
+
+  @override
+  String get skyActivityWedding => 'Boda';
+
+  @override
+  String get skyActivityContract => 'Contrato';
+
+  @override
+  String get skyActivityMoving => 'Mudanza';
+
+  @override
+  String get skyActivityRuleHairGrowth => 'Luna creciente, no en vacío';
+
+  @override
+  String get skyActivityRuleHairThicken => 'Luna creciente · Tauro, Leo, Virgo';
+
+  @override
+  String get skyActivityRuleWedding =>
+      'Luna creciente · Tauro, Cáncer, Libra, Piscis';
+
+  @override
+  String get skyActivityRuleContract => 'Luna creciente · signos cardinales';
+
+  @override
+  String get skyActivityRuleMoving => 'Signos de tierra · no en vacío';
+
+  @override
+  String get skyActivityEmpty => 'No hay ventana adecuada en este período.';
+
+  @override
+  String get skyActivityTapHint => 'Toca para añadir al calendario';
+
+  @override
+  String get proLockTimingBody =>
+      'Los períodos de Luna en vacío y las ventanas de buen momento para cortes de pelo, firmas, bodas y mudanzas están disponibles con Pro.';
+
+  @override
+  String get skyActivityTrade => 'Comercio';
+
+  @override
+  String get skyActivityEducation => 'Educación';
+
+  @override
+  String get skyActivityPlanting => 'Siembra';
+
+  @override
+  String get skyActivityRuleTrade =>
+      'Luna creciente · Tauro, Géminis, Virgo, Libra';
+
+  @override
+  String get skyActivityRuleEducation =>
+      'Luna creciente · Géminis, Virgo, Sagitario, Piscis';
+
+  @override
+  String get skyActivityRulePlanting =>
+      'Luna creciente · Tauro, Cáncer, Escorpio, Capricornio, Piscis';
+
+  @override
+  String get skyActivityAboutHairGrowth =>
+      'Se cree que el pelo cortado con Luna creciente crece más rápido. Usa estas ventanas si quieres longitud.';
+
+  @override
+  String get skyActivityAboutHairThicken =>
+      'Se dice que los cortes en Tauro, Leo y Virgo hacen el pelo más grueso. Espera estos signos para más volumen.';
+
+  @override
+  String get skyActivityAboutTrade =>
+      'Las compras, el regateo y el comercio están animados en los signos de Mercurio con Luna creciente. Buena base para ventas, compras y nuevos clientes.';
+
+  @override
+  String get skyActivityAboutEducation =>
+      'Los signos de Mercurio y Júpiter se consideran más claros para aprender, solicitar cursos y preparar exámenes.';
+
+  @override
+  String get skyActivityAboutContract =>
+      'Los signos cardinales apoyan empezar y la Luna creciente apoya crecer. Favorable para firmas y acuerdos.';
+
+  @override
+  String get skyActivityAboutWedding =>
+      'La Luna creciente en Tauro, Cáncer, Libra y Piscis se considera favorable para unir y fortalecer una relación.';
+
+  @override
+  String get skyActivityAboutMoving =>
+      'Mudarse con Luna en signo de tierra y sin vacío se asocia con estabilidad y arraigo.';
+
+  @override
+  String get skyActivityAboutPlanting =>
+      'La Luna creciente y los signos de agua/tierra se consideran fértiles para sembrar, plantar y trabajar el jardín.';
+
+  @override
+  String get skyMoonTimingVoidHint =>
+      'Espera para nuevos proyectos, firmas o compras; empieza cuando termine el vacío.';
+
+  @override
+  String get skyMoonTimingClearHint =>
+      'La Luna no está en vacío. Elige una actividad y añade una ventana adecuada a tu calendario.';
 }

@@ -81,6 +81,9 @@ class ApiConfig {
   // Ay'ın burç giriş/çıkış saatleri (ay takvimi)
   static const String skyMoonCalendar = '$baseUrl/api/sky/moon-calendar';
 
+  // Ay boşta (VOC) dönemleri ve doğru zaman pencereleri
+  static const String skyMoonTiming = '$baseUrl/api/sky/moon-timing';
+
   // Haritalar (SolarFire tarzı, paralel modül)
   static const String chartsNatal = '$baseUrl/api/charts/natal';
   static const String chartsBiwheel = '$baseUrl/api/charts/biwheel';

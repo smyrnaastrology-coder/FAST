@@ -3267,4 +3267,127 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get skyReadingAspectOpposition =>
       'karşıt ihtiyaçları dengelemeni istiyor.';
+
+  @override
+  String get skyMoonTimingTitle => 'Ay\'ın Boşta Olduğu Anlar';
+
+  @override
+  String skyMoonTimingActive(String time) {
+    return 'Ay şu anda boşta · $time\'e kadar';
+  }
+
+  @override
+  String get skyMoonTimingNext => 'Sonraki boşluklar';
+
+  @override
+  String get skyMoonTimingNone => 'Önümüzdeki günlerde boşluk yok.';
+
+  @override
+  String get skyMoonTimingNote =>
+      'Ay, burcunu değiştirmeden önce son majör açısını tamamladığında \'boşta\' sayılır. Klasik astrolojide bu aralıklarda yeni iş başlatmak önerilmez.';
+
+  @override
+  String get skyActivityTitle => 'Doğru zaman pencereleri';
+
+  @override
+  String get skyActivityHairGrowth => 'Saç uzatma';
+
+  @override
+  String get skyActivityHairThicken => 'Saç gürleştirme';
+
+  @override
+  String get skyActivityWedding => 'Düğün';
+
+  @override
+  String get skyActivityContract => 'İmza';
+
+  @override
+  String get skyActivityMoving => 'Taşınma';
+
+  @override
+  String get skyActivityRuleHairGrowth => 'Büyüyen Ay, boşta değil';
+
+  @override
+  String get skyActivityRuleHairThicken => 'Büyüyen Ay · Boğa, Aslan, Başak';
+
+  @override
+  String get skyActivityRuleWedding =>
+      'Büyüyen Ay · Boğa, Yengeç, Terazi, Balık';
+
+  @override
+  String get skyActivityRuleContract => 'Büyüyen Ay · öncü burçlar';
+
+  @override
+  String get skyActivityRuleMoving => 'Dünya burçları · boşta değil';
+
+  @override
+  String get skyActivityEmpty => 'Bu dönemde uygun pencere yok.';
+
+  @override
+  String get skyActivityTapHint => 'Takvime eklemek için dokun';
+
+  @override
+  String get proLockTimingBody =>
+      'Ay boşta (VOC) dönemleri ve saç kesimi, imza, düğün, taşınma için doğru zaman pencereleri Pro\'da.';
+
+  @override
+  String get skyActivityTrade => 'Ticaret';
+
+  @override
+  String get skyActivityEducation => 'Eğitim';
+
+  @override
+  String get skyActivityPlanting => 'Ekim';
+
+  @override
+  String get skyActivityRuleTrade =>
+      'Büyüyen Ay · Boğa, İkizler, Başak, Terazi';
+
+  @override
+  String get skyActivityRuleEducation =>
+      'Büyüyen Ay · İkizler, Başak, Yay, Balık';
+
+  @override
+  String get skyActivityRulePlanting =>
+      'Büyüyen Ay · Boğa, Yengeç, Akrep, Oğlak, Balık';
+
+  @override
+  String get skyActivityAboutHairGrowth =>
+      'Büyüyen Ay\'da kesilen saçın daha hızlı uzadığı kabul edilir. Uzatmak istiyorsan bu pencereleri kullan.';
+
+  @override
+  String get skyActivityAboutHairThicken =>
+      'Boğa, Aslan ve Başak\'ta yapılan kesimlerin saçı gürleştirdiği söylenir. Daha dolgun saç için bu burçları bekle.';
+
+  @override
+  String get skyActivityAboutTrade =>
+      'Merkür burçlarında ve büyüyen Ay\'da alışveriş, pazarlık ve ticaret canlıdır. Yeni müşteri, satış veya alım için uygun zemin.';
+
+  @override
+  String get skyActivityAboutEducation =>
+      'Merkür ve Jüpiter burçlarında öğrenme, kurs başvurusu ve sınav hazırlığı için zihin daha açık kabul edilir.';
+
+  @override
+  String get skyActivityAboutContract =>
+      'Öncü burçlar başlatmayı, büyüyen Ay ise sonucu büyütmeyi destekler. İmza ve anlaşmalar için elverişli.';
+
+  @override
+  String get skyActivityAboutWedding =>
+      'Boğa, Yengeç, Terazi ve Balık\'ta büyüyen Ay, bağ kurmak ve ortaklığı sağlamlaştırmak için uygun sayılır.';
+
+  @override
+  String get skyActivityAboutMoving =>
+      'Dünya burçlarında ve boşta olmayan Ay\'da taşınmak kalıcılık ve yerleşme ile ilişkilendirilir.';
+
+  @override
+  String get skyActivityAboutPlanting =>
+      'Büyüyen Ay ve su/toprak burçları ekim, dikim ve bahçe işleri için bereketli kabul edilir.';
+
+  @override
+  String get skyMoonTimingVoidHint =>
+      'Yeni iş, imza veya alışveriş için bekle; boşluk bitince başla.';
+
+  @override
+  String get skyMoonTimingClearHint =>
+      'Ay boşta değil. Aşağıdan eylemini seç, uygun pencereyi takvimine ekle.';
 }

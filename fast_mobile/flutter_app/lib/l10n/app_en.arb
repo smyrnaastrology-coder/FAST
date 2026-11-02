@@ -634,7 +634,13 @@
   "storyRepostAdded": "Added to your story",
   "storyRepostFailed": "Could not add to story",
   "shareProfileMessage": "@{handle} — Holavon astrology community",
-  "@shareProfileMessage": {"placeholders": {"handle": {"type": "String"}}},
+  "@shareProfileMessage": {
+    "placeholders": {
+      "handle": {
+        "type": "String"
+      }
+    }
+  },
   "feedFollowingTab": "Following",
   "feedDiscoverTab": "Discover",
   "feedFollowingEmpty": "Posts from people you follow will appear here.",
@@ -648,25 +654,67 @@
   "skyAvoid": "Avoid",
   "skyTitle": "Sky",
   "skyMoonLine": "Moon {sign} {degree}°",
-  "@skyMoonLine": {"placeholders": {"sign": {"type": "String"}, "degree": {"type": "String"}}},
+  "@skyMoonLine": {
+    "placeholders": {
+      "sign": {
+        "type": "String"
+      },
+      "degree": {
+        "type": "String"
+      }
+    }
+  },
   "skyIllumination": "%{pct} illuminated",
-  "@skyIllumination": {"placeholders": {"pct": {"type": "String"}}},
+  "@skyIllumination": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "skySpeedSlow": "slow",
   "skySpeedNormal": "normal",
   "skySpeedFast": "fast",
   "skyVoid": "Moon void of course",
   "skyNotVoid": "Moon in flow",
   "skyVoidUntil": "Void until {time}",
-  "@skyVoidUntil": {"placeholders": {"time": {"type": "String"}}},
+  "@skyVoidUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "skyPlanetHour": "{planet} hour",
-  "@skyPlanetHour": {"placeholders": {"planet": {"type": "String"}}},
+  "@skyPlanetHour": {
+    "placeholders": {
+      "planet": {
+        "type": "String"
+      }
+    }
+  },
   "skyNextHour": "Next: {planet} hour",
-  "@skyNextHour": {"placeholders": {"planet": {"type": "String"}}},
+  "@skyNextHour": {
+    "placeholders": {
+      "planet": {
+        "type": "String"
+      }
+    }
+  },
   "skyAspects": "Moon aspects",
   "skyNoAspects": "No major aspect right now",
   "skyRetro": "Retrograde",
   "skySunLine": "Sun {sign} {degree}°",
-  "@skySunLine": {"placeholders": {"sign": {"type": "String"}, "degree": {"type": "String"}}},
+  "@skySunLine": {
+    "placeholders": {
+      "sign": {
+        "type": "String"
+      },
+      "degree": {
+        "type": "String"
+      }
+    }
+  },
   "skyPhaseNew": "New Moon",
   "skyPhaseWaxingCrescent": "Waxing Crescent",
   "skyPhaseFirstQuarter": "First Quarter",
@@ -686,22 +734,76 @@
   "skyCalendarToday": "today",
   "skyCalendarTomorrow": "tomorrow",
   "skyCalendarInDays": "in {days} days",
-  "@skyCalendarInDays": {"placeholders": {"days": {"type": "String"}}},
+  "@skyCalendarInDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
   "skyCalendarInHours": "in {hours} h",
-  "@skyCalendarInHours": {"placeholders": {"hours": {"type": "String"}}},
+  "@skyCalendarInHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonCalendarTitle": "Moon Calendar",
   "skyMoonInSign": "Moon in {sign}",
-  "@skyMoonInSign": {"placeholders": {"sign": {"type": "String"}}},
+  "@skyMoonInSign": {
+    "placeholders": {
+      "sign": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonEnters": "Moon enters {sign}",
-  "@skyMoonEnters": {"placeholders": {"sign": {"type": "String"}}},
+  "@skyMoonEnters": {
+    "placeholders": {
+      "sign": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonRemaining": "Remaining: {value}",
-  "@skyMoonRemaining": {"placeholders": {"value": {"type": "String"}}},
+  "@skyMoonRemaining": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonDaysHours": "{days}d {hours}h",
-  "@skyMoonDaysHours": {"placeholders": {"days": {"type": "String"}, "hours": {"type": "String"}}},
+  "@skyMoonDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonHoursMinutes": "{hours}h {minutes}m",
-  "@skyMoonHoursMinutes": {"placeholders": {"hours": {"type": "String"}, "minutes": {"type": "String"}}},
+  "@skyMoonHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonMinutes": "{minutes}m",
-  "@skyMoonMinutes": {"placeholders": {"minutes": {"type": "String"}}},
+  "@skyMoonMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonNextChanges": "Next sign changes",
   "skyNewMoon": "New Moon",
   "skyFullMoon": "Full Moon",
@@ -715,11 +817,29 @@
   "skyEclipseVisibleHere": "visible from here",
   "skyEclipseNotVisible": "not visible here",
   "skyEclipseNextVisible": "Next visible: {when}",
-  "@skyEclipseNextVisible": {"placeholders": {"when": {"type": "String"}}},
+  "@skyEclipseNextVisible": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "skyEclipseObscuration": "{pct}% covered",
-  "@skyEclipseObscuration": {"placeholders": {"pct": {"type": "String"}}},
+  "@skyEclipseObscuration": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
   "skyPerDay": "{value}°/day",
-  "@skyPerDay": {"placeholders": {"value": {"type": "String"}}},
+  "@skyPerDay": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "skyMoonSpeed": "Moon speed",
   "handleTooShort": "Username must be at least 3 characters.",
   "handleInvalid": "Only lowercase letters, numbers, dots and underscores.",
@@ -1142,22 +1262,34 @@
   "skyReadingHeadline": "Moon in {sign}: {mood}",
   "@skyReadingHeadline": {
     "placeholders": {
-      "sign": {"type": "String"},
-      "mood": {"type": "String"}
+      "sign": {
+        "type": "String"
+      },
+      "mood": {
+        "type": "String"
+      }
     }
   },
   "skyReadingAspectLine": "Moon–{planet} {aspect}: {text}",
   "@skyReadingAspectLine": {
     "placeholders": {
-      "planet": {"type": "String"},
-      "aspect": {"type": "String"},
-      "text": {"type": "String"}
+      "planet": {
+        "type": "String"
+      },
+      "aspect": {
+        "type": "String"
+      },
+      "text": {
+        "type": "String"
+      }
     }
   },
   "skyReadingRetroLine": "Retrograde planets: {list}. Reviewing related matters comes to the fore.",
   "@skyReadingRetroLine": {
     "placeholders": {
-      "list": {"type": "String"}
+      "list": {
+        "type": "String"
+      }
     }
   },
   "skyReadingVoidNote": "Moon void of course: don't rush new beginnings; routine work and finishing things suit better.",
@@ -1199,5 +1331,47 @@
   "skyReadingAspectSextile": "opens an easy opportunity and a door for cooperation.",
   "skyReadingAspectSquare": "creates inner tension; patience works better than rushing.",
   "skyReadingAspectTrine": "brings a flowing, supportive harmony.",
-  "skyReadingAspectOpposition": "asks you to balance opposing needs."
+  "skyReadingAspectOpposition": "asks you to balance opposing needs.",
+  "skyMoonTimingTitle": "Moon Void of Course",
+  "skyMoonTimingActive": "Moon is void now · until {time}",
+  "skyMoonTimingNext": "Upcoming void periods",
+  "skyMoonTimingNone": "No void periods in the coming days.",
+  "skyMoonTimingNote": "The Moon is 'void' when it has completed its last major aspect before changing sign. Classical astrology advises against starting new ventures during these periods.",
+  "skyActivityTitle": "Right timing windows",
+  "skyActivityHairGrowth": "Hair growth",
+  "skyActivityHairThicken": "Hair thickness",
+  "skyActivityWedding": "Wedding",
+  "skyActivityContract": "Contract",
+  "skyActivityMoving": "Moving",
+  "skyActivityRuleHairGrowth": "Waxing Moon, not void",
+  "skyActivityRuleHairThicken": "Waxing Moon · Taurus, Leo, Virgo",
+  "skyActivityRuleWedding": "Waxing Moon · Taurus, Cancer, Libra, Pisces",
+  "skyActivityRuleContract": "Waxing Moon · cardinal signs",
+  "skyActivityRuleMoving": "Earth signs · not void",
+  "skyActivityEmpty": "No suitable window in this period.",
+  "skyActivityTapHint": "Tap to add to your calendar",
+  "proLockTimingBody": "Moon void-of-course periods and right timing windows for haircuts, contracts, weddings and moving are available with Pro.",
+  "@skyMoonTimingActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "skyActivityTrade": "Trade",
+  "skyActivityEducation": "Education",
+  "skyActivityPlanting": "Planting",
+  "skyActivityRuleTrade": "Waxing Moon · Taurus, Gemini, Virgo, Libra",
+  "skyActivityRuleEducation": "Waxing Moon · Gemini, Virgo, Sagittarius, Pisces",
+  "skyActivityRulePlanting": "Waxing Moon · Taurus, Cancer, Scorpio, Capricorn, Pisces",
+  "skyActivityAboutHairGrowth": "Hair cut under a waxing Moon is believed to grow faster. Use these windows if you want length.",
+  "skyActivityAboutHairThicken": "Cuts in Taurus, Leo and Virgo are said to make hair thicker. Wait for these signs for fuller hair.",
+  "skyActivityAboutTrade": "Shopping, bargaining and trade are lively in Mercury signs under a waxing Moon. A good base for sales, purchases and new clients.",
+  "skyActivityAboutEducation": "Mercury and Jupiter signs are considered clearer for learning, course applications and exam preparation.",
+  "skyActivityAboutContract": "Cardinal signs support starting, and a waxing Moon supports growth. Favourable for signatures and agreements.",
+  "skyActivityAboutWedding": "A waxing Moon in Taurus, Cancer, Libra and Pisces is considered favourable for bonding and strengthening partnership.",
+  "skyActivityAboutMoving": "Moving under an earth sign and a Moon that is not void is associated with stability and settling in.",
+  "skyActivityAboutPlanting": "A waxing Moon and water/earth signs are considered fertile for sowing, planting and garden work.",
+  "skyMoonTimingVoidHint": "Hold off on new ventures, signatures or shopping; start once the void ends.",
+  "skyMoonTimingClearHint": "The Moon is not void. Pick an activity below and add a suitable window to your calendar."
 }

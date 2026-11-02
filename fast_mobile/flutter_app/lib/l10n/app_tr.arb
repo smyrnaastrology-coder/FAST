@@ -641,7 +641,13 @@
   "storyRepostAdded": "Hikâyene eklendi",
   "storyRepostFailed": "Hikâyeye eklenemedi",
   "shareProfileMessage": "@{handle} — Holavon astroloji topluluğu",
-  "@shareProfileMessage": {"placeholders": {"handle": {"type": "String"}}},
+  "@shareProfileMessage": {
+    "placeholders": {
+      "handle": {
+        "type": "String"
+      }
+    }
+  },
   "feedFollowingTab": "Takip",
   "feedDiscoverTab": "Keşfet",
   "feedFollowingEmpty": "Takip ettiğin kişilerin gönderileri burada görünecek.",
@@ -1082,5 +1088,47 @@
   "skyReadingAspectSextile": "kolay bir fırsat ve iş birliği kapısı aralıyor.",
   "skyReadingAspectSquare": "içsel bir gerilim yaratıyor; acele yerine sabırlı olmak faydalı.",
   "skyReadingAspectTrine": "akışkan ve destekleyici bir uyum sağlıyor.",
-  "skyReadingAspectOpposition": "karşıt ihtiyaçları dengelemeni istiyor."
+  "skyReadingAspectOpposition": "karşıt ihtiyaçları dengelemeni istiyor.",
+  "skyMoonTimingTitle": "Ay'ın Boşta Olduğu Anlar",
+  "skyMoonTimingActive": "Ay şu anda boşta · {time}'e kadar",
+  "skyMoonTimingNext": "Sonraki boşluklar",
+  "skyMoonTimingNone": "Önümüzdeki günlerde boşluk yok.",
+  "skyMoonTimingNote": "Ay, burcunu değiştirmeden önce son majör açısını tamamladığında 'boşta' sayılır. Klasik astrolojide bu aralıklarda yeni iş başlatmak önerilmez.",
+  "skyActivityTitle": "Doğru zaman pencereleri",
+  "skyActivityHairGrowth": "Saç uzatma",
+  "skyActivityHairThicken": "Saç gürleştirme",
+  "skyActivityWedding": "Düğün",
+  "skyActivityContract": "İmza",
+  "skyActivityMoving": "Taşınma",
+  "skyActivityRuleHairGrowth": "Büyüyen Ay, boşta değil",
+  "skyActivityRuleHairThicken": "Büyüyen Ay · Boğa, Aslan, Başak",
+  "skyActivityRuleWedding": "Büyüyen Ay · Boğa, Yengeç, Terazi, Balık",
+  "skyActivityRuleContract": "Büyüyen Ay · öncü burçlar",
+  "skyActivityRuleMoving": "Dünya burçları · boşta değil",
+  "skyActivityEmpty": "Bu dönemde uygun pencere yok.",
+  "skyActivityTapHint": "Takvime eklemek için dokun",
+  "proLockTimingBody": "Ay boşta (VOC) dönemleri ve saç kesimi, imza, düğün, taşınma için doğru zaman pencereleri Pro'da.",
+  "@skyMoonTimingActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "skyActivityTrade": "Ticaret",
+  "skyActivityEducation": "Eğitim",
+  "skyActivityPlanting": "Ekim",
+  "skyActivityRuleTrade": "Büyüyen Ay · Boğa, İkizler, Başak, Terazi",
+  "skyActivityRuleEducation": "Büyüyen Ay · İkizler, Başak, Yay, Balık",
+  "skyActivityRulePlanting": "Büyüyen Ay · Boğa, Yengeç, Akrep, Oğlak, Balık",
+  "skyActivityAboutHairGrowth": "Büyüyen Ay'da kesilen saçın daha hızlı uzadığı kabul edilir. Uzatmak istiyorsan bu pencereleri kullan.",
+  "skyActivityAboutHairThicken": "Boğa, Aslan ve Başak'ta yapılan kesimlerin saçı gürleştirdiği söylenir. Daha dolgun saç için bu burçları bekle.",
+  "skyActivityAboutTrade": "Merkür burçlarında ve büyüyen Ay'da alışveriş, pazarlık ve ticaret canlıdır. Yeni müşteri, satış veya alım için uygun zemin.",
+  "skyActivityAboutEducation": "Merkür ve Jüpiter burçlarında öğrenme, kurs başvurusu ve sınav hazırlığı için zihin daha açık kabul edilir.",
+  "skyActivityAboutContract": "Öncü burçlar başlatmayı, büyüyen Ay ise sonucu büyütmeyi destekler. İmza ve anlaşmalar için elverişli.",
+  "skyActivityAboutWedding": "Boğa, Yengeç, Terazi ve Balık'ta büyüyen Ay, bağ kurmak ve ortaklığı sağlamlaştırmak için uygun sayılır.",
+  "skyActivityAboutMoving": "Dünya burçlarında ve boşta olmayan Ay'da taşınmak kalıcılık ve yerleşme ile ilişkilendirilir.",
+  "skyActivityAboutPlanting": "Büyüyen Ay ve su/toprak burçları ekim, dikim ve bahçe işleri için bereketli kabul edilir.",
+  "skyMoonTimingVoidHint": "Yeni iş, imza veya alışveriş için bekle; boşluk bitince başla.",
+  "skyMoonTimingClearHint": "Ay boşta değil. Aşağıdan eylemini seç, uygun pencereyi takvimine ekle."
 }

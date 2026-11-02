@@ -165,4 +165,12 @@ class ApiService {
       timeout: const Duration(seconds: 20),
     );
   }
+
+  /// Ay boşta (VOC) dönemleri ve eylemlere göre doğru zaman pencereleri.
+  Future<Map<String, dynamic>> skyMoonTiming({int days = 30}) {
+    return _get(
+      '${ApiConfig.skyMoonTiming}?days=$days',
+      timeout: const Duration(seconds: 20),
+    );
+  }
 }

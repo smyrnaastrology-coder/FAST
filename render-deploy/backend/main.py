@@ -7124,6 +7124,229 @@ def sky_moon_calendar(days: int = 30):
     return sonuc
 
 
+# ── Ay boşta (VOC) ve doğru zaman pencereleri ──────────────────────────
+# Klasik tanım: Ay, burcunu terk etmeden önce son majör açısını (0/60/90/
+# 120/180) tamamladıysa "boşta"dır. Yalnızca geleneksel yedi gezegen
+# kullanılır (_SKY_VOC_PLANETS). Astronomik hesap Swiss Ephemeris'ten gelir;
+# pencereler yorum katmanıdır, gökcismi konumlarını değiştirmez.
+
+_SKY_TIMING_CACHE = {}
+
+# Eylem kuralları. "waxing": True ise yalnızca büyüyen Ay; None ise evre
+# serbest. "signs": izinli burç indeksleri (0 = Koç); None ise tüm burçlar.
+_SKY_ACTIVITY_RULES = {
+    "hair_growth": {"waxing": True, "signs": None},
+    "hair_thicken": {"waxing": True, "signs": {1, 4, 5}},      # Boğa, Aslan, Başak
+    "trade": {"waxing": True, "signs": {1, 2, 5, 6}},          # Boğa, İkizler, Başak, Terazi
+    "education": {"waxing": True, "signs": {2, 5, 8, 11}},     # Merkür + Jüpiter burçları
+    "contract": {"waxing": True, "signs": {0, 3, 6, 9}},       # Öncü burçlar
+    "wedding": {"waxing": True, "signs": {1, 3, 6, 11}},       # Boğa, Yengeç, Terazi, Balık
+    "moving": {"waxing": None, "signs": {1, 5, 9}},            # Boğa, Başak, Oğlak
+    "planting": {"waxing": True, "signs": {1, 3, 7, 9, 11}},   # Boğa, Yengeç, Akrep, Oğlak, Balık
+}
+
+
+def _sky_last_moon_aspect(jd_start, jd_end):
+    """Ay'ın [jd_start, jd_end] aralığında tamamladığı son majör açının anı."""
+    step = 15.0 / (24.0 * 60.0)  # 15 dakika
+    prev = {}
+    last = None
+    t = jd_start
+    first = True
+    while t <= jd_end + 1e-9:
+        md, _ = _sky_pos(t, swe.MOON)
+        for pid in _SKY_VOC_PLANETS:
+            pd, _ = _sky_pos(t, pid)
+            for aci in _SKY_ASPECTS:
+                targets = (aci,) if aci in (0, 180) else (aci, -aci)
+                for target in targets:
+                    sd = _sky_wrap180(md - pd - target)
+                    key = (pid, target)
+                    p = prev.get(key)
+                    if (not first and p is not None and p * sd <= 0
+                            and abs(p - sd) < 5.0):
+                        span = abs(p) + abs(sd)
+                        frac = (abs(p) / span) if span else 0.5
+                        last = t - step + step * frac
+                    prev[key] = sd
+        first = False
+        t += step
+    return last
+
+
+def _sky_moon_segments(jd_now, jd_limit):
+    """[jd_now, jd_limit] aralığını Ay'ın burç segmentlerine böler."""
+    start = _sky_moon_prev_change(jd_now)
+    if start is None:
+        start = jd_now
+    segs = []
+    current_start = start
+    jd = start
+    guard = 0
+    while guard < 80:
+        guard += 1
+        a = max(jd, jd_now)
+        nxt = _sky_moon_next_change(a + 1.0 / 24.0)
+        if nxt is None:
+            break
+        if nxt > jd_limit:
+            if a < jd_limit:
+                segs.append(
+                    (a, jd_limit, _sky_moon_sign((a + nxt) / 2.0), False)
+                )
+            break
+        sign = _sky_moon_sign((a + nxt) / 2.0)
+        segs.append((a, nxt, sign, True))
+        jd = nxt
+    return segs, current_start
+
+
+def _sky_void_periods(segs, current_start):
+    """Her burç segmenti için son majör açıdan burç çıkışına kadar boşluk.
+
+    Son (kısmi) segment atlanır: 30 günlük pencere içinde kesilen bir burcun
+    gerçek çıkışı bilinmediği için sahte bir boşluk üretilmemeli.
+    """
+    out = []
+    first = True
+    for a, b, sign, complete in segs:
+        if not complete:
+            first = False
+            continue
+        seg_start = current_start if first else a
+        last = _sky_last_moon_aspect(seg_start, b)
+        vs = last if (last is not None and seg_start <= last <= b) else seg_start
+        if b - vs > 1e-9:
+            out.append({"s": vs, "e": b, "sign": sign})
+        first = False
+    return out
+
+
+def _sky_lunations_between(jd_start, jd_end):
+    """Aralıktaki yeni ay ve dolunay anları (evre sınırları için)."""
+    out = []
+    for target in (0.0, 180.0):
+        jd = jd_start - 1.0
+        guard = 0
+        while guard < 10:
+            guard += 1
+            e = _sky_next_lunation(jd, target)
+            if e is None or e > jd_end:
+                break
+            if e >= jd_start:
+                out.append(e)
+            jd = e + 1.0
+    return sorted(out)
+
+
+def _sky_activity_windows(jd_now, jd_limit, segs, voids, lunations, rule):
+    """Kurala uyan kesintisiz zaman pencereleri üretir."""
+    bounds = {jd_now}
+    for a, b, _sign, _complete in segs:
+        if jd_now < a < jd_limit:
+            bounds.add(a)
+        if jd_now < b < jd_limit:
+            bounds.add(b)
+    for v in voids:
+        if jd_now < v["s"] < jd_limit:
+            bounds.add(v["s"])
+    for l in lunations:
+        if jd_now < l < jd_limit:
+            bounds.add(l)
+    bounds = sorted(bounds)
+
+    out = []
+    for a, b in zip(bounds, bounds[1:]):
+        if b - a < 1e-9:
+            continue
+        mid = (a + b) / 2.0
+        m, _ = _sky_pos(mid, swe.MOON)
+        s, _ = _sky_pos(mid, swe.SUN)
+        waxing = ((m - s) % 360.0) < 180.0
+        if rule["waxing"] is not None and waxing != rule["waxing"]:
+            continue
+        sign = int(m // 30)
+        if rule["signs"] is not None and sign not in rule["signs"]:
+            continue
+        if any(v["s"] <= mid < v["e"] for v in voids):
+            continue
+        if out and abs(out[-1]["e"] - a) < 1e-9 and out[-1]["sign"] == sign:
+            out[-1]["e"] = b
+        else:
+            out.append({"s": a, "e": b, "sign": sign, "waxing": waxing})
+    # 45 dakikadan kısa pencereler gösterilmez.
+    return [w for w in out if w["e"] - w["s"] >= 45.0 / (24.0 * 60.0)][:8]
+
+
+@app_fast.get("/api/sky/moon-timing")
+def sky_moon_timing(days: int = 30):
+    """Ay boşta (VOC) dönemleri ve eylemlere göre doğru zaman pencereleri."""
+    days = max(1, min(60, int(days)))
+    cache_key = (int(time.time() // 300), days)
+    cached = _SKY_TIMING_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    ephe_yolu = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(ephe_yolu):
+        swe.set_ephe_path(ephe_yolu)
+
+    now = datetime.utcnow()
+    jd_now = swe.julday(
+        now.year, now.month, now.day,
+        now.hour + now.minute / 60.0 + now.second / 3600.0,
+    )
+    jd_limit = jd_now + days
+
+    segs, current_start = _sky_moon_segments(jd_now, jd_limit)
+    voids = _sky_void_periods(segs, current_start)
+    lunations = _sky_lunations_between(jd_now, jd_limit)
+
+    pencereler = {}
+    for key, rule in _SKY_ACTIVITY_RULES.items():
+        pencereler[key] = [
+            {
+                "baslangic": _sky_epoch(w["s"]),
+                "bitis": _sky_epoch(w["e"]),
+                "burc": w["sign"],
+                "evre": "waxing" if w["waxing"] else "waning",
+            }
+            for w in _sky_activity_windows(
+                jd_now, jd_limit, segs, voids, lunations, rule
+            )
+        ]
+
+    moon_now, _mh = _sky_pos(jd_now, swe.MOON)
+    current = next((v for v in voids if v["s"] <= jd_now < v["e"]), None)
+    bosluklar = [
+        {
+            "baslangic": _sky_epoch(v["s"]),
+            "bitis": _sky_epoch(v["e"]),
+            "burc": v["sign"],
+        }
+        for v in voids
+        if v["e"] > jd_now
+    ][:8]
+
+    sonuc = {
+        "ok": True,
+        "sunucu_zamani": _sky_epoch(jd_now),
+        "ay": {
+            "mutlak": round(moon_now, 4),
+            "burc": int(moon_now // 30),
+            "derece": round(moon_now % 30, 2),
+            "bos": current is not None,
+            "bos_baslangic": _sky_epoch(current["s"]) if current else None,
+            "bos_bitis": _sky_epoch(current["e"]) if current else None,
+        },
+        "bosluklar": bosluklar,
+        "pencereler": pencereler,
+    }
+    if len(_SKY_TIMING_CACHE) > 32:
+        _SKY_TIMING_CACHE.clear()
+    _SKY_TIMING_CACHE[cache_key] = sonuc
+    return sonuc
+
 
 # ── Haritalar (SolarFire tarzı) ─────────────────────────────────────────
 # Paralel modül. Mevcut analiz akışına dokunmaz.

@@ -7,9 +7,11 @@ import '../config/astro_signs.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../models/sky_calendar.dart';
+import '../models/sky_moon_timing.dart';
 import '../models/sky_snapshot.dart';
 import '../services/api_service.dart';
 import '../models/sky_event_export.dart';
+import '../widgets/moon_timing_card.dart';
 import '../widgets/pro_gate.dart';
 import '../widgets/sky_daily_reading_card.dart';
 
@@ -136,6 +138,7 @@ class SkyCalendarScreen extends StatefulWidget {
 class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
   late Future<SkyCalendar> _future;
   late Future<SkyMoonCalendar?> _moon;
+  late Future<SkyMoonTiming?> _timing;
   late Future<SkySnapshot?> _reading;
   Timer? _readingTimer;
   String _filter = 'all';
@@ -147,6 +150,7 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
     super.initState();
     _future = _load();
     _moon = _loadMoon();
+    _timing = _loadTiming();
     _reading = _loadReading();
     // Yorum, Ay burcu değiştiğinde kendiliğinden tazelensin.
     _readingTimer = Timer.periodic(const Duration(minutes: 15), (_) {
@@ -183,10 +187,20 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
     }
   }
 
+  /// VOC ve doğru zaman pencereleri; uç yoksa kart gizlenir.
+  Future<SkyMoonTiming?> _loadTiming() async {
+    try {
+      return SkyMoonTiming.fromJson(await _api.skyMoonTiming());
+    } catch (_) {
+      return null;
+    }
+  }
+
   void _reload() {
     setState(() {
       _future = _load();
       _moon = _loadMoon();
+      _timing = _loadTiming();
       _reading = _loadReading();
     });
   }
@@ -288,6 +302,24 @@ class _SkyCalendarScreenState extends State<SkyCalendarScreen> {
                     final moon = ms.data;
                     if (moon == null) return const SizedBox.shrink();
                     return _MoonSection(moon: moon, onElapsed: _reloadMoon);
+                  },
+                ),
+              ),
+              ProGate(
+                icon: Icons.hourglass_disabled_outlined,
+                title: l.skyMoonTimingTitle,
+                body: l.proLockTimingBody,
+                statusLoader: widget.proLoader,
+                child: FutureBuilder<SkyMoonTiming?>(
+                  future: _timing,
+                  builder: (context, ts) {
+                    final timing = ts.data;
+                    if (timing == null) return const SizedBox.shrink();
+                    return MoonTimingCard(
+                      timing: timing,
+                      onExport: (time, title, description) =>
+                          _exportEvent(context, time, title, description),
+                    );
                   },
                 ),
               ),

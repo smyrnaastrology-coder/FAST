@@ -3282,4 +3282,127 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get skyReadingAspectOpposition =>
       'asks you to balance opposing needs.';
+
+  @override
+  String get skyMoonTimingTitle => 'Moon Void of Course';
+
+  @override
+  String skyMoonTimingActive(String time) {
+    return 'Moon is void now · until $time';
+  }
+
+  @override
+  String get skyMoonTimingNext => 'Upcoming void periods';
+
+  @override
+  String get skyMoonTimingNone => 'No void periods in the coming days.';
+
+  @override
+  String get skyMoonTimingNote =>
+      'The Moon is \'void\' when it has completed its last major aspect before changing sign. Classical astrology advises against starting new ventures during these periods.';
+
+  @override
+  String get skyActivityTitle => 'Right timing windows';
+
+  @override
+  String get skyActivityHairGrowth => 'Hair growth';
+
+  @override
+  String get skyActivityHairThicken => 'Hair thickness';
+
+  @override
+  String get skyActivityWedding => 'Wedding';
+
+  @override
+  String get skyActivityContract => 'Contract';
+
+  @override
+  String get skyActivityMoving => 'Moving';
+
+  @override
+  String get skyActivityRuleHairGrowth => 'Waxing Moon, not void';
+
+  @override
+  String get skyActivityRuleHairThicken => 'Waxing Moon · Taurus, Leo, Virgo';
+
+  @override
+  String get skyActivityRuleWedding =>
+      'Waxing Moon · Taurus, Cancer, Libra, Pisces';
+
+  @override
+  String get skyActivityRuleContract => 'Waxing Moon · cardinal signs';
+
+  @override
+  String get skyActivityRuleMoving => 'Earth signs · not void';
+
+  @override
+  String get skyActivityEmpty => 'No suitable window in this period.';
+
+  @override
+  String get skyActivityTapHint => 'Tap to add to your calendar';
+
+  @override
+  String get proLockTimingBody =>
+      'Moon void-of-course periods and right timing windows for haircuts, contracts, weddings and moving are available with Pro.';
+
+  @override
+  String get skyActivityTrade => 'Trade';
+
+  @override
+  String get skyActivityEducation => 'Education';
+
+  @override
+  String get skyActivityPlanting => 'Planting';
+
+  @override
+  String get skyActivityRuleTrade =>
+      'Waxing Moon · Taurus, Gemini, Virgo, Libra';
+
+  @override
+  String get skyActivityRuleEducation =>
+      'Waxing Moon · Gemini, Virgo, Sagittarius, Pisces';
+
+  @override
+  String get skyActivityRulePlanting =>
+      'Waxing Moon · Taurus, Cancer, Scorpio, Capricorn, Pisces';
+
+  @override
+  String get skyActivityAboutHairGrowth =>
+      'Hair cut under a waxing Moon is believed to grow faster. Use these windows if you want length.';
+
+  @override
+  String get skyActivityAboutHairThicken =>
+      'Cuts in Taurus, Leo and Virgo are said to make hair thicker. Wait for these signs for fuller hair.';
+
+  @override
+  String get skyActivityAboutTrade =>
+      'Shopping, bargaining and trade are lively in Mercury signs under a waxing Moon. A good base for sales, purchases and new clients.';
+
+  @override
+  String get skyActivityAboutEducation =>
+      'Mercury and Jupiter signs are considered clearer for learning, course applications and exam preparation.';
+
+  @override
+  String get skyActivityAboutContract =>
+      'Cardinal signs support starting, and a waxing Moon supports growth. Favourable for signatures and agreements.';
+
+  @override
+  String get skyActivityAboutWedding =>
+      'A waxing Moon in Taurus, Cancer, Libra and Pisces is considered favourable for bonding and strengthening partnership.';
+
+  @override
+  String get skyActivityAboutMoving =>
+      'Moving under an earth sign and a Moon that is not void is associated with stability and settling in.';
+
+  @override
+  String get skyActivityAboutPlanting =>
+      'A waxing Moon and water/earth signs are considered fertile for sowing, planting and garden work.';
+
+  @override
+  String get skyMoonTimingVoidHint =>
+      'Hold off on new ventures, signatures or shopping; start once the void ends.';
+
+  @override
+  String get skyMoonTimingClearHint =>
+      'The Moon is not void. Pick an activity below and add a suitable window to your calendar.';
 }

@@ -634,7 +634,13 @@
   "storyRepostAdded": "Añadido a tu historia",
   "storyRepostFailed": "No se pudo añadir a la historia",
   "shareProfileMessage": "@{handle} — comunidad de astrología Holavon",
-  "@shareProfileMessage": {"placeholders": {"handle": {"type": "String"}}},
+  "@shareProfileMessage": {
+    "placeholders": {
+      "handle": {
+        "type": "String"
+      }
+    }
+  },
   "feedFollowingTab": "Siguiendo",
   "feedDiscoverTab": "Descubrir",
   "feedFollowingEmpty": "Las publicaciones de las personas que sigues aparecerán aquí.",
@@ -1075,5 +1081,47 @@
   "skyReadingAspectSextile": "abre una oportunidad sencilla y una puerta a la cooperación.",
   "skyReadingAspectSquare": "genera tensión interna; la paciencia funciona mejor que la prisa.",
   "skyReadingAspectTrine": "aporta una armonía fluida y de apoyo.",
-  "skyReadingAspectOpposition": "te pide equilibrar necesidades opuestas."
+  "skyReadingAspectOpposition": "te pide equilibrar necesidades opuestas.",
+  "skyMoonTimingTitle": "Luna en Vacío",
+  "skyMoonTimingActive": "La Luna está en vacío · hasta {time}",
+  "skyMoonTimingNext": "Próximos períodos de vacío",
+  "skyMoonTimingNone": "No hay períodos de vacío en los próximos días.",
+  "skyMoonTimingNote": "La Luna está 'en vacío' cuando ya completó su último aspecto mayor antes de cambiar de signo. La astrología clásica desaconseja iniciar nuevos proyectos en estos períodos.",
+  "skyActivityTitle": "Ventanas de buen momento",
+  "skyActivityHairGrowth": "Crecimiento del pelo",
+  "skyActivityHairThicken": "Grosor del pelo",
+  "skyActivityWedding": "Boda",
+  "skyActivityContract": "Contrato",
+  "skyActivityMoving": "Mudanza",
+  "skyActivityRuleHairGrowth": "Luna creciente, no en vacío",
+  "skyActivityRuleHairThicken": "Luna creciente · Tauro, Leo, Virgo",
+  "skyActivityRuleWedding": "Luna creciente · Tauro, Cáncer, Libra, Piscis",
+  "skyActivityRuleContract": "Luna creciente · signos cardinales",
+  "skyActivityRuleMoving": "Signos de tierra · no en vacío",
+  "skyActivityEmpty": "No hay ventana adecuada en este período.",
+  "skyActivityTapHint": "Toca para añadir al calendario",
+  "proLockTimingBody": "Los períodos de Luna en vacío y las ventanas de buen momento para cortes de pelo, firmas, bodas y mudanzas están disponibles con Pro.",
+  "@skyMoonTimingActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "skyActivityTrade": "Comercio",
+  "skyActivityEducation": "Educación",
+  "skyActivityPlanting": "Siembra",
+  "skyActivityRuleTrade": "Luna creciente · Tauro, Géminis, Virgo, Libra",
+  "skyActivityRuleEducation": "Luna creciente · Géminis, Virgo, Sagitario, Piscis",
+  "skyActivityRulePlanting": "Luna creciente · Tauro, Cáncer, Escorpio, Capricornio, Piscis",
+  "skyActivityAboutHairGrowth": "Se cree que el pelo cortado con Luna creciente crece más rápido. Usa estas ventanas si quieres longitud.",
+  "skyActivityAboutHairThicken": "Se dice que los cortes en Tauro, Leo y Virgo hacen el pelo más grueso. Espera estos signos para más volumen.",
+  "skyActivityAboutTrade": "Las compras, el regateo y el comercio están animados en los signos de Mercurio con Luna creciente. Buena base para ventas, compras y nuevos clientes.",
+  "skyActivityAboutEducation": "Los signos de Mercurio y Júpiter se consideran más claros para aprender, solicitar cursos y preparar exámenes.",
+  "skyActivityAboutContract": "Los signos cardinales apoyan empezar y la Luna creciente apoya crecer. Favorable para firmas y acuerdos.",
+  "skyActivityAboutWedding": "La Luna creciente en Tauro, Cáncer, Libra y Piscis se considera favorable para unir y fortalecer una relación.",
+  "skyActivityAboutMoving": "Mudarse con Luna en signo de tierra y sin vacío se asocia con estabilidad y arraigo.",
+  "skyActivityAboutPlanting": "La Luna creciente y los signos de agua/tierra se consideran fértiles para sembrar, plantar y trabajar el jardín.",
+  "skyMoonTimingVoidHint": "Espera para nuevos proyectos, firmas o compras; empieza cuando termine el vacío.",
+  "skyMoonTimingClearHint": "La Luna no está en vacío. Elige una actividad y añade una ventana adecuada a tu calendario."
 }
