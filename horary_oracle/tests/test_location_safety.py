@@ -70,15 +70,38 @@ def test_person_location_answer_states_tradition_and_does_not_invent_details():
             "house": 6,
             "ruler_sign": "Kova",
             "trust_level": "zayif",
+            "trust_n_type": 1,
+            "horary_geo": {
+                "azimut": 45.0,
+                "mesafe_kalibre_km": 42,
+                "band": "~50–100 km",
+            },
         },
     ).lower()
     assert "klasik horary'de öğrenci 3. evle temsil ediliyor" in answer
     assert "klasik yöneticisi satürn" in answer
     assert "satürn i̇kizler burcunda, 6. evde" in answer
     assert "okul, staj ya da iş rutini" in answer
+    assert "kalibre edilmiş yön ipucu: yaklaşık kuzeydoğu (45° azimut), güven zayıf" in answer
+    assert "50–100 km" not in answer  # weak trust suppresses distance, not direction
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", answer)
-    assert "kuzeydoğu" not in answer
     assert "kiler" not in answer
+
+
+def test_medium_trust_can_report_calibrated_km():
+    answer = person_location_answer(
+        "tr", "Arkadaş", reported_missing=False,
+        context={
+            "subject_type": "friend", "_derived_house": 11,
+            "sig_planet": "Venus", "sign": "Boğa", "house": 6,
+            "ruler_sign": "Terazi", "trust_level": "orta",
+            "trust_n_type": 3, "trust_dir_err_deg": 31.0,
+            "horary_geo": {"azimut": 225, "mesafe_kalibre_km": 80, "band": "~50–100 km"},
+        },
+    ).lower()
+    assert "güven orta" in answer
+    assert "~50–100 km" in answer
+    assert "yaklaşık güneybatı" in answer
 
 
 def test_general_person_theme_is_not_school_specific():
@@ -135,7 +158,8 @@ def test_api_bypasses_llm_and_redacts_fake_geo_for_student(monkeypatch):
     assert "klasik yöneticisi" in body["answer"]
     assert "sembolik olarak" in body["answer"]
     assert "uranüs" not in body["answer"].lower()
-    assert "kuzeydoğu" not in body["answer"].lower()
+    assert "kalibre edilmiş yön ipucu" in body["answer"].lower()
+    assert "güven zayıf" in body["answer"].lower()
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", body["answer"].lower())
     assert body["location"] == {
         "subject_type": "person",

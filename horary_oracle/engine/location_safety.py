@@ -1,10 +1,9 @@
 """Safety and intent handling for horary questions about a real person's location.
 
-Astrological chart data cannot verify anyone's live physical location. Keep
-person-location questions out of the lost-object prompt and avoid fabricated
-directions, distances, rooms, or cities. Instead, translate the significator's
-sign/house into a symbolic *kind of environment* (school routine, home, group
-setting, ...), and say plainly that it is symbolism, not a verified address.
+Use the calibrated horary direction, and calibrated distance only when the
+question-type trust layer allows it. Keep the result explicitly approximate:
+this is not live tracking or a verified address, and must not invent a room,
+city, or more precise bearing than the calibration supports.
 """
 
 import re
@@ -140,6 +139,93 @@ _ES_PLANETS = {
     "Sun": "Sol", "Moon": "Luna", "Mercury": "Mercurio", "Venus": "Venus",
     "Mars": "Marte", "Jupiter": "Júpiter", "Saturn": "Saturno",
 }
+_DIRECTION_EN = {
+    "Kuzey": "North", "Kuzey-Kuzeydoğu": "North-northeast", "Kuzeydoğu": "Northeast",
+    "Doğu-Kuzeydoğu": "East-northeast", "Doğu": "East", "Doğu-Güneydoğu": "East-southeast",
+    "Güneydoğu": "Southeast", "Güney-Güneydoğu": "South-southeast", "Güney": "South",
+    "Güney-Güneybatı": "South-southwest", "Güneybatı": "Southwest", "Batı-Güneybatı": "West-southwest",
+    "Batı": "West", "Batı-Kuzeybatı": "West-northwest", "Kuzeybatı": "Northwest",
+    "Kuzey-Kuzeybatı": "North-northwest",
+}
+_DIRECTION_ES = {
+    "Kuzey": "Norte", "Kuzey-Kuzeydoğu": "Norte-noreste", "Kuzeydoğu": "Noreste",
+    "Doğu-Kuzeydoğu": "Este-noreste", "Doğu": "Este", "Doğu-Güneydoğu": "Este-sureste",
+    "Güneydoğu": "Sureste", "Güney-Güneydoğu": "Sur-sureste", "Güney": "Sur",
+    "Güney-Güneybatı": "Sur-suroeste", "Güneybatı": "Suroeste", "Batı-Güneybatı": "Oeste-suroeste",
+    "Batı": "Oeste", "Batı-Kuzeybatı": "Oeste-noroeste", "Kuzeybatı": "Noroeste",
+    "Kuzey-Kuzeybatı": "Norte-noroeste",
+}
+
+
+def _direction_from_context(context, language):
+    """Prefer the calibrated azimuth; fall back to separate house/sign clues."""
+    geo = context.get("horary_geo") or {}
+    azimuth = geo.get("azimut")
+    if isinstance(azimuth, (int, float)):
+        try:
+            from engine.lilly_location import angle_to_dir_label
+            label_tr = angle_to_dir_label(float(azimuth))
+            label = (_DIRECTION_EN if language == "en" else _DIRECTION_ES if language == "es" else {}).get(label_tr, label_tr)
+            return label, float(azimuth), "calibrated"
+        except Exception:
+            pass
+    house_dir = context.get("direction")
+    sign_dir = context.get("sign_direction")
+    if house_dir or sign_dir:
+        return None, None, "symbolic"
+    return None, None, None
+
+
+def _location_calibration_lines(context, language):
+    """Build directional/distance lines without exceeding the trust tier."""
+    lines = []
+    label, azimuth, source = _direction_from_context(context, language)
+    trust = context.get("trust_level") or "zayif"
+    geo = context.get("horary_geo") or {}
+    n = context.get("trust_n_type")
+    err = context.get("trust_dir_err_deg")
+
+    if label:
+        if language == "tr":
+            confidence = {"guclu": "güçlü", "orta": "orta", "zayif": "zayıf"}.get(trust, "zayıf")
+            stat = f"; {n} doğrulanmış vaka" if isinstance(n, int) else ""
+            if isinstance(err, (int, float)):
+                stat += f", ortalama yön hatası {err:.0f}°"
+            lines.append(f"Kalibre edilmiş yön ipucu: yaklaşık {label} ({azimuth:.0f}° azimut), güven {confidence}{stat}.")
+        elif language == "es":
+            confidence = {"guclu": "alta", "orta": "media", "zayif": "baja"}.get(trust, "baja")
+            stat = f"; {n} casos verificados" if isinstance(n, int) else ""
+            if isinstance(err, (int, float)):
+                stat += f", error direccional medio {err:.0f}°"
+            lines.append(f"Pista direccional calibrada: aproximadamente {label} (azimut {azimuth:.0f}°), confianza {confidence}{stat}.")
+        else:
+            confidence = {"guclu": "high", "orta": "medium", "zayif": "low"}.get(trust, "low")
+            stat = f"; {n} verified cases" if isinstance(n, int) else ""
+            if isinstance(err, (int, float)):
+                stat += f", mean direction error {err:.0f}°"
+            lines.append(f"Calibrated direction clue: approximately {label} ({azimuth:.0f}° bearing), {confidence} confidence{stat}.")
+    elif source == "symbolic":
+        house_dir = context.get("direction")
+        sign_dir = context.get("sign_direction")
+        if language == "tr":
+            lines.append(f"Sembolik yön ipuçları: ev yönü {house_dir or 'belirsiz'}; burç yönü {sign_dir or 'belirsiz'}.")
+        elif language == "es":
+            lines.append(f"Pistas direccionales simbólicas: casa {house_dir or 'incierta'}; signo {sign_dir or 'incierto'}.")
+        else:
+            lines.append(f"Symbolic direction clues: house direction {house_dir or 'unclear'}; sign direction {sign_dir or 'unclear'}.")
+
+    # Distance is shown only when the calibration trust tier explicitly permits it.
+    km = geo.get("mesafe_kalibre_km")
+    band = geo.get("band")
+    if trust in ("orta", "guclu") and isinstance(km, (int, float)) and km >= 0:
+        distance = band if isinstance(band, str) and band.strip() else f"yaklaşık {km:.0f} km"
+        if language == "tr":
+            lines.append(f"Kalibre edilmiş mesafe tahmini: {distance} (yaklaşık; canlı konum doğrulaması değildir).")
+        elif language == "es":
+            lines.append(f"Distancia calibrada estimada: {distance} (aproximada; no es una verificación en tiempo real).")
+        else:
+            lines.append(f"Calibrated distance estimate: {distance} (approximate; not live-location verification).")
+    return lines
 
 
 def person_location_subject(question: str, quesited_type: str = "general"):
@@ -215,8 +301,6 @@ def person_location_answer(
     planet = context.get("sig_planet")
     sign = context.get("sign")
     ruler_sign = context.get("ruler_sign")
-    trust = context.get("trust_level")
-
     if language == "tr":
         if planet:
             planet = _TR_PLANETS.get(planet, planet)
@@ -236,17 +320,11 @@ def person_location_answer(
             )
         if theme:
             lines.append(f"Bu yerleşim sembolik olarak {theme} temasını öne çıkarıyor.")
-        if trust == "zayif":
-            lines.append(
-                "Bu soru türünde yön doğrulamamız zayıf; bu yüzden kesin pusula yönü "
-                "ve kilometre vermiyorum. Bu, gerçek konum/adres tespiti değil, horary "
-                "sembolizmine dayalı genel bir ortam ipucudur."
-            )
-        else:
-            lines.append(
-                "Bunu doğrulanmış gerçek konum değil, horary sembolizmine dayalı genel bir "
-                "ortam ipucu olarak değerlendir."
-            )
+        lines.extend(_location_calibration_lines(context, language))
+        lines.append(
+            "Yön/mesafe kalibrasyon çıktısı yaklaşık bir horary tahminidir; gerçek zamanlı "
+            "konum veya adres doğrulaması değildir."
+        )
         if reported_missing:
             lines.append(
                 "Gerçekten kayıpsa veya güvenliğinden endişe ediyorsan öğrenciyi ve gerekiyorsa "
@@ -269,9 +347,8 @@ def person_location_answer(
             lines.append(f"El significador {planet} está en {sign}, casa {position_house}.")
         if theme:
             lines.append(f"Esa posición destaca simbólicamente {theme}.")
-        lines.append(
-            "Es una pista astrológica general, no una ubicación real verificada ni una dirección."
-        )
+        lines.extend(_location_calibration_lines(context, language))
+        lines.append("Son pistas horarias aproximadas, no una ubicación en tiempo real ni una dirección verificada.")
         if reported_missing:
             lines.append(
                 "Si realmente ha desaparecido o hay riesgo, contacta con la escuela, sus "
@@ -291,12 +368,8 @@ def person_location_answer(
         lines.append(f"The significator {planet} is in {sign}, house {position_house}.")
     if theme:
         lines.append(f"That placement symbolically highlights {theme}.")
-    lines.append("This is a general astrological theme, not a verified live location or address.")
-    if trust == "zayif":
-        lines.append(
-            "Direction and distance are not reliable for this question type, so I won't "
-            "give a compass bearing or kilometers."
-        )
+    lines.extend(_location_calibration_lines(context, language))
+    lines.append("These are approximate horary estimates, not live tracking or a verified address.")
     if reported_missing:
         lines.append(
             "If the person is actually missing or at risk, contact the school/guardian and "
