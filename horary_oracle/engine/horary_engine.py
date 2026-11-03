@@ -915,6 +915,49 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         except Exception:
             pass
 
+    # --- HAVA DURUMU ÇERÇEVESİ (kitap #62) ---
+    # Hedef 6. ev. 6. evin yöneticisi querent göstergesine YUMUŞAK açı (kavuşum/
+    # sekstil/üçgen) yapıyorsa yağış EVET; sert açı (kare/karşıtlık) ise HAYIR.
+    # Kitap geniş orb kullanıyor (Ay 8° Oğlak ~ Uranüs 22° Akrep sekstil sayılmış),
+    # bu yüzden yumuşak açıda 15°'ye kadar kabul ediliyor.
+    weather_override = None
+    if quesited_type == "weather":
+        try:
+            _w_rn = quesited["planet"]
+            _w_rd = planets.get(_w_rn) or {}
+            _q_rn = querent["planet"]
+            _q_rd = planets.get(_q_rn) or {}
+            _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}
+            _soft = None
+            _hard = None
+            for _a in (0, 60, 120):
+                _ap, _dd = aspect_pair(_w_rd.get("lon", 0), _q_rd.get("lon", 0), _a)
+                if _ap and _dd <= 15:
+                    _soft = (_a, _dd); break
+            if not _soft:
+                for _a in (90, 180):
+                    _ap, _dd = aspect_pair(_w_rd.get("lon", 0), _q_rd.get("lon", 0), _a)
+                    if _ap and _dd <= 10:
+                        _hard = (_a, _dd); break
+            if _soft:
+                _sc(10, "weather_precip_yes")
+                weather_override = "YES"
+                strictures.append({"code":"weather_precip_yes","level":"info","planet":_w_rn,"with":_q_rn,
+                    "meaning":f"HAVA (#62) EVET: hava hedefi 6. evin yöneticisi {_w_rn}, soruyu soranın göstergesi {_q_rn} ile {_anm.get(_soft[0])} açıda (~{_soft[1]:.1f}°) — yağış işareti var (+10)."})
+            elif _hard:
+                _sc(-10, "weather_precip_no")
+                weather_override = "NO"
+                strictures.append({"code":"weather_precip_no","level":"info","planet":_w_rn,"with":_q_rn,
+                    "meaning":f"HAVA (#62) HAYIR: 6. evin yöneticisi {_w_rn}, soranın göstergesi {_q_rn} ile {_anm.get(_hard[0])} açıda (~{_hard[1]:.1f}°) — yağış engelleniyor (-10)."})
+            else:
+                strictures.append({"code":"weather_no_aspect","level":"info","planet":_w_rn,"with":_q_rn,
+                    "meaning":f"HAVA (#62): 6. evin yöneticisi {_w_rn} ile soranın göstergesi {_q_rn} arasında yağış açısı yok — gökyüzü durağan."})
+            _wp = [s for s in strictures if str(s.get("code", "")).startswith("weather_")]
+            if _wp:
+                strictures[:] = _wp + [s for s in strictures if not str(s.get("code", "")).startswith("weather_")]
+        except Exception:
+            pass
+
     # Threshold
     if _DO_TRACE:
         import sys as _sys
@@ -927,6 +970,9 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         verdict = "NO"
     else:
         verdict = "UNCERTAIN"
+    # Hava durumu çerçevesi (6. ev) karar verici: 6. ev yöneticisi - querent açısı.
+    if weather_override:
+        verdict = weather_override
 
     # --- Bonatus / Vergilius dolunay ---
     try:

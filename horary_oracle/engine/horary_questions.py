@@ -43,6 +43,7 @@ QUESTION_HOUSES = {
     "sport_rival": 11,
     "sport_fan": 7,      # TARAFTAR çerçevesi (kitap #59): takım 7.ev, rakip takımın 7.'si = sorgu 1., onur 4., rakip takım 11.
     "sport_goals": 5,    # GOL/DAKİKA/skor sorusu (gösteri/spekülasyon 5.ev) -> kalibre değilse dakika verilmez
+    "weather": 6,        # HAVA DURUMU (kitap #62): hedef 6.ev; 6.ev yöneticisi querent'e yumuşak açı = yağış
     "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
@@ -58,6 +59,7 @@ LABEL_TR = {
     "sport_fav": "Kendi takımın (katılımcı çerçevesi, #34)", "sport_rival": "Rakip takım (11.ev)",
     "sport_fan": "Taraftar: üçüncü taraf takım (7.ev) — rakip 1., onur 4., rakip takım 11.",
     "sport_goals": "Gol/dakika/skor sorusu (5. ev) — kalibre değilse dakika verilmez",
+    "weather": "Hava durumu (6. ev) — 6. ev yöneticisinin querent'e açısı",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
@@ -183,6 +185,24 @@ if TEAM_LEXICON:
     _SPORT_TEAM_RE = re.compile(r"(?:" + _alt + r")\D{0,30}?(kazan|kazanır|kazanacak|kazanir)", re.I)
 
 
+# HAVA DURUMU (kitap #62): hedef 6. ev. "Bu gece kar yağacak mı?" gibi sorular.
+_WEATHER_RE = re.compile(
+    r"(kar\s*(yağ|yag)|yağmur\s*(yağ|yag)|yagmur\s*(yag)|kar\s*yağış|kar\s*yagis|yağış\s*olacak|yagis\s*olacak|"
+    r"dolu\s*(yağ|yag)|kar\s*(var\s*mı|var\s*mi|geliyor|bekleniyor)|yağmur\s*(var\s*mı|var\s*mi|bekleniyor)|"
+    r"hava\s*durumu|hava\s*nasıl\s*olacak|hava\s*nasil\s*olacak|hava\s*nasıl\s*olur|"
+    r"will\s+it\s+(snow|rain)|is\s+it\s+going\s+to\s+(snow|rain)|snowfall|weather\s+(today|tonight|tomorrow)|"
+    r"\bnevar[aá]|llover[aá]|va\s+a\s+nevar|va\s+a\s+llover|pron[oó]stico\s+del\s+tiempo)",
+    re.I,
+)
+
+
+def is_weather_question(question: str) -> bool:
+    """Kar/yağmur/hava durumu sorusu mu? (kitap #62 çerçevesi)"""
+    if not question:
+        return False
+    return bool(_WEATHER_RE.search(question.lower()))
+
+
 def is_fan_sport_question(question: str) -> bool:
     """Maç kazananı soran ÜÇÜNCÜ TARAF takım sorusu mu? (#59/#60 çerçevesi)
     Kendi takımı ('bizim/miyiz/takımımız') veya 'kim kazanacak' soruları KENDİ/çift taraf çerçevesinde kalır.
@@ -205,6 +225,8 @@ def classify_question(question):
     Nested (iyelikli ikinci kişi) kelimesi ana tipi kirletmeden tespit edilir.
     """
     q = _strip_nested(question.lower())
+    if _WEATHER_RE.search(q):
+        return {"type": "weather", "house": QUESTION_HOUSES["weather"], "label": LABEL_TR["weather"]}
     # Özel ad (takım) tespiti büyük/küçük harfe duyarlı olduğu için orijinal metin de verilir.
     if is_fan_sport_question(q) or is_fan_sport_question(_strip_nested(question)):
         return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}
