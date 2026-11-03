@@ -8,7 +8,11 @@ from fastapi.testclient import TestClient
 
 import api
 import auth
-from engine.location_safety import person_location_answer, person_location_subject
+from engine.location_safety import (
+    classical_significator,
+    person_location_answer,
+    person_location_subject,
+)
 
 
 def test_student_where_is_person_even_if_lost_object_ui_category_selected():
@@ -35,25 +39,65 @@ def test_student_where_is_detected_in_supported_languages():
     }
 
 
-def test_person_location_answer_does_not_invent_details():
+def test_classical_ruler_is_used_instead_of_modern_outer_planets():
+    # Kova burcu klasikte Saturn, modern astrolojide Uranüs'tür.
+    assert classical_significator(
+        3,
+        [0, 0, 310],
+        {"Saturn": {"sign": "İkizler", "house": 6}},
+    ) == {
+        "ruler_sign": "Kova",
+        "planet": "Saturn",
+        "sign": "İkizler",
+        "house": 6,
+    }
+    # Akrep klasikte Mars, modern astrolojide Plüton'dur.
+    assert classical_significator(
+        7, [0, 0, 0, 0, 0, 0, 220], {"Mars": {"sign": "Yay", "house": 9}}
+    )["planet"] == "Mars"
+
+
+def test_person_location_answer_states_tradition_and_does_not_invent_details():
     answer = person_location_answer(
         "tr",
         "Öğrenci",
         reported_missing=False,
         context={
+            "subject_type": "student",
             "_derived_house": 3,
-            "sig_planet": "Moon",
-            "sign": "Aslan",
-            "house": 4,
+            "sig_planet": "Saturn",
+            "sign": "İkizler",
+            "house": 6,
+            "ruler_sign": "Kova",
             "trust_level": "zayif",
         },
     ).lower()
-    assert "3. ev göstergesi" in answer
-    assert "ay aslan burcunda, 4. evde" in answer
-    assert "ev, aile" in answer
+    assert "klasik horary'de öğrenci 3. evle temsil ediliyor" in answer
+    assert "klasik yöneticisi satürn" in answer
+    assert "satürn i̇kizler burcunda, 6. evde" in answer
+    assert "okul, staj ya da iş rutini" in answer
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", answer)
     assert "kuzeydoğu" not in answer
     assert "kiler" not in answer
+
+
+def test_general_person_theme_is_not_school_specific():
+    answer = person_location_answer(
+        "tr",
+        "Arkadaş",
+        reported_missing=False,
+        context={
+            "subject_type": "friend",
+            "_derived_house": 7,
+            "sig_planet": "Venus",
+            "sign": "Boğa",
+            "house": 6,
+            "ruler_sign": "Terazi",
+            "trust_level": "orta",
+        },
+    ).lower()
+    assert "günlük iş, rutin, hizmet ya da sağlık ortamı" in answer
+    assert "staj" not in answer
 
 
 def test_explicit_missing_person_gets_practical_safety_guidance():
@@ -87,8 +131,10 @@ def test_api_bypasses_llm_and_redacts_fake_geo_for_student(monkeypatch):
 
     assert response.status_code == 200
     body = response.json()
-    assert "3. ev göstergesi" in body["answer"]
+    assert "3. evle temsil ediliyor" in body["answer"]
+    assert "klasik yöneticisi" in body["answer"]
     assert "sembolik olarak" in body["answer"]
+    assert "uranüs" not in body["answer"].lower()
     assert "kuzeydoğu" not in body["answer"].lower()
     assert not re.search(r"\b\d+\s*(km|kilometre|metre)\b", body["answer"].lower())
     assert body["location"] == {

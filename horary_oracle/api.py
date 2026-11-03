@@ -755,6 +755,20 @@ async def _cast(req: CastRequest, *, holavon=None):
         person_location_subject(req.question, req.quesited_type)
         if is_where_q else None
     )
+    if person_where_target and loc_info.get("_derived_house"):
+        # Kisi sorularinda gosterge KLASIK yoneticiden secilir (Kova->Saturn,
+        # Akrep->Mars); modern Uranus/Pluto/Neptune kullanilmaz. Boylece
+        # yorumun hangi gelenekten geldigi acikca soylenebilir.
+        from engine.location_safety import classical_significator
+        _sig = classical_significator(
+            loc_info["_derived_house"], res["houses"]["cusps"], res["planets"]
+        )
+        if _sig.get("planet") and _sig.get("sign") and _sig.get("house"):
+            loc_info["sig_planet"] = _sig["planet"]
+            loc_info["sign"] = _sig["sign"]
+            loc_info["house"] = _sig["house"]
+            loc_info["ruler_sign"] = _sig["ruler_sign"]
+            loc_info["ruler_tradition"] = "classical"
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
@@ -1192,11 +1206,13 @@ async def _cast(req: CastRequest, *, holavon=None):
         pass
     if person_where_target:
         from engine.location_safety import person_location_answer
+        _loc_ctx = dict(loc_info)
+        _loc_ctx["subject_type"] = person_where_target["type"]
         answer = person_location_answer(
             req.lang,
             person_where_target["label"],
             loc_info.get("urgency") == "kayip",
-            loc_info,
+            _loc_ctx,
         )
     else:
         answer = call_openai(engine_json, req.lang)
