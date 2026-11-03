@@ -922,6 +922,16 @@ async def _cast(req: CastRequest, *, holavon=None):
                 )
         except Exception:
             pass
+    # KAYIP EŞYA: yalnızca sorulan konum için sembolik ipuçları; bulunma hükmü/zamanı ekleme.
+    if qtype == "lost_object":
+        try:
+            from engine.lost_object_brief import build_lost_object_brief
+            _lost_brief = build_lost_object_brief(res, qtype, req.lang)
+            if _lost_brief:
+                engine_json["lost_object_brief"] = _lost_brief
+                engine_json.pop("timing", None)
+        except Exception:
+            pass
     # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
     if holavon is None:
         try:
@@ -1300,6 +1310,10 @@ async def _cast(req: CastRequest, *, holavon=None):
             loc_info.get("urgency") == "kayip",
             _loc_ctx,
         )
+    elif engine_json.get("lost_object_brief"):
+        # Deterministic and intentionally limited to the asked-for location clues.
+        # Do not volunteer whether/when it will be found.
+        answer = engine_json["lost_object_brief"]
     else:
         answer = call_openai(engine_json, req.lang)
     if not person_where_target and engine_json.get("sport_brief"):
