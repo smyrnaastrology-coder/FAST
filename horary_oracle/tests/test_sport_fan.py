@@ -32,6 +32,11 @@ def test_fan_frame_detection():
     assert not is_fan_sport_question("Maçı kim kazanacak?")
     # spor dışı soru -> fan değil
     assert not is_fan_sport_question("Babam nerede?")
+    # #62: "maç" kelimesi yok, YENME fiili + iki takım adı yeterli
+    assert is_fan_sport_question("Dallas Houston'ı yenecek mi?")
+    assert (classify_question("Dallas Houston'ı yenecek mi?") or {}).get("type") == "sport_fan"
+    # tek özel ad + yenme fiili takım sorusu sayılmaz (kişi sorusu olabilir)
+    assert not is_fan_sport_question("Ali'yi yenecek miyim?")
     print("OK frame detection")
 
 
@@ -132,6 +137,23 @@ def test_superbowl_redskins_no_regression():
     print(f"OK Superbowl XVIII NO score={r['score']}")
 
 
+def test_62_dallas_houston_no():
+    """#62: 22 Kas 1979 12:40 PST Coeur d'Alene, "Dallas Houston'ı yenecek mi?"
+
+    Gerçek sonuç: Houston kazandı. Kitap: Dallas'ın göstergesi Güneş 29° Akrep'te
+    (anaretik, eksi puan) ve Şans Noktası Houston'ın 1. evinde (Houston artısı).
+    """
+    r = cast_horary_chart(1979, 11, 22, 20 + 40 / 60.0, COEUR[0], COEUR[1], "sport_fan")
+    codes = [s["code"] for s in r["strictures"]]
+    assert "sport_team_ruler_anaretic" in codes, codes
+    assert "sport_pof_in_rival_1st" in codes, codes
+    assert r["verdict"] == "NO", f"#62 NO olmali, {r['verdict']} score={r['score']}"
+    # kitaptaki derecelerle uyum (Sun 29.9 Akrep, Merkür 23.8 Akrep, Satürn 25.2 Başak)
+    sun = r["planets"]["Sun"]
+    assert sun["sign"] == "Akrep" and sun["deg"] >= 29, sun
+    print(f"OK #62 NO score={r['score']}")
+
+
 def test_sport_brief_lists_the_checklist():
     r = cast_horary_chart(1982, 3, 10, 3 + 38 / 60.0, COEUR[0], COEUR[1], "sport_fan")
     brief = build_sport_brief(r, "sport_fan", "tr")
@@ -159,5 +181,6 @@ if __name__ == "__main__":
     test_60_same_chart_own_team_frame_unchanged()
     test_opponent_ruler_in_honor_counts_against_the_team()
     test_superbowl_redskins_no_regression()
+    test_62_dallas_houston_no()
     test_sport_brief_lists_the_checklist()
-    print("test_sport_fan: 10/10 OK")
+    print("test_sport_fan: 11/11 OK")

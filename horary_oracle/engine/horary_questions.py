@@ -136,6 +136,13 @@ def _strip_nested(q):
 _SPORT_MATCH_RE = re.compile(r"(play[-\s]?off|play[-\s]?offs|maç|mac|derbi|final|şampiyonluk|sampiyonluk)\D{0,40}?(kazan|kazanır|kazanacak|kazanir)", re.I)
 _SPORT_OWN_RE = re.compile(r"\b(bizim|biz|miyiz|takımım|takimim|takımımız|takimimiz|maçımız|macimiz|my team|our team|will we|we win)\b", re.I)
 _SPORT_WHO_WINS_RE = re.compile(r"(maçı kim kazanacak|maci kim kazanacak|kim kazanır|kim kazanacak|kazanan kim|kim kazandı)", re.I)
+# "Dallas Houston'ı yenecek mi?" gibi YENME fiilli maç soruları (#62).
+# İki takım adı (büyük harfle başlayan iki özel ad) + yenme fiili yeterlidir.
+_SPORT_BEAT_RE = re.compile(
+    r"\b(yenecek|yener|yenmek|yendi|yenece|mağlup|maglup|mağlup\s*et|beat|beats|defeat)\b",
+    re.I,
+)
+_PROPER_NOUN_RE = re.compile(r"\b[A-ZÇĞİÖŞÜ][\wçğıöşü]{2,}")
 
 # GOL/DAKİKA/skor sorusu: kazanma sorusu DEĞİL, ama spor sorusu. "gol olur",
 # "kaçıncı dakikada gol", "kaç gol", "kaç kaç biter", "skor ne olur".
@@ -188,6 +195,8 @@ def is_fan_sport_question(question: str) -> bool:
         return False
     if _SPORT_MATCH_RE.search(q):
         return True
+    if _SPORT_BEAT_RE.search(q) and len(set(_PROPER_NOUN_RE.findall(question))) >= 2:
+        return True
     return bool(_SPORT_TEAM_RE and _SPORT_TEAM_RE.search(q))
 
 
@@ -196,7 +205,8 @@ def classify_question(question):
     Nested (iyelikli ikinci kişi) kelimesi ana tipi kirletmeden tespit edilir.
     """
     q = _strip_nested(question.lower())
-    if is_fan_sport_question(q):
+    # Özel ad (takım) tespiti büyük/küçük harfe duyarlı olduğu için orijinal metin de verilir.
+    if is_fan_sport_question(q) or is_fan_sport_question(_strip_nested(question)):
         return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}
     if _SPORT_GOALS_RE.search(q):
         return {"type": "sport_goals", "house": QUESTION_HOUSES["sport_goals"], "label": LABEL_TR["sport_goals"]}

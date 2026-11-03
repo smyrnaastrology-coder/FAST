@@ -859,8 +859,13 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 _orbs = {0: 8, 60: 6, 90: 7, 120: 6, 180: 8}
                 _ap = best_applying_major(planets[_fast]["lon"], planets[_slow]["lon"], _fast, _slow, _orbs)
                 if _ap:
-                    _sc(4, "sport_benefic_applies_team_ruler")
                     _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}.get(_ap[0], f"{_ap[0]}°")
+                    # Sert açı (kare/karşıtlık) destek değildir: hayırsever olsa da +4 verilmez.
+                    if _ap[0] in (90, 180):
+                        strictures.append({"code":"sport_benefic_hard_aspect","level":"info","planet":_bn,"with":_team_rn,
+                            "meaning":f"SPOR: hayırsever {_bn}, takımın yöneticisi {_team_rn}'ye {_anm} açıyı uyguluyor (~{_ap[1]:.1f}°) — sert açı, destek sayılmaz (0)."})
+                        continue
+                    _sc(4, "sport_benefic_applies_team_ruler")
                     strictures.append({"code":"sport_benefic_applies_team_ruler","level":"info","planet":_bn,"with":_team_rn,
                         "meaning":f"SPOR (#60) EVET: hayırsever {_bn}, takımın yöneticisi {_team_rn}'ye {_anm} açıyı UYGULUYOR (~{_ap[1]:.1f}°) (+4)."})
                     break
@@ -870,6 +875,34 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                 _sc(4, "sport_opponent_ruler_fall")
                 strictures.append({"code":"sport_opponent_ruler_fall","level":"info","planet":_opp_rn,
                     "meaning":f"SPOR (#60) EVET: rakibin yöneticisi {_opp_rn} düşüşte/zelilde ({_opp_rd.get('sign')}) — rakip zayıf (+4)."})
+            # 10) ANARETİK DERECE (kitap #62): takımın göstergesi 29°'de ise
+            #     "ipin ucu kaçar, çaresiz kalma" => eksi puan.
+            try:
+                _team_deg = float(_team_rd.get("deg") or 0)
+                if _team_deg >= 29.0:
+                    _sc(-6, "sport_team_ruler_anaretic")
+                    strictures.append({"code":"sport_team_ruler_anaretic","level":"info","planet":_team_rn,
+                        "meaning":f"SPOR (#62) HAYIR: takımın yöneticisi {_team_rn} {_team_deg:.1f}° ile burcun son derecesinde (anaretik) — ipin ucu kaçar, takım çaresiz kalır (-6)."})
+            except Exception:
+                pass
+            # 11) ŞANS NOKTASI (kitap #62): POF rakibin 1. evinde = rakip için onay
+            #     (taraftar çerçevesinde rakip = sorgu 1.evi; takımın 1.evi = sorgu 7.evi).
+            try:
+                _ascp = houses["asc"] % 360
+                _sunl = planets["Sun"]["lon"]; _moonl = planets["Moon"]["lon"]
+                _pof = ((_moonl - _sunl + _ascp) if planets["Sun"]["house"] in (7, 8, 9, 10, 11, 12)
+                        else (_sunl - _moonl + _ascp)) % 360
+                _pof_h = house_of_planet(_pof, houses["cusps"])
+                if _pof_h == 1:
+                    _sc(-4, "sport_pof_in_rival_1st")
+                    strictures.append({"code":"sport_pof_in_rival_1st","level":"info",
+                        "meaning":f"SPOR (#62) HAYIR: Şans Noktası rakibin 1. evinde (sorgu 1.) — şans rakibin tarafında (-4)."})
+                elif _pof_h == 7:
+                    _sc(4, "sport_pof_in_team_1st")
+                    strictures.append({"code":"sport_pof_in_team_1st","level":"info",
+                        "meaning":"SPOR (#62) EVET: Şans Noktası takımın 1. evinde (sorgu 7.) — şans takımın tarafında (+4)."})
+            except Exception:
+                pass
             # 9) PERFECTION/UYGULAMA YOKSA "DAR EVET" notu (aynı pozisyonlu iki taraf => az farkla kazanım)
             _perf_t = (perfection or {}).get("type") if isinstance(perfection, dict) else None
             if score > 0 and not _m_app and _perf_t in (None, "none"):
