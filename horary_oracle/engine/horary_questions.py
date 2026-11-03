@@ -44,6 +44,7 @@ QUESTION_HOUSES = {
     "sport_fan": 7,      # TARAFTAR çerçevesi (kitap #59): takım 7.ev, rakip takımın 7.'si = sorgu 1., onur 4., rakip takım 11.
     "sport_goals": 5,    # GOL/DAKİKA/skor sorusu (gösteri/spekülasyon 5.ev) -> kalibre değilse dakika verilmez
     "weather": 6,        # HAVA DURUMU (kitap #62): hedef 6.ev; 6.ev yöneticisi querent'e yumuşak açı = yağış
+    "event_party": 7,    # ETKİNLİK/KATILIM (kitap #63): taraf 7.ev; etkinlik 5.ev (oyunlar) + 10.ev (onur)
     "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
@@ -60,6 +61,7 @@ LABEL_TR = {
     "sport_fan": "Taraftar: üçüncü taraf takım (7.ev) — rakip 1., onur 4., rakip takım 11.",
     "sport_goals": "Gol/dakika/skor sorusu (5. ev) — kalibre değilse dakika verilmez",
     "weather": "Hava durumu (6. ev) — 6. ev yöneticisinin querent'e açısı",
+    "event_party": "Etkinlik/katılım: üçüncü taraf (7. ev) — etkinlik 5. ve 10. ev",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
@@ -185,6 +187,32 @@ if TEAM_LEXICON:
     _SPORT_TEAM_RE = re.compile(r"(?:" + _alt + r")\D{0,30}?(kazan|kazanır|kazanacak|kazanir)", re.I)
 
 
+# ETKİNLİK/KATILIM — "evrensel" sorular (kitap #63): üçüncü taraf + etkinlik.
+# "Ruslar Olimpiyatlara gelecek mi?" / "Will Russia come to the Olympics?"
+# Taraf = 7. ev; etkinlik = 5. ev (oyunlar) ve 10. ev (onur/prestij).
+_EVENT_NOUN_RE = re.compile(
+    r"(olimpiyat|olimpik|oyunlar\s*|seçim|secim|turnuva|şampiyona|sampiyona|festival|konferans|"
+    r"zirve|toplantı|toplanti|düğün|dugun|konser|müsabaka|musabaka|yarışma|yarisma|"
+    r"olympics?|elections?|tournament|championship|conference|summit|wedding|concert|festival)",
+    re.I,
+)
+_EVENT_ATTEND_RE = re.compile(
+    r"(gelecek|gelir|katılacak|katilacak|katılır|iştirak|istirak|gidecek|gider|"
+    r"come|attend|participate|take\s+part|go\s+to)",
+    re.I,
+)
+
+
+def is_event_party_question(question: str) -> bool:
+    """Üçüncü bir tarafın bir etkinliğe katılıp katılmayacağını soran 'evrensel' soru mu?"""
+    if not question:
+        return False
+    q = question.lower()
+    if _SPORT_OWN_RE.search(q) or _SPORT_WHO_WINS_RE.search(q):
+        return False
+    return bool(_EVENT_NOUN_RE.search(q) and _EVENT_ATTEND_RE.search(q))
+
+
 # HAVA DURUMU (kitap #62): hedef 6. ev. "Bu gece kar yağacak mı?" gibi sorular.
 _WEATHER_RE = re.compile(
     r"(kar\s*(yağ|yag)|yağmur\s*(yağ|yag)|yagmur\s*(yag)|kar\s*yağış|kar\s*yagis|yağış\s*olacak|yagis\s*olacak|"
@@ -227,6 +255,9 @@ def classify_question(question):
     q = _strip_nested(question.lower())
     if _WEATHER_RE.search(q):
         return {"type": "weather", "house": QUESTION_HOUSES["weather"], "label": LABEL_TR["weather"]}
+    # Üçüncü tarafın bir etkinliğe katılımı (kitap #63) — "Ruslar Olimpiyatlara gelecek mi?"
+    if is_event_party_question(question):
+        return {"type": "event_party", "house": QUESTION_HOUSES["event_party"], "label": LABEL_TR["event_party"]}
     # Özel ad (takım) tespiti büyük/küçük harfe duyarlı olduğu için orijinal metin de verilir.
     if is_fan_sport_question(q) or is_fan_sport_question(_strip_nested(question)):
         return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}

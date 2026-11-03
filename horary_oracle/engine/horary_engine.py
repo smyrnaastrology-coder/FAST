@@ -958,6 +958,52 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         except Exception:
             pass
 
+    # --- ETKİNLİK/KATILIM ("EVRENSEL") ÇERÇEVESİ (kitap #63) ---
+    # "Ruslar Olimpiyatlara gelecek mi?" gibi üçüncü taraf + etkinlik soruları:
+    # taraf = 7. evin yöneticisi; etkinlik = 5. ev (oyunlar) ve 10. ev (onur/prestij).
+    # Tarafın göstergesi etkinliğin göstergelerinden biriyle majör açı yapmıyorsa
+    # "pek bir hareket yok" => katılım YOK. (Kitap: Merkür - Venüs açısı yok,
+    # Ruslar gelmedi; 4. ev/etkinlik sahibi Mars ile de açı yok, sonuç değişmez.)
+    event_override = None
+    if quesited_type == "event_party":
+        try:
+            _pt_rn = quesited["planet"]
+            _pt_rd = planets.get(_pt_rn) or {}
+            _ev_rulers = []
+            for _h in (5, 10):
+                _s_h = sign_from_lon(houses["cusps"][_h - 1])
+                _r_h = DOMICILE.get(_s_h, "Venus")
+                if _r_h != _pt_rn and _r_h not in _ev_rulers:
+                    _ev_rulers.append(_r_h)
+            _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}
+            _hit = None          # (ruler, angle, orb)
+            _closest = None      # (ruler, angle, orb) en yakın ama orb dışı
+            for _r in _ev_rulers:
+                _rd = planets.get(_r) or {}
+                for _a in (0, 60, 90, 120, 180):
+                    _diff = abs((_pt_rd.get("lon", 0) - _rd.get("lon", 0) + 180) % 360 - 180)
+                    _orb = abs(_diff - _a)
+                    if _orb <= 8 and (_hit is None or _orb < _hit[2]):
+                        _hit = (_r, _a, _orb)
+                    if _closest is None or _orb < _closest[2]:
+                        _closest = (_r, _a, _orb)
+            if _hit:
+                _sc(8, "event_party_aspect")
+                event_override = "YES"
+                strictures.append({"code":"event_party_aspect","level":"info","planet":_pt_rn,"with":_hit[0],
+                    "meaning":f"ETKİNLİK (#63) EVET: tarafın göstergesi {_pt_rn}, etkinlik göstergesi {_hit[0]} ile {_anm.get(_hit[1])} açıda (~{_hit[2]:.1f}°) — katılım için hareket var (+8)."})
+            elif _ev_rulers:
+                _sc(-8, "event_party_no_aspect")
+                event_override = "NO"
+                _cl = (f"; en yakını {_pt_rn}-{_closest[0]} {_anm.get(_closest[1])} yönünde ama ~{_closest[2]:.1f}° orb, majör açı sayılmaz" if _closest else "")
+                strictures.append({"code":"event_party_no_aspect","level":"info","planet":_pt_rn,
+                    "meaning":f"ETKİNLİK (#63) HAYIR: tarafın göstergesi {_pt_rn} ile etkinlik göstergeleri ({', '.join(_ev_rulers)}) arasında majör açı yok{_cl} — hareket yok, katılım gerçekleşmez (-8)."})
+            _evp = [s for s in strictures if str(s.get("code", "")).startswith("event_party")]
+            if _evp:
+                strictures[:] = _evp + [s for s in strictures if not str(s.get("code", "")).startswith("event_party")]
+        except Exception:
+            pass
+
     # Threshold
     if _DO_TRACE:
         import sys as _sys
@@ -973,6 +1019,14 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Hava durumu çerçevesi (6. ev) karar verici: 6. ev yöneticisi - querent açısı.
     if weather_override:
         verdict = weather_override
+    # Etkinlik/katılım çerçevesi (#63) karar verici: taraf - etkinlik göstergesi açısı.
+    if event_override:
+        verdict = event_override
+    # Çerçeve kararı verildiyse skoru eşiğe taşı (verdict ile skor çelişmesin).
+    if weather_override == "YES" or event_override == "YES":
+        score = max(score, RULES["scoring"]["threshold_yes"])
+    elif weather_override == "NO" or event_override == "NO":
+        score = min(score, RULES["scoring"]["threshold_no"])
 
     # --- Bonatus / Vergilius dolunay ---
     try:

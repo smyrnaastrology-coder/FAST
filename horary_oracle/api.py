@@ -328,9 +328,11 @@ async def _cast(req: CastRequest, *, holavon=None):
     # HAVA DURUMU ÇERÇEVESİ (#62): "Bu gece kar yağacak mı?" -> weather (hedef 6. ev).
     if qtype == "general":
         try:
-            from engine.horary_questions import is_weather_question
+            from engine.horary_questions import is_weather_question, is_event_party_question
             if is_weather_question(req.question):
                 qtype = "weather"
+            elif is_event_party_question(req.question):
+                qtype = "event_party"
         except Exception:
             pass
     try:
@@ -883,6 +885,23 @@ async def _cast(req: CastRequest, *, holavon=None):
                 )
         except Exception:
             pass
+    # ETKİNLİK/KATILIM: cevabin basinda taraf (7.ev) - etkinlik (5./10.ev) kontrolu.
+    if qtype == "event_party":
+        try:
+            from engine.event_brief import build_event_brief
+            _event_brief = build_event_brief(res, qtype, req.lang)
+            if _event_brief:
+                engine_json["event_brief"] = _event_brief
+                engine_json.pop("timing", None)
+                engine_json["event_instruction"] = (
+                    "Cevabini bu etkinlik/katilim kontrol listesindeki gercek yerlesimlere dayandir; "
+                    "gezegen/burc/ev bilgilerini degistirme. Taraf 7. ev, etkinlik 5. (oyunlar) ve "
+                    "10. (onur/prestij) evdir. Iki gosterge arasinda major aci yoksa 'hareket yok' "
+                    "de, katilim olacak deme. Liste HAYIR diyorsa cevabin olumsuz olsun. "
+                    "Kesin tarih/saat uydurma."
+                )
+        except Exception:
+            pass
     # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
     if holavon is None:
         try:
@@ -1267,6 +1286,8 @@ async def _cast(req: CastRequest, *, holavon=None):
         answer = engine_json["sport_brief"] + "\n\n" + answer
     if not person_where_target and engine_json.get("weather_brief"):
         answer = engine_json["weather_brief"] + "\n\n" + answer
+    if not person_where_target and engine_json.get("event_brief"):
+        answer = engine_json["event_brief"] + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
