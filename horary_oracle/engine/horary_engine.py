@@ -1004,6 +1004,112 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
         except Exception:
             pass
 
+    # --- ANLAŞMA / SATIN ALMA ÇERÇEVESİ (kitap #64) ---
+    # "Murchison Bunker Hill madenini alacak mı?" gibi üçüncü taraf iş anlaşması:
+    # alıcı = 7. ev; satıcı = alıcının 10. evi (haritanın 4. evi); 7. evdeki
+    # araya sıkışmış burcun yöneticisi satıcının ortak yöneticisidir. Alıcının
+    # göstergesi satıcının bir göstergesine uygulanıyorsa anlaşma gerçekleşir.
+    deal_override = None
+    if quesited_type == "deal":
+        try:
+            _by_rn = quesited["planet"]
+            _by_rd = planets.get(_by_rn) or {}
+            # Satıcı = alıcının 10. evi = haritanın 4. evi.
+            _seller_house = ((7 - 1) + (10 - 1)) % 12 + 1
+            _seller_sign = sign_from_lon(houses["cusps"][_seller_house - 1])
+            _sl_rn = DOMICILE.get(_seller_sign, "Mercury")
+            # Satıcının ortak yöneticisi: alıcının 7. evinde (haritanın 1.) araya sıkışmış burç.
+            _co_rn = None
+            _co_sign = None
+            try:
+                _buyer_seventh_house = ((7 - 1) + (7 - 1)) % 12 + 1
+                _start = houses["cusps"][_buyer_seventh_house - 1] % 360
+                _next = houses["cusps"][_buyer_seventh_house % 12] % 360
+                _span = (_next - _start) % 360
+                _cusp_signs = {sign_from_lon(c) for c in houses["cusps"]}
+                for _sg in SIGNS_TR:
+                    if _sg in _cusp_signs:
+                        continue
+                    _sg_start = SIGNS_TR.index(_sg) * 30.0
+                    if ((_sg_start - _start) % 360) < _span:
+                        _co_sign = _sg
+                        _co_rn = DOMICILE.get(_sg)
+                        break
+            except Exception:
+                pass
+            _targets = [t for t in (_sl_rn, _co_rn) if t and t != _by_rn]
+            _orbs = {0: 8, 60: 6, 90: 7, 120: 6, 180: 8}
+            _anm = {0: "kavuşum", 60: "sekstil", 90: "kare", 120: "üçgen", 180: "karşıtlık"}
+            _best = None
+            for _t in _targets:
+                _td = planets.get(_t) or {}
+                _spd_b = abs(_by_rd.get("speed", 0)); _spd_t = abs(_td.get("speed", 0))
+                _fast, _slow = ((_by_rn, _t) if _spd_b >= _spd_t else (_t, _by_rn))
+                _ap = best_applying_major(planets[_fast]["lon"], planets[_slow]["lon"], _fast, _slow, _orbs)
+                if _ap and (_best is None or _ap[1] < _best[2]):
+                    _best = (_t, _ap[0], _ap[1])
+            if _best:
+                deal_override = "YES"
+                _tur = "ortak yöneticisi" if _best[0] == _co_rn else "yöneticisi"
+                strictures.append({"code":"deal_buyer_applies_seller","level":"info","planet":_by_rn,"with":_best[0],
+                    "angle":_best[1], "orb":round(_best[2], 2),
+                    "meaning":f"ANLAŞMA (#64) EVET: alıcının göstergesi {_by_rn}, satıcının {_tur} {_best[0]}'ye {_anm.get(_best[1])} açıyı UYGULUYOR (~{_best[2]:.1f}°) — anlaşma gerçekleşir (+8)."})
+            # Kitaptaki Ay'ın 150° quincunx'ları: geniş orb olsa da üç göstergeye
+            # uygulayan uyum, ışık aktarımı/toplanması için destek ve ayarlama ihtiyacı.
+            _moon_hits = []
+            _moon_lon = planets["Moon"]["lon"]
+            for _target in list(dict.fromkeys([_by_rn] + _targets)):
+                _td = planets.get(_target) or {}
+                _app, _orb = aspect_pair(_moon_lon, _td.get("lon", 0), 150)
+                if _app and _orb <= 15:
+                    _moon_hits.append((_target, _orb))
+            if len(_moon_hits) >= 2:
+                if not deal_override:
+                    deal_override = "YES"
+                _mh = ", ".join(f"{p} (~{o:.1f}°)" for p, o in _moon_hits)
+                strictures.append({"code":"deal_moon_quincunx_translation","level":"info","planet":"Moon",
+                    "meaning":f"ANLAŞMA (#64) AY DESTEĞİ: Ay uygulayan 150° quincunx yapıyor: {_mh} — ışığın aktarımı/toplanması anlaşmayı destekler, fakat önce ayarlama/değişiklik gerekebilir."})
+            # Alıcının 2. evi (chart 8) ve bunun 5.si/yatırım evi (chart 12).
+            try:
+                _buyer_money_house = ((7 - 1) + (2 - 1)) % 12 + 1
+                _invest_house = ((_buyer_money_house - 1) + (5 - 1)) % 12 + 1
+                _money_ruler = DOMICILE.get(sign_from_lon(houses["cusps"][_buyer_money_house - 1]), "Venus")
+                _invest_ruler = DOMICILE.get(sign_from_lon(houses["cusps"][_invest_house - 1]), "Saturn")
+                _money_data = planets.get(_money_ruler) or {}
+                _invest_data = planets.get(_invest_ruler) or {}
+                _asp = abs((_money_data.get("lon", 0) - _invest_data.get("lon", 0) + 180) % 360 - 180)
+                _trine_orb = abs(_asp - 120)
+                _square_orb = abs(_asp - 90)
+                if _trine_orb <= 20:
+                    strictures.append({"code":"deal_investment_source_aspect","level":"info","planet":_money_ruler,"with":_invest_ruler,
+                        "meaning":f"ANLAŞMA (#64) YATIRIM: kaynak metin {_money_ruler}-{_invest_ruler} ilişkisini üçgen olarak yorumluyor; derecelere göre gerçek aralık {_asp:.1f}°, tam üçgene {_trine_orb:.1f}° orb (kareye {_square_orb:.1f}°). Bu geniş/yoruma açık bir destek, kesin perfection değil."})
+            except Exception:
+                pass
+            if not deal_override:
+                deal_override = "NO"
+                strictures.append({"code":"deal_no_link","level":"info","planet":_by_rn,
+                    "meaning":f"ANLAŞMA (#64) HAYIR: alıcının göstergesi {_by_rn} ile satıcı göstergeleri ({', '.join(_targets) or '—'}) arasında uygulayan majör açı ve Ay'ın ışık aktarımı yok — anlaşma gerçekleşmez (-8)."})
+            # Sendika hiyerarşisi: metin doğal göstergesi Uranüs'ü kullanıyor;
+            # alıcının 3. evi = chart 9, Uranüs chart 9'da; Pluto alıcının para evi chart 8'de.
+            try:
+                _union_house = ((7 - 1) + (3 - 1)) % 12 + 1
+                _union_ruler = "Uranus"
+                _union_data = planets.get(_union_ruler) or {}
+                _money_planet = "Pluto"
+                _money_data = planets.get(_money_planet) or {}
+                _uasp = abs((_union_data.get("lon", 0) - _money_data.get("lon", 0) + 180) % 360 - 180)
+                _uorb = abs(_uasp - 60)
+                if _uorb <= 30:
+                    strictures.append({"code":"deal_union_approval_delay","level":"info","planet":_union_ruler,"with":_money_planet,
+                        "meaning":f"ANLAŞMA (#64) GECİKME: sendika göstergesi {_union_ruler} (alıcının 3. evi, harita {_union_house}. ev) ile alıcının para evindeki {_money_planet} arasında sekstil yönünde geniş ({_uorb:.1f}° orb) yaklaşan temas var. Onay süreci geciktirebilir; bu açı kesin süre vermez."})
+            except Exception:
+                pass
+            _dp = [s for s in strictures if str(s.get("code", "")).startswith("deal_")]
+            if _dp:
+                strictures[:] = _dp + [s for s in strictures if not str(s.get("code", "")).startswith("deal_")]
+        except Exception:
+            pass
+
     # Threshold
     if _DO_TRACE:
         import sys as _sys
@@ -1022,11 +1128,15 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
     # Etkinlik/katılım çerçevesi (#63) karar verici: taraf - etkinlik göstergesi açısı.
     if event_override:
         verdict = event_override
+    # Anlaşma/satın alma çerçevesi (#64) karar verici: alıcı - satıcı göstergesi.
+    if deal_override:
+        verdict = deal_override
     # Çerçeve kararı verildiyse skoru eşiğe taşı (verdict ile skor çelişmesin).
-    if weather_override == "YES" or event_override == "YES":
+    if weather_override == "YES" or event_override == "YES" or deal_override == "YES":
         score = max(score, RULES["scoring"]["threshold_yes"])
-    elif weather_override == "NO" or event_override == "NO":
+    elif weather_override == "NO" or event_override == "NO" or deal_override == "NO":
         score = min(score, RULES["scoring"]["threshold_no"])
+    # Anlaşma çerçevesi süre vermez (kitap #64: işlem ~1 yıl sürdü, açıdan süre çıkmıyor).
 
     # --- Bonatus / Vergilius dolunay ---
     try:

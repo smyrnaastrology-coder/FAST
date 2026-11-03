@@ -328,11 +328,13 @@ async def _cast(req: CastRequest, *, holavon=None):
     # HAVA DURUMU ÇERÇEVESİ (#62): "Bu gece kar yağacak mı?" -> weather (hedef 6. ev).
     if qtype == "general":
         try:
-            from engine.horary_questions import is_weather_question, is_event_party_question
+            from engine.horary_questions import is_weather_question, is_event_party_question, is_deal_question
             if is_weather_question(req.question):
                 qtype = "weather"
             elif is_event_party_question(req.question):
                 qtype = "event_party"
+            elif is_deal_question(req.question):
+                qtype = "deal"
         except Exception:
             pass
     try:
@@ -902,6 +904,24 @@ async def _cast(req: CastRequest, *, holavon=None):
                 )
         except Exception:
             pass
+    # ANLAŞMA/SATIN ALMA: alıcı 7. ev; satıcı alıcının 10. evi; para/yatırım evleri.
+    if qtype == "deal":
+        try:
+            from engine.deal_brief import build_deal_brief
+            _deal_brief = build_deal_brief(res, qtype, req.lang)
+            if _deal_brief:
+                engine_json["deal_brief"] = _deal_brief
+                engine_json.pop("timing", None)
+                engine_json["deal_instruction"] = (
+                    "Cevabini bu anlaşma kontrol listesindeki gerçek yerleşimlere dayandır. "
+                    "Alıcı 7. ev, satıcı alıcının 10. evi (harita 4), satıcının ortak yöneticisi "
+                    "alıcının 7. evindeki intercepted burcun yöneticisidir. Uygulayan açı veya Ay'ın "
+                    "ışık aktarımı varsa anlaşma EVET; mevcut harita onay sürecinin gecikebileceğini "
+                    "gösteriyorsa bunu belirt ama net tarih/süre uydurma. Geçmişteki gerçek kapanış "
+                    "tarihini yorum gibi sunma."
+                )
+        except Exception:
+            pass
     # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
     if holavon is None:
         try:
@@ -1288,6 +1308,8 @@ async def _cast(req: CastRequest, *, holavon=None):
         answer = engine_json["weather_brief"] + "\n\n" + answer
     if not person_where_target and engine_json.get("event_brief"):
         answer = engine_json["event_brief"] + "\n\n" + answer
+    if not person_where_target and engine_json.get("deal_brief"):
+        answer = engine_json["deal_brief"] + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":

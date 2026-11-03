@@ -45,6 +45,7 @@ QUESTION_HOUSES = {
     "sport_goals": 5,    # GOL/DAKİKA/skor sorusu (gösteri/spekülasyon 5.ev) -> kalibre değilse dakika verilmez
     "weather": 6,        # HAVA DURUMU (kitap #62): hedef 6.ev; 6.ev yöneticisi querent'e yumuşak açı = yağış
     "event_party": 7,    # ETKİNLİK/KATILIM (kitap #63): taraf 7.ev; etkinlik 5.ev (oyunlar) + 10.ev (onur)
+    "deal": 7,           # ANLAŞMA/SATIN ALMA (kitap #64): alıcı 7.ev; satıcı 1.ev + sıkışmış burç ortak yöneticisi
     "investment": 5,   # hisse senedi/borsa/yatırım (spekülasyon) -> 5.ev; kâr 2. evden görülür
 }
 
@@ -62,6 +63,7 @@ LABEL_TR = {
     "sport_goals": "Gol/dakika/skor sorusu (5. ev) — kalibre değilse dakika verilmez",
     "weather": "Hava durumu (6. ev) — 6. ev yöneticisinin querent'e açısı",
     "event_party": "Etkinlik/katılım: üçüncü taraf (7. ev) — etkinlik 5. ve 10. ev",
+    "deal": "Anlaşma/satın alma: alıcı 7. ev — satıcı alıcının 10. evi (ortak yönetici dahil)",
     "investment": "Hisse senedi/yatırım (5. ev spekülasyon)",
     "court": "Mahkeme/Dava (9. ev)",
 }
@@ -213,6 +215,29 @@ def is_event_party_question(question: str) -> bool:
     return bool(_EVENT_NOUN_RE.search(q) and _EVENT_ATTEND_RE.search(q))
 
 
+# ANLAŞMA / SATIN ALMA (kitap #64): üçüncü taraf iş anlaşması.
+# "Murchison Bunker Hill madenini alacak mı?" — işletme/varlık + satın alma fiili.
+_DEAL_ASSET_RE = re.compile(
+    r"(maden\w*|şirket\w*|sirket\w*|firma\w*|işletme\w*|isletme\w*|fabrika\w*|arazi\w*|arsa\w*|"
+    r"hisse\w*|holding\w*|marka\w*|lisans\w*|imtiyaz\w*|otel\w*|lojman\w*|"
+    r"\bmine\b|\bmines\b|company|firm|plant|factory|land\b|shares?|stake|hotel|license|licence|acquisition)",
+    re.I,
+)
+_DEAL_VERB_RE = re.compile(
+    r"(sat[ıi]n\s*al\w*|alacak\s*m[ıi]|al[ıi]r\s*m[ıi]|sat[ıi]lacak\s*m[ıi]|sat[ıi]n\s*al[ıi]nacak|"
+    r"anlaşma\w*\s*(olacak|yapılacak|gerçekleşecek)|buy|buys|purchase|sell|sale|deal)",
+    re.I,
+)
+
+
+def is_deal_question(question: str) -> bool:
+    """Üçüncü taraf iş anlaşması / satın alma sorusu mu? (kitap #64 çerçevesi)"""
+    if not question:
+        return False
+    q = question.lower()
+    return bool(_DEAL_ASSET_RE.search(q) and _DEAL_VERB_RE.search(q))
+
+
 # HAVA DURUMU (kitap #62): hedef 6. ev. "Bu gece kar yağacak mı?" gibi sorular.
 _WEATHER_RE = re.compile(
     r"(kar\s*(yağ|yag)|yağmur\s*(yağ|yag)|yagmur\s*(yag)|kar\s*yağış|kar\s*yagis|yağış\s*olacak|yagis\s*olacak|"
@@ -258,6 +283,9 @@ def classify_question(question):
     # Üçüncü tarafın bir etkinliğe katılımı (kitap #63) — "Ruslar Olimpiyatlara gelecek mi?"
     if is_event_party_question(question):
         return {"type": "event_party", "house": QUESTION_HOUSES["event_party"], "label": LABEL_TR["event_party"]}
+    # Üçüncü taraf iş anlaşması / satın alma (kitap #64) — "… madenini alacak mı?"
+    if is_deal_question(question):
+        return {"type": "deal", "house": QUESTION_HOUSES["deal"], "label": LABEL_TR["deal"]}
     # Özel ad (takım) tespiti büyük/küçük harfe duyarlı olduğu için orijinal metin de verilir.
     if is_fan_sport_question(q) or is_fan_sport_question(_strip_nested(question)):
         return {"type": "sport_fan", "house": QUESTION_HOUSES["sport_fan"], "label": LABEL_TR["sport_fan"]}
