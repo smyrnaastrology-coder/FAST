@@ -818,11 +818,14 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
                     _sc(5, "sport_team_ruler_conj_honor_ruler")
                     strictures.append({"code":"sport_team_ruler_conj_honor_ruler","level":"info","planet":_team_rn,"with":_hon_rn,
                         "meaning":f"SPOR (#59) EVET: takımın yöneticisi {_team_rn}, takımın onur/zafere evi yöneticisi {_hon_rn} ile {_d2:.1f}° kavuşum (+5)."})
-            # 3) Rakibin gösteresi (sorgu 1. yöneticisi) takımın onur evinde (4.) = rakip takımın evinde
+            # 3) Rakibin gösteresi (sorgu 1. yöneticisi) takımın onur/zafer evinde (4.)
+            #    => zaferi RAKİP alır (kitap: "rakip yöneticisi ... takımın 1. evinde
+            #    olması rakip için kesin üstünlük sağlıyor"). Önceden +4 yazılıydı;
+            #    işaret hatasıydı: rakip, takımın zafer evine yerleşmişse kupa rakiptedir.
             if _opp_h == 4:
-                _sc(4, "sport_opponent_ruler_in_honor")
+                _sc(-4, "sport_opponent_ruler_in_honor")
                 strictures.append({"code":"sport_opponent_ruler_in_honor","level":"info","planet":_opp_rn,
-                    "meaning":f"SPOR (#59) EVET: rakibin yöneticisi {_opp_rn} takımın onur/zafere evinde (sorgu 4.) (+4)."})
+                    "meaning":f"SPOR (#59) HAYIR: rakibin yöneticisi {_opp_rn} takımın onur/zafere evinde (sorgu 4.) — zafer evini rakip tutuyor (-4)."})
             # 4) Rakip takımın (11.ev) yöneticisi düşüş/zelilde = rakip zayıf
             if _riv_rd and in_det_fall(_riv_rn, _riv_rd.get("sign","")):
                 _sc(4, "sport_rival_ruler_fall")

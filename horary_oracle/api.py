@@ -836,6 +836,28 @@ async def _cast(req: CastRequest, *, holavon=None):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
+    # SPOR: cevabin basinda deterministik kontrol listesi (takim evi, basari 5.'si,
+    # onur/zafer 10.'su, POF, Ay) -> yorumun dayanagi gorunur olsun.
+    if qtype in ("sport_fan", "sport_fav", "sport_rival"):
+        try:
+            from engine.sport_brief import build_sport_brief
+            _sport_brief = build_sport_brief(res, qtype, req.lang)
+            if _sport_brief:
+                engine_json["sport_brief"] = _sport_brief
+                # Mac sonucu sorusunda "X saat icinde" turu sure cumlesi anlamsiz:
+                # timing'i modele hic vermeyelim (cevapta yine de donuyor).
+                engine_json.pop("timing", None)
+                engine_json["sport_instruction"] = (
+                    "Cevabini bu kontrol listesindeki gercek yerlesimlere dayandir; listedeki "
+                    "gezegen, burc ve ev bilgilerini degistirme, skor veya rakam uydurma. "
+                    "Takim ve rakip gostergeleri kontrol listesindeki gibidir; rakip icin "
+                    "querent/quesited alanlarindan tahmin yurutme. Timing (sure) bilgisini mac "
+                    "sonucunun gerekcesi yapma, 'X saat icinde' gibi bir sure cumlesi kurma. "
+                    "Listeyi kelimesi kelimesine tekrarlamak zorunda degilsin ama hukmun "
+                    "gerekcesi oradaki gostergeler olsun."
+                )
+        except Exception:
+            pass
     # kullanici plani -> model secimi (basic gpt-4.1, plus terra, pro sol; local son care)
     if holavon is None:
         try:
@@ -1216,6 +1238,8 @@ async def _cast(req: CastRequest, *, holavon=None):
         )
     else:
         answer = call_openai(engine_json, req.lang)
+    if not person_where_target and engine_json.get("sport_brief"):
+        answer = engine_json["sport_brief"] + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
     if not person_where_target and req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":

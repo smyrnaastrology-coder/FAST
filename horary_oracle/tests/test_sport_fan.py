@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "core"))
 from engine.horary_engine import cast_horary_chart
 from engine.horary_questions import classify_question, is_fan_sport_question
+from engine.sport_brief import build_sport_brief
 
 COEUR = (47.6833, -116.7667)
 LA = (34.0522, -118.2437)
@@ -106,6 +107,48 @@ def test_60_same_chart_own_team_frame_unchanged():
     print("OK #60 kendi-takim kutusu degismedi:", r["verdict"])
 
 
+def test_opponent_ruler_in_honor_counts_against_the_team():
+    """Kitap: rakibin gostergesi takimin zafer evine yerlesirse ustunluk rakibin.
+
+    #59 Vandals haritasinda Venüs (rakip gostergesi) sorgu 4. evinde; bu artik
+    takim lehine +4 degil, takim aleyhine -4 sayiliyor.
+    """
+    r = cast_horary_chart(1982, 3, 10, 3 + 38 / 60.0, COEUR[0], COEUR[1], "sport_fan")
+    item = next(s for s in r["strictures"] if s["code"] == "sport_opponent_ruler_in_honor")
+    assert "HAYIR" in item["meaning"], item
+    assert r["verdict"] == "YES", f"#59 hala YES olmali, {r['verdict']} score={r['score']}"
+
+
+def test_superbowl_redskins_no_regression():
+    """22 Oca 1984 16:00 Kansas City, 'Redskins Superbowl'u kazanacak mi?'
+
+    Gercek sonuc: Raiders 38-9 (Redskins kaybetti). Kitabin hukmu de NO idi;
+    motor artik UNCERTAIN'de kalmiyor.
+    """
+    r = cast_horary_chart(1984, 1, 22, 22.0, 39.1, -94.5833, "sport_fan")
+    assert r["verdict"] == "NO", f"Redskins NO olmali, {r['verdict']} score={r['score']}"
+    codes = [s["code"] for s in r["strictures"]]
+    assert "sport_opponent_ruler_in_honor" in codes, codes
+    print(f"OK Superbowl XVIII NO score={r['score']}")
+
+
+def test_sport_brief_lists_the_checklist():
+    r = cast_horary_chart(1982, 3, 10, 3 + 38 / 60.0, COEUR[0], COEUR[1], "sport_fan")
+    brief = build_sport_brief(r, "sport_fan", "tr")
+    assert brief, "spor sorusunda kontrol listesi bos olmamali"
+    assert "Spor kontrol listesi" in brief
+    assert "Takımın başarı evi" in brief
+    assert "onur/zafer" in brief
+    assert "Hüküm:" in brief
+    assert "Şans Noktası" in brief
+    # Taraftar cercevesinde rakip = takimin 7.'si = haritanin 1. evi (2. ev degil)
+    assert "Rakip: 1. ev" in brief
+    assert "Rakip: 2. ev" not in brief
+    assert build_sport_brief(r, "sport_fan", "en").startswith("Sports checklist")
+    assert build_sport_brief(r, "relationship", "tr") is None
+    print("OK sport brief")
+
+
 if __name__ == "__main__":
     test_fan_frame_detection()
     test_59_vandals_yes()
@@ -114,4 +157,7 @@ if __name__ == "__main__":
     test_60_houston_detected_without_match_word()
     test_60_houston_yes()
     test_60_same_chart_own_team_frame_unchanged()
-    print("test_sport_fan: 7/7 OK")
+    test_opponent_ruler_in_honor_counts_against_the_team()
+    test_superbowl_redskins_no_regression()
+    test_sport_brief_lists_the_checklist()
+    print("test_sport_fan: 10/10 OK")
