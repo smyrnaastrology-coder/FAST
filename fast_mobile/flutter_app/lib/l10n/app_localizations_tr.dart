@@ -2167,6 +2167,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get postDelete => 'Paylaşımı sil';
 
   @override
+  String get postEdit => 'Paylaşımı düzenle';
+
+  @override
+  String get postCaptionHint => 'Açıklama yaz...';
+
+  @override
+  String get commentEdit => 'Yorumu düzenle';
+
+  @override
+  String get editSave => 'Kaydet';
+
+  @override
+  String get editCancel => 'Vazgeç';
+
+  @override
   String get reportSent => 'Bildirim gönderildi. Teşekkürler.';
 
   @override
@@ -2350,6 +2365,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get horaryQuestionHint => 'Sorunu yaz... (örn. bu işe girecek miyim?)';
+
+  @override
+  String get horaryVoiceStart => 'Sorunu sesle dikte et';
+
+  @override
+  String get horaryVoiceStop => 'Ses kaydını bitir';
+
+  @override
+  String get horaryVoiceUnavailable =>
+      'Bu cihazda konuşma tanıma kullanılamıyor.';
+
+  @override
+  String get horaryVoicePermission =>
+      'Sesle soru yazmak için mikrofon ve konuşma tanıma izni gerekli.';
 
   @override
   String get horaryAsk => 'Sor ✨';

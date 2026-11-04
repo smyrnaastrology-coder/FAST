@@ -27,11 +27,19 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   bool _busy = false;
   List<CommentItem> _comments = const [];
+  late PostItem _post;
 
   @override
   void initState() {
     super.initState();
+    _post = widget.post;
     _loadComments();
+  }
+
+  @override
+  void didUpdateWidget(covariant PostCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.post != widget.post) _post = widget.post;
   }
 
   Future<void> _loadComments() async {
@@ -59,6 +67,46 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  Future<void> _editCaption() async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: _post.caption ?? '');
+    final value = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: FastTheme.bgSecondary,
+        title: Text(l10n.postEdit, style: TextStyle(color: FastTheme.accentGold)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          minLines: 2,
+          maxLines: 7,
+          maxLength: 2200,
+          style: TextStyle(color: FastTheme.text),
+          decoration: InputDecoration(hintText: l10n.postCaptionHint),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.editCancel)),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, controller.text), child: Text(l10n.editSave)),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (!mounted || value == null) return;
+    try {
+      final caption = value.trim();
+      await SocialService.updatePostCaption(_post.id, caption);
+      if (!mounted) return;
+      setState(() => _post = _post.copyWith(caption: caption));
+      context.read<SocialProvider>().updatePostCaption(_post.id, caption);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.socialErrorServer)),
+        );
+      }
+    }
+  }
+
   void _openDm() {
     final p = widget.post;
     if (p.userId.isEmpty || p.author == null) return;
@@ -81,7 +129,7 @@ class _PostCardState extends State<PostCard> {
     final l10n = AppLocalizations.of(context);
     final sp = context.read<SocialProvider>();
     final ap = context.read<AuthProvider>();
-    final isMine = widget.post.userId == SocialService.currentUserId;
+    final isMine = _post.userId == SocialService.currentUserId;
 
     final choice = await showModalBottomSheet<String>(
       context: context,
@@ -111,6 +159,12 @@ class _PostCardState extends State<PostCard> {
                 onTap: () => Navigator.pop(ctx, 'block'),
               ),
             ],
+            if (isMine)
+              ListTile(
+                leading: Icon(Icons.edit_outlined, color: FastTheme.accentGold),
+                title: Text(l10n.postEdit, style: TextStyle(color: FastTheme.text)),
+                onTap: () => Navigator.pop(ctx, 'edit'),
+              ),
             if (isMine)
               ListTile(
                 leading: Icon(Icons.delete_outline, color: FastTheme.error),
@@ -150,9 +204,11 @@ class _PostCardState extends State<PostCard> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(l10n.blockDone)));
+    } else if (choice == 'edit') {
+      await _editCaption();
     } else if (choice == 'delete') {
-      await SocialService.deletePost(widget.post.id);
-      sp.removePost(widget.post.id);
+      await SocialService.deletePost(_post.id);
+      sp.removePost(_post.id);
     }
   }
 
@@ -164,7 +220,7 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final locale = context.watch<LocaleProvider>().locale;
-    final p = widget.post;
+    final p = _post;
     final author = p.author;
 
   Future<void> _translateCaption() async {

@@ -2178,6 +2178,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postDelete => 'Delete post';
 
   @override
+  String get postEdit => 'Edit post';
+
+  @override
+  String get postCaptionHint => 'Write a caption...';
+
+  @override
+  String get commentEdit => 'Edit comment';
+
+  @override
+  String get editSave => 'Save';
+
+  @override
+  String get editCancel => 'Cancel';
+
+  @override
   String get reportSent => 'Report sent. Thank you.';
 
   @override
@@ -2361,6 +2376,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get horaryQuestionHint =>
       'Write your question... (e.g. will I get this job?)';
+
+  @override
+  String get horaryVoiceStart => 'Dictate your question';
+
+  @override
+  String get horaryVoiceStop => 'Stop dictation';
+
+  @override
+  String get horaryVoiceUnavailable =>
+      'Speech recognition is unavailable on this device.';
+
+  @override
+  String get horaryVoicePermission =>
+      'Microphone and speech recognition permission is needed for dictation.';
 
   @override
   String get horaryAsk => 'Ask ✨';

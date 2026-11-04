@@ -664,9 +664,13 @@ class _SocialProfileScreenState extends State<SocialProfileScreen> {
       itemBuilder: (context, i) {
         final post = _posts[i];
         return GestureDetector(
-          onTap: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => _PostDetail(post: post))),
+          onTap: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => _PostDetail(post: post)),
+            );
+            final refreshed = await SocialService.fetchUserPosts(_uid);
+            if (mounted) setState(() => _posts = refreshed);
+          },
           child: Stack(
             fit: StackFit.expand,
             children: [

@@ -4036,6 +4036,36 @@ abstract class AppLocalizations {
   /// **'Delete post'**
   String get postDelete;
 
+  /// No description provided for @postEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit post'**
+  String get postEdit;
+
+  /// No description provided for @postCaptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a caption...'**
+  String get postCaptionHint;
+
+  /// No description provided for @commentEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit comment'**
+  String get commentEdit;
+
+  /// No description provided for @editSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get editSave;
+
+  /// No description provided for @editCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get editCancel;
+
   /// No description provided for @reportSent.
   ///
   /// In en, this message translates to:
@@ -4383,6 +4413,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Write your question... (e.g. will I get this job?)'**
   String get horaryQuestionHint;
+
+  /// No description provided for @horaryVoiceStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Dictate your question'**
+  String get horaryVoiceStart;
+
+  /// No description provided for @horaryVoiceStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop dictation'**
+  String get horaryVoiceStop;
+
+  /// No description provided for @horaryVoiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition is unavailable on this device.'**
+  String get horaryVoiceUnavailable;
+
+  /// No description provided for @horaryVoicePermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone and speech recognition permission is needed for dictation.'**
+  String get horaryVoicePermission;
 
   /// No description provided for @horaryAsk.
   ///

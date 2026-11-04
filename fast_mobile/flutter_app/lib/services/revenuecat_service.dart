@@ -71,7 +71,9 @@ class RevenueCatService {
       return;
     }
     try {
-      await Purchases.setLogLevel(LogLevel.debug);
+      // RevenueCat debug logs can contain customer and purchase diagnostics.
+      // Keep verbose SDK logging confined to debug builds.
+      await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.warn);
       final uid = await BillingService.getBillingUid();
       PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
       await Purchases.configure(config);

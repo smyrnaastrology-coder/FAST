@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/horary_service.dart';
@@ -37,6 +38,7 @@ class _ChatMsg {
 class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver {
   final _questionCtrl = TextEditingController();
   final _scroll = ScrollController();
+  final _speech = SpeechToText();
   final List<_ChatMsg> _chat = [];
 
   String _category = 'general';
@@ -45,6 +47,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   double _lon = 27.1428;
   bool _locating = true;
   bool _busy = false;
+  bool _dictating = false;
+  bool _speechInitialized = false;
+  String _dictationPrefix = '';
   bool _showDetails = false;
   bool _showLanding = true;
   Map<String, dynamic>? _lastChart;
@@ -73,6 +78,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _speech.cancel();
     _questionCtrl.dispose();
     _scroll.dispose();
     super.dispose();
@@ -80,7 +86,76 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _loadQuota(refresh: true);
+    if (state == AppLifecycleState.resumed) {
+      _loadQuota(refresh: true);
+    } else if (_speech.isListening) {
+      _speech.stop();
+    }
+  }
+
+  Future<void> _toggleDictation(AppLocalizations l10n) async {
+    if (_speech.isListening) {
+      await _speech.stop();
+      if (mounted) setState(() => _dictating = false);
+      return;
+    }
+    try {
+      final available = _speechInitialized || await _speech.initialize(
+        onStatus: (status) {
+          if (mounted) setState(() => _dictating = status == 'listening');
+        },
+        onError: (_) {
+          if (mounted) setState(() => _dictating = false);
+        },
+      );
+      _speechInitialized = available;
+      if (!available) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.horaryVoiceUnavailable)),
+          );
+        }
+        return;
+      }
+      if (!mounted) return;
+
+      final languageCode = Localizations.localeOf(context).languageCode.toLowerCase();
+      final locales = await _speech.locales();
+      final matchingLocales = locales.where((locale) {
+        final id = locale.localeId.toLowerCase().replaceAll('-', '_');
+        return id == languageCode || id.startsWith('${languageCode}_');
+      });
+      final localeId = matchingLocales.isEmpty ? null : matchingLocales.first.localeId;
+      _dictationPrefix = _questionCtrl.text.trim();
+      await _speech.listen(
+        listenOptions: SpeechListenOptions(
+          partialResults: true,
+          listenFor: const Duration(seconds: 45),
+          pauseFor: const Duration(seconds: 4),
+          listenMode: ListenMode.dictation,
+          localeId: localeId,
+        ),
+        onResult: (result) {
+          if (!mounted || result.recognizedWords.isEmpty) return;
+          final prefix = _dictationPrefix.isEmpty
+              ? ''
+              : '${_dictationPrefix.trimRight()} ';
+          final text = '$prefix${result.recognizedWords}'.trimLeft();
+          _questionCtrl.value = TextEditingValue(
+            text: text,
+            selection: TextSelection.collapsed(offset: text.length),
+          );
+        },
+      );
+      if (mounted) setState(() => _dictating = _speech.isListening);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _dictating = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.horaryVoicePermission)),
+        );
+      }
+    }
   }
 
   Future<HoraryResult> _loadQuota({bool refresh = false}) async {
@@ -306,7 +381,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
         messenger.showSnackBar(SnackBar(
           content: Text(added > 0
               ? l10n.horaryCreditAdded(added)
-              : l10n.horaryCreditAdded(pack.credits)),
+              : l10n.horaryCreditBalance(_credits)),
         ));
         return;
       }
@@ -1002,6 +1077,14 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       ),
       child: Row(
         children: [
+          IconButton(
+            tooltip: _dictating ? l10n.horaryVoiceStop : l10n.horaryVoiceStart,
+            onPressed: _busy ? null : () => _toggleDictation(l10n),
+            icon: Icon(
+              _dictating ? Icons.mic : Icons.mic_none,
+              color: _dictating ? FastTheme.danger : FastTheme.accentGold,
+            ),
+          ),
           Expanded(
             child: TextField(
               controller: _questionCtrl,

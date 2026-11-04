@@ -72,6 +72,10 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Horary soruları için konumunuz kullanılır.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Horary sorularını sesle dikte edip metne çevirebilmeniz için mikrofon kullanılır.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Konuştuğunuz Horary sorusunu metne çevirmek için konuşma tanıma kullanılır.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

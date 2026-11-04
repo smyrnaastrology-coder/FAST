@@ -47,6 +47,33 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
   });
 
+  testWidgets('quota is refreshed from the server when the app resumes', (tester) async {
+    SharedPreferences.setMockInitialValues({'holavon_horary_intro_shown': true});
+    var quotaReads = 0;
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: HoraryScreen(quotaLoader: () async => HoraryResult(
+        ok: true,
+        data: {
+          'remaining': quotaReads++ == 0 ? 2 : 1,
+          'limit': 3,
+          'is_pro': true,
+          'credits': 0,
+        },
+      )),
+    ));
+    await tester.pumpAndSettle();
+    expect(quotaReads, 1);
+
+    // Model the persisted server value after a question was consumed while
+    // Horary was not visible, then return the app to the foreground.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(quotaReads, 2);
+  });
+
   testWidgets('unavailable quota service does not grant a question', (tester) async {
     SharedPreferences.setMockInitialValues({'holavon_horary_intro_shown': true});
     await tester.pumpWidget(MaterialApp(

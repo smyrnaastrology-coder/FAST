@@ -195,6 +195,13 @@ class SocialProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updatePostCaption(String postId, String caption) {
+    final i = _feed.indexWhere((p) => p.id == postId);
+    if (i < 0) return;
+    _feed[i] = _feed[i].copyWith(caption: caption);
+    notifyListeners();
+  }
+
   /// Bir kullanıcıyı engelledikten sonra feed'den temizler.
   void filterBlockedFeed() {
     _feed.removeWhere((p) => _blocked.contains(p.userId));

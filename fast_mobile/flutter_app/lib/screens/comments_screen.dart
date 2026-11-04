@@ -69,6 +69,43 @@ class _CommentsScreenState extends State<CommentsScreen> {
     }
   }
 
+  Future<void> _editComment(CommentItem comment) async {
+    final l10n = AppLocalizations.of(context);
+    final controller = TextEditingController(text: comment.text);
+    final value = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: FastTheme.bgSecondary,
+        title: Text(l10n.commentEdit, style: TextStyle(color: FastTheme.accentGold)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          minLines: 2,
+          maxLines: 6,
+          maxLength: 300,
+          style: TextStyle(color: FastTheme.text),
+          decoration: InputDecoration(hintText: l10n.commentsHint),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.editCancel)),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, controller.text), child: Text(l10n.editSave)),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (!mounted || value == null) return;
+    try {
+      await SocialService.updateCommentText(comment.id, value);
+      await _load();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.socialErrorServer)),
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _ctrl.dispose();
@@ -154,8 +191,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   : null,
             ),
             const SizedBox(width: 10),
-            Expanded(
-              child: Column(
+             Expanded(
+               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -173,10 +210,29 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(c.text, style: TextStyle(color: FastTheme.text, fontSize: 13, height: 1.4)),
-                ],
-              ),
-            ),
-          ],
+                 ],
+               ),
+             ),
+             if (c.userId == SocialService.currentUserId)
+               PopupMenuButton<String>(
+                 tooltip: l10n.commentEdit,
+                 color: FastTheme.cardBg,
+                 icon: Icon(Icons.more_horiz, color: FastTheme.textDim, size: 19),
+                 onSelected: (value) {
+                   if (value == 'edit') _editComment(c);
+                 },
+                 itemBuilder: (_) => [
+                   PopupMenuItem(
+                     value: 'edit',
+                     child: Row(children: [
+                       Icon(Icons.edit_outlined, size: 18, color: FastTheme.accentGold),
+                       const SizedBox(width: 8),
+                       Text(l10n.commentEdit, style: TextStyle(color: FastTheme.text)),
+                     ]),
+                   ),
+                 ],
+               ),
+           ],
         ),
       ),
     );

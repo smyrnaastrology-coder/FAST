@@ -155,6 +155,7 @@ class PostItem {
   );
 
   PostItem copyWith({
+    String? caption,
     SocialProfile? author,
     int? likeCount,
     int? commentCount,
@@ -163,7 +164,7 @@ class PostItem {
     id: id,
     userId: userId,
     mediaUrl: mediaUrl,
-    caption: caption,
+    caption: caption ?? this.caption,
     isChart: isChart,
     createdAt: createdAt,
     author: author ?? this.author,
@@ -1361,7 +1362,15 @@ class SocialService {
 
   static Future<void> deletePost(String id) async {
     if (!enabled) return;
-    await _c.from('posts').delete().eq('id', id);
+    await _c.from('posts').delete().eq('id', id).eq('user_id', _me);
+  }
+
+  static Future<void> updatePostCaption(String id, String caption) async {
+    if (!enabled || _me.isEmpty) throw StateError('not_signed_in');
+    final value = caption.trim();
+    if (value.length > 2200) throw ArgumentError('caption_too_long');
+    await _c.from('posts').update({'caption': value.isEmpty ? null : value})
+        .eq('id', id).eq('user_id', _me);
   }
 
   /// Feed sayfası çeker + yazar/like/yorum sayaçlarını toplu zenginleştirir.
@@ -1610,6 +1619,16 @@ class SocialService {
       'text': text.trim(),
     });
     return true;
+  }
+
+  static Future<void> updateCommentText(String id, String text) async {
+    if (!enabled || _me.isEmpty) throw StateError('not_signed_in');
+    final value = text.trim();
+    if (value.isEmpty || value.length > 300) {
+      throw ArgumentError('invalid_comment');
+    }
+    await _c.from('comments').update({'text': value})
+        .eq('id', id).eq('user_id', _me);
   }
 
   static Future<void> deleteComment(String id) async {
