@@ -128,6 +128,44 @@ class RevenueCatService {
     }
   }
 
+  /// Consumable purchase: question credits are granted by the server after
+  /// RevenueCat verifies the transaction. Success here only means the store
+  /// purchase completed; the app still refreshes the server balance.
+  static Future<bool> purchaseConsumable(String productId) async {
+    lastAlreadyOwned = false;
+    if (!_inited) {
+      if (kDebugMode) {
+        print('[RC mock] purchase consumable $productId');
+        return true;
+      }
+      return false;
+    }
+    try {
+      final offerings = await Purchases.getOfferings();
+      Package? pkg;
+      for (final off in offerings.all.values) {
+        for (final p in off.availablePackages) {
+          if (_matchesProduct(p.storeProduct.identifier, productId)) {
+            pkg = p;
+            break;
+          }
+        }
+        if (pkg != null) break;
+      }
+      if (pkg == null) {
+        if (kDebugMode) print('[RC] consumable bulunamadı: $productId');
+        return false;
+      }
+      await Purchases.purchase(PurchaseParams.package(pkg));
+      return true;
+    } catch (e) {
+      final s = e.toString().toLowerCase();
+      if (s.contains('already')) lastAlreadyOwned = true;
+      if (kDebugMode) print('[RC] consumable purchase err $e');
+      return false;
+    }
+  }
+
   static Future<bool> isSubscribed({bool refresh = false}) async {
     if (!_inited) {
       final s = await BillingService.getStatus();

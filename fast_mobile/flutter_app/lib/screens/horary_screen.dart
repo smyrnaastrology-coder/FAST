@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +9,7 @@ import '../config/theme.dart';
 import '../l10n/app_localizations.dart';
 import '../services/horary_service.dart';
 import '../services/horary_localization.dart';
+import '../services/revenuecat_service.dart';
 import '../widgets/holavon_mark.dart';
 import '../widgets/horary_localized_detail.dart';
 import 'landing_screen.dart';
@@ -55,6 +56,8 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   bool _quotaError = false;
   int _remaining = 0;
   int _quotaLimit = 3;
+  int _credits = 0;
+  DateTime? _resetAt;
   int _quotaLoadVersion = 0;
 
   @override
@@ -91,6 +94,8 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           _isPro = result.data['is_pro'] as bool;
           _remaining = result.data['remaining'] as int;
           _quotaLimit = result.data['limit'] as int;
+          _credits = (result.data['credits'] as int?) ?? 0;
+          _resetAt = DateTime.tryParse((result.data['reset_at'] ?? '').toString());
         }
       });
     }
@@ -112,13 +117,41 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       ));
       return false;
     }
-    if ((quota.data['remaining'] as int) > 0) return true;
+    final remaining = quota.data['remaining'] as int;
+    final credits = (quota.data['credits'] as int?) ?? 0;
+    if (remaining + credits > 0) return true;
     await _showLimitDialog(l10n);
     return false;
   }
 
+  String? _resetLabel() {
+    final at = _resetAt;
+    if (at == null) return null;
+    var diff = at.difference(DateTime.now().toUtc());
+    if (diff.isNegative) diff = Duration.zero;
+    final hours = diff.inHours.toString().padLeft(2, '0');
+    final minutes = (diff.inMinutes % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes';
+  }
+
+  Widget _dialogStat(IconData icon, String text, {bool danger = false}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: danger ? FastTheme.danger : FastTheme.accentGold),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(text,
+              style: TextStyle(
+                  color: danger ? FastTheme.danger : FastTheme.textMuted,
+                  fontSize: 13)),
+        ),
+      ],
+    );
+  }
+
   Future<void> _showLimitDialog(AppLocalizations l10n) async {
     if (!mounted) return;
+    final reset = _isPro ? _resetLabel() : null;
     await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -129,20 +162,162 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           const SizedBox(width: 8),
           Expanded(child: Text(l10n.horaryLimitTitle, style: TextStyle(color: FastTheme.accentGold, fontSize: 17, fontWeight: FontWeight.w700))),
         ]),
-        content: Text(_isPro ? l10n.horaryProLimitDesc : l10n.horaryLimitDesc, style: TextStyle(color: FastTheme.textMuted, height: 1.4)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _isPro ? l10n.horaryProCreditDialogDesc : l10n.horaryCreditDialogDesc,
+              style: TextStyle(color: FastTheme.textMuted, height: 1.4),
+            ),
+            const SizedBox(height: 14),
+            _dialogStat(Icons.timelapse,
+                '${_isPro ? l10n.horaryQuotaPro : l10n.horaryQuotaFree} $_remaining/$_quotaLimit',
+                danger: true),
+            const SizedBox(height: 6),
+            _dialogStat(Icons.confirmation_number_outlined,
+                l10n.horaryCreditBalance(_credits)),
+            if (reset != null) ...[
+              const SizedBox(height: 6),
+              _dialogStat(Icons.schedule, l10n.horaryResetIn(reset)),
+            ],
+          ],
+        ),
+        actionsOverflowDirection: VerticalDirection.down,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.horaryLimitLater, style: TextStyle(color: FastTheme.textDim))),
-          if (!_isPro) ElevatedButton(
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(_isPro ? l10n.horaryCreditContinueTomorrow : l10n.horaryLimitLater,
+                style: TextStyle(color: FastTheme.textDim)),
+          ),
+          if (!_isPro)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _openPaywall();
+              },
+              child: Text(l10n.proEntry, style: TextStyle(color: FastTheme.accentGold)),
+            ),
+          ElevatedButton.icon(
             onPressed: () {
               Navigator.pop(ctx);
-              _openPaywall();
+              _showCreditSheet(l10n);
             },
             style: ElevatedButton.styleFrom(backgroundColor: FastTheme.accentGold),
-            child: Text(l10n.proEntry, style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.add_card, size: 18),
+            label: Text(l10n.horaryCreditBuy,
+                style: TextStyle(color: FastTheme.bg, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _showCreditSheet(AppLocalizations l10n) async {
+    if (!mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: FastTheme.bgSecondary,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Icon(Icons.add_card, color: FastTheme.accentGold),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(l10n.horaryCreditSheetTitle,
+                      style: TextStyle(
+                          color: FastTheme.accentGold,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700)),
+                ),
+              ]),
+              const SizedBox(height: 8),
+              Text(l10n.horaryCreditSheetDesc,
+                  style: TextStyle(color: FastTheme.textMuted, height: 1.35)),
+              const SizedBox(height: 12),
+              for (final pack in HoraryCreditPack.all)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: FastTheme.accentGold.withValues(alpha: 0.15),
+                    child: Icon(Icons.confirmation_number,
+                        color: FastTheme.accentGold, size: 20),
+                  ),
+                  title: Text(l10n.horaryCreditPackLabel(pack.credits),
+                      style: TextStyle(
+                          color: FastTheme.text,
+                          fontWeight: FontWeight.w600)),
+                  subtitle: Text(l10n.horaryCreditSheetDesc,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: FastTheme.textDim, fontSize: 11)),
+                  trailing: Text(
+                    RevenueCatService.priceFor(pack.productId,
+                        fallback: pack.fallbackPrice),
+                    style: TextStyle(
+                        color: FastTheme.text,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _buyCredits(pack, l10n);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _buyCredits(HoraryCreditPack pack, AppLocalizations l10n) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await RevenueCatService.purchaseConsumable(pack.productId);
+    if (!mounted) return;
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(
+        content: Text(l10n.horaryCreditPurchaseFailed),
+      ));
+      return;
+    }
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.horaryCreditPending),
+    ));
+    // The webhook may still be in flight; sync the verified purchase and retry.
+    for (var attempt = 0; attempt < 4; attempt++) {
+      final sync = await HoraryService.syncCredits();
+      if (!mounted) return;
+      if (sync.ok) {
+        final added = (sync.data['credits_added'] as int?) ?? 0;
+        final balance = sync.data['credits'] as int?;
+        if (balance != null) setState(() => _credits = balance);
+        await _loadQuota(refresh: true);
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(
+          content: Text(added > 0
+              ? l10n.horaryCreditAdded(added)
+              : l10n.horaryCreditAdded(pack.credits)),
+        ));
+        return;
+      }
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    if (!mounted) return;
+    await _loadQuota(refresh: true);
+    if (!mounted) return;
+    messenger.showSnackBar(SnackBar(
+      content: Text(l10n.horaryCreditSyncFailed),
+    ));
   }
 
   Future<void> _determinePosition() async {
@@ -224,8 +399,10 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       if (verdict == 'NO_QUOTA') {
         setState(() {
           _busy = false;
-          _remaining = 0;
+          _remaining = data['remaining'] is int ? data['remaining'] as int : 0;
+          _credits = data['credits'] is int ? data['credits'] as int : 0;
           if (data['is_pro'] is bool) _isPro = data['is_pro'] as bool;
+          _resetAt = DateTime.tryParse((data['reset_at'] ?? '').toString());
           if (_chat.isNotEmpty && _chat.last.role == 'user') _chat.removeLast();
           _questionCtrl.text = q;
           _persistChat();
@@ -236,6 +413,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       final ans = (data['answer'] ?? verdict).toString();
       setState(() {
         if (data['remaining'] is int) _remaining = data['remaining'] as int;
+        if (data['credits'] is int) _credits = data['credits'] as int;
         if (data['is_pro'] is bool) _isPro = data['is_pro'] as bool;
         if (data['houses'] is Map && (data['houses'] as Map).isNotEmpty) {
           _lastChart = data;
@@ -598,8 +776,8 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
       child: Row(
         children: [
-          _quotaBadge(l10n),
-          const Spacer(),
+          Expanded(child: _quotaBadge(l10n)),
+          const SizedBox(width: 6),
           GestureDetector(
             onTap: _determinePosition,
             child: Container(
@@ -962,13 +1140,21 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       return Text(_quotaError ? l10n.horaryQuotaUnavailable : l10n.horaryQuotaLoading,
           style: TextStyle(color: FastTheme.textDim, fontSize: 12));
     }
-    final out = _remaining <= 0;
+    final out = _remaining <= 0 && _credits <= 0;
+    final creditPart = _credits > 0 ? ' · $_credits ${l10n.horaryCredits}' : '';
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(out ? Icons.lock_outline : Icons.timelapse, size: 14, color: out ? FastTheme.danger : FastTheme.textDim),
         const SizedBox(width: 6),
-        Text('${_isPro ? l10n.horaryQuotaPro : l10n.horaryQuotaFree} $_remaining/$_quotaLimit', style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12)),
+        Flexible(child: Text('$_remaining/$_quotaLimit$creditPart', overflow: TextOverflow.ellipsis, style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12))),
+        if (_credits <= 0 && out) ...[
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => _showCreditSheet(l10n),
+            child: Text(l10n.horaryCreditBuy, style: TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
+          ),
+        ],
         if (out && !_isPro) ...[
           const SizedBox(width: 6),
           GestureDetector(
@@ -1021,3 +1207,4 @@ class MiniChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
+

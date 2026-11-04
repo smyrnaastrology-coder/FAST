@@ -993,6 +993,41 @@
   "horaryLimitDesc": "You've used your 3 free questions. Pro lets you ask 3 questions each day.",
   "horaryProLimitDesc": "You've used your 3 Pro questions for today. Your allowance resets at 00:00 UTC.",
   "horaryLimitLater": "OK",
+  "horaryCreditBalance": "Purchased credits: {count}",
+  "@horaryCreditBalance": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditBuy": "Buy credits",
+  "horaryCreditContinueTomorrow": "Continue tomorrow",
+  "horaryCreditDialogDesc": "Your free questions are used up. Buy credits to keep asking; credits never expire and are always used after the daily allowance.",
+  "horaryProCreditDialogDesc": "Today's Pro questions are used up. Buy credits to keep asking now; credits never expire. Your daily allowance resets at 00:00 UTC.",
+  "horaryCreditSheetTitle": "Question credits",
+  "horaryCreditSheetDesc": "1 question = 1 credit. Credits never expire and are used after the daily allowance.",
+  "horaryCreditPackLabel": "{count} credits",
+  "@horaryCreditPackLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditPurchasing": "Completing purchase…",
+  "horaryCreditPurchaseFailed": "Purchase could not be completed. Please try again.",
+  "horaryCreditPending": "Payment received. Loading your credits…",
+  "horaryCreditAdded": "{count} credits added.",
+  "@horaryCreditAdded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditSyncFailed": "Payment received, but credits are not visible yet. They will be added automatically; try again in a moment.",
+  "horaryResetIn": "Resets in {time}",
+  "@horaryResetIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "horaryCreditNone": "No purchased credits",
   "horaryAuthError": "Session could not be verified. Please sign in again and retry.",
   "horaryCredits": "credits",
   "horaryClear": "Clear chat",

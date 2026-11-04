@@ -13,6 +13,21 @@ class HoraryResult {
   const HoraryResult({required this.ok, this.data = const {}, this.error, this.authError = false});
 }
 
+/// One purchasable question-credit pack. Product IDs must match the server
+/// map in `horary_oracle/api.py` and the Play Console / RevenueCat products.
+class HoraryCreditPack {
+  final String productId;
+  final int credits;
+  final String fallbackPrice;
+  const HoraryCreditPack(this.productId, this.credits, this.fallbackPrice);
+
+  static const List<HoraryCreditPack> all = [
+    HoraryCreditPack('horary_credits_5', 5, '₺69'),
+    HoraryCreditPack('horary_credits_15', 15, '₺169'),
+    HoraryCreditPack('horary_credits_40', 40, '₺399'),
+  ];
+}
+
 /// Authenticated Holavon Horary API client.
 class HoraryService {
   static Map<String, String>? _headers(String? accessToken) {
@@ -42,7 +57,33 @@ class HoraryService {
       final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
       if (data['remaining'] is! int || data['limit'] is! int || data['is_pro'] is! bool ||
           (data['limit'] as int) <= 0 || (data['remaining'] as int) < 0 ||
-          (data['remaining'] as int) > (data['limit'] as int)) {
+          (data['remaining'] as int) > (data['limit'] as int) ||
+          (data['credits'] != null &&
+              (data['credits'] is! int || (data['credits'] as int) < 0))) {
+        return const HoraryResult(ok: false, error: 'parse');
+      }
+      data['credits'] = (data['credits'] as int?) ?? 0;
+      return HoraryResult(ok: true, data: data);
+    } catch (_) {
+      return const HoraryResult(ok: false, error: 'error');
+    }
+  }
+
+  /// Recover consumable purchases from RevenueCat immediately after checkout.
+  /// The server verifies the purchase and grants credits idempotently.
+  static Future<HoraryResult> syncCredits({http.Client? client, String? accessToken}) async {
+    final headers = _headers(accessToken);
+    if (headers == null) return const HoraryResult(ok: false, error: 'auth', authError: true);
+    try {
+      final uri = Uri.parse(ApiConfig.horaryCreditsSync);
+      final response = await (client == null
+              ? http.post(uri, headers: headers)
+              : client.post(uri, headers: headers))
+          .timeout(const Duration(seconds: 60));
+      if (response.statusCode == 401) return const HoraryResult(ok: false, error: 'auth', authError: true);
+      if (response.statusCode != 200) return HoraryResult(ok: false, error: 'http_${response.statusCode}');
+      final data = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      if (data['credits'] is! int || (data['credits'] as int) < 0) {
         return const HoraryResult(ok: false, error: 'parse');
       }
       return HoraryResult(ok: true, data: data);

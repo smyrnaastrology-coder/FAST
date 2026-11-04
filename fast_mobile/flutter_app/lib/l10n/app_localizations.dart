@@ -4762,6 +4762,96 @@ abstract class AppLocalizations {
   /// **'OK'**
   String get horaryLimitLater;
 
+  /// No description provided for @horaryCreditBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchased credits: {count}'**
+  String horaryCreditBalance(int count);
+
+  /// No description provided for @horaryCreditBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy credits'**
+  String get horaryCreditBuy;
+
+  /// No description provided for @horaryCreditContinueTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue tomorrow'**
+  String get horaryCreditContinueTomorrow;
+
+  /// No description provided for @horaryCreditDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your free questions are used up. Buy credits to keep asking; credits never expire and are always used after the daily allowance.'**
+  String get horaryCreditDialogDesc;
+
+  /// No description provided for @horaryProCreditDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Pro questions are used up. Buy credits to keep asking now; credits never expire. Your daily allowance resets at 00:00 UTC.'**
+  String get horaryProCreditDialogDesc;
+
+  /// No description provided for @horaryCreditSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Question credits'**
+  String get horaryCreditSheetTitle;
+
+  /// No description provided for @horaryCreditSheetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'1 question = 1 credit. Credits never expire and are used after the daily allowance.'**
+  String get horaryCreditSheetDesc;
+
+  /// No description provided for @horaryCreditPackLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} credits'**
+  String horaryCreditPackLabel(int count);
+
+  /// No description provided for @horaryCreditPurchasing.
+  ///
+  /// In en, this message translates to:
+  /// **'Completing purchase…'**
+  String get horaryCreditPurchasing;
+
+  /// No description provided for @horaryCreditPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase could not be completed. Please try again.'**
+  String get horaryCreditPurchaseFailed;
+
+  /// No description provided for @horaryCreditPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received. Loading your credits…'**
+  String get horaryCreditPending;
+
+  /// No description provided for @horaryCreditAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} credits added.'**
+  String horaryCreditAdded(int count);
+
+  /// No description provided for @horaryCreditSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment received, but credits are not visible yet. They will be added automatically; try again in a moment.'**
+  String get horaryCreditSyncFailed;
+
+  /// No description provided for @horaryResetIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets in {time}'**
+  String horaryResetIn(String time);
+
+  /// No description provided for @horaryCreditNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchased credits'**
+  String get horaryCreditNone;
+
   /// No description provided for @horaryAuthError.
   ///
   /// In en, this message translates to:

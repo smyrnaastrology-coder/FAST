@@ -2555,6 +2555,64 @@ class AppLocalizationsTr extends AppLocalizations {
   String get horaryLimitLater => 'Tamam';
 
   @override
+  String horaryCreditBalance(int count) {
+    return 'Satın alınmış kredi: $count';
+  }
+
+  @override
+  String get horaryCreditBuy => 'Kredi al';
+
+  @override
+  String get horaryCreditContinueTomorrow => 'Yarın devam et';
+
+  @override
+  String get horaryCreditDialogDesc =>
+      'Ücretsiz soru hakkın doldu. Soru sormaya devam etmek için kredi alabilirsin; krediler süresizdir ve her zaman önce günlük hak kullanılır.';
+
+  @override
+  String get horaryProCreditDialogDesc =>
+      'Bugünkü 3 Pro soru hakkın doldu. Şimdi devam etmek için kredi alabilirsin; krediler süresizdir. Günlük hakkın 00:00 UTC\'de yenilenir.';
+
+  @override
+  String get horaryCreditSheetTitle => 'Soru kredisi';
+
+  @override
+  String get horaryCreditSheetDesc =>
+      '1 soru = 1 kredi. Krediler süresizdir ve önce günlük hak kullanılır.';
+
+  @override
+  String horaryCreditPackLabel(int count) {
+    return '$count kredi';
+  }
+
+  @override
+  String get horaryCreditPurchasing => 'Satın alma tamamlanıyor…';
+
+  @override
+  String get horaryCreditPurchaseFailed =>
+      'Satın alma tamamlanamadı. Lütfen tekrar dene.';
+
+  @override
+  String get horaryCreditPending => 'Ödeme alındı. Kredilerin yükleniyor…';
+
+  @override
+  String horaryCreditAdded(int count) {
+    return '$count kredi eklendi.';
+  }
+
+  @override
+  String get horaryCreditSyncFailed =>
+      'Ödeme alındı ama krediler henüz görünmüyor. Otomatik eklenecek; birazdan tekrar dene.';
+
+  @override
+  String horaryResetIn(String time) {
+    return 'Yenilenmeye $time';
+  }
+
+  @override
+  String get horaryCreditNone => 'Satın alınmış kredi yok';
+
+  @override
   String get horaryAuthError =>
       'Oturum doğrulanamadı. Lütfen tekrar giriş yapıp yeniden dene.';
 

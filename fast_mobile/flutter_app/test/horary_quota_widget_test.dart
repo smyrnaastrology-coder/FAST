@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  Future<void> showScreen(WidgetTester tester, {required bool pro}) async {
+  Future<void> showScreen(WidgetTester tester, {required bool pro, int credits = 0}) async {
     SharedPreferences.setMockInitialValues({'holavon_horary_intro_shown': true});
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2;
@@ -17,7 +17,7 @@ void main() {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: HoraryScreen(quotaLoader: () async => HoraryResult(
-        ok: true, data: {'remaining': 0, 'limit': 3, 'is_pro': pro},
+        ok: true, data: {'remaining': 0, 'limit': 3, 'is_pro': pro, 'credits': credits},
       )),
     ));
     await tester.pumpAndSettle();
@@ -26,16 +26,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('exhausted free users see the Pro offer', (tester) async {
+  testWidgets('exhausted free users see both Pro and credit offers', (tester) async {
     await showScreen(tester, pro: false);
-    expect(find.textContaining("You've used your 3 free questions"), findsOneWidget);
+    expect(find.textContaining('Your free questions are used up'), findsOneWidget);
     expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Go Pro')), findsOneWidget);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Buy credits')), findsOneWidget);
   });
 
-  testWidgets('exhausted Pro users see the UTC reset and no upsell', (tester) async {
+  testWidgets('exhausted Pro users see the credit offer and UTC reset, not Pro', (tester) async {
     await showScreen(tester, pro: true);
-    expect(find.textContaining('Your allowance resets at 00:00 UTC'), findsOneWidget);
+    expect(find.textContaining('Your daily allowance resets at 00:00 UTC'), findsOneWidget);
     expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Go Pro')), findsNothing);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Buy credits')), findsOneWidget);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Continue tomorrow')), findsOneWidget);
+    expect(find.descendant(of: find.byType(AlertDialog), matching: find.text('Purchased credits: 0')), findsOneWidget);
+  });
+
+  testWidgets('a purchased credit lets the question through without a dialog', (tester) async {
+    await showScreen(tester, pro: true, credits: 1);
+    expect(find.byType(AlertDialog), findsNothing);
   });
 
   testWidgets('unavailable quota service does not grant a question', (tester) async {

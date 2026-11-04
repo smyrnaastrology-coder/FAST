@@ -862,6 +862,41 @@
   "horaryLimitDesc": "Has usado tus 3 preguntas gratis. Con Pro puedes hacer 3 preguntas cada día.",
   "horaryProLimitDesc": "Has usado tus 3 preguntas Pro de hoy. Se renuevan a las 00:00 UTC.",
   "horaryLimitLater": "Aceptar",
+  "horaryCreditBalance": "Créditos comprados: {count}",
+  "@horaryCreditBalance": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditBuy": "Comprar créditos",
+  "horaryCreditContinueTomorrow": "Continuar mañana",
+  "horaryCreditDialogDesc": "Has usado tus preguntas gratis. Compra créditos para seguir preguntando; los créditos no caducan y siempre se usan después del cupo diario.",
+  "horaryProCreditDialogDesc": "Has usado tus 3 preguntas Pro de hoy. Compra créditos para seguir ahora; no caducan. Tu cupo diario se renueva a las 00:00 UTC.",
+  "horaryCreditSheetTitle": "Créditos de preguntas",
+  "horaryCreditSheetDesc": "1 pregunta = 1 crédito. Los créditos no caducan y se usan después del cupo diario.",
+  "horaryCreditPackLabel": "{count} créditos",
+  "@horaryCreditPackLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditPurchasing": "Completando la compra…",
+  "horaryCreditPurchaseFailed": "No se pudo completar la compra. Inténtalo de nuevo.",
+  "horaryCreditPending": "Pago recibido. Cargando tus créditos…",
+  "horaryCreditAdded": "{count} créditos añadidos.",
+  "@horaryCreditAdded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditSyncFailed": "Pago recibido, pero los créditos aún no aparecen. Se añadirán automáticamente; inténtalo de nuevo en un momento.",
+  "horaryResetIn": "Se renueva en {time}",
+  "@horaryResetIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "horaryCreditNone": "Sin créditos comprados",
   "horaryAuthError": "No se pudo verificar la sesión. Inicia sesión de nuevo e inténtalo otra vez.",
   "horaryCredits": "créditos",
   "horaryClear": "Borrar chat",

@@ -869,6 +869,41 @@
   "horaryLimitDesc": "Toplam 3 ücretsiz soru hakkını kullandın. Pro ile her gün 3 soru sorabilirsin.",
   "horaryProLimitDesc": "Bugünkü 3 Pro soru hakkını kullandın. Hakların 00:00 UTC'de yenilenir.",
   "horaryLimitLater": "Tamam",
+  "horaryCreditBalance": "Satın alınmış kredi: {count}",
+  "@horaryCreditBalance": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditBuy": "Kredi al",
+  "horaryCreditContinueTomorrow": "Yarın devam et",
+  "horaryCreditDialogDesc": "Ücretsiz soru hakkın doldu. Soru sormaya devam etmek için kredi alabilirsin; krediler süresizdir ve her zaman önce günlük hak kullanılır.",
+  "horaryProCreditDialogDesc": "Bugünkü 3 Pro soru hakkın doldu. Şimdi devam etmek için kredi alabilirsin; krediler süresizdir. Günlük hakkın 00:00 UTC'de yenilenir.",
+  "horaryCreditSheetTitle": "Soru kredisi",
+  "horaryCreditSheetDesc": "1 soru = 1 kredi. Krediler süresizdir ve önce günlük hak kullanılır.",
+  "horaryCreditPackLabel": "{count} kredi",
+  "@horaryCreditPackLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditPurchasing": "Satın alma tamamlanıyor…",
+  "horaryCreditPurchaseFailed": "Satın alma tamamlanamadı. Lütfen tekrar dene.",
+  "horaryCreditPending": "Ödeme alındı. Kredilerin yükleniyor…",
+  "horaryCreditAdded": "{count} kredi eklendi.",
+  "@horaryCreditAdded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "horaryCreditSyncFailed": "Ödeme alındı ama krediler henüz görünmüyor. Otomatik eklenecek; birazdan tekrar dene.",
+  "horaryResetIn": "Yenilenmeye {time}",
+  "@horaryResetIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "horaryCreditNone": "Satın alınmış kredi yok",
   "horaryAuthError": "Oturum doğrulanamadı. Lütfen tekrar giriş yapıp yeniden dene.",
   "horaryCredits": "kredi",
   "horaryClear": "Sohbeti temizle",

@@ -74,4 +74,34 @@ void main() {
     expect(ids, hasLength(2));
     expect(ids[0], ids[1]);
   });
+
+  test('purchased credits are parsed and synced through the authenticated endpoint', () async {
+    final quotaClient = MockClient((request) async {
+      expect(request.url.path, '/api/holavon/quota');
+      return http.Response(jsonEncode({
+        'remaining': 0, 'limit': 3, 'is_pro': true,
+        'credits': 12, 'available': 12,
+        'reset_at': '2026-11-04T00:00:00Z',
+      }), 200);
+    });
+    final quota = await HoraryService.quota(client: quotaClient, accessToken: 'test-token');
+    expect(quota.ok, isTrue);
+    expect(quota.data['credits'], 12);
+
+    final syncClient = MockClient((request) async {
+      expect(request.url.path, '/api/holavon/credits/sync');
+      expect(request.headers['Authorization'], 'Bearer test-token');
+      return http.Response(jsonEncode({'ok': true, 'credits_added': 5, 'credits': 17}), 200);
+    });
+    final sync = await HoraryService.syncCredits(client: syncClient, accessToken: 'test-token');
+    expect(sync.ok, isTrue);
+    expect(sync.data['credits'], 17);
+  });
+
+  test('credit packs match the server product IDs and order', () {
+    expect(HoraryCreditPack.all.map((p) => p.productId).toList(), [
+      'horary_credits_5', 'horary_credits_15', 'horary_credits_40',
+    ]);
+    expect(HoraryCreditPack.all.map((p) => p.credits).toList(), [5, 15, 40]);
+  });
 }

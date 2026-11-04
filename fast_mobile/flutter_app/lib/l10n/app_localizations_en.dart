@@ -2568,6 +2568,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get horaryLimitLater => 'OK';
 
   @override
+  String horaryCreditBalance(int count) {
+    return 'Purchased credits: $count';
+  }
+
+  @override
+  String get horaryCreditBuy => 'Buy credits';
+
+  @override
+  String get horaryCreditContinueTomorrow => 'Continue tomorrow';
+
+  @override
+  String get horaryCreditDialogDesc =>
+      'Your free questions are used up. Buy credits to keep asking; credits never expire and are always used after the daily allowance.';
+
+  @override
+  String get horaryProCreditDialogDesc =>
+      'Today\'s Pro questions are used up. Buy credits to keep asking now; credits never expire. Your daily allowance resets at 00:00 UTC.';
+
+  @override
+  String get horaryCreditSheetTitle => 'Question credits';
+
+  @override
+  String get horaryCreditSheetDesc =>
+      '1 question = 1 credit. Credits never expire and are used after the daily allowance.';
+
+  @override
+  String horaryCreditPackLabel(int count) {
+    return '$count credits';
+  }
+
+  @override
+  String get horaryCreditPurchasing => 'Completing purchase…';
+
+  @override
+  String get horaryCreditPurchaseFailed =>
+      'Purchase could not be completed. Please try again.';
+
+  @override
+  String get horaryCreditPending => 'Payment received. Loading your credits…';
+
+  @override
+  String horaryCreditAdded(int count) {
+    return '$count credits added.';
+  }
+
+  @override
+  String get horaryCreditSyncFailed =>
+      'Payment received, but credits are not visible yet. They will be added automatically; try again in a moment.';
+
+  @override
+  String horaryResetIn(String time) {
+    return 'Resets in $time';
+  }
+
+  @override
+  String get horaryCreditNone => 'No purchased credits';
+
+  @override
   String get horaryAuthError =>
       'Session could not be verified. Please sign in again and retry.';
 

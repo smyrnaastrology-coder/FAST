@@ -2590,6 +2590,64 @@ class AppLocalizationsEs extends AppLocalizations {
   String get horaryLimitLater => 'Aceptar';
 
   @override
+  String horaryCreditBalance(int count) {
+    return 'Créditos comprados: $count';
+  }
+
+  @override
+  String get horaryCreditBuy => 'Comprar créditos';
+
+  @override
+  String get horaryCreditContinueTomorrow => 'Continuar mañana';
+
+  @override
+  String get horaryCreditDialogDesc =>
+      'Has usado tus preguntas gratis. Compra créditos para seguir preguntando; los créditos no caducan y siempre se usan después del cupo diario.';
+
+  @override
+  String get horaryProCreditDialogDesc =>
+      'Has usado tus 3 preguntas Pro de hoy. Compra créditos para seguir ahora; no caducan. Tu cupo diario se renueva a las 00:00 UTC.';
+
+  @override
+  String get horaryCreditSheetTitle => 'Créditos de preguntas';
+
+  @override
+  String get horaryCreditSheetDesc =>
+      '1 pregunta = 1 crédito. Los créditos no caducan y se usan después del cupo diario.';
+
+  @override
+  String horaryCreditPackLabel(int count) {
+    return '$count créditos';
+  }
+
+  @override
+  String get horaryCreditPurchasing => 'Completando la compra…';
+
+  @override
+  String get horaryCreditPurchaseFailed =>
+      'No se pudo completar la compra. Inténtalo de nuevo.';
+
+  @override
+  String get horaryCreditPending => 'Pago recibido. Cargando tus créditos…';
+
+  @override
+  String horaryCreditAdded(int count) {
+    return '$count créditos añadidos.';
+  }
+
+  @override
+  String get horaryCreditSyncFailed =>
+      'Pago recibido, pero los créditos aún no aparecen. Se añadirán automáticamente; inténtalo de nuevo en un momento.';
+
+  @override
+  String horaryResetIn(String time) {
+    return 'Se renueva en $time';
+  }
+
+  @override
+  String get horaryCreditNone => 'Sin créditos comprados';
+
+  @override
   String get horaryAuthError =>
       'No se pudo verificar la sesión. Inicia sesión de nuevo e inténtalo otra vez.';
 
