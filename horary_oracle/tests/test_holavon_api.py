@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 import api
-from engine.holavon_quota_store import QuotaReservation
+from engine.holavon_quota_store import CreditGrant, QuotaReservation
 
 
 REQUEST_ID = '32280f23-219e-45cf-b18b-90c8a8367703'
@@ -12,6 +12,12 @@ class FakeStore:
         self.allowed = allowed
         self.duplicate = duplicate
         self.calls = []
+        self.credits = 5
+
+    def status(self, user_id, *, is_pro):
+        self.calls.append(('status', user_id, is_pro))
+        return {'remaining': 2, 'limit': 3, 'credits': self.credits,
+                'available': 2 + self.credits, 'is_pro': is_pro}
 
     def remaining(self, user_id, *, is_pro):
         self.calls.append(('remaining', user_id, is_pro))
@@ -19,7 +25,15 @@ class FakeStore:
 
     def consume(self, user_id, *, is_pro, request_id):
         self.calls.append(('consume', user_id, is_pro, request_id))
-        return QuotaReservation(self.allowed, 2 if self.allowed else 0, self.duplicate)
+        return QuotaReservation(self.allowed, 2 if self.allowed else 0, self.duplicate,
+                                source='pro' if self.allowed else '',
+                                credits=self.credits)
+
+    def grant_credits(self, user_id, *, transaction_id, product_id, credits, source):
+        self.calls.append(('grant', user_id, transaction_id, product_id,
+                           credits, source))
+        self.credits += credits
+        return CreditGrant(credits, self.credits)
 
     def complete(self, user_id, request_id):
         self.calls.append(('complete', user_id, request_id))
@@ -48,8 +62,17 @@ def test_status_uses_verified_identity_and_subscription(monkeypatch):
     _configure(monkeypatch, store, pro=True)
     r = TestClient(api.app).get('/api/holavon/quota')
     assert r.status_code == 200
-    assert r.json() == {'remaining': 2, 'limit': 3, 'is_pro': True, 'reset_timezone': 'UTC'}
-    assert store.calls == [('remaining', 'verified-user', True)]
+    body = r.json()
+    assert body['remaining'] == 2
+    assert body['limit'] == 3
+    assert body['is_pro'] is True
+    assert body['credits'] == 5
+    assert body['available'] == 7
+    assert body['reset_timezone'] == 'UTC'
+    assert body['reset_at'].endswith('Z')
+    assert [p['product_id'] for p in body['credit_packs']] == [
+        'horary_credits_5', 'horary_credits_15', 'horary_credits_40']
+    assert store.calls == [('status', 'verified-user', True)]
 
 
 def test_answer_consumes_only_verified_account_quota(monkeypatch):
@@ -126,3 +149,42 @@ def test_failed_answer_refunds_pending_reservation(monkeypatch):
     client = TestClient(api.app, raise_server_exceptions=False)
     assert client.post('/api/holavon/cast', json=_payload()).status_code == 500
     assert ('release', 'verified-user', REQUEST_ID) in store.calls
+
+
+def test_credit_grant_requires_secret_and_rejects_unknown_product(monkeypatch):
+    store = FakeStore()
+    monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
+    monkeypatch.setattr(api, '_holavon_store', lambda: store)
+    client = TestClient(api.app)
+    body = {'user_id': 'verified-user', 'transaction_id': 'tx-1',
+            'product_id': 'horary_credits_5'}
+    assert client.post('/api/holavon/credits/grant', json=body).status_code == 401
+    assert store.calls == []
+    assert client.post('/api/holavon/credits/grant', json=body,
+                       headers={'X-Webhook-Secret': 'credit-secret'}).status_code == 200
+    assert store.calls[-1] == ('grant', 'verified-user', 'tx-1',
+                               'horary_credits_5', 5, 'revenuecat')
+    body['product_id'] = 'not-a-product'
+    assert client.post('/api/holavon/credits/grant', json=body,
+                       headers={'X-Webhook-Secret': 'credit-secret'}).status_code == 400
+
+
+def test_revenuecat_webhook_ignores_subscriptions_and_grants_credits(monkeypatch):
+    store = FakeStore()
+    monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
+    monkeypatch.setattr(api, '_holavon_store', lambda: store)
+    client = TestClient(api.app)
+    headers = {'Authorization': 'Bearer credit-secret'}
+    subscription = {'event': {'type': 'RENEWAL', 'app_user_id': 'verified-user',
+                              'product_id': 'sub_daily', 'transaction_id': 'sub-1'}}
+    r = client.post('/api/holavon/credits/webhook', json=subscription, headers=headers)
+    assert r.status_code == 200 and r.json()['ignored'] == 'event type'
+    assert store.calls == []
+    purchase = {'event': {'type': 'NON_RENEWING_PURCHASE',
+                          'app_user_id': 'verified-user',
+                          'product_id': 'horary_credits_15',
+                          'transaction_id': 'tx-15'}}
+    r = client.post('/api/holavon/credits/webhook', json=purchase, headers=headers)
+    assert r.status_code == 200 and r.json()['credits_added'] == 15
+    assert store.calls[-1] == ('grant', 'verified-user', 'tx-15',
+                               'horary_credits_15', 15, 'revenuecat_webhook')

@@ -37,6 +37,14 @@ services:
         value: /var/data/horary_location_feedback.json
       - key: OPENAI_API_KEY
         sync: false
+      - key: HORARY_DATABASE_URL
+        sync: false
+      - key: REVENUECAT_API_SECRET
+        sync: false
+      - key: HOLAVON_CREDIT_WEBHOOK_SECRET
+        sync: false
+      - key: HOLAVON_QUOTA_EXPERIMENTAL
+        value: "true"
   - type: web
     name: horary-oracle-web
     runtime: python

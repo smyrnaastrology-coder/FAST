@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+﻿from datetime import datetime, timezone
 
 import pytest
 
@@ -27,7 +27,7 @@ class FakeCursor:
 
 
 class FakeConnection:
-    def __init__(self, row=(0, None, 0), fail=False, existing=None):
+    def __init__(self, row=(0, None, 0, 0), fail=False, existing=None):
         self.row = row
         self.fail = fail
         self.existing = existing
@@ -51,11 +51,11 @@ class FakeConnection:
 
 
 def test_free_claim_locks_and_updates():
-    conn = FakeConnection(row=(2, None, 0))
+    conn = FakeConnection(row=(2, None, 0, 0))
     result = PostgresQuotaStore(lambda: conn).consume('verified-user', is_pro=False, request_id=REQUEST_ID)
     assert result.allowed and result.remaining == 0
     assert 'FOR UPDATE' in conn.calls[1][0]
-    assert conn.calls[3][1] == (3, None, 0, 'verified-user')
+    assert conn.calls[3][1] == (3, None, 0, 0, 'verified-user')
     assert conn.calls[4][1][:3] == ('verified-user', REQUEST_ID, 'free')
     assert not conn.autocommit
     assert conn.committed and conn.closed and not conn.rolled_back
@@ -63,7 +63,7 @@ def test_free_claim_locks_and_updates():
 
 def test_blocked_pro_claim_does_not_update():
     today = datetime.now(timezone.utc).date()
-    conn = FakeConnection(row=(0, today, 3))
+    conn = FakeConnection(row=(0, today, 3, 0))
     result = PostgresQuotaStore(lambda: conn).consume('verified-user', is_pro=True, request_id=REQUEST_ID)
     assert not result.allowed and result.remaining == 0
     assert len(conn.calls) == 3
@@ -88,8 +88,9 @@ def test_missing_identity_and_invalid_entitlement_rejected():
 
 
 def test_retry_does_not_spend_a_second_question():
-    conn = FakeConnection(row=(1, None, 0), existing=(2,))
+    conn = FakeConnection(row=(1, None, 0, 0), existing=(2,))
     result = PostgresQuotaStore(lambda: conn).consume('verified-user', is_pro=False, request_id=REQUEST_ID)
     assert result.allowed and result.duplicate and result.remaining == 2
     assert len(conn.calls) == 3
     assert conn.committed and conn.closed
+

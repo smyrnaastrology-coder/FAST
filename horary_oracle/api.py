@@ -98,6 +98,22 @@ class FeedbackRequest(BaseModel):
                                   description="bulamadıysa neler denendi")
     note: Optional[str] = Field(None, max_length=300)
 
+class CreditGrantRequest(BaseModel):
+    """Server-to-server credit grant (RevenueCat webhook / admin)."""
+    user_id: str = Field(..., min_length=1, max_length=200)
+    transaction_id: str = Field(..., min_length=1, max_length=200)
+    product_id: str = Field(..., min_length=1, max_length=100)
+
+
+# Purchased question credits. One question costs one credit regardless of
+# category. Product IDs must match the Play Console / RevenueCat products.
+HORARY_CREDIT_PACKS = (
+    {"product_id": "horary_credits_5", "credits": 5, "price_label": "₺69"},
+    {"product_id": "horary_credits_15", "credits": 15, "price_label": "₺169"},
+    {"product_id": "horary_credits_40", "credits": 40, "price_label": "₺399"},
+)
+HORARY_CREDIT_BY_PRODUCT = {p["product_id"]: p for p in HORARY_CREDIT_PACKS}
+
 class HealthResponse(BaseModel):
     status: str
     version: str
@@ -966,8 +982,18 @@ async def _cast(req: CastRequest, *, holavon=None):
             # Never execute the LLM twice for the same quota reservation.
             raise HTTPException(409, 'request already submitted')
         if not quota_result.allowed:
-            return {"verdict":"NO_QUOTA", "answer":"", "remaining":0,
-                    "is_pro":holavon['is_pro'], "houses":{}}
+            from engine.holavon_quota import FREE_TOTAL_LIMIT, PRO_DAILY_LIMIT
+            return {
+                "verdict": "NO_QUOTA", "answer": "",
+                "remaining": quota_result.remaining,
+                "credits": quota_result.credits,
+                "available": quota_result.available,
+                "limit": PRO_DAILY_LIMIT if holavon['is_pro'] else FREE_TOTAL_LIMIT,
+                "is_pro": holavon['is_pro'],
+                "reset_timezone": 'UTC' if holavon['is_pro'] else None,
+                "reset_at": _credit_reset_at() if holavon['is_pro'] else None,
+                "houses": {},
+            }
         holavon['reserved'] = True
     else:
         import auth as _auth3
@@ -1355,6 +1381,8 @@ async def _cast(req: CastRequest, *, holavon=None):
         "answer": answer,
         "credits_left": engine_json.get("credits_left"),
         "remaining": quota_result.remaining if quota_result is not None else None,
+        "credits": quota_result.credits if quota_result is not None else None,
+        "quota_source": quota_result.source if quota_result is not None else None,
         "is_pro": holavon['is_pro'] if holavon is not None else None,
         # GUVEN: yanitta konum guveni ne, cevabi kac kademe yazdi
         "trust": {
@@ -1381,6 +1409,20 @@ async def _cast(req: CastRequest, *, holavon=None):
     return response
 
 
+def _holavon_store():
+    from engine.holavon_quota_store import PostgresQuotaStore
+    import psycopg2
+    db_url = os.getenv('HORARY_DATABASE_URL', '').strip()
+    if not db_url:
+        raise HTTPException(503, 'quota database not configured')
+    store = PostgresQuotaStore(lambda: psycopg2.connect(db_url, connect_timeout=10))
+    try:
+        store.ensure_schema(db_url)
+    except Exception:
+        raise HTTPException(503, 'quota database unavailable')
+    return store
+
+
 def _holavon_context(authorization):
     """Authenticate the account and independently verify Pro server-side."""
     if os.getenv('HOLAVON_QUOTA_EXPERIMENTAL', '').lower() != 'true':
@@ -1388,9 +1430,7 @@ def _holavon_context(authorization):
     from engine.holavon_identity import (
         AuthenticationError, IdentityUnavailable, verify_identity, verify_pro,
     )
-    from engine.holavon_quota_store import PostgresQuotaStore
     import requests
-    import psycopg2
     try:
         identity = verify_identity(
             authorization, supabase_url=os.getenv('SUPABASE_URL', ''),
@@ -1404,18 +1444,21 @@ def _holavon_context(authorization):
         raise HTTPException(401, 'invalid session')
     except IdentityUnavailable:
         raise HTTPException(503, 'account verification unavailable')
-    db_url = os.getenv('HORARY_DATABASE_URL', '').strip()
-    if not db_url:
-        raise HTTPException(503, 'quota database not configured')
-    store = PostgresQuotaStore(lambda: psycopg2.connect(db_url, connect_timeout=10))
-    try:
-        store.ensure_schema(db_url)
-    except Exception:
-        raise HTTPException(503, 'quota database unavailable')
+    store = _holavon_store()
     return {
         'user_id': identity.user_id, 'email': identity.email, 'is_pro': is_pro,
         'store': store,
     }
+
+
+def _credit_reset_at():
+    """Next 00:00 UTC as an ISO timestamp for the Pro daily reset."""
+    from datetime import timedelta, timezone
+    now = datetime.now(timezone.utc)
+    reset = (now + timedelta(days=1)).replace(
+        hour=0, minute=0, second=0, microsecond=0,
+    )
+    return reset.isoformat().replace('+00:00', 'Z')
 
 
 @app.get('/api/holavon/quota')
@@ -1423,13 +1466,179 @@ async def holavon_quota(authorization: str | None = Header(None)):
     import asyncio
     context = await asyncio.to_thread(_holavon_context, authorization)
     try:
-        remaining = await asyncio.to_thread(
-            context['store'].remaining, context['user_id'], is_pro=context['is_pro'],
+        status = await asyncio.to_thread(
+            context['store'].status, context['user_id'],
+            is_pro=context['is_pro'],
         )
     except Exception:
         raise HTTPException(503, 'quota service unavailable')
-    return {'remaining': remaining, 'limit': 3, 'is_pro': context['is_pro'],
-            'reset_timezone': 'UTC' if context['is_pro'] else None}
+    return {
+        'remaining': status['remaining'],
+        'limit': status['limit'],
+        'is_pro': context['is_pro'],
+        'credits': status['credits'],
+        'available': status['available'],
+        'reset_timezone': 'UTC' if context['is_pro'] else None,
+        'reset_at': _credit_reset_at() if context['is_pro'] else None,
+        'credit_packs': [
+            {'product_id': p['product_id'], 'credits': p['credits'],
+             'price_label': p['price_label']}
+            for p in HORARY_CREDIT_PACKS
+        ],
+    }
+
+
+def _require_credit_secret(authorization: str | None, x_webhook_secret: str | None):
+    secret = os.getenv('HOLAVON_CREDIT_WEBHOOK_SECRET', '').strip()
+    if not secret:
+        raise HTTPException(503, 'credit service not configured')
+    provided = (x_webhook_secret or '').strip()
+    if not provided:
+        scheme, _, token = (authorization or '').partition(' ')
+        if scheme.lower() == 'bearer':
+            provided = token.strip()
+    if not hmac.compare_digest(provided, secret):
+        raise HTTPException(401, 'invalid credit authorization')
+
+
+@app.post('/api/holavon/credits/grant')
+async def holavon_credit_grant(
+    req: CreditGrantRequest,
+    authorization: str | None = Header(None),
+    x_webhook_secret: str | None = Header(None),
+):
+    """Idempotent server-to-server grant. Credits come from the pack map."""
+    import asyncio
+    _require_credit_secret(authorization, x_webhook_secret)
+    pack = HORARY_CREDIT_BY_PRODUCT.get(req.product_id)
+    if pack is None:
+        raise HTTPException(400, 'unknown credit product')
+    store = await asyncio.to_thread(_holavon_store)
+    try:
+        grant = await asyncio.to_thread(
+            store.grant_credits, req.user_id,
+            transaction_id=req.transaction_id, product_id=req.product_id,
+            credits=pack['credits'], source='revenuecat',
+        )
+    except ValueError:
+        raise HTTPException(400, 'invalid credit grant')
+    except Exception:
+        raise HTTPException(503, 'credit service unavailable')
+    return {
+        'ok': True, 'credits_added': grant.credits_added,
+        'credits': grant.balance, 'duplicate': grant.duplicate,
+    }
+
+
+@app.post('/api/holavon/credits/webhook')
+async def holavon_credit_webhook(
+    payload: dict,
+    authorization: str | None = Header(None),
+    x_webhook_secret: str | None = Header(None),
+):
+    """RevenueCat webhook for consumable question credits."""
+    import asyncio
+    _require_credit_secret(authorization, x_webhook_secret)
+    event = payload.get('event') if isinstance(payload.get('event'), dict) else payload
+    event_type = str(event.get('type') or '')
+    if event_type not in ('NON_RENEWING_PURCHASE', 'INITIAL_PURCHASE'):
+        return {'ok': True, 'ignored': 'event type'}
+    product_id = str(event.get('product_id') or '')
+    user_id = str(event.get('app_user_id') or '')
+    transaction_id = str(event.get('transaction_id') or event.get('id') or '')
+    pack = HORARY_CREDIT_BY_PRODUCT.get(product_id)
+    if pack is None:
+        return {'ok': True, 'ignored': 'not a credit product'}
+    if not user_id or not transaction_id:
+        raise HTTPException(400, 'incomplete credit event')
+    store = await asyncio.to_thread(_holavon_store)
+    try:
+        grant = await asyncio.to_thread(
+            store.grant_credits, user_id,
+            transaction_id=transaction_id, product_id=product_id,
+            credits=pack['credits'], source='revenuecat_webhook',
+        )
+    except ValueError:
+        raise HTTPException(400, 'invalid credit event')
+    except Exception:
+        raise HTTPException(503, 'credit service unavailable')
+    return {
+        'ok': True, 'credits_added': grant.credits_added,
+        'credits': grant.balance, 'duplicate': grant.duplicate,
+    }
+
+
+@app.post('/api/holavon/credits/sync')
+async def holavon_credit_sync(authorization: str | None = Header(None)):
+    """Recover consumable purchases from RevenueCat right after checkout.
+
+    Webhooks are the source of truth, but an app can call this immediately so
+    the new balance appears without waiting for webhook delivery. Grants are
+    idempotent by transaction ID.
+    """
+    import asyncio
+    import requests
+    context = await asyncio.to_thread(_holavon_context, authorization)
+    secret = os.getenv('REVENUECAT_API_SECRET', '').strip()
+    if not secret:
+        raise HTTPException(503, 'credit verification unavailable')
+    try:
+        from urllib.parse import quote
+        response = await asyncio.to_thread(
+            requests.get,
+            'https://api.revenuecat.com/v1/subscribers/' + quote(context['user_id'], safe=''),
+            headers={'Authorization': 'Bearer ' + secret}, timeout=20,
+        )
+    except Exception:
+        raise HTTPException(503, 'credit verification unavailable')
+    if response.status_code == 404:
+        return {'ok': True, 'credits_added': 0, 'credits': 0, 'grants': 0}
+    if response.status_code != 200:
+        raise HTTPException(503, 'credit verification failed')
+    try:
+        non_subscriptions = response.json()['subscriber'].get('non_subscriptions', {})
+        if not isinstance(non_subscriptions, dict):
+            raise ValueError('invalid non subscriptions')
+    except Exception:
+        raise HTTPException(503, 'invalid credit response')
+    added = 0
+    grants = 0
+    balance = None
+    for product_id, records in non_subscriptions.items():
+        pack = HORARY_CREDIT_BY_PRODUCT.get(product_id)
+        if pack is None or not isinstance(records, list):
+            continue
+        for record in records:
+            if not isinstance(record, dict) or record.get('refunded_at'):
+                continue
+            transaction_id = str(record.get('id') or record.get('transaction_id') or '')
+            if not transaction_id:
+                continue
+            try:
+                grant = await asyncio.to_thread(
+                    context['store'].grant_credits, context['user_id'],
+                    transaction_id=transaction_id, product_id=product_id,
+                    credits=pack['credits'], source='revenuecat_sync',
+                )
+            except ValueError:
+                continue
+            except Exception:
+                raise HTTPException(503, 'credit service unavailable')
+            balance = grant.balance
+            if not grant.duplicate:
+                grants += 1
+                added += grant.credits_added
+    if balance is None:
+        try:
+            status = await asyncio.to_thread(
+                context['store'].status, context['user_id'],
+                is_pro=context['is_pro'],
+            )
+            balance = status['credits']
+        except Exception:
+            raise HTTPException(503, 'credit service unavailable')
+    return {'ok': True, 'credits_added': added, 'credits': balance,
+            'grants': grants}
 
 
 @app.post('/api/holavon/cast')
