@@ -232,3 +232,31 @@ def test_credit_sync_without_revenuecat_subscriber_keeps_local_balance(monkeypat
     assert r.status_code == 200
     assert r.json()['credits'] == store.credits
 
+
+
+def test_credit_grant_accepts_play_purchase_option_suffix(monkeypatch):
+    store = FakeStore()
+    monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
+    monkeypatch.setattr(api, '_holavon_store', lambda: store)
+    client = TestClient(api.app)
+    body = {'user_id': 'verified-user', 'transaction_id': 'tx-opt',
+            'product_id': 'horary_credits_40:kredi_40'}
+    r = client.post('/api/holavon/credits/grant', json=body,
+                    headers={'X-Webhook-Secret': 'credit-secret'})
+    assert r.status_code == 200
+    assert r.json()['credits_added'] == 40
+
+
+def test_credit_webhook_accepts_play_purchase_option_suffix(monkeypatch):
+    store = FakeStore()
+    monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
+    monkeypatch.setattr(api, '_holavon_store', lambda: store)
+    client = TestClient(api.app)
+    payload = {'event': {'type': 'NON_RENEWING_PURCHASE',
+                         'app_user_id': 'verified-user',
+                         'product_id': 'horary_credits_15:kredi_15',
+                         'transaction_id': 'tx-opt-15'}}
+    r = client.post('/api/holavon/credits/webhook', json=payload,
+                    headers={'Authorization': 'Bearer credit-secret'})
+    assert r.status_code == 200
+    assert r.json()['credits_added'] == 15

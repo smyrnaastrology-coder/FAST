@@ -29,6 +29,16 @@ kredi** harcanır. Pro abonelik bitse bile satın alınmış krediler hesapta ka
 
 Fiyat etiketi uygulamada RevenueCat'ten gelir; `price_label` yalnızca yedektir.
 
+### Play "satın alma seçeneği kimliği"
+
+Google Play'in yeni tek seferlik ürün modelinde her ürünün altında bir veya daha
+fazla **purchase option** bulunur ve bunun da bir kimliği vardır. Bu kimlik
+bazen ürün kimliğine eklenerek gelir (`horary_credits_5:kredi_5`), tıpkı
+aboneliklerdeki `sub_daily:aylik-temel` gibi. Sunucu ve uygulama her iki biçimi
+de kabul eder (`_credit_pack()` / `_matchesProduct()`), yani seçenek kimliği
+istediğin gibi olabilir. Öneri: ürünle aynı mantıkta `kredi_5`, `kredi_15`,
+`kredi_40`.
+
 ## Akış
 
 1. Uygulama `POST /api/holavon/credits/sync` çağırır (Supabase oturumu ile).

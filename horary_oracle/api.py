@@ -1,4 +1,4 @@
-"""
+﻿"""
 Horary Oracle FastAPI - Yüksek Performans
 - LRU cache (ephemeris + chart) ~200ms -> ~5ms
 - Async + orjson
@@ -113,6 +113,23 @@ HORARY_CREDIT_PACKS = (
     {"product_id": "horary_credits_40", "credits": 40, "price_label": "₺399"},
 )
 HORARY_CREDIT_BY_PRODUCT = {p["product_id"]: p for p in HORARY_CREDIT_PACKS}
+
+
+def _credit_pack(product_id):
+    """Resolve a credit pack from a store/RevenueCat product identifier.
+
+    Google Play's one-time product model appends a purchase option ID to the
+    product ID (e.g. `horary_credits_5:kredi_5`), the same way subscriptions
+    look like `sub_daily:aylik-temel`. Accept both the bare and suffixed form
+    so a purchase is never ignored because of the option suffix.
+    """
+    pid = (product_id or '').strip()
+    if not pid:
+        return None
+    pack = HORARY_CREDIT_BY_PRODUCT.get(pid)
+    if pack is not None:
+        return pack
+    return HORARY_CREDIT_BY_PRODUCT.get(pid.split(':', 1)[0])
 
 class HealthResponse(BaseModel):
     status: str
@@ -1532,7 +1549,7 @@ async def holavon_credit_grant(
     """Idempotent server-to-server grant. Credits come from the pack map."""
     import asyncio
     _require_credit_secret(authorization, x_webhook_secret)
-    pack = HORARY_CREDIT_BY_PRODUCT.get(req.product_id)
+    pack = _credit_pack(req.product_id)
     if pack is None:
         raise HTTPException(400, 'unknown credit product')
     store = await asyncio.to_thread(_holavon_store)
@@ -1568,7 +1585,7 @@ async def holavon_credit_webhook(
     product_id = str(event.get('product_id') or '')
     user_id = str(event.get('app_user_id') or '')
     transaction_id = str(event.get('transaction_id') or event.get('id') or '')
-    pack = HORARY_CREDIT_BY_PRODUCT.get(product_id)
+    pack = _credit_pack(product_id)
     if pack is None:
         return {'ok': True, 'ignored': 'not a credit product'}
     if not user_id or not transaction_id:
@@ -1636,7 +1653,7 @@ async def holavon_credit_sync(authorization: str | None = Header(None)):
     grants = 0
     balance = None
     for product_id, records in non_subscriptions.items():
-        pack = HORARY_CREDIT_BY_PRODUCT.get(product_id)
+        pack = _credit_pack(product_id)
         if pack is None or not isinstance(records, list):
             continue
         for record in records:
