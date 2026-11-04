@@ -188,3 +188,47 @@ def test_revenuecat_webhook_ignores_subscriptions_and_grants_credits(monkeypatch
     assert r.status_code == 200 and r.json()['credits_added'] == 15
     assert store.calls[-1] == ('grant', 'verified-user', 'tx-15',
                                'horary_credits_15', 15, 'revenuecat_webhook')
+
+
+def test_credit_sync_grants_verified_purchases_and_skips_refunds(monkeypatch):
+    import requests
+    store = FakeStore()
+    _configure(monkeypatch, store)
+    monkeypatch.setenv('REVENUECAT_API_SECRET', 'rc-secret')
+
+    class Response:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {'subscriber': {'non_subscriptions': {
+                'horary_credits_5': [
+                    {'id': 'tx-a'},
+                    {'id': 'tx-b', 'refunded_at': '2026-11-01T00:00:00Z'},
+                ],
+                'sub_daily': [{'id': 'sub-1'}],
+            }}}
+
+    monkeypatch.setattr(requests, 'get', lambda *a, **k: Response())
+    r = TestClient(api.app).post('/api/holavon/credits/sync')
+    assert r.status_code == 200
+    body = r.json()
+    assert body['credits_added'] == 5 and body['grants'] == 1
+    assert ('grant', 'verified-user', 'tx-a', 'horary_credits_5', 5,
+            'revenuecat_sync') in store.calls
+
+
+def test_credit_sync_without_revenuecat_subscriber_keeps_local_balance(monkeypatch):
+    import requests
+    store = FakeStore()
+    _configure(monkeypatch, store)
+    monkeypatch.setenv('REVENUECAT_API_SECRET', 'rc-secret')
+
+    class Response:
+        status_code = 404
+
+    monkeypatch.setattr(requests, 'get', lambda *a, **k: Response())
+    r = TestClient(api.app).post('/api/holavon/credits/sync')
+    assert r.status_code == 200
+    assert r.json()['credits'] == store.credits
+

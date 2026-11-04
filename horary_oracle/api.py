@@ -1592,7 +1592,16 @@ async def holavon_credit_sync(authorization: str | None = Header(None)):
     except Exception:
         raise HTTPException(503, 'credit verification unavailable')
     if response.status_code == 404:
-        return {'ok': True, 'credits_added': 0, 'credits': 0, 'grants': 0}
+        # No RevenueCat subscriber yet: never reset an existing local balance.
+        try:
+            status = await asyncio.to_thread(
+                context['store'].status, context['user_id'],
+                is_pro=context['is_pro'],
+            )
+        except Exception:
+            raise HTTPException(503, 'credit service unavailable')
+        return {'ok': True, 'credits_added': 0, 'credits': status['credits'],
+                'grants': 0}
     if response.status_code != 200:
         raise HTTPException(503, 'credit verification failed')
     try:
