@@ -1423,6 +1423,28 @@ def _holavon_store():
     return store
 
 
+@app.on_event('startup')
+def _apply_quota_migrations_on_startup():
+    """Apply quota/credit migrations before the first authenticated request.
+
+    A failure here must not prevent the service from booting (the DB may be
+    waking up); the per-request path retries and fails closed with a 503.
+    """
+    if os.getenv('HOLAVON_QUOTA_EXPERIMENTAL', '').lower() != 'true':
+        return
+    db_url = os.getenv('HORARY_DATABASE_URL', '').strip()
+    if not db_url:
+        return
+    try:
+        from engine.holavon_quota_store import PostgresQuotaStore
+        import psycopg2
+        store = PostgresQuotaStore(
+            lambda: psycopg2.connect(db_url, connect_timeout=10))
+        store.ensure_schema(db_url)
+    except Exception:
+        pass
+
+
 def _holavon_context(authorization):
     """Authenticate the account and independently verify Pro server-side."""
     if os.getenv('HOLAVON_QUOTA_EXPERIMENTAL', '').lower() != 'true':
