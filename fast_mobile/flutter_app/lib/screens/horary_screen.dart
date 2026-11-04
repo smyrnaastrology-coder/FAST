@@ -1141,14 +1141,19 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           style: TextStyle(color: FastTheme.textDim, fontSize: 12));
     }
     final out = _remaining <= 0 && _credits <= 0;
-    final creditPart = _credits > 0 ? ' · $_credits ${l10n.horaryCredits}' : '';
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(out ? Icons.lock_outline : Icons.timelapse, size: 14, color: out ? FastTheme.danger : FastTheme.textDim),
         const SizedBox(width: 6),
-        Flexible(child: Text('$_remaining/$_quotaLimit$creditPart', overflow: TextOverflow.ellipsis, style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12))),
-        if (_credits <= 0 && out) ...[
+        Flexible(child: Text('$_remaining/$_quotaLimit', overflow: TextOverflow.ellipsis, style: TextStyle(color: out ? FastTheme.danger : FastTheme.textDim, fontSize: 12))),
+        if (_credits > 0) ...[
+          const SizedBox(width: 5),
+          Icon(Icons.confirmation_number_outlined, size: 13, color: FastTheme.accentGold),
+          const SizedBox(width: 2),
+          Text('$_credits', style: TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
+        ],
+        if (out) ...[
           const SizedBox(width: 6),
           GestureDetector(
             onTap: () => _showCreditSheet(l10n),
