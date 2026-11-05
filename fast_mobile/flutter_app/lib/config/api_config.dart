@@ -25,8 +25,9 @@ class ApiConfig {
   static const String horaryQuota = '$horaryBaseUrl/api/holavon/quota';
   static const String horaryCreditsSync = '$horaryBaseUrl/api/holavon/credits/sync';
 
-  // Health
+  // Health / forced update
   static const String health = '$baseUrl/api/health';
+  static const String appVersion = '$baseUrl/api/app/version';
 
   // Ülke/Şehir
   static const String ulkeler = '$baseUrl/api/ulkeler';

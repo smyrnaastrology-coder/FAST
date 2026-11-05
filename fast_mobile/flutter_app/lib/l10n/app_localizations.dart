@@ -3454,6 +3454,24 @@ abstract class AppLocalizations {
   /// **'Notification time'**
   String get settingsReminderTime;
 
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This version of Holavon is no longer supported. Please download the latest version from the store to continue.'**
+  String get updateRequiredBody;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get updateNow;
+
   /// No description provided for @dailyReminderAt.
   ///
   /// In en, this message translates to:

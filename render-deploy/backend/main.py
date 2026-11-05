@@ -6530,6 +6530,34 @@ def _collect_natal_data(motor):
 def health():
     return {"status": "ok", "version": "4.0"}
 
+
+def _env_int(name: str, default: int = 0) -> int:
+    """Read a non-negative integer from the environment, tolerating bad values."""
+    try:
+        return max(0, int(os.getenv(name, "").strip() or default))
+    except (TypeError, ValueError):
+        return default
+
+
+@app_fast.get("/api/app/version")
+def app_version():
+    """Minimum supported app builds for the forced-update gate.
+
+    Values stay 0 (disabled) until the matching release is live in each store.
+    """
+    return {
+        "android": {
+            "min_version_code": _env_int("APP_MIN_ANDROID_VERSION_CODE"),
+            "latest_version_code": _env_int("APP_LATEST_ANDROID_VERSION_CODE"),
+        },
+        "ios": {
+            "min_build": _env_int("APP_MIN_IOS_BUILD"),
+            "latest_build": _env_int("APP_LATEST_IOS_BUILD"),
+        },
+        "android_store_url": "https://play.google.com/store/apps/details?id=com.fastastrology.fast",
+        "ios_store_url": "https://apps.apple.com/app/id6827527304",
+    }
+
 @app_fast.post("/api/kunye")
 def kunye(p: KunyeInput):
     """Gunes/Ay burcu + derece (profil kunyesi icin hafif hesap).

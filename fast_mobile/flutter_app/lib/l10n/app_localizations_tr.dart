@@ -1837,6 +1837,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsReminderTime => 'Bildirim saati';
 
   @override
+  String get updateRequiredTitle => 'Güncelleme gerekli';
+
+  @override
+  String get updateRequiredBody =>
+      'Holavon\'un bu sürümü artık desteklenmiyor. Devam etmek için lütfen mağazadan en son sürümü indir.';
+
+  @override
+  String get updateNow => 'Güncelle';
+
+  @override
   String dailyReminderAt(String time) {
     return 'Her gün $time';
   }

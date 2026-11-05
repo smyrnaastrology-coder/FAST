@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'config/api_config.dart';
 import 'config/theme.dart';
 import 'l10n/app_localizations.dart';
@@ -24,6 +25,7 @@ import 'screens/warning_screen.dart';
 import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
 import 'services/daily_minor_progress_notifications.dart';
+import 'services/app_update_service.dart';
 import 'services/profile_links.dart';
 import 'widgets/splash_logo.dart';
 
@@ -125,9 +127,10 @@ class StartupGate extends StatefulWidget {
   State<StartupGate> createState() => _StartupGateState();
 }
 
-class _StartupGateState extends State<StartupGate> {
+class _StartupGateState extends State<StartupGate> with WidgetsBindingObserver {
   bool _warningAccepted = true;
   bool _startupReady = false;
+  bool _updateDialogShown = false;
   StreamSubscription<Uri>? _profileLinks;
   String? _pendingProfile;
   String? _lastProfile;
@@ -136,8 +139,48 @@ class _StartupGateState extends State<StartupGate> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _init();
     _listenProfileLinks();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_checkForUpdate());
+    }
+  }
+
+  Future<void> _checkForUpdate() async {
+    if (!mounted || _updateDialogShown) return;
+    final status = await AppUpdateService.check();
+    if (!mounted || status == null || !status.required) return;
+    _updateDialogShown = true;
+    final l10n = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text(l10n.updateRequiredTitle),
+            content: Text(l10n.updateRequiredBody),
+            actions: [
+              FilledButton(
+                onPressed: () => launchUrl(
+                  Uri.parse(status.storeUrl),
+                  mode: LaunchMode.externalApplication,
+                ),
+                child: Text(l10n.updateNow),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    _updateDialogShown = false;
   }
 
   Future<void> _listenProfileLinks() async {
@@ -166,6 +209,7 @@ class _StartupGateState extends State<StartupGate> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _profileLinks?.cancel();
     super.dispose();
   }
@@ -187,6 +231,7 @@ class _StartupGateState extends State<StartupGate> {
       _warningAccepted = accepted;
       _startupReady = true;
     });
+    unawaited(_checkForUpdate());
   }
 
   Widget _decideHome(LocaleProvider lp, AuthProvider ap) {

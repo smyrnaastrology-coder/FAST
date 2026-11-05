@@ -1864,6 +1864,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsReminderTime => 'Hora de notificación';
 
   @override
+  String get updateRequiredTitle => 'Actualización necesaria';
+
+  @override
+  String get updateRequiredBody =>
+      'Esta versión de Holavon ya no es compatible. Descarga la última versión desde la tienda para continuar.';
+
+  @override
+  String get updateNow => 'Actualizar';
+
+  @override
   String dailyReminderAt(String time) {
     return 'Cada día a las $time';
   }
