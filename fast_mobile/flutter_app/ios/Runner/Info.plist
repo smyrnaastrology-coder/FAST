@@ -72,6 +72,8 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Horary soruları için konumunuz kullanılır.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Horary sorusunu sorduğunuz andaki konumu belirlemek için konumunuza erişilir. Konumunuz arka planda kullanılmaz.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Horary sorularını sesle dikte edip metne çevirebilmeniz için mikrofon kullanılır.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
