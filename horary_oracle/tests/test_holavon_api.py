@@ -169,7 +169,7 @@ def test_credit_grant_requires_secret_and_rejects_unknown_product(monkeypatch):
                        headers={'X-Webhook-Secret': 'credit-secret'}).status_code == 400
 
 
-def test_revenuecat_webhook_ignores_subscriptions_and_grants_credits(monkeypatch):
+def test_revenuecat_webhook_acknowledges_credit_events_without_granting(monkeypatch):
     store = FakeStore()
     monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
     monkeypatch.setattr(api, '_holavon_store', lambda: store)
@@ -185,9 +185,9 @@ def test_revenuecat_webhook_ignores_subscriptions_and_grants_credits(monkeypatch
                           'product_id': 'horary_credits_15',
                           'transaction_id': 'tx-15'}}
     r = client.post('/api/holavon/credits/webhook', json=purchase, headers=headers)
-    assert r.status_code == 200 and r.json()['credits_added'] == 15
-    assert store.calls[-1] == ('grant', 'verified-user', 'tx-15',
-                               'horary_credits_15', 15, 'revenuecat_webhook')
+    assert r.status_code == 200
+    assert r.json()['ignored'] == 'verified sync is the sole credit grant source'
+    assert store.calls == []
 
 
 def test_credit_sync_grants_verified_purchases_and_skips_refunds(monkeypatch):
@@ -263,7 +263,7 @@ def test_credit_webhook_never_uses_event_id_as_purchase_id(monkeypatch):
     )
 
     assert response.status_code == 200
-    assert response.json()['ignored'] == 'missing store transaction id'
+    assert response.json()['ignored'] == 'verified sync is the sole credit grant source'
     assert not any(call[0] == 'grant' for call in store.calls)
 
 
@@ -296,7 +296,7 @@ def test_credit_grant_accepts_play_purchase_option_suffix(monkeypatch):
     assert r.json()['credits_added'] == 40
 
 
-def test_credit_webhook_accepts_play_purchase_option_suffix(monkeypatch):
+def test_credit_webhook_acknowledges_play_purchase_option_without_granting(monkeypatch):
     store = FakeStore()
     monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
     monkeypatch.setattr(api, '_holavon_store', lambda: store)
@@ -308,4 +308,5 @@ def test_credit_webhook_accepts_play_purchase_option_suffix(monkeypatch):
     r = client.post('/api/holavon/credits/webhook', json=payload,
                     headers={'Authorization': 'Bearer credit-secret'})
     assert r.status_code == 200
-    assert r.json()['credits_added'] == 15
+    assert r.json()['ignored'] == 'verified sync is the sole credit grant source'
+    assert store.calls == []

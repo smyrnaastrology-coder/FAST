@@ -1575,43 +1575,23 @@ async def holavon_credit_webhook(
     authorization: str | None = Header(None),
     x_webhook_secret: str | None = Header(None),
 ):
-    """RevenueCat webhook for consumable question credits."""
-    import asyncio
+    """Acknowledge credit webhooks; verified subscriber sync grants credits.
+
+    RevenueCat webhook IDs and subscriber transaction records have not been
+    consistently identical for Play consumables. Since `/credits/sync` reads
+    the authenticated subscriber's verified purchase history and is idempotent
+    by store transaction ID, webhook events must not also mutate the wallet.
+    """
     _require_credit_secret(authorization, x_webhook_secret)
     event = payload.get('event') if isinstance(payload.get('event'), dict) else payload
     event_type = str(event.get('type') or '')
     if event_type not in ('NON_RENEWING_PURCHASE', 'INITIAL_PURCHASE'):
         return {'ok': True, 'ignored': 'event type'}
     product_id = str(event.get('product_id') or '')
-    user_id = str(event.get('app_user_id') or '')
-    # `event.id` identifies a RevenueCat webhook event, not the store purchase.
-    # Using it when transaction_id is absent makes webhook + subscriber sync
-    # look like two different purchases and can grant the same consumable twice.
-    transaction_id = str(event.get('transaction_id') or '')
     pack = _credit_pack(product_id)
     if pack is None:
         return {'ok': True, 'ignored': 'not a credit product'}
-    if not user_id:
-        raise HTTPException(400, 'incomplete credit event')
-    if not transaction_id:
-        # The authenticated RevenueCat subscriber sync can still recover this
-        # purchase using the store transaction ID. Never grant by webhook ID.
-        return {'ok': True, 'ignored': 'missing store transaction id'}
-    store = await asyncio.to_thread(_holavon_store)
-    try:
-        grant = await asyncio.to_thread(
-            store.grant_credits, user_id,
-            transaction_id=transaction_id, product_id=product_id,
-            credits=pack['credits'], source='revenuecat_webhook',
-        )
-    except ValueError:
-        raise HTTPException(400, 'invalid credit event')
-    except Exception:
-        raise HTTPException(503, 'credit service unavailable')
-    return {
-        'ok': True, 'credits_added': grant.credits_added,
-        'credits': grant.balance, 'duplicate': grant.duplicate,
-    }
+    return {'ok': True, 'ignored': 'verified sync is the sole credit grant source'}
 
 
 @app.post('/api/holavon/credits/sync')
