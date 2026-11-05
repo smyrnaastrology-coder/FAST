@@ -1584,12 +1584,19 @@ async def holavon_credit_webhook(
         return {'ok': True, 'ignored': 'event type'}
     product_id = str(event.get('product_id') or '')
     user_id = str(event.get('app_user_id') or '')
-    transaction_id = str(event.get('transaction_id') or event.get('id') or '')
+    # `event.id` identifies a RevenueCat webhook event, not the store purchase.
+    # Using it when transaction_id is absent makes webhook + subscriber sync
+    # look like two different purchases and can grant the same consumable twice.
+    transaction_id = str(event.get('transaction_id') or '')
     pack = _credit_pack(product_id)
     if pack is None:
         return {'ok': True, 'ignored': 'not a credit product'}
-    if not user_id or not transaction_id:
+    if not user_id:
         raise HTTPException(400, 'incomplete credit event')
+    if not transaction_id:
+        # The authenticated RevenueCat subscriber sync can still recover this
+        # purchase using the store transaction ID. Never grant by webhook ID.
+        return {'ok': True, 'ignored': 'missing store transaction id'}
     store = await asyncio.to_thread(_holavon_store)
     try:
         grant = await asyncio.to_thread(
@@ -1659,7 +1666,10 @@ async def holavon_credit_sync(authorization: str | None = Header(None)):
         for record in records:
             if not isinstance(record, dict) or record.get('refunded_at'):
                 continue
-            transaction_id = str(record.get('id') or record.get('transaction_id') or '')
+            # Prefer the store transaction ID used by NON_RENEWING_PURCHASE
+            # webhooks. RevenueCat's record `id` can be a separate identifier;
+            # using it first breaks webhook/sync idempotency.
+            transaction_id = str(record.get('transaction_id') or record.get('id') or '')
             if not transaction_id:
                 continue
             try:

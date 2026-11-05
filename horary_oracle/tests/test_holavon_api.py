@@ -218,6 +218,55 @@ def test_credit_sync_grants_verified_purchases_and_skips_refunds(monkeypatch):
             'revenuecat_sync') in store.calls
 
 
+def test_credit_sync_prefers_store_transaction_id_for_webhook_idempotency(monkeypatch):
+    import requests
+    store = FakeStore()
+    _configure(monkeypatch, store)
+    monkeypatch.setenv('REVENUECAT_API_SECRET', 'rc-secret')
+
+    class Response:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return {'subscriber': {'non_subscriptions': {
+                'horary_credits_40': [{
+                    'id': 'revenuecat-record-id',
+                    'transaction_id': 'google-play-order-id',
+                }],
+            }}}
+
+    monkeypatch.setattr(requests, 'get', lambda *a, **k: Response())
+    response = TestClient(api.app).post('/api/holavon/credits/sync')
+
+    assert response.status_code == 200
+    assert ('grant', 'verified-user', 'google-play-order-id',
+            'horary_credits_40', 40, 'revenuecat_sync') in store.calls
+    assert not any(call[2] == 'revenuecat-record-id'
+                   for call in store.calls if call[0] == 'grant')
+
+
+def test_credit_webhook_never_uses_event_id_as_purchase_id(monkeypatch):
+    store = FakeStore()
+    monkeypatch.setenv('HOLAVON_CREDIT_WEBHOOK_SECRET', 'credit-secret')
+    monkeypatch.setattr(api, '_holavon_store', lambda: store)
+    payload = {'event': {
+        'id': 'revenuecat-event-id',
+        'type': 'NON_RENEWING_PURCHASE',
+        'app_user_id': 'verified-user',
+        'product_id': 'horary_credits_5',
+    }}
+
+    response = TestClient(api.app).post(
+        '/api/holavon/credits/webhook', json=payload,
+        headers={'Authorization': 'Bearer credit-secret'},
+    )
+
+    assert response.status_code == 200
+    assert response.json()['ignored'] == 'missing store transaction id'
+    assert not any(call[0] == 'grant' for call in store.calls)
+
+
 def test_credit_sync_without_revenuecat_subscriber_keeps_local_balance(monkeypatch):
     import requests
     store = FakeStore()
