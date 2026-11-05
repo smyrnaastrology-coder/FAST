@@ -47,6 +47,22 @@ void main() {
     expect(find.byType(AlertDialog), findsNothing);
   });
 
+  testWidgets('credit purchase is visible before the daily allowance is used', (tester) async {
+    SharedPreferences.setMockInitialValues({'holavon_horary_intro_shown': true});
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: HoraryScreen(quotaLoader: () async => const HoraryResult(
+        ok: true,
+        data: {'remaining': 2, 'limit': 3, 'is_pro': true, 'credits': 0},
+      )),
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Buy credits'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('quota is refreshed from the server when the app resumes', (tester) async {
     SharedPreferences.setMockInitialValues({'holavon_horary_intro_shown': true});
     var quotaReads = 0;

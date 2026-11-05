@@ -23,6 +23,7 @@ import 'screens/social_profile_screen.dart';
 import 'screens/warning_screen.dart';
 import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
+import 'services/daily_minor_progress_notifications.dart';
 import 'services/profile_links.dart';
 import 'widgets/splash_logo.dart';
 
@@ -30,16 +31,6 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-}
-
-/// Günlük kısa vadeli ilerleme bildirimini abonelere özel zamanlar.
-Future<void> _scheduleDailyIfSubscribed() async {
-  try {
-    final isSub = await RevenueCatService.isSubscribed();
-    if (!isSub) return;
-    await NotificationService.instance
-        .scheduleDaily(9, 0, title: 'Holavon', body: 'Günlük kısa vadeli ilerleme akışını keşfet 🌟');
-  } catch (_) {}
 }
 
 void main() async {
@@ -77,7 +68,6 @@ void main() async {
   }
   await RevenueCatService.init();
   await NotificationService.instance.init();
-  _scheduleDailyIfSubscribed();
   runApp(
     MultiProvider(
       providers: [
@@ -184,6 +174,7 @@ class _StartupGateState extends State<StartupGate> {
     final ap = context.read<AuthProvider>();
     await ap.restore();
     if (!mounted) return;
+    unawaited(DailyMinorProgressNotifications.refresh());
     final tp = context.read<ThemeProvider>();
     await tp.restore();
     var accepted = true;

@@ -1858,7 +1858,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsNotifications => 'Notificaciones';
 
   @override
-  String get settingsDailyReminder => 'Recordatorio diario (09:00)';
+  String get settingsDailyReminder => 'Notificación personal de Progreso Menor';
+
+  @override
+  String get settingsReminderTime => 'Hora de notificación';
+
+  @override
+  String dailyReminderAt(String time) {
+    return 'Cada día a las $time';
+  }
+
+  @override
+  String get dailyReminderProOnly => 'Esta notificación personal requiere Pro.';
+
+  @override
+  String get dailyReminderNeedsNatal =>
+      'Guarda tu fecha, hora y ciudad de nacimiento en tu perfil para activar esta notificación.';
+
+  @override
+  String get dailyReminderPermission =>
+      'No se concedió el permiso de notificaciones. Actívalas en los ajustes del dispositivo.';
+
+  @override
+  String get dailyReminderUnavailable =>
+      'No se pudo preparar tu lectura diaria. Inténtalo más tarde.';
 
   @override
   String get settingsSubscription => 'Suscripción';
@@ -2720,6 +2743,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get proPillarSocialDesc =>
       'La comunidad es gratis e ilimitada para todos — comparte, añade historias, interactúa.';
+
+  @override
+  String get proPillarProgress => 'Progreso Menor diario personal';
+
+  @override
+  String get proPillarProgressDesc =>
+      'Una lectura diaria basada en tu carta natal, a la hora que elijas.';
+
+  @override
+  String get notificationMinorProgressTitle => 'Tu Progreso Menor diario';
 
   @override
   String get chartSignAries => 'Aries';

@@ -300,6 +300,11 @@ class _LandingScreenState extends State<LandingScreen> {
         'title': l10n.proPillarSocial,
         'desc': l10n.proPillarSocialDesc,
       },
+      {
+        'icon': Icons.notifications_active_outlined,
+        'title': l10n.proPillarProgress,
+        'desc': l10n.proPillarProgressDesc,
+      },
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),

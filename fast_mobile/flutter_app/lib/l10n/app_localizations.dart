@@ -3445,8 +3445,44 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDailyReminder.
   ///
   /// In en, this message translates to:
-  /// **'Daily reminder (09:00)'**
+  /// **'Personal Minor Progress notification'**
   String get settingsDailyReminder;
+
+  /// No description provided for @settingsReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification time'**
+  String get settingsReminderTime;
+
+  /// No description provided for @dailyReminderAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day at {time}'**
+  String dailyReminderAt(String time);
+
+  /// No description provided for @dailyReminderProOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This personal notification requires Pro.'**
+  String get dailyReminderProOnly;
+
+  /// No description provided for @dailyReminderNeedsNatal.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your own birth date, time, and city in your profile to enable this notification.'**
+  String get dailyReminderNeedsNatal;
+
+  /// No description provided for @dailyReminderPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission was not granted. Enable notifications in device settings.'**
+  String get dailyReminderPermission;
+
+  /// No description provided for @dailyReminderUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily reading could not be prepared. Please try again later.'**
+  String get dailyReminderUnavailable;
 
   /// No description provided for @settingsSubscription.
   ///
@@ -4983,6 +5019,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The community is free and unlimited for everyone — share, add stories, interact.'**
   String get proPillarSocialDesc;
+
+  /// No description provided for @proPillarProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Daily Minor Progress'**
+  String get proPillarProgress;
+
+  /// No description provided for @proPillarProgressDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A daily reading based on your natal chart, delivered at a time you choose.'**
+  String get proPillarProgressDesc;
+
+  /// No description provided for @notificationMinorProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily Minor Progress'**
+  String get notificationMinorProgressTitle;
 
   /// No description provided for @chartSignAries.
   ///

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import '../main.dart';
@@ -10,16 +13,18 @@ import '../screens/main_shell.dart';
 import '../screens/social_shell.dart';
 import '../screens/dm_inbox_screen.dart';
 
-/// Günlük zamanlanmış bildirim servisi (yerel, backend gerektirmez).
-/// Abonelere günlük minör progress hatırlatması gönderir.
+/// Local notification service for personal natal Minor Progress readings and DMs.
 class NotificationService {
   static final NotificationService instance = NotificationService._();
   NotificationService._();
 
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  StreamSubscription<AuthState>? _authSubscription;
 
   static const int _dailyId = 1001;
+  static const int _minorProgressIdStart = 2000;
+  static const int _minorProgressMaxDays = 30;
   /// Kanal kimligi API/ayar uyumlulugu icin sabit tutulur; kullaniciya
   /// gosterilen ad guncellenirse kimlik degismez ( aksi halde cihazda yeni
   /// bir kanal olusur ve eskisi kalir).
@@ -39,6 +44,14 @@ class NotificationService {
       }
       if (payload == 'analysis' || payload == 'synastry') {
         nav.push(MaterialPageRoute(builder: (_) => const AnalyzerScreen()));
+        return;
+      }
+      if (payload == 'minor_progress') {
+        nav.push(
+          MaterialPageRoute(
+            builder: (_) => const AnalyzerScreen(initialMode: 'bireysel_natal'),
+          ),
+        );
         return;
       }
       if (payload == 'social' || payload == 'feed') {
@@ -66,6 +79,23 @@ class NotificationService {
       onDidReceiveBackgroundNotificationResponse: _notificationTapBackground,
     );
     tz.initializeTimeZones();
+    try {
+      final zone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(zone.identifier));
+    } catch (e) {
+      if (kDebugMode) debugPrint('[NOTIF] local timezone unavailable: $e');
+    }
+    try {
+      _authSubscription ??= Supabase.instance.client.auth.onAuthStateChange.listen(
+        (state) {
+          if (state.event == AuthChangeEvent.signedOut) {
+            unawaited(cancelDaily());
+          }
+        },
+      );
+    } catch (_) {
+      // Notifications still work when the optional Supabase account layer is off.
+    }
     _initialized = true;
     if (kDebugMode) debugPrint('[NOTIF] init ok');
   }
@@ -75,36 +105,85 @@ class NotificationService {
     if (kDebugMode) debugPrint('[NOTIF] background tap: ${response.payload}');
   }
 
-  /// Her gün [hour]:[minute]'te bildirim zamanlar.
-  Future<void> scheduleDaily(int hour, int minute, {String title = 'Holavon', String body = 'Bugünün kısa vadeli ilerleme akışını keşfet'}) async {
-    if (!_initialized) return;
-    final android = AndroidNotificationDetails(
-      _channelId,
-      _channelName,
-      channelDescription: 'Günlük kısa vadeli ilerleme hatırlatması',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-    const darwin = DarwinNotificationDetails();
-    final details = NotificationDetails(android: android, iOS: darwin);
-
-    var now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (!scheduled.isAfter(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
+  Future<bool> requestPermissions() async {
+    if (!_initialized) return false;
+    var granted = true;
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      granted = (await android.requestNotificationsPermission()) ?? false;
     }
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      final appleGranted = await ios.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      granted = granted && (appleGranted ?? false);
+    }
+    return granted;
+  }
 
-    await _plugin.zonedSchedule(
-      _dailyId,
-      title,
-      body,
-      scheduled,
-      details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-      payload: 'analysis',
+  /// Schedules personalized one-shot notifications for the supplied dates.
+  /// The caller refreshes this rolling 30-day window when the app is opened.
+  Future<void> scheduleMinorProgress(
+    List<Map<String, dynamic>> entries, {
+    required int hour,
+    required int minute,
+    required String title,
+  }) async {
+    if (!_initialized) return;
+    await cancelDaily();
+    final details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _channelId,
+        _channelName,
+        channelDescription: 'Kişisel günlük Minör Progress yorumları',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: const DarwinNotificationDetails(),
     );
-    if (kDebugMode) debugPrint('[NOTIF] günlük bildirim zamanlandı: $scheduled');
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledCount = 0;
+    for (final entry in entries.take(_minorProgressMaxDays)) {
+      final date = DateTime.tryParse((entry['tarih'] ?? '').toString());
+      if (date == null) continue;
+      final scheduled = tz.TZDateTime(
+        tz.local,
+        date.year,
+        date.month,
+        date.day,
+        hour,
+        minute,
+      );
+      if (!scheduled.isAfter(now)) continue;
+      final rawComments = entry['yorumlar'];
+      final comments = rawComments is List
+          ? rawComments.whereType<String>().where((s) => s.trim().isNotEmpty)
+          : const <String>[];
+      var body = comments.isNotEmpty
+          ? comments.first.trim()
+          : (entry['ortam'] ?? '').toString().trim();
+      body = body.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('\n', ' ');
+      if (body.length > 220) body = '${body.substring(0, 217).trimRight()}…';
+      if (body.isEmpty) continue;
+      await _plugin.zonedSchedule(
+        _minorProgressIdStart + scheduledCount,
+        title,
+        body,
+        scheduled,
+        details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: 'minor_progress',
+      );
+      scheduledCount++;
+    }
+    if (kDebugMode) {
+      debugPrint('[NOTIF] scheduled $scheduledCount personal minor-progress days');
+    }
   }
 
   Future<void> showMessageNotification({required String title, required String body, String payload = 'dm'}) async {
@@ -123,5 +202,8 @@ class NotificationService {
 
   Future<void> cancelDaily() async {
     await _plugin.cancel(_dailyId);
+    for (var i = 0; i < _minorProgressMaxDays; i++) {
+      await _plugin.cancel(_minorProgressIdStart + i);
+    }
   }
 }

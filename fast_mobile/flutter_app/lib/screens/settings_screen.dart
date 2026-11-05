@@ -9,6 +9,7 @@ import '../providers/locale_provider.dart';
 import '../providers/theme_provider.dart';
 import '../services/auth_service.dart';
 import '../services/notification_service.dart';
+import '../services/daily_minor_progress_notifications.dart';
 import '../services/pro_service.dart';
 import '../services/revenuecat_service.dart';
 import '../widgets/theme_palette_picker.dart';
@@ -18,7 +19,7 @@ import 'landing_screen.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
-  static const String _reminderKey = 'daily_reminder_on';
+  static const String _reminderKey = DailyMinorProgressNotifications.enabledKey;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -28,6 +29,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _reminder = false;
   bool? _pro;
   bool _busy = false;
+  TimeOfDay _reminderTime = const TimeOfDay(
+    hour: DailyMinorProgressNotifications.defaultHour,
+    minute: DailyMinorProgressNotifications.defaultMinute,
+  );
 
   @override
   void initState() {
@@ -39,6 +44,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       _reminder = prefs.getBool(SettingsScreen._reminderKey) ?? false;
+      _reminderTime = TimeOfDay(
+        hour: prefs.getInt(DailyMinorProgressNotifications.hourKey) ?? 9,
+        minute: prefs.getInt(DailyMinorProgressNotifications.minuteKey) ?? 0,
+      );
     } catch (_) {}
     final pro = await ProService.isPro();
     if (!mounted) return;
@@ -47,20 +56,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _toggleReminder(bool on) async {
     final l10n = AppLocalizations.of(context);
+    if (on && _pro != true) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const LandingScreen(asPaywall: true)),
+      );
+      return;
+    }
     setState(() => _reminder = on);
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(SettingsScreen._reminderKey, on);
     } catch (_) {}
     if (on) {
-      await NotificationService.instance.scheduleDaily(
-        9,
-        0,
-        title: 'Holavon',
-        body: l10n.settingsDailyReminder,
+      final result = await DailyMinorProgressNotifications.refresh(
+        requestPermission: true,
       );
+      if (result != DailyProgressReminderResult.scheduled && mounted) {
+        await NotificationService.instance.cancelDaily();
+        if (!mounted) return;
+        setState(() => _reminder = false);
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(SettingsScreen._reminderKey, false);
+        } catch (_) {}
+        if (!mounted) return;
+        final message = switch (result) {
+          DailyProgressReminderResult.natalRequired => l10n.dailyReminderNeedsNatal,
+          DailyProgressReminderResult.permissionDenied => l10n.dailyReminderPermission,
+          _ => l10n.dailyReminderUnavailable,
+        };
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      }
     } else {
       await NotificationService.instance.cancelDaily();
+    }
+  }
+
+  Future<void> _chooseReminderTime() async {
+    final l10n = AppLocalizations.of(context);
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: _reminderTime,
+    );
+    if (selected == null || !mounted) return;
+    setState(() => _reminderTime = selected);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(DailyMinorProgressNotifications.hourKey, selected.hour);
+      await prefs.setInt(DailyMinorProgressNotifications.minuteKey, selected.minute);
+    } catch (_) {}
+    final result = await DailyMinorProgressNotifications.refresh();
+    if (mounted && result != DailyProgressReminderResult.scheduled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.dailyReminderUnavailable)),
+      );
     }
   }
 
@@ -82,7 +131,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _signOut() async {
-    await context.read<AuthProvider>().signOut();
+    final auth = context.read<AuthProvider>();
+    await NotificationService.instance.cancelDaily();
+    await auth.signOut();
     if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
   }
 
@@ -199,7 +250,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ChoiceChip(
                   label: Text(e.$2),
                   selected: lp.locale.languageCode == e.$1,
-                  onSelected: (_) => lp.setLanguage(e.$1),
+                  onSelected: (_) async {
+                    await lp.setLanguage(e.$1);
+                    if (_reminder && _pro == true) {
+                      await DailyMinorProgressNotifications.refresh();
+                    }
+                  },
                 ),
             ],
           ),
@@ -213,8 +269,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               l10n.settingsDailyReminder,
               style: TextStyle(color: FastTheme.text, fontSize: 14),
             ),
-            onChanged: _toggleReminder,
+            subtitle: Text(
+              _pro == true
+                  ? l10n.dailyReminderAt(_reminderTime.format(context))
+                  : l10n.dailyReminderProOnly,
+              style: TextStyle(color: FastTheme.textDim, fontSize: 12),
+            ),
+            onChanged: (on) => _toggleReminder(on),
           ),
+          if (_reminder && _pro == true)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.schedule, color: FastTheme.accentGold),
+              title: Text(l10n.settingsReminderTime, style: TextStyle(color: FastTheme.text)),
+              subtitle: Text(_reminderTime.format(context), style: TextStyle(color: FastTheme.textDim)),
+              trailing: Icon(Icons.chevron_right, color: FastTheme.textDim),
+              onTap: _chooseReminderTime,
+            ),
           const SizedBox(height: 8),
           _section(l10n.settingsSubscription),
           _tile(
@@ -260,7 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _tile(
             icon: Icons.info_outline,
             title: l10n.settingsVersion,
-            subtitle: '1.0.12 (57)',
+            subtitle: '1.0.14 (74)',
             onTap: null,
           ),
           _tile(

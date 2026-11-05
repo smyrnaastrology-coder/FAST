@@ -776,7 +776,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
         ),
         const SizedBox(height: 18),
         Text(l10n.horarySubtitle, textAlign: TextAlign.center, style: TextStyle(color: FastTheme.textMuted, fontSize: 14, height: 1.5)),
-        const SizedBox(height: 22),
+        const SizedBox(height: 14),
+        _quotaBadge(l10n),
+        const SizedBox(height: 18),
         _sectionLabel(l10n.horaryCategory, Icons.category_outlined),
         const SizedBox(height: 8),
         _categoryChips(l10n),
@@ -808,8 +810,6 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
               ),
           ],
         ),
-        const SizedBox(height: 18),
-        _quotaBadge(l10n),
       ],
     );
   }
@@ -849,26 +849,30 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   Widget _topBar(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(child: _quotaBadge(l10n)),
-          const SizedBox(width: 6),
-          GestureDetector(
-            onTap: _determinePosition,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: FastTheme.cardBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.4)),
+          _quotaBadge(l10n),
+          const SizedBox(height: 5),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: _determinePosition,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: FastTheme.cardBg,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: FastTheme.accentGold.withValues(alpha: 0.4)),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.location_on, size: 14, color: FastTheme.accentGold),
+                  const SizedBox(width: 4),
+                  Text(_locating ? l10n.horaryLocationHint : '${_lat.toStringAsFixed(2)}, ${_lon.toStringAsFixed(2)}', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
+                  const SizedBox(width: 4),
+                  Icon(Icons.my_location, size: 12, color: FastTheme.accentGold),
+                ]),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.location_on, size: 14, color: FastTheme.accentGold),
-                const SizedBox(width: 4),
-                Text(_locating ? l10n.horaryLocationHint : '${_lat.toStringAsFixed(2)}, ${_lon.toStringAsFixed(2)}', style: TextStyle(color: FastTheme.textMuted, fontSize: 11)),
-                const SizedBox(width: 4),
-                Icon(Icons.my_location, size: 12, color: FastTheme.accentGold),
-              ]),
             ),
           ),
         ],
@@ -1236,13 +1240,22 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           const SizedBox(width: 2),
           Text('$_credits', style: TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
         ],
-        if (out) ...[
-          const SizedBox(width: 6),
-          GestureDetector(
-            onTap: () => _showCreditSheet(l10n),
-            child: Text(l10n.horaryCreditBuy, style: TextStyle(color: FastTheme.accentGold, fontSize: 12, fontWeight: FontWeight.w700)),
+        const SizedBox(width: 6),
+        OutlinedButton.icon(
+          onPressed: () => _showCreditSheet(l10n),
+          icon: Icon(Icons.add_card, size: 14, color: FastTheme.accentGold),
+          label: Text(
+            l10n.horaryCreditBuy,
+            style: TextStyle(color: FastTheme.accentGold, fontSize: 11, fontWeight: FontWeight.w700),
           ),
-        ],
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: FastTheme.accentGold.withValues(alpha: 0.65)),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            minimumSize: const Size(0, 30),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+        ),
         if (out && !_isPro) ...[
           const SizedBox(width: 6),
           GestureDetector(

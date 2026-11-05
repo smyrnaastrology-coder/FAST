@@ -43,6 +43,8 @@ class ApiConfig {
       '$baseUrl/api/analiz/ebeveyn_cocuk/detayli';
   static const String analizPy = '$baseUrl/api/analiz/potansiyel_yetenek';
   static const String analizNatal = '$baseUrl/api/analiz/bireysel_natal';
+  static const String minorProgressNotifications =
+      '$baseUrl/api/notifications/minor-progress';
   static const String analizAshtakoot = '$baseUrl/api/analiz/ashtakoot';
 
   // Simülasyon

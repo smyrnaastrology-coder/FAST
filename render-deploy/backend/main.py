@@ -1835,6 +1835,9 @@ class BireyselNatalInput(BaseModel):
     utc_offset: Optional[float] = None
     lang: str = "tr"
 
+class MinorProgressNotificationsInput(BireyselNatalInput):
+    days: int = 30
+
 class SehirInput(BaseModel):
     arama: str
 
@@ -9692,6 +9695,33 @@ def analiz_bireysel_natal(input: BireyselNatalInput):
     sonuc, hata = _analiz_sonuc("bireysel_natal", input, calistir)
     if hata: raise hata
     return sonuc
+
+@app_fast.post("/api/notifications/minor-progress")
+def minor_progress_notifications(input: MinorProgressNotificationsInput):
+    """Return a bounded, short-range personal forecast for local notifications.
+
+    The caller supplies only the signed-in user's own private birth profile.
+    This endpoint does not persist the chart/session or return the full natal
+    report. Local notifications are scheduled on-device for the next month.
+    """
+    days = max(1, min(int(input.days), 30))
+    tarih = _parse_date(input.tarih)
+    _ephe_yolu = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ephe')
+    if os.path.isdir(_ephe_yolu):
+        swe.set_ephe_path(_ephe_yolu)
+    motor = FBST_Engine(
+        p1=tarih, p2=tarih,
+        event_date=tarih, event_time=_parse_time(input.saat),
+        city=input.sehir, country=input.ulke,
+        lat=input.enlem, lon=input.boylam,
+        p1_isim=input.isim, p2_isim="",
+        mod="bireysel_natal", utc_offset=input.utc_offset,
+        lang=input.lang,
+    )
+    motor.fbst_analizi_yap(sessiz=True)
+    entries = _natal_minor_progress_yorumlari(motor, gun_sayisi=days)
+    return {"entries": entries, "days": len(entries), "lang": input.lang}
 
 @app_fast.get("/api/pdf/{session_id}/{tip}")
 def pdf_indir(request: Request, session_id: str, tip: str, uid: str = "", device_token: str = ""):

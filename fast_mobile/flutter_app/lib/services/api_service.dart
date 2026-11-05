@@ -52,6 +52,38 @@ class ApiService {
     return _post(url, req.toJson(), timeout: ApiConfig.longTimeout);
   }
 
+  Future<List<Map<String, dynamic>>> minorProgressNotifications({
+    required String date,
+    required String time,
+    required String city,
+    required String country,
+    required double latitude,
+    required double longitude,
+    required String language,
+    int days = 30,
+  }) async {
+    final response = await _post(
+      ApiConfig.minorProgressNotifications,
+      {
+        'tarih': date,
+        'saat': time,
+        'sehir': city,
+        'ulke': country,
+        'enlem': latitude,
+        'boylam': longitude,
+        'lang': language,
+        'days': days.clamp(1, 30).toInt(),
+      },
+      timeout: const Duration(seconds: 45),
+    );
+    final entries = response['entries'];
+    if (entries is! List) throw const FormatException('invalid minor progress');
+    return entries
+        .whereType<Map>()
+        .map((entry) => Map<String, dynamic>.from(entry))
+        .toList(growable: false);
+  }
+
   Future<Map<String, dynamic>> detayliAnaliz(AnalysisRequest req) {
     final url = switch (req.mod) {
       'ebeveyn_cocuk' => ApiConfig.analizEbDetayli,

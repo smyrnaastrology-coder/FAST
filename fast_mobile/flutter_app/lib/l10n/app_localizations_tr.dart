@@ -1831,7 +1831,31 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsNotifications => 'Bildirimler';
 
   @override
-  String get settingsDailyReminder => 'Günlük hatırlatma (09:00)';
+  String get settingsDailyReminder => 'Kişisel Minör Progress bildirimi';
+
+  @override
+  String get settingsReminderTime => 'Bildirim saati';
+
+  @override
+  String dailyReminderAt(String time) {
+    return 'Her gün $time';
+  }
+
+  @override
+  String get dailyReminderProOnly =>
+      'Bu kişisel bildirim Pro üyeliği gerektirir.';
+
+  @override
+  String get dailyReminderNeedsNatal =>
+      'Bildirim için kendi doğum tarihini, saatini ve şehrini profilinde kaydet.';
+
+  @override
+  String get dailyReminderPermission =>
+      'Bildirim izni verilmedi. Cihaz ayarlarından bildirimleri açabilirsin.';
+
+  @override
+  String get dailyReminderUnavailable =>
+      'Günlük yorum şu an hazırlanamadı. Daha sonra tekrar dene.';
 
   @override
   String get settingsSubscription => 'Abonelik';
@@ -2684,6 +2708,16 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get proPillarSocialDesc =>
       'Topluluk herkes için ücretsiz ve sınırsız — paylaş, hikâye ekle, etkileş.';
+
+  @override
+  String get proPillarProgress => 'Kişisel Günlük Minör Progress';
+
+  @override
+  String get proPillarProgressDesc =>
+      'Kendi natal haritana göre her gün kişisel yorum; bildirim saatini sen seç.';
+
+  @override
+  String get notificationMinorProgressTitle => 'Günlük Minör Progress yorumun';
 
   @override
   String get chartSignAries => 'Koç';
