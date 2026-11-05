@@ -56,6 +56,7 @@ class DailyMinorProgressNotifications {
     final birth = await SocialService.myBirthInfo();
     final date = birth?.date?.trim() ?? '';
     if (date.isEmpty) {
+      await prefs.setBool(enabledKey, false);
       await NotificationService.instance.cancelDaily();
       return DailyProgressReminderResult.natalRequired;
     }
@@ -74,11 +75,13 @@ class DailyMinorProgressNotifications {
         city = (location['city'] ?? city).toString();
         if (country.isEmpty) country = (location['country'] ?? '').toString();
       } catch (_) {
+        await prefs.setBool(enabledKey, false);
         await NotificationService.instance.cancelDaily();
         return DailyProgressReminderResult.natalRequired;
       }
     }
     if (city.isEmpty || latitude == null || longitude == null) {
+      await prefs.setBool(enabledKey, false);
       await NotificationService.instance.cancelDaily();
       return DailyProgressReminderResult.natalRequired;
     }
