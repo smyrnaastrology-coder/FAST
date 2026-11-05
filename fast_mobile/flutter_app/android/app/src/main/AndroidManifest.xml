@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <!-- Sesle dikte isteğe bağlıdır; mikrofonsuz cihazlar uygulamayı kurabilsin. -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false"/>
     <!-- Kamera opsiyonel: kamerasi olmayan cihazlarda da kurulabilsin.
          Fotograf cekimi sistem kamera uygulamasina devredilir (izin gerekmez). -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
