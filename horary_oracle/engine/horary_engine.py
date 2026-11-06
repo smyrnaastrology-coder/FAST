@@ -1672,6 +1672,9 @@ def cast_horary_chart(year, month, day, hour_decimal, lat, lon, quesited_type="r
 
     return {
         "jd": jd,
+        # Sorunun sorulduğu takvim günü. Yorum katmanı "bugün"ü bilmediği için
+        # modelin eğitim kesim tarihine (2025) kaymasını bu alan engeller.
+        "cast_date": f"{int(year):04d}-{int(month):02d}-{int(day):02d}",
         "houses": houses,
         "planets": planets,
         "querent": querent,

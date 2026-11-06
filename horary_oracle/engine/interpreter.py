@@ -247,6 +247,21 @@ def build_prompt(engine_json: dict, lang="tr") -> str:
     prompt = LOCKED_PROMPT.replace("{json}", j)
     # dil talimatını en başa ve en sona koy (LLM bazen sona bakıyor)
     prompt = f"LANGUAGE OVERRIDE: Respond ONLY in '{lang}'. The entire answer must be in {lang}, no Turkish mix.\n" + prompt
+    # "Bugün" modelin eğitim kesim tarihi değil, sorunun sorulduğu gündür.
+    # Aksi halde 2026'daki soruya "2025 ortalarında" gibi geçmiş tarih yazıyor.
+    try:
+        from datetime import date as _date
+        _raw = str(engine_json.get("cast_date") or "").strip()
+        _anchor = _raw or _date.today().isoformat()
+        prompt += (f"\n\n⛔ TARİH KİLİDİ: Sorunun sorulduğu gün = {_anchor}. "
+                   f"Bugün bu tarihtir. Bu tarihten ÖNCEKİ bir yıl veya tarih YAZMA "
+                   f"(örn. 2025 gibi geçmiş yıllar yasak). Gelecek bir tarih vereceksen "
+                   f"sadece bu günden ileri hesapla; emin değilsen tarih yazma, sadece "
+                   f"motorun süresini (timing.text) kullan. "
+                   f"\nDATE LOCK: Today is {_anchor}. Never output a date or year before today. "
+                   f"Use only the engine timing; do not invent calendar dates.")
+    except Exception:
+        pass
     # gezegen burçlarını açıkça listele - halüsinasyonu kökten kes
     try:
         _planets = engine_json.get("planets", {})
@@ -355,6 +370,102 @@ def _correct_timing_hallucination(text: str, engine_json: dict, lang: str = "tr"
     except: return text
 
 
+_MONTH_NAMES = {
+    "tr": ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+           "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+    "en": ["January", "February", "March", "April", "May", "June",
+           "July", "August", "September", "October", "November", "December"],
+    "es": ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+           "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+}
+
+
+def _anchor_day(engine_json: dict):
+    """Sorunun sorulduğu gün; yoksa bugün."""
+    import datetime as _dt
+    raw = str(engine_json.get("cast_date") or "").strip()
+    try:
+        y, m, d = (int(part) for part in raw.split("-")[:3])
+        return _dt.date(y, m, d)
+    except Exception:
+        return _dt.date.today()
+
+
+def _timing_target_day(engine_json: dict, anchor):
+    """Motorun süresini (örn '36 GÜN', '3 AY', '2 YIL') bugüne ekleyip tarih üret."""
+    try:
+        import re
+        from datetime import timedelta
+        text = str((engine_json.get("timing") or {}).get("text") or "").upper()
+        match = re.search(r"(\d+)(?:\s*-\s*(\d+))?\s*(DAKİKA|DAKIKA|SAAT|GÜN|GUN|HAFTA|AY|YIL)", text)
+        if not match:
+            return None
+        number = int(match.group(2) or match.group(1))
+        unit = match.group(3)
+        days = {
+            "DAKİKA": number / 1440, "DAKIKA": number / 1440,
+            "SAAT": number / 24, "GÜN": number, "GUN": number,
+            "HAFTA": number * 7, "AY": number * 30, "YIL": number * 365,
+        }.get(unit)
+        if days is None:
+            return None
+        return anchor + timedelta(days=days)
+    except Exception:
+        return None
+
+
+def _correct_past_date_hallucination(text: str, engine_json: dict, lang: str = "tr") -> str:
+    """Model eğitim kesim tarihine kayıp geçmiş yıl/tarih yazarsa düzelt.
+
+    Ölçüm (2026-11): soru 2026'da sorulurken yanıt "2025 ortalarında" diyordu.
+    Modelin eğitim verisi 2025'te bittiği için "bugün"ü 2025 sanıyor. Motorun
+    süresi + soru tarihi elimizde olduğundan geçmiş tarihleri ileri tarihe çevir.
+    """
+    try:
+        import re
+        anchor = _anchor_day(engine_json)
+        target = _timing_target_day(engine_json, anchor) or anchor
+        lang = lang if lang in _MONTH_NAMES else "tr"
+        months = _MONTH_NAMES[lang]
+        label = f"{target.day} {months[target.month - 1]} {target.year}" if lang != "en" \
+            else f"{months[target.month - 1]} {target.day}, {target.year}"
+
+        before = text
+
+        # "2025 ortalarında / 2025'in başında / 2025 sonunda" gibi ifadeler
+        def _replace_phrase(match):
+            suffix = (match.group(2) or "").lower()
+            if lang == "tr":
+                tail = "ortasında" if "orta" in suffix else ("başında" if "baş" in suffix else "sonunda")
+                return f"{months[target.month - 1]} {target.year} {tail}"
+            if lang == "es":
+                return f"mediados de {months[target.month - 1]} de {target.year}"
+            return label
+
+        text = re.sub(
+            r"\b(20\d{2})\s*(?:'?[a-zçğıöşü]+)?\s*(ortalarında|ortasında|başlarında|başında|sonlarında|sonunda)",
+            _replace_phrase, text, flags=re.IGNORECASE)
+
+        # "mid-2025", "in 2025", "mediados de 2025" gibi yakın geçmiş yıllar.
+        # Doğum yılı (1990 gibi) veya çok eski yıllara dokunmuyoruz.
+        def _replace_year(match):
+            year = int(match.group(1))
+            if not (anchor.year - 3 <= year < anchor.year):
+                return match.group(0)
+            prefix = "mid-" if match.group(0).lower().startswith("mid") else ""
+            if lang == "es":
+                return f"mediados de {months[target.month - 1]} de {target.year}"
+            return f"{prefix}{months[target.month - 1]} {target.year}"
+
+        text = re.sub(r"\b(?:mid-|early |late )?(20\d{2})\b", _replace_year, text)
+
+        if text != before:
+            print("[interpreter] gecmis tarih duzeltildi ->", target.isoformat(), flush=True)
+        return text
+    except Exception:
+        return text
+
+
 def call_openai(engine_json: dict, lang="tr") -> str:
     """Yorum katmanlari: engine.tiers merdiveni (local < basic < plus < pro).
     Bos metin/hatada bir alt katmana dusulur; en altta yerel deterministik yorum vardir."""
@@ -374,6 +485,7 @@ def call_openai(engine_json: dict, lang="tr") -> str:
         # son dogrulama katmanlari: gezegen burc + sure uydurmasini motorla duzelt
         txt = _correct_planet_hallucination(txt, engine_json, lang)
         txt = _correct_timing_hallucination(txt, engine_json, lang)
+        txt = _correct_past_date_hallucination(txt, engine_json, lang)
         if used == "local":
             txt += "\n[LLM katmanlari kullanilamadi, yerel deterministik yorum verildi]"
         return txt
