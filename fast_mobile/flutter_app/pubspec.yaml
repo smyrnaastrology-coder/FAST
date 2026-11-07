@@ -63,6 +63,7 @@ dependencies:
   speech_to_text: ^7.4.0
   flutter_timezone: ^5.1.1
   package_info_plus: ^9.0.1
+  firebase_crashlytics: ^5.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

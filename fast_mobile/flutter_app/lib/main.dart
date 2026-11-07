@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -35,53 +36,76 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (ApiConfig.supabaseEnabled) {
-    try {
-      await Supabase.initialize(
-        url: ApiConfig.supabaseUrl,
-        publishableKey: ApiConfig.supabaseAnonKey,
+void main() {
+  // Crashlytics'e ait olmayan (ör. Firebase açılmadan önceki) hatalar da
+  // kaybolmasın diye tüm uygulama bir zone içinde çalışır.
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      if (ApiConfig.supabaseEnabled) {
+        try {
+          await Supabase.initialize(
+            url: ApiConfig.supabaseUrl,
+            publishableKey: ApiConfig.supabaseAnonKey,
+          );
+        } catch (e) {
+          // ignore: avoid_print
+          print('[Supabase] init error: $e');
+        }
+      }
+      try {
+        await Firebase.initializeApp();
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
+        final messaging = FirebaseMessaging.instance;
+        await messaging.requestPermission(alert: true, badge: true, sound: true);
+        final token = await messaging.getToken();
+        if (token != null) {
+          // Token'ı backend'e bildirmek için sakla — abonelikte kullanılacak
+          // ignore: avoid_print
+          print('[FCM] token: $token');
+        }
+        // Token yenilenince
+        FirebaseMessaging.instance.onTokenRefresh.listen((t) {
+          // ignore: avoid_print
+          print('[FCM] token refresh: $t');
+        });
+
+        // Çökme raporlama: Flutter ve platform hatalarını Crashlytics'e gönder.
+        await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+        FlutterError.onError =
+            FirebaseCrashlytics.instance.recordFlutterFatalError;
+        WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
+          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+          return true;
+        };
+      } catch (e) {
+        // ignore: avoid_print
+        print('[FCM] init error: $e');
+      }
+      await RevenueCatService.init();
+      await NotificationService.instance.init();
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => SocialProvider()),
+            ChangeNotifierProvider(create: (_) => ChartProvider()),
+            ChangeNotifierProvider(create: (_) => AnalysisProvider()),
+          ],
+          child: const FastApp(),
+        ),
       );
-    } catch (e) {
-      // ignore: avoid_print
-      print('[Supabase] init error: $e');
-    }
-  }
-  try {
-    await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    final messaging = FirebaseMessaging.instance;
-    await messaging.requestPermission(alert: true, badge: true, sound: true);
-    final token = await messaging.getToken();
-    if (token != null) {
-      // Token'ı backend'e bildirmek için sakla — abonelikte kullanılacak
-      // ignore: avoid_print
-      print('[FCM] token: $token');
-    }
-    // Token yenilenince
-    FirebaseMessaging.instance.onTokenRefresh.listen((t) {
-      // ignore: avoid_print
-      print('[FCM] token refresh: $t');
-    });
-  } catch (e) {
-    // ignore: avoid_print
-    print('[FCM] init error: $e');
-  }
-  await RevenueCatService.init();
-  await NotificationService.instance.init();
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => SocialProvider()),
-        ChangeNotifierProvider(create: (_) => ChartProvider()),
-        ChangeNotifierProvider(create: (_) => AnalysisProvider()),
-      ],
-      child: const FastApp(),
-    ),
+    },
+    (error, stack) {
+      // Firebase hazır değilse burada da hata fırlatmayalım.
+      try {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      } catch (_) {}
+    },
   );
 }
 
