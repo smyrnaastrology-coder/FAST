@@ -31,8 +31,16 @@ class NotificationService {
   static const String _channelId = 'daily_minor_progress';
   static const String _channelName = 'Günlük Kısa Vadeli İlerleme';
 
+  /// Routes a notification payload (used by local + FCM notifications).
+  void routeTo(String payload) {
+    _route(payload);
+  }
+
   void _handleNotificationTap(NotificationResponse response) {
-    final payload = response.payload ?? '';
+    _route(response.payload ?? '');
+  }
+
+  void _route(String payload) {
     final ctx = rootNavigatorKey.currentContext;
     if (ctx == null) return;
     final nav = rootNavigatorKey.currentState;
@@ -198,6 +206,31 @@ class NotificationService {
     const darwin = DarwinNotificationDetails();
     final details = NotificationDetails(android: android, iOS: darwin);
     await _plugin.show(DateTime.now().millisecondsSinceEpoch ~/ 1000, title, body, details, payload: payload);
+  }
+
+  /// Foreground display for server-sent social notifications (like/comment).
+  Future<void> showSocialNotification({
+    required String title,
+    required String body,
+    String payload = 'social',
+  }) async {
+    if (!_initialized) return;
+    final android = AndroidNotificationDetails(
+      'social_activity',
+      'Sosyal Bildirimler',
+      channelDescription: 'Beğeni ve yorum bildirimleri',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    const darwin = DarwinNotificationDetails();
+    final details = NotificationDetails(android: android, iOS: darwin);
+    await _plugin.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
   }
 
   Future<void> cancelDaily() async {

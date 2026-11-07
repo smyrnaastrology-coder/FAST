@@ -6558,6 +6558,311 @@ def app_version():
         "ios_store_url": "https://apps.apple.com/app/id6827527304",
     }
 
+# ============================================================================
+# Social push notifications (likes / comments)
+# ----------------------------------------------------------------------------
+# Supabase trigger -> POST /api/push/social -> FCM HTTP v1.
+#
+# Required env (fbst-api):
+#   SUPABASE_URL                 (already set)
+#   SUPABASE_SERVICE_ROLE_KEY    service_role key (server only!)
+#   FCM_CRED_JSON                Firebase service-account JSON (one line)
+#   FCM_PROJECT_ID               optional; read from the JSON if omitted
+#   HOLAVON_PUSH_SECRET          shared secret with the Supabase trigger
+# ============================================================================
+
+_PUSH_FCM_CACHE = {"token": "", "expires": 0.0}
+_PUSH_SEEN = {}
+
+
+class SocialPushInput(BaseModel):
+    type: str
+    post_id: str
+    actor_id: str
+    owner_id: Optional[str] = None
+    actor_name: Optional[str] = None
+    comment_id: Optional[str] = None
+    comment_text: Optional[str] = None
+
+
+def _push_supabase_cfg():
+    url = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    return url, key
+
+
+def _push_sb_headers(key: str) -> dict:
+    return {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+
+
+def _push_fcm_credentials():
+    """Return (credentials, project_id) for the FCM service account."""
+    from google.oauth2 import service_account
+
+    raw = os.getenv("FCM_CRED_JSON", "").strip()
+    if not raw:
+        return None, ""
+    info = json.loads(raw)
+    creds = service_account.Credentials.from_service_account_info(
+        info, scopes=["https://www.googleapis.com/auth/firebase.messaging"]
+    )
+    project_id = (
+        os.getenv("FCM_PROJECT_ID", "").strip()
+        or info.get("project_id", "")
+        or creds.project_id
+    )
+    return creds, project_id
+
+
+def _push_fcm_access_token(creds) -> str:
+    from google.auth.transport.requests import Request as _GAuthRequest
+
+    now = time.time()
+    if _PUSH_FCM_CACHE["token"] and _PUSH_FCM_CACHE["expires"] > now + 60:
+        return _PUSH_FCM_CACHE["token"]
+    creds.refresh(_GAuthRequest())
+    _PUSH_FCM_CACHE["token"] = creds.token or ""
+    _PUSH_FCM_CACHE["expires"] = now + 3300
+    return _PUSH_FCM_CACHE["token"]
+
+
+def _push_text(lang: str, kind: str, actor: str, comment: str = ""):
+    actor = (actor or "").strip()[:40]
+    comment = (comment or "").strip()[:120]
+    if lang not in ("tr", "en", "es"):
+        lang = "tr"
+    if kind == "comment":
+        if lang == "en":
+            title = "New comment"
+            body = f"{actor or 'Someone'} commented: {comment}" if comment else f"{actor or 'Someone'} commented on your post."
+        elif lang == "es":
+            title = "Nuevo comentario"
+            body = f"{actor or 'Alguien'} comentó: {comment}" if comment else f"{actor or 'Alguien'} comentó tu publicación."
+        else:
+            title = "Yeni yorum"
+            body = f"{actor or 'Bir kullanıcı'} yorum yaptı: {comment}" if comment else f"{actor or 'Bir kullanıcı'} gönderine yorum yaptı."
+    else:
+        if lang == "en":
+            title = "New like"
+            body = f"{actor or 'Someone'} liked your post."
+        elif lang == "es":
+            title = "Nuevo me gusta"
+            body = f"A {actor or 'alguien'} le gustó tu publicación."
+        else:
+            title = "Yeni beğeni"
+            body = f"{actor or 'Bir kullanıcı'} gönderini beğendi."
+    return title, body
+
+
+def _push_send_fcm(project_id: str, access_token: str, token: str, title: str,
+                   body: str, data: dict):
+    """Send one FCM HTTP v1 message. Returns (ok, invalid_token, detail)."""
+    message = {
+        "message": {
+            "token": token,
+            "notification": {"title": title, "body": body},
+            "data": {k: str(v) for k, v in data.items()},
+            "android": {
+                "priority": "high",
+                "notification": {"sound": "default", "default_vibrate_timings": True},
+            },
+            "apns": {
+                "headers": {"apns-priority": "10"},
+                "payload": {"aps": {"sound": "default"}},
+            },
+        }
+    }
+    url = f"https://fcm.googleapis.com/v1/projects/{project_id}/messages:send"
+    try:
+        r = requests.post(
+            url,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            json=message,
+            timeout=10,
+        )
+    except Exception as e:
+        return False, False, f"request_error: {e}"
+    if r.status_code == 200:
+        return True, False, ""
+    detail = r.text[:300]
+    try:
+        err = r.json().get("error", {})
+        code = str(err.get("status", "")) + " " + str(err.get("message", ""))
+    except Exception:
+        code = detail
+    invalid = (
+        r.status_code == 404
+        or "UNREGISTERED" in code.upper()
+        or "INVALID_ARGUMENT" in code.upper()
+        or "registration token is not a valid" in code.lower()
+    )
+    if r.status_code == 401:
+        # Access token expired between cache and send; clear it for next call.
+        _PUSH_FCM_CACHE["token"] = ""
+        _PUSH_FCM_CACHE["expires"] = 0.0
+    return False, invalid, detail
+
+
+@app_fast.get("/api/push/status")
+def push_status():
+    """Configuration check for the social push pipeline (no secrets leaked)."""
+    supa_url, supa_key = _push_supabase_cfg()
+    return {
+        "supabase_url": bool(supa_url),
+        "service_role_key": bool(supa_key),
+        "fcm_cred_json": bool(os.getenv("FCM_CRED_JSON", "").strip()),
+        "fcm_project_id": bool(os.getenv("FCM_PROJECT_ID", "").strip()),
+        "push_secret": bool(os.getenv("HOLAVON_PUSH_SECRET", "").strip()),
+    }
+
+
+@app_fast.post("/api/push/social")
+async def push_social(request: Request):
+    """Webhook called by the Supabase trigger for likes/comments."""
+    expected = os.getenv("HOLAVON_PUSH_SECRET", "").strip()
+    if not expected:
+        return JSONResponse(status_code=503, content={"ok": False, "reason": "push_not_configured"})
+    got = request.headers.get("X-Holavon-Push-Secret", "")
+    if not hmac.compare_digest(got, expected):
+        return JSONResponse(status_code=401, content={"ok": False, "reason": "bad_secret"})
+
+    try:
+        body = await request.json()
+        payload = SocialPushInput(**body)
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"ok": False, "reason": f"bad_payload: {e}"})
+
+    kind = (payload.type or "").strip().lower()
+    if kind not in ("like", "comment"):
+        return JSONResponse(status_code=400, content={"ok": False, "reason": "bad_type"})
+    if not payload.post_id or not payload.actor_id:
+        return JSONResponse(status_code=400, content={"ok": False, "reason": "missing_ids"})
+    if payload.owner_id and payload.owner_id == payload.actor_id:
+        return {"ok": True, "sent": 0, "reason": "self_action"}
+
+    # Simple idempotency: Supabase may retry a webhook delivery.
+    dedup_key = (
+        kind,
+        payload.post_id,
+        payload.actor_id,
+        payload.comment_id or "",
+    )
+    now = time.time()
+    last = _PUSH_SEEN.get(dedup_key, 0)
+    if now - last < 30:
+        return {"ok": True, "sent": 0, "reason": "duplicate"}
+    if len(_PUSH_SEEN) > 500:
+        for k, ts in list(_PUSH_SEEN.items()):
+            if now - ts > 300:
+                _PUSH_SEEN.pop(k, None)
+    _PUSH_SEEN[dedup_key] = now
+
+    supa_url, supa_key = _push_supabase_cfg()
+    if not supa_url or not supa_key:
+        return JSONResponse(
+            status_code=503,
+            content={"ok": False, "reason": "supabase_service_role_missing"},
+        )
+
+    headers = _push_sb_headers(supa_key)
+
+    # Authoritative owner (and post existence check).
+    owner = payload.owner_id or ""
+    try:
+        r = requests.get(
+            f"{supa_url}/rest/v1/posts",
+            params={"id": f"eq.{payload.post_id}", "select": "user_id", "limit": 1},
+            headers=headers,
+            timeout=10,
+        )
+        if r.status_code == 200 and isinstance(r.json(), list) and r.json():
+            owner = r.json()[0].get("user_id") or owner
+    except Exception as e:
+        print(f"[push] post lookup failed: {e}")
+    if not owner:
+        return {"ok": True, "sent": 0, "reason": "post_not_found"}
+    if owner == payload.actor_id:
+        return {"ok": True, "sent": 0, "reason": "self_action"}
+
+    try:
+        r = requests.get(
+            f"{supa_url}/rest/v1/device_tokens",
+            params={
+                "user_id": f"eq.{owner}",
+                "select": "token,lang,platform",
+            },
+            headers=headers,
+            timeout=10,
+        )
+    except Exception as e:
+        return JSONResponse(status_code=502, content={"ok": False, "reason": f"token_lookup_failed: {e}"})
+    if r.status_code != 200:
+        return JSONResponse(
+            status_code=502,
+            content={"ok": False, "reason": "token_lookup_failed", "detail": r.text[:200]},
+        )
+    tokens = r.json() or []
+    if not tokens:
+        return {"ok": True, "sent": 0, "reason": "no_devices"}
+
+    try:
+        creds, project_id = _push_fcm_credentials()
+        if creds is None or not project_id:
+            return JSONResponse(status_code=503, content={"ok": False, "reason": "fcm_not_configured"})
+        access_token = _push_fcm_access_token(creds)
+    except Exception as e:
+        print(f"[push] fcm credential error: {e}")
+        return JSONResponse(status_code=500, content={"ok": False, "reason": "fcm_credential_error"})
+
+    data = {
+        "type": kind,
+        "post_id": payload.post_id,
+        "actor_id": payload.actor_id,
+        "route": "social",
+    }
+    if payload.comment_id:
+        data["comment_id"] = payload.comment_id
+
+    sent = 0
+    failed = 0
+    removed = 0
+    for row in tokens:
+        tok = str(row.get("token") or "").strip()
+        if not tok:
+            continue
+        title, text = _push_text(row.get("lang") or "tr", kind, payload.actor_name or "",
+                                 payload.comment_text or "")
+        ok, invalid, detail = _push_send_fcm(
+            project_id, access_token, tok, title, text, data
+        )
+        if ok:
+            sent += 1
+            continue
+        failed += 1
+        if invalid:
+            removed += 1
+            try:
+                requests.delete(
+                    f"{supa_url}/rest/v1/device_tokens",
+                    params={"token": f"eq.{tok}"},
+                    headers=headers,
+                    timeout=5,
+                )
+            except Exception:
+                pass
+        else:
+            print(f"[push] send failed ({row.get('platform')}): {detail}")
+
+    return {"ok": True, "sent": sent, "failed": failed, "removed": removed}
+
+
 @app_fast.post("/api/kunye")
 def kunye(p: KunyeInput):
     """Gunes/Ay burcu + derece (profil kunyesi icin hafif hesap).

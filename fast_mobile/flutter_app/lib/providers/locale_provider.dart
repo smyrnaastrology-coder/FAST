@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/push_service.dart';
 
 class LocaleProvider extends ChangeNotifier {
   static const _prefKey = 'app_language';
@@ -38,6 +39,10 @@ class LocaleProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_prefKey, locale.languageCode);
+    } catch (_) {}
+    // Keep server-side notification text in sync with the chosen language.
+    try {
+      await PushService.instance.updateLanguage(locale.languageCode);
     } catch (_) {}
   }
 

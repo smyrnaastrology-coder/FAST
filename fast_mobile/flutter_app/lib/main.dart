@@ -25,6 +25,7 @@ import 'screens/social_profile_screen.dart';
 import 'screens/warning_screen.dart';
 import 'services/revenuecat_service.dart';
 import 'services/notification_service.dart';
+import 'services/push_service.dart';
 import 'services/daily_minor_progress_notifications.dart';
 import 'services/app_update_service.dart';
 import 'services/profile_links.dart';
@@ -58,19 +59,6 @@ void main() {
         FirebaseMessaging.onBackgroundMessage(
           _firebaseMessagingBackgroundHandler,
         );
-        final messaging = FirebaseMessaging.instance;
-        await messaging.requestPermission(alert: true, badge: true, sound: true);
-        final token = await messaging.getToken();
-        if (token != null) {
-          // Token'ı backend'e bildirmek için sakla — abonelikte kullanılacak
-          // ignore: avoid_print
-          print('[FCM] token: $token');
-        }
-        // Token yenilenince
-        FirebaseMessaging.instance.onTokenRefresh.listen((t) {
-          // ignore: avoid_print
-          print('[FCM] token refresh: $t');
-        });
 
         // Çökme raporlama: Flutter ve platform hatalarını Crashlytics'e gönder.
         await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
@@ -86,6 +74,12 @@ void main() {
       }
       await RevenueCatService.init();
       await NotificationService.instance.init();
+      try {
+        await PushService.instance.init();
+      } catch (e) {
+        // ignore: avoid_print
+        print('[PUSH] init error: $e');
+      }
       runApp(
         MultiProvider(
           providers: [
