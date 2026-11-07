@@ -51,8 +51,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            // Enable R8 shrinking/obfuscation for Play's DEX optimization
+            // recommendations. Flutter/Dart AOT output is handled separately;
+            // R8 optimizes the Android/Java/Kotlin DEX and plugin dependencies.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
             signingConfig = if (kpHasKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }
