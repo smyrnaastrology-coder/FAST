@@ -23,11 +23,24 @@ class HoraryScreen extends StatefulWidget {
     this.quotaLoader,
     this.initialQuestion,
     this.skipIntro = false,
+    this.autoAsk = false,
+    this.locationLoader,
+    this.castLoader,
   });
 
   /// Optional quota source for isolated widget tests.
   @visibleForTesting
   final Future<HoraryResult> Function()? quotaLoader;
+
+  /// Test hook: gerçek Geolocator yerine konum döndürür. `null` dönerse
+  /// konum alınamamış sayılır ve otomatik gönderim yapılmaz.
+  @visibleForTesting
+  final Future<({double lat, double lon})?> Function()? locationLoader;
+
+  /// Test hook: ağ çağrısı yerine sahte horary yanıtı üretir.
+  @visibleForTesting
+  final Future<HoraryResult> Function(String question, double lat, double lon)?
+      castLoader;
 
   /// İlk kurulum akışından gelindiyse soru kutusuna önceden doldurulur.
   /// Kullanıcı yine de göndermeden önce düzenleyebilir.
@@ -36,6 +49,10 @@ class HoraryScreen extends StatefulWidget {
   /// Uygulama ilk kurulumu zaten anlattıysa horary'nin ayrı tanıtım
   /// diyaloğunu tekrar gösterme.
   final bool skipIntro;
+
+  /// Gerçek konum ve kota hazırsa ilk soruyu kendiliğinden gönder.
+  /// Hazır değilse soru kutuya yazılır, kullanıcı "gönder"e basar.
+  final bool autoAsk;
 
   @override
   State<HoraryScreen> createState() => _HoraryScreenState();
@@ -59,6 +76,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   double _lat = 38.4237; // varsayılan: İzmir
   double _lon = 27.1428;
   bool _locating = true;
+  bool _hasRealLocation = false;
+  bool _autoAskPending = false;
+  bool _autoAskStarted = false;
   bool _busy = false;
   bool _dictating = false;
   bool _speechInitialized = false;
@@ -82,6 +102,8 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _autoAskPending = widget.autoAsk &&
+        (widget.initialQuestion?.trim().isNotEmpty ?? false);
     _determinePosition();
     _loadQuota();
     _loadChat().then((_) {
@@ -188,8 +210,21 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           _resetAt = DateTime.tryParse((result.data['reset_at'] ?? '').toString());
         }
       });
+      _maybeAutoAsk();
     }
     return result;
+  }
+
+  /// Onboarding'den gelen ilk soruyu, konum ve kota hazırsa kendiliğinden
+  /// gönder. Konum alınamadıysa veya kota yoksa kutuya yazılı bırakır;
+  /// böylece yanlış konumla harita çekilmez.
+  Future<void> _maybeAutoAsk() async {
+    if (!mounted || !_autoAskPending || _autoAskStarted) return;
+    if (_busy || _locating || !_hasRealLocation || !_quotaReady) return;
+    if (_questionCtrl.text.trim().length < 2) return;
+    _autoAskStarted = true;
+    _autoAskPending = false;
+    await _ask(AppLocalizations.of(context));
   }
 
   void _openPaywall() {
@@ -412,6 +447,28 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
 
   Future<void> _determinePosition() async {
     setState(() => _locating = true);
+    final loader = widget.locationLoader;
+    if (loader != null) {
+      try {
+        final pos = await loader();
+        if (!mounted) return;
+        if (pos != null) {
+          setState(() {
+            _lat = pos.lat;
+            _lon = pos.lon;
+            _hasRealLocation = true;
+          });
+        }
+      } catch (_) {
+        // test konumu alınamadı
+      } finally {
+        if (mounted) {
+          setState(() => _locating = false);
+          _maybeAutoAsk();
+        }
+      }
+      return;
+    }
     try {
       var perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
@@ -420,16 +477,24 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
       if (perm == LocationPermission.denied || perm == LocationPermission.deniedForever) {
         return; // varsayılan konumda kal
       }
-      final pos = await Geolocator.getCurrentPosition();
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          timeLimit: Duration(seconds: 8),
+        ),
+      );
       if (!mounted) return;
       setState(() {
         _lat = pos.latitude;
         _lon = pos.longitude;
+        _hasRealLocation = true;
       });
     } catch (_) {
-      // varsayılan konum
+      // varsayılan konum; otomatik gönderim yapılmaz
     } finally {
-      if (mounted) setState(() => _locating = false);
+      if (mounted) {
+        setState(() => _locating = false);
+        _maybeAutoAsk();
+      }
     }
   }
 
@@ -461,18 +526,20 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     });
     _scrollDown();
     try {
-      final res = await HoraryService.cast(
-        question: q,
-        lat: _lat,
-        lon: _lon,
-        lang: Localizations.localeOf(context).languageCode,
-        category: _category,
-        asker: _asker,
-        history: _chat
-            .where((m) => m.content.isNotEmpty)
-            .map((m) => {'role': m.role, 'content': m.content})
-            .toList(),
-      );
+      final res = widget.castLoader != null
+          ? await widget.castLoader!(q, _lat, _lon)
+          : await HoraryService.cast(
+              question: q,
+              lat: _lat,
+              lon: _lon,
+              lang: Localizations.localeOf(context).languageCode,
+              category: _category,
+              asker: _asker,
+              history: _chat
+                  .where((m) => m.content.isNotEmpty)
+                  .map((m) => {'role': m.role, 'content': m.content})
+                  .toList(),
+            );
       if (!mounted) return;
       if (!res.ok) {
         setState(() {
@@ -627,6 +694,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
           TextSelection.collapsed(offset: _questionCtrl.text.length);
     });
     _scrollDown();
+    _maybeAutoAsk();
   }
 
   Future<void> _shareText(String text) async {

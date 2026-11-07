@@ -75,6 +75,7 @@ class _MainShellState extends State<MainShell> {
           _push(HoraryScreen(
             initialQuestion: question,
             skipIntro: true,
+            autoAsk: true,
           ));
         },
         onSkip: _markOnboardingDone,
