@@ -4,15 +4,15 @@ services:
     runtime: python
     branch: main
     rootDir: render-deploy
-    plan: free
+    plan: starter
     buildCommand: pip install -r requirements.txt
     startCommand: bash start.sh
     healthCheckPath: /api/health
-    - type: web
+  - type: web
     name: horary-oracle-api
     runtime: python
     branch: horary
-    plan: free
+    plan: starter
     buildCommand: pip install -r horary_oracle/requirements.txt
     startCommand: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
