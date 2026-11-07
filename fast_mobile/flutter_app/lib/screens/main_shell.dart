@@ -10,9 +10,6 @@ import '../services/social_service.dart';
 import '../widgets/sky_strip.dart';
 import '../widgets/theme_palette_picker.dart';
 import 'analyzer_screen.dart';
-import 'auth_screen.dart';
-import 'social_shell.dart';
-import 'handle_claim_screen.dart';
 import 'horary_screen.dart';
 import 'landing_screen.dart';
 import 'profile_screen.dart';
@@ -20,6 +17,7 @@ import 'settings_screen.dart';
 import 'chart_list_screen.dart';
 import '../widgets/chart_mark.dart';
 import '../widgets/first_run_onboarding.dart';
+import '../widgets/social_gate.dart';
 
 /// Uygulama kabuÄŸu (Hub): tek giriÅŸten 3 sÃ¼tuna eriÅŸim â€”
 /// Sosyal Â· Fast Synastry Â· Horary Oracle. Ãœstte profil.
@@ -261,7 +259,6 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final ap = context.watch<AuthProvider>();
-    final sp = context.watch<SocialProvider>();
 
     return PopScope(
       canPop: true,
@@ -343,7 +340,7 @@ class _MainShellState extends State<MainShell> {
                         desc: l10n.hubSocialDesc,
                         colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
                         onTap: () =>
-                            _push(_SocialGate(l10n: l10n, enabled: sp.enabled)),
+                            _push(const SocialGate()),
                       ),
                       const SizedBox(height: 16),
                       _PillarCard(
@@ -390,87 +387,6 @@ class _MainShellState extends State<MainShell> {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Sosyal sÃ¼tunu kapÄ±sÄ±: giriÅŸ (auth-first ile her zaman var) â†’ @handle â†’ feed.
-class _SocialGate extends StatelessWidget {
-  final AppLocalizations l10n;
-  final bool enabled;
-  const _SocialGate({required this.l10n, required this.enabled});
-
-  @override
-  Widget build(BuildContext context) {
-    if (!enabled) {
-      return _SimpleMessage(
-        icon: Icons.people_alt_outlined,
-        title: l10n.communityLoginTitle,
-        desc: l10n.communityLoginSubtitle,
-      );
-    }
-    final sp = context.watch<SocialProvider>();
-    if (!sp.signedIn) {
-      return const AuthScreen(force: true);
-    }
-    if (!sp.hasHandle) {
-      return HandleClaimScreen(
-        onClaimed: () => context.read<SocialProvider>().refreshProfile(),
-      );
-    }
-    return const SocialShell();
-  }
-}
-
-class _SimpleMessage extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String desc;
-  const _SimpleMessage({
-    required this.icon,
-    required this.title,
-    required this.desc,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FastTheme.bg,
-      appBar: AppBar(
-        backgroundColor: FastTheme.bgSecondary,
-        iconTheme: IconThemeData(color: FastTheme.accentGold),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 64, color: FastTheme.accentGold),
-              const SizedBox(height: 20),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: FastTheme.accentGold,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                desc,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: FastTheme.textMuted,
-                  height: 1.5,
-                ),
-              ),
-            ],
           ),
         ),
       ),

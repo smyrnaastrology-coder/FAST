@@ -353,6 +353,24 @@ class SocialService {
     }
   }
 
+  /// [myProfile] ile aynı sorgu, ancak hatayı yutmaz.
+  ///
+  /// "Profil yok" ile "profil henüz yüklenemedi" durumunu ayırt etmek için
+  /// kullanılır; aksi halde giriş anındaki geçici bir hata kullanıcıyı
+  /// yanlışlıkla "profil oluştur" ekranına düşürüyordu.
+  static Future<SocialProfile?> myProfileStrict() async {
+    if (!enabled) return null;
+    // Oturum kimliği henüz hazır değilse "profil yok" demek yanlış olur;
+    // çağıran taraf bunu yüklenemedi olarak ele alıp tekrar dener.
+    if (_me.isEmpty) throw StateError('no-session');
+    final r = await _c
+        .from('social_profiles')
+        .select()
+        .eq('user_id', _me)
+        .maybeSingle();
+    return r == null ? null : SocialProfile.fromMap(r);
+  }
+
   static Future<SocialProfile?> profileByUser(String userId) async {
     if (!enabled || userId.isEmpty) return null;
     try {

@@ -17,6 +17,14 @@ class SocialProvider extends ChangeNotifier {
   bool _loadingMore = false;
   bool _hasMore = true;
   bool _initialized = false;
+  bool _refreshing = false;
+
+  /// Profilin gerçekten sorgulandığı ve sonucun kesinleştiği durum.
+  ///
+  /// `hasHandle == false` tek başına "profil yok" demek değildir: veri henüz
+  /// yüklenmemiş veya geçici bir hata olmuş olabilir. Bu bayrak true olmadan
+  /// "profil oluştur" ekranı gösterilmez.
+  bool _profileVerified = false;
 
   static const int _pageSize = 15;
 
@@ -39,6 +47,10 @@ class SocialProvider extends ChangeNotifier {
   /// Kullanıcının sosyal profili var mı (handle aldı mı)?
   bool get hasHandle => _myProfile != null;
 
+  /// Profil sorgusu tamamlandı mı? false ise ekran "yükleniyor" göstermelidir;
+  /// bu durumda profil yokmuş gibi davranmak yanlış olur.
+  bool get profileVerified => _profileVerified;
+
   bool get enabled => SocialService.enabled;
   bool get signedIn =>
       SocialService.enabled &&
@@ -55,34 +67,55 @@ class SocialProvider extends ChangeNotifier {
   }
 
   /// Feed'i baştan çeker (pull-to-refresh).
+  ///
+  /// Profil sorgusu feed/blok sorgularından AYRI ve önce çalışır. Böylece
+  /// giriş anında feed tarafındaki geçici bir hata, kullanıcının var olan
+  /// profilini "yok" gibi göstermez.
   Future<void> refresh() async {
-    if (!enabled || !signedIn) return;
+    if (!enabled || !signedIn || _refreshing) return;
+    _refreshing = true;
     _status = SocialStatus.loading;
     _error = null;
     notifyListeners();
 
     try {
-      _blocked = await SocialService.blockedIds();
-      await SocialService.syncProStatus();
-      unawaited(SocialService.syncKunye());
-      _myProfile = await SocialService.myProfile();
-      final page = await SocialService.fetchFeed(
-        limit: _pageSize,
-        offset: 0,
-        blocked: _blocked,
-        onlyFollowing: _followingOnly,
-      );
-      _feed
-        ..clear()
-        ..addAll(page);
-      _hasMore = page.length >= _pageSize;
-      _status = SocialStatus.ready;
-    } catch (e) {
-      // Hata "boş feed" olarak yutulmaz — kullanıcı retry görebilsin.
-      _status = SocialStatus.error;
-      _error = _describe(e);
+      // 1) Profil: kesin sonuç (var / yok / hata).
+      try {
+        _myProfile = await SocialService.myProfileStrict();
+        _profileVerified = true;
+      } catch (e) {
+        _profileVerified = false;
+        _status = SocialStatus.error;
+        _error = _describe(e);
+      }
+
+      // 2) Feed ve sosyal veriler: profil sonucu ne olursa olsun dene.
+      try {
+        _blocked = await SocialService.blockedIds();
+        await SocialService.syncProStatus();
+        unawaited(SocialService.syncKunye());
+        final page = await SocialService.fetchFeed(
+          limit: _pageSize,
+          offset: 0,
+          blocked: _blocked,
+          onlyFollowing: _followingOnly,
+        );
+        _feed
+          ..clear()
+          ..addAll(page);
+        _hasMore = page.length >= _pageSize;
+        if (_profileVerified) _status = SocialStatus.ready;
+      } catch (e) {
+        // Hata "boş feed" olarak yutulmaz — kullanıcı retry görebilsin.
+        if (_profileVerified) {
+          _status = SocialStatus.error;
+          _error = _describe(e);
+        }
+      }
+    } finally {
+      _refreshing = false;
+      notifyListeners();
     }
-    notifyListeners();
     refreshStories();
   }
 
@@ -215,9 +248,17 @@ class SocialProvider extends ChangeNotifier {
 
   Future<void> refreshProfile() async {
     if (!enabled || !signedIn) return;
-    await SocialService.syncProStatus();
-    await SocialService.syncKunye();
-    _myProfile = await SocialService.myProfile();
+    try {
+      await SocialService.syncProStatus();
+      await SocialService.syncKunye();
+      _myProfile = await SocialService.myProfileStrict();
+      _profileVerified = true;
+      _status = SocialStatus.ready;
+    } catch (e) {
+      _profileVerified = false;
+      _status = SocialStatus.error;
+      _error = _describe(e);
+    }
     notifyListeners();
   }
 
@@ -231,6 +272,9 @@ class SocialProvider extends ChangeNotifier {
       _stories.clear();
       _blocked = {};
       _status = SocialStatus.idle;
+      _profileVerified = false;
+      _initialized = false;
+      _refreshing = false;
       notifyListeners();
       return;
     }
