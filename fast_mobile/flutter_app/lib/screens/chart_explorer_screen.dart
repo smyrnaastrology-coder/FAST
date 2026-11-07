@@ -288,9 +288,16 @@ class _ChartExplorerScreenState extends State<ChartExplorerScreen> {
         );
       }
       if (!mounted || !social.signedIn) return;
-      if (!social.hasHandle) {
+      if (!social.profileVerified || !social.hasHandle) {
         await social.refreshProfile();
         if (!mounted) return;
+        if (!social.profileVerified) {
+          // Geçici hata: profil yokmuş gibi kayıt ekranına düşürme.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.socialRetry)),
+          );
+          return;
+        }
         if (!social.hasHandle) {
           await Navigator.of(context).push(
             MaterialPageRoute(
