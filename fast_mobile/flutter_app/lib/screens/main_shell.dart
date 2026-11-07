@@ -19,6 +19,7 @@ import 'profile_screen.dart';
 import 'settings_screen.dart';
 import 'chart_list_screen.dart';
 import '../widgets/chart_mark.dart';
+import '../widgets/first_run_onboarding.dart';
 
 /// Uygulama kabuÄŸu (Hub): tek giriÅŸten 3 sÃ¼tuna eriÅŸim â€”
 /// Sosyal Â· Fast Synastry Â· Horary Oracle. Ãœstte profil.
@@ -30,6 +31,8 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  static const _onboardingPrefKey = 'holavon_onboarding_v1';
+
   bool _wasLoggedIn = false;
   AuthProvider? _ap;
 
@@ -43,7 +46,47 @@ class _MainShellState extends State<MainShell> {
       ap.addListener(_onAuth);
       final sp = context.read<SocialProvider>();
       if (sp.enabled && sp.signedIn) sp.init();
+      _maybeShowFirstRun();
     });
+  }
+
+  /// İlk girişte 3 adımlı tanıtımı göster; bir kez gösterilir.
+  Future<void> _maybeShowFirstRun() async {
+    bool done = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      done = prefs.getBool(_onboardingPrefKey) ?? false;
+    } catch (_) {
+      return;
+    }
+    if (done || !mounted) return;
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'onboarding',
+      barrierColor: Colors.black.withValues(alpha: 0.86),
+      transitionDuration: const Duration(milliseconds: 220),
+      transitionBuilder: (_, anim, _, child) =>
+          FadeTransition(opacity: anim, child: child),
+      pageBuilder: (_, _, _) => FirstRunOnboarding(
+        onStart: (question) async {
+          await _markOnboardingDone();
+          if (!mounted) return;
+          _push(HoraryScreen(
+            initialQuestion: question,
+            skipIntro: true,
+          ));
+        },
+        onSkip: _markOnboardingDone,
+      ),
+    );
+  }
+
+  Future<void> _markOnboardingDone() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_onboardingPrefKey, true);
+    } catch (_) {}
   }
 
   void _onAuth() {

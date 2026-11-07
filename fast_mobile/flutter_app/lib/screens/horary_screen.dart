@@ -18,11 +18,24 @@ import 'landing_screen.dart';
 /// Horary Oracle: soru anının haritasıyla chat gibi cevap.
 /// horary_mobile tam deneyiminin Holavon portu (TTS/STT hariç).
 class HoraryScreen extends StatefulWidget {
-  const HoraryScreen({super.key, this.quotaLoader});
+  const HoraryScreen({
+    super.key,
+    this.quotaLoader,
+    this.initialQuestion,
+    this.skipIntro = false,
+  });
 
   /// Optional quota source for isolated widget tests.
   @visibleForTesting
   final Future<HoraryResult> Function()? quotaLoader;
+
+  /// İlk kurulum akışından gelindiyse soru kutusuna önceden doldurulur.
+  /// Kullanıcı yine de göndermeden önce düzenleyebilir.
+  final String? initialQuestion;
+
+  /// Uygulama ilk kurulumu zaten anlattıysa horary'nin ayrı tanıtım
+  /// diyaloğunu tekrar gösterme.
+  final bool skipIntro;
 
   @override
   State<HoraryScreen> createState() => _HoraryScreenState();
@@ -71,7 +84,9 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     WidgetsBinding.instance.addObserver(this);
     _determinePosition();
     _loadQuota();
-    _loadChat();
+    _loadChat().then((_) {
+      if (mounted) _applyInitialQuestion();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowIntro());
   }
 
@@ -601,6 +616,19 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
     } catch (_) {}
   }
 
+  /// Onboarding'den gelen soruyu kutuya koy, kullanıcı düzenleyip göndersin.
+  void _applyInitialQuestion() {
+    final q = widget.initialQuestion?.trim();
+    if (q == null || q.isEmpty) return;
+    setState(() {
+      _showLanding = false;
+      _questionCtrl.text = q;
+      _questionCtrl.selection =
+          TextSelection.collapsed(offset: _questionCtrl.text.length);
+    });
+    _scrollDown();
+  }
+
   Future<void> _shareText(String text) async {
     if (text.trim().isEmpty) return;
     await Share.share(text);
@@ -608,6 +636,7 @@ class _HoraryScreenState extends State<HoraryScreen> with WidgetsBindingObserver
 
   /// "Doğru Soru Sormak" öğretisini bir kez göster.
   Future<void> _maybeShowIntro() async {
+    if (widget.skipIntro) return;
     try {
       final prefs = await SharedPreferences.getInstance();
       if (prefs.getBool('holavon_horary_intro_shown') == true) return;
