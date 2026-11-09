@@ -81,6 +81,46 @@ class CastRequest(BaseModel):
     # kalibrasyon/doğrulama: gerçek konum şehir adı (tahmine asla karışmaz, sadece kayıt)
     verify_city: Optional[str] = None
 
+
+def _horary_language_instructions(lang: str) -> tuple[str, str]:
+    """Return conversational tone and pre-summary instructions in the UI language."""
+    language = (lang or "tr").lower()
+    if language == "es":
+        return (
+            "Estilo: cálido, natural y cercano, como una conversación entre amigos. "
+            "Usa párrafos cortos, evita tecnicismos y habla de forma humana. Si preguntan "
+            "dónde está una persona, describe un entorno posible (casa, trabajo, escuela, "
+            "hospital, camino, parque, café o casa de un familiar), no 'al lado de una caja'.",
+            "PRIMERO resume en una frase lo que entendiste: 'Entiendo: [quién] [qué] "
+            "[dónde/cuándo].' No preguntes '¿verdad?'; pasa directamente al veredicto.",
+        )
+    if language == "en":
+        return (
+            "Style: warm, natural, and friendly, like a conversation between friends. "
+            "Use short paragraphs, avoid technical jargon, and speak humanly. If asked "
+            "where someone is, describe a possible environment (home, work, school, "
+            "hospital, road, park, cafe, or a relative's home), not 'next to a box'.",
+            "FIRST, summarize what you understood in one sentence: 'I understand: [who] "
+            "[what] [where/when].' Do not ask 'is that right?'; go straight to the verdict.",
+        )
+    if language == "tr":
+        return (
+            "Üslup: sıcak, doğal, muhabbet gibi dostça anlat; kısa paragraflar kullan, "
+            "teknik terimlerden kaçın ve insan gibi konuş. İnsan nerede diye sorulduğunda "
+            "eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, "
+            "yol, park, kafe, akraba yanı gibi).",
+            "ÖNCE tek cümlede ne anladığını özetle: 'Anladığım: [kim] [ne] "
+            "[nerede/ne zaman].' diye belirt; 'doğru mu?' diye sorma, doğrudan hükme geç.",
+        )
+    # The interpreter receives the requested language separately; English here is
+    # only a control instruction for the other supported locales.
+    return (
+        "Style: warm, natural, and friendly, like a conversation between friends. "
+        "Use short paragraphs, avoid technical jargon, and speak humanly.",
+        "FIRST, summarize what you understood in one sentence. Do not ask for "
+        "confirmation; go straight to the verdict.",
+    )
+
 class AuthRequest(BaseModel):
     email: str
     password: str
@@ -1025,18 +1065,24 @@ async def _cast(req: CastRequest, *, holavon=None):
         if _left is None:
             return {"verdict":"NO_CREDITS","score":0,"perfection":{},"timing":{},"querent":{},"quesited":{},"houses":{},"strictures":[],"lots":{},"location":{},"credits_left":0,"answer":"Krediniz bitti. Lutfen kredi paketi alin.","meta":{}}
         engine_json["credits_left"] = _left
+    # Conversation and one-line summary instructions must follow the selected UI language.
+    _tone_instruction, _pre_summary_instruction = _horary_language_instructions(req.lang)
     # muhabbet tonu (genel horary icin) - spor gol sorusu haric sicak dostca
     if not any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
-        engine_json["tone_instruction"] = "Üslup: sıcak, doğal, muhabbet gibi dostça anlat, kısa paragraflar, teknik terimlerden kaçın, insan gibi konuş. Dünkü insancıl tonu koru. İnsan nerede diye sorulduğunda eşya gibi 'kutu yanında' deme; mekan ve ortam belirt (ev, iş, okul, hastane, yol, park, kafe, akraba yanı gibi)."
-    # anlama öncesi özet - ne anladığını tek cümlede özetle, teyit sorma
-    engine_json["pre_summary_instruction"] = "ÖNCE tek cümlede ne anladığını özetle: 'Anladığım: [kim] [ne] [nerede/ne zaman].' diye belirt, 'doğru mu?' diye sorma, doğrudan hükme geç."
+        engine_json["tone_instruction"] = _tone_instruction
+    engine_json["pre_summary_instruction"] = _pre_summary_instruction
     # visitor/dream için prompt'a gizli talimat ekle (dışarıda görünmez)
     if is_visitor_who or is_visitor_why or is_dream:
         hidden = []
         if is_visitor_who: hidden.append("WHO: ASC ve yöneticisinin burç/ev/sabit yıldızına göre karakteri muhabbet gibi anlat")
         if is_visitor_why: hidden.append("WHY: 7.yönetici evi + Ay evi + 3.ev ile niyeti anlat")
         if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
-        engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
+        if req.lang == "es":
+            engine_json["hidden_instruction"] = "Pregunta con análisis especial: " + " | ".join(hidden) + " - responde de forma humana y en español."
+        elif req.lang == "en":
+            engine_json["hidden_instruction"] = "Question with special analysis: " + " | ".join(hidden) + " - answer naturally in English."
+        else:
+            engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
     # GUVEN KATMANI hesaplaniyor; talimat sona eklenir (asagida).
     _trust_txt = ""
     if res["verdict"] == "LOCATION":

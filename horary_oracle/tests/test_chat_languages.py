@@ -36,6 +36,19 @@ def test_sign_correction_keeps_the_requested_language():
     assert _correct_planet_hallucination("Jupiter Aries", chart, "es") == "Jupiter Sagitario"
 
 
+def test_horary_summary_instruction_uses_selected_language():
+    tone, summary = api._horary_language_instructions("es")
+    assert "Entiendo:" in summary
+    assert "Anladığım" not in summary
+    assert "amigos" in tone
+
+    _, turkish_summary = api._horary_language_instructions("tr")
+    assert "Anladığım:" in turkish_summary
+
+    _, english_summary = api._horary_language_instructions("en")
+    assert "I understand:" in english_summary
+
+
 def test_offline_fallback_does_not_return_turkish_in_english_or_spanish():
     chart = {"verdict": "YES"}
     assert "preliminary verdict is yes" in _localized_fallback(chart, "en")
