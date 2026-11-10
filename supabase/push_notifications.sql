@@ -80,6 +80,10 @@ begin
 end;
 $$;
 
+-- Functions are executable by PUBLIC by default; close that before granting
+-- only the signed-in role. Anonymous callers must never reach this RPC.
+revoke all on function public.register_device_token(text, text, text, text) from public;
+revoke all on function public.register_device_token(text, text, text, text) from anon;
 grant execute on function public.register_device_token(text, text, text, text) to authenticated;
 
 -- Remove this device when the user signs out (only their own row).
@@ -99,6 +103,8 @@ begin
 end;
 $$;
 
+revoke all on function public.unregister_device_token(text) from public;
+revoke all on function public.unregister_device_token(text) from anon;
 grant execute on function public.unregister_device_token(text) to authenticated;
 
 -- ----------------------------------------------------------------------------
@@ -215,6 +221,11 @@ exception
 end;
 $$;
 
+-- Trigger-only function: no client role needs direct RPC access.
+revoke all on function public.notify_social_push() from public;
+revoke all on function public.notify_social_push() from anon;
+revoke all on function public.notify_social_push() from authenticated;
+
 drop trigger if exists trg_push_like on public.likes;
 create trigger trg_push_like
   after insert on public.likes
@@ -236,6 +247,11 @@ set search_path = public
 as $$
   delete from public.device_tokens where updated_at < now() - interval '180 days';
 $$;
+
+-- Maintenance function: callable by the owner/cron only, never by the API.
+revoke all on function public.prune_device_tokens() from public;
+revoke all on function public.prune_device_tokens() from anon;
+revoke all on function public.prune_device_tokens() from authenticated;
 
 -- To change the secret later:
 --   update public.push_config set secret = 'NEW_SECRET' where id = 1;
