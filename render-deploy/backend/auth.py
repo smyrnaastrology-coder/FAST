@@ -104,6 +104,10 @@ def _pg_ensure_schema():
                     updated_at DOUBLE PRECISION
                 );
                 CREATE INDEX IF NOT EXISTS idx_auth_people_owner ON auth_people(owner_id);
+                -- These tables are backend-only. RLS keeps them off the public
+                -- PostgREST API while the owner connection below still works.
+                ALTER TABLE IF EXISTS auth_profiles ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS auth_people   ENABLE ROW LEVEL SECURITY;
             """)
         conn.commit()
     except Exception as e:

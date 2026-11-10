@@ -117,6 +117,15 @@ def _pg_ensure_schema():
                     input JSONB,
                     created_at DOUBLE PRECISION
                 );
+                -- Backend-only tables: RLS blocks the public PostgREST API.
+                -- The direct DATABASE_URL connection is the table owner and
+                -- keeps bypassing RLS, so no policies are required.
+                ALTER TABLE IF EXISTS billing_subs        ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS billing_free        ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS billing_pdf_single  ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS billing_pdf_credits ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS billing_pdf_txns    ENABLE ROW LEVEL SECURITY;
+                ALTER TABLE IF EXISTS analysis_sessions   ENABLE ROW LEVEL SECURITY;
             """)
         conn.commit()
     finally:
