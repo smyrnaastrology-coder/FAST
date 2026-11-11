@@ -4399,7 +4399,7 @@ abstract class AppLocalizations {
   /// No description provided for @hubChoose.
   ///
   /// In en, this message translates to:
-  /// **'Where to?'**
+  /// **'Start with a Horary question'**
   String get hubChoose;
 
   /// No description provided for @hubSocialTitle.
@@ -4435,7 +4435,7 @@ abstract class AppLocalizations {
   /// No description provided for @hubHoraryDesc.
   ///
   /// In en, this message translates to:
-  /// **'A clear answer from the chart of the moment'**
+  /// **'A question-led chart: the relevant house, significator and timing are derived from what you ask'**
   String get hubHoraryDesc;
 
   /// No description provided for @hubChartsTitle.

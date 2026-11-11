@@ -2373,7 +2373,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hubWelcome => 'Welcome';
 
   @override
-  String get hubChoose => 'Where to?';
+  String get hubChoose => 'Start with a Horary question';
 
   @override
   String get hubSocialTitle => 'Holavon';
@@ -2391,7 +2391,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hubHoraryTitle => 'Horary Oracle';
 
   @override
-  String get hubHoraryDesc => 'A clear answer from the chart of the moment';
+  String get hubHoraryDesc =>
+      'A question-led chart: the relevant house, significator and timing are derived from what you ask';
 
   @override
   String get hubChartsTitle => 'My Charts';

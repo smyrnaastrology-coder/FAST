@@ -2364,7 +2364,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hubWelcome => 'Hoş geldin';
 
   @override
-  String get hubChoose => 'Nereye gidelim?';
+  String get hubChoose => 'Horary sorunu sorarak başla';
 
   @override
   String get hubSocialTitle => 'Holavon';
@@ -2382,7 +2382,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get hubHoraryTitle => 'Horary Oracle';
 
   @override
-  String get hubHoraryDesc => 'Soru anının haritasıyla net cevap';
+  String get hubHoraryDesc =>
+      'Soruna göre ilgili ev, gösterge ve zamanlamayı belirleyen soru odaklı harita';
 
   @override
   String get hubChartsTitle => 'Haritalarım';

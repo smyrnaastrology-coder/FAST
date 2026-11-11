@@ -2394,7 +2394,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hubWelcome => 'Bienvenido';
 
   @override
-  String get hubChoose => '¿A dónde vamos?';
+  String get hubChoose => 'Empieza con una pregunta horaria';
 
   @override
   String get hubSocialTitle => 'Holavon';
@@ -2413,7 +2413,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get hubHoraryTitle => 'Horary Oracle';
 
   @override
-  String get hubHoraryDesc => 'Una respuesta clara desde la carta del momento';
+  String get hubHoraryDesc =>
+      'Carta guiada por tu pregunta: determina la casa, el significador y el momento pertinente';
 
   @override
   String get hubChartsTitle => 'Mis cartas';

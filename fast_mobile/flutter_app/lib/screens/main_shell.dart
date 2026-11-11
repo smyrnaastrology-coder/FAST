@@ -70,11 +70,13 @@ class _MainShellState extends State<MainShell> {
         onStart: (question) async {
           await _markOnboardingDone();
           if (!mounted) return;
-          _push(HoraryScreen(
-            initialQuestion: question,
-            skipIntro: true,
-            autoAsk: true,
-          ));
+          _push(
+            HoraryScreen(
+              initialQuestion: question,
+              skipIntro: true,
+              autoAsk: true,
+            ),
+          );
         },
         onSkip: _markOnboardingDone,
       ),
@@ -333,28 +335,17 @@ class _MainShellState extends State<MainShell> {
                     children: [
                       const SkyStrip(),
                       _PillarCard(
-                        icon: Icons.people_alt_outlined,
-                        activeIcon: Icons.people_alt,
-                        asset: 'assets/holavon_logo.png',
-                        title: l10n.hubSocialTitle,
-                        desc: l10n.hubSocialDesc,
-                        colors: [FastTheme.accentGold, FastTheme.accentGoldLight],
-                        onTap: () =>
-                            _push(const SocialGate()),
-                      ),
-                      const SizedBox(height: 16),
-                      _PillarCard(
-                        icon: Icons.auto_awesome_outlined,
-                        activeIcon: Icons.auto_awesome,
+                        icon: Icons.auto_stories_outlined,
+                        activeIcon: Icons.auto_stories,
                         asset: 'assets/horary_oracle_logo.png',
-                        title: l10n.hubAnalysisTitle,
-                        desc: l10n.hubAnalysisDesc,
-                        colors: [FastTheme.secondary, FastTheme.accent],
+                        title: l10n.hubHoraryTitle,
+                        desc: l10n.hubHoraryDesc,
+                        colors: [FastTheme.accentGold, FastTheme.rose],
                         onTap: () => _pushWithNotice(
-                          prefKey: 'holavon_synastry_notice_v1',
-                          title: l10n.warningTitle,
-                          body: l10n.warningBody,
-                          screen: const AnalyzerScreen(),
+                          prefKey: 'holavon_horary_notice_v1',
+                          title: l10n.horaryIntroTitle,
+                          body: l10n.horaryNoticeBody,
+                          screen: const HoraryScreen(),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -369,18 +360,31 @@ class _MainShellState extends State<MainShell> {
                       ),
                       const SizedBox(height: 16),
                       _PillarCard(
-                        icon: Icons.auto_stories_outlined,
-                        activeIcon: Icons.auto_stories,
+                        icon: Icons.auto_awesome_outlined,
+                        activeIcon: Icons.auto_awesome,
                         asset: 'assets/fast_synastry_logo.png',
-                        title: l10n.hubHoraryTitle,
-                        desc: l10n.hubHoraryDesc,
-                        colors: [FastTheme.rose, FastTheme.secondary],
+                        title: l10n.hubAnalysisTitle,
+                        desc: l10n.hubAnalysisDesc,
+                        colors: [FastTheme.secondary, FastTheme.accent],
                         onTap: () => _pushWithNotice(
-                          prefKey: 'holavon_horary_notice_v1',
-                          title: l10n.horaryIntroTitle,
-                          body: l10n.horaryNoticeBody,
-                          screen: const HoraryScreen(),
+                          prefKey: 'holavon_synastry_notice_v1',
+                          title: l10n.warningTitle,
+                          body: l10n.warningBody,
+                          screen: const AnalyzerScreen(),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      _PillarCard(
+                        icon: Icons.people_alt_outlined,
+                        activeIcon: Icons.people_alt,
+                        asset: 'assets/holavon_logo.png',
+                        title: l10n.hubSocialTitle,
+                        desc: l10n.hubSocialDesc,
+                        colors: [
+                          FastTheme.accentGold,
+                          FastTheme.accentGoldLight,
+                        ],
+                        onTap: () => _push(const SocialGate()),
                       ),
                     ],
                   ),
@@ -451,19 +455,24 @@ class _PillarCard extends StatelessWidget {
                     gradient: LinearGradient(colors: colors),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: emblem ?? (asset == null
-                      ? Icon(activeIcon, color: FastTheme.bg, size: 28)
-                      : Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: ClipOval(
-                            child: Image.asset(
-                              asset!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) =>
-                                  Icon(activeIcon, color: FastTheme.bg, size: 28),
-                            ),
-                          ),
-                        )),
+                  child:
+                      emblem ??
+                      (asset == null
+                          ? Icon(activeIcon, color: FastTheme.bg, size: 28)
+                          : Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  asset!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Icon(
+                                    activeIcon,
+                                    color: FastTheme.bg,
+                                    size: 28,
+                                  ),
+                                ),
+                              ),
+                            )),
                 ),
                 const SizedBox(width: 18),
                 Expanded(

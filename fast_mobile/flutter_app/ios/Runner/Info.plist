@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Holavon</string>
+	<string>Holavon Horary</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -71,13 +71,13 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Horary soruları için konumunuz kullanılır.</string>
+	<string>Your location is used to cast a Horary chart for your question. It is accessed only while you use the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Horary sorusunu sorduğunuz andaki konumu belirlemek için konumunuza erişilir. Konumunuz arka planda kullanılmaz.</string>
+	<string>Your location is used only to cast a Horary chart when you ask a question; it is not used in the background.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Horary sorularını sesle dikte edip metne çevirebilmeniz için mikrofon kullanılır.</string>
+	<string>The microphone lets you dictate a Horary question. Audio is transcribed on your device and is not uploaded.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Konuştuğunuz Horary sorusunu metne çevirmek için konuşma tanıma kullanılır.</string>
+	<string>Speech recognition converts your spoken Horary question into text on your device.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -90,10 +90,10 @@
 		</dict>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Holavon, gönderi ve hikâye için fotoğraf çekebilmeniz amacıyla kamerayı kullanır.</string>
+	<string>The camera lets you take photos to share in Holavon posts and stories.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Holavon, gönderi ve hikâye paylaşabilmeniz için fotoğraf galerinize erişir.</string>
+	<string>Photo library access lets you choose images to share in Holavon posts and stories.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Holavon, oluşturduğunuz harita görsellerini fotoğraf galerinize kaydedebilmek için izin ister.</string>
+	<string>Photo library access lets you save chart images that you create.</string>
 </dict>
 </plist>
