@@ -469,6 +469,15 @@ def _correct_past_date_hallucination(text: str, engine_json: dict, lang: str = "
 def call_openai(engine_json: dict, lang="tr") -> str:
     """Yorum katmanlari: engine.tiers merdiveni (local < basic < plus < pro).
     Bos metin/hatada bir alt katmana dusulur; en altta yerel deterministik yorum vardir."""
+    # Lost-object questions need a chart-grounded search order, not a generic
+    # list of planetary placements. Keep this bounded and deterministic.
+    try:
+        from engine.lost_item_response import build_lost_item_answer
+        lost_item_answer = build_lost_item_answer(engine_json, lang)
+        if lost_item_answer:
+            return lost_item_answer
+    except Exception as e:
+        print(f"lost_item_response hata: {e}")
     import os
     if not os.getenv("OPENAI_API_KEY"):
         return _localized_fallback(engine_json, lang)
