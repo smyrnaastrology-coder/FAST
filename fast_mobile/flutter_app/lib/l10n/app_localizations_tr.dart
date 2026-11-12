@@ -1051,6 +1051,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get themePaletteArgentina => 'Arjantin Mavisi (Açık)';
 
   @override
+  String get themePaletteGold => 'Altın (Koyu)';
+
+  @override
   String get chartTabSituaA => 'Oturan A';
 
   @override
@@ -2384,6 +2387,13 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get hubHoraryDesc =>
       'Soruna göre ilgili ev, gösterge ve zamanlamayı belirleyen soru odaklı harita';
+
+  @override
+  String get hubFeatured => 'ÖNE ÇIKAN';
+
+  @override
+  String get hubProBannerDesc =>
+      'Sınırsız PDF, günlük kişisel yorum ve Pro ayrıcalıkları';
 
   @override
   String get hubChartsTitle => 'Haritalarım';

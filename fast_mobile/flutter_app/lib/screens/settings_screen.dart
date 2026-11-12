@@ -60,7 +60,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const LandingScreen(asPaywall: true)),
       );
-      return;
+      if (!mounted) return;
+      // Satın alma sonrası önbelleği atlayıp Pro'yu yeniden doğrula; aksi
+      // halde kullanıcı ödeme yapmış olsa da tekrar ödeme ekranına düşer.
+      final pro = await ProService.isPro(refresh: true);
+      if (!mounted) return;
+      setState(() => _pro = pro);
+      if (!pro) return;
     }
     setState(() => _reminder = on);
     try {
@@ -331,7 +337,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _tile(
             icon: Icons.info_outline,
             title: l10n.settingsVersion,
-            subtitle: '1.0.14 (74)',
+            subtitle: '1.0.18 (83)',
             onTap: null,
           ),
           _tile(

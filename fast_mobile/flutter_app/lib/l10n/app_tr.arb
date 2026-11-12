@@ -322,6 +322,7 @@
   "themePaletteLight": "Yumuşak Krem (Açık)",
   "themePaletteSpain": "İspanya Kırmızısı (Koyu)",
   "themePaletteArgentina": "Arjantin Mavisi (Açık)",
+  "themePaletteGold": "Altın (Koyu)",
   "@themePickerTitle": {
     "description": "Tema seçim penceresi başlığı"
   },
@@ -816,6 +817,8 @@
   "hubAnalysisDesc": "Sinastri, natal ve potansiyel analizleri",
   "hubHoraryTitle": "Horary Oracle",
   "hubHoraryDesc": "Soruna göre ilgili ev, gösterge ve zamanlamayı belirleyen soru odaklı harita",
+  "hubFeatured": "ÖNE ÇIKAN",
+  "hubProBannerDesc": "Sınırsız PDF, günlük kişisel yorum ve Pro ayrıcalıkları",
   "hubChartsTitle": "Haritalarım",
   "hubChartsDesc": "Natal haritanı oluştur ve incele",
   "horaryTitle": "Horary Oracle",

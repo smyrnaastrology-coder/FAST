@@ -8,6 +8,8 @@ import '../providers/theme_provider.dart';
 /// Palet kimliğine göre yerelleştirilmiş ad.
 String themePaletteLabel(AppLocalizations l10n, String id) {
   switch (id) {
+    case 'gold':
+      return l10n.themePaletteGold;
     case 'spain':
       return l10n.themePaletteSpain;
     case 'argentina':

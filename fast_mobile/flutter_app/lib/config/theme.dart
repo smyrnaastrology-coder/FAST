@@ -55,6 +55,18 @@ class FastTheme {
   static const Color argCardBgHover = Color(0xFFEAF3FB);
   static const Color argBorder = Color(0xFFBFD6E9);
 
+  // ── Gold (koyu, gece mürekkebi + altın) ──
+  static const Color goldPrimary = Color(0xFF8A6A2F);
+  static const Color goldPrimaryLight = Color(0xFFC9A24B);
+  static const Color goldAccentGold = Color(0xFFE8C877);
+  static const Color goldAccentGoldLight = Color(0xFFF7E7B0);
+  static const Color goldAccentGoldGlow = Color(0x4DE8C877);
+  static const Color goldBg = Color(0xFF12100B);
+  static const Color goldBgSecondary = Color(0xFF1B1710);
+  static const Color goldCardBg = Color(0xFF262017);
+  static const Color goldCardBgHover = Color(0xFF332B1D);
+  static const Color goldBorder = Color(0xFF4C3F24);
+
   // ── Logo mavisi (yeni "h" ambleminin iç rengi) ──
   static const Color logoBlue = Color(0xFF3E8FE0);
   static const Color logoBlueLight = Color(0xFF7FC0FF);
@@ -85,7 +97,7 @@ class FastTheme {
   /// İsteğe bağlı: widget'ların aktif paleti izleyip rebuild edebilmesi.
   static ThemeMode mode = ThemeMode.dark;
 
-  /// Aktif palet kimliği ('dark' | 'light' | 'spain' | 'argentina').
+  /// Aktif palet kimliği ('dark' | 'light' | 'spain' | 'argentina' | 'gold').
   static String palette = 'dark';
 
   /// Aktif paleti değiştirir. Tüm statik renkler güncellenir.
@@ -93,16 +105,25 @@ class FastTheme {
     mode = newMode;
     if (newMode == ThemeMode.dark) {
       final isSpain = palette == 'spain';
-      primary = isSpain ? spainPrimary : darkPrimary;
-      primaryLight = isSpain ? spainPrimaryLight : darkPrimaryLight;
-      accentGold = isSpain ? spainAccentGold : darkAccentGold;
-      accentGoldLight = isSpain ? spainAccentGoldLight : darkAccentGoldLight;
-      accentGoldGlow = isSpain ? spainAccentGoldGlow : darkAccentGoldGlow;
-      bg = isSpain ? spainBg : darkBg;
-      bgSecondary = isSpain ? spainBgSecondary : darkBgSecondary;
-      cardBg = isSpain ? spainCardBg : darkCardBg;
-      cardBgHover = isSpain ? spainCardBgHover : darkCardBgHover;
-      border = isSpain ? spainBorder : darkBorder;
+      final isGold = palette == 'gold';
+      primary = isGold ? goldPrimary : (isSpain ? spainPrimary : darkPrimary);
+      primaryLight =
+          isGold ? goldPrimaryLight : (isSpain ? spainPrimaryLight : darkPrimaryLight);
+      accentGold =
+          isGold ? goldAccentGold : (isSpain ? spainAccentGold : darkAccentGold);
+      accentGoldLight = isGold
+          ? goldAccentGoldLight
+          : (isSpain ? spainAccentGoldLight : darkAccentGoldLight);
+      accentGoldGlow = isGold
+          ? goldAccentGoldGlow
+          : (isSpain ? spainAccentGoldGlow : darkAccentGoldGlow);
+      bg = isGold ? goldBg : (isSpain ? spainBg : darkBg);
+      bgSecondary =
+          isGold ? goldBgSecondary : (isSpain ? spainBgSecondary : darkBgSecondary);
+      cardBg = isGold ? goldCardBg : (isSpain ? spainCardBg : darkCardBg);
+      cardBgHover =
+          isGold ? goldCardBgHover : (isSpain ? spainCardBgHover : darkCardBgHover);
+      border = isGold ? goldBorder : (isSpain ? spainBorder : darkBorder);
       text = const Color(0xFFFFFFFF);
       textMuted = const Color(0xFFFFFFFF);
       textDim = const Color(0xFFFFFFFF);

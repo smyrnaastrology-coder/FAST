@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
 import '../providers/social_provider.dart';
 import '../services/social_service.dart';
+import '../services/pro_service.dart';
 import '../widgets/sky_strip.dart';
 import '../widgets/theme_palette_picker.dart';
 import 'analyzer_screen.dart';
@@ -33,6 +34,7 @@ class _MainShellState extends State<MainShell> {
 
   bool _wasLoggedIn = false;
   AuthProvider? _ap;
+  bool? _isPro;
 
   @override
   void initState() {
@@ -44,8 +46,38 @@ class _MainShellState extends State<MainShell> {
       ap.addListener(_onAuth);
       final sp = context.read<SocialProvider>();
       if (sp.enabled && sp.signedIn) sp.init();
+      _loadPro();
       _maybeShowFirstRun();
     });
+  }
+
+  Future<void> _loadPro({bool refresh = false}) async {
+    final pro = await ProService.isPro(refresh: refresh);
+    if (!mounted) return;
+    setState(() => _isPro = pro);
+  }
+
+  /// Pro satın alma ekranını açar; dönüşte Pro durumunu tazeler.
+  Future<void> _openPaywall() async {
+    await _pushAndWait(const LandingScreen(asPaywall: true));
+    if (!mounted) return;
+    await _loadPro(refresh: true);
+  }
+
+  Future<void> _pushAndWait(Widget screen) async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
+  /// Günlük kişisel yorum: doğrudan kişisel natal haritaya gider.
+  Future<void> _openDailyProgress() async {
+    // Bildirim hakkı Pro'ya bağlı olsa da yorum ekranının kendisi herkese
+    // açıktır; burada Pro kapısı yok. Böylece Pro olan kullanıcı tekrar
+    // ödeme ekranına düşmez.
+    await _pushAndWait(
+      const AnalyzerScreen(initialMode: 'bireysel_natal'),
+    );
   }
 
   /// İlk girişte 3 adımlı tanıtımı göster; bir kez gösterilir.
@@ -257,6 +289,125 @@ class _MainShellState extends State<MainShell> {
     );
   }
 
+  Widget _proChip(AppLocalizations l10n) {
+    final isPro = _isPro == true;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      child: Tooltip(
+        message: isPro ? l10n.settingsProActive : l10n.proEntry,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _openPaywall,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: FastTheme.accentGold.withValues(alpha: 0.75),
+                ),
+                gradient: LinearGradient(
+                  colors: [
+                    FastTheme.accentGold.withValues(alpha: 0.26),
+                    FastTheme.accentGold.withValues(alpha: 0.06),
+                  ],
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isPro
+                        ? Icons.workspace_premium
+                        : Icons.workspace_premium_outlined,
+                    color: FastTheme.accentGold,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'PRO',
+                    style: TextStyle(
+                      color: FastTheme.accentGold,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _proBanner(AppLocalizations l10n) {
+    final isPro = _isPro == true;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _openPaywall,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                FastTheme.accentGold.withValues(alpha: 0.30),
+                FastTheme.accentGold.withValues(alpha: 0.08),
+              ],
+            ),
+            border: Border.all(
+              color: FastTheme.accentGold.withValues(alpha: 0.55),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isPro ? Icons.verified : Icons.workspace_premium,
+                color: FastTheme.accentGold,
+                size: 26,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isPro ? l10n.settingsProActive : l10n.proEntry,
+                      style: TextStyle(
+                        color: FastTheme.accentGold,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isPro ? l10n.settingsManagePro : l10n.hubProBannerDesc,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: FastTheme.textMuted,
+                        fontSize: 11.5,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: FastTheme.accentGold),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -289,14 +440,7 @@ class _MainShellState extends State<MainShell> {
               onPressed: () => showThemePaletteSheet(context),
               icon: Icon(Icons.palette_outlined, color: FastTheme.accentGold),
             ),
-            IconButton(
-              tooltip: l10n.proEntry,
-              onPressed: () => _push(const LandingScreen(asPaywall: true)),
-              icon: Icon(
-                Icons.workspace_premium_outlined,
-                color: FastTheme.accentGold,
-              ),
-            ),
+            _proChip(l10n),
             IconButton(
               tooltip: l10n.navProfile,
               onPressed: () => _push(const ProfileScreen()),
@@ -334,12 +478,17 @@ class _MainShellState extends State<MainShell> {
                   child: ListView(
                     children: [
                       const SkyStrip(),
+                      const SizedBox(height: 14),
+                      _proBanner(l10n),
+                      const SizedBox(height: 14),
                       _PillarCard(
                         icon: Icons.auto_stories_outlined,
                         activeIcon: Icons.auto_stories,
                         asset: 'assets/fast_synastry_logo.png',
                         title: l10n.hubHoraryTitle,
                         desc: l10n.hubHoraryDesc,
+                        badge: l10n.hubFeatured,
+                        featured: true,
                         colors: [FastTheme.accentGold, FastTheme.rose],
                         onTap: () => _pushWithNotice(
                           prefKey: 'holavon_horary_notice_v1',
@@ -347,6 +496,12 @@ class _MainShellState extends State<MainShell> {
                           body: l10n.horaryNoticeBody,
                           screen: const HoraryScreen(),
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      _DailyProgressTile(
+                        onTap: _openDailyProgress,
+                        title: l10n.proPillarProgress,
+                        desc: l10n.proPillarProgressDesc,
                       ),
                       const SizedBox(height: 16),
                       _PillarCard(
@@ -407,6 +562,8 @@ class _PillarCard extends StatelessWidget {
   final String desc;
   final List<Color> colors;
   final VoidCallback onTap;
+  final bool featured;
+  final String? badge;
 
   const _PillarCard({
     required this.icon,
@@ -417,6 +574,8 @@ class _PillarCard extends StatelessWidget {
     required this.desc,
     required this.colors,
     required this.onTap,
+    this.featured = false,
+    this.badge,
   });
 
   @override
@@ -427,40 +586,64 @@ class _PillarCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: onTap,
         child: Ink(
-          height: 108,
+          height: featured ? 150 : 108,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                colors.first.withValues(alpha: 0.22),
-                colors.last.withValues(alpha: 0.08),
+                colors.first.withValues(alpha: featured ? 0.34 : 0.22),
+                colors.last.withValues(alpha: featured ? 0.14 : 0.08),
               ],
             ),
             border: Border.all(
-              color: colors.first.withValues(alpha: 0.4),
-              width: 1,
+              color: colors.first.withValues(alpha: featured ? 0.75 : 0.4),
+              width: featured ? 1.6 : 1,
             ),
+            boxShadow: featured
+                ? [
+                    BoxShadow(
+                      color: colors.first.withValues(alpha: 0.28),
+                      blurRadius: 22,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            padding: EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: featured ? 18 : 16,
+            ),
             child: Row(
               children: [
                 Container(
-                  width: 52,
-                  height: 52,
+                  width: featured ? 72 : 52,
+                  height: featured ? 72 : 52,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(colors: colors),
+                    boxShadow: featured
+                        ? [
+                            BoxShadow(
+                              color: colors.first.withValues(alpha: 0.55),
+                              blurRadius: 18,
+                            ),
+                          ]
+                        : null,
                   ),
                   clipBehavior: Clip.antiAlias,
                   child:
                       emblem ??
                       (asset == null
-                          ? Icon(activeIcon, color: FastTheme.bg, size: 28)
+                          ? Icon(
+                              activeIcon,
+                              color: FastTheme.bg,
+                              size: featured ? 34 : 28,
+                            )
                           : Padding(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(featured ? 5 : 4),
                               child: ClipOval(
                                 child: Image.asset(
                                   asset!,
@@ -468,7 +651,7 @@ class _PillarCard extends StatelessWidget {
                                   errorBuilder: (_, _, _) => Icon(
                                     activeIcon,
                                     color: FastTheme.bg,
-                                    size: 28,
+                                    size: featured ? 34 : 28,
                                   ),
                                 ),
                               ),
@@ -480,22 +663,46 @@ class _PillarCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (badge != null) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.first,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              color: FastTheme.bg,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.1,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                      ],
                       Text(
                         title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: FastTheme.textLight,
-                          fontSize: 18,
+                          fontSize: featured ? 21 : 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         desc,
-                        maxLines: 2,
+                        maxLines: featured ? 3 : 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: FastTheme.textMuted,
-                          fontSize: 12.5,
+                          fontSize: featured ? 13 : 12.5,
                           height: 1.3,
                         ),
                       ),
@@ -513,4 +720,82 @@ class _PillarCard extends StatelessWidget {
 }
 
 /// Sosyal servis kapalÄ±ysa (Supabase define yok) false dÃ¶ner.
+/// Günlük kişisel Minor Progress yorumuna giden kısa yol.
+class _DailyProgressTile extends StatelessWidget {
+  final VoidCallback onTap;
+  final String title;
+  final String desc;
+
+  const _DailyProgressTile({
+    required this.onTap,
+    required this.title,
+    required this.desc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: FastTheme.cardBg,
+            border: Border.all(color: FastTheme.border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: FastTheme.accentGold.withValues(alpha: 0.16),
+                ),
+                child: Icon(
+                  Icons.wb_sunny_outlined,
+                  color: FastTheme.accentGold,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: FastTheme.text,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      desc,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: FastTheme.textDim,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward, color: FastTheme.accentGold, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 bool socialAvailable() => SocialService.enabled;

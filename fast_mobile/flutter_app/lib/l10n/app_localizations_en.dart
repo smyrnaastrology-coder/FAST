@@ -1055,6 +1055,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePaletteArgentina => 'Argentina Blue (Light)';
 
   @override
+  String get themePaletteGold => 'Gold (Dark)';
+
+  @override
   String get chartTabSituaA => 'Chart A';
 
   @override
@@ -2393,6 +2396,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get hubHoraryDesc =>
       'A question-led chart: the relevant house, significator and timing are derived from what you ask';
+
+  @override
+  String get hubFeatured => 'FEATURED';
+
+  @override
+  String get hubProBannerDesc =>
+      'Unlimited PDFs, a daily personal reading and Pro perks';
 
   @override
   String get hubChartsTitle => 'My Charts';

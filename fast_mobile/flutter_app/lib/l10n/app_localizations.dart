@@ -2032,6 +2032,12 @@ abstract class AppLocalizations {
   /// **'Argentina Blue (Light)'**
   String get themePaletteArgentina;
 
+  /// No description provided for @themePaletteGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold (Dark)'**
+  String get themePaletteGold;
+
   /// No description provided for @chartTabSituaA.
   ///
   /// In en, this message translates to:
@@ -4437,6 +4443,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A question-led chart: the relevant house, significator and timing are derived from what you ask'**
   String get hubHoraryDesc;
+
+  /// No description provided for @hubFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'FEATURED'**
+  String get hubFeatured;
+
+  /// No description provided for @hubProBannerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited PDFs, a daily personal reading and Pro perks'**
+  String get hubProBannerDesc;
 
   /// No description provided for @hubChartsTitle.
   ///

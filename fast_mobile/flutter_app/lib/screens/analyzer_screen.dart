@@ -24,7 +24,6 @@ import '../widgets/language_switcher.dart';
 import '../widgets/holavon_mark.dart';
 import '../widgets/section_card.dart' as w;
 import '../widgets/premium_pdf_button.dart';
-import '../widgets/holavon_mark.dart';
 import 'auth_screen.dart';
 import 'create_post_screen.dart';
 
@@ -139,6 +138,49 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
     _mode = widget.initialMode;
     _loadDB();
     _loadPeople();
+    if (_isNatal) _prefillNatal();
+  }
+
+  /// Kişisel yorum kısayolundan/ bildirimden gelindiğinde kullanıcının
+  /// profilindeki doğum bilgilerini forma doldurur; böylece ekran doğrudan
+  /// işe yarar, kullanıcı aynı bilgileri tekrar yazmaz.
+  Future<void> _prefillNatal() async {
+    try {
+      final results = await Future.wait([
+        SocialService.myBirthInfo(),
+        SocialService.myProfile(),
+      ]);
+      final birth = results[0] as BirthInfo?;
+      final profile = results[1] as SocialProfile?;
+      if (!mounted) return;
+      final parsed = birth?.date == null ? null : _parseDate(birth!.date!);
+      final time = birth?.time?.trim() ?? '';
+      final city = birth?.city?.trim() ?? '';
+      final country = birth?.country?.trim() ?? '';
+      final name =
+          (profile?.displayName?.trim().isNotEmpty ?? false)
+              ? profile!.displayName!.trim()
+              : (profile?.username ?? '');
+      setState(() {
+        if (parsed != null && _p1TarihCtrl.text.trim().isEmpty) {
+          _p1TarihCtrl.text = _formatDate(parsed);
+        }
+        if (time.isNotEmpty && _p1SaatCtrl.text.trim().isEmpty) {
+          _p1SaatCtrl.text = time.length >= 5 ? time.substring(0, 5) : time;
+        }
+        if (city.isNotEmpty) _seciliSehir = city;
+        if (country.isNotEmpty) _seciliUlke = country;
+        if (birth?.lat != null) {
+          _latCtrl.text = birth!.lat!.toStringAsFixed(4);
+        }
+        if (birth?.lon != null) {
+          _lonCtrl.text = birth!.lon!.toStringAsFixed(4);
+        }
+        if (name.isNotEmpty && _p1IsimCtrl.text.trim().isEmpty) {
+          _p1IsimCtrl.text = name;
+        }
+      });
+    } catch (_) {}
   }
 
   Future<void> _loadPeople() async {

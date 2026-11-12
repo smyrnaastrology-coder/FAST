@@ -17,13 +17,18 @@ class ThemePalette {
   });
 }
 
-/// Koyu/açık + palet seçimi (Mor, Yumuşak Krem, İspanya, Arjantin).
+/// Koyu/açık + palet seçimi (Mor, Yumuşak Krem, İspanya, Arjantin, Altın).
 class ThemeProvider extends ChangeNotifier {
   static const _prefKey = 'theme_mode';
   static const _paletteKey = 'theme_palette';
 
   /// Kullanılabilir paletler.
   static const palettes = <ThemePalette>[
+    ThemePalette(
+      id: 'gold',
+      isDark: true,
+      colors: [FastTheme.goldBg, FastTheme.goldCardBg, FastTheme.goldAccentGold],
+    ),
     ThemePalette(
       id: 'dark',
       isDark: true,
