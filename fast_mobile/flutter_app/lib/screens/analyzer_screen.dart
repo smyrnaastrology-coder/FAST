@@ -3400,7 +3400,7 @@ class _AnalyzerScreenState extends State<AnalyzerScreen> {
           await Future.delayed(const Duration(milliseconds: 800));
         } catch (_) {}
         // Şimdi direkt ödeme ekranına git
-        final ok = await RevenueCatService.purchase('pdf_single');
+        final ok = await RevenueCatService.purchaseConsumable('pdf_single');
         if (!mounted) return;
         if (!ok && !RevenueCatService.lastAlreadyOwned) {
           // Kullanıcı ödeme ekranını kapattı (vazgeçti): sarmala girmeden DUR.

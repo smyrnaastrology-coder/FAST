@@ -1082,7 +1082,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           await PdfRepurchaseService.consumeOwnedPdfSingle();
           await Future.delayed(const Duration(milliseconds: 800));
         } catch (_) {}
-        final ok = await RevenueCatService.purchase('pdf_single');
+        final ok = await RevenueCatService.purchaseConsumable('pdf_single');
         if (!mounted) return;
         if (!ok && !RevenueCatService.lastAlreadyOwned) {
           // Kullanıcı ödeme ekranını kapattı (vazgeçti): sarmala girmeden DUR.
