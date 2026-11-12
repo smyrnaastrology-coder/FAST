@@ -337,7 +337,7 @@ class _MainShellState extends State<MainShell> {
                       _PillarCard(
                         icon: Icons.auto_stories_outlined,
                         activeIcon: Icons.auto_stories,
-                        asset: 'assets/horary_oracle_logo.png',
+                        asset: 'assets/fast_synastry_logo.png',
                         title: l10n.hubHoraryTitle,
                         desc: l10n.hubHoraryDesc,
                         colors: [FastTheme.accentGold, FastTheme.rose],
@@ -362,7 +362,7 @@ class _MainShellState extends State<MainShell> {
                       _PillarCard(
                         icon: Icons.auto_awesome_outlined,
                         activeIcon: Icons.auto_awesome,
-                        asset: 'assets/fast_synastry_logo.png',
+                        asset: 'assets/horary_oracle_logo.png',
                         title: l10n.hubAnalysisTitle,
                         desc: l10n.hubAnalysisDesc,
                         colors: [FastTheme.secondary, FastTheme.accent],
