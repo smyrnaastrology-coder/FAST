@@ -304,6 +304,15 @@ def _correct_planet_hallucination(text: str, engine_json: dict, lang: str = "tr"
 
 def call_openai(engine_json: dict, lang="tr") -> str:
     import os, json
+    # Lost-object questions need a chart-grounded search order, not a generic
+    # list of planetary placements. Keep this bounded and deterministic.
+    try:
+        from engine.lost_item_response import build_lost_item_answer
+        lost_item_answer = build_lost_item_answer(engine_json, lang)
+        if lost_item_answer:
+            return lost_item_answer
+    except Exception as e:
+        print(f"lost_item_response hata: {e}")
     key = os.getenv("OPENAI_API_KEY")
     if not key:
         return _localized_fallback(engine_json, lang)

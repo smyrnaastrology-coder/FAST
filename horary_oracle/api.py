@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "core"))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from core.timezone_utils import otomatik_utc_offset
@@ -105,6 +105,129 @@ def resolve_time(req: CastRequest):
 @app.get("/api/health", response_model=HealthResponse)
 async def health():
     return {"status":"ok","version":"1.0.0"}
+
+
+_PRIVACY_HTML = """<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holavon - Gizlilik Politikasi / Privacy Policy</title>
+<style>
+  body { margin:0; background:#181026; color:#EDE7F6; font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; line-height:1.65; }
+  main { max-width:820px; margin:0 auto; padding:48px 22px 80px; }
+  h1 { color:#C9A96E; font-size:28px; margin-bottom:4px; }
+  h2 { color:#C9A96E; font-size:20px; margin-top:34px; }
+  h3 { color:#E0C68A; font-size:16px; margin-top:22px; }
+  p, li { color:#D6CEE8; font-size:15px; }
+  a { color:#E0C68A; }
+  .meta { color:#9C92B4; font-size:13px; }
+  hr { border:0; border-top:1px solid #463262; margin:44px 0; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Holavon — Gizlilik Politikası</h1>
+<p class="meta">Son güncelleme: 13 Kasım 2026</p>
+
+<p>Bu politika, <strong>Holavon: Horary Oracle</strong> mobil uygulamasında (iOS ve Android) kişisel verilerin nasıl işlendiğini açıklar. Veri sorumlusu Fatih Asartepe'dir. İletişim: <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a>.</p>
+
+<h2>1. İşlediğimiz veriler</h2>
+<ul>
+  <li><strong>Hesap bilgileri:</strong> e-posta adresi, şifre (Supabase Auth tarafından hash'lenerek saklanır), görünen ad ve kullanıcı adı.</li>
+  <li><strong>Doğum bilgileri:</strong> doğum tarihi, saati, şehri/ülkesi ve koordinatları — natal harita ve kişisel yorumlar için.</li>
+  <li><strong>Horary soruları ve yanıtları:</strong> yazdığınız veya cihazınızda sesle yazıya çevirdiğiniz sorular ve üretilen yorumlar. Ses kaydı sunucuya gönderilmez; dikte cihazda yapılır.</li>
+  <li><strong>Sosyal içerik:</strong> profil bilgileri, gönderiler, yorumlar, beğeniler ve mesajlar.</li>
+  <li><strong>Satın alma bilgileri:</strong> abonelik/kredi durumu. Ödeme kartı bilgileri Apple, Google veya RevenueCat tarafından işlenir; biz kart bilgisi görmeyiz.</li>
+  <li><strong>Cihaz ve tanılama verileri:</strong> bildirim jetonu, cihaz türü, uygulama sürümü ve hata kayıtları.</li>
+</ul>
+
+<h2>2. Kullanım amaçları</h2>
+<ul>
+  <li>Hesabınızı oluşturmak ve oturum açmanızı sağlamak.</li>
+  <li>Horary haritası ve yorumu üretmek, natal analizler sunmak.</li>
+  <li>Kredi ve abonelik haklarınızı doğrulamak.</li>
+  <li>Sosyal özellikleri ve bildirimleri çalıştırmak.</li>
+  <li>Hataları gidermek, güvenliği sağlamak ve yasal yükümlülükleri yerine getirmek.</li>
+</ul>
+
+<h2>3. Paylaşılan hizmet sağlayıcılar</h2>
+<ul>
+  <li><strong>Supabase</strong> — kimlik doğrulama, veritabanı ve dosya saklama.</li>
+  <li><strong>OpenAI</strong> — horary yorumu üretmek için soru ve harita verisinin işlenmesi.</li>
+  <li><strong>RevenueCat, Apple, Google</strong> — uygulama içi satın alma ve abonelik yönetimi.</li>
+  <li><strong>Firebase (Google)</strong> — bildirim iletimi ve hata raporlama.</li>
+</ul>
+<p>Verileriniz reklam amacıyla satılmaz veya kiralanmaz.</p>
+
+<h2>4. Saklama ve silme</h2>
+<p>Veriler hesabınız aktif olduğu sürece saklanır. Hesabınızı uygulama içinden <strong>Ayarlar → Hesabı sil</strong> yolundan silebilirsiniz; silme talebiyle birlikte hesap verileriniz ve kişisel içerikleriniz kaldırılır. Yasal olarak saklanması gereken kayıtlar bu kapsam dışındadır.</p>
+
+<h2>5. Haklarınız</h2>
+<p>KVKK ve GDPR kapsamında verilerinize erişme, düzeltme, silme, işlemeye itiraz etme ve taşınabilirlik haklarına sahipsiniz. Talepleriniz için <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a> adresine yazabilirsiniz.</p>
+
+<h2>6. Güvenlik ve çocuklar</h2>
+<p>Veriler şifreli bağlantı (HTTPS) üzerinden iletilir ve erişim yetkileriyle korunur. Uygulama 13 yaşın altındaki çocuklara yönelik değildir; bu yaş grubundan bilerek veri toplamayız.</p>
+
+<h2>7. Değişiklikler</h2>
+<p>Bu politika güncellendiğinde bu sayfada yayımlanır ve “son güncelleme” tarihi değişir.</p>
+
+<hr>
+
+<h1>Holavon — Privacy Policy</h1>
+<p class="meta">Last updated: 13 November 2026</p>
+
+<p>This policy explains how <strong>Holavon: Horary Oracle</strong> (iOS and Android) processes personal data. The data controller is Fatih Asartepe. Contact: <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a>.</p>
+
+<h2>1. Data we process</h2>
+<ul>
+  <li><strong>Account data:</strong> email address, password (hashed by Supabase Auth), display name and username.</li>
+  <li><strong>Birth data:</strong> date, time, city/country and coordinates — used for natal charts and personal readings.</li>
+  <li><strong>Horary questions and answers:</strong> questions you type or dictate on-device, and the generated readings. Audio is not uploaded; dictation happens on your device.</li>
+  <li><strong>Social content:</strong> profile details, posts, comments, likes and messages.</li>
+  <li><strong>Purchase data:</strong> subscription and credit status. Payment card details are handled by Apple, Google or RevenueCat; we never see them.</li>
+  <li><strong>Device and diagnostics:</strong> notification token, device type, app version and crash logs.</li>
+</ul>
+
+<h2>2. Why we use it</h2>
+<ul>
+  <li>To create your account and keep you signed in.</li>
+  <li>To cast horary charts and generate readings, and to provide natal analyses.</li>
+  <li>To verify credits and subscription entitlements.</li>
+  <li>To run social features and notifications.</li>
+  <li>To fix errors, keep the service secure and meet legal obligations.</li>
+</ul>
+
+<h2>3. Service providers</h2>
+<ul>
+  <li><strong>Supabase</strong> — authentication, database and file storage.</li>
+  <li><strong>OpenAI</strong> — processing the question and chart data to generate horary readings.</li>
+  <li><strong>RevenueCat, Apple, Google</strong> — in-app purchases and subscriptions.</li>
+  <li><strong>Firebase (Google)</strong> — push delivery and crash reporting.</li>
+</ul>
+<p>We do not sell or rent your data for advertising.</p>
+
+<h2>4. Retention and deletion</h2>
+<p>Data is kept while your account is active. You can delete your account in the app via <strong>Settings → Delete account</strong>; your account data and personal content are then removed. Records we must keep by law are excluded.</p>
+
+<h2>5. Your rights</h2>
+<p>Under GDPR/KVKK you may access, correct, delete, object to processing and request portability of your data. Contact <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a>.</p>
+
+<h2>6. Security and children</h2>
+<p>Data is transmitted over HTTPS and protected by access controls. The app is not directed to children under 13 and we do not knowingly collect their data.</p>
+
+<h2>7. Changes</h2>
+<p>Updates are published on this page and the “last updated” date changes accordingly.</p>
+
+</main>
+</body>
+</html>"""
+
+
+@app.get("/privacy", response_class=HTMLResponse, include_in_schema=False)
+async def privacy():
+    return HTMLResponse(content=_PRIVACY_HTML)
 
 @app.post("/api/auth/login")
 async def auth_login(req: AuthRequest):
@@ -678,6 +801,11 @@ async def cast(req: CastRequest):
     # Konum sorusu olduğu için karar "evet/hayır" değil; sorgulayan hep NO almamalı
     qlow3 = req.question.lower()
     is_where_q = any(k in qlow3 for k in ["nerede","nerde","nere","nereye","nere da","kaybol","kayıp","kayip","tutar mı","nere git","nereye gid","hangi yön","hangi yon","hangi taraf"]) or req.quesited_type in ("missing_person","missing_child","pet","lost_object")
+    from engine.location_safety import person_location_subject
+    person_where_target = (
+        person_location_subject(req.question, req.quesited_type)
+        if is_where_q else None
+    )
     if is_where_q:
         loc_info["person"] = "quesited"
         # kimin yerini soruyoruz (person etiketi - mock_interpret label için)
@@ -745,6 +873,15 @@ async def cast(req: CastRequest):
         "question": req.question, "location": loc_info,
         "is_followup": is_followup, "history": req.history[-4:] if req.history and is_followup else []
     }
+    if person_where_target:
+        # Do not pass astrological direction/distance/room hints to the model
+        # for a real person's live location; the chart cannot verify these.
+        engine_json["location"] = {
+            "subject_type": "person",
+            "subject": person_where_target["label"],
+            "urgency": loc_info.get("urgency", "merak"),
+            "real_time_location_available": False,
+        }
     # kullanici plani -> model secimi (oracle 5k mini, premium 8k 4o, elite 20k o1)
     try:
         import auth as _auth2
@@ -783,7 +920,14 @@ async def cast(req: CastRequest):
         if is_dream: hidden.append("DREAM: 12.ev yöneticisi evi + Ay burç/ev + Neptune ile rüyanın kaynağı/prophetic mi/kaygı mı olduğunu muhabbet gibi anlat, standart horary kalıbının dışına çık")
         engine_json["hidden_instruction"] = "Bu soru gizli model: " + " | ".join(hidden) + " - insani dil kullan."
     # NEREDE sorularında mesafe: daima querent×quesited×10 formülü (qq_distance_km) esas
-    if res["verdict"] == "LOCATION" and loc_info.get("proximity"):
+    if person_where_target:
+        engine_json["loc_instruction"] = (
+            "Bu soru gerçek bir kişinin şu anki konumunu soruyor. Harita canlı konumu "
+            "doğrulayamaz. Yön, kilometre, şehir, oda, bina veya fiziksel ortam tahmini "
+            "üretme; mevcut location içindeki hiçbir astrolojik ipucunu gerçek konum gibi "
+            "sunma. Güvenli ve dürüst yanıt ver."
+        )
+    elif res["verdict"] == "LOCATION" and loc_info.get("proximity"):
         engine_json["loc_instruction"] = "Bu bir NEREDE/KONUM sorusu ve gösterge bir açıya (ASC/MC/DSC/IC) çok yakın (" + str(loc_info.get("proximity_angle","")) + " ≤10°) — kural: KİŞİ SORANA ÇOK YAKINDIR. Cevabında kişinin hemen yakınlarda/aynı mekanda olduğunu söyle; km çarpım formülü bu durumda GEÇERSİZ, HİÇBİR km/metre rakamı verme. Yine de 'Ev yönü: location['direction']' ve 'Burç yönü: location['sign_direction']' kısımlarını rapor et (kişinin hangi yönde durduğuna işaret eder). Gösterge: " + str(loc_info.get('_qr_ruler_klasik','')) + "."
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
@@ -817,9 +961,9 @@ async def cast(req: CastRequest):
         if loc_info.get("clarify"):
             engine_json["loc_instruction"] += f" Soru hangi kardeş olduğunu söylemiyor — cevabın SONUNA şu netleştirmeyi de ekle: {loc_info['clarify']}"
     # Kayıp yakın/ev içi ise: 12-ev eviçi tablosu (kaybolanın göstergesinin evi -> ev içi yer)
-    if res["verdict"] == "LOCATION" and loc_info.get("ev_ici"):
+    if res["verdict"] == "LOCATION" and loc_info.get("ev_ici") and not person_where_target:
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " Ev-içi yer ipucu (kaybolanın göstergesinin evi): " + loc_info["ev_ici"] + " — cevabında bu oda/eşya tarifini kullan, kısa tut."
-    if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak":
+    if res["verdict"] == "LOCATION" and loc_info.get("urgency") == "merak" and not person_where_target:
         engine_json["loc_instruction"] = (engine_json.get("loc_instruction","") or "") + " NOT: bu soru kayıp/çalınma değil, gündelik MERAK kategorisinde (manasızlık riski) — kişinin şu an nerede olabileceğini yön+mesafe ile NAZİKÇE söyle, 'gitmiş/dönmüyor/kayıp' gibi kesin telaşlı hüküm ve tehdit tespiti verme. Cevabının SONUNA şunu da ekle: 'Kişi gerçekten kayıpsa veya ulaşamıyorsan bunu ayrıca söyle, kayıp analizi açarım.'"
     # --- SPOR GOL DAKİKASI (kullanıcı taktiği: ASC°=1.gol, +2.ev°=2.gol, +3.ev°=3.gol...) ---
     if any(k in req.question.lower() for k in ["gol", "dakika", "dakikada"]):
@@ -1038,12 +1182,20 @@ async def cast(req: CastRequest):
                 engine_json["multi_instruction"] = multi_instruction_text(engine_json, _mq_rows)
     except Exception:
         pass
-    answer = call_openai(engine_json, req.lang)
-    if req.lang == "tr" and engine_json.get("theft_verdict"):
+    if person_where_target:
+        from engine.location_safety import person_location_answer
+        answer = person_location_answer(
+            req.lang,
+            person_where_target["label"],
+            loc_info.get("urgency") == "kayip",
+        )
+    else:
+        answer = call_openai(engine_json, req.lang)
+    if not person_where_target and req.lang == "tr" and engine_json.get("theft_verdict"):
         answer = "Hırsızlık/çalınma kararı: " + engine_json["theft_verdict"] + " — " + engine_json.get("theft_thief","") + "\n\n" + answer
-    if req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
+    if not person_where_target and req.lang == "tr" and engine_json.get("two_option_verdict") and engine_json["two_option_verdict"] != "belirsiz":
         answer = "İki seçenek kararı (Ay açısı kuralı): " + engine_json["two_option_verdict"] + "\n\n" + answer
-    if req.lang == "tr" and engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
+    if not person_where_target and req.lang == "tr" and engine_json.get("health_verdict") and engine_json["health_verdict"] != "belirsiz":
         answer = "Sağlık analizi: " + engine_json["health_verdict"] + "\n\n" + answer
 
     dt = (time.perf_counter()-t0)*1000
@@ -1057,7 +1209,15 @@ async def cast(req: CastRequest):
         "planets": planets_out,
         "strictures": res["strictures"][:12],
         "lots": res.get("lots",{}),
-        "location": loc_info,
+        "location": (
+            {
+                "subject_type": "person",
+                "subject": person_where_target["label"],
+                "urgency": loc_info.get("urgency", "merak"),
+                "real_time_location_available": False,
+            }
+            if person_where_target else loc_info
+        ),
         "derived_info": res.get("derived_info"),
         "answer": answer,
         "credits_left": engine_json.get("credits_left"),
