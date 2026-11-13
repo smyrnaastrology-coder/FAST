@@ -231,6 +231,13 @@ async def privacy():
     from privacy_page import PRIVACY_HTML
     return HTMLResponse(content=PRIVACY_HTML)
 
+@app.get("/support", include_in_schema=False)
+async def support():
+    # App Store requires a reachable Support URL.
+    from fastapi.responses import HTMLResponse
+    from support_page import SUPPORT_HTML
+    return HTMLResponse(content=SUPPORT_HTML)
+
 @app.post("/api/auth/login")
 async def auth_login(req: AuthRequest):
     from auth import verify
