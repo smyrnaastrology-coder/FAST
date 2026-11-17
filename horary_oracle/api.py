@@ -1379,15 +1379,33 @@ def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
 # Statik site: horary_oracle/site/. API yolları yukarıda tanımlı olduğu için
 # aşağıdaki catch-all yalnızca eşleşmeyen sayfa isteklerini yakalar.
 from fastapi.responses import FileResponse as _FileResponse
+from fastapi.responses import RedirectResponse as _RedirectResponse
 from fastapi.staticfiles import StaticFiles as _StaticFiles
 
 _SITE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site")
 _SITE_ASSETS = os.path.join(_SITE_DIR, "assets")
+_WEB_APP_DIR = os.path.join(_SITE_DIR, "app")
+
+# The Flutter web build lives under /app so public content pages remain on the
+# same host and keep their existing URLs.
+if os.path.isdir(_WEB_APP_DIR):
+    app.add_api_route(
+        "/app",
+        lambda: _RedirectResponse("/app/", status_code=307),
+        methods=["GET"],
+        include_in_schema=False,
+    )
+    app.mount(
+        "/app",
+        _StaticFiles(directory=_WEB_APP_DIR, html=True),
+        name="holavon-web-app",
+    )
 
 if os.path.isdir(_SITE_ASSETS):
     app.mount("/assets", _StaticFiles(directory=_SITE_ASSETS), name="site-assets")
 
 _SITE_PAGES = {
+    "about": "index.html",
     "horary": "horary.html",
     "analysis": "analysis.html",
     "community": "community.html",
@@ -1404,6 +1422,8 @@ _SITE_PAGES = {
 
 @app.get("/", include_in_schema=False)
 def site_home():
+    if os.path.isdir(_WEB_APP_DIR):
+        return _RedirectResponse("/app/", status_code=307)
     return _FileResponse(os.path.join(_SITE_DIR, "index.html"))
 
 

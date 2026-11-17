@@ -457,6 +457,17 @@ class AuthService {
   }
 
   static String get _redirectUri {
+    // Web OAuth must return to the Flutter web app path, not the mobile
+    // com.fastastrology.fast:// deep link. Supabase must allow this URL.
+    if (kIsWeb) {
+      final uri = Uri.base;
+      return Uri(
+        scheme: uri.scheme,
+        host: uri.host,
+        port: uri.hasPort ? uri.port : null,
+        path: uri.path.endsWith('/') ? uri.path : '${uri.path}/',
+      ).toString();
+    }
     // Android deep link — applicationId scheme.
     return '$_callbackScheme://login-callback';
   }
