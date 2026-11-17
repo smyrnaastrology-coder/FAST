@@ -10351,6 +10351,25 @@ def _natal_radar(p1_dt, event_date_str, event_time):
     sonuc = [_hesapla(u, s, la, lo) for u, s, la, lo in is_list]
     return sonuc
 
+# Adaş şehirler: aynı isim birden fazla ülkede geçtiğinde doğru olanı seçer.
+# Radar taraması DB'deki tüm kayıtları dolaştığı için "Boston" gibi isimler
+# yanlış ülkeyle (ör. Filipinler) listeye girebiliyor. Bu harita, isim
+# eşleşmesi belirsizse yalnızca tercih edilen ülkeyi kabul eder.
+SEHIR_ULKE_TERCIHI = {
+    "Adelaide": "Avustralya",
+    "Alexandria": "Mısır",
+    "İskenderiye": "Mısır",
+    "Barcelona": "İspanya",
+    "Berlin": "Almanya",
+    "Boston": "ABD",
+    "Bristol": "İngiltere",
+    "Buenos Aires": "Arjantin",
+    "Córdoba": "Arjantin",
+    "Cordoba": "Arjantin",
+    "Manama": "Bahreyn",
+    "Prag": "Çekya",
+}
+
 def _result_kategorize(radar):
     """Sort radar results into 4 categories, one per country, exclude 3rd world."""
     EXCLUDED = {"Afghanistan","Afganistan","Pakistan","Bangladesh","Sri Lanka","Myanmar","Cambodia","Laos","Nepal","Bhutan","Maldives","Maldivler","Yemen","Syria","Suriye","Iraq","Irak","Libya","Sudan","Somali","Somalia","Ethiopia","Eritre","Chad","Nijer","Niger","Mali","Burkina Faso","Moritanya","Mauritania","Orta Afrika Cumhuriyeti","Central African Republic","Kongo","Demokratik Kongo Cumhuriyeti","DRC","Zimbabwe","Mozambik","Mozambique","Madagaskar","Madagascar","Haiti","Kuzey Kore","North Korea","Küba","Cuba"}
@@ -10369,6 +10388,8 @@ def _result_kategorize(radar):
         sehir_ad, ulke = raw.rsplit(", ", 1) if ", " in raw else (raw, "")
         if (ulke in EXCLUDED) or (ulke and any(e in raw.lower() for e in excluded_any)): continue
         if sehir_ad not in BUYUK_SEHIRLER: continue
+        tercih = SEHIR_ULKE_TERCIHI.get(sehir_ad)
+        if tercih and ulke != tercih: continue
         for kat in sirali:
             sirali[kat].append((sehir_ad, ulke, c[kat], c.get("lat"), c.get("lon"), c.get("etkiler", [])))
     for kat in sirali:
