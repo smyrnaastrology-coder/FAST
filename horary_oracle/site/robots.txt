@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://horary-oracle-api.onrender.com/sitemap.xml
+Sitemap: https://holavon.com/sitemap.xml
