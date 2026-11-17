@@ -15,6 +15,21 @@
       en: ["What is horary? — Holavon", "What horary astrology is, how a chart is read, what it is good for, and its limits. A plain-language guide to the classical method."],
       es: ["¿Qué es la horaria? — Holavon", "Qué es la astrología horaria, cómo se lee una carta, para qué sirve y cuáles son sus límites."]
     },
+    analysis: {
+      tr: ["Fast Synastry — sinastri, natal ve haritalar | Holavon", "Eş/sevgili, ebeveyn/çocuk, bireysel natal ve potansiyel analizleri; Situa A/B, Composite, Açı Gridi, Arap Noktaları, şehir radarı ve PDF raporlar."],
+      en: ["Fast Synastry — synastry, natal and charts | Holavon", "Partner, parent-child, individual natal and potential analyses; Situa A/B, composite, aspect grid, Arabic parts, city radar and PDF reports."],
+      es: ["Fast Synastry — sinastría, natal y cartas | Holavon", "Análisis de pareja, padre-hijo, natal individual y potencial; Situa A/B, compuesta, rejilla de aspectos, partes árabes, radar de ciudades e informes PDF."]
+    },
+    community: {
+      tr: ["Topluluk — akış, hikâye, reels | Holavon", "Holavon topluluğu: takip ve keşfet akışı, 24 saatlik hikâyeler, reels, birebir mesajlar ve burç künyeli profil."],
+      en: ["Community — feed, stories, reels | Holavon", "The Holavon community: following and discover feeds, 24-hour stories, reels, direct messages and a profile with your sign card."],
+      es: ["Comunidad — feed, historias, reels | Holavon", "La comunidad de Holavon: feeds de siguiendo y descubrir, historias de 24 horas, reels, mensajes directos y perfil con ficha de signos."]
+    },
+    sky: {
+      tr: ["Gökyüzü — günlük okuma, retrograd, ay menzilleri | Holavon", "Günlük gökyüzü okuması, 28 ay menzili, retrograd takvimi, ay zamanlaması ve tutulmaların kişisel haritana etkisi."],
+      en: ["Sky — daily reading, retrogrades, lunar mansions | Holavon", "Daily sky reading, 28 lunar mansions, retrograde calendar, Moon timing and how eclipses touch your chart."],
+      es: ["Cielo — lectura diaria, retrógrados, mansiones lunares | Holavon", "Lectura diaria del cielo, 28 mansiones lunares, calendario retrógrado, timing lunar y el efecto de los eclipses en tu carta."]
+    },
     features: {
       tr: ["Özellikler — Holavon", "Tek soruya odaklı yorum, kayıp eşya modu, sesli soru, natal çapraz kontrol, üç dil ve PDF raporlar."],
       en: ["Features — Holavon", "Question-focused readings, lost-object mode, voice input, natal cross-check, three languages and PDF reports."],

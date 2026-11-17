@@ -1389,6 +1389,9 @@ if os.path.isdir(_SITE_ASSETS):
 
 _SITE_PAGES = {
     "horary": "horary.html",
+    "analysis": "analysis.html",
+    "community": "community.html",
+    "sky": "sky.html",
     "features": "features.html",
     "pricing": "pricing.html",
     "faq": "faq.html",
