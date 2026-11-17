@@ -3,9 +3,9 @@
     "short_name": "Holavon",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Holavon — astrology, synastry and horary in one app.",
+    "background_color": "#100b1b",
+    "theme_color": "#100b1b",
+    "description": "Holavon — Horary Oracle, Fast Synastry, sky and astrology community.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
