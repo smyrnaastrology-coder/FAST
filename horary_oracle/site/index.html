@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holavon — Horary Oracle | Sorunu sor, gökyüzü cevaplasın</title>
+<meta name="description" content="Holavon, sorunun sorulduğu anın haritasını çıkarır ve klasik horary kurallarıyla yorumlar. Kayıp eşya, ilişki, iş ve para sorularına net cevaplar.">
+<meta name="theme-color" content="#0f0817">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Holavon">
+<meta property="og:title" content="Holavon — Horary Oracle | Sorunu sor, gökyüzü cevaplasın">
+<meta property="og:description" content="Holavon, sorunun sorulduğu anın haritasını çıkarır ve klasik horary kurallarıyla yorumlar. Kayıp eşya, ilişki, iş ve para sorularına net cevaplar.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://horary-oracle-api.onrender.com/">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Holavon: Horary Oracle","applicationCategory":"LifestyleApplication","operatingSystem":"iOS, Android","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Holavon, sorunun sorulduğu anın haritasını çıkarır ve klasik horary kurallarıyla yorumlar. Kayıp eşya, ilişki, iş ve para sorularına net cevaplar.","url":"https://horary-oracle-api.onrender.com/"}
+</script>
+</head>
+<body data-page="home">
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/" aria-label="Holavon">
+      <span class="brand-mark">✦</span>
+      <span class="brand-word">Holavon</span>
+    </a>
+    <nav class="nav" aria-label="Ana menü">
+      <a href="/" data-i18n="nav.home" aria-current="page">Ana sayfa</a>
+      <a href="/horary" data-i18n="nav.horary" >Horary</a>
+      <a href="/features" data-i18n="nav.features" >Özellikler</a>
+      <a href="/pricing" data-i18n="nav.pricing" >Fiyatlar</a>
+      <a href="/faq" data-i18n="nav.faq" >SSS</a>
+      <a href="/blog" data-i18n="nav.blog" >Günlük</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang" role="group" aria-label="Dil / Language / Idioma">
+        <button type="button" data-lang="tr" aria-pressed="true">TR</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      </div>
+      <a class="btn btn-gold btn-sm" href="/#download" data-i18n="nav.cta">İndir</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Menü">☰</button>
+    </div>
+  </div>
+</header>
+<main>
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <p class="eyebrow" data-i18n="home.eyebrow">HORARY • SORU HARİTASI</p>
+      <h1><span data-i18n="home.h1">Sorunu sor,</span><br><em data-i18n="home.h1em">gökyüzü cevaplasın.</em></h1>
+      <p class="hero-lead" data-i18n="home.lead">Holavon, sorunu sorduğun anın gökyüzünü haritalandırır ve klasik horary kurallarıyla yorumlar. Kayıp eşyadan ilişkilere, iş kararlarından taşınmaya kadar net sorulara net cevaplar.</p>
+      <div class="btn-row" style="margin-top:26px">
+        <a class="btn btn-gold" href="https://apps.apple.com/app/id6827527304" target="_blank" rel="noopener"><span data-i18n="cta.ios">App Store</span></a>
+        <a class="btn btn-ghost" href="https://play.google.com/store/apps/details?id=com.fastastrology.fast" target="_blank" rel="noopener"><span data-i18n="cta.android">Google Play</span></a>
+        <a class="btn btn-ghost" href="#how" data-i18n="cta.how">Nasıl çalışır?</a>
+      </div>
+      <p class="hero-note" data-i18n="home.note">3 ücretsiz soru • Satın alınan krediler süresiz • Türkçe, İngilizce, İspanyolca</p>
+    </div>
+    <div class="hero-art reveal" aria-hidden="true">
+      <div class="chart">
+        <span class="chart-glyph g1">☉</span>
+        <span class="chart-glyph g2">☽</span>
+        <span class="chart-glyph g3">♃</span>
+        <span class="chart-glyph g4">♀</span>
+        <div class="chart-core"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="container stats-grid">
+    <div class="stat"><b>3</b><span data-i18n="home.stat1">ücretsiz soru</span></div>
+    <div class="stat"><b>40+</b><span data-i18n="home.stat2">klasik horary kuralı</span></div>
+    <div class="stat"><b>3</b><span data-i18n="home.stat3">dilde yorum</span></div>
+    <div class="stat"><b>∞</b><span data-i18n="home.stat4">krediyle sınırsız soru</span></div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.how.eyebrow">NASIL ÇALIŞIR</p>
+      <h2 data-i18n="home.how.title">Üç adımda cevap</h2>
+      <p data-i18n="home.how.sub">Karmaşık formlar yok. Sorunu yaz, haritanı gör, yorumu oku.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card step reveal"><span class="step-num">01</span><h3 data-i18n="step1.t">Sorunu tek cümleyle yaz</h3><p data-i18n="step1.d">“Anahtarlarımı evde mi bıraktım?” gibi net bir soru. İstersen mikrofonla dikte et; ses cihazından çıkmaz.</p></div>
+      <div class="card step reveal"><span class="step-num">02</span><h3 data-i18n="step2.t">Harita çizilir</h3><p data-i18n="step2.d">Sorunun sorulduğu an ve konumla horary haritası oluşur: yükselen, Ay, anlam evleri ve gezegen açıları.</p></div>
+      <div class="card step reveal"><span class="step-num">03</span><h3 data-i18n="step3.t">Yorumu oku</h3><p data-i18n="step3.d">Klasik kurallara göre hazırlanan yorum, evet/hayır eğilimini ve zaman penceresini sade bir dille anlatır.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.why.eyebrow">NEDEN HORARY</p>
+      <h2 data-i18n="home.why.title">An'ın haritası, kelime kalabalığı değil.</h2>
+      <p data-i18n="home.why.sub">Burç yorumları genel konuşur. Horary tam olarak senin sorunla ilgilenir.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal"><div class="card-icon">✦</div><h3 data-i18n="why1.t">An'ın haritası</h3><p data-i18n="why1.d">Horary doğum haritası değildir. Sorunun sorulduğu saniyeyi ve yeri merkeze alır; cevap o ana aittir.</p></div>
+      <div class="card reveal"><div class="card-icon">☉</div><h3 data-i18n="why2.t">Binlerce yıllık yöntem</h3><p data-i18n="why2.d">Hellenistik astrolojiden William Lilly'ye uzanan kurallar; modern yorumla sadeleştirilmiş, uydurma değil.</p></div>
+      <div class="card reveal"><div class="card-icon">☽</div><h3 data-i18n="why3.t">Net soruya net cevap</h3><p data-i18n="why3.d">Genel geçer burç yorumu yerine, sorduğun konuya odaklanan tek bir harita ve tek bir yorum.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.ask.eyebrow">KONULAR</p>
+      <h2 data-i18n="home.ask.title">Neler sorabilirsin?</h2>
+      <p data-i18n="home.ask.sub">Horary en iyi net, tek konulu ve zaman ya da sonuç içeren sorularda çalışır.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal"><div class="card-icon">⌂</div><h3 data-i18n="ask1.t">Kayıp eşya</h3><p data-i18n="ask1.d">Anahtar, evrak, takı… Nerede olduğunu ve bulunup bulunmayacağını sor.</p></div>
+      <div class="card reveal"><div class="card-icon">♡</div><h3 data-i18n="ask2.t">İlişkiler</h3><p data-i18n="ask2.d">Karşı tarafın niyeti, iletişim, ayrılık veya barışma ihtimali.</p></div>
+      <div class="card reveal"><div class="card-icon">⌘</div><h3 data-i18n="ask3.t">İş ve kariyer</h3><p data-i18n="ask3.d">Başvuru, terfi, teklif, ortaklık; hangisi ilerler, hangisi bekler?</p></div>
+      <div class="card reveal"><div class="card-icon">¤</div><h3 data-i18n="ask4.t">Para ve anlaşmalar</h3><p data-i18n="ask4.d">Ödeme gelecek mi, anlaşma sonuçlanır mı, borç kapanır mı?</p></div>
+      <div class="card reveal"><div class="card-icon">✈</div><h3 data-i18n="ask5.t">Taşınma ve seyahat</h3><p data-i18n="ask5.d">Yeni şehir, yeni ev, vize; zamanlama uygun mu?</p></div>
+      <div class="card reveal"><div class="card-icon">⌖</div><h3 data-i18n="ask6.t">Kayıp kişi ve konum</h3><p data-i18n="ask6.d">Ulaşılamayan biri için güvenli konum değerlendirmesi. Acil durumda önce 112.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container quote-wrap">
+    <div class="reveal">
+      <p class="eyebrow" data-i18n="home.sample.eyebrow">ÖRNEK YORUM</p>
+      <h2 data-i18n="home.sample.title">Gerçek bir sorudan</h2>
+      <ul style="list-style:none;padding:0;margin:22px 0 0">
+        <li style="padding:7px 0 7px 24px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">✦</span><span data-i18n="sample.p1">Evet/hayır eğilimi</span></li>
+        <li style="padding:7px 0 7px 24px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">✦</span><span data-i18n="sample.p2">Zaman penceresi</span></li>
+        <li style="padding:7px 0 7px 24px;position:relative"><span style="position:absolute;left:0;color:var(--gold)">✦</span><span data-i18n="sample.p3">Dikkat edilecek uyarı</span></li>
+      </ul>
+    </div>
+    <div class="reveal">
+      <blockquote class="quote" style="margin:0">
+        <span data-i18n="sample.quote">“Kedim kayboldu, eve dönecek mi?” Yükselen'in yöneticisi Ay, 4. evde ve retro değil; 6. evdeki Mars ile üçgen yapıyor. Cevap: döner — 2–3 gün içinde, yakın bir kapalı alandan.</span>
+        <small data-i18n="sample.cite">Holavon yorumundan, kısaltılmış</small>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="pricing.eyebrow">FİYATLAR</p>
+      <h2 data-i18n="pricing.title">İhtiyacın kadar kredi, sürpriz yok.</h2>
+      <p data-i18n="pricing.sub">Tek seferlik krediler süresiz geçerlidir. Abonelik istemiyorsan yalnızca ihtiyacın kadar al.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card reveal"><h3 data-i18n="p.5.name">5 Kredi</h3><p class="muted" style="font-size:.85rem" data-i18n="p.5.desc">Ara sıra soru soranlar için.</p><div class="price">₺79,99</div><ul><li data-i18n="p.5.f1">5 horary sorusu</li><li data-i18n="p.5.f2">Krediler süresiz</li><li data-i18n="p.5.f3">Tüm kategoriler</li></ul><a class="btn btn-ghost btn-sm" href="/pricing" data-i18n="p.cta">Kredi Al</a></div>
+      <div class="price-card featured reveal"><span class="badge" data-i18n="p.badge">En çok seçilen</span><h3 data-i18n="p.15.name">15 Kredi</h3><p class="muted" style="font-size:.85rem" data-i18n="p.15.desc">Düzenli kullananlar için en avantajlısı.</p><div class="price">₺149,99</div><ul><li data-i18n="p.15.f1">15 horary sorusu</li><li data-i18n="p.15.f2">Soru başına daha düşük maliyet</li><li data-i18n="p.15.f3">Krediler süresiz</li></ul><a class="btn btn-gold btn-sm" href="/pricing" data-i18n="p.cta">Kredi Al</a></div>
+      <div class="price-card reveal"><h3 data-i18n="p.40.name">40 Kredi</h3><p class="muted" style="font-size:.85rem" data-i18n="p.40.desc">Yoğun kullanım ve hediye için.</p><div class="price">₺399,99</div><ul><li data-i18n="p.40.f1">40 horary sorusu</li><li data-i18n="p.40.f2">En düşük birim fiyat</li><li data-i18n="p.40.f3">Krediler süresiz</li></ul><a class="btn btn-ghost btn-sm" href="/pricing" data-i18n="p.cta">Kredi Al</a></div>
+      <div class="price-card reveal"><h3 data-i18n="p.pro.name">Pro</h3><p class="muted" style="font-size:.85rem" data-i18n="p.pro.desc">Her gün 3 soru, otomatik yenilenir.</p><div class="price">₺319<span data-i18n="p.pro.per">/ ay</span></div><ul><li data-i18n="p.pro.f1">Günde 3 horary sorusu</li><li data-i18n="p.pro.f2">Günlük kişisel gelişim bildirimi</li><li data-i18n="p.pro.f3">Dilediğin an iptal</li></ul><a class="btn btn-ghost btn-sm" href="/pricing" data-i18n="p.pro.cta">Pro'ya geç</a></div>
+    </div>
+    <p class="price-note" data-i18n="price.note">Fiyatlar Türkiye mağazası içindir; App Store ve Google Play yerel para birimini gösterir, vergiler dahildir.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container" style="max-width:820px">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.faq.eyebrow">SSS</p>
+      <h2 data-i18n="home.faq.title">Merak edilenler</h2>
+    </div>
+    <details class="faq reveal"><summary data-i18n="c1.q">Kredi nasıl çalışır?</summary><div class="faq-body"><p data-i18n="c1.a">Her soru 1 kredi harcar. Yeni hesapta 3 ücretsiz soru vardır; Pro üyelerde her gün 3 soru yenilenir.</p></div></details>
+    <details class="faq reveal"><summary data-i18n="c2.q">Krediler süresi doluyor mu?</summary><div class="faq-body"><p data-i18n="c2.a">Hayır. Satın alınan krediler süresiz geçerlidir; önce günlük/ücretsiz hak, sonra kredi kullanılır.</p></div></details>
+    <details class="faq reveal"><summary data-i18n="b2.q">Ne tür sorular sorabilirim?</summary><div class="faq-body"><p data-i18n="b2.a">Net, tek konulu; evet/hayır ya da zamanlama içeren sorular en iyi sonuç verir.</p></div></details>
+    <details class="faq reveal"><summary data-i18n="b4.q">Yorumlar ne kadar güvenilir?</summary><div class="faq-body"><p data-i18n="b4.a">Klasik kurallara dayanır ama kesinlik iddiası taşımaz; karar desteği olarak kullan.</p></div></details>
+    <p class="center" style="margin-top:22px"><a href="/faq" data-i18n="home.faq.all">Tüm soruları gör</a></p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="cta-band reveal" id="download">
+      <p class="eyebrow">HOLAVON</p>
+      <h2 data-i18n="home.cta.title">Bir sorunun cevabı bir harita uzağında.</h2>
+      <p data-i18n="home.cta.sub">Holavon'u indir, ilk üç soruyu ücretsiz sor.</p>
+      <div class="btn-row center" style="margin-top:26px">
+  <a class="btn btn-gold" href="https://apps.apple.com/app/id6827527304" target="_blank" rel="noopener"><span data-i18n="cta.ios">App Store</span></a>
+  <a class="btn btn-ghost" href="https://play.google.com/store/apps/details?id=com.fastastrology.fast" target="_blank" rel="noopener"><span data-i18n="cta.android">Google Play</span></a>
+</div>
+      <p class="hero-note" style="margin-top:16px" data-i18n="home.cta.note">iOS ve Android • Tek hesapla iki platform</p>
+    </div>
+  </div>
+</section>
+</main><footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/" style="margin-bottom:14px">
+          <span class="brand-mark">✦</span>
+          <span class="brand-word">Holavon</span>
+        </a>
+        <p data-i18n="footer.blurb">Holavon, horary astrolojisini modern bir uygulamaya taşır: sorunu yaz, anın haritasını gör, yorumu oku.</p>
+      </div>
+      <div>
+        <h4 data-i18n="footer.product">Ürün</h4>
+        <a href="/horary" data-i18n="footer.l_horary">Horary nedir?</a>
+        <a href="/features" data-i18n="footer.l_features">Özellikler</a>
+        <a href="/pricing" data-i18n="footer.l_pricing">Fiyatlar</a>
+        <a href="/faq" data-i18n="footer.l_faq">Sık sorulanlar</a>
+      </div>
+      <div>
+        <h4 data-i18n="footer.resources">Kaynaklar</h4>
+        <a href="/blog" data-i18n="footer.l_blog">Astroloji günlüğü</a>
+        <a href="/support" data-i18n="footer.l_support">Destek</a>
+        <a href="mailto:smyrnaastrology@gmail.com" data-i18n="footer.l_contact">İletişim</a>
+        <a href="https://apps.apple.com/app/id6827527304" target="_blank" rel="noopener">App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.fastastrology.fast" target="_blank" rel="noopener">Google Play</a>
+      </div>
+      <div>
+        <h4 data-i18n="footer.legal">Yasal</h4>
+        <a href="/privacy" data-i18n="footer.l_privacy">Gizlilik politikası</a>
+        <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener" data-i18n="footer.l_terms">Kullanım koşulları</a>
+        <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener" data-i18n="footer.l_eula">Apple EULA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">© 2026 Holavon. Tüm hakları saklıdır.</span>
+      <span>Holavon · Horary Oracle</span>
+    </div>
+    <p class="disclaimer" data-i18n="footer.disclaimer">Holavon eğlence ve kişisel farkındalık amacıyla horary yorumu üretir. Tıbbi, hukuki veya finansal tavsiye yerine geçmez.</p>
+  </div>
+</footer>
+<script src="/assets/i18n.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

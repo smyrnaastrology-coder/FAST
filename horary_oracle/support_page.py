@@ -21,6 +21,8 @@ SUPPORT_HTML = """<!DOCTYPE html>
 <body>
 <main>
 
+<p style="margin-bottom:26px"><a href="/">&larr; Holavon</a> &middot; <a href="/horary">Horary</a> &middot; <a href="/pricing">Pricing</a> &middot; <a href="/privacy">Privacy</a></p>
+
 <h1>Holavon — Destek</h1>
 <p class="meta">Son güncelleme: 13 Kasım 2026</p>
 

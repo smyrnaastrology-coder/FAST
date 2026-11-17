@@ -1973,3 +1973,55 @@ def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
     return _auth5.update(_reset)
 
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
+
+# ---------- Public website (Holavon) ----------
+# Statik site: horary_oracle/site/. API yolları yukarıda tanımlı olduğu için
+# aşağıdaki catch-all yalnızca eşleşmeyen sayfa isteklerini yakalar.
+from fastapi.responses import FileResponse as _FileResponse
+from fastapi.staticfiles import StaticFiles as _StaticFiles
+
+_SITE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site")
+_SITE_ASSETS = os.path.join(_SITE_DIR, "assets")
+
+if os.path.isdir(_SITE_ASSETS):
+    app.mount("/assets", _StaticFiles(directory=_SITE_ASSETS), name="site-assets")
+
+_SITE_PAGES = {
+    "horary": "horary.html",
+    "features": "features.html",
+    "pricing": "pricing.html",
+    "faq": "faq.html",
+    "blog": "blog.html",
+    "blog-horary-nedir": "blog-horary-nedir.html",
+    "blog-kayip-esya": "blog-kayip-esya.html",
+    "blog-ay": "blog-ay.html",
+}
+
+
+@app.get("/", include_in_schema=False)
+def site_home():
+    return _FileResponse(os.path.join(_SITE_DIR, "index.html"))
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def site_favicon():
+    return _FileResponse(os.path.join(_SITE_ASSETS, "favicon.svg"), media_type="image/svg+xml")
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def site_robots():
+    return _FileResponse(os.path.join(_SITE_DIR, "robots.txt"), media_type="text/plain")
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def site_sitemap():
+    return _FileResponse(os.path.join(_SITE_DIR, "sitemap.xml"), media_type="application/xml")
+
+
+@app.get("/{page}", include_in_schema=False)
+def site_page(page: str):
+    fn = _SITE_PAGES.get(page)
+    if not fn:
+        raise HTTPException(status_code=404, detail="Sayfa bulunamadı")
+    return _FileResponse(os.path.join(_SITE_DIR, fn))
+

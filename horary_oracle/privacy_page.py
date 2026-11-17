@@ -21,7 +21,9 @@ PRIVACY_HTML = """<!DOCTYPE html>
 <body>
 <main>
 
-<h1>Holavon — Gizlilik Politikası</h1>
+<p style="margin-bottom:26px"><a href="/">&larr; Holavon</a> &middot; <a href="/horary">Horary</a> &middot; <a href="/pricing">Pricing</a> &middot; <a href="/support">Support</a></p>
+
+<h1>Holavon - Gizlilik Politikası</h1>
 <p class="meta">Son güncelleme: 13 Kasım 2026</p>
 
 <p>Bu politika, <strong>Holavon: Horary Oracle</strong> mobil uygulamasında (iOS ve Android) kişisel verilerin nasıl işlendiğini açıklar. Veri sorumlusu Fatih Asartepe'dir. İletişim: <a href="mailto:smyrnaastrology@gmail.com">smyrnaastrology@gmail.com</a>.</p>
