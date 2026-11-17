@@ -59,6 +59,12 @@ window.HOLAVON_I18N = {
     "sample.cite": "Holavon yorumundan, kısaltılmış",
     "sample.p1": "Evet/hayır eğilimi", "sample.p2": "Zaman penceresi", "sample.p3": "Dikkat edilecek uyarı",
 
+    "home.screens.eyebrow": "UYGULAMADAN",
+    "home.screens.title": "Gerçek ekranlar, gerçek yorumlar.",
+    "home.screens.sub": "Uygulamanın akışı: soru, harita, yorum.",
+    "screen1": "Sorunu yaz", "screen2": "Haritayı gör", "screen3": "Yorumu oku",
+    "screens.note": "Arayüz Türkçe gösterilmiştir; uygulama İngilizce ve İspanyolca da çalışır.",
+
     "home.faq.eyebrow": "SSS", "home.faq.title": "Merak edilenler",
     "home.faq.all": "Tüm soruları gör",
 
@@ -283,6 +289,12 @@ window.HOLAVON_I18N = {
     "sample.cite": "From a Holavon reading, abridged",
     "sample.p1": "Yes/no tendency", "sample.p2": "Timing window", "sample.p3": "What to watch for",
 
+    "home.screens.eyebrow": "FROM THE APP",
+    "home.screens.title": "Real screens, real readings.",
+    "home.screens.sub": "The flow: question, chart, judgement.",
+    "screen1": "Ask your question", "screen2": "See the chart", "screen3": "Read the judgement",
+    "screens.note": "Interface shown in Turkish; the app also runs in English and Spanish.",
+
     "home.faq.eyebrow": "FAQ", "home.faq.title": "Common questions",
     "home.faq.all": "See all questions",
     "home.cta.title": "Your answer is one chart away.",
@@ -505,6 +517,12 @@ window.HOLAVON_I18N = {
     "sample.quote": "«Mi gata se perdió, ¿volverá a casa?» El regente del ascendente es la Luna en la casa 4, no retrógrada, en trígono con Marte en la casa 6. Respuesta: sí, en dos o tres días, desde un espacio cerrado cercano.",
     "sample.cite": "De una lectura de Holavon, abreviada",
     "sample.p1": "Tendencia sí/no", "sample.p2": "Ventana de tiempo", "sample.p3": "Advertencias",
+
+    "home.screens.eyebrow": "DESDE LA APP",
+    "home.screens.title": "Pantallas reales, lecturas reales.",
+    "home.screens.sub": "El flujo: pregunta, carta, interpretación.",
+    "screen1": "Escribe tu pregunta", "screen2": "Mira la carta", "screen3": "Lee la interpretación",
+    "screens.note": "La interfaz se muestra en turco; la app también funciona en inglés y español.",
 
     "home.faq.eyebrow": "PREGUNTAS", "home.faq.title": "Dudas frecuentes",
     "home.faq.all": "Ver todas las preguntas",
