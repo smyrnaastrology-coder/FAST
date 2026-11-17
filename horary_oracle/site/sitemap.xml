@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://horary-oracle-api.onrender.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/horary</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/features</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/pricing</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/blog-horary-nedir</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/blog-kayip-esya</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/blog-ay</loc><changefreq>yearly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://horary-oracle-api.onrender.com/support</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+</urlset>
