@@ -11,10 +11,6 @@ import swisseph as swe
 from datetime import datetime, date, timedelta
 from collections import defaultdict
 from PIL import Image
-try:
-    import streamlit as st
-except Exception:
-    st = None
 
 from core.data import (_FAST_RENKLER, fbst_yukselenler, fbst_retrolar,
     fbst_yukselenler_cocuk, fbst_retrolar_cocuk, fbst_yukselenler_ebeveyn, fbst_retrolar_ebeveyn,
@@ -9589,7 +9585,7 @@ class FBST_Engine:
                             toplam_muhur += 1
                             yorum_key = (asteroit_adi, hedef_adi)
                             varsayilan_yorum = (f"{asteroit_adi} - {pdf_label(hedef_adi)} karmic contact" if _L else f"{asteroit_adi} - {hedef_adi} karmik teması")
-                            _aktif_mod = st.session_state.get("sim_modu", "es_sevgili")
+                            _aktif_mod = getattr(self, "mod", "es_sevgili")
                             _asteroid_sinastri_sozluk = ARAP_ILISKI.get("ASTEROID_SINASTRI_YORUMLARI", {})
                             if _aktif_mod == "ebeveyn_cocuk" and ASTEROID_SINASTRI_YORUMLARI_EBEVEYN:
                                 yorum = ASTEROID_SINASTRI_YORUMLARI_EBEVEYN.get(yorum_key, _asteroid_sinastri_sozluk.get(yorum_key, varsayilan_yorum))

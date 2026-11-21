@@ -1235,6 +1235,58 @@ async def _rate_limit(request: Request, call_next):
                 del _RL_BUCKET[k]
     return await call_next(request)
 
+
+# ─── Bellek gözlemcisi ───
+# Render "starter" planinda bellek sinirli; OOM ile yeniden baslamayi
+# teshis edebilmek icin API isteklerinin RSS etkisini logluyoruz.
+# Yalnizca dikkat ceken istekleri yazar (yavas, pahali veya esik ustu),
+# boylece log gurultusu olmaz.
+_RSS_WARN_MB = float(os.getenv("RSS_WARN_MB", "420"))
+
+
+def _rss_mb() -> float:
+    """Surecin yerlesik bellek kullanimi (MB). Bilinmiyorsa -1."""
+    try:
+        with open("/proc/self/statm", "r") as f:
+            sayfa = int(f.read().split()[1])
+        return sayfa * (os.sysconf("SC_PAGE_SIZE") / (1024 * 1024))
+    except Exception:
+        try:
+            import resource
+
+            rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            # macOS bayt, Linux KB dondurur.
+            return rss / (1024 * 1024) if sys.platform == "darwin" else rss / 1024
+        except Exception:
+            return -1.0
+
+
+@app_fast.middleware("http")
+async def _bellek_gozlem(request: Request, call_next):
+    yol = request.url.path
+    if not yol.startswith("/api/") or yol in _TR_BLOCK_PATHS:
+        return await call_next(request)
+    once = _rss_mb()
+    basla = _rl_time.time()
+    yanit = await call_next(request)
+    sonra = _rss_mb()
+    sure_ms = (_rl_time.time() - basla) * 1000
+    if once >= 0 and sonra >= 0:
+        artis = sonra - once
+        if yanit.status_code >= 500 or sonra >= _RSS_WARN_MB or artis >= 40 or sure_ms >= 8000:
+            print(
+                f"[mem] {request.method} {yol} {yanit.status_code} "
+                f"{sure_ms:.0f}ms rss={once:.0f}->{sonra:.0f}MB (+{artis:.0f})",
+                flush=True,
+            )
+    return yanit
+
+
+@app_fast.on_event("startup")
+def _bellek_taban_logu():
+    print(f"[mem] baslangic rss={_rss_mb():.0f}MB (uyari esigi {_RSS_WARN_MB:.0f}MB)", flush=True)
+
+
 # ─── IP ülke gate (kaldırıldı — tüm ülkeler erişebilir) ───
 
 # ─── In-memory engine cache ───
