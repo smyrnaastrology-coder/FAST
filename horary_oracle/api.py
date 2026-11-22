@@ -2065,7 +2065,7 @@ async function load(){
     const created=new Date(q.created_at).toLocaleString();
     const dl=q.deadline_at?new Date(q.deadline_at).toLocaleString():'-';
     d.innerHTML=`<div class="meta">${esc(q.topic)} &middot; ${esc(q.lang)} &middot; ${esc(q.status)} ${badge(q.status,q.deadline_at)} &middot; ${q.price_try} TL</div>
-      <div class="meta">olusturma: ${created} &middot; son cevap: ${dl}</div>
+      <div class="meta">olusturma: ${created} &middot; sure bitisi: ${dl}</div>
       <div class="q">${esc(q.question)}</div>
       <textarea id="a_${q.id}" placeholder="Cevabinizi yazin...">${esc(q.answer_text||'')}</textarea>
       <div class="row" style="margin-top:8px">
