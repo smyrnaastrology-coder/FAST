@@ -251,21 +251,24 @@ async def admin_page():
     html = pathlib.Path("horary_oracle/admin.html").read_text(encoding="utf-8")
     return HTMLResponse(html)
 
+def _admin_ok(key):
+    """Accept only the configured ADMIN_KEY; never fall back to source defaults."""
+    import hmac
+    expected = (os.getenv("ADMIN_KEY") or "").strip()
+    supplied = (key or "").strip()
+    return bool(expected and supplied) and hmac.compare_digest(supplied, expected)
+
+
 @app.get("/admin/list")
 async def admin_list(key: str = ""):
-    import os, json
-    admin_key = os.getenv("ADMIN_KEY", "")
-    # Env set ise key zorunlu, yoksa geçici açık (ama logla)
-    if admin_key and key != admin_key:
+    if not _admin_ok(key):
         raise HTTPException(403, "forbidden: admin key required")
     import auth as _adm
     return _adm._load()
 
 @app.post("/admin/create")
 async def admin_create(email: str, key: str = ""):
-    import os
-    admin_key = os.getenv("ADMIN_KEY", "")
-    if admin_key and key != admin_key:
+    if not _admin_ok(key):
         raise HTTPException(403, "forbidden: admin key required")
     from auth import create_user
     pwd = create_user(email)
@@ -1248,7 +1251,7 @@ def admin_page():
 Kredili 100 soru: <b>Oracle 200 TL</b> &middot; <b>Premium 360 TL</b> &middot; <b>Elite 600 TL</b><br>
 Yillik Sinirsiz: <b>Oracle 5.000 TL</b> &middot; <b>Premium 10.000 TL</b> &middot; <b>Elite 20.000 TL</b>
 </div>
-<div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
+<div>Admin Key: <input id="key" type="password" placeholder="ADMIN_KEY" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="365" style="width:60px"> gün <button onclick="createUser()">Uret (yillik)</button> <span id="out"></span></div>
 <div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''oracle''','''200''')" style="background:#6a9ae2">Oracle 100 - 200TL</button> <button onclick="addCredits('''premium''','''360''')" style="background:#C9A96E">Premium 100 - 360TL</button> <button onclick="addCredits('''elite''','''600''')" style="background:#D4AF37">Elite 100 - 600TL</button></div>
 <table id="tbl"><thead><tr><th>Kullanici</th><th>Plan</th><th>Expiry</th><th>Trial</th><th>Cihaz</th><th>Islem</th></tr></thead><tbody></tbody></table>
@@ -1281,8 +1284,7 @@ load();
 
 @app.get("/admin/users")
 def admin_users(x_admin_key: str = _Header(None)):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
+    if not _admin_ok(x_admin_key):
         return {"error": "unauthorized"}
     db=_auth._load()
     out=[]
@@ -1292,8 +1294,7 @@ def admin_users(x_admin_key: str = _Header(None)):
 
 @app.post("/admin/create")
 def admin_create(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
+    if not _admin_ok(x_admin_key):
         return {"error": "unauthorized"}
     email=(payload.get("email") or payload.get("user") or "").strip().lower()
     if not email: return {"error": "email gerekli"}
@@ -1314,8 +1315,7 @@ def admin_create(payload: dict, x_admin_key: str = _Header(None)):
 
 @app.post("/admin/add_credits")
 def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
+    if not _admin_ok(x_admin_key):
         return {"error": "unauthorized"}
     email=(payload.get("email") or payload.get("user") or "").strip().lower()
     if not email:
@@ -1336,8 +1336,7 @@ def admin_add_credits(payload: dict, x_admin_key: str = _Header(None)):
 
 @app.post("/admin/set_plan")
 def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
+    if not _admin_ok(x_admin_key):
         return {"error": "unauthorized"}
     email=(payload.get("user") or payload.get("email") or "").strip().lower()
     plan=(payload.get("plan") or "").strip()
@@ -1357,8 +1356,7 @@ def admin_set_plan(payload: dict, x_admin_key: str = _Header(None)):
 
 @app.post("/admin/reset_devices")
 def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
-    _allowed = {__import__("os").getenv("ADMIN_KEY", "Tuana21."), "Tuana21.", "asartepe 2025", "asartepe2025"}
-    if x_admin_key not in _allowed:
+    if not _admin_ok(x_admin_key):
         return {"error": "unauthorized"}
     email=(payload.get("user") or payload.get("email") or "").strip().lower()
     if not email:
@@ -1386,9 +1384,7 @@ _SB_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or ""
 
 
 def _q_allowed(key):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.",
-                "asartepe 2025", "asartepe2025"}
-    return key in _allowed
+    return _admin_ok(key)
 
 
 def _sb(method, path, payload=None, prefer=None):
