@@ -1841,7 +1841,7 @@ def admin_page():
 Kredili 100 soru: <b>Temel 700 TL</b> &middot; <b>Gelismis 750 TL</b> &middot; <b>En iyi 1.500 TL</b><br>
 Yillik Sinirsiz: fiyatlar maliyet &times;4 &mdash; kademe eklendikce buraya eklenir
 </div>
-<div>Admin Key: <input id="key" type="password" value="asartepe 2025" style="width:200px"> <button onclick="load()">Listele</button></div>
+<div>Admin Key: <input id="key" type="password" placeholder="ADMIN_KEY" style="width:200px"> <button onclick="load()">Listele</button></div>
 <div style="margin-top:12px"><input id="email" placeholder="email veya kullanici adi (ornek: hilal@gmail.com)" style="width:260px"> <input id="days" type="number" value="365" style="width:60px"> gün <button onclick="createUser()">Uret (yillik)</button> <span id="out"></span></div>
 <div style="margin-top:8px">Kredili 100 soru: <button onclick="addCredits('''basic''','''700''')" style="background:#6a9ae2">Temel 100 - 700TL</button> <button onclick="addCredits('''plus''','''750''')" style="background:#C9A96E">Gelismis 100 - 750TL</button> <button onclick="addCredits('''pro''','''1500''')" style="background:#D4AF37">En iyi 100 - 1500TL</button></div>
 <table id="tbl"><thead><tr><th>Kullanici</th><th>Plan</th><th>Expiry</th><th>Trial</th><th>Cihaz</th><th>Islem</th></tr></thead><tbody></tbody></table>
@@ -1985,9 +1985,11 @@ _SB_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or ""
 
 
 def _q_allowed(key):
-    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.",
-                "asartepe 2025", "asartepe2025"}
-    return key in _allowed
+    try:
+        _require_admin_key(key)
+        return True
+    except HTTPException:
+        return False
 
 
 def _sb(method, path, payload=None, prefer=None):
