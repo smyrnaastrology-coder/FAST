@@ -11,6 +11,7 @@ import '../services/pro_service.dart';
 import '../widgets/sky_strip.dart';
 import '../widgets/theme_palette_picker.dart';
 import 'analyzer_screen.dart';
+import 'astro_consult_screen.dart';
 import 'horary_screen.dart';
 import 'landing_screen.dart';
 import 'profile_screen.dart';
@@ -65,9 +66,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   Future<void> _pushAndWait(Widget screen) async {
-    await Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => screen));
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
   /// Günlük kişisel yorum: doğrudan kişisel natal haritaya gider.
@@ -75,9 +74,7 @@ class _MainShellState extends State<MainShell> {
     // Bildirim hakkı Pro'ya bağlı olsa da yorum ekranının kendisi herkese
     // açıktır; burada Pro kapısı yok. Böylece Pro olan kullanıcı tekrar
     // ödeme ekranına düşmez.
-    await _pushAndWait(
-      const AnalyzerScreen(initialMode: 'bireysel_natal'),
-    );
+    await _pushAndWait(const AnalyzerScreen(initialMode: 'bireysel_natal'));
   }
 
   /// İlk girişte 3 adımlı tanıtımı göster; bir kez gösterilir.
@@ -449,103 +446,184 @@ class _MainShellState extends State<MainShell> {
           ],
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ap.email.isNotEmpty
-                      ? '${l10n.hubWelcome}\n${ap.email}'
-                      : l10n.hubWelcome,
-                  style: TextStyle(
-                    color: FastTheme.textMuted,
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.hubChoose,
-                  style: TextStyle(
-                    color: FastTheme.textLight,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      const SkyStrip(),
-                      const SizedBox(height: 14),
-                      _proBanner(l10n),
-                      const SizedBox(height: 14),
-                      _PillarCard(
-                        icon: Icons.auto_stories_outlined,
-                        activeIcon: Icons.auto_stories,
-                        asset: 'assets/horary_oracle_logo.png',
-                        title: l10n.hubHoraryTitle,
-                        desc: l10n.hubHoraryDesc,
-                        badge: l10n.hubFeatured,
-                        featured: true,
-                        colors: [FastTheme.accentGold, FastTheme.rose],
-                        onTap: () => _pushWithNotice(
-                          prefKey: 'holavon_horary_notice_v1',
-                          title: l10n.horaryIntroTitle,
-                          body: l10n.horaryNoticeBody,
-                          screen: const HoraryScreen(),
+          child: LayoutBuilder(
+            builder: (context, viewport) {
+              final wide = viewport.maxWidth >= 760;
+              final horizontalPadding = wide ? 32.0 : 20.0;
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1280),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                      vertical: 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ap.email.isNotEmpty
+                              ? '${l10n.hubWelcome}\n${ap.email}'
+                              : l10n.hubWelcome,
+                          style: TextStyle(
+                            color: FastTheme.textMuted,
+                            fontSize: 14,
+                            height: 1.4,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _DailyProgressTile(
-                        onTap: _openDailyProgress,
-                        title: l10n.proPillarProgress,
-                        desc: l10n.proPillarProgressDesc,
-                      ),
-                      const SizedBox(height: 16),
-                      _PillarCard(
-                        icon: Icons.auto_graph_outlined,
-                        activeIcon: Icons.auto_graph,
-                        emblem: const ChartMark(),
-                        title: l10n.hubChartsTitle,
-                        desc: l10n.hubChartsDesc,
-                        colors: [Color(0xFFD9B75B), Color(0xFFF5B700)],
-                        onTap: () => _push(const ChartListScreen()),
-                      ),
-                      const SizedBox(height: 16),
-                      _PillarCard(
-                        icon: Icons.auto_awesome_outlined,
-                        activeIcon: Icons.auto_awesome,
-                        asset: 'assets/fast_synastry_logo.png',
-                        title: l10n.hubAnalysisTitle,
-                        desc: l10n.hubAnalysisDesc,
-                        colors: [FastTheme.secondary, FastTheme.accent],
-                        onTap: () => _pushWithNotice(
-                          prefKey: 'holavon_synastry_notice_v1',
-                          title: l10n.warningTitle,
-                          body: l10n.warningBody,
-                          screen: const AnalyzerScreen(),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.hubChoose,
+                          style: TextStyle(
+                            color: FastTheme.textLight,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _PillarCard(
-                        icon: Icons.people_alt_outlined,
-                        activeIcon: Icons.people_alt,
-                        asset: 'assets/holavon_logo.png',
-                        title: l10n.hubSocialTitle,
-                        desc: l10n.hubSocialDesc,
-                        colors: [
-                          FastTheme.accentGold,
-                          FastTheme.accentGoldLight,
-                        ],
-                        onTap: () => _push(const SocialGate()),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: LayoutBuilder(
+                            builder: (context, content) {
+                              final columns = content.maxWidth >= 1120
+                                  ? 3
+                                  : content.maxWidth >= 700
+                                  ? 2
+                                  : 1;
+                              const gap = 16.0;
+                              final tileWidth =
+                                  (content.maxWidth - gap * (columns - 1)) /
+                                  columns;
+                              final modules = <Widget>[
+                                _PillarCard(
+                                  icon: Icons.auto_stories_outlined,
+                                  activeIcon: Icons.auto_stories,
+                                  asset: 'assets/horary_oracle_logo.png',
+                                  title: l10n.hubHoraryTitle,
+                                  desc: l10n.hubHoraryDesc,
+                                  badge: l10n.hubFeatured,
+                                  featured: true,
+                                  colors: [
+                                    FastTheme.accentGold,
+                                    FastTheme.rose,
+                                  ],
+                                  onTap: () => _pushWithNotice(
+                                    prefKey: 'holavon_horary_notice_v1',
+                                    title: l10n.horaryIntroTitle,
+                                    body: l10n.horaryNoticeBody,
+                                    screen: const HoraryScreen(),
+                                  ),
+                                ),
+                                _PillarCard(
+                                  icon: Icons.support_agent_outlined,
+                                  activeIcon: Icons.support_agent,
+                                  title: switch (Localizations.localeOf(
+                                    context,
+                                  ).languageCode) {
+                                    'en' => 'Ask an Astrologer',
+                                    'es' => 'Pregunta a un Astrólogo',
+                                    _ => 'Astroloğa Sor',
+                                  },
+                                  desc: switch (Localizations.localeOf(
+                                    context,
+                                  ).languageCode) {
+                                    'en' =>
+                                      'Written answer from a real astrologer within 24 hours',
+                                    'es' =>
+                                      'Respuesta escrita de un astrólogo real en 24 horas',
+                                    _ =>
+                                      '24 saat içinde gerçek astrologdan yazılı cevap',
+                                  },
+                                  badge: switch (Localizations.localeOf(
+                                    context,
+                                  ).languageCode) {
+                                    'en' => 'NEW',
+                                    'es' => 'NUEVO',
+                                    _ => 'YENİ',
+                                  },
+                                  colors: [
+                                    FastTheme.accentGold,
+                                    FastTheme.secondary,
+                                  ],
+                                  onTap: () =>
+                                      _push(const AstroConsultScreen()),
+                                ),
+                                _DailyProgressTile(
+                                  onTap: _openDailyProgress,
+                                  title: l10n.proPillarProgress,
+                                  desc: l10n.proPillarProgressDesc,
+                                ),
+                                _PillarCard(
+                                  icon: Icons.auto_graph_outlined,
+                                  activeIcon: Icons.auto_graph,
+                                  emblem: const ChartMark(),
+                                  title: l10n.hubChartsTitle,
+                                  desc: l10n.hubChartsDesc,
+                                  colors: [
+                                    Color(0xFFD9B75B),
+                                    Color(0xFFF5B700),
+                                  ],
+                                  onTap: () => _push(const ChartListScreen()),
+                                ),
+                                _PillarCard(
+                                  icon: Icons.auto_awesome_outlined,
+                                  activeIcon: Icons.auto_awesome,
+                                  asset: 'assets/fast_synastry_logo.png',
+                                  title: l10n.hubAnalysisTitle,
+                                  desc: l10n.hubAnalysisDesc,
+                                  colors: [
+                                    FastTheme.secondary,
+                                    FastTheme.accent,
+                                  ],
+                                  onTap: () => _pushWithNotice(
+                                    prefKey: 'holavon_synastry_notice_v1',
+                                    title: l10n.warningTitle,
+                                    body: l10n.warningBody,
+                                    screen: const AnalyzerScreen(),
+                                  ),
+                                ),
+                                _PillarCard(
+                                  icon: Icons.people_alt_outlined,
+                                  activeIcon: Icons.people_alt,
+                                  asset: 'assets/holavon_logo.png',
+                                  title: l10n.hubSocialTitle,
+                                  desc: l10n.hubSocialDesc,
+                                  colors: [
+                                    FastTheme.accentGold,
+                                    FastTheme.accentGoldLight,
+                                  ],
+                                  onTap: () => _push(const SocialGate()),
+                                ),
+                              ];
+
+                              return ListView(
+                                children: [
+                                  const SkyStrip(),
+                                  const SizedBox(height: 14),
+                                  _proBanner(l10n),
+                                  const SizedBox(height: 16),
+                                  Wrap(
+                                    spacing: gap,
+                                    runSpacing: gap,
+                                    children: modules
+                                        .map(
+                                          (module) => SizedBox(
+                                            width: tileWidth,
+                                            child: module,
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
