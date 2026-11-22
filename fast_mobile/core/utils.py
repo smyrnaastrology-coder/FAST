@@ -26,8 +26,8 @@ def _plt():
         return _PLT
     import matplotlib.pyplot as plt
     plt.rcParams.update({
-        'font.family': 'sans-serif',
-        'font.sans-serif': ['Segoe UI Symbol', 'Segoe UI', 'DejaVu Sans', 'Arial'],
+        'font.family': ['DejaVu Sans', 'Segoe UI Symbol', 'Segoe UI', 'Arial'],
+        'font.sans-serif': ['DejaVu Sans', 'Segoe UI Symbol', 'Segoe UI', 'Arial'],
         'font.size': 11, 'axes.titlesize': 14, 'axes.titleweight': 'bold',
         'axes.labelsize': 11, 'axes.facecolor': '#FBF7F4', 'figure.facecolor': '#FFFFFF',
         'axes.edgecolor': '#E8E0D8', 'axes.linewidth': 0.8, 'axes.grid': True,
