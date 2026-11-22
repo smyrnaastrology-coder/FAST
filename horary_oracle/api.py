@@ -7,7 +7,7 @@ Horary Oracle FastAPI - Yüksek Performans
 import os, sys, time, copy, hmac
 from collections import OrderedDict
 from functools import lru_cache
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from threading import RLock
 from typing import Optional
 
@@ -1972,6 +1972,192 @@ def admin_reset_devices(payload: dict, x_admin_key: str = _Header(None)):
         return {"ok": True, "user": email}
     return _auth5.update(_reset)
 
+# ─── ADMIN: Astroloğa Sor — soru kuyruğu ────────────────────────────────────
+# Supabase tablolarına service_role ile erişir. Gerekli ortam değişkenleri:
+#   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+# Panel: https://horary-oracle-api.onrender.com/admin/questions
+import json as _json_q
+import urllib.request as _urlq
+import urllib.error as _urlerrq
+
+_SB_URL = (os.getenv("SUPABASE_URL") or "").rstrip("/")
+_SB_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or ""
+
+
+def _q_allowed(key):
+    _allowed = {os.getenv("ADMIN_KEY", "Tuana21."), "Tuana21.",
+                "asartepe 2025", "asartepe2025"}
+    return key in _allowed
+
+
+def _sb(method, path, payload=None, prefer=None):
+    """Supabase REST çağrısı (service_role). Sonuç: (durum, gövde)."""
+    if not _SB_URL or not _SB_KEY:
+        return 503, {"error": "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY tanimli degil"}
+    url = f"{_SB_URL}/rest/v1/{path}"
+    data = _json_q.dumps(payload).encode("utf-8") if payload is not None else None
+    req = _urlq.Request(url, data=data, method=method)
+    req.add_header("apikey", _SB_KEY)
+    req.add_header("Authorization", f"Bearer {_SB_KEY}")
+    req.add_header("Content-Type", "application/json")
+    if prefer:
+        req.add_header("Prefer", prefer)
+    try:
+        with _urlq.urlopen(req, timeout=20) as r:
+            raw = r.read().decode("utf-8")
+            return r.status, (_json_q.loads(raw) if raw.strip() else None)
+    except _urlerrq.HTTPError as e:
+        try:
+            body = _json_q.loads(e.read().decode("utf-8"))
+        except Exception:
+            body = {"error": str(e)}
+        return e.code, body
+    except Exception as e:
+        return 500, {"error": str(e)}
+
+
+@app.get("/admin/questions", include_in_schema=False)
+def admin_questions_page():
+    return HTMLResponse("""<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Astrologa Sor - Sorular</title>
+<style>
+body{font-family:system-ui;background:#0F0A18;color:#e8e0f0;padding:18px;max-width:900px;margin:0 auto}
+input,textarea,button,select{font:inherit;padding:10px;border-radius:8px;border:1px solid #3d2e50;background:#1A1423;color:#e8e0f0}
+button{background:#C9A96E;color:#000;font-weight:700;cursor:pointer;border:none}
+button.sec{background:#3d2e50;color:#e8e0f0}
+.card{border:1px solid #3d2e50;border-radius:12px;padding:14px;margin:12px 0;background:#171021}
+.meta{font-size:12px;color:#a99bc0;margin-bottom:6px}
+.q{font-size:14px;line-height:1.45;margin:6px 0 10px}
+.badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700}
+.late{background:#5a1b1b;color:#ffb3b3}
+.ok{background:#1b4a2a;color:#a8f0c0}
+.wait{background:#4a3a12;color:#f0dfa8}
+textarea{width:100%;min-height:110px;box-sizing:border-box}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+</style>
+<h2 style="color:#C9A96E;margin:0 0 12px">Astrologa Sor &mdash; Sorular</h2>
+<div class="row">
+  <input id="key" type="password" placeholder="Admin Key" style="width:180px">
+  <button onclick="load()">Yenile</button>
+  <span id="out" style="font-size:12px;color:#a99bc0"></span>
+</div>
+<div id="list" style="margin-top:14px"></div>
+<script>
+const K=()=>document.getElementById('key').value;
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function badge(st,deadline){
+  const now=Date.now();
+  const late = deadline && new Date(deadline).getTime() < now;
+  if(st==='answered'||st==='closed') return '<span class="badge ok">cevaplandi</span>';
+  if(st==='refunded'||st==='expired') return '<span class="badge late">'+st+'</span>';
+  if(st==='open') return '<span class="badge '+(late?'late':'wait')+'">'+(late?'gecikti':'cevap bekliyor')+'</span>';
+  return '<span class="badge wait">odeme bekliyor</span>';
+}
+async function load(){
+  const r=await fetch('/admin/questions/list?limit=60',{headers:{'x-admin-key':K()}});
+  const j=await r.json();
+  if(j.error){document.getElementById('out').textContent=j.error;return;}
+  document.getElementById('out').textContent=(j.items||[]).length+' soru';
+  const box=document.getElementById('list'); box.innerHTML='';
+  (j.items||[]).forEach(q=>{
+    const d=document.createElement('div'); d.className='card';
+    const created=new Date(q.created_at).toLocaleString();
+    const dl=q.deadline_at?new Date(q.deadline_at).toLocaleString():'-';
+    d.innerHTML=`<div class="meta">${esc(q.topic)} &middot; ${esc(q.lang)} &middot; ${esc(q.status)} ${badge(q.status,q.deadline_at)} &middot; ${q.price_try} TL</div>
+      <div class="meta">olusturma: ${created} &middot; son cevap: ${dl}</div>
+      <div class="q">${esc(q.question)}</div>
+      <textarea id="a_${q.id}" placeholder="Cevabinizi yazin...">${esc(q.answer_text||'')}</textarea>
+      <div class="row" style="margin-top:8px">
+        <button onclick="answer('${q.id}')">Cevabi gonder</button>
+        <button class="sec" onclick="mark('${q.id}','open')">Odeme alindi - ac</button>
+        <button class="sec" onclick="mark('${q.id}','refunded')">Iade et</button>
+        <button class="sec" onclick="mark('${q.id}','closed')">Kapat</button>
+      </div>`;
+    box.appendChild(d);
+  });
+}
+async function answer(id){
+  const text=document.getElementById('a_'+id).value.trim();
+  if(text.length<20){alert('Cevap en az 20 karakter olmali.');return;}
+  const r=await fetch('/admin/questions/answer',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,answer:text})});
+  const j=await r.json();
+  if(j.error){alert(j.error);return;}
+  load();
+}
+async function mark(id,status){
+  if(!confirm(status+' olarak isaretlensin mi?'))return;
+  await fetch('/admin/questions/status',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,status})});
+  load();
+}
+</script>""")
+
+
+@app.get("/admin/questions/list")
+def admin_questions_list(x_admin_key: str = _Header(None), limit: int = 60):
+    if not _q_allowed(x_admin_key):
+        return {"error": "unauthorized"}
+    fields = ("id,user_id,topic,question,lang,price_try,status,deadline_at,"
+              "answer_text,created_at,answered_at,rating")
+    status, body = _sb(
+        "GET",
+        f"astro_questions?select={fields}&order=created_at.desc&limit={max(1, min(limit, 200))}",
+    )
+    if status >= 400:
+        return {"error": body}
+    return {"items": body or []}
+
+
+@app.post("/admin/questions/answer")
+def admin_questions_answer(payload: dict, x_admin_key: str = _Header(None)):
+    if not _q_allowed(x_admin_key):
+        return {"error": "unauthorized"}
+    qid = (payload.get("id") or "").strip()
+    answer = (payload.get("answer") or "").strip()
+    if not qid:
+        return {"error": "id gerekli"}
+    if len(answer) < 20:
+        return {"error": "cevap en az 20 karakter olmali"}
+    status, body = _sb(
+        "PATCH",
+        f"astro_questions?id=eq.{qid}",
+        {
+            "answer_text": answer,
+            "answered_at": datetime.utcnow().isoformat() + "Z",
+            "status": "answered",
+        },
+        prefer="return=minimal",
+    )
+    if status >= 400:
+        return {"error": body}
+    return {"ok": True}
+
+
+@app.post("/admin/questions/status")
+def admin_questions_status(payload: dict, x_admin_key: str = _Header(None)):
+    if not _q_allowed(x_admin_key):
+        return {"error": "unauthorized"}
+    qid = (payload.get("id") or "").strip()
+    new_status = (payload.get("status") or "").strip()
+    if new_status not in ("open", "closed", "refunded", "expired"):
+        return {"error": "gecersiz durum"}
+    patch = {"status": new_status}
+    if new_status == "open":
+        # Ödeme doğrulandığında 24 saatlik cevap süresi başlar.
+        patch["deadline_at"] = (
+            datetime.utcnow() + timedelta(hours=24)
+        ).isoformat() + "Z"
+    status, body = _sb(
+        "PATCH",
+        f"astro_questions?id=eq.{qid}",
+        patch,
+        prefer="return=minimal",
+    )
+    if status >= 400:
+        return {"error": body}
+    return {"ok": True}
+
+
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
 
 # ---------- Public website (Holavon) ----------
@@ -2047,4 +2233,3 @@ def site_page(page: str):
     if not fn:
         raise HTTPException(status_code=404, detail="Sayfa bulunamadı")
     return _FileResponse(os.path.join(_SITE_DIR, fn))
-
