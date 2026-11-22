@@ -6915,6 +6915,188 @@ async def push_social(request: Request):
     return {"ok": True, "sent": sent, "failed": failed, "removed": removed}
 
 
+# ============================================================================
+# Astro consultation push (Astrologoga Sor)
+#
+# Supabase trigger -> POST /api/push/astro -> FCM HTTP v1.
+# Same secret (HOLAVON_PUSH_SECRET) and FCM credentials as social push.
+# ============================================================================
+
+_ASTRO_TOPICS = {
+    "love": {"tr": "Aşk & ilişki", "en": "Love & relationship", "es": "Amor y relación"},
+    "career": {"tr": "İş & kariyer", "en": "Work & career", "es": "Trabajo y carrera"},
+    "family": {"tr": "Aile", "en": "Family", "es": "Familia"},
+    "lost": {"tr": "Kayıp", "en": "Lost item", "es": "Objeto perdido"},
+    "health": {"tr": "Sağlık", "en": "Health", "es": "Salud"},
+    "other": {"tr": "Diğer", "en": "Other", "es": "Otro"},
+}
+
+
+def _astro_topic_label(lang: str, topic: str) -> str:
+    labels = _ASTRO_TOPICS.get((topic or "").strip().lower())
+    if not labels:
+        return ""
+    return labels.get(lang) or labels["tr"]
+
+
+def _astro_push_text(lang: str, kind: str, topic: str = "",
+                     preview: str = ""):
+    """Localized title/body for consultation notifications."""
+    if lang not in ("tr", "en", "es"):
+        lang = "tr"
+    label = _astro_topic_label(lang, topic)
+    preview = (preview or "").strip()[:120]
+
+    if kind == "new_question":
+        if lang == "en":
+            return ("New question",
+                    f"{label or 'Consultation'} · payment pending. Open the panel to answer.")
+        if lang == "es":
+            return ("Nueva pregunta",
+                    f"{label or 'Consulta'} · pago pendiente. Abre el panel para responder.")
+        return ("Yeni soru",
+                f"{label or 'Danışmanlık'} · ödeme bekliyor. Cevaplamak için paneli açın.")
+
+    if kind == "answered":
+        if lang == "en":
+            return ("Your answer is ready",
+                    preview or "Your astrologer replied. Open the app to read it.")
+        if lang == "es":
+            return ("Tu respuesta está lista",
+                    preview or "Tu astrólogo respondió. Abre la app para leerla.")
+        return ("Cevabınız hazır",
+                preview or "Astroloğunuz yanıtı yazdı. Okumak için uygulamayı açın.")
+
+    if kind == "expired":
+        if lang == "en":
+            return ("Time is up",
+                    "No answer arrived in 24 hours. Your refund process has started.")
+        if lang == "es":
+            return ("Se acabó el tiempo",
+                    "No llegó respuesta en 24 horas. Tu reembolso está en proceso.")
+        return ("Süre doldu",
+                "24 saat içinde cevap gelmedi. İade süreciniz başlatıldı.")
+
+    if lang == "en":
+        return ("Consultation updated", "Your consultation status changed.")
+    if lang == "es":
+        return ("Consulta actualizada", "El estado de tu consulta cambió.")
+    return ("Danışmanlık güncellendi", "Sorunuzun durumu değişti.")
+
+
+class AstroPushInput(BaseModel):
+    kind: str
+    user_id: str
+    question_id: Optional[str] = None
+    lang: Optional[str] = None
+    topic: Optional[str] = None
+    preview: Optional[str] = None
+
+
+@app_fast.post("/api/push/astro")
+async def push_astro(request: Request):
+    """Webhook called by the Supabase trigger for consultation events."""
+    expected = os.getenv("HOLAVON_PUSH_SECRET", "").strip()
+    if not expected:
+        return JSONResponse(status_code=503, content={"ok": False, "reason": "push_not_configured"})
+    got = request.headers.get("X-Holavon-Push-Secret", "")
+    if not hmac.compare_digest(got, expected):
+        return JSONResponse(status_code=401, content={"ok": False, "reason": "bad_secret"})
+
+    try:
+        payload = AstroPushInput(**(await request.json()))
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"ok": False, "reason": f"bad_payload: {e}"})
+
+    kind = (payload.kind or "").strip().lower()
+    if kind not in ("new_question", "answered", "expired", "refunded"):
+        return JSONResponse(status_code=400, content={"ok": False, "reason": "bad_kind"})
+    if not (payload.user_id or "").strip():
+        return JSONResponse(status_code=400, content={"ok": False, "reason": "missing_user"})
+
+    dedup_key = ("astro", kind, payload.question_id or "", payload.user_id)
+    now = time.time()
+    if now - _PUSH_SEEN.get(dedup_key, 0) < 30:
+        return {"ok": True, "sent": 0, "reason": "duplicate"}
+    if len(_PUSH_SEEN) > 500:
+        for k, ts in list(_PUSH_SEEN.items()):
+            if now - ts > 300:
+                _PUSH_SEEN.pop(k, None)
+    _PUSH_SEEN[dedup_key] = now
+
+    supa_url, supa_key = _push_supabase_cfg()
+    if not supa_url or not supa_key:
+        return JSONResponse(
+            status_code=503,
+            content={"ok": False, "reason": "supabase_service_role_missing"},
+        )
+    headers = _push_sb_headers(supa_key)
+
+    try:
+        r = requests.get(
+            f"{supa_url}/rest/v1/device_tokens",
+            params={
+                "user_id": f"eq.{payload.user_id}",
+                "select": "token,lang,platform",
+            },
+            headers=headers,
+            timeout=10,
+        )
+    except Exception as e:
+        return JSONResponse(status_code=502, content={"ok": False, "reason": f"token_lookup_failed: {e}"})
+    if r.status_code != 200:
+        return JSONResponse(
+            status_code=502,
+            content={"ok": False, "reason": "token_lookup_failed", "detail": r.text[:200]},
+        )
+    tokens = r.json() or []
+    if not tokens:
+        return {"ok": True, "sent": 0, "reason": "no_devices"}
+
+    try:
+        creds, project_id = _push_fcm_credentials()
+        if creds is None or not project_id:
+            return JSONResponse(status_code=503, content={"ok": False, "reason": "fcm_not_configured"})
+        access_token = _push_fcm_access_token(creds)
+    except Exception as e:
+        print(f"[push] fcm credential error: {e}")
+        return JSONResponse(status_code=500, content={"ok": False, "reason": "fcm_credential_error"})
+
+    data = {"type": kind, "route": "astro"}
+    if payload.question_id:
+        data["question_id"] = payload.question_id
+
+    sent = 0
+    failed = 0
+    removed = 0
+    for row in tokens:
+        tok = str(row.get("token") or "").strip()
+        if not tok:
+            continue
+        lang = payload.lang or row.get("lang") or "tr"
+        title, body = _astro_push_text(lang, kind, payload.topic or "", payload.preview or "")
+        ok, invalid, detail = _push_send_fcm(project_id, access_token, tok, title, body, data)
+        if ok:
+            sent += 1
+            continue
+        failed += 1
+        if invalid:
+            removed += 1
+            try:
+                requests.delete(
+                    f"{supa_url}/rest/v1/device_tokens",
+                    params={"token": f"eq.{tok}"},
+                    headers=headers,
+                    timeout=5,
+                )
+            except Exception:
+                pass
+        else:
+            print(f"[push] astro send failed ({row.get('platform')}): {detail}")
+
+    return {"ok": True, "sent": sent, "failed": failed, "removed": removed}
+
+
 @app_fast.post("/api/kunye")
 def kunye(p: KunyeInput):
     """Gunes/Ay burcu + derece (profil kunyesi icin hafif hesap).

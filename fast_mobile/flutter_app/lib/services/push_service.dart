@@ -70,15 +70,15 @@ class PushService {
 
     if (ApiConfig.supabaseEnabled) {
       try {
-        _authSub ??= Supabase.instance.client.auth.onAuthStateChange.listen(
-          (state) {
-            if (state.event == AuthChangeEvent.signedOut) {
-              unawaited(_unregister());
-            } else if (state.session != null) {
-              unawaited(_register());
-            }
-          },
-        );
+        _authSub ??= Supabase.instance.client.auth.onAuthStateChange.listen((
+          state,
+        ) {
+          if (state.event == AuthChangeEvent.signedOut) {
+            unawaited(_unregister());
+          } else if (state.session != null) {
+            unawaited(_register());
+          }
+        });
       } catch (e) {
         if (kDebugMode) debugPrint('[PUSH] auth listen error: $e');
       }
@@ -172,18 +172,20 @@ class PushService {
     final title = notification?.title ?? '';
     final body = notification?.body ?? '';
     if (title.isEmpty && body.isEmpty) return;
+    final route = (message.data['route'] ?? 'social').toString();
     unawaited(
       NotificationService.instance.showSocialNotification(
         title: title,
         body: body,
-        payload: 'social',
+        payload: route == 'astro' ? 'astro' : 'social',
       ),
     );
   }
 
   void _onMessageOpened(RemoteMessage message) {
-    // Likes/comments always land on the social feed; the post id stays in
-    // message.data for future deep-linking.
-    NotificationService.instance.routeTo('social');
+    // Server pushes carry a `route` hint: 'social' (likes/comments) or
+    // 'astro' (consultation events).
+    final route = (message.data['route'] ?? 'social').toString();
+    NotificationService.instance.routeTo(route == 'astro' ? 'astro' : 'social');
   }
 }

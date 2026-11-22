@@ -9,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../main.dart';
 import '../screens/horary_screen.dart';
 import '../screens/analyzer_screen.dart';
+import '../screens/astro_consult_screen.dart';
 import '../screens/main_shell.dart';
 import '../screens/social_shell.dart';
 import '../screens/dm_inbox_screen.dart';
@@ -25,6 +26,7 @@ class NotificationService {
   static const int _dailyId = 1001;
   static const int _minorProgressIdStart = 2000;
   static const int _minorProgressMaxDays = 30;
+
   /// Kanal kimligi API/ayar uyumlulugu icin sabit tutulur; kullaniciya
   /// gosterilen ad guncellenirse kimlik degismez ( aksi halde cihazda yeni
   /// bir kanal olusur ve eskisi kalir).
@@ -66,12 +68,19 @@ class NotificationService {
         nav.push(MaterialPageRoute(builder: (_) => const SocialShell()));
         return;
       }
+      if (payload == 'astro' || payload == 'consult') {
+        nav.push(MaterialPageRoute(builder: (_) => const AstroConsultScreen()));
+        return;
+      }
       if (payload == 'dm') {
         nav.push(MaterialPageRoute(builder: (_) => const DmInboxScreen()));
         return;
       }
       if (payload == 'home') {
-        nav.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const MainShell()), (r) => false);
+        nav.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainShell()),
+          (r) => false,
+        );
         return;
       }
     } catch (_) {}
@@ -80,7 +89,10 @@ class NotificationService {
   Future<void> init() async {
     if (_initialized) return;
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidInit, iOS: DarwinInitializationSettings());
+    const initSettings = InitializationSettings(
+      android: androidInit,
+      iOS: DarwinInitializationSettings(),
+    );
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _handleNotificationTap,
@@ -94,13 +106,12 @@ class NotificationService {
       if (kDebugMode) debugPrint('[NOTIF] local timezone unavailable: $e');
     }
     try {
-      _authSubscription ??= Supabase.instance.client.auth.onAuthStateChange.listen(
-        (state) {
-          if (state.event == AuthChangeEvent.signedOut) {
-            unawaited(cancelDaily());
-          }
-        },
-      );
+      _authSubscription ??= Supabase.instance.client.auth.onAuthStateChange
+          .listen((state) {
+            if (state.event == AuthChangeEvent.signedOut) {
+              unawaited(cancelDaily());
+            }
+          });
     } catch (_) {
       // Notifications still work when the optional Supabase account layer is off.
     }
@@ -116,13 +127,17 @@ class NotificationService {
   Future<bool> requestPermissions() async {
     if (!_initialized) return false;
     var granted = true;
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android != null) {
       granted = (await android.requestNotificationsPermission()) ?? false;
     }
-    final ios = _plugin.resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>();
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
     if (ios != null) {
       final appleGranted = await ios.requestPermissions(
         alert: true,
@@ -190,11 +205,17 @@ class NotificationService {
       scheduledCount++;
     }
     if (kDebugMode) {
-      debugPrint('[NOTIF] scheduled $scheduledCount personal minor-progress days');
+      debugPrint(
+        '[NOTIF] scheduled $scheduledCount personal minor-progress days',
+      );
     }
   }
 
-  Future<void> showMessageNotification({required String title, required String body, String payload = 'dm'}) async {
+  Future<void> showMessageNotification({
+    required String title,
+    required String body,
+    String payload = 'dm',
+  }) async {
     if (!_initialized) return;
     final android = AndroidNotificationDetails(
       'messages',
@@ -205,7 +226,13 @@ class NotificationService {
     );
     const darwin = DarwinNotificationDetails();
     final details = NotificationDetails(android: android, iOS: darwin);
-    await _plugin.show(DateTime.now().millisecondsSinceEpoch ~/ 1000, title, body, details, payload: payload);
+    await _plugin.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
   }
 
   /// Foreground display for server-sent social notifications (like/comment).
