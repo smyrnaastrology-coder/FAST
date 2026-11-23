@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config/api_config.dart';
 import '../config/theme.dart';
+import '../services/api_service.dart';
 import '../services/astro_consult_service.dart';
 import '../widgets/chart_location_picker.dart';
 
@@ -38,7 +41,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   String? _birthPlace;
   double? _birthLat;
   double? _birthLon;
-  double _birthTz = DateTime.now().timeZoneOffset.inMinutes / 60.0;
+  double _birthTz = 3.0;
+  bool _timezoneLoading = false;
+  bool _timezoneManualOverride = false;
+  String? _timezoneError;
+  int _timezoneRequest = 0;
   String? _placeError;
 
   static const _topics = <String, Map<String, String>>{
@@ -189,7 +196,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         _birthPlace = null;
         _birthLat = null;
         _birthLon = null;
-        _birthTz = DateTime.now().timeZoneOffset.inMinutes / 60.0;
+        _birthTz = 3.0;
+        _timezoneLoading = false;
+        _timezoneManualOverride = false;
+        _timezoneError = null;
+        _timezoneRequest++;
         _placeError = null;
       });
       await _load();
@@ -331,15 +342,84 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
 
   void _onBirthDateChanged(String value) {
     final parsed = _parseBirthDate(value);
-    setState(() => _birthDate = parsed);
+    setState(() {
+      _birthDate = parsed;
+      if (parsed != null) _timezoneManualOverride = false;
+    });
+    unawaited(_refreshBirthTimezone());
   }
 
   String _utcLabel(double v) {
-    final sign = v < 0 ? '-' : '+';
-    final abs = v.abs();
-    final whole = abs.truncate();
-    final half = (abs - whole) >= 0.5 ? ':30' : '';
-    return 'UTC$sign$whole$half';
+    final totalMinutes = (v * 60).round();
+    final sign = totalMinutes < 0 ? '-' : '+';
+    final absoluteMinutes = totalMinutes.abs();
+    final hours = absoluteMinutes ~/ 60;
+    final minutes = absoluteMinutes % 60;
+    return 'UTC$sign$hours'
+        '${minutes == 0 ? '' : ':${minutes.toString().padLeft(2, '0')}'}';
+  }
+
+  Future<void> _refreshBirthTimezone() async {
+    final request = ++_timezoneRequest;
+    final date = _birthDate;
+    final lat = _birthLat;
+    final lon = _birthLon;
+    if (date == null || lat == null || lon == null) {
+      if (mounted) {
+        setState(() {
+          _timezoneLoading = false;
+          _timezoneError = null;
+        });
+      }
+      return;
+    }
+    if (_timezoneLoading) {
+      _snack(
+        _t(
+          'Doğum yeriniz için UTC hesaplanıyor; lütfen bekleyin.',
+          'Calculating UTC for your birth place; please wait.',
+          'Calculando UTC para su lugar de nacimiento; espere.',
+        ),
+      );
+      return;
+    }
+    if (_timezoneError != null && !_timezoneManualOverride) {
+      _snack(_timezoneError!);
+      return;
+    }
+
+    setState(() {
+      _timezoneLoading = true;
+      _timezoneManualOverride = false;
+      _timezoneError = null;
+    });
+    try {
+      final result = await ApiService().birthTimezone(
+        lat: lat,
+        lon: lon,
+        birthDate: date,
+        birthTime: _timeText(
+          _birthTime ?? const TimeOfDay(hour: 12, minute: 0),
+        ),
+      );
+      final offset = (result['utc_offset'] as num).toDouble();
+      if (!mounted || request != _timezoneRequest) return;
+      setState(() {
+        _birthTz = offset;
+        _timezoneLoading = false;
+        _timezoneError = null;
+      });
+    } catch (_) {
+      if (!mounted || request != _timezoneRequest) return;
+      setState(() {
+        _timezoneLoading = false;
+        _timezoneError = _t(
+          'UTC otomatik hesaplanamadı; listeden elle seçebilirsiniz.',
+          'Could not detect UTC automatically; choose it from the list.',
+          'No se pudo detectar UTC; selecciónelo manualmente.',
+        );
+      });
+    }
   }
 
   Future<void> _pickBirthDate() async {
@@ -355,7 +435,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       setState(() {
         _birthDate = picked;
         _birthDateCtrl.text = _dateText(picked);
+        _timezoneManualOverride = false;
       });
+      unawaited(_refreshBirthTimezone());
     }
   }
 
@@ -366,7 +448,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       helpText: _t('Doğum saati', 'Birth time', 'Hora de nacimiento'),
     );
     if (picked != null && mounted) {
-      setState(() => _birthTime = picked);
+      setState(() {
+        _birthTime = picked;
+        _timezoneManualOverride = false;
+      });
+      unawaited(_refreshBirthTimezone());
     }
   }
 
@@ -675,7 +761,10 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   }
 
   Widget _birthSection() {
-    final tzOptions = List<double>.generate(53, (i) => -12 + i * 0.5);
+    final tzOptions = <double>{
+      ...List<double>.generate(105, (i) => -12 + i * 0.25),
+      _birthTz,
+    }.toList()..sort();
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -779,7 +868,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
             dropdownColor: FastTheme.cardBg,
             style: TextStyle(color: FastTheme.text, fontSize: 13),
             decoration: InputDecoration(
-              labelText: _t('Saat dilimi', 'Time zone', 'Zona horaria'),
+              labelText: _t(
+                'UTC saat dilimi',
+                'UTC time zone',
+                'Zona horaria UTC',
+              ),
               labelStyle: TextStyle(color: FastTheme.textMuted, fontSize: 12),
               filled: true,
               fillColor: FastTheme.cardBg,
@@ -805,8 +898,46 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 )
                 .toList(),
             onChanged: (v) {
-              if (v != null) setState(() => _birthTz = v);
+              if (v != null) {
+                setState(() {
+                  _timezoneRequest++;
+                  _birthTz = v;
+                  _timezoneManualOverride = true;
+                  _timezoneLoading = false;
+                  _timezoneError = null;
+                });
+              }
             },
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _timezoneLoading
+                  ? _t(
+                      'Konum ve doğum tarihine göre hesaplanıyor…',
+                      'Calculating from birth place and date…',
+                      'Calculando según el lugar y fecha…',
+                    )
+                  : _timezoneError ??
+                        (_timezoneManualOverride
+                            ? _t(
+                                'Saat dilimini elle seçtiniz.',
+                                'Time zone selected manually.',
+                                'Zona horaria seleccionada manualmente.',
+                              )
+                            : _t(
+                                'Doğum tarihi ve yeri girilince otomatik seçilir.',
+                                'Detected automatically after entering date and place.',
+                                'Se detecta al introducir fecha y lugar.',
+                              )),
+              style: TextStyle(
+                color: _timezoneError == null
+                    ? FastTheme.textMuted
+                    : Colors.orangeAccent,
+                fontSize: 10,
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           ChartLocationPicker(
@@ -815,11 +946,21 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 _birthPlace = place;
                 _birthLat = lat;
                 _birthLon = lon;
+                _timezoneManualOverride = false;
                 _placeError = null;
               });
+              unawaited(_refreshBirthTimezone());
             },
             onPending: () {
-              setState(() => _birthPlace = null);
+              setState(() {
+                _birthPlace = null;
+                _birthLat = null;
+                _birthLon = null;
+                _timezoneRequest++;
+                _timezoneLoading = false;
+                _timezoneError = null;
+                _timezoneManualOverride = false;
+              });
             },
           ),
           if (_placeError != null) ...[

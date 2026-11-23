@@ -41,6 +41,21 @@ class ApiService {
   Future<Map<String, dynamic>> geocode(String sehir) =>
       _post(ApiConfig.geocode, {'arama': sehir});
 
+  Future<Map<String, dynamic>> birthTimezone({
+    required double lat,
+    required double lon,
+    required DateTime birthDate,
+    required String birthTime,
+  }) => _post(ApiConfig.birthTimezone, {
+    'lat': lat,
+    'lon': lon,
+    'birth_date':
+        '${birthDate.year.toString().padLeft(4, '0')}-'
+        '${birthDate.month.toString().padLeft(2, '0')}-'
+        '${birthDate.day.toString().padLeft(2, '0')}',
+    'birth_time': birthTime,
+  });
+
   Future<Map<String, dynamic>> analizYap(AnalysisRequest req) {
     final url = switch (req.mod) {
       'es_sevgili' => ApiConfig.analizEs,
@@ -62,20 +77,16 @@ class ApiService {
     required String language,
     int days = 30,
   }) async {
-    final response = await _post(
-      ApiConfig.minorProgressNotifications,
-      {
-        'tarih': date,
-        'saat': time,
-        'sehir': city,
-        'ulke': country,
-        'enlem': latitude,
-        'boylam': longitude,
-        'lang': language,
-        'days': days.clamp(1, 30).toInt(),
-      },
-      timeout: const Duration(seconds: 45),
-    );
+    final response = await _post(ApiConfig.minorProgressNotifications, {
+      'tarih': date,
+      'saat': time,
+      'sehir': city,
+      'ulke': country,
+      'enlem': latitude,
+      'boylam': longitude,
+      'lang': language,
+      'days': days.clamp(1, 30).toInt(),
+    }, timeout: const Duration(seconds: 45));
     final entries = response['entries'];
     if (entries is! List) throw const FormatException('invalid minor progress');
     return entries

@@ -1893,6 +1893,12 @@ class MinorProgressNotificationsInput(BireyselNatalInput):
 class SehirInput(BaseModel):
     arama: str
 
+class BirthTimezoneInput(BaseModel):
+    lat: float
+    lon: float
+    birth_date: str
+    birth_time: str = "12:00"
+
 class KunyeInput(BaseModel):
     """Sosyal profil kunyesi: dogum tarihi/saati/yeri -> Gunes + Ay burcu."""
     tarih: str
@@ -9629,6 +9635,46 @@ def geocode(input: SehirInput):
     except Exception as e:
         raise HTTPException(404, f"Şehir bulunamadı: {str(e)}")
     raise HTTPException(404, f"Şehir bulunamadı: {input.arama}")
+
+@app_fast.post("/api/birth-timezone")
+def birth_timezone(input: BirthTimezoneInput):
+    """Coordinates + local birth date/time -> historical UTC offset."""
+    try:
+        if not (-90 <= input.lat <= 90 and -180 <= input.lon <= 180):
+            raise HTTPException(422, "Geçersiz enlem/boylam.")
+        birth_date = datetime.strptime(input.birth_date, "%Y-%m-%d")
+        birth_time = datetime.strptime(input.birth_time, "%H:%M")
+        local_decimal_hour = birth_time.hour + birth_time.minute / 60.0
+        from core.utils import otomatik_utc_offset
+
+        offset = float(
+            otomatik_utc_offset(
+                input.lat,
+                input.lon,
+                birth_date.year,
+                birth_date.month,
+                birth_date.day,
+                local_decimal_hour,
+            )
+        )
+        total_minutes = round(offset * 60)
+        sign = "+" if total_minutes >= 0 else "-"
+        absolute_minutes = abs(total_minutes)
+        label = (
+            f"UTC{sign}{absolute_minutes // 60}"
+            + (
+                f":{absolute_minutes % 60:02d}"
+                if absolute_minutes % 60
+                else ""
+            )
+        )
+        return {"utc_offset": offset, "label": label}
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(400, f"Geçersiz doğum tarihi veya saati: {e}")
+    except Exception as e:
+        raise HTTPException(400, f"Saat dilimi hesaplanamadı: {e}")
 
 @app_fast.post("/api/harita/es_sevgili")
 def harita_es(input: EsSevgiliInput):

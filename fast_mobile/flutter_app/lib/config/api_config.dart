@@ -23,7 +23,8 @@ class ApiConfig {
   );
   static const String horaryCast = '$horaryBaseUrl/api/holavon/cast';
   static const String horaryQuota = '$horaryBaseUrl/api/holavon/quota';
-  static const String horaryCreditsSync = '$horaryBaseUrl/api/holavon/credits/sync';
+  static const String horaryCreditsSync =
+      '$horaryBaseUrl/api/holavon/credits/sync';
 
   // Health / forced update
   static const String health = '$baseUrl/api/health';
@@ -32,6 +33,7 @@ class ApiConfig {
   // Ülke/Şehir
   static const String ulkeler = '$baseUrl/api/ulkeler';
   static const String geocode = '$baseUrl/api/geocode';
+  static const String birthTimezone = '$baseUrl/api/birth-timezone';
   static const String sehirBilgi = '$baseUrl/api/sehir_bilgi';
   static const String sehirGorsel = '$baseUrl/api/sehir_gorsel';
 
