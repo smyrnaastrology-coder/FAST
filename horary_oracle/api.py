@@ -2042,12 +2042,16 @@ textarea{width:100%;min-height:110px;box-sizing:border-box}
 <div class="row">
   <input id="key" type="password" placeholder="Admin Key" style="width:180px">
   <button onclick="load()">Yenile</button>
-  <span id="out" style="font-size:12px;color:#a99bc0"></span>
+  <span id="out" style="font-size:12px;color:#a99bc0;white-space:pre-wrap;overflow-wrap:anywhere"></span>
 </div>
 <div id="list" style="margin-top:14px"></div>
 <script>
 const K=()=>document.getElementById('key').value;
 function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function errorText(e){
+  if(typeof e==='string')return e;
+  try{return JSON.stringify(e,null,2);}catch(_){return String(e);}
+}
 function badge(st,deadline){
   const now=Date.now();
   const late = deadline && new Date(deadline).getTime() < now;
@@ -2057,10 +2061,13 @@ function badge(st,deadline){
   return '<span class="badge wait">odeme bekliyor</span>';
 }
 async function load(){
+  const out=document.getElementById('out');
+  try{
   const r=await fetch('/admin/questions/list?limit=60',{headers:{'x-admin-key':K()}});
   const j=await r.json();
-  if(j.error){document.getElementById('out').textContent=j.error;return;}
-  document.getElementById('out').textContent=(j.items||[]).length+' soru';
+  if(j.error){out.textContent='Hata: '+errorText(j.error);return;}
+  if(!r.ok){out.textContent='HTTP '+r.status+': '+errorText(j);return;}
+  out.textContent=(j.items||[]).length+' soru';
   const box=document.getElementById('list'); box.innerHTML='';
   (j.items||[]).forEach(q=>{
     const d=document.createElement('div'); d.className='card';
@@ -2089,6 +2096,7 @@ async function load(){
       </div>`;
     box.appendChild(d);
   });
+  }catch(e){out.textContent='Liste yüklenemedi: '+errorText(e);}
 }
 async function uploadPdf(id){
   const input=document.getElementById('f_'+id);
@@ -2105,7 +2113,7 @@ async function uploadPdf(id){
   });
   const r=await fetch('/admin/questions/pdf',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,filename:f.name,data_base64:b64})});
   const j=await r.json();
-  if(j.error){st.textContent=j.error;return;}
+  if(j.error){st.textContent=errorText(j.error);return;}
   st.textContent='yuklendi';
   load();
 }
@@ -2114,12 +2122,14 @@ async function answer(id){
   if(text.length<20){alert('Cevap en az 20 karakter olmali.');return;}
   const r=await fetch('/admin/questions/answer',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,answer:text})});
   const j=await r.json();
-  if(j.error){alert(j.error);return;}
+  if(j.error){alert(errorText(j.error));return;}
   load();
 }
 async function mark(id,status){
   if(!confirm(status+' olarak isaretlensin mi?'))return;
-  await fetch('/admin/questions/status',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,status})});
+  const r=await fetch('/admin/questions/status',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,status})});
+  const j=await r.json();
+  if(j.error){alert(errorText(j.error));return;}
   load();
 }
 </script>""")
