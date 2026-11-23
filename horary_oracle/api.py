@@ -2066,18 +2066,48 @@ async function load(){
     const d=document.createElement('div'); d.className='card';
     const created=new Date(q.created_at).toLocaleString();
     const dl=q.deadline_at?new Date(q.deadline_at).toLocaleString():'-';
+    const bd=[q.birth_date,q.birth_time,q.birth_place].filter(Boolean).join(' \u00b7 ');
+    const plc=(q.birth_lat!=null&&q.birth_lon!=null)?(' \u00b7 '+q.birth_lat+', '+q.birth_lon):'';
+    const tzn=(q.birth_tz!=null)?(' \u00b7 UTC'+(q.birth_tz>=0?'+':'')+q.birth_tz):'';
+    const pdf=q.answer_pdf_url?('<div class="meta">PDF: <a style="color:#C9A96E" href="'+q.answer_pdf_url+'" target="_blank">'+esc(q.answer_pdf_name||'cevap.pdf')+'</a></div>'):'';
     d.innerHTML=`<div class="meta">${esc(q.topic)} &middot; ${esc(q.lang)} &middot; ${esc(q.status)} ${badge(q.status,q.deadline_at)} &middot; ${q.price_try} TL</div>
       <div class="meta">olusturma: ${created} &middot; sure bitisi: ${dl}</div>
+      ${bd?`<div class="meta">dogum: ${esc(bd+plc+tzn)}</div>`:''}
       <div class="q">${esc(q.question)}</div>
       <textarea id="a_${q.id}" placeholder="Cevabinizi yazin...">${esc(q.answer_text||'')}</textarea>
+      ${pdf}
       <div class="row" style="margin-top:8px">
         <button onclick="answer('${q.id}')">Cevabi gonder</button>
         <button class="sec" onclick="mark('${q.id}','open')">Odeme alindi - ac</button>
         <button class="sec" onclick="mark('${q.id}','refunded')">Iade et</button>
         <button class="sec" onclick="mark('${q.id}','closed')">Kapat</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <input type="file" id="f_${q.id}" accept="application/pdf">
+        <button class="sec" onclick="uploadPdf('${q.id}')">PDF yukle</button>
+        <span class="meta" id="p_${q.id}"></span>
       </div>`;
     box.appendChild(d);
   });
+}
+async function uploadPdf(id){
+  const input=document.getElementById('f_'+id);
+  const f=input.files&&input.files[0];
+  if(!f){alert('Once bir PDF secin.');return;}
+  if(f.size>8*1024*1024){alert('PDF en fazla 8 MB olabilir.');return;}
+  const st=document.getElementById('p_'+id);
+  st.textContent='yukleniyor...';
+  const b64=await new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{const s=String(r.result||'');res(s.indexOf(',')>=0?s.slice(s.indexOf(',')+1):s);};
+    r.onerror=rej;
+    r.readAsDataURL(f);
+  });
+  const r=await fetch('/admin/questions/pdf',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':K()},body:JSON.stringify({id,filename:f.name,data_base64:b64})});
+  const j=await r.json();
+  if(j.error){st.textContent=j.error;return;}
+  st.textContent='yuklendi';
+  load();
 }
 async function answer(id){
   const text=document.getElementById('a_'+id).value.trim();
@@ -2100,7 +2130,9 @@ def admin_questions_list(x_admin_key: str = _Header(None), limit: int = 60):
     if not _q_allowed(x_admin_key):
         return {"error": "unauthorized"}
     fields = ("id,user_id,topic,question,lang,price_try,status,deadline_at,"
-              "answer_text,created_at,answered_at,rating")
+              "answer_text,created_at,answered_at,rating,"
+              "birth_date,birth_time,birth_place,birth_lat,birth_lon,birth_tz,"
+              "answer_pdf_url,answer_pdf_name")
     status, body = _sb(
         "GET",
         f"astro_questions?select={fields}&order=created_at.desc&limit={max(1, min(limit, 200))}",
@@ -2158,6 +2190,88 @@ def admin_questions_status(payload: dict, x_admin_key: str = _Header(None)):
     if status >= 400:
         return {"error": body}
     return {"ok": True}
+
+
+_MAX_PDF_BYTES = 8 * 1024 * 1024
+_PDF_BUCKET = "astro-pdfs"
+
+
+def _sb_storage_upload(bucket, path, data, content_type="application/pdf"):
+    """Supabase Storage'a binary yükler (service_role). Sonuç: (durum, gövde)."""
+    if not _SB_URL or not _SB_KEY:
+        return 503, {"error": "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY tanimli degil"}
+    url = f"{_SB_URL}/storage/v1/object/{bucket}/{path}"
+    req = _urlq.Request(url, data=data, method="POST")
+    req.add_header("apikey", _SB_KEY)
+    req.add_header("Authorization", f"Bearer {_SB_KEY}")
+    req.add_header("Content-Type", content_type)
+    req.add_header("x-upsert", "true")
+    req.add_header("cache-control", "3600")
+    try:
+        with _urlq.urlopen(req, timeout=60) as r:
+            raw = r.read().decode("utf-8")
+            return r.status, (_json_q.loads(raw) if raw.strip() else None)
+    except _urlerrq.HTTPError as e:
+        try:
+            body = _json_q.loads(e.read().decode("utf-8"))
+        except Exception:
+            body = {"error": str(e)}
+        return e.code, body
+    except Exception as e:
+        return 500, {"error": str(e)}
+
+
+@app.post("/admin/questions/pdf")
+def admin_questions_pdf(payload: dict, x_admin_key: str = _Header(None)):
+    """Astrolog cevabına PDF ekler: base64 JSON -> Storage -> satır güncelleme.
+
+    Panel/istemci dosyayı multipart yerine base64 gönderir; sunucuda
+    `python-multipart` gerekmez.
+    """
+    if not _q_allowed(x_admin_key):
+        return {"error": "unauthorized"}
+    import base64 as _b64
+    import re as _re
+    import uuid as _uuid
+
+    qid = (payload.get("id") or "").strip()
+    raw_b64 = payload.get("data_base64") or ""
+    filename = (payload.get("filename") or "cevap.pdf").strip() or "cevap.pdf"
+    if not qid:
+        return {"error": "id gerekli"}
+    if "," in raw_b64:
+        raw_b64 = raw_b64.split(",", 1)[1]
+    raw_b64 = "".join(raw_b64.split())
+    if not raw_b64:
+        return {"error": "pdf verisi gerekli"}
+    try:
+        data = _b64.b64decode(raw_b64, validate=True)
+    except Exception:
+        return {"error": "gecersiz base64"}
+    if not data.startswith(b"%PDF"):
+        return {"error": "dosya PDF degil"}
+    if len(data) > _MAX_PDF_BYTES:
+        return {"error": "PDF en fazla 8 MB olabilir"}
+
+    safe = _re.sub(r"[^A-Za-z0-9._-]+", "_", filename).strip("._-")
+    if not safe.lower().endswith(".pdf"):
+        safe = (safe or "cevap") + ".pdf"
+    object_path = f"{qid}/{_uuid.uuid4().hex}_{safe[-64:]}"
+
+    st, body = _sb_storage_upload(_PDF_BUCKET, object_path, data)
+    if st >= 400:
+        return {"error": body}
+
+    public_url = f"{_SB_URL}/storage/v1/object/public/{_PDF_BUCKET}/{object_path}"
+    st2, body2 = _sb(
+        "PATCH",
+        f"astro_questions?id=eq.{qid}",
+        {"answer_pdf_url": public_url, "answer_pdf_name": filename},
+        prefer="return=minimal",
+    )
+    if st2 >= 400:
+        return {"error": body2}
+    return {"ok": True, "url": public_url, "name": filename}
 
 
 # Render start: uvicorn horary_oracle.api:app --host 0.0.0.0 --port $PORT
