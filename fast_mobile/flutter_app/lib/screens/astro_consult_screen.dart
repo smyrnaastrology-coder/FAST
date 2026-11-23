@@ -848,7 +848,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   Widget _form() {
     final priceText = RevenueCatService.priceFor(
       AstroConsultService.singleQuestionProductId,
-      fallback: '1.999,99 ₺',
+      fallback: '2.399,99 ₺',
     );
 
     return Column(

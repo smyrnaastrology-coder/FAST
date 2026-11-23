@@ -13,7 +13,7 @@ create policy astro_questions_insert on public.astro_questions for insert
   with check (
     auth.uid() = user_id
     and status = 'pending_payment'
-    and price_try = 1999.99
+    and price_try = 2399.99
     and (product_id is null or product_id = 'sor_tek')
     and payment_ref is null
     and answer_text is null
@@ -83,7 +83,7 @@ begin
   update public.astro_questions
      set payment_ref = v_payment_ref,
          product_id  = 'sor_tek',
-         price_try   = 1999.99
+         price_try   = 2399.99
    where id = p_question_id;
   return jsonb_build_object('ok', true, 'reserved', true);
 end;
@@ -131,7 +131,7 @@ begin
   update public.astro_questions
      set payment_ref = v_payment_ref,
          product_id  = 'sor_tek',
-         price_try   = 1999.99
+         price_try   = 2399.99
    where id = p_question_id;
   return jsonb_build_object('ok', true, 'reserved', true);
 end;
@@ -194,7 +194,7 @@ begin
 
   update public.astro_questions
      set product_id   = 'sor_tek',
-         price_try    = 1999.99,
+         price_try    = 2399.99,
          payment_ref  = v_payment_ref,
          status       = 'open',
          deadline_at  = now() + interval '24 hours'

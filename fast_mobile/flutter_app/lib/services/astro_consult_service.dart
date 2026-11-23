@@ -11,7 +11,7 @@ import '../config/api_config.dart';
 /// olduğu için [astrologers] listesi ileride seçim ekranına dönüşebilir.
 class AstroConsultService {
   static const String singleQuestionProductId = 'sor_tek';
-  static const double singleQuestionPrice = 1999.99;
+  static const double singleQuestionPrice = 2399.99;
   static const double followUpPrice = 399.99;
   static const int answerWindowHours = 24;
 
