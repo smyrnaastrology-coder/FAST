@@ -1,10 +1,16 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../config/api_config.dart';
 
 /// "Astroloğa Sor" — tek soruluk danışmanlık.
 ///
 /// Faz 1: tek astrolog (platform sahibi). Şema çok astrologlu yapıya hazır
 /// olduğu için [astrologers] listesi ileride seçim ekranına dönüşebilir.
 class AstroConsultService {
+  static const String singleQuestionProductId = 'sor_tek';
   static const double singleQuestionPrice = 1999.99;
   static const double followUpPrice = 399.99;
   static const int answerWindowHours = 24;
@@ -67,6 +73,7 @@ class AstroConsultService {
           'question': question.trim(),
           'lang': lang,
           'price_try': price,
+          'product_id': singleQuestionProductId,
           'status': 'pending_payment',
           'birth_date': isoDate(birthDate),
           'birth_time': birthTime,
@@ -79,6 +86,44 @@ class AstroConsultService {
         .single();
 
     return row['id'] as String;
+  }
+
+  /// RevenueCat transaction is verified server-side before the 24-hour
+  /// answer window starts. `paid: false` means the store transaction is not
+  /// available yet; callers may then open the Play purchase sheet.
+  static Future<Map<String, dynamic>> verifyQuestionPayment({
+    required String questionId,
+    String? transactionId,
+    bool storePurchaseCompleted = false,
+  }) async {
+    final session = _c.auth.currentSession;
+    if (session == null) throw const AuthException('not_authenticated');
+    final response = await http
+        .post(
+          Uri.parse(ApiConfig.astroVerifyQuestionPayment),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ${session.accessToken}',
+          },
+          body: jsonEncode({
+            'question_id': questionId,
+            if (transactionId != null && transactionId.isNotEmpty)
+              'transaction_id': transactionId,
+            if (storePurchaseCompleted) 'store_purchase_completed': true,
+          }),
+        )
+        .timeout(const Duration(seconds: 25));
+    Map<String, dynamic> body;
+    try {
+      body = jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (_) {
+      throw Exception('payment_verification_http_${response.statusCode}');
+    }
+    if (response.statusCode != 200) {
+      final detail = body['detail'];
+      throw Exception(detail is Map ? detail['code'] ?? detail : detail);
+    }
+    return body;
   }
 
   /// Kullanıcının kendi soruları (yeniden eskiye).

@@ -8,6 +8,7 @@ import '../config/api_config.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
 import '../services/astro_consult_service.dart';
+import '../services/revenuecat_service.dart';
 import '../widgets/chart_location_picker.dart';
 
 /// "Astroloğa Sor" — tek soruluk danışmanlık ekranı.
@@ -175,8 +176,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     }
 
     setState(() => _sending = true);
+    String? questionId;
     try {
-      await AstroConsultService.createQuestion(
+      questionId = await AstroConsultService.createQuestion(
         topic: _topic,
         question: text,
         lang: _lang(),
@@ -188,30 +190,150 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         birthLon: _birthLon,
         birthTz: _birthTz,
       );
-      _questionCtrl.clear();
-      setState(() {
-        _birthDate = null;
-        _birthDateCtrl.clear();
-        _birthTime = null;
-        _birthPlace = null;
-        _birthLat = null;
-        _birthLon = null;
-        _birthTz = 3.0;
-        _timezoneLoading = false;
-        _timezoneManualOverride = false;
-        _timezoneError = null;
-        _timezoneRequest++;
-        _placeError = null;
-      });
+      final payment = await _purchaseAndVerify(questionId);
+      _clearQuestionForm();
       await _load();
       if (!mounted) return;
-      _snack(
-        _t(
-          'Sorunuz alındı. 24 saat içinde yazılı cevap gelecek.',
-          'Your question is received. A written answer will arrive within 24 hours.',
-          'Su pregunta fue recibida. La respuesta llegará en 24 horas.',
-        ),
-      );
+      if (payment['paid'] == true) {
+        _snack(
+          _t(
+            'Ödeme alındı. Sorunuz açıldı; 24 saatlik cevap süresi başladı.',
+            'Payment received. Your question is open; the 24-hour answer window has started.',
+            'Pago recibido. Su pregunta está abierta; comenzó el plazo de 24 horas.',
+          ),
+        );
+      } else if (payment['cancelled'] == true) {
+        _snack(
+          _t(
+            'Ödeme tamamlanmadı. Sorunuz kaydedildi; “Sorularım” bölümünden tekrar deneyebilirsiniz.',
+            'Payment was not completed. Your question is saved; you can retry from “My questions.”',
+            'El pago no se completó. Su pregunta está guardada; puede reintentarlo en “Mis preguntas”.',
+          ),
+        );
+      } else {
+        _snack(
+          _t(
+            'Satın alma alındı, doğrulama bekleniyor. Tekrar ödeme yapmadan “Sorularım” bölümünden kontrol edin.',
+            'Purchase received; verification is pending. Check “My questions” before trying to pay again.',
+            'Compra recibida; falta verificarla. Revise “Mis preguntas” antes de volver a pagar.',
+          ),
+        );
+      }
+    } catch (e) {
+      if (questionId != null) {
+        _clearQuestionForm();
+        await _load();
+        _snack(
+          _t(
+            'Sorunuz ödeme bekliyor. “Sorularım” bölümünden ödemeyi tamamlayabilirsiniz. $e',
+            'Your question is awaiting payment. Complete payment from “My questions.” $e',
+            'Su pregunta espera el pago. Complételo desde “Mis preguntas”. $e',
+          ),
+        );
+      } else {
+        _snack(e.toString());
+      }
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  Future<Map<String, dynamic>> _purchaseAndVerify(String questionId) async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) throw const AuthException('not_authenticated');
+    await RevenueCatService.identify(uid);
+
+    // First check for a previous store success. This makes a retry safe if
+    // the user closed the app after paying but before the server response.
+    var verification = await AstroConsultService.verifyQuestionPayment(
+      questionId: questionId,
+    );
+    if (verification['paid'] == true) return verification;
+    if (verification['verification_pending'] == true) {
+      return {'paid': false, 'verificationPending': true};
+    }
+
+    final transactionId =
+        await RevenueCatService.purchaseConsumableWithTransaction(
+          AstroConsultService.singleQuestionProductId,
+        );
+    if (!RevenueCatService.lastConsumablePurchaseSucceeded) {
+      if (RevenueCatService.lastAlreadyOwned) {
+        return {'paid': false, 'verificationPending': true};
+      }
+      return {'paid': false, 'cancelled': true};
+    }
+
+    // RevenueCat's server-side subscriber record can lag the Play sheet by a
+    // few seconds. Retry verification only; never launch a second charge here.
+    for (var attempt = 0; attempt < 4; attempt++) {
+      if (attempt > 0) {
+        await Future<void>.delayed(const Duration(seconds: 1));
+      }
+      try {
+        verification = await AstroConsultService.verifyQuestionPayment(
+          questionId: questionId,
+          transactionId: transactionId,
+          storePurchaseCompleted: true,
+        );
+        if (verification['paid'] == true) return verification;
+      } catch (_) {
+        if (attempt == 3) return {'paid': false, 'verificationPending': true};
+      }
+    }
+    return {'paid': false, 'verificationPending': true};
+  }
+
+  void _clearQuestionForm() {
+    _questionCtrl.clear();
+    setState(() {
+      _birthDate = null;
+      _birthDateCtrl.clear();
+      _birthTime = null;
+      _birthPlace = null;
+      _birthLat = null;
+      _birthLon = null;
+      _birthTz = 3.0;
+      _timezoneLoading = false;
+      _timezoneManualOverride = false;
+      _timezoneError = null;
+      _timezoneRequest++;
+      _placeError = null;
+    });
+  }
+
+  Future<void> _retryQuestionPayment(String questionId) async {
+    if (_sending) return;
+    setState(() => _sending = true);
+    try {
+      final payment = await _purchaseAndVerify(questionId);
+      await _load();
+      if (!mounted) return;
+      if (payment['paid'] == true) {
+        _snack(
+          _t(
+            'Ödeme doğrulandı; 24 saatlik cevap süresi başladı.',
+            'Payment verified; the 24-hour answer window has started.',
+            'Pago verificado; comenzó el plazo de 24 horas.',
+          ),
+        );
+      } else if (payment['cancelled'] == true) {
+        _snack(
+          _t(
+            'Ödeme tamamlanmadı; dilediğiniz zaman tekrar deneyebilirsiniz.',
+            'Payment was not completed; you can retry any time.',
+            'El pago no se completó; puede volver a intentarlo.',
+          ),
+        );
+      } else {
+        _snack(
+          _t(
+            'Satın alma doğrulaması sürüyor. Biraz sonra “Yenile”ye basın; tekrar ödeme yapmayın.',
+            'Purchase verification is still pending. Tap refresh shortly; do not pay again.',
+            'La verificación sigue pendiente. Actualice en un momento; no vuelva a pagar.',
+          ),
+        );
+      }
     } catch (e) {
       _snack(e.toString());
     } finally {
@@ -622,8 +744,10 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   }
 
   Widget _form() {
-    final price = AstroConsultService.singleQuestionPrice;
-    final priceText = '${price.toStringAsFixed(2).replaceAll('.', ',')} ₺';
+    final priceText = RevenueCatService.priceFor(
+      AstroConsultService.singleQuestionProductId,
+      fallback: '1.999,99 ₺',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -726,6 +850,18 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+                    const SizedBox(height: 3),
+                    Text(
+                      _t(
+                        'Güvenli ödeme Google Play üzerinden alınır.',
+                        'Secure payment is processed by Google Play.',
+                        'El pago seguro se procesa en Google Play.',
+                      ),
+                      style: TextStyle(
+                        color: FastTheme.textMuted,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -749,7 +885,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                         ),
                       )
                     : Text(
-                        _t('Sor', 'Ask', 'Preguntar'),
+                        _t('Öde ve Sor', 'Pay & Ask', 'Pagar y preguntar'),
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
               ),
@@ -1038,6 +1174,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
 
   Widget _questionCard(Map<String, dynamic> q) {
     final status = (q['status'] as String?) ?? 'pending_payment';
+    final questionId = (q['id'] as String?) ?? '';
     final answer = (q['answer_text'] as String?)?.trim();
     final pdfUrl = (q['answer_pdf_url'] as String?)?.trim();
     final hasPdf = pdfUrl != null && pdfUrl.isNotEmpty;
@@ -1093,6 +1230,26 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                   ),
                 ),
               ],
+            ),
+          ],
+          if (status == 'pending_payment' && questionId.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: _sending
+                    ? null
+                    : () => _retryQuestionPayment(questionId),
+                icon: Icon(
+                  Icons.payment,
+                  size: 17,
+                  color: FastTheme.accentGold,
+                ),
+                label: Text(
+                  _t('Ödemeyi tamamla', 'Complete payment', 'Completar pago'),
+                  style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
+                ),
+              ),
             ),
           ],
           if (answer != null && answer.isNotEmpty) ...[

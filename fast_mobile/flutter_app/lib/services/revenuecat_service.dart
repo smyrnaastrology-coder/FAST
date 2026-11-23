@@ -75,7 +75,8 @@ class RevenueCatService {
       // Keep verbose SDK logging confined to debug builds.
       await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.warn);
       final uid = await BillingService.getBillingUid();
-      PurchasesConfiguration config = PurchasesConfiguration(key)..appUserID = uid;
+      PurchasesConfiguration config = PurchasesConfiguration(key)
+        ..appUserID = uid;
       await Purchases.configure(config);
       _currentAppUserId = uid;
       _inited = true;
@@ -92,6 +93,7 @@ class RevenueCatService {
   /// (ALREADY_OWNED) ile reddedildiyse true olur. PDF akışı bunu yakalayıp
   /// kullanıcıyı girişe yönlendirir (hak, satın alan Google hesabındadır).
   static bool lastAlreadyOwned = false;
+  static bool lastConsumablePurchaseSucceeded = false;
 
   static Future<bool> purchase(String productId) async {
     lastAlreadyOwned = false;
@@ -165,6 +167,71 @@ class RevenueCatService {
       if (s.contains('already')) lastAlreadyOwned = true;
       if (kDebugMode) print('[RC] consumable purchase err $e');
       return false;
+    }
+  }
+
+  /// Consumable purchase variant used by Astroloğa Sor. Returns the Play
+  /// store transaction id so the backend can verify that exact purchase with
+  /// RevenueCat before opening the question.
+  static Future<String?> purchaseConsumableWithTransaction(
+    String productId,
+  ) async {
+    lastAlreadyOwned = false;
+    lastConsumablePurchaseSucceeded = false;
+    if (!_inited) {
+      if (kDebugMode) print('[RC mock] purchase consumable $productId');
+      return null;
+    }
+    try {
+      final offerings = await Purchases.getOfferings();
+      Package? pkg;
+      for (final offering in offerings.all.values) {
+        for (final candidate in offering.availablePackages) {
+          if (_matchesProduct(candidate.storeProduct.identifier, productId)) {
+            pkg = candidate;
+            break;
+          }
+        }
+        if (pkg != null) break;
+      }
+      if (pkg == null) {
+        if (kDebugMode) print('[RC] consumable not found: $productId');
+        return null;
+      }
+
+      final before = await Purchases.getCustomerInfo();
+      final previousTransactionIds = before.nonSubscriptionTransactions
+          .where((t) => _matchesProduct(t.productIdentifier, productId))
+          .map((t) => t.transactionIdentifier)
+          .where((id) => id.isNotEmpty)
+          .toSet();
+
+      final result = await Purchases.purchase(PurchaseParams.package(pkg));
+      lastConsumablePurchaseSucceeded = true;
+      final matching =
+          result.customerInfo.nonSubscriptionTransactions
+              .where((t) => _matchesProduct(t.productIdentifier, productId))
+              .toList()
+            ..sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
+      for (final transaction in matching) {
+        if (transaction.transactionIdentifier.isNotEmpty &&
+            !previousTransactionIds.contains(
+              transaction.transactionIdentifier,
+            )) {
+          return transaction.transactionIdentifier;
+        }
+      }
+      // Some stores don't include the new transaction in the immediate
+      // CustomerInfo response; the server can still locate the latest one.
+      return matching.isNotEmpty &&
+              matching.first.transactionIdentifier.isNotEmpty
+          ? matching.first.transactionIdentifier
+          : null;
+    } catch (e) {
+      final s = e.toString().toLowerCase();
+      if (s.contains('already')) lastAlreadyOwned = true;
+      if (kDebugMode) print('[RC] consumable transaction purchase err $e');
+      return null;
     }
   }
 

@@ -9178,6 +9178,273 @@ class PersonUpdate(BaseModel):
     utc_offset: Optional[str] = None
     folder: Optional[str] = None
 
+class AstroQuestionPaymentVerify(BaseModel):
+    question_id: str
+    transaction_id: Optional[str] = None
+    store_purchase_completed: bool = False
+
+@app_fast.post("/api/astro/verify-question-payment")
+def verify_astro_question_payment(
+    body: AstroQuestionPaymentVerify,
+    request: Request,
+):
+    """Verify an unconsumed Play purchase with RevenueCat and open its question.
+
+    The client cannot mark a question paid. The signed-in Supabase user is
+    verified first, then RevenueCat's server API confirms a unique `sor_tek`
+    transaction before the service-role RPC starts the 24-hour answer window.
+    """
+    user = _require_user(request)
+    uid = str(user.get("id") or "").strip()
+    try:
+        from uuid import UUID
+
+        question_id = str(UUID(body.question_id))
+    except Exception:
+        raise HTTPException(400, detail={"code": "INVALID_QUESTION_ID"})
+
+    sb_url, service_key = _push_supabase_cfg()
+    if not sb_url or not service_key:
+        raise HTTPException(503, detail={"code": "SUPABASE_SERVER_CONFIG_MISSING"})
+    sb_headers = _push_sb_headers(service_key)
+    try:
+        readiness = requests.post(
+            f"{sb_url}/rest/v1/rpc/astro_question_payment_ready",
+            headers=sb_headers,
+            json={},
+            timeout=10,
+        )
+    except Exception:
+        raise HTTPException(503, detail={"code": "ASTRO_PAYMENT_MIGRATION_REQUIRED"})
+    if readiness.status_code >= 400:
+        raise HTTPException(503, detail={"code": "ASTRO_PAYMENT_MIGRATION_REQUIRED"})
+
+    questions_url = f"{sb_url}/rest/v1/astro_questions"
+    try:
+        question_response = requests.get(
+            questions_url,
+            params={
+                "select": "id,user_id,status,payment_ref,deadline_at",
+                "id": f"eq.{question_id}",
+                "user_id": f"eq.{uid}",
+                "limit": "1",
+            },
+            headers=sb_headers,
+            timeout=15,
+        )
+    except Exception:
+        raise HTTPException(502, detail={"code": "QUESTION_LOOKUP_FAILED"})
+    if question_response.status_code >= 400:
+        raise HTTPException(502, detail={"code": "QUESTION_LOOKUP_FAILED"})
+    rows = question_response.json()
+    if not rows:
+        raise HTTPException(404, detail={"code": "QUESTION_NOT_FOUND"})
+    question = rows[0]
+    if (
+        question.get("status") == "open"
+        and question.get("payment_ref")
+        and question["payment_ref"].startswith("store:")
+    ):
+        return {
+            "ok": True,
+            "paid": True,
+            "status": "open",
+            "deadline_at": question.get("deadline_at"),
+        }
+    if question.get("status") != "pending_payment":
+        raise HTTPException(409, detail={"code": "QUESTION_NOT_AWAITING_PAYMENT"})
+
+    rc_secret = os.getenv("REVENUECAT_API_SECRET", "").strip()
+    if not rc_secret:
+        raise HTTPException(503, detail={"code": "REVENUECAT_SERVER_KEY_MISSING"})
+    from urllib.parse import quote
+
+    rpc_base = f"{sb_url}/rest/v1/rpc"
+
+    def _reserve_transaction(transaction_id: str):
+        try:
+            response = requests.post(
+                f"{rpc_base}/reserve_astro_question_payment",
+                headers=sb_headers,
+                json={
+                    "p_question_id": question_id,
+                    "p_user_id": uid,
+                    "p_transaction_id": transaction_id,
+                },
+                timeout=15,
+            )
+        except Exception:
+            raise HTTPException(502, detail={"code": "PAYMENT_RESERVATION_FAILED"})
+        payload = {}
+        try:
+            payload = response.json()
+        except Exception:
+            pass
+        return response, payload
+
+    reserved_ref = str(question.get("payment_ref") or "")
+    reserved_id = (
+        reserved_ref[len("pending_store:"):]
+        if reserved_ref.startswith("pending_store:")
+        else ""
+    )
+    lookup_reserved = reserved_ref.startswith("pending_lookup:")
+    requested_id = str(body.transaction_id or "").strip()
+    if reserved_id and requested_id and reserved_id != requested_id:
+        raise HTTPException(409, detail={"code": "ANOTHER_PAYMENT_ATTEMPT_RESERVED"})
+
+    transaction_id = requested_id or reserved_id
+    if transaction_id:
+        reserve_response, reserve_body = _reserve_transaction(transaction_id)
+        if reserve_response.status_code >= 400:
+            error_text = str(reserve_body).lower()
+            if "duplicate" in error_text or "unique" in error_text or "23505" in error_text:
+                if not body.store_purchase_completed:
+                    raise HTTPException(409, detail={"code": "TRANSACTION_ALREADY_USED"})
+                transaction_id = ""
+            elif "another_payment_attempt_reserved" in error_text:
+                raise HTTPException(409, detail={"code": "ANOTHER_PAYMENT_ATTEMPT_RESERVED"})
+            else:
+                raise HTTPException(409, detail={"code": "PAYMENT_RESERVATION_FAILED"})
+
+    try:
+        subscriber_response = requests.get(
+            f"https://api.revenuecat.com/v1/subscribers/{quote(uid, safe='')}",
+            headers={
+                "Authorization": f"Bearer {rc_secret}",
+                "Content-Type": "application/json",
+            },
+            timeout=20,
+        )
+    except Exception:
+        raise HTTPException(502, detail={"code": "REVENUECAT_LOOKUP_FAILED"})
+    if subscriber_response.status_code == 404:
+        return {
+            "ok": True,
+            "paid": False,
+            "verification_pending": bool(transaction_id),
+            "reason": "PURCHASE_NOT_FOUND",
+        }
+    if subscriber_response.status_code not in (200, 201):
+        logging.warning(
+            "[astro-payment] RevenueCat subscriber lookup returned HTTP %s",
+            subscriber_response.status_code,
+        )
+        raise HTTPException(502, detail={"code": "REVENUECAT_LOOKUP_FAILED"})
+    try:
+        subscriber = (subscriber_response.json().get("subscriber") or {})
+    except Exception:
+        raise HTTPException(502, detail={"code": "REVENUECAT_INVALID_RESPONSE"})
+
+    transactions = (subscriber.get("non_subscriptions") or {}).get("sor_tek") or []
+    transactions = sorted(
+        transactions,
+        key=lambda txn: str(
+            (txn or {}).get("purchase_date")
+            or (txn or {}).get("purchase_date_ms")
+            or ""
+        ),
+        reverse=True,
+    )
+
+    if not transaction_id:
+        for txn in transactions:
+            txn = txn or {}
+            store = str(txn.get("store") or "").lower()
+            if store and store not in ("play_store", "playstore"):
+                continue
+            candidate = str(
+                txn.get("store_transaction_id") or txn.get("id") or ""
+            ).strip()
+            if not candidate:
+                continue
+            reserve_response, reserve_body = _reserve_transaction(candidate)
+            if reserve_response.status_code < 400:
+                transaction_id = candidate
+                break
+            error_text = str(reserve_body).lower()
+            if "duplicate" in error_text or "unique" in error_text or "23505" in error_text:
+                continue
+            if "another_payment_attempt_reserved" in error_text:
+                if lookup_reserved or body.store_purchase_completed:
+                    return {
+                        "ok": True,
+                        "paid": False,
+                        "verification_pending": True,
+                        "reason": "PAYMENT_ATTEMPT_ALREADY_RESERVED",
+                    }
+                continue
+            raise HTTPException(409, detail={"code": "PAYMENT_RESERVATION_FAILED"})
+
+    if not transaction_id:
+        if body.store_purchase_completed and not lookup_reserved:
+            try:
+                lookup_response = requests.post(
+                    f"{rpc_base}/reserve_astro_question_payment_lookup",
+                    headers=sb_headers,
+                    json={
+                        "p_question_id": question_id,
+                        "p_user_id": uid,
+                    },
+                    timeout=15,
+                )
+            except Exception:
+                raise HTTPException(502, detail={"code": "PAYMENT_RESERVATION_FAILED"})
+            if lookup_response.status_code >= 400:
+                raise HTTPException(409, detail={"code": "PAYMENT_RESERVATION_FAILED"})
+            lookup_reserved = True
+        if lookup_reserved:
+            return {
+                "ok": True,
+                "paid": False,
+                "verification_pending": True,
+                "reason": "PURCHASE_NOT_VISIBLE_YET",
+            }
+        return {"ok": True, "paid": False, "reason": "PURCHASE_NOT_FOUND"}
+
+    verified_transaction = None
+    for txn in transactions:
+        txn = txn or {}
+        store = str(txn.get("store") or "").lower()
+        if store and store not in ("play_store", "playstore"):
+            continue
+        candidate = str(
+            txn.get("store_transaction_id") or txn.get("id") or ""
+        ).strip()
+        if candidate == transaction_id:
+            verified_transaction = txn
+            break
+    if verified_transaction is None:
+        return {
+            "ok": True,
+            "paid": False,
+            "verification_pending": True,
+            "reason": "PURCHASE_NOT_VISIBLE_YET",
+        }
+
+    try:
+        rpc_response = requests.post(
+            f"{rpc_base}/confirm_astro_question_payment",
+            headers=sb_headers,
+            json={
+                "p_question_id": question_id,
+                "p_user_id": uid,
+                "p_transaction_id": transaction_id,
+                "p_product_id": "sor_tek",
+            },
+            timeout=20,
+        )
+    except Exception:
+        raise HTTPException(502, detail={"code": "PAYMENT_CONFIRMATION_FAILED"})
+    if rpc_response.status_code < 400:
+        result = rpc_response.json() if rpc_response.content else {}
+        return result or {"ok": True, "paid": True, "status": "open"}
+    logging.warning(
+        "[astro-payment] payment RPC returned HTTP %s",
+        rpc_response.status_code,
+    )
+    raise HTTPException(409, detail={"code": "PAYMENT_CONFIRMATION_FAILED"})
+
 @app_fast.get("/api/env_diag")
 def env_diag():
     import os as _os

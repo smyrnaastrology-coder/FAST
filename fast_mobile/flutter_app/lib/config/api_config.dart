@@ -34,6 +34,8 @@ class ApiConfig {
   static const String ulkeler = '$baseUrl/api/ulkeler';
   static const String geocode = '$baseUrl/api/geocode';
   static const String birthTimezone = '$baseUrl/api/birth-timezone';
+  static const String astroVerifyQuestionPayment =
+      '$baseUrl/api/astro/verify-question-payment';
   static const String sehirBilgi = '$baseUrl/api/sehir_bilgi';
   static const String sehirGorsel = '$baseUrl/api/sehir_gorsel';
 
