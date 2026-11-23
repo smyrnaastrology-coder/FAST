@@ -9,7 +9,6 @@ import '../config/theme.dart';
 import '../services/api_service.dart';
 import '../services/astro_consult_service.dart';
 import '../services/revenuecat_service.dart';
-import '../widgets/chart_location_picker.dart';
 
 /// "Astroloğa Sor" — tek soruluk danışmanlık ekranı.
 ///
@@ -27,6 +26,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   final _questionCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   final _birthDateCtrl = TextEditingController();
+  final _birthPlaceCtrl = TextEditingController();
 
   String _topic = 'love';
   String? _astrologerId;
@@ -47,6 +47,8 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   bool _timezoneManualOverride = false;
   String? _timezoneError;
   int _timezoneRequest = 0;
+  int _placeRequest = 0;
+  bool _placeResolving = false;
   String? _placeError;
 
   static const _topics = <String, Map<String, String>>{
@@ -81,6 +83,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     _questionCtrl.dispose();
     _scrollCtrl.dispose();
     _birthDateCtrl.dispose();
+    _birthPlaceCtrl.dispose();
     super.dispose();
   }
 
@@ -153,12 +156,15 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       );
       return;
     }
-    if (_birthPlace == null || _birthPlace!.isEmpty) {
+    if (_birthPlace == null ||
+        _birthPlace!.isEmpty ||
+        _birthLat == null ||
+        _birthLon == null) {
       _snack(
         _t(
-          'Doğum yerinizi (ülke ve şehir) seçin.',
-          'Please select your birth place (country and city).',
-          'Seleccione su lugar de nacimiento (país y ciudad).',
+          'Doğum yerinizi şehir ve ülke olarak yazıp aratın.',
+          'Enter and search your birth city and country.',
+          'Escriba y busque su ciudad y país de nacimiento.',
         ),
       );
       return;
@@ -205,7 +211,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       } else if (payment['cancelled'] == true) {
         _snack(
           _t(
-            'Ödeme tamamlanmadı. Sorunuz kaydedildi; “Sorularım” bölümünden tekrar deneyebilirsiniz.',
+            'Ödeme tamamlanmadı. Sorunuz kaydedildi; “Sorularım ve Cevaplarım” bölümünden tekrar deneyebilirsiniz.',
             'Payment was not completed. Your question is saved; you can retry from “My questions.”',
             'El pago no se completó. Su pregunta está guardada; puede reintentarlo en “Mis preguntas”.',
           ),
@@ -213,7 +219,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       } else {
         _snack(
           _t(
-            'Satın alma alındı, doğrulama bekleniyor. Tekrar ödeme yapmadan “Sorularım” bölümünden kontrol edin.',
+            'Satın alma alındı, doğrulama bekleniyor. Tekrar ödeme yapmadan “Sorularım ve Cevaplarım” bölümünden kontrol edin.',
             'Purchase received; verification is pending. Check “My questions” before trying to pay again.',
             'Compra recibida; falta verificarla. Revise “Mis preguntas” antes de volver a pagar.',
           ),
@@ -225,7 +231,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         await _load();
         _snack(
           _t(
-            'Sorunuz ödeme bekliyor. “Sorularım” bölümünden ödemeyi tamamlayabilirsiniz. $e',
+            'Sorunuz ödeme bekliyor. “Sorularım ve Cevaplarım” bölümünden ödemeyi tamamlayabilirsiniz. $e',
             'Your question is awaiting payment. Complete payment from “My questions.” $e',
             'Su pregunta espera el pago. Complételo desde “Mis preguntas”. $e',
           ),
@@ -291,6 +297,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       _birthDateCtrl.clear();
       _birthTime = null;
       _birthPlace = null;
+      _birthPlaceCtrl.clear();
       _birthLat = null;
       _birthLon = null;
       _birthTz = 3.0;
@@ -298,6 +305,8 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       _timezoneManualOverride = false;
       _timezoneError = null;
       _timezoneRequest++;
+      _placeRequest++;
+      _placeResolving = false;
       _placeError = null;
     });
   }
@@ -362,10 +371,22 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     int? month;
     int? day;
 
+    final compact = RegExp(r'^\d{8}$').hasMatch(raw);
     final numeric = RegExp(
-      r'^(\d{1,4})[./\-\s]+(\d{1,2})[./\-\s]+(\d{1,4})$',
+      r'^(\d{1,4})[./,\-\s]+(\d{1,2})[./,\-\s]+(\d{1,4})$',
     ).firstMatch(raw);
-    if (numeric != null) {
+    if (compact) {
+      final first = int.parse(raw.substring(0, 4));
+      if (first >= 1900 && first <= DateTime.now().year) {
+        year = first;
+        month = int.parse(raw.substring(4, 6));
+        day = int.parse(raw.substring(6, 8));
+      } else {
+        day = int.parse(raw.substring(0, 2));
+        month = int.parse(raw.substring(2, 4));
+        year = int.parse(raw.substring(4, 8));
+      }
+    } else if (numeric != null) {
       final a = int.tryParse(numeric.group(1)!);
       final b = int.tryParse(numeric.group(2)!);
       final c = int.tryParse(numeric.group(3)!);
@@ -578,6 +599,83 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     }
   }
 
+  void _onBirthPlaceChanged(String _) {
+    ++_placeRequest;
+    setState(() {
+      _birthPlace = null;
+      _birthLat = null;
+      _birthLon = null;
+      _placeError = null;
+      _placeResolving = false;
+      _timezoneRequest++;
+      _timezoneLoading = false;
+      _timezoneError = null;
+      _timezoneManualOverride = false;
+    });
+  }
+
+  Future<void> _resolveBirthPlace() async {
+    final query = _birthPlaceCtrl.text.trim();
+    if (query.length < 2) {
+      setState(
+        () => _placeError = _t(
+          'Şehir ve ülkeyi yazın (ör. İzmir, Türkiye).',
+          'Enter a city and country (e.g. Paris, France).',
+          'Escriba una ciudad y un país (p. ej., Madrid, España).',
+        ),
+      );
+      return;
+    }
+    final request = ++_placeRequest;
+    setState(() {
+      _birthPlace = null;
+      _birthLat = null;
+      _birthLon = null;
+      _placeResolving = true;
+      _placeError = null;
+      _timezoneRequest++;
+      _timezoneLoading = false;
+      _timezoneError = null;
+    });
+    try {
+      final geo = await ApiService().geocode(query);
+      if (!mounted || request != _placeRequest) return;
+      final lat = (geo['lat'] as num).toDouble();
+      final lon = (geo['lon'] as num).toDouble();
+      final city = (geo['city'] as String? ?? '').trim();
+      final country = (geo['country'] as String? ?? '').trim();
+      final fullPlace = [city, country].where((s) => s.isNotEmpty).join(', ');
+      final resolved = fullPlace.isNotEmpty
+          ? fullPlace
+          : ((geo['tam_ad'] as String?)?.trim().isNotEmpty == true
+                ? (geo['tam_ad'] as String).trim()
+                : query);
+      setState(() {
+        _birthPlace = resolved;
+        _birthLat = lat;
+        _birthLon = lon;
+        _birthPlaceCtrl.value = TextEditingValue(
+          text: resolved,
+          selection: TextSelection.collapsed(offset: resolved.length),
+        );
+      });
+      unawaited(_refreshBirthTimezone());
+    } catch (_) {
+      if (!mounted || request != _placeRequest) return;
+      setState(
+        () => _placeError = _t(
+          'Konum bulunamadı. Şehir ve ülkeyi birlikte yazıp tekrar deneyin.',
+          'Place not found. Enter the city and country together and try again.',
+          'No se encontró el lugar. Escriba la ciudad y el país juntos.',
+        ),
+      );
+    } finally {
+      if (mounted && request == _placeRequest) {
+        setState(() => _placeResolving = false);
+      }
+    }
+  }
+
   Future<void> _openPdf(String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
@@ -625,7 +723,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                   const SizedBox(height: 26),
                   if (_questions.isNotEmpty) ...[
                     Text(
-                      _t('Sorularım', 'My questions', 'Mis preguntas'),
+                      _t(
+                        'Sorularım ve Cevaplarım',
+                        'My Questions & Answers',
+                        'Mis preguntas y respuestas',
+                      ),
                       style: TextStyle(
                         color: FastTheme.text,
                         fontSize: 16,
@@ -941,10 +1043,19 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 child: TextField(
                   controller: _birthDateCtrl,
                   keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
                   onChanged: _onBirthDateChanged,
+                  onSubmitted: (value) {
+                    _onBirthDateChanged(value);
+                    FocusScope.of(context).unfocus();
+                  },
                   style: TextStyle(color: FastTheme.text, fontSize: 13),
                   decoration: InputDecoration(
-                    labelText: _t('Doğum tarihi', 'Birth date', 'Fecha'),
+                    labelText: _t(
+                      'Doğum tarihi — elle yazın',
+                      'Birth date — type it',
+                      'Fecha de nacimiento — escríbala',
+                    ),
                     hintText: _t('17.07.1995', '17.07.1995', '17.07.1995'),
                     errorText:
                         _birthDateCtrl.text.trim().isNotEmpty &&
@@ -955,19 +1066,13 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                             'Revise la fecha',
                           )
                         : null,
-                    suffixIcon: IconButton(
-                      tooltip: _t(
-                        'Takvimden seç',
-                        'Choose from calendar',
-                        'Elegir del calendario',
-                      ),
-                      onPressed: _pickBirthDate,
-                      icon: Icon(
-                        Icons.calendar_today,
-                        size: 17,
-                        color: FastTheme.accentGold,
-                      ),
-                    ),
+                    suffixIcon: _birthDate == null
+                        ? null
+                        : Icon(
+                            Icons.check_circle,
+                            size: 18,
+                            color: FastTheme.accentGold,
+                          ),
                     filled: true,
                     fillColor: FastTheme.cardBg,
                     contentPadding: const EdgeInsets.symmetric(
@@ -996,6 +1101,28 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 ),
               ),
             ],
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _pickBirthDate,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              ),
+              icon: Icon(
+                Icons.calendar_today,
+                size: 14,
+                color: FastTheme.accentGold,
+              ),
+              label: Text(
+                _t(
+                  'İsterseniz takvimden seçin',
+                  'Or choose from the calendar',
+                  'O selecciónela en el calendario',
+                ),
+                style: TextStyle(color: FastTheme.accentGold, fontSize: 11),
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           DropdownButtonFormField<double>(
@@ -1076,28 +1203,57 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          ChartLocationPicker(
-            onSelected: (place, lat, lon) {
-              setState(() {
-                _birthPlace = place;
-                _birthLat = lat;
-                _birthLon = lon;
-                _timezoneManualOverride = false;
-                _placeError = null;
-              });
-              unawaited(_refreshBirthTimezone());
-            },
-            onPending: () {
-              setState(() {
-                _birthPlace = null;
-                _birthLat = null;
-                _birthLon = null;
-                _timezoneRequest++;
-                _timezoneLoading = false;
-                _timezoneError = null;
-                _timezoneManualOverride = false;
-              });
-            },
+          TextField(
+            controller: _birthPlaceCtrl,
+            keyboardType: TextInputType.streetAddress,
+            textInputAction: TextInputAction.search,
+            onChanged: _onBirthPlaceChanged,
+            onSubmitted: (_) => unawaited(_resolveBirthPlace()),
+            style: TextStyle(color: FastTheme.text, fontSize: 13),
+            decoration: InputDecoration(
+              labelText: _t(
+                'Doğum yeri (şehir, ülke)',
+                'Birth place (city, country)',
+                'Lugar de nacimiento (ciudad, país)',
+              ),
+              hintText: _t('İzmir, Türkiye', 'Paris, France', 'Madrid, España'),
+              suffixIcon: _placeResolving
+                  ? const Padding(
+                      padding: EdgeInsets.all(13),
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : IconButton(
+                      tooltip: _t('Dünyada ara', 'Search worldwide', 'Buscar'),
+                      onPressed: _resolveBirthPlace,
+                      icon: Icon(Icons.search, color: FastTheme.accentGold),
+                    ),
+              filled: true,
+              fillColor: FastTheme.cardBg,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: FastTheme.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: FastTheme.border),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              _t(
+                'Doğum yerini yazın; kayıtlı listede olmasa da dünyada aranır.',
+                'Type the birth place; it is searched worldwide, even if not listed.',
+                'Escriba el lugar; se busca en todo el mundo aunque no esté en la lista.',
+              ),
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 10),
+            ),
           ),
           if (_placeError != null) ...[
             const SizedBox(height: 6),
