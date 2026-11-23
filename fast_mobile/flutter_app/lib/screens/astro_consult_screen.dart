@@ -270,9 +270,16 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         backgroundColor: FastTheme.bgSecondary,
         elevation: 0,
         title: Text(
-          _t('Astroloğa Sor', 'Ask an Astrologer', 'Pregunta a un Astrólogo'),
+          _t(
+            "Astrolog Fatih Asartepe'ye Sor",
+            'Ask Astrologer Fatih Asartepe',
+            'Pregunta a Fatih Asartepe',
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: FastTheme.accentGold,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -343,15 +350,22 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundColor: FastTheme.cardBg,
-                backgroundImage: (photo != null && photo.isNotEmpty)
-                    ? NetworkImage(photo)
-                    : null,
-                child: (photo == null || photo.isEmpty)
-                    ? Icon(Icons.person, color: FastTheme.accentGold)
-                    : null,
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: FastTheme.accentGold.withValues(alpha: 0.8),
+                    width: 1.5,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 31,
+                  backgroundColor: FastTheme.cardBg,
+                  backgroundImage: photo != null && photo.isNotEmpty
+                      ? NetworkImage(photo)
+                      : const AssetImage('assets/astrolog_fatih.jpeg'),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(

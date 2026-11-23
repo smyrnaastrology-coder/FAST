@@ -516,13 +516,15 @@ class _MainShellState extends State<MainShell> {
                                 _PillarCard(
                                   icon: Icons.support_agent_outlined,
                                   activeIcon: Icons.support_agent,
+                                  asset: 'assets/astrolog_fatih.jpeg',
                                   title: switch (Localizations.localeOf(
                                     context,
                                   ).languageCode) {
-                                    'en' => 'Ask an Astrologer',
-                                    'es' => 'Pregunta a un Astrólogo',
-                                    _ => 'Astroloğa Sor',
+                                    'en' => 'Ask Astrologer Fatih Asartepe',
+                                    'es' => 'Pregunta a Fatih Asartepe',
+                                    _ => "Astrolog Fatih Asartepe'ye Sor",
                                   },
+                                  titleFontSize: 15,
                                   desc: switch (Localizations.localeOf(
                                     context,
                                   ).languageCode) {
@@ -642,6 +644,7 @@ class _PillarCard extends StatelessWidget {
   final VoidCallback onTap;
   final bool featured;
   final String? badge;
+  final double? titleFontSize;
 
   const _PillarCard({
     required this.icon,
@@ -654,6 +657,7 @@ class _PillarCard extends StatelessWidget {
     required this.onTap,
     this.featured = false,
     this.badge,
+    this.titleFontSize,
   });
 
   @override
@@ -769,7 +773,7 @@ class _PillarCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: FastTheme.textLight,
-                          fontSize: featured ? 21 : 18,
+                          fontSize: titleFontSize ?? (featured ? 21 : 18),
                           fontWeight: FontWeight.w700,
                         ),
                       ),

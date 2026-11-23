@@ -94,6 +94,7 @@ flutter:
     - assets/holavon_logo.png
     - assets/fast_synastry_logo.png
     - assets/horary_oracle_logo.png
+    - assets/astrolog_fatih.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
