@@ -31,12 +31,27 @@ class AstroConsultService {
     return (rows as List).cast<Map<String, dynamic>>();
   }
 
+  /// `DateTime` → `YYYY-MM-DD` (Supabase `date` alanı için).
+  static String isoDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
   /// Yeni soru oluşturur. Ödeme henüz bağlı olmadığı için
   /// `pending_payment` durumunda kalır; ödeme doğrulanınca sunucu açar.
+  ///
+  /// Doğum bilgisi zorunludur: astrolog haritayı ancak tarih + saat + yer ile
+  /// çıkarabilir. [birthTz] saat dilimi farkıdır (ör. Türkiye için 3).
   static Future<String> createQuestion({
     required String topic,
     required String question,
     required String lang,
+    required DateTime birthDate,
+    required String birthTime,
+    required String birthPlace,
+    double? birthLat,
+    double? birthLon,
+    double? birthTz,
     String? astrologerId,
     double price = singleQuestionPrice,
   }) async {
@@ -53,6 +68,12 @@ class AstroConsultService {
           'lang': lang,
           'price_try': price,
           'status': 'pending_payment',
+          'birth_date': isoDate(birthDate),
+          'birth_time': birthTime,
+          'birth_place': birthPlace.trim(),
+          'birth_lat': birthLat,
+          'birth_lon': birthLon,
+          'birth_tz': birthTz,
         })
         .select('id')
         .single();

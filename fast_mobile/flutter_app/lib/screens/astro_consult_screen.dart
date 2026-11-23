@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../config/api_config.dart';
 import '../config/theme.dart';
 import '../services/astro_consult_service.dart';
+import '../widgets/chart_location_picker.dart';
 
-/// "AstroloÄŸa Sor" â€” tek soruluk danÄ±ÅŸmanlÄ±k ekranÄ±.
+/// "Astroloğa Sor" — tek soruluk danışmanlık ekranı.
 ///
-/// Faz 1: tek astrolog. Soru gÃ¶nderilir, 24 saat iÃ§inde yazÄ±lÄ± cevap gelir.
-/// Ã–deme (Play IAP) henÃ¼z baÄŸlÄ± deÄŸil; sorular `pending_payment` olarak
-/// oluÅŸur ve Ã¶deme doÄŸrulamasÄ± sunucuda yapÄ±lÄ±r.
+/// Faz 1: tek astrolog. Soru gönderilir, 24 saat içinde yazılı cevap gelir.
+/// Ödeme (Play IAP) henüz bağlı değil; sorular `pending_payment` olarak
+/// oluşur ve ödeme doğrulaması sunucuda yapılır.
 class AstroConsultScreen extends StatefulWidget {
   const AstroConsultScreen({super.key});
 
@@ -29,25 +31,34 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   bool _sending = false;
   String? _error;
 
+  // Doğum bilgisi — astrolog haritayı bununla çıkarır.
+  DateTime? _birthDate;
+  TimeOfDay? _birthTime;
+  String? _birthPlace;
+  double? _birthLat;
+  double? _birthLon;
+  double _birthTz = DateTime.now().timeZoneOffset.inMinutes / 60.0;
+  String? _placeError;
+
   static const _topics = <String, Map<String, String>>{
     'love': {
-      'tr': 'AÅŸk & iliÅŸki',
+      'tr': 'Aşk & ilişki',
       'en': 'Love & relationship',
-      'es': 'Amor y relaciÃ³n',
+      'es': 'Amor y relación',
     },
     'career': {
-      'tr': 'Ä°ÅŸ & kariyer',
+      'tr': 'İş & kariyer',
       'en': 'Work & career',
       'es': 'Trabajo y carrera',
     },
     'family': {'tr': 'Aile', 'en': 'Family', 'es': 'Familia'},
-    'lost': {'tr': 'KayÄ±p', 'en': 'Lost item', 'es': 'Objeto perdido'},
+    'lost': {'tr': 'Kayıp', 'en': 'Lost item', 'es': 'Objeto perdido'},
     'health': {
-      'tr': 'SaÄŸlÄ±k & iyi olma',
+      'tr': 'Sağlık & iyi olma',
       'en': 'Health & wellbeing',
       'es': 'Salud y bienestar',
     },
-    'other': {'tr': 'DiÄŸer', 'en': 'Other', 'es': 'Otro'},
+    'other': {'tr': 'Diğer', 'en': 'Other', 'es': 'Otro'},
   };
 
   @override
@@ -105,9 +116,39 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     if (text.length < 20) {
       _snack(
         _t(
-          'Sorunuzu en az 20 karakterle yazÄ±n.',
+          'Sorunuzu en az 20 karakterle yazın.',
           'Please write at least 20 characters.',
           'Escriba al menos 20 caracteres.',
+        ),
+      );
+      return;
+    }
+    if (_birthDate == null) {
+      _snack(
+        _t(
+          'Doğum tarihinizi seçin.',
+          'Please select your birth date.',
+          'Seleccione su fecha de nacimiento.',
+        ),
+      );
+      return;
+    }
+    if (_birthTime == null) {
+      _snack(
+        _t(
+          'Doğum saatinizi seçin.',
+          'Please select your birth time.',
+          'Seleccione su hora de nacimiento.',
+        ),
+      );
+      return;
+    }
+    if (_birthPlace == null || _birthPlace!.isEmpty) {
+      _snack(
+        _t(
+          'Doğum yerinizi (ülke ve şehir) seçin.',
+          'Please select your birth place (country and city).',
+          'Seleccione su lugar de nacimiento (país y ciudad).',
         ),
       );
       return;
@@ -116,9 +157,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         Supabase.instance.client.auth.currentUser == null) {
       _snack(
         _t(
-          'Soru sormak iÃ§in giriÅŸ yapmalÄ±sÄ±nÄ±z.',
+          'Soru sormak için giriş yapmalısınız.',
           'Please sign in to ask a question.',
-          'Inicie sesiÃ³n para hacer una pregunta.',
+          'Inicie sesión para hacer una pregunta.',
         ),
       );
       return;
@@ -131,15 +172,30 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         question: text,
         lang: _lang(),
         astrologerId: _astrologerId,
+        birthDate: _birthDate!,
+        birthTime: _timeText(_birthTime!),
+        birthPlace: _birthPlace!,
+        birthLat: _birthLat,
+        birthLon: _birthLon,
+        birthTz: _birthTz,
       );
       _questionCtrl.clear();
+      setState(() {
+        _birthDate = null;
+        _birthTime = null;
+        _birthPlace = null;
+        _birthLat = null;
+        _birthLon = null;
+        _birthTz = DateTime.now().timeZoneOffset.inMinutes / 60.0;
+        _placeError = null;
+      });
       await _load();
       if (!mounted) return;
       _snack(
         _t(
-          'Sorunuz alÄ±ndÄ±. 24 saat iÃ§inde yazÄ±lÄ± cevap gelecek.',
+          'Sorunuz alındı. 24 saat içinde yazılı cevap gelecek.',
           'Your question is received. A written answer will arrive within 24 hours.',
-          'Su pregunta fue recibida. La respuesta llegarÃ¡ en 24 horas.',
+          'Su pregunta fue recibida. La respuesta llegará en 24 horas.',
         ),
       );
     } catch (e) {
@@ -156,6 +212,56 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
+  String _timeText(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  String _dateText(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+
+  String _utcLabel(double v) {
+    final sign = v < 0 ? '-' : '+';
+    final abs = v.abs();
+    final whole = abs.truncate();
+    final half = (abs - whole) >= 0.5 ? ':30' : '';
+    return 'UTC$sign$whole$half';
+  }
+
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate ?? DateTime(now.year - 30, now.month, now.day),
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: _t('Doğum tarihi', 'Birth date', 'Fecha de nacimiento'),
+    );
+    if (picked != null && mounted) {
+      setState(() => _birthDate = picked);
+    }
+  }
+
+  Future<void> _pickBirthTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _birthTime ?? const TimeOfDay(hour: 12, minute: 0),
+      helpText: _t('Doğum saati', 'Birth time', 'Hora de nacimiento'),
+    );
+    if (picked != null && mounted) {
+      setState(() => _birthTime = picked);
+    }
+  }
+
+  Future<void> _openPdf(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok) _snack(url);
+    } catch (_) {
+      _snack(url);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,7 +270,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         backgroundColor: FastTheme.bgSecondary,
         elevation: 0,
         title: Text(
-          _t('AstroloÄŸa Sor', 'Ask an Astrologer', 'Pregunta a un AstrÃ³logo'),
+          _t('Astroloğa Sor', 'Ask an Astrologer', 'Pregunta a un Astrólogo'),
           style: TextStyle(
             color: FastTheme.accentGold,
             fontWeight: FontWeight.w700,
@@ -185,7 +291,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                   const SizedBox(height: 26),
                   if (_questions.isNotEmpty) ...[
                     Text(
-                      _t('SorularÄ±m', 'My questions', 'Mis preguntas'),
+                      _t('Sorularım', 'My questions', 'Mis preguntas'),
                       style: TextStyle(
                         color: FastTheme.text,
                         fontSize: 16,
@@ -215,7 +321,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     final name = (_astrologer?['display_name'] as String?) ?? 'Fatih Asartepe';
     final headline =
         (_astrologer?['headline'] as String?) ??
-        _t('Karma Astrolog', 'Karma Astrologer', 'AstrÃ³logo KÃ¡rmico');
+        _t('Karma Astrolog', 'Karma Astrologer', 'Astrólogo Kármico');
     final photo = _astrologer?['photo_url'] as String?;
 
     return Container(
@@ -282,9 +388,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
               Expanded(
                 child: Text(
                   _t(
-                    '24 saat iÃ§inde yazÄ±lÄ± cevap Â· cevap gelmezse Ã¼cret iadesi',
-                    'Written answer within 24 hours Â· full refund if unanswered',
-                    'Respuesta escrita en 24 horas Â· reembolso si no hay respuesta',
+                    '24 saat içinde yazılı cevap · cevap gelmezse ücret iadesi',
+                    'Written answer within 24 hours · full refund if unanswered',
+                    'Respuesta escrita en 24 horas · reembolso si no hay respuesta',
                   ),
                   style: TextStyle(color: FastTheme.textMuted, fontSize: 12),
                 ),
@@ -298,7 +404,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
 
   Widget _form() {
     final price = AstroConsultService.singleQuestionPrice;
-    final priceText = '${price.toStringAsFixed(2).replaceAll('.', ',')} â‚º';
+    final priceText = '${price.toStringAsFixed(2).replaceAll('.', ',')} ₺';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,6 +443,8 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
           }).toList(),
         ),
         const SizedBox(height: 16),
+        _birthSection(),
+        const SizedBox(height: 16),
         TextField(
           controller: _questionCtrl,
           maxLines: 5,
@@ -344,9 +452,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
           style: TextStyle(color: FastTheme.text),
           decoration: InputDecoration(
             hintText: _t(
-              'Sorunuzu tek ve net biÃ§imde yazÄ±n. Ã–rnek: "Bu iliÅŸki evliliÄŸe gider mi?"',
+              'Sorunuzu tek ve net biçimde yazın. Örnek: "Bu ilişki evliliğe gider mi?"',
               'Write one clear question. Example: "Will this relationship lead to marriage?"',
-              'Escriba una pregunta clara. Ejemplo: "Â¿Esta relaciÃ³n llevarÃ¡ al matrimonio?"',
+              'Escriba una pregunta clara. Ejemplo: "¿Esta relación llevará al matrimonio?"',
             ),
             hintStyle: TextStyle(color: FastTheme.textMuted, fontSize: 13),
             filled: true,
@@ -381,7 +489,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                   children: [
                     Text(
                       _t(
-                        'Tek soru danÄ±ÅŸmanlÄ±ÄŸÄ±',
+                        'Tek soru danışmanlığı',
                         'Single-question consultation',
                         'Consulta de una pregunta',
                       ),
@@ -433,6 +541,188 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     );
   }
 
+  Widget _birthSection() {
+    final tzOptions = List<double>.generate(53, (i) => -12 + i * 0.5);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: FastTheme.cardBg.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: FastTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.cake_outlined, size: 16, color: FastTheme.accentGold),
+              const SizedBox(width: 6),
+              Text(
+                _t('Doğum Bilgileri', 'Birth details', 'Datos de nacimiento'),
+                style: TextStyle(
+                  color: FastTheme.text,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _t(
+              'Haritanızın doğru çıkması için gerçek doğum tarihi, saati ve yerinizi girin.',
+              'For an accurate chart, enter your real birth date, time and place.',
+              'Para una carta precisa, introduzca su fecha, hora y lugar reales de nacimiento.',
+            ),
+            style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _fieldBox(
+                  label: _t('Tarih', 'Date', 'Fecha'),
+                  value: _birthDate == null ? null : _dateText(_birthDate!),
+                  hint: _t('gg.aa.yyyy', 'dd.mm.yyyy', 'dd.mm.aaaa'),
+                  icon: Icons.calendar_today,
+                  onTap: _pickBirthDate,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _fieldBox(
+                  label: _t('Saat', 'Time', 'Hora'),
+                  value: _birthTime == null ? null : _timeText(_birthTime!),
+                  hint: _t('ss:dd', 'hh:mm', 'hh:mm'),
+                  icon: Icons.access_time,
+                  onTap: _pickBirthTime,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          DropdownButtonFormField<double>(
+            initialValue: tzOptions.contains(_birthTz) ? _birthTz : 3.0,
+            isExpanded: true,
+            dropdownColor: FastTheme.cardBg,
+            style: TextStyle(color: FastTheme.text, fontSize: 13),
+            decoration: InputDecoration(
+              labelText: _t('Saat dilimi', 'Time zone', 'Zona horaria'),
+              labelStyle: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+              filled: true,
+              fillColor: FastTheme.cardBg,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 4,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: FastTheme.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: FastTheme.border),
+              ),
+            ),
+            items: tzOptions
+                .map(
+                  (v) => DropdownMenuItem<double>(
+                    value: v,
+                    child: Text(_utcLabel(v)),
+                  ),
+                )
+                .toList(),
+            onChanged: (v) {
+              if (v != null) setState(() => _birthTz = v);
+            },
+          ),
+          const SizedBox(height: 10),
+          ChartLocationPicker(
+            onSelected: (place, lat, lon) {
+              setState(() {
+                _birthPlace = place;
+                _birthLat = lat;
+                _birthLon = lon;
+                _placeError = null;
+              });
+            },
+            onPending: () {
+              setState(() => _birthPlace = null);
+            },
+          ),
+          if (_placeError != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              _placeError!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 11),
+            ),
+          ],
+          if (_birthPlace != null &&
+              _birthLat != null &&
+              _birthLon != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${_birthPlace!} · ${_birthLat!.toStringAsFixed(4)}, '
+              '${_birthLon!.toStringAsFixed(4)}',
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _fieldBox({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+    String? value,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(color: FastTheme.textMuted, fontSize: 12),
+          prefixIcon: Icon(icon, size: 16, color: FastTheme.accentGold),
+          filled: true,
+          fillColor: FastTheme.cardBg,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 12,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: FastTheme.border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: FastTheme.border),
+          ),
+        ),
+        child: Text(
+          value ?? hint,
+          style: TextStyle(
+            color: value == null ? FastTheme.textMuted : FastTheme.text,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _birthSummary(Map<String, dynamic> q) {
+    final rawDate = (q['birth_date'] as String?) ?? '';
+    String date = rawDate;
+    final parts = rawDate.split('-');
+    if (parts.length == 3) date = '${parts[2]}.${parts[1]}.${parts[0]}';
+    final time = (q['birth_time'] as String?) ?? '';
+    final place = (q['birth_place'] as String?) ?? '';
+    return [date, time, place].where((s) => s.isNotEmpty).join(' · ');
+  }
+
   Widget _questionCard(Map<String, dynamic> q) {
     final status = (q['status'] as String?) ?? 'pending_payment';
     final answer = (q['answer_text'] as String?)?.trim();
@@ -475,6 +765,21 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
               style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
             ),
           ],
+          if ((q['birth_date'] as String?) != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(Icons.cake_outlined, size: 12, color: FastTheme.textMuted),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    _birthSummary(q),
+                    style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (answer != null && answer.isNotEmpty) ...[
             const SizedBox(height: 10),
             Container(
@@ -493,6 +798,28 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 ),
               ),
             ),
+            if ((q['answer_pdf_url'] as String?) != null) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () => _openPdf(q['answer_pdf_url'] as String),
+                icon: Icon(
+                  Icons.picture_as_pdf,
+                  size: 18,
+                  color: FastTheme.accentGold,
+                ),
+                label: Text(
+                  ((q['answer_pdf_name'] as String?) ?? '').isNotEmpty
+                      ? (q['answer_pdf_name'] as String)
+                      : _t('PDF cevabı aç', 'Open PDF answer', 'Abrir PDF'),
+                  style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: FastTheme.accentGold.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ],
             if (rating == null)
               Align(
                 alignment: Alignment.centerRight,
@@ -518,11 +845,11 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   Widget _statusChip(String status) {
     final label = switch (status) {
       'open' => _t('Cevap bekliyor', 'Awaiting answer', 'Esperando respuesta'),
-      'answered' => _t('CevaplandÄ±', 'Answered', 'Respondida'),
-      'closed' => _t('TamamlandÄ±', 'Completed', 'Completada'),
-      'refunded' => _t('Ä°ade edildi', 'Refunded', 'Reembolsada'),
-      'expired' => _t('SÃ¼re doldu', 'Expired', 'Expirada'),
-      _ => _t('Ã–deme bekliyor', 'Awaiting payment', 'Esperando pago'),
+      'answered' => _t('Cevaplandı', 'Answered', 'Respondida'),
+      'closed' => _t('Tamamlandı', 'Completed', 'Completada'),
+      'refunded' => _t('İade edildi', 'Refunded', 'Reembolsada'),
+      'expired' => _t('Süre doldu', 'Expired', 'Expirada'),
+      _ => _t('Ödeme bekliyor', 'Awaiting payment', 'Esperando pago'),
     };
     final color = switch (status) {
       'answered' || 'closed' => FastTheme.accentGold,
@@ -556,7 +883,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: FastTheme.cardBg,
           title: Text(
-            _t('CevabÄ± puanla', 'Rate the answer', 'Califica la respuesta'),
+            _t('Cevabı puanla', 'Rate the answer', 'Califica la respuesta'),
             style: TextStyle(color: FastTheme.text, fontSize: 16),
           ),
           content: Column(
@@ -580,7 +907,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 style: TextStyle(color: FastTheme.text),
                 decoration: InputDecoration(
                   hintText: _t(
-                    'Not (isteÄŸe baÄŸlÄ±)',
+                    'Not (isteğe bağlı)',
                     'Note (optional)',
                     'Nota (opcional)',
                   ),
@@ -595,7 +922,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text(_t('VazgeÃ§', 'Cancel', 'Cancelar')),
+              child: Text(_t('Vazgeç', 'Cancel', 'Cancelar')),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
@@ -603,7 +930,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 backgroundColor: FastTheme.accentGold,
               ),
               child: Text(
-                _t('GÃ¶nder', 'Send', 'Enviar'),
+                _t('Gönder', 'Send', 'Enviar'),
                 style: TextStyle(color: FastTheme.bg),
               ),
             ),
