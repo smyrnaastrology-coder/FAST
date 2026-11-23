@@ -21,6 +21,7 @@ class PlaceSuggestField extends StatefulWidget {
     this.enabled = true,
     this.searchOf,
     this.onTextChanged,
+    this.allowCustom = false,
   });
 
   final String label;
@@ -40,6 +41,9 @@ class PlaceSuggestField extends StatefulWidget {
 
   /// Kullanıcı yazarken çağrılır (tam eşleşmeyi yakalamak için).
   final ValueChanged<String>? onTextChanged;
+
+  /// Allows a typed value not present in [options] to be submitted.
+  final bool allowCustom;
 
   @override
   State<PlaceSuggestField> createState() => _PlaceSuggestFieldState();
@@ -139,10 +143,10 @@ class _PlaceSuggestFieldState extends State<PlaceSuggestField> {
 
   /// Yazılan metni (tam eşleşme yoksa ilk öneriyi) seçer.
   void _commitTyped() {
-    final typed = _fold(_ctrl.text.trim());
+    final raw = _ctrl.text.trim();
+    final typed = _fold(raw);
     if (typed.isEmpty) return;
     final matches = _matches;
-    if (matches.isEmpty) return;
     String? exact;
     for (final o in matches) {
       if (_fold(_search(o)) == typed || _fold(widget.displayOf(o)) == typed) {
@@ -150,7 +154,13 @@ class _PlaceSuggestFieldState extends State<PlaceSuggestField> {
         break;
       }
     }
-    _select(exact ?? matches.first);
+    if (exact != null) {
+      _select(exact);
+    } else if (widget.allowCustom) {
+      _select(raw);
+    } else if (matches.isNotEmpty) {
+      _select(matches.first);
+    }
   }
 
   @override
@@ -168,7 +178,10 @@ class _PlaceSuggestFieldState extends State<PlaceSuggestField> {
           decoration: InputDecoration(
             labelText: widget.label,
             hintText: widget.hint,
-            suffixIcon: _open && matches.isNotEmpty
+            suffixIcon:
+                _open &&
+                    (matches.isNotEmpty ||
+                        (widget.allowCustom && _ctrl.text.trim().isNotEmpty))
                 ? IconButton(
                     tooltip: 'Tamam',
                     icon: Icon(Icons.check, color: FastTheme.accentGold),

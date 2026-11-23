@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../config/country_labels.dart';
 import '../l10n/app_localizations.dart';
+import '../config/theme.dart';
 import 'place_suggest_field.dart';
 
 /// A country-qualified city lookup; stale responses never replace a newer city.
@@ -42,8 +43,7 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
     } catch (_) {
       if (mounted) {
         setState(
-          () => _error =
-              AppLocalizations.of(context).chartLocationLoadError,
+          () => _error = AppLocalizations.of(context).chartLocationLoadError,
         );
       }
     }
@@ -68,8 +68,7 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
     } catch (_) {
       if (mounted && request == _request) {
         setState(
-          () => _error =
-              AppLocalizations.of(context).chartLocationResolveError,
+          () => _error = AppLocalizations.of(context).chartLocationResolveError,
         );
       }
     } finally {
@@ -102,6 +101,7 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
           displayOf: (c) => labels[c] ?? c,
           searchOf: (c) => '${labels[c] ?? c} $c',
           initialValue: _country == null ? '' : (labels[_country] ?? _country!),
+          allowCustom: true,
           onSelected: (v) {
             ++_request;
             widget.onPending();
@@ -117,8 +117,7 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
             if (q.isEmpty) return;
             final match = countries.firstWhere(
               (c) =>
-                  (labels[c] ?? c).toLowerCase() == q ||
-                  c.toLowerCase() == q,
+                  (labels[c] ?? c).toLowerCase() == q || c.toLowerCase() == q,
               orElse: () => '',
             );
             if (match.isNotEmpty && match != _country) {
@@ -142,8 +141,22 @@ class _ChartLocationPickerState extends State<ChartLocationPicker> {
           initialValue: _city ?? '',
           enabled: _country != null,
           hint: _country == null ? l10n.chartLocationCountry : null,
+          allowCustom: true,
           onSelected: _resolve,
         ),
+        if (_country != null) ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(switch (Localizations.localeOf(context).languageCode) {
+              'en' =>
+                'If your city is not listed, type it and tap ✓ to search worldwide.',
+              'es' =>
+                'Si su ciudad no aparece, escríbala y pulse ✓ para buscarla.',
+              _ => 'Şehir listede yoksa adını yazıp ✓ ile dünyada aratın.',
+            }, style: TextStyle(color: FastTheme.textMuted, fontSize: 10)),
+          ),
+        ],
         if (_busy) const LinearProgressIndicator(),
         if (_error != null)
           Text(_error!, style: const TextStyle(color: Colors.redAccent)),

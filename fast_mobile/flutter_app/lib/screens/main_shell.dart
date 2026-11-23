@@ -520,20 +520,20 @@ class _MainShellState extends State<MainShell> {
                                   title: switch (Localizations.localeOf(
                                     context,
                                   ).languageCode) {
-                                    'en' => 'Ask Astrologer Fatih Asartepe',
+                                    'en' => 'Ask Fatih Asartepe',
                                     'es' => 'Pregunta a Fatih Asartepe',
-                                    _ => "Astrolog Fatih Asartepe'ye Sor",
+                                    _ => "Fatih Asartepe'ye Sor",
                                   },
-                                  titleFontSize: 15,
+                                  titleFontSize: 16,
                                   desc: switch (Localizations.localeOf(
                                     context,
                                   ).languageCode) {
                                     'en' =>
-                                      'Written answer from a real astrologer within 24 hours',
+                                      'Astrologer Fatih Asartepe replies in 24 hours',
                                     'es' =>
-                                      'Respuesta escrita de un astrólogo real en 24 horas',
+                                      'Respuesta de Fatih Asartepe en 24 horas',
                                     _ =>
-                                      '24 saat içinde gerçek astrologdan yazılı cevap',
+                                      'Astrolog Fatih Asartepe’den 24 saatte yanıt',
                                   },
                                   badge: switch (Localizations.localeOf(
                                     context,

@@ -22,6 +22,7 @@ class AstroConsultScreen extends StatefulWidget {
 class _AstroConsultScreenState extends State<AstroConsultScreen> {
   final _questionCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
+  final _birthDateCtrl = TextEditingController();
 
   String _topic = 'love';
   String? _astrologerId;
@@ -71,6 +72,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   void dispose() {
     _questionCtrl.dispose();
     _scrollCtrl.dispose();
+    _birthDateCtrl.dispose();
     super.dispose();
   }
 
@@ -126,9 +128,9 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
     if (_birthDate == null) {
       _snack(
         _t(
-          'Doğum tarihinizi seçin.',
-          'Please select your birth date.',
-          'Seleccione su fecha de nacimiento.',
+          'Doğum tarihinizi GG.AA.YYYY biçiminde yazın veya takvimden seçin.',
+          'Enter your birth date as DD.MM.YYYY or choose it from the calendar.',
+          'Escriba su fecha como DD.MM.AAAA o selecciónela en el calendario.',
         ),
       );
       return;
@@ -182,6 +184,7 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       _questionCtrl.clear();
       setState(() {
         _birthDate = null;
+        _birthDateCtrl.clear();
         _birthTime = null;
         _birthPlace = null;
         _birthLat = null;
@@ -218,6 +221,119 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   String _dateText(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
 
+  DateTime? _parseBirthDate(String value) {
+    final raw = value.trim();
+    if (raw.isEmpty) return null;
+
+    int? year;
+    int? month;
+    int? day;
+
+    final numeric = RegExp(
+      r'^(\d{1,4})[./\-\s]+(\d{1,2})[./\-\s]+(\d{1,4})$',
+    ).firstMatch(raw);
+    if (numeric != null) {
+      final a = int.tryParse(numeric.group(1)!);
+      final b = int.tryParse(numeric.group(2)!);
+      final c = int.tryParse(numeric.group(3)!);
+      if (a == null || b == null || c == null) return null;
+      if (numeric.group(1)!.length == 4) {
+        year = a;
+        month = b;
+        day = c;
+      } else {
+        day = a;
+        month = b;
+        year = c;
+      }
+    } else {
+      final words = raw
+          .toLowerCase()
+          .replaceAll(',', ' ')
+          .split(RegExp(r'\s+'))
+          .where((word) => word.isNotEmpty)
+          .toList();
+      if (words.length != 3) return null;
+      const monthNames = <String, int>{
+        'ocak': 1,
+        'january': 1,
+        'enero': 1,
+        'şubat': 2,
+        'subat': 2,
+        'february': 2,
+        'febrero': 2,
+        'mart': 3,
+        'march': 3,
+        'marzo': 3,
+        'nisan': 4,
+        'april': 4,
+        'abril': 4,
+        'mayıs': 5,
+        'mayis': 5,
+        'may': 5,
+        'mayo': 5,
+        'haziran': 6,
+        'june': 6,
+        'junio': 6,
+        'temmuz': 7,
+        'july': 7,
+        'julio': 7,
+        'ağustos': 8,
+        'agustos': 8,
+        'august': 8,
+        'agosto': 8,
+        'eylül': 9,
+        'eylul': 9,
+        'september': 9,
+        'septiembre': 9,
+        'ekim': 10,
+        'october': 10,
+        'octubre': 10,
+        'kasım': 11,
+        'kasim': 11,
+        'november': 11,
+        'noviembre': 11,
+        'aralık': 12,
+        'aralik': 12,
+        'december': 12,
+        'diciembre': 12,
+      };
+      final firstMonth = monthNames[words[0]];
+      final secondMonth = monthNames[words[1]];
+      if (firstMonth != null) {
+        month = firstMonth;
+        day = int.tryParse(words[1]);
+        year = int.tryParse(words[2]);
+      } else if (secondMonth != null) {
+        day = int.tryParse(words[0]);
+        month = secondMonth;
+        year = int.tryParse(words[2]);
+      } else {
+        return null;
+      }
+    }
+
+    if (year == null ||
+        day == null ||
+        year < 1900 ||
+        year > DateTime.now().year) {
+      return null;
+    }
+    final parsed = DateTime(year, month, day);
+    if (parsed.year != year ||
+        parsed.month != month ||
+        parsed.day != day ||
+        parsed.isAfter(DateTime.now())) {
+      return null;
+    }
+    return parsed;
+  }
+
+  void _onBirthDateChanged(String value) {
+    final parsed = _parseBirthDate(value);
+    setState(() => _birthDate = parsed);
+  }
+
   String _utcLabel(double v) {
     final sign = v < 0 ? '-' : '+';
     final abs = v.abs();
@@ -236,7 +352,10 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
       helpText: _t('Doğum tarihi', 'Birth date', 'Fecha de nacimiento'),
     );
     if (picked != null && mounted) {
-      setState(() => _birthDate = picked);
+      setState(() {
+        _birthDate = picked;
+        _birthDateCtrl.text = _dateText(picked);
+      });
     }
   }
 
@@ -594,12 +713,51 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
           Row(
             children: [
               Expanded(
-                child: _fieldBox(
-                  label: _t('Tarih', 'Date', 'Fecha'),
-                  value: _birthDate == null ? null : _dateText(_birthDate!),
-                  hint: _t('gg.aa.yyyy', 'dd.mm.yyyy', 'dd.mm.aaaa'),
-                  icon: Icons.calendar_today,
-                  onTap: _pickBirthDate,
+                child: TextField(
+                  controller: _birthDateCtrl,
+                  keyboardType: TextInputType.datetime,
+                  onChanged: _onBirthDateChanged,
+                  style: TextStyle(color: FastTheme.text, fontSize: 13),
+                  decoration: InputDecoration(
+                    labelText: _t('Doğum tarihi', 'Birth date', 'Fecha'),
+                    hintText: _t('17.07.1995', '17.07.1995', '17.07.1995'),
+                    errorText:
+                        _birthDateCtrl.text.trim().isNotEmpty &&
+                            _birthDate == null
+                        ? _t(
+                            'Tarihi kontrol edin',
+                            'Check the date',
+                            'Revise la fecha',
+                          )
+                        : null,
+                    suffixIcon: IconButton(
+                      tooltip: _t(
+                        'Takvimden seç',
+                        'Choose from calendar',
+                        'Elegir del calendario',
+                      ),
+                      onPressed: _pickBirthDate,
+                      icon: Icon(
+                        Icons.calendar_today,
+                        size: 17,
+                        color: FastTheme.accentGold,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: FastTheme.cardBg,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: FastTheme.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: FastTheme.border),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -740,6 +898,8 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
   Widget _questionCard(Map<String, dynamic> q) {
     final status = (q['status'] as String?) ?? 'pending_payment';
     final answer = (q['answer_text'] as String?)?.trim();
+    final pdfUrl = (q['answer_pdf_url'] as String?)?.trim();
+    final hasPdf = pdfUrl != null && pdfUrl.isNotEmpty;
     final rating = q['rating'] as int?;
     final created = DateTime.tryParse((q['created_at'] as String?) ?? '');
 
@@ -812,45 +972,45 @@ class _AstroConsultScreenState extends State<AstroConsultScreen> {
                 ),
               ),
             ),
-            if ((q['answer_pdf_url'] as String?) != null) ...[
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: () => _openPdf(q['answer_pdf_url'] as String),
+          ],
+          if (hasPdf) ...[
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => _openPdf(pdfUrl),
+              icon: Icon(
+                Icons.picture_as_pdf,
+                size: 18,
+                color: FastTheme.accentGold,
+              ),
+              label: Text(
+                ((q['answer_pdf_name'] as String?) ?? '').isNotEmpty
+                    ? (q['answer_pdf_name'] as String)
+                    : _t('PDF cevabı aç', 'Open PDF answer', 'Abrir PDF'),
+                style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: FastTheme.accentGold.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ],
+          if (answer != null && answer.isNotEmpty && rating == null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => _rateDialog(q['id'] as String),
                 icon: Icon(
-                  Icons.picture_as_pdf,
+                  Icons.star_outline,
                   size: 18,
                   color: FastTheme.accentGold,
                 ),
                 label: Text(
-                  ((q['answer_pdf_name'] as String?) ?? '').isNotEmpty
-                      ? (q['answer_pdf_name'] as String)
-                      : _t('PDF cevabı aç', 'Open PDF answer', 'Abrir PDF'),
-                  style: TextStyle(color: FastTheme.accentGold, fontSize: 12),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: FastTheme.accentGold.withValues(alpha: 0.5),
-                  ),
+                  _t('Puanla', 'Rate', 'Calificar'),
+                  style: TextStyle(color: FastTheme.accentGold),
                 ),
               ),
-            ],
-            if (rating == null)
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: () => _rateDialog(q['id'] as String),
-                  icon: Icon(
-                    Icons.star_outline,
-                    size: 18,
-                    color: FastTheme.accentGold,
-                  ),
-                  label: Text(
-                    _t('Puanla', 'Rate', 'Calificar'),
-                    style: TextStyle(color: FastTheme.accentGold),
-                  ),
-                ),
-              ),
-          ],
+            ),
         ],
       ),
     );
