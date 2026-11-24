@@ -65,7 +65,17 @@ class RevenueCatService {
   }
 
   static Future<void> init() async {
-    const key = String.fromEnvironment('REVENUECAT_API_KEY', defaultValue: '');
+    const androidKey = String.fromEnvironment(
+      'REVENUECAT_API_KEY',
+      defaultValue: '',
+    );
+    const iosKey = String.fromEnvironment(
+      'REVENUECAT_API_KEY_IOS',
+      defaultValue: '',
+    );
+    final key = defaultTargetPlatform == TargetPlatform.iOS
+        ? (iosKey.isNotEmpty ? iosKey : androidKey)
+        : androidKey;
     if (key.isEmpty) {
       if (kDebugMode) print('[RC] API key yok — iskelet mod (mock)');
       return;

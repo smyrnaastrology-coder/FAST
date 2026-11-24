@@ -9351,7 +9351,12 @@ def verify_astro_question_payment(
         for txn in transactions:
             txn = txn or {}
             store = str(txn.get("store") or "").lower()
-            if store and store not in ("play_store", "playstore"):
+            if store and store not in (
+                "play_store",
+                "playstore",
+                "app_store",
+                "appstore",
+            ):
                 continue
             candidate = str(
                 txn.get("store_transaction_id") or txn.get("id") or ""
@@ -9406,7 +9411,12 @@ def verify_astro_question_payment(
     for txn in transactions:
         txn = txn or {}
         store = str(txn.get("store") or "").lower()
-        if store and store not in ("play_store", "playstore"):
+        if store and store not in (
+            "play_store",
+            "playstore",
+            "app_store",
+            "appstore",
+        ):
             continue
         candidate = str(
             txn.get("store_transaction_id") or txn.get("id") or ""

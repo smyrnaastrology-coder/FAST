@@ -9,9 +9,18 @@ import '../widgets/brand_icons.dart';
 
 /// Giriş / kayıt ekranı. [force] true ise kapanamaz (paywall akışı).
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, this.force = false, this.onSignedIn});
+  const AuthScreen({
+    super.key,
+    this.force = false,
+    this.onSignedIn,
+    this.showOauth = true,
+  });
 
   final bool force;
+
+  /// iOS danışmanlık sürümünde Google/Facebook gizlenir; App Store kuralı
+  /// 4.8 gereği üçüncü taraf giriş sunulmuyorsa Apple girişi de gerekmez.
+  final bool showOauth;
   final VoidCallback? onSignedIn;
 
   @override
@@ -228,6 +237,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 16),
                 if (!_awaitingVerification)
                   _goldButton(_isSignup ? l10n.signupButton : l10n.loginButton, () => _submit(context.read<AuthProvider>()), busy: _busy),
+                if (widget.showOauth) ...[
                 const SizedBox(height: 20),
                 Row(
                   children: [
@@ -243,6 +253,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 _oauthButton(Icons.g_mobiledata, l10n.loginGoogle, () => _oauth(() => context.read<AuthProvider>().signInWithGoogle()), leading: const GoogleLogo(size: 20)),
                 const SizedBox(height: 10),
                 _oauthButton(Icons.facebook_outlined, l10n.loginFacebook, () => _oauth(() => context.read<AuthProvider>().signInWithFacebook())),
+                ],
                 const SizedBox(height: 16),
                 if (!widget.force)
                   TextButton(
