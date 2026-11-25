@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Holavon Horary</string>
+	<string>Holavon</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -71,13 +71,13 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is used to cast a Horary chart for your question. It is accessed only while you use the app.</string>
+	<string>Your location is used only to calculate the chart for the question you submit. It is accessed only while you use the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Your location is used only to cast a Horary chart when you ask a question; it is not used in the background.</string>
+	<string>Your location is used only to calculate the chart for your question; it is not used in the background.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The microphone lets you dictate a Horary question. Audio is transcribed on your device and is not uploaded.</string>
+	<string>The microphone lets you dictate your question. Audio is transcribed on your device and is not uploaded.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Speech recognition converts your spoken Horary question into text on your device.</string>
+	<string>Speech recognition converts your spoken question into text on your device.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

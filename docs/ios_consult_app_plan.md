@@ -27,6 +27,13 @@ Danışmanlık akışı dışındaki içerik ekranları bu sürümde yok.
 
 ## 2. Derleme
 
+**Codemagic (önerilen):** depo kökündeki `codemagic.yaml` → `ios-consult`
+workflow'u. Mevcut `holavon_appstore` entegrasyonunu ve `holavon_ios` değişken
+grubunu kullanır; panelde ek kurulum gerekmez. Sadece `IOS_BUILD_NUMBER`
+değerini her yüklemede artırın.
+
+Elle derleme (Mac varsa):
+
 ```powershell
 flutter build ipa -t lib/main_consult.dart `
   --dart-define=SUPABASE_URL=... `
