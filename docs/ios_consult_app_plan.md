@@ -41,6 +41,9 @@ flutter build ipa -t lib/main_consult.dart `
 
 ## 3. App Store Connect hazırlığı
 
+Ad, alt başlık, açıklama, anahtar kelimeler, IAP alanları ve İngilizce review
+notes için hazır metinler: `docs/app_store_metinleri.md`.
+
 1. **Uygulama kaydı**: Mevcut (reddedilen) kayıt kullanılır; yeni bundle ID açılmaz.
 2. **Uygulama adı**: "Holavon — Uzman Danışmanlık" gibi hizmet odaklı ad.
    Alt başlık: "24 saatte yazılı uzman cevabı" (burç/horoscope kelimesi yok).
