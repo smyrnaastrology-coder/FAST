@@ -6,6 +6,8 @@ import '../services/astro_consult_service.dart';
 import '../services/revenuecat_service.dart';
 import 'astro_consult_screen.dart';
 import 'consult_account_screen.dart';
+import 'consult_expert_screen.dart';
+import 'consult_sample_screen.dart';
 
 /// Danışmanlık odaklı iOS sürümünün ana ekranı.
 ///
@@ -46,6 +48,8 @@ class ConsultHomeScreen extends StatelessWidget {
             _header(context),
             const SizedBox(height: 20),
             _expertCard(context),
+            const SizedBox(height: 10),
+            _expertLinks(context),
             const SizedBox(height: 16),
             _priceCard(context, priceText),
             const SizedBox(height: 24),
@@ -196,6 +200,65 @@ class ConsultHomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _expertLinks(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ConsultExpertScreen()),
+            ),
+            icon: Icon(
+              Icons.person_outline,
+              size: 15,
+              color: FastTheme.accentGold,
+            ),
+            label: Text(
+              _t(
+                context,
+                'Uzmanı tanıyın',
+                'Meet the expert',
+                'Conozca al experto',
+              ),
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: FastTheme.border),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ConsultSampleScreen()),
+            ),
+            icon: Icon(
+              Icons.picture_as_pdf_outlined,
+              size: 15,
+              color: FastTheme.accentGold,
+            ),
+            label: Text(
+              _t(context, 'Örnek dosya', 'Sample report', 'Informe de ejemplo'),
+              style: TextStyle(color: FastTheme.textMuted, fontSize: 11),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: FastTheme.border),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
