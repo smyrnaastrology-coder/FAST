@@ -15,9 +15,9 @@ Sürüm: ilk danışmanlık gönderimi · Build: `lib/main_consult.dart` · Tari
 | Ad (30) | tr | `Holavon: Uzman Danışmanlık` | 26 |
 | Ad (30) | en | `Holavon: Expert Consultation` | 28 |
 | Ad (30) | es | `Holavon: Consulta Experta` | 25 |
-| Alt başlık (30) | tr | `24 saatte yazılı uzman cevabı` | 29 |
-| Alt başlık (30) | en | `Expert answer in 24 hours` | 24 |
-| Alt başlık (30) | es | `Respuesta experta en 24 horas` | 28 |
+| Alt başlık (30) | tr | `Horary · 24 saatte cevap` | 25 |
+| Alt başlık (30) | en | `Horary · answers in 24 hours` | 26 |
+| Alt başlık (30) | es | `Astrología horaria · 24 h` | 25 |
 | Tanıtım (170) | tr | `Tek soru, tek ücret, abonelik yok. Ödemeden sonra 24 saat içinde uzmandan yazılı cevap; dosyanız PDF olarak hesabınızda kalır.` | 132 |
 | Tanıtım (170) | en | `One question, one fee, no subscription. Within 24 hours of payment you get a written answer from the expert, and the PDF report stays in your account.` | 147 |
 | Tanıtım (170) | es | `Una pregunta, un pago, sin suscripción. En 24 horas tras el pago recibes la respuesta escrita del experto y el informe PDF queda en tu cuenta.` | 140 |
@@ -26,9 +26,12 @@ Sürüm: ilk danışmanlık gönderimi · Build: `lib/main_consult.dart` · Tari
 - `Holavon: Astrolog Danışmanlık` (28) — "astrolog" aramasında görünürlük artar, riski hâlâ düşük.
 - `Holavon Danışmanlık` (19) — en nötr seçenek; marka adı öne çıkar.
 
-> Karar: **"Horary" kelimesi addan tamamen çıkarıldı.** Apple'ın 24.11.2026 reddinde
-> uygulama adı "Holavon: Horary Oracle" idi; ad değişmezse yeni build tek başına
-> yeterli olmaz.
+> Karar: **"Horary" addan çıkarıldı, üründe kaldı.** Apple'ın 24.11.2026
+> reddinde uygulama adı "Holavon: Horary Oracle" idi; ad değişmezse yeni build tek
+> başına yeterli olmaz. Bu yüzden mağaza adı "danışmanlık" ekseninde; "horary"
+> alt başlıkta, anahtar kelimelerde, açıklamada ve uygulama içinde (uzman kartında
+> ince bir satır + uzman profili) görünüyor. Alt başlık alternatifi:
+> `24 saatte yazılı uzman cevabı` (29) — horary hiç görünmez, dönüşüm odaklı.
 
 ---
 
@@ -39,6 +42,8 @@ Sürüm: ilk danışmanlık gönderimi · Build: `lib/main_consult.dart` · Tari
 ```
 Holavon, tek bir uzmandan yazılı danışmanlık hizmetidir. Burç yorumu ya da otomatik
 rapor üretmez: sorunuzu gerçek bir astrolog okur ve size özel yazılı cevap hazırlar.
+Danışmanlık formatı klasik horary (soru astrolojisi) geleneğindeki gibi tek soruya
+odaklanır: tek soru, tek konu, doğrudan cevap.
 
 NASIL İŞLİYOR
 1. Sorunuzu yazın (aşk, kariyer, aile, sağlık, kayıp, diğer).
@@ -75,7 +80,9 @@ Holavon bir tıbbi, hukuki veya finansal danışmanlık hizmeti değildir.
 ```
 Holavon is a written consultation service with one real practitioner. It does not
 generate horoscopes or automated reports: your question is read by a professional
-astrologer and answered in writing, for you specifically.
+astrologer and answered in writing, for you specifically. The format follows the
+classical horary tradition of one question at a time: one question, one subject,
+a direct answer.
 
 HOW IT WORKS
 1. Write your question (love, career, family, health, loss, other).
@@ -112,7 +119,8 @@ Holavon is not medical, legal or financial advice.
 ```
 Holavon es un servicio de consulta escrita con un profesional real. No genera
 horóscopos ni informes automáticos: un astrólogo profesional lee su pregunta y
-responde por escrito, de forma personalizada.
+responde por escrito, de forma personalizada. El formato sigue la tradición clásica
+de la astrología horaria: una pregunta, un tema, una respuesta directa.
 
 CÓMO FUNCIONA
 1. Escriba su pregunta (amor, trabajo, familia, salud, pérdida, otros).
@@ -149,13 +157,14 @@ Holavon no es asesoramiento médico, legal ni financiero.
 
 | Dil | Metin | Karakter |
 |---|---|---|
-| tr | `astrolog,danışmanlık,uzman,yazılı cevap,soru sor,danışman,öngörü` | 67 |
-| en | `astrologer,consultation,expert,written answer,ask a question,advisor,guidance` | 77 |
-| es | `astrologo,consulta,experto,respuesta escrita,pregunta,asesor,orientacion` | 72 |
+| tr | `astrolog,danışmanlık,uzman,yazılı cevap,soru sor,horary,soru astrolojisi` | 72 |
+| en | `astrologer,consultation,expert,written answer,ask a question,horary,guidance` | 82 |
+| es | `astrologo,consulta,experto,respuesta escrita,pregunta,horaria,orientacion` | 79 |
 
-`doğum haritası`, `burç`, `horoscope`, `horary` kelimeleri **bilinçli olarak
-dışarıda**. Gerekirse `burç yorumu` tek başına eklenebilir; ancak ilk gönderimde
-kategori sinyalini bulanıklaştırmamak için eklenmedi.
+`doğum haritası`, `burç`, `horoscope` kelimeleri **bilinçli olarak dışarıda**.
+`horary` / `horaria` eklendi: ad ve alt başlıkta iddia olarak görünmez, yalnızca
+aramada bulunurluk sağlar. Gerekirse `burç yorumu` tek başına eklenebilir; ancak
+kategori sinyalini bulanıklaştırmamak için ilk gönderimde eklenmedi.
 
 ---
 
@@ -186,9 +195,9 @@ kategori sinyalini bulanıklaştırmamak için eklenmedi.
 | Görünen ad (tr) | `Tek soru danışmanlık` |
 | Görünen ad (en) | `Single question consultation` |
 | Görünen ad (es) | `Consulta de una pregunta` |
-| Açıklama (tr) | `Uzman astrologdan 24 saat içinde yazılı cevap ve PDF dosya.` |
-| Açıklama (en) | `Written answer from a professional astrologer within 24 hours, plus a PDF report.` |
-| Açıklama (es) | `Respuesta escrita de un astrólogo profesional en 24 horas, con informe PDF.` |
+| Açıklama (tr) | `24 saatte yazılı cevap ve PDF rapor.` (45 karakter sınırı) |
+| Açıklama (en) | `Written answer and PDF report in 24 hours.` |
+| Açıklama (es) | `Respuesta escrita y PDF en 24 horas.` |
 | Review screenshot | `astro_consult_screen` ödeme ekranı görüntüsü (zorunlu) |
 
 ---
@@ -275,7 +284,9 @@ CONTACT
 ## 7. Gönderim öncesi kontrol listesi
 
 - [ ] App Store Connect'te uygulama adı "Holavon: Uzman Danışmanlık" olarak değiştirildi
-- [ ] Alt başlık ve tanıtım metni girildi (3 dil)
+- [ ] Alt başlık `Horary · 24 saatte cevap` / `Horary · answers in 24 hours` / `Astrología horaria · 24 h` girildi
+- [ ] `astrologers.headline` Supabase'de "Astroloji danışmanı · Horary ve matematiksel sinastri" yapıldı
+- [ ] Eski 4 IAP (horary kredileri + pdf_single) sürümden çıkarıldı, mümkünse silindi
 - [ ] Açıklama ve anahtar kelimeler girildi (3 dil)
 - [ ] `sor_tek` consumable ürünü "Ready to Submit" durumunda + review screenshot yüklendi
 - [ ] RevenueCat iOS uygulaması eklendi, `sor_tek` offering'e bağlandı
