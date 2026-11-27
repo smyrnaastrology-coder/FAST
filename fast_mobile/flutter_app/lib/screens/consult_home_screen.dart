@@ -144,6 +144,20 @@ class ConsultHomeScreen extends StatelessWidget {
                     Text(
                       _t(
                         context,
+                        'Klasik horary · tek soru',
+                        'Classical horary · one question',
+                        'Astrología horaria clásica · una pregunta',
+                      ),
+                      style: TextStyle(
+                        color: FastTheme.accentGold.withValues(alpha: 0.85),
+                        fontSize: 10,
+                        letterSpacing: 0.7,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _t(
+                        context,
                         'Astrolog · Birebir yazılı danışmanlık',
                         'Astrologer · One-to-one written consultation',
                         'Astrólogo · Consulta escrita individual',
