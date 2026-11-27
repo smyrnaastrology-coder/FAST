@@ -137,7 +137,7 @@ workflows:
       vars:
         BUNDLE_ID: com.fastastrology.fastApp
         PROJECT_PATH: fast_mobile/flutter_app
-        IOS_BUILD_NUMBER: "100"
+        IOS_BUILD_NUMBER: "101"
       flutter: 3.44.8
       xcode: latest
       cocoapods: default
