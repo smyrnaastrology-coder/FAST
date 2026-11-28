@@ -205,8 +205,44 @@ class RevenueCatService {
         if (pkg != null) break;
       }
       if (pkg == null) {
-        if (kDebugMode) print('[RC] consumable not found: $productId');
-        return null;
+        // Consumables are not always attached to an offering; fall back to
+        // fetching the store product directly so the purchase can still run.
+        StoreProduct? direct;
+        try {
+          final products = await Purchases.getProducts([productId]);
+          if (products.isNotEmpty) direct = products.first;
+        } catch (e) {
+          if (kDebugMode) print('[RC] getProducts err $e');
+        }
+        if (direct == null) {
+          if (kDebugMode) print('[RC] consumable not found: $productId');
+          return null;
+        }
+        final beforeDirect = await Purchases.getCustomerInfo();
+        final previousDirect = beforeDirect.nonSubscriptionTransactions
+            .where((t) => _matchesProduct(t.productIdentifier, productId))
+            .map((t) => t.transactionIdentifier)
+            .where((id) => id.isNotEmpty)
+            .toSet();
+        final directResult = await Purchases.purchase(
+          PurchaseParams.storeProduct(direct),
+        );
+        lastConsumablePurchaseSucceeded = true;
+        final directMatching =
+            directResult.customerInfo.nonSubscriptionTransactions
+                .where((t) => _matchesProduct(t.productIdentifier, productId))
+                .toList()
+              ..sort((a, b) => b.purchaseDate.compareTo(a.purchaseDate));
+        for (final transaction in directMatching) {
+          if (transaction.transactionIdentifier.isNotEmpty &&
+              !previousDirect.contains(transaction.transactionIdentifier)) {
+            return transaction.transactionIdentifier;
+          }
+        }
+        return directMatching.isNotEmpty &&
+                directMatching.first.transactionIdentifier.isNotEmpty
+            ? directMatching.first.transactionIdentifier
+            : null;
       }
 
       final before = await Purchases.getCustomerInfo();
