@@ -12,9 +12,9 @@ Sürüm: ilk danışmanlık gönderimi · Build: `lib/main_consult.dart` · Tari
 
 | Alan | Dil | Metin | Karakter |
 |---|---|---|---|
-| Ad (30) | tr | `Holavon: Uzman Danışmanlık` | 26 |
-| Ad (30) | en | `Holavon: Expert Consultation` | 28 |
-| Ad (30) | es | `Holavon: Consulta Experta` | 25 |
+| Ad (30) | tr | `Holavon: Danışmanlık & Horary` | 29 |
+| Ad (30) | en | `Holavon: Consultation & Horary` | 30 |
+| Ad (30) | es | `Holavon: Consulta y Horaria` | 27 |
 | Alt başlık (30) | tr | `Horary · 24 saatte cevap` | 25 |
 | Alt başlık (30) | en | `Horary · answers in 24 hours` | 26 |
 | Alt başlık (30) | es | `Astrología horaria · 24 h` | 25 |
@@ -283,7 +283,7 @@ CONTACT
 
 ## 7. Gönderim öncesi kontrol listesi
 
-- [ ] App Store Connect'te uygulama adı "Holavon: Uzman Danışmanlık" olarak değiştirildi
+- [ ] App Store Connect'te uygulama adı `Holavon: Danışmanlık & Horary` (EN: `Holavon: Consultation & Horary`, ES: `Holavon: Consulta y Horaria`) olarak değiştirildi
 - [ ] Alt başlık `Horary · 24 saatte cevap` / `Horary · answers in 24 hours` / `Astrología horaria · 24 h` girildi
 - [ ] `astrologers.headline` Supabase'de "Astroloji danışmanı · Horary ve matematiksel sinastri" yapıldı
 - [ ] Eski 4 IAP (horary kredileri + pdf_single) sürümden çıkarıldı, mümkünse silindi
